@@ -20,6 +20,7 @@
  */
 
 namespace oat\taoProctoring\controller;
+use oat\generisHard\models\hardapi\Exception;
 
 /**
  * Sample controller
@@ -39,10 +40,85 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
 
     /**
+     * Gets the list of available deliveries
+     * @return array
+     */
+    private function getDeliveries() {
+        /* --- Mock data --- */
+        return array(
+            'delivery-1' => array(
+                'uri' => 'delivery-1',
+                'label' => 'test A for classroom XYZ',
+                'disabled' => false
+            ),
+            'delivery-2' => array(
+                'uri' => 'delivery-2',
+                'label' => 'test B for classroom XYZ',
+                'disabled' => false
+            ),
+            'delivery-3' => array(
+                'uri' => 'delivery-3',
+                'label' => 'test C for classroom XYZ',
+                'disabled' => true
+            ),
+        );
+        /* --- End of mock data --- */
+    }
+
+    /**
+     * Gets a delivery by its URI
+     * @param string $uri
+     * @return array
+     */
+    private function getDelivery($uri) {
+        $deliveries = $this->getDeliveries();
+        return isset($deliveries[$uri]) ? $deliveries[$uri] : null;
+    }
+
+    /**
      * A possible entry point to tao
      */
     public function index() {
-        $this->setData('author', 'Open Assessment Technologies SA');
+        $deliveries = $this->getDeliveries();
+        
+        $this->setData('deliveries', $deliveries);
+        
         $this->setView('TaoProctoring/index.tpl');
+    }
+    
+    /**
+     * Manage a delivery
+     */
+    public function delivery() {
+        $uri = $this->getRequestParameter('uri');
+        $delivery = $this->getDelivery($uri);
+        
+        if (!$delivery) {
+            throw new Exception('Unknown delivery!');
+        }
+
+        $this->setData('breadcrumbs', array(
+            array(
+                'id' => 'home',
+                'url' => _url('index', 'TaoProctoring'),
+                'label' => __('Home'),
+            ),
+            array(
+                'id' => 'manageDelivery',
+                'label' => __('Manage Delivery'),
+                'data' => $delivery['label'],
+            ),
+        ));
+        $this->setData('delivery', $delivery);
+
+        $this->setView('TaoProctoring/delivery.tpl');
+    }
+
+    /**
+     * Just logout the user
+     */
+    public function logout(){
+        \common_session_SessionManager::endSession();
+        $this->redirect(ROOT_URL);
     }
 }

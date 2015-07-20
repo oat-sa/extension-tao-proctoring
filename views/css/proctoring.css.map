@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAEI,qCAAoB,CAChB,KAAK,CAAE,KAAK,CACZ,MAAM,CAAE,IAAI,CACZ,wCAAG,CACC,WAAW,CCGT,qDAAgB,CC0KtB,SAAS,CAAE,IAAc,CACzB,SAAS,CAAE,MAAoB,CF5K3B,WAAW,CAAE,MAAM,CAEvB,wCAAG,CACC,WAAW,CCFT,qDAAgB,CC0KtB,SAAS,CAAE,IAAc,CACzB,SAAS,CAAE,MAAoB,CFvK3B,MAAM,CAAE,WAAW,CAEvB,sDAAiB,CACb,UAAU,CAAE,CAAC",
+"sources": ["../scss/proctoring.scss","../../../tao/views/scss/inc/_variables.scss","../../../tao/views/scss/inc/_functions.scss"],
+"names": [],
+"file": "proctoring.css"
+}
