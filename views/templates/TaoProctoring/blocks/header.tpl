@@ -45,7 +45,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
                     </li>
                     <li class="infoControl sep-before">
                         <span class="a">
-                            <span class="icon-test-taker"></span>
+                            <span class="icon-user"></span>
                             <span><?= get_data('userLabel'); ?></span>
                         </span>
                     </li>

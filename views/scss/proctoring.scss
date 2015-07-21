@@ -1,5 +1,21 @@
 @import "inc/bootstrap";
 .proctoring-scope {
+    .breadcrumbs {
+        padding: 8px;
+        margin: 0;
+        list-style: none;
+
+        li {
+            display: inline-block;
+        }
+
+        li:not(:first-child):before {
+            @include tao-icon-setup;
+            @include icon-right();
+            padding: 0 4px 0 8px;
+        }
+    }
+
     .deliveries-listing {
         width: 500px;
         margin: auto;
@@ -19,6 +35,12 @@
     }
 
     .delivery-manager {
+        width: 800px;
+        margin: auto;
 
+        .message {
+            padding: 8px;
+            text-align: center;
+        }
     }
 }
