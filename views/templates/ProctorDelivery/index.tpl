@@ -2,9 +2,10 @@
 use oat\tao\helpers\Template;
 
 print Template::inc('TaoProctoring/blocks/header.tpl');
-print Template::inc('TaoProctoring/blocks/breadcrumbs.tpl', 'TaoProctoring');
+print Template::inc('TaoProctoring/blocks/breadcrumbs.tpl');
 ?>
 <div class="delivery-manager">
+    <h1><?= get_data('delivery')->getLabel() ?></h1>
     <aside class="action-bar">
         <button class="small assign"><span class="icon icon-add"></span><?= __('Add test taker'); ?></button>
     </aside>

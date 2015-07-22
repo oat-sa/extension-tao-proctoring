@@ -12,10 +12,10 @@ print Template::inc('TaoProctoring/blocks/header.tpl');
     </h2>
     <ul class="entry-point-box plain">
         <?php foreach ($deliveries as $delivery) : ?>
-        <?php $url = empty($delivery['disabled']) ? _url('delivery', 'TaoProctoring', null, array('uri' => $delivery['uri'])) : '#'?>
+        <?php $url = _url('index', 'ProctorDelivery', null, array('id' => $delivery->getId())) ?>
         <li>
-            <a class="block entry-point<?= !empty($delivery['disabled']) ? ' disabled' : '' ?>" href="<?= $url ?>">
-            <h3><?= _dh($delivery['label']) ?></h3>
+            <a class="block entry-point" href="<?= $url ?>">
+            <h3><?= _dh($delivery->getLabel()) ?></h3>
 
             <div class="clearfix">
                 <span class="text-link" href="<?= $url ?>"><span class="icon-play"></span> <?= __('Manage') ?> </span>
