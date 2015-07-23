@@ -1,0 +1,62 @@
+<?php
+use oat\tao\helpers\Template;
+use oat\tao\helpers\Layout;
+
+$releaseMsgData = Layout::getReleaseMsgData();
+?><!doctype html>
+<html class="no-js no-version-warning" lang="<?=tao_helpers_I18n::getLangCode()?>">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?php echo __("TAO - An Open and Versatile Computer-Based Assessment Platform"); ?></title>
+    <link rel="stylesheet" href="<?= Template::css('tao-main-style.css', 'tao')?>"/>
+    <link rel="stylesheet" href="<?= Template::css('tao-3.css', 'tao')?>"/>
+    <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
+    <link rel="shortcut icon" href="<?= Template::img('favicon.ico', 'tao')?>"/>
+
+    <?php if (($themeUrl = Layout::getThemeUrl()) !== null): ?>
+        <link rel="stylesheet" href="<?= $themeUrl ?>" />
+    <?php endif; ?>
+</head>
+<body class="proctoring-scope">
+<!-- content wrap -->
+<div class="content-wrap">
+    <header class="dark-bar clearfix">
+        <a href="<?= $releaseMsgData['link'] ?>" title="<?=$releaseMsgData['msg'] ?>" class="lft" target="_blank">
+            <img src="<?= $releaseMsgData['logo']?>" alt="<?= $releaseMsgData['branding']?> Logo" id="tao-main-logo">
+        </a>
+        <div class="lft title-box"></div>
+        <nav class="rgt">
+            <!-- snippet: dark bar left menu -->
+
+            <div class="settings-menu">
+                <!-- Hamburger -->
+                <span class="reduced-menu-trigger">
+                    <span class="icon-mobile-menu"></span>
+                    <?= __('More')?>
+                </span>
+
+                <ul class="clearfix plain">
+                    <li data-control="home">
+                        <a id="home" href="<?=_url('index', 'TaoProctoring')?>">
+                            <span class="icon-home"></span>
+                        </a>
+                    </li>
+                    <li class="infoControl sep-before">
+                        <span class="a">
+                            <span class="icon-user"></span>
+                            <span><?= get_data('userLabel'); ?></span>
+                        </span>
+                    </li>
+                    <li class="infoControl sep-before" data-control="logout">
+                        <a id="logout" class="" href="<?=_url('logout', 'TaoProctoring')?>">
+                            <span class="icon-logout"></span>
+                            <span class="text"><?= __("Logout"); ?></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="feedback-box"></div>

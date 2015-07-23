@@ -18,11 +18,8 @@
  *               
  * 
  */
-namespace oat\taoProctoring\controller;
 
-use oat\generisHard\models\hardapi\Exception;
-use \common_session_SessionManager;
-use oat\oatbox\service\ServiceNotFoundException;
+namespace oat\taoProctoring\controller;
 
 /**
  * Sample controller
@@ -32,52 +29,50 @@ use oat\oatbox\service\ServiceNotFoundException;
  * @license GPL-2.0
  *
  */
-class TaoProctoring extends \tao_actions_CommonModule {
+class ProctorDelivery extends \tao_actions_CommonModule {
 
     /**
-     * initialize the services
-     */
-    public function __construct(){
-        parent::__construct();
-    }
-
-    /**
-     * Gets a delivery by its URI
-     * @param string $uri
-     * @return array
-     */
-    private function getDelivery($uri) {
-        $deliveries = $this->getDeliveries();
-        return isset($deliveries[$uri]) ? $deliveries[$uri] : null;
-    }
-
-    /**
-     * A possible entry point to tao
+     * Views a delivery
      */
     public function index() {
-        //$deliveries = $this->getDeliveries();
-        try {
         
+        $deliveryId = $this->getRequestParameter('id');
+        
+        try {
+
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
             $currentUser = \common_session_SessionManager::getSession()->getUser();
             
-            $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+            $delivery = $deliveryService->getDelivery($deliveryId);
+
+            if (!$delivery) {
+                throw new Exception('Unknown delivery!');
+            }
             
-            $this->setData('deliveries', $deliveries);
+            $this->setData('breadcrumbs', array(
+                array(
+                    'id' => 'home',
+                    'url' => _url('index', 'TaoProctoring'),
+                    'label' => __('Home'),
+                ),
+                array(
+                    'id' => 'manageDelivery',
+                    'label' => __('Manage Delivery'),
+                    'data' => $delivery->getLabel('label'),
+                ),
+            ));
+            $this->setData('delivery', $delivery);
             
-            $this->setView('TaoProctoring/index.tpl');
+            $this->setView('ProctorDelivery/index.tpl');
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
-        
     }
-
-    /**
-     * Just logout the user
-     */
-    public function logout(){
-        \common_session_SessionManager::endSession();
-        $this->redirect(ROOT_URL);
+    
+    public function assign() {
+        $deliveryId = $this->getRequestParameter('id');
+        $testTaker = $this->getRequestParameter('tt');
     }
+    
 }
