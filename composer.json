@@ -21,8 +21,7 @@
     },
     "minimum-stability" : "dev",
     "require": {
-        "oat-sa/oatbox-extension-installer": "dev-master",
-        "oat-sa/extension-tao-frontoffice" : "dev-develop"
+        "oat-sa/oatbox-extension-installer": "dev-master"
     },
     "autoload" : {
         "psr-4" : {
