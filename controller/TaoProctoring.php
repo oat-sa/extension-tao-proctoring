@@ -39,23 +39,16 @@ class TaoProctoring extends \tao_actions_CommonModule {
      */
     public function __construct(){
         parent::__construct();
-    }
 
-    /**
-     * Gets a delivery by its URI
-     * @param string $uri
-     * @return array
-     */
-    private function getDelivery($uri) {
-        $deliveries = $this->getDeliveries();
-        return isset($deliveries[$uri]) ? $deliveries[$uri] : null;
+        $this->defaultData();
+        $this->setData('clientConfigUrl',$this->getClientConfigUrl());
     }
 
     /**
      * A possible entry point to tao
      */
     public function index() {
-        //$deliveries = $this->getDeliveries();
+
         try {
         
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
@@ -64,7 +57,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
             $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
             
             $this->setData('deliveries', $deliveries);
-            
+
             $this->setView('TaoProctoring/index.tpl');
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');

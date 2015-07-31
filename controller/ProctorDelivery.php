@@ -32,6 +32,16 @@ namespace oat\taoProctoring\controller;
 class ProctorDelivery extends \tao_actions_CommonModule {
 
     /**
+     * initialize the services
+     */
+    public function __construct(){
+        parent::__construct();
+
+        $this->defaultData();
+        $this->setData('clientConfigUrl',$this->getClientConfigUrl());
+    }
+
+    /**
      * Views a delivery
      */
     public function index() {
@@ -62,6 +72,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
                 ),
             ));
             $this->setData('delivery', $delivery);
+            $this->setData('clientConfigUrl',$this->getClientConfigUrl());
             
             $this->setView('ProctorDelivery/index.tpl');
         } catch (ServiceNotFoundException $e) {

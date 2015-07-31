@@ -1,7 +1,7 @@
 <?php
 use oat\tao\helpers\Template;
 
-print Template::inc('TaoProctoring/blocks/header.tpl');
+print Template::inc('blocks/header.tpl');
 ?>
 <div class="deliveries-listing">
     <h1><?= __("My Deliveries"); ?></h1>
@@ -26,4 +26,4 @@ print Template::inc('TaoProctoring/blocks/header.tpl');
     </ul>
     <?php endif; ?>
 </div>
-<?= Template::inc('TaoProctoring/blocks/footer.tpl'); ?>
+<?= Template::inc('blocks/footer.tpl'); ?>

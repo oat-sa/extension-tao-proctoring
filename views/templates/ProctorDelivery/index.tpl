@@ -1,8 +1,8 @@
 <?php
 use oat\tao\helpers\Template;
 
-print Template::inc('TaoProctoring/blocks/header.tpl');
-print Template::inc('TaoProctoring/blocks/breadcrumbs.tpl');
+print Template::inc('blocks/header.tpl');
+print Template::inc('blocks/breadcrumbs.tpl');
 ?>
 <div class="delivery-manager">
     <h1><?= get_data('delivery')->getLabel() ?></h1>
@@ -61,4 +61,4 @@ print Template::inc('TaoProctoring/blocks/breadcrumbs.tpl');
         </div>
     </section>
 </div>
-<?= Template::inc('TaoProctoring/blocks/footer.tpl'); ?>
+<?= Template::inc('blocks/footer.tpl'); ?>

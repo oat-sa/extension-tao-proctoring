@@ -9,15 +9,16 @@ $releaseMsgData = Layout::getReleaseMsgData();
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo __("TAO - An Open and Versatile Computer-Based Assessment Platform"); ?></title>
-    <link rel="stylesheet" href="<?= Template::css('tao-main-style.css', 'tao')?>"/>
-    <link rel="stylesheet" href="<?= Template::css('tao-3.css', 'tao')?>"/>
+    <title><?= Layout::getTitle() ?></title>
+<?= tao_helpers_Scriptloader::render() ?>
     <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
-    <link rel="shortcut icon" href="<?= Template::img('favicon.ico', 'tao')?>"/>
+<?php if (($themeUrl = Layout::getThemeUrl()) !== null): ?>
+    <link rel="stylesheet" href="<?= $themeUrl ?>" />
+<?php endif; ?>
+    <link rel="shortcut icon" href="<?= Template::img('img/favicon.ico') ?>"/>
+    <script src="<?= Template::js('lib/modernizr-2.8/modernizr.js', 'tao') ?>"></script>
+    <?= Layout::getAmdLoader() ?>
 
-    <?php if (($themeUrl = Layout::getThemeUrl()) !== null): ?>
-        <link rel="stylesheet" href="<?= $themeUrl ?>" />
-    <?php endif; ?>
 </head>
 <body class="proctoring-scope">
 <!-- content wrap -->
