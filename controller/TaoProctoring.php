@@ -35,16 +35,6 @@ use oat\oatbox\service\ServiceNotFoundException;
 class TaoProctoring extends \tao_actions_CommonModule {
 
     /**
-     * initialize the services
-     */
-    public function __construct(){
-        parent::__construct();
-
-        $this->defaultData();
-        $this->setData('clientConfigUrl',$this->getClientConfigUrl());
-    }
-
-    /**
      * Gets a list of available deliveries
      *
      * @return array
@@ -75,7 +65,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
 
     /**
-     * A possible entry point to tao
+     * Displays the index page of the extension: list all available deliveries.
      */
     public function index() {
 
@@ -83,9 +73,12 @@ class TaoProctoring extends \tao_actions_CommonModule {
 
             $deliveries = $this->getDeliveries();
 
+            $this->defaultData();
+            $this->setData('clientConfigUrl', $this->getClientConfigUrl());
             $this->setData('deliveries', $deliveries);
+            $this->setData('template', 'TaoProctoring/index.tpl');
 
-            $this->setView('TaoProctoring/index.tpl');
+            $this->setView('layout.tpl');
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -95,7 +88,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
 
     /**
-     * A possible entry point to tao
+     * Gets the available deliveries using JSON format
      */
     public function deliveries() {
 
@@ -103,7 +96,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
 
             $deliveries = $this->getDeliveries();
 
-            echo json_encode(array(
+            $this->returnJson(array(
                 'entries' => $deliveries
             ));
 

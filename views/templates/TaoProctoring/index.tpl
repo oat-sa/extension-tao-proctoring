@@ -1,8 +1,3 @@
-<?php
-use oat\tao\helpers\Template;
-
-print Template::inc('blocks/header.tpl');
-?>
 <div class="deliveries-listing">
     <h1><?= __("My Deliveries"); ?></h1>
     <h2>
@@ -12,4 +7,3 @@ print Template::inc('blocks/header.tpl');
     </h2>
     <div class="list" data-list="<?= count(get_data('deliveries')) ? _dh(json_encode(get_data('deliveries'))) : ''; ?>"></div>
 </div>
-<?= Template::inc('blocks/footer.tpl'); ?>
