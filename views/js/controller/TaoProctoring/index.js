@@ -20,10 +20,91 @@
  */
 define([
     'jquery',
-    'lodash',
-    'i18n'
-], function ($, _, __) {
+    'helpers',
+    'layout/loading-bar',
+    'tpl!taoProctoring/tpl/entryPoint'
+], function ($, helpers, loadingBar, entryPointTpl) {
     'use strict';
 
-    return {};
+    /**
+     * The polling delay used to refresh the list
+     * @type {Number}
+     */
+    var refreshPolling = 60 * 1000; // once per minute
+
+    loadingBar.start();
+
+    /**
+     * Controls the taoProctoring index page
+     *
+     * @type {{start: Function}}
+     */
+    var taoProctoringCtlr = {
+        /**
+         * Entry point of the page
+         */
+        start : function start() {
+            var $titleLoading = $('.deliveries-listing .loading');
+            var $titleEmpty = $('.deliveries-listing .empty-list');
+            var $titleAvailable = $('.deliveries-listing .available-list');
+            var $titleCount = $('.deliveries-listing .count');
+            var $list = $('.deliveries-listing .list');
+            var listEntries = $list.data('list');
+            var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
+            var pollTo = null;
+
+            // update the index from a JSON array
+            var update = function(entries) {
+                if (pollTo) {
+                    clearTimeout(pollTo);
+                    pollTo = null;
+                }
+
+                $titleLoading.addClass('hidden');
+                $list.empty();
+
+                if (entries && entries.length) {
+                    $titleAvailable.removeClass('hidden');
+                    $list.append(entryPointTpl({entries : entries}));
+                    $titleCount.text(entries.length);
+                    loadingBar.stop();
+                } else {
+                    $titleEmpty.removeClass('hidden');
+                }
+
+                // poll the server at regular interval to refresh the index
+                if (refreshPolling) {
+                    pollTo = setTimeout(refresh, refreshPolling);
+                }
+            };
+
+            // refresh the index
+            var refresh = function() {
+                loadingBar.start();
+
+                $titleLoading.removeClass('hidden');
+                $titleEmpty.addClass('hidden');
+                $titleAvailable.addClass('hidden');
+
+                $.ajax({
+                    url: serviceUrl,
+                    data: { _cb : Date.now() },
+                    dataType : 'json',
+                    type: 'GET'
+                }).done(function(response) {
+                    listEntries = response && response.entries;
+                    update(listEntries);
+                });
+            };
+
+            if (listEntries) {
+                update(listEntries);
+            } else {
+                refresh();
+            }
+
+        }
+    };
+
+    return taoProctoringCtlr;
 });

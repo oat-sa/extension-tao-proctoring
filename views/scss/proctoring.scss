@@ -1,6 +1,10 @@
 @import "inc/bootstrap";
 .proctoring-scope {
     .breadcrumbs {
+        font-style: italic;
+        font-weight: normal;
+        font-family: $headingFont;
+        @include font-size(11);
         padding: 8px;
         margin: 0;
         list-style: none;

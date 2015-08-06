@@ -45,25 +45,73 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
 
     /**
+     * Gets a list of available deliveries
+     *
+     * @return array
+     * @throws ServiceNotFoundException
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     */
+    private function getDeliveries() {
+
+        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        $entries = array();
+        foreach ($deliveries as $delivery) {
+
+            $entries[] = array(
+                'url' => _url('index', 'ProctorDelivery', null, array('id' => $delivery->getId())),
+                'label' => $delivery->getLabel(),
+                'text' => __('Manage'),
+            );
+
+        }
+
+        return $entries;
+
+    }
+
+    /**
      * A possible entry point to tao
      */
     public function index() {
 
         try {
-        
-            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-            $currentUser = \common_session_SessionManager::getSession()->getUser();
-            
-            $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
-            
+
+            $deliveries = $this->getDeliveries();
+
             $this->setData('deliveries', $deliveries);
 
             $this->setView('TaoProctoring/index.tpl');
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
-        
+
+    }
+
+    /**
+     * A possible entry point to tao
+     */
+    public function deliveries() {
+
+        try {
+
+            $deliveries = $this->getDeliveries();
+
+            echo json_encode(array(
+                'entries' => $deliveries
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
     }
 
     /**
