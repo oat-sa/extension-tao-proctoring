@@ -1,7 +1,7 @@
 <?php if (count(get_data('breadcrumbs'))): ?>
 <ul class="breadcrumbs">
     <?php foreach (get_data('breadcrumbs') as $breadcrumb): ?>
-    <li data-control="<?= $breadcrumb['id'] ?>">
+    <li data-breadcrumb="<?= $breadcrumb['id'] ?>">
         <?php $label = $breadcrumb['label'] . (!empty($breadcrumb['data']) ? ' - ' . $breadcrumb['data']: ''); ?>
         <?php if (!empty($breadcrumb['url'])): ?>
         <a href="<?= $breadcrumb['url'] ?>"><?= $label ?></a>

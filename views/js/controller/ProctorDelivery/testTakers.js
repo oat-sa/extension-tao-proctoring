@@ -28,26 +28,20 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.delivery-manager';
+    var cssScope = '.assign-test-takers';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the ProctorDelivery index page
+     * Controls the ProctorDelivery test takers assign page
      *
      * @type {{start: Function}}
      */
-    var proctorDeliveryIndexCtlr = {
+    var proctorDeliveryAssignCtlr = {
         /**
          * Entry point of the page
          */
@@ -55,14 +49,37 @@ define([
             var $list = $(cssScope + ' .list');
             var dataset = $list.data('set');
             var deliveryId = $list.data('id');
-            var assignUrl = helpers._url('testTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var serviceUrl = helpers._url('availableTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var assignUrl = helpers._url('assign', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var indexUrl = helpers._url('index', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+
+            // send the selection to the server and redirect to the index page
+            var assign = function(selection) {
+                if (selection && selection.length) {
+                    loadingBar.start();
+
+                    $.ajax({
+                        url: assignUrl,
+                        data: {
+                            tt: selection
+                        },
+                        dataType : 'json',
+                        type: 'POST'
+                    }).done(function(response) {
+                        loadingBar.stop();
+
+                        if (response && response.success) {
+                            location.href = indexUrl;
+                        }
+                    });
+                }
+            };
 
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function() {
+                .on('load.datatable', function(event, response) {
                     loadingBar.stop();
                 })
                 .datatable({
@@ -70,39 +87,35 @@ define([
                     data: dataset,
                     filter: true,
                     status: {
-                        empty: __('No assigned test takers'),
-                        available: __('Assigned test takers'),
+                        empty: __('No available test takers to assign'),
+                        available: __('Available test takers'),
                         loading: __('Loading')
                     },
                     tools: [{
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
+                        id: 'back',
+                        icon: 'left',
+                        title: __('Return to the delivery'),
+                        label: __('Back'),
                         action: function() {
-                            location.href = assignUrl;
+                            history.back();
+                        }
+                    }, {
+                        id: 'assign',
+                        icon: 'checkbox-checked',
+                        title: __('Assign the selected test takers to the delivery'),
+                        label: __('Assign the selected test takers'),
+                        massAction: true,
+                        action: function(id) {
+                            var selection = $list.datatable('selection');
+                            assign(selection);
                         }
                     }],
                     actions: [{
-                        id: 'validate',
+                        id: 'assign',
                         icon: 'checkbox-checked',
-                        title: __('Validate the request'),
-                        action: function() {
-                            alert('validate')
-                        }
-                    }, {
-                        id: 'lock',
-                        icon: 'lock',
-                        title: __('Lock the test taker'),
-                        action: function() {
-                            alert('lock')
-                        }
-                    }, {
-                        id: 'comment',
-                        icon: 'document',
-                        title: __('Write comment'),
-                        action: function() {
-                            alert('comment')
+                        title: __('Assign the test taker to the delivery'),
+                        action: function(id) {
+                            assign([id]);
                         }
                     }],
                     selectable: true,
@@ -118,14 +131,10 @@ define([
                         id: 'company',
                         label: __('Company name'),
                         sortable: true
-                    }, {
-                        id: 'status',
-                        label: __('Status'),
-                        sortable: true
                     }]
                 });
         }
     };
 
-    return proctorDeliveryIndexCtlr;
+    return proctorDeliveryAssignCtlr;
 });

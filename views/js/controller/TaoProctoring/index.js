@@ -32,6 +32,19 @@ define([
      */
     var refreshPolling = 60 * 1000; // once per minute
 
+    /**
+     * The CSS scope
+     * @type {String}
+     */
+    var cssScope = '.deliveries-listing';
+
+    /**
+     * The CSS class used to hide an element
+     * @type {String}
+     */
+    var hiddenCls = 'hidden';
+
+    // the page is always loading data when starting
     loadingBar.start();
 
     /**
@@ -44,11 +57,11 @@ define([
          * Entry point of the page
          */
         start : function start() {
-            var $titleLoading = $('.deliveries-listing .loading');
-            var $titleEmpty = $('.deliveries-listing .empty-list');
-            var $titleAvailable = $('.deliveries-listing .available-list');
-            var $titleCount = $('.deliveries-listing .count');
-            var $list = $('.deliveries-listing .list');
+            var $titleLoading = $(cssScope + ' .loading');
+            var $titleEmpty = $(cssScope + ' .empty-list');
+            var $titleAvailable = $(cssScope + ' .available-list');
+            var $titleCount = $(cssScope + ' .count');
+            var $list = $(cssScope + ' .list');
             var listEntries = $list.data('list');
             var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
             var pollTo = null;
@@ -60,17 +73,20 @@ define([
                     pollTo = null;
                 }
 
-                $titleLoading.addClass('hidden');
+                $titleLoading.addClass(hiddenCls);
                 $list.empty();
 
                 if (entries && entries.length) {
-                    $titleAvailable.removeClass('hidden');
+                    $titleAvailable.removeClass(hiddenCls);
                     $list.append(entryPointTpl({entries : entries}));
                     $titleCount.text(entries.length);
-                    loadingBar.stop();
+                    $titleEmpty.addClass(hiddenCls);
                 } else {
-                    $titleEmpty.removeClass('hidden');
+                    $titleEmpty.removeClass(hiddenCls);
+                    $titleAvailable.addClass(hiddenCls);
                 }
+
+                loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
                 if (refreshPolling) {
@@ -82,9 +98,7 @@ define([
             var refresh = function() {
                 loadingBar.start();
 
-                $titleLoading.removeClass('hidden');
-                $titleEmpty.addClass('hidden');
-                $titleAvailable.addClass('hidden');
+                $titleLoading.removeClass(hiddenCls);
 
                 $.ajax({
                     url: serviceUrl,
@@ -102,7 +116,6 @@ define([
             } else {
                 refresh();
             }
-
         }
     };
 

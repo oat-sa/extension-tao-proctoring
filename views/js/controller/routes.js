@@ -7,7 +7,8 @@ define(function(){
         },
         'ProctorDelivery' : {
             'actions' : {
-                'index' : 'controller/ProctorDelivery/index'
+                'index' : 'controller/ProctorDelivery/index',
+                'testTakers' : 'controller/ProctorDelivery/testTakers'
             }
         }
     };

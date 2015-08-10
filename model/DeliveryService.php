@@ -47,14 +47,35 @@ class DeliveryService extends ConfigurableService
     public function getDelivery($deliveryId) {
         return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
     }
-    
+
     /**
-    public function getDeliveryTesttakers($deliveryId) {
-        return array('tt1', 'tt2');
+     * @param $deliveryId
+     * @param array $options
+     * @return array
+     */
+    public function getDeliveryTestTakers($deliveryId, $options = array()) {
+        // TODO: get the list of test takers assigned to a particular delivery
+        return array();
     }
-    
-    public function getAvailableTesttakers(User $proctor, $deliveryId) {
-        return 'proctoring';
+
+    /**
+     * @param User $proctor
+     * @param string $deliveryId
+     * @param array $options
+     * @return array
+     */
+    public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array()) {
+        // TODO: get the list of available test takers that have not been already assigned to a particular delivery
+        return array();
     }
-    */    
+
+    /**
+     * @param $testTakerId
+     * @param $deliveryId
+     * @return bool
+     */
+    public function assignTestTaker($testTakerId, $deliveryId) {
+        // TODO: assign a test taker to a delivery
+        return true;
+    }
 }
