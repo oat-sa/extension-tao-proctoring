@@ -23,8 +23,10 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
+    'util/encode',
+    'ui/feedback',
     'ui/datatable'
-], function ($, __, helpers, loadingBar) {
+], function ($, __, helpers, loadingBar, encode, feedback) {
     'use strict';
 
     /**
@@ -56,7 +58,46 @@ define([
             var dataset = $list.data('set');
             var deliveryId = $list.data('id');
             var assignUrl = helpers._url('testTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var removeUrl = helpers._url('remove', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var authoriseUrl = helpers._url('authorise', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+
+            // request the server with a selection of test takers
+            var request = function(url, selection, message) {
+                if (selection && selection.length) {
+                    loadingBar.start();
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            tt: selection
+                        },
+                        dataType : 'json',
+                        type: 'POST'
+                    }).done(function(response) {
+                        loadingBar.stop();
+
+                        if (response && response.success) {
+                            if (message) {
+                                feedback().success(message);
+                            }
+                            $list.datatable('refresh');
+                        } else {
+                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
+                        }
+                    });
+                }
+            };
+
+            // request the server to authorise the selected test takers
+            var authorise = function(selection) {
+                request(authoriseUrl, selection, __('Test takers have been authorised'));
+            };
+
+            // request the server to remove the selected test takers
+            var remove = function(selection) {
+                request(removeUrl, selection, __('Test takers have been removed'));
+            };
 
             $list
                 .on('query.datatable', function() {
@@ -82,27 +123,41 @@ define([
                         action: function() {
                             location.href = assignUrl;
                         }
+                    }, {
+                        id: 'authorise',
+                        icon: 'checkbox-checked',
+                        title: __('Authorise the selected test takers to run the delivery'),
+                        label: __('Authorise'),
+                        massAction: true,
+                        action: function(selection) {
+                            authorise(selection);
+                        }
+                    }, {
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the selected test takers from the delivery'),
+                        label: __('Remove'),
+                        massAction: true,
+                        action: function(selection) {
+                            remove(selection);
+                        }
                     }],
                     actions: [{
-                        id: 'validate',
+                        id: 'authorise',
                         icon: 'checkbox-checked',
-                        title: __('Validate the request'),
-                        action: function() {
-                            alert('validate')
+                        title: __('Authorise the test taker to run the delivery'),
+                        hidden: function() {
+                            return !!this.authorised;
+                        },
+                        action: function(id) {
+                            authorise([id]);
                         }
                     }, {
-                        id: 'lock',
-                        icon: 'lock',
-                        title: __('Lock the test taker'),
-                        action: function() {
-                            alert('lock')
-                        }
-                    }, {
-                        id: 'comment',
-                        icon: 'document',
-                        title: __('Write comment'),
-                        action: function() {
-                            alert('comment')
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the test taker from the delivery'),
+                        action: function(id) {
+                            remove([id]);
                         }
                     }],
                     selectable: true,

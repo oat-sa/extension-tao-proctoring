@@ -238,5 +238,61 @@ class ProctorDelivery extends \tao_actions_CommonModule {
         }
 
     }
-    
+
+    /**
+     * Authorise a test taker to run the delivery
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function authorise() {
+
+        $deliveryId = $this->getRequestParameter('id');
+        $testTakerId = $this->getRequestParameter('tt');
+
+        try {
+
+            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+
+            $result = $deliveryService->authoriseTestTaker($testTakerId, $deliveryId);
+
+            $this->returnJson(array(
+                'success' => $result
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
+     * Remove a test taker from a delivery
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function remove() {
+
+        $deliveryId = $this->getRequestParameter('id');
+        $testTakerId = $this->getRequestParameter('tt');
+
+        try {
+
+            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+
+            $result = $deliveryService->removeTestTaker($testTakerId, $deliveryId);
+
+            $this->returnJson(array(
+                'success' => $result
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
 }

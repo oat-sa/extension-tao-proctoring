@@ -29,7 +29,12 @@ use oat\oatbox\service\ConfigurableService;
  */
 class DeliveryService extends ConfigurableService
 {
-
+    /**
+     * Get the deliveries accessible by a proctor
+     *
+     * @param User $proctor
+     * @return array
+     */
     public function getProctorableDeliveries(User $proctor) {
         $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
         $allDeliveries = array();
@@ -40,6 +45,7 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Get a delivery
      * 
      * @param string $deliveryId
      * @return \taoDelivery_models_classes_DeliveryRdf
@@ -49,6 +55,8 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Gets the test takers assigned to a delivery
+     *
      * @param $deliveryId
      * @param array $options
      * @return array
@@ -59,6 +67,8 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Gets the test takers attached to the proctor's test center
+     *
      * @param User $proctor
      * @param string $deliveryId
      * @param array $options
@@ -70,12 +80,38 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Assign a test taker to a delivery
+     *
      * @param $testTakerId
      * @param $deliveryId
      * @return bool
      */
     public function assignTestTaker($testTakerId, $deliveryId) {
         // TODO: assign a test taker to a delivery
+        return true;
+    }
+
+    /**
+     * Authorise a test taker to run a delivery
+     *
+     * @param $testTakerId
+     * @param $deliveryId
+     * @return bool
+     */
+    public function authoriseTestTaker($testTakerId, $deliveryId) {
+        // TODO: authorise a test taker to start a delivery
+        return true;
+    }
+
+    /**
+     * Remove a test taker from a delivery
+     *
+     * @param $testTakerId
+     * @param $deliveryId
+     * @return bool
+     */
+    public function removeTestTaker($testTakerId, $deliveryId) {
+        // TODO: remove a test taker from a delivery
         return true;
     }
 }

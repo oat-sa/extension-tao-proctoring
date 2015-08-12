@@ -23,8 +23,10 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
+    'util/encode',
+    'ui/feedback',
     'ui/datatable'
-], function ($, __, helpers, loadingBar) {
+], function ($, __, helpers, loadingBar, encode, feedback) {
     'use strict';
 
     /**
@@ -69,7 +71,10 @@ define([
                         loadingBar.stop();
 
                         if (response && response.success) {
+                            feedback().success(__('Test takers have been added'));
                             location.href = indexUrl;
+                        } else {
+                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
                     });
                 }
@@ -101,18 +106,17 @@ define([
                         }
                     }, {
                         id: 'assign',
-                        icon: 'checkbox-checked',
+                        icon: 'add',
                         title: __('Assign the selected test takers to the delivery'),
                         label: __('Assign the selected test takers'),
                         massAction: true,
-                        action: function(id) {
-                            var selection = $list.datatable('selection');
+                        action: function(selection) {
                             assign(selection);
                         }
                     }],
                     actions: [{
                         id: 'assign',
-                        icon: 'checkbox-checked',
+                        icon: 'add',
                         title: __('Assign the test taker to the delivery'),
                         action: function(id) {
                             assign([id]);
