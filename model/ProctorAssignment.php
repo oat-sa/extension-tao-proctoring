@@ -23,28 +23,12 @@ namespace oat\taoProctoring\model;
 use oat\oatbox\user\User;
 use oat\taoFrontOffice\model\Delivery;
 /**
- * Interface for the proctoringservice
+ * Interface to assign test-takers to a delivery
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-interface ProctorAssignment
+interface ProctorAssignment extends ProctorMonitor
 {
-    /**
-     * Get the deliveries accessible by a proctor
-     *
-     * @param User $proctor
-     * @return Delivery[]
-     */
-    public function getProctorableDeliveries(User $proctor);
-
-    /**
-     * Get a delivery
-     * 
-     * @param string $deliveryId
-     * @return Delivery
-     */
-    public function getDelivery($deliveryId);
-
     /**
      * Gets the test takers assigned to a delivery
      *
@@ -82,13 +66,4 @@ interface ProctorAssignment
      */
     public function unassignTestTaker($testTakerId, $deliveryId);
 
-    
-    /**
-     * Authorise a test taker to run a delivery
-     *
-     * @param $testTakerId
-     * @param $deliveryId
-     * @return bool
-     */
-    public function authoriseTestTaker($testTakerId, $deliveryId);
 }

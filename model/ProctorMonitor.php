@@ -21,27 +21,38 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
+use oat\taoFrontOffice\model\Delivery;
 use taoDelivery_models_classes_execution_DeliveryExecution;
+
 /**
- * Interface for the proctor authorisation
+ * Interface for the proctoringservice
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-interface ProctorAuthorisation extends ProctorMonitor
+interface ProctorMonitor
 {
     /**
-     * 
-     * @param string $deliveryId
+     * Get the deliveries accessible by a proctor
+     *
+     * @param User $proctor
+     * @return Delivery[]
+     */
+    public function getProctorableDeliveries(User $proctor);
+
+    /**
+     * Gets the executions of a delivery
+     *
+     * @param $deliveryId
      * @return taoDelivery_models_classes_execution_DeliveryExecution[]
      */
-    public function getPendingDeliveryExecutions($deliveryId);
+    public function getDeliveryExecutions($deliveryId);
     
     /**
-     * Authorise a delivery execution of 
-     * test taker to run a delivery
+     * Get a delivery
      *
-     * @param string $deliveryExecutionId
-     * @return bool
+     * @param string $deliveryId
+     * @return Delivery
      */
-    public function authoriseDeliveryExecution($deliveryExecutionId);
+    public function getDelivery($deliveryId);
+
 }
