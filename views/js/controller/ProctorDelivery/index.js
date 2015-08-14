@@ -25,8 +25,9 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
+    'ui/dialog',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog) {
     'use strict';
 
     /**
@@ -132,7 +133,14 @@ define([
                         label: __('Authorise'),
                         massAction: true,
                         action: function(selection) {
-                            authorise(selection);
+                            dialog({
+                                message: __('The test takers will be authorized to start this delivery. Continue ?'),
+                                autoRender: true,
+                                autoDestroy: true,
+                                onOkBtn: function() {
+                                    authorise(selection);
+                                }
+                            });
                         }
                     }, {
                         id: 'remove',
@@ -141,7 +149,14 @@ define([
                         label: __('Remove'),
                         massAction: true,
                         action: function(selection) {
-                            remove(selection);
+                            dialog({
+                                message: __('The test takers will be removed from this delivery. Continue ?'),
+                                autoRender: true,
+                                autoDestroy: true,
+                                onOkBtn: function() {
+                                    remove(selection);
+                                }
+                            });
                         }
                     }],
                     actions: [{
@@ -152,14 +167,28 @@ define([
                             return !!this.authorised;
                         },
                         action: function(id) {
-                            authorise([id]);
+                            dialog({
+                                message: __('The test taker will be authorized to start this delivery. Continue ?'),
+                                autoRender: true,
+                                autoDestroy: true,
+                                onOkBtn: function() {
+                                    authorise([id]);
+                                }
+                            });
                         }
                     }, {
                         id: 'remove',
                         icon: 'remove',
                         title: __('Remove the test taker from the delivery'),
                         action: function(id) {
-                            remove([id]);
+                            dialog({
+                                autoRender: true,
+                                autoDestroy: true,
+                                message: __('The test taker will be removed from this delivery. Continue ?'),
+                                onOkBtn: function() {
+                                    remove([id]);
+                                }
+                            });
                         }
                     }],
                     selectable: true,
