@@ -21,40 +21,27 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
-use oat\oatbox\service\ConfigurableService;
+use taoDelivery_models_classes_execution_DeliveryExecution;
 /**
- * Sample Delivery Service for proctoring
+ * Interface for the proctor authorisation
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-class DeliveryService extends ConfigurableService
+interface ProctorAuthorisation extends ProctorMonitor
 {
-
-    public function getProctorableDeliveries(User $proctor) {
-        $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
-        $allDeliveries = array();
-        foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
-        }
-        return $allDeliveries;
-    }
-
     /**
      * 
      * @param string $deliveryId
-     * @return \taoDelivery_models_classes_DeliveryRdf
+     * @return taoDelivery_models_classes_execution_DeliveryExecution[]
      */
-    public function getDelivery($deliveryId) {
-        return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
-    }
+    public function getPendingDeliveryExecutions($deliveryId);
     
     /**
-    public function getDeliveryTesttakers($deliveryId) {
-        return array('tt1', 'tt2');
-    }
-    
-    public function getAvailableTesttakers(User $proctor, $deliveryId) {
-        return 'proctoring';
-    }
-    */    
+     * Authorise a delivery execution of 
+     * test taker to run a delivery
+     *
+     * @param string $deliveryExecutionId
+     * @return bool
+     */
+    public function authoriseDeliveryExecution($deliveryExecutionId);
 }
