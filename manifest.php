@@ -24,7 +24,7 @@ return array(
 	'label' => 'Proctoring',
 	'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '0.1',
+    'version' => '0.2',
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
 	   'tao' => '>=2.8.0',
@@ -44,14 +44,10 @@ return array(
     ),
     'uninstall' => array(
     ),
-    'autoload' => array (
-        'psr-4' => array(
-            'oat\\taoProctoring\\' => dirname(__FILE__).DIRECTORY_SEPARATOR
-        )
-    ),
     'routes' => array(
         'taoProctoring' => 'oat\\taoProctoring\\controller'
-    ),    
+    ),
+    'update' => 'oat\\taoProctoring\\scripts\\update\\Updater',
 	'constants' => array(
 	    # views directory
 	    "DIR_VIEWS" => dirname(__FILE__).DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR,
