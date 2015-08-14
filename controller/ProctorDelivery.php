@@ -287,11 +287,18 @@ class ProctorDelivery extends \tao_actions_CommonModule {
         $deliveryId = $this->getRequestParameter('id');
         $testTakerId = $this->getRequestParameter('tt');
 
+        if (!is_array($testTakerId)) {
+            $testTakerId = array($testTakerId);
+        }
+
         try {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
-            $result = $deliveryService->assignTestTaker($testTakerId, $deliveryId);
+            $result = true;
+            foreach($testTakerId as $ttId) {
+                $result = $deliveryService->assignTestTaker($ttId, $deliveryId) && $result;
+            }
 
             $this->returnJson(array(
                 'success' => $result
@@ -315,11 +322,18 @@ class ProctorDelivery extends \tao_actions_CommonModule {
         $deliveryId = $this->getRequestParameter('id');
         $testTakerId = $this->getRequestParameter('tt');
 
+        if (!is_array($testTakerId)) {
+            $testTakerId = array($testTakerId);
+        }
+
         try {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
-            $result = $deliveryService->authoriseTestTaker($testTakerId, $deliveryId);
+            $result = true;
+            foreach($testTakerId as $ttId) {
+                $result = $deliveryService->authoriseTestTaker($ttId, $deliveryId) && $result;
+            }
 
             $this->returnJson(array(
                 'success' => $result
@@ -343,11 +357,18 @@ class ProctorDelivery extends \tao_actions_CommonModule {
         $deliveryId = $this->getRequestParameter('id');
         $testTakerId = $this->getRequestParameter('tt');
 
+        if (!is_array($testTakerId)) {
+            $testTakerId = array($testTakerId);
+        }
+
         try {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
-            $result = $deliveryService->unassignTestTaker($testTakerId, $deliveryId);
+            $result = true;
+            foreach($testTakerId as $ttId) {
+                $result = $deliveryService->unassignTestTaker($ttId, $deliveryId) && $result;
+            }
 
             $this->returnJson(array(
                 'success' => $result

@@ -95,7 +95,13 @@ define([
 
             // request the server to authorise the selected test takers
             var authorise = function(selection) {
-                request(authoriseUrl, selection, __('Test takers have been authorised'));
+                dialog({
+                    message: __('Not yet implemented!'),
+                    autoRender: true,
+                    autoDestroy: true,
+                    buttons: 'ok'
+                });
+                //request(authoriseUrl, selection, __('Test takers have been authorised'));
             };
 
             // request the server to remove the selected test takers
