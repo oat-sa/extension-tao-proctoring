@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\user\User;
+
 /**
  * Sample controller
  *
@@ -52,7 +54,9 @@ class ProctorDelivery extends \tao_actions_CommonModule {
                 throw new \Exception('Unknown delivery!');
             }
 
-            $testTakers = $deliveryService->getDeliveryTestTakers($deliveryId, $this->getRequestOptions());
+            $requestOptions = $this->getRequestOptions();
+            $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
+            $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
             $this->defaultData();
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
@@ -103,7 +107,9 @@ class ProctorDelivery extends \tao_actions_CommonModule {
                 throw new \Exception('Unknown delivery!');
             }
 
-            $testTakers = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $this->getRequestOptions());
+            $requestOptions = $this->getRequestOptions();
+            $users = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $requestOptions);
+            $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
             $this->defaultData();
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
@@ -135,6 +141,61 @@ class ProctorDelivery extends \tao_actions_CommonModule {
             $this->returnError('Proctoring interface not available');
         }
 
+    }
+
+    /**
+     * Gets the value of a string property from a user
+     * @param User $user
+     * @param string $property
+     * @return mixed|string
+     */
+    private function getUserStringProp($user, $property) {
+        $value = $user->getPropertyValues($property);
+        return empty($value) ? '' : current($value);
+    }
+
+    /**
+     * Get a list of test takers usable in a table page
+     * @param User[] $users
+     * @param array $options
+     * @return array
+     */
+    private function getTestTakersPage($users, $options) {
+        $amount = count($users);
+        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
+        $total = ceil($amount / $rows);
+        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
+        $start = ($page - 1) * $rows;
+        $list = array();
+
+        $users = array_slice($users, ($page - 1) * $rows, $rows);
+
+        foreach($users as $user) {
+            /* @var $user User */
+            $firstName = $this->getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
+            $lastName = $this->getUserStringProp($user, PROPERTY_USER_LASTNAME);
+            if (empty($firstName) && empty($lastName)) {
+                $firstName = $this->getUserStringProp($user, RDFS_LABEL);
+            }
+
+            $list[] = array(
+                'id' => $user->getIdentifier(),
+                'firstname' => $firstName,
+                'lastname' => $lastName,
+                'company' => '',
+                'status' => ''
+            );
+        }
+
+        return array(
+            'offset' => $start,
+            'length' => count($list),
+            'amount' => $amount,
+            'total'  => $total,
+            'page'   => $page,
+            'rows'   => $rows,
+            'data'   => $list
+        );
     }
 
     /**
@@ -174,7 +235,9 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
-            $testTakers = $deliveryService->getDeliveryTestTakers($deliveryId, $this->getRequestOptions());
+            $requestOptions = $this->getRequestOptions();
+            $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
+            $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
             $this->returnJson($testTakers);
 
@@ -199,8 +262,10 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
+            $requestOptions = $this->getRequestOptions();
             $proctor = \common_session_SessionManager::getSession()->getUser();
-            $testTakers = $deliveryService->getAvailableTestTakers($proctor, $deliveryId, $this->getRequestOptions());
+            $users = $deliveryService->getAvailableTestTakers($proctor, $deliveryId, $requestOptions);
+            $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
             $this->returnJson($testTakers);
 
@@ -282,7 +347,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
 
-            $result = $deliveryService->removeTestTaker($testTakerId, $deliveryId);
+            $result = $deliveryService->unassignTestTaker($testTakerId, $deliveryId);
 
             $this->returnJson(array(
                 'success' => $result
