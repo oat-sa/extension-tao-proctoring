@@ -93,7 +93,6 @@ define([
                 .datatable({
                     url: serviceUrl,
                     data: dataset,
-                    filter: true,
                     status: {
                         empty: __('No available test takers to assign'),
                         available: __('Available test takers'),
@@ -128,16 +127,13 @@ define([
                     selectable: true,
                     model: [{
                         id: 'firstname',
-                        label: __('First name'),
-                        sortable: true
+                        label: __('First name')
                     }, {
                         id: 'lastname',
-                        label: __('Last name'),
-                        sortable: true
+                        label: __('Last name')
                     }, {
                         id: 'company',
-                        label: __('Company name'),
-                        sortable: true
+                        label: __('Company name')
                     }]
                 });
         }
