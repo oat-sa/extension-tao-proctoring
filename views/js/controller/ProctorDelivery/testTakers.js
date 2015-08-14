@@ -66,7 +66,10 @@ define([
                             tt: selection
                         },
                         dataType : 'json',
-                        type: 'POST'
+                        type: 'POST',
+                        error: function() {
+                            loadingBar.stop();
+                        }
                     }).done(function(response) {
                         loadingBar.stop();
 
