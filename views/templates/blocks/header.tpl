@@ -12,7 +12,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
     <title><?= Layout::getTitle() ?></title>
 <?= tao_helpers_Scriptloader::render() ?>
     <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
-<?php if (($themeUrl = Layout::getThemeUrl()) !== null): ?>
+<?php if (($themeUrl = Layout::getThemeStylesheet('frontOffice')) !== null): ?>
     <link rel="stylesheet" href="<?= $themeUrl ?>" />
 <?php endif; ?>
     <link rel="shortcut icon" href="<?= Template::img('img/favicon.ico') ?>"/>
@@ -25,7 +25,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
 <div class="content-wrap">
     <header class="dark-bar clearfix">
         <a href="<?= $releaseMsgData['link'] ?>" title="<?=$releaseMsgData['msg'] ?>" class="lft" target="_blank">
-            <img src="<?= $releaseMsgData['logo']?>" alt="<?= $releaseMsgData['branding']?> Logo" id="tao-main-logo">
+            <img src="<?= $releaseMsgData['logo']?>" alt="TAO Logo" id="tao-main-logo">
         </a>
         <div class="lft title-box"></div>
         <nav class="rgt">
