@@ -23,9 +23,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
 <!-- content wrap -->
 <div class="content-wrap">
     <header class="dark-bar clearfix">
-        <a href="<?= $releaseMsgData['link'] ?>" title="<?=$releaseMsgData['msg'] ?>" class="lft" target="_blank">
-            <img src="<?= $releaseMsgData['logo']?>" alt="TAO Logo" id="tao-main-logo">
-        </a>
+        <?=Layout::renderThemeTemplate(Theme::CONTEXT_FRONTOFFICE, 'header-logo')?>
         <div class="lft title-box"></div>
         <nav class="rgt">
             <!-- snippet: dark bar left menu -->

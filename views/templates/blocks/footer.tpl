@@ -1,11 +1,9 @@
-</div>
-
+<?php
+use oat\tao\model\theme\Theme;
+use oat\tao\helpers\Layout;
+?>
 <!-- /content wrap -->
-<footer class="dark-bar">
-    © 2013 - <?= date('Y') ?> · <span class="tao-version"><?= TAO_VERSION_NAME ?></span> ·
-    <a href="http://taotesting.com" target="_blank">Open Assessment Technologies S.A.</a>
-    · <?= __('All rights reserved.') ?>
-</footer>
+<?=Layout::renderThemeTemplate(Theme::CONTEXT_FRONTOFFICE, 'footer') ?>
 <div class="loading-bar"></div>
 </body>
 </html>
