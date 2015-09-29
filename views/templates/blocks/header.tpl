@@ -58,4 +58,3 @@ $releaseMsgData = Layout::getReleaseMsgData();
         </nav>
     </header>
     <div id="feedback-box"></div>
-</div>
