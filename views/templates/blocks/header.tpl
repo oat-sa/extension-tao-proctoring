@@ -1,6 +1,7 @@
 <?php
 use oat\tao\helpers\Template;
 use oat\tao\helpers\Layout;
+use oat\tao\model\theme\Theme;
 
 $releaseMsgData = Layout::getReleaseMsgData();
 ?><!doctype html>
@@ -12,9 +13,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
     <title><?= Layout::getTitle() ?></title>
 <?= tao_helpers_Scriptloader::render() ?>
     <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
-<?php if (($themeUrl = Layout::getThemeUrl()) !== null): ?>
-    <link rel="stylesheet" href="<?= $themeUrl ?>" />
-<?php endif; ?>
+    <link rel="stylesheet" href="<?= Layout::getThemeStylesheet(Theme::CONTEXT_FRONTOFFICE) ?>" />
     <link rel="shortcut icon" href="<?= Template::img('img/favicon.ico') ?>"/>
     <script src="<?= Template::js('lib/modernizr-2.8/modernizr.js', 'tao') ?>"></script>
     <?= Layout::getAmdLoader() ?>
@@ -24,9 +23,7 @@ $releaseMsgData = Layout::getReleaseMsgData();
 <!-- content wrap -->
 <div class="content-wrap">
     <header class="dark-bar clearfix">
-        <a href="<?= $releaseMsgData['link'] ?>" title="<?=$releaseMsgData['msg'] ?>" class="lft" target="_blank">
-            <img src="<?= $releaseMsgData['logo']?>" alt="<?= $releaseMsgData['branding']?> Logo" id="tao-main-logo">
-        </a>
+        <?=Layout::renderThemeTemplate(Theme::CONTEXT_FRONTOFFICE, 'header-logo')?>
         <div class="lft title-box"></div>
         <nav class="rgt">
             <!-- snippet: dark bar left menu -->
