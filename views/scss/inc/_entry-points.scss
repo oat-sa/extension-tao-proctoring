@@ -1,0 +1,29 @@
+@import "inc/bootstrap";
+
+.entries {
+
+  &.loading {
+    .loading {
+      display: inline-block;
+    }
+    .list, .empty-list, .available-list {
+      display: none;
+    }
+  }
+  &.loaded {
+    .list, .available-list {
+      display: inline-block;
+    }
+    .loading, .empty-list {
+      display: none;
+    }
+  }
+  &.empty {
+    .empty-list {
+      display: inline-block;
+    }
+    .loading, .list, .available-list {
+      display: none;
+    }
+  }
+}

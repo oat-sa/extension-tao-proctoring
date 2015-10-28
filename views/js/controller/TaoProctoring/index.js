@@ -20,10 +20,11 @@
  */
 define([
     'jquery',
+    'i18n',
     'helpers',
     'layout/loading-bar',
-    'tpl!taoProctoring/tpl/entryPoint'
-], function ($, helpers, loadingBar, entryPointTpl) {
+    'taoProctoring/lib/entry-points'
+], function ($, __, helpers, loadingBar, entryPoints) {
     'use strict';
 
     /**
@@ -57,12 +58,17 @@ define([
          * Entry point of the page
          */
         start : function start() {
-            var $titleLoading = $(cssScope + ' .loading');
-            var $titleEmpty = $(cssScope + ' .empty-list');
-            var $titleAvailable = $(cssScope + ' .available-list');
-            var $titleCount = $(cssScope + ' .count');
-            var $list = $(cssScope + ' .list');
-            var listEntries = $list.data('list');
+            var $container = $('.deliveries-listing');
+            var listEntries = $container.data('list');
+            var list = entryPoints({
+                title: __("My Deliveries"),
+                textEmpty: __("No deliveries available"),
+                textNumber: __("Available"),
+                textLoading: __("Loading"),
+                renderTo: $container,
+                replace: true,
+                entries: listEntries
+            });
             var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
             var pollTo = null;
 
@@ -73,19 +79,7 @@ define([
                     pollTo = null;
                 }
 
-                $titleLoading.addClass(hiddenCls);
-                $list.empty();
-
-                if (entries && entries.length) {
-                    $titleAvailable.removeClass(hiddenCls);
-                    $list.append(entryPointTpl({entries : entries}));
-                    $titleCount.text(entries.length);
-                    $titleEmpty.addClass(hiddenCls);
-                } else {
-                    $titleEmpty.removeClass(hiddenCls);
-                    $titleAvailable.addClass(hiddenCls);
-                }
-
+                list.update(entries);
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
@@ -97,12 +91,11 @@ define([
             // refresh the index
             var refresh = function() {
                 loadingBar.start();
-
-                $titleLoading.removeClass(hiddenCls);
+                list.setLoading(true);
 
                 $.ajax({
                     url: serviceUrl,
-                    data: { _cb : Date.now() },
+                    cache: false,
                     dataType : 'json',
                     type: 'GET'
                 }).done(function(response) {
@@ -111,10 +104,10 @@ define([
                 });
             };
 
-            if (listEntries) {
-                update(listEntries);
-            } else {
+            if (!listEntries) {
                 refresh();
+            } else {
+                loadingBar.stop();
             }
         }
     };
