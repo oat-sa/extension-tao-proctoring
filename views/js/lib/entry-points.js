@@ -22,9 +22,10 @@ define([
     'jquery',
     'lodash',
     'i18n',
+    'taoProctoring/lib/component',
     'tpl!taoProctoring/tpl/entry-points-main',
     'tpl!taoProctoring/tpl/entry-points'
-], function ($, _, __, mainTpl, entriesTpl) {
+], function ($, _, __, component, mainTpl, entriesTpl) {
     'use strict';
 
     /**
@@ -45,57 +46,16 @@ define([
      */
     var entryPoints = {
         /**
-         * Initializes the component
-         * @param {Object} config
-         * @param {String|Boolean} [config.title] - Sets the title of the list. If the value is false no title is displayed (default: false)
-         * @param {String|Boolean} [config.textNumber] - Sets the label of the number of entries. If the value is false no label is displayed (default: 'Available')
-         * @param {String|Boolean} [config.textEmpty] - Sets the label displayed when there no entries available. If the value is false no label is displayed (default: 'There is nothing to list!')
-         * @param {String|Boolean} [config.textLoading] - Sets the label displayed when the list is loading. If the value is false no label is displayed (default: 'Loading')
-         * @param {Array} [config.entries] - The list of entries to display
-         * @param {jQuery|HTMLElement|String} [config.renderTo] - An optional container in which renders the component
-         * @param {Boolean} [config.replace] - When the component is appended to its container, clears the place before
-         * @returns {entryPoints}
-         */
-        init : function init(config) {
-            var initConfig = config || {};
-            this.config = _.omit(initConfig, function(value) {
-                return value === undefined || value === null;
-            });
-            _.defaults(this.config, _defaults);
-            this.config.is = {};
-
-            if (this.config.renderTo) {
-                this.render(this.config.renderTo);
-            }
-
-            return this;
-        },
-
-        /**
          * Uninstalls the component
-         * @returns {entryPoints}
          */
-        destroy : function destroy() {
-            if (this.$component) {
-                this.$component.remove();
-            }
-
-            this.$component = null;
+        tearDown : function tearDown() {
             this.controls = null;
-            this.config.is = {};
-
-            return this;
         },
 
         /**
          * Renders the component
-         * @param {jQuery|HTMLElement|String} [to]
-         * @returns {jQuery}
          */
-        render : function render(to) {
-            var $to;
-
-            this.$component = $(mainTpl(this.config));
+        postRender : function postRender() {
             this.controls = {
                 $title : this.$component.find('h1'),
                 $textEmpty : this.$component.find('.empty-list'),
@@ -105,7 +65,6 @@ define([
                 $numberValue : this.$component.find('.available-list .count'),
                 $list : this.$component.find('.list')
             };
-            this.setState('rendered', true);
 
             if (this.config.entries) {
                 this.update(this.config.entries);
@@ -113,16 +72,6 @@ define([
                 this.setState('empty', true);
                 this.setState('loaded', false);
             }
-
-            if (to) {
-                $to = $(to);
-                if (this.config.replace) {
-                    $to.empty();
-                }
-                $to.append(this.$component);
-            }
-
-            return this.$component;
         },
 
         /**
@@ -149,63 +98,6 @@ define([
                 }
             }
             this.setLoading(false);
-
-            return this;
-        },
-
-        /**
-         * Shows the component
-         * @returns {entryPoints}
-         */
-        show : function show() {
-            return this.setState('hidden', false);
-        },
-
-        /**
-         * Hides the component
-         * @returns {entryPoints}
-         */
-        hide : function hide() {
-            return this.setState('hidden', true);
-        },
-
-        /**
-         * Enables the component
-         * @returns {entryPoints}
-         */
-        enable : function enable() {
-            return this.setState('disabled', false);
-        },
-
-        /**
-         * Disables the component
-         * @returns {entryPoints}
-         */
-        disable : function disable() {
-            return this.setState('disabled', true);
-        },
-
-        /**
-         * Checks if the component has a particular state
-         * @param {String} state
-         * @returns {Boolean}
-         */
-        is : function is(state) {
-            return !!this.config.is[state];
-        },
-
-        /**
-         * Sets the component to a particular state
-         * @param {String} state
-         * @param {Boolean} flag
-         * @returns {entryPoints}
-         */
-        setState : function setState(state, flag) {
-            this.config.is[state] = !!flag;
-
-            if (this.$component) {
-                this.$component.toggleClass(state, !!flag);
-            }
 
             return this;
         },
@@ -297,24 +189,23 @@ define([
             }
 
             return this;
-        },
-
-        /**
-         * Gets the underlying DOM element
-         * @returns {jQuery}
-         */
-        getDom : function getDom() {
-            return this.$component;
         }
     };
 
     /**
      * Builds an instance of the entries manager
      * @param {Object} config
+     * @param {String|Boolean} [config.title] - Sets the title of the list. If the value is false no title is displayed (default: false)
+     * @param {String|Boolean} [config.textNumber] - Sets the label of the number of entries. If the value is false no label is displayed (default: 'Available')
+     * @param {String|Boolean} [config.textEmpty] - Sets the label displayed when there no entries available. If the value is false no label is displayed (default: 'There is nothing to list!')
+     * @param {String|Boolean} [config.textLoading] - Sets the label displayed when the list is loading. If the value is false no label is displayed (default: 'Loading')
+     * @param {Array} [config.entries] - The list of entries to display
+     * @param {jQuery|HTMLElement|String} [config.renderTo] - An optional container in which renders the component
+     * @param {Boolean} [config.replace] - When the component is appended to its container, clears the place before
      * @returns {entryPoints}
      */
     var entryPointsFactory = function entryPointsFactory(config) {
-        var instance = _.clone(entryPoints);
+        var instance = component(entryPoints, mainTpl, _defaults);
         return instance.init(config);
     };
 
