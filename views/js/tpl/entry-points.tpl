@@ -1,6 +1,6 @@
 <ul class="entry-point-box plain">
     {{#each entries}}
-    <li class="entry">
+    <li class="entry flex-grid-{{#if width}}{{width}}{{else}}6{{/if}}">
         <a class="block entry-point" href="{{url}}">
             <h3 class="title">{{label}}</h3>
             {{#if content}}<div class="content clearfix">{{{content}}}</div>{{/if}}

@@ -77,6 +77,11 @@ define([
         /**
          * Updates the list of entries
          * @param {Array} entries
+         * @param {String} [entries.url] - The URL of the entry point
+         * @param {String} [entries.label] - The displayed label
+         * @param {String} [entries.content] - An optional content displayed in the middle
+         * @param {String} [entries.text] - A bottom text
+         * @param {String} [entries.width] - The width of the entry related to flex-grid (default: 6)
          * @returns {entryPoints}
          */
         update : function update(entries) {
