@@ -61,7 +61,7 @@ define([
                 this.setup();
 
                 if (this.config.renderTo) {
-                    this.render(this.config.renderTo);
+                    this.render();
                 }
 
                 return this;
@@ -90,12 +90,13 @@ define([
              * @returns {jQuery}
              */
             render : function render(to) {
+                var renderTo = to || this.config.renderTo;
                 var $to;
 
                 this.$component = $(componentTpl(this.config));
 
-                if (to) {
-                    $to = $(to);
+                if (renderTo) {
+                    $to = $(renderTo);
                     if (this.config.replace) {
                         $to.empty();
                     }
@@ -196,7 +197,11 @@ define([
         };
 
         // let's extend the instance with extra methods
-        return _.assign(instance, specs);
+        if (specs) {
+            _.assign(instance, specs);
+        }
+
+        return instance;
     };
 
     return component;
