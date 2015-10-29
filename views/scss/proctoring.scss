@@ -1,26 +1,7 @@
 @import "inc/bootstrap";
 @import "inc/entry-points";
+@import "inc/breadcrumbs";
 .proctoring-scope {
-    .breadcrumbs {
-        font-style: italic;
-        font-weight: normal;
-        font-family: $headingFont;
-        @include font-size(11);
-        padding: 8px;
-        margin: 0;
-        list-style: none;
-
-        li {
-            display: inline-block;
-        }
-
-        li:not(:first-child):before {
-            @include tao-icon-setup;
-            @include icon-right();
-            padding: 0 4px 0 8px;
-        }
-    }
-
     h1 {
         font-family: $headingFont;
         @include font-size(22);
