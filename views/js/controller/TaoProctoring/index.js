@@ -23,8 +23,8 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
-    'taoProctoring/lib/entry-points'
-], function ($, __, helpers, loadingBar, entryPoints) {
+    'ui/listbox'
+], function ($, __, helpers, loadingBar, listBox) {
     'use strict';
 
     /**
@@ -39,12 +39,6 @@ define([
      */
     var cssScope = '.deliveries-listing';
 
-    /**
-     * The CSS class used to hide an element
-     * @type {String}
-     */
-    var hiddenCls = 'hidden';
-
     // the page is always loading data when starting
     loadingBar.start();
 
@@ -58,28 +52,28 @@ define([
          * Entry point of the page
          */
         start : function start() {
-            var $container = $('.deliveries-listing');
-            var listEntries = $container.data('list');
-            var list = entryPoints({
+            var $container = $(cssScope);
+            var boxes = $container.data('list');
+            var list = listBox({
                 title: __("My Deliveries"),
                 textEmpty: __("No deliveries available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
                 renderTo: $container,
                 replace: true,
-                entries: listEntries
+                list: boxes
             });
             var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
             var pollTo = null;
 
             // update the index from a JSON array
-            var update = function(entries) {
+            var update = function(boxes) {
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
                 }
 
-                list.update(entries);
+                list.update(boxes);
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
@@ -99,12 +93,12 @@ define([
                     dataType : 'json',
                     type: 'GET'
                 }).done(function(response) {
-                    listEntries = response && response.entries;
-                    update(listEntries);
+                    boxes = response && response.entries;
+                    update(boxes);
                 });
             };
 
-            if (!listEntries) {
+            if (!boxes) {
                 refresh();
             } else {
                 loadingBar.stop();
