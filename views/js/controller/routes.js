@@ -10,6 +10,11 @@ define(function(){
                 'index' : 'controller/ProctorDelivery/index',
                 'testTakers' : 'controller/ProctorDelivery/testTakers'
             }
+        },
+        'Main': {
+            'actions': {
+                'index' : 'controller/Main/index'
+            }
         }
     };
 });
