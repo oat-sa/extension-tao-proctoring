@@ -23,8 +23,9 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
-    'ui/listbox'
-], function ($, __, helpers, loadingBar, listBox) {
+    'ui/listbox',
+    'ui/breadcrumbs'
+], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
     'use strict';
 
     /**
@@ -37,7 +38,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.deliveries-listing';
+    var cssScope = '.testsites-listing';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -45,25 +46,30 @@ define([
     /**
      * Controls the taoProctoring index page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
-    var taoProctoringCtlr = {
+    var taoProctoringIndexCtlr = {
         /**
          * Entry point of the page
          */
         start : function start() {
             var $container = $(cssScope);
             var boxes = $container.data('list');
+            var crumbs = $container.data('breadcrumbs');
             var list = listBox({
-                title: __("My Deliveries"),
-                textEmpty: __("No deliveries available"),
+                title: __("My Test sites"),
+                textEmpty: __("No test site available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
-                renderTo: $container,
-                replace: true,
-                list: boxes
+                renderTo: $container.find('.content'),
+                replace: true
             });
-            var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
+            var bc = breadcrumbs({
+                breadcrumbs : crumbs,
+                renderTo: $container.find('.header'),
+                replace: true
+            });
+            var serviceUrl = helpers._url('index', 'TaoProctoring', 'taoProctoring');
             var pollTo = null;
 
             // update the index from a JSON array
@@ -93,7 +99,7 @@ define([
                     dataType : 'json',
                     type: 'GET'
                 }).done(function(response) {
-                    boxes = response && response.entries;
+                    boxes = response && response.list;
                     update(boxes);
                 });
             };
@@ -101,10 +107,10 @@ define([
             if (!boxes) {
                 refresh();
             } else {
-                loadingBar.stop();
+                update(boxes);
             }
         }
     };
 
-    return taoProctoringCtlr;
+    return taoProctoringIndexCtlr;
 });

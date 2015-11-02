@@ -34,16 +34,174 @@ use oat\oatbox\user\User;
 class ProctorDelivery extends \tao_actions_CommonModule {
 
     /**
+     * Gets a list of available deliveries
+     *
+     * @param $testSiteId
+     * @return array
+     * @throws ServiceNotFoundException
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     */
+    private function getDeliveries($testSiteId) {
+
+        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        $entries = array();
+        foreach ($deliveries as $delivery) {
+
+            $entries[] = array(
+                'id' => $delivery->getId(),
+                'url' => _url('delivery', 'ProctorDelivery', null, array('id' => $delivery->getId(), 'testsite' => $testSiteId)),
+                'label' => $delivery->getLabel(),
+                'text' => __('Manage'),
+            );
+
+        }
+
+        return $entries;
+
+    }
+
+    /**
+     * Gets a list of available test sites
+     *
+     * @return array
+     * @throws ServiceNotFoundException
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     */
+    private function getTestSites() {
+        $testSiteService = $this->getServiceManager()->get('taoProctoring/testSite');
+
+        return $testSiteService->getTestSites();
+    }
+
+    /**
+     * Gets the breadcrumbs
+     * @param string $testSiteId
+     * @param \taoDelivery_models_classes_DeliveryRdf $delivery
+     * @param array $extra
+     * @return array
+     */
+    private function getBreadcrumbs($testSiteId, $delivery = null, $extra = array()) {
+        $breadcrumbs = array(
+            array(
+                'id' => 'home',
+                'url' => _url('index', 'TaoProctoring'),
+                'label' => __('Test sites')
+            ),
+            array(
+                'id' => $testSiteId,
+                'url' => _url('testSite', 'TaoProctoring', null, array('id' => $testSiteId)),
+                'label' => __('Test site %d', $testSiteId),
+            ),
+            array(
+                'id' => 'deliveries',
+                'url' => _url('index', 'ProctorDelivery', null, array('id' => $testSiteId)),
+                'label' => __('Deliveries'),
+                'entries' => array(
+                    array(
+                        'id' => 'diagnostic',
+                        'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $testSiteId)),
+                        'label' => __('Readyness Check'),
+                    ),
+                    array(
+                        'id' => 'report',
+                        'url' => _url('report', 'TaoProctoring', null, array('id' => $testSiteId)),
+                        'label' => __('Assessment Activity Reporting'),
+                    ),
+                )
+            ),
+        );
+
+        $otherTestSites = array_filter($this->getTestSites(), function($value) use ($testSiteId) {
+            return $value['id'] != $testSiteId;
+        });
+
+        if (count($otherTestSites)) {
+            $breadcrumbs[1]['entries'] = $otherTestSites;
+        }
+
+        if ($delivery) {
+            $breadcrumbs[] = array(
+                'id' => $delivery->getId(),
+                'url' => _url('delivery', 'ProctorDelivery', null, array('id' => $delivery->getId(), 'testsite' => $testSiteId)),
+                'label' => __('Manage Delivery'),
+                'data' => $delivery->getLabel(),
+            );
+
+            $otherDeliveries = array_filter($this->getDeliveries($testSiteId), function($value) use ($delivery) {
+                return $value['id'] != $delivery->getId();
+            });
+
+            if (count($otherDeliveries)) {
+                $breadcrumbs[3]['entries'] = $otherDeliveries;
+            }
+        }
+
+        if (count($extra)) {
+            $breadcrumbs[] = $extra;
+        }
+
+        return $breadcrumbs;
+    }
+
+    /**
+     * Sets the page using default behavior
+     *
+     * @param string $cls
+     * @param array $data
+     * @throws Exception
+     */
+    private function setPage($cls, $data) {
+        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            $this->returnJson($data);
+        } else {
+            $this->defaultData();
+            $this->setData('clientConfigUrl', $this->getClientConfigUrl());
+            $this->setData('cls', $cls);
+            $this->setData('data', $data);
+            $this->setData('template', 'ProctorDelivery/index.tpl');
+
+            $this->setView('layout.tpl');
+        }
+    }
+
+    /**
+     * Displays the index page of the extension: list all available deliveries.
+     */
+    public function index() {
+
+        try {
+
+            $testSiteId = $this->getRequestParameter('id');
+            $this->setPage('deliveries-listing', array(
+                'list' => $this->getDeliveries($testSiteId),
+                'breadcrumbs' => $this->getBreadcrumbs($testSiteId)
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
      * Views a delivery
      *
      * @throws \Exception
      * @throws \common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public function index() {
+    public function delivery() {
         
         $deliveryId = $this->getRequestParameter('id');
-        
+        $testSiteId = $this->getRequestParameter('testsite');
+
         try {
 
             $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
@@ -58,25 +216,15 @@ class ProctorDelivery extends \tao_actions_CommonModule {
             $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
             $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
-            $this->defaultData();
-            $this->setData('clientConfigUrl', $this->getClientConfigUrl());
-            $this->setData('breadcrumbs', array(
-                array(
-                    'id' => 'home',
-                    'url' => _url('index', 'TaoProctoring'),
-                    'label' => __('Home'),
-                ),
-                array(
-                    'id' => 'manageDelivery',
-                    'label' => __('Manage Delivery'),
-                    'data' => $delivery->getLabel('label'),
-                ),
-            ));
-            $this->setData('delivery', $delivery);
-            $this->setData('testTakers', $testTakers);
-            $this->setData('template', 'ProctorDelivery/index.tpl');
+            $this->setData('title', $delivery->getLabel());
 
-            $this->setView('layout.tpl');
+            $this->setPage('delivery-manager', array(
+                'id' => $delivery->getUri(),
+                'testsite' => $testSiteId,
+                'set' => $testTakers,
+                'breadcrumbs' => $this->getBreadcrumbs($testSiteId, $delivery),
+
+            ));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -95,6 +243,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
     public function testTakers() {
 
         $deliveryId = $this->getRequestParameter('id');
+        $testSiteId = $this->getRequestParameter('testsite');
 
         try {
 
@@ -111,30 +260,17 @@ class ProctorDelivery extends \tao_actions_CommonModule {
             $users = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $requestOptions);
             $testTakers = $this->getTestTakersPage($users, $requestOptions);
 
-            $this->defaultData();
-            $this->setData('clientConfigUrl', $this->getClientConfigUrl());
-            $this->setData('breadcrumbs', array(
-                array(
-                    'id' => 'home',
-                    'url' => _url('index', 'TaoProctoring'),
-                    'label' => __('Home'),
-                ),
-                array(
-                    'id' => 'manageDelivery',
-                    'url' => _url('index', 'ProctorDelivery', null, array('id' => $deliveryId)),
-                    'label' => __('Manage Delivery'),
-                    'data' => $delivery->getLabel('label'),
-                ),
-                array(
-                    'id' => 'assign',
-                    'label' => __('Assign test takers'),
-                ),
-            ));
-            $this->setData('delivery', $delivery);
-            $this->setData('testTakers', $testTakers);
-            $this->setData('template', 'ProctorDelivery/testTakers.tpl');
+            $this->setData('title', __('Assign test takers to %s', $delivery->getLabel()));
 
-            $this->setView('layout.tpl');
+            $this->setPage('assign-test-takers', array(
+                'id' => $delivery->getUri(),
+                'testsite' => $testSiteId,
+                'set' => $testTakers,
+                'breadcrumbs' => $this->getBreadcrumbs($testSiteId, $delivery, array(
+                        'id' => 'assign',
+                        'label' => __('Assign test takers'),
+                )),
+            ));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');

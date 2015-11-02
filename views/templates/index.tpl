@@ -4,8 +4,5 @@
     }
 ?>>
     <div class="header"></div>
-    <div class="content">
-        <h1><?= get_data('title'); ?></h1>
-        <div class="list"></div>
-    </div>
+    <div class="content"></div>
 </div>

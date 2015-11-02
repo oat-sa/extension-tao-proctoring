@@ -27,6 +27,7 @@ use \tao_install_ExtensionInstaller;
 use oat\tao\model\ThemeRegistry;
 use oat\tao\model\websource\DirectWebSource;
 use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\implementation\TestSiteService;
 /**
  * 
  * @author Joel Bout <joel@taotesting.com>
@@ -46,6 +47,12 @@ class Updater extends common_ext_ExtensionUpdater {
             $service = new DeliveryService();
             $ext->setConfig('delivery', $service);
             $currentVersion = '0.2';
+        }
+
+        if ($currentVersion == '0.2') {
+            $service = new TestSiteService();
+            $ext->setConfig('testSite', $service);
+            $currentVersion = '0.3';
         }
 
         return $currentVersion;
