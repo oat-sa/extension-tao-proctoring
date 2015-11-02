@@ -1,25 +1,5 @@
 @import "inc/bootstrap";
 .proctoring-scope {
-    .breadcrumbs {
-        font-style: italic;
-        font-weight: normal;
-        font-family: $headingFont;
-        @include font-size(11);
-        padding: 8px;
-        margin: 0;
-        list-style: none;
-
-        li {
-            display: inline-block;
-        }
-
-        li:not(:first-child):before {
-            @include tao-icon-setup;
-            @include icon-right();
-            padding: 0 4px 0 8px;
-        }
-    }
-
     h1 {
         font-family: $headingFont;
         @include font-size(22);
@@ -37,27 +17,24 @@
         }
     }
 
-    .deliveries-listing {
-        width: 500px;
+    .content {
         margin: auto;
+    }
 
-        .entry-point-box {
-            margin-top: 0
+    .testsites-listing, .deliveries-listing {
+        .content {
+            width: 500px;
         }
     }
 
-    .delivery-manager {
-        width: 800px;
-        margin: auto;
+    .diagnostic, .report, .delivery-manager, .assign-test-takers {
+        .content {
+            width: 800px;
+        }
 
         .message {
             padding: 8px;
             text-align: center;
         }
-    }
-
-    .assign-test-takers {
-        width: 800px;
-        margin: auto;
     }
 }

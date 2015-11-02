@@ -29,16 +29,10 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.deliveries-listing';
+    var cssScope = '.testsite';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -46,9 +40,9 @@ define([
     /**
      * Controls the taoProctoring index page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
-    var taoProctoringCtlr = {
+    var taoProctoringTestSiteCtlr = {
         /**
          * Entry point of the page
          */
@@ -56,37 +50,28 @@ define([
             var $container = $(cssScope);
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
+            var id = $container.data('id');
+            var title = $container.data('title');
             var list = listBox({
-                title: __("My Deliveries"),
-                textEmpty: __("No deliveries available"),
-                textNumber: __("Available"),
+                title: title,
+                textEmpty: false,
+                textNumber: false,
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                list: boxes
+                width: 4
             });
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            var serviceUrl = helpers._url('index', 'TaoProctoring', 'taoProctoring');
-            var pollTo = null;
+            var serviceUrl = helpers._url('testSite', 'TaoProctoring', 'taoProctoring');
 
             // update the index from a JSON array
             var update = function(boxes) {
-                if (pollTo) {
-                    clearTimeout(pollTo);
-                    pollTo = null;
-                }
-
                 list.update(boxes);
                 loadingBar.stop();
-
-                // poll the server at regular interval to refresh the index
-                if (refreshPolling) {
-                    pollTo = setTimeout(refresh, refreshPolling);
-                }
             };
 
             // refresh the index
@@ -108,10 +93,10 @@ define([
             if (!boxes) {
                 refresh();
             } else {
-                loadingBar.stop();
+                update(boxes);
             }
         }
     };
 
-    return taoProctoringCtlr;
+    return taoProctoringTestSiteCtlr;
 });

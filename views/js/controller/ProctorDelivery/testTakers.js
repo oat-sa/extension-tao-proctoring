@@ -25,8 +25,9 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
+    'ui/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback) {
+], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbs) {
     'use strict';
 
     /**
@@ -48,12 +49,20 @@ define([
          * Entry point of the page
          */
         start : function start() {
-            var $list = $(cssScope + ' .list');
-            var dataset = $list.data('set');
-            var deliveryId = $list.data('id');
+            var $container = $(cssScope);
+            var $list = $container.find('.list');
+            var crumbs = $container.data('breadcrumbs');
+            var dataset = $container.data('set');
+            var deliveryId = $container.data('id');
             var serviceUrl = helpers._url('availableTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
             var assignUrl = helpers._url('assign', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
             var indexUrl = helpers._url('index', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+
+            var bc = breadcrumbs({
+                breadcrumbs : crumbs,
+                renderTo: $container.find('.header'),
+                replace: true
+            });
 
             // send the selection to the server and redirect to the index page
             var assign = function(selection) {

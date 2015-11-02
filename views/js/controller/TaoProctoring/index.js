@@ -20,10 +20,12 @@
  */
 define([
     'jquery',
+    'i18n',
     'helpers',
     'layout/loading-bar',
-    'tpl!taoProctoring/tpl/entryPoint'
-], function ($, helpers, loadingBar, entryPointTpl) {
+    'ui/listbox',
+    'ui/breadcrumbs'
+], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
     'use strict';
 
     /**
@@ -36,13 +38,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.deliveries-listing';
-
-    /**
-     * The CSS class used to hide an element
-     * @type {String}
-     */
-    var hiddenCls = 'hidden';
+    var cssScope = '.testsites-listing';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -50,42 +46,40 @@ define([
     /**
      * Controls the taoProctoring index page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
-    var taoProctoringCtlr = {
+    var taoProctoringIndexCtlr = {
         /**
          * Entry point of the page
          */
         start : function start() {
-            var $titleLoading = $(cssScope + ' .loading');
-            var $titleEmpty = $(cssScope + ' .empty-list');
-            var $titleAvailable = $(cssScope + ' .available-list');
-            var $titleCount = $(cssScope + ' .count');
-            var $list = $(cssScope + ' .list');
-            var listEntries = $list.data('list');
-            var serviceUrl = helpers._url('deliveries', 'TaoProctoring', 'taoProctoring');
+            var $container = $(cssScope);
+            var boxes = $container.data('list');
+            var crumbs = $container.data('breadcrumbs');
+            var list = listBox({
+                title: __("My Test sites"),
+                textEmpty: __("No test site available"),
+                textNumber: __("Available"),
+                textLoading: __("Loading"),
+                renderTo: $container.find('.content'),
+                replace: true
+            });
+            var bc = breadcrumbs({
+                breadcrumbs : crumbs,
+                renderTo: $container.find('.header'),
+                replace: true
+            });
+            var serviceUrl = helpers._url('index', 'TaoProctoring', 'taoProctoring');
             var pollTo = null;
 
             // update the index from a JSON array
-            var update = function(entries) {
+            var update = function(boxes) {
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
                 }
 
-                $titleLoading.addClass(hiddenCls);
-                $list.empty();
-
-                if (entries && entries.length) {
-                    $titleAvailable.removeClass(hiddenCls);
-                    $list.append(entryPointTpl({entries : entries}));
-                    $titleCount.text(entries.length);
-                    $titleEmpty.addClass(hiddenCls);
-                } else {
-                    $titleEmpty.removeClass(hiddenCls);
-                    $titleAvailable.addClass(hiddenCls);
-                }
-
+                list.update(boxes);
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
@@ -97,27 +91,26 @@ define([
             // refresh the index
             var refresh = function() {
                 loadingBar.start();
-
-                $titleLoading.removeClass(hiddenCls);
+                list.setLoading(true);
 
                 $.ajax({
                     url: serviceUrl,
-                    data: { _cb : Date.now() },
+                    cache: false,
                     dataType : 'json',
                     type: 'GET'
                 }).done(function(response) {
-                    listEntries = response && response.entries;
-                    update(listEntries);
+                    boxes = response && response.list;
+                    update(boxes);
                 });
             };
 
-            if (listEntries) {
-                update(listEntries);
-            } else {
+            if (!boxes) {
                 refresh();
+            } else {
+                update(boxes);
             }
         }
     };
 
-    return taoProctoringCtlr;
+    return taoProctoringIndexCtlr;
 });
