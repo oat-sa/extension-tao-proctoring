@@ -106,7 +106,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
                     array(
                         'id' => 'diagnostic',
                         'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $testSiteId)),
-                        'label' => __('Readyness Check'),
+                        'label' => __('Readiness Check'),
                     ),
                     array(
                         'id' => 'report',

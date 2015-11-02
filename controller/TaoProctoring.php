@@ -62,7 +62,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
         $entries = array(
             array(
                 'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
-                'label' => __('Readyness Check'),
+                'label' => __('Readiness Check'),
                 'content' => __('Check the compatibility of the current workstation and see the results'),
                 'text' => __('Go'),
                 'width' => 4
@@ -186,7 +186,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
     
     /**
-     * Displays the readyness check page
+     * Displays the readiness check page
      */
     public function diagnostic() {
 
@@ -195,7 +195,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
             $id = $this->getRequestParameter('id');
             $this->setPage('diagnostic', array(
                 'id' => $id,
-                'title' => __('Readyness Check for test site %s', $id),
+                'title' => __('Readiness Check for test site %s', $id),
                 'list' => array(
                     array(
                         'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
@@ -205,7 +205,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
                 ),
                 'breadcrumbs' => $this->getBreadcrumbs($id, array(
                     'id' => 'diagnostic',
-                    'label' => __('Readyness Check'),
+                    'label' => __('Readiness Check'),
                     'entries' => array(
                         array(
                             'id' => 'deliveries',
@@ -253,7 +253,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
                         array(
                             'id' => 'diagnostic',
                             'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
-                            'label' => __('Readyness Check'),
+                            'label' => __('Readiness Check'),
                         ),
                         array(
                             'id' => 'deliveries',
