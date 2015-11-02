@@ -37,4 +37,12 @@
             text-align: center;
         }
     }
+
+    .list-box {
+        .dark {
+            .box {
+                background: blacken($uiClickableDefaultBg, .1);
+            }
+        }
+    }
 }

@@ -49,12 +49,19 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
         $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
 
-        $entries = array();
+        $id = 'all';
+        $entries = array(array(
+            'id' => $id,
+            'url' => _url('delivery', 'ProctorDelivery', null, array('id' => $id, 'testsite' => $testSiteId)),
+            'label' => __('All Deliveries'),
+            'text' => __('Manage'),
+            'cls' => 'dark'
+        ));
         foreach ($deliveries as $delivery) {
-
+            $id = $delivery->getId();
             $entries[] = array(
-                'id' => $delivery->getId(),
-                'url' => _url('delivery', 'ProctorDelivery', null, array('id' => $delivery->getId(), 'testsite' => $testSiteId)),
+                'id' => $id,
+                'url' => _url('delivery', 'ProctorDelivery', null, array('id' => $id, 'testsite' => $testSiteId)),
                 'label' => $delivery->getLabel(),
                 'text' => __('Manage'),
             );
