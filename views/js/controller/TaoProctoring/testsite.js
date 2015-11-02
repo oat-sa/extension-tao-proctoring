@@ -58,7 +58,8 @@ define([
                 textNumber: false,
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
-                replace: true
+                replace: true,
+                width: 4
             });
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,

@@ -64,22 +64,19 @@ class TaoProctoring extends \tao_actions_CommonModule {
                 'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
                 'label' => __('Readiness Check'),
                 'content' => __('Check the compatibility of the current workstation and see the results'),
-                'text' => __('Go'),
-                'width' => 4
+                'text' => __('Go')
             ),
             array(
                 'url' => _url('index', 'ProctorDelivery', null, array('id' => $id)),
                 'label' => __('Deliveries'),
                 'content' => __('Monitor and manage the deliveries of the test site'),
-                'text' => __('Go'),
-                'width' => 4
+                'text' => __('Go')
             ),
             array(
                 'url' => _url('report', 'TaoProctoring', null, array('id' => $id)),
                 'label' => __('Assessment Activity Reporting'),
                 'content' => __('Generate and review test histories'),
-                'text' => __('Go'),
-                'width' => 4
+                'text' => __('Go')
             ),
         );
         
