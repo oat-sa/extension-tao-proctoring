@@ -22,11 +22,6 @@ define(function(){
                 'monitoring' : 'controller/ProctorDelivery/delivery',
                 'testTakers' : 'controller/ProctorDelivery/testTakers'
             }
-        },
-        'Main' : {
-            'actions' : {
-                'index' : 'controller/Main/index'
-            }
         }
     };
 });
