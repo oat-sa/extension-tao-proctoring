@@ -171,7 +171,6 @@ class ProctorDelivery extends \tao_actions_CommonModule {
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
             $this->setData('cls', $cls);
             $this->setData('data', $data);
-            $this->setData('template', 'ProctorDelivery/index.tpl');
 
             $this->setView('layout.tpl');
         }
@@ -298,22 +297,43 @@ class ProctorDelivery extends \tao_actions_CommonModule {
     }
 
     /**
-     * Get a list of test takers usable in a table page
-     * @param User[] $users
+     * Paginates a list of items to render a data subset in a table
+     * @param array $data
      * @param array $options
      * @return array
      */
-    private function getTestTakersPage($users, $options) {
-        $amount = count($users);
+    private function paginate($data, $options) {
+        $amount = count($data);
         $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
         $total = ceil($amount / $rows);
         $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
         $start = ($page - 1) * $rows;
         $list = array();
 
-        $users = array_slice($users, ($page - 1) * $rows, $rows);
+        $data = array_slice($data, ($page - 1) * $rows, $rows);
 
-        foreach($users as $user) {
+        return array(
+            'offset' => $start,
+            'length' => count($list),
+            'amount' => $amount,
+            'total'  => $total,
+            'page'   => $page,
+            'rows'   => $rows,
+            'data'   => $data
+        );
+    }
+
+    /**
+     * Get a list of test takers usable in a table page
+     * @param User[] $users
+     * @param array $options
+     * @return array
+     */
+    private function getTestTakersPage($users, $options) {
+        $page = $this->paginate($users, $options);
+
+        $list = array();
+        foreach($page['data'] as $user) {
             /* @var $user User */
             $firstName = $this->getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
             $lastName = $this->getUserStringProp($user, PROPERTY_USER_LASTNAME);
@@ -330,15 +350,9 @@ class ProctorDelivery extends \tao_actions_CommonModule {
             );
         }
 
-        return array(
-            'offset' => $start,
-            'length' => count($list),
-            'amount' => $amount,
-            'total'  => $total,
-            'page'   => $page,
-            'rows'   => $rows,
-            'data'   => $list
-        );
+        $page['data'] = $list;
+
+        return $page;
     }
 
     /**

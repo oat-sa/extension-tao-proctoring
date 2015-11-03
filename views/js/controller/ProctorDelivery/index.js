@@ -44,9 +44,9 @@ define([
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring index page
+     * Controls the ProctorDelivery index page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
     var taoProctoringCtlr = {
         /**

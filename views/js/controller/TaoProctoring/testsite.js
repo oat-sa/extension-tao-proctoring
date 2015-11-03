@@ -38,7 +38,7 @@ define([
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring index page
+     * Controls the taoProctoring test site page
      *
      * @type {Object}
      */

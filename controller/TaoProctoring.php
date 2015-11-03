@@ -47,6 +47,37 @@ class TaoProctoring extends \tao_actions_CommonModule {
 
         return $testSiteService->getTestSites();
     }
+
+    /**
+     * Gets the list of readiness chechks related to a test site
+     * 
+     * @param $id
+     * @return array
+     */
+    private function getReadinessChecks($id) {
+        $count = 10;
+        $os = array('WinXP', 'Win7', 'Win8', 'Win10', 'Linux', 'Mac OS X');
+        $browser = array('IE11', 'Edge', 'Firefox', 'Chrome', 'Safari', 'Opera');
+        $performances = array('bad', 'medium', 'good');
+        $bandwidth = array('30', '50', '70', '>100');
+        $date = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
+        $results = array();
+        
+        for ($i = 0; $i < $count; $i ++) {
+            $id = $i + 1;
+            $results[] = array(
+                'id' => $id,
+                'workstation' => 'Computer ' . $id,
+                'os' => $os[array_rand($os)],
+                'browser' => $browser[array_rand($browser)],
+                'performance' => $performances[array_rand($performances)],
+                'bandwidth' => $bandwidth[array_rand($bandwidth)],
+                'date' => $date[array_rand($date)],
+            ); 
+        }
+        
+        return $results;
+    }
     
     /**
      * Gets a list of entries available for a test site
@@ -61,18 +92,21 @@ class TaoProctoring extends \tao_actions_CommonModule {
         
         $entries = array(
             array(
+                'id' => 'diagnostic',
                 'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
                 'label' => __('Readiness Check'),
                 'content' => __('Check the compatibility of the current workstation and see the results'),
                 'text' => __('Go')
             ),
             array(
+                'id' => 'deliveries',
                 'url' => _url('index', 'ProctorDelivery', null, array('id' => $id)),
                 'label' => __('Deliveries'),
                 'content' => __('Monitor and manage the deliveries of the test site'),
                 'text' => __('Go')
             ),
             array(
+                'id' => 'report',
                 'url' => _url('report', 'TaoProctoring', null, array('id' => $id)),
                 'label' => __('Assessment Activity Reporting'),
                 'content' => __('Generate and review test histories'),
@@ -114,6 +148,20 @@ class TaoProctoring extends \tao_actions_CommonModule {
             }
         }
         
+        if (is_string($extra)) {
+            $entryId = $extra;
+            $otherEntries = array();
+            $extra = array();
+            foreach($this->getTestSiteEntries($id) as $entry) {
+                if ($entry['id'] == $entryId) {
+                    $extra = $entry;
+                } else {
+                    $otherEntries[] = $entry;
+                }
+            }
+            $extra['entries'] = $otherEntries;
+        } 
+        
         if (count($extra)) {
             $breadcrumbs[] = $extra;
         }
@@ -139,6 +187,56 @@ class TaoProctoring extends \tao_actions_CommonModule {
 
             $this->setView('layout.tpl');    
         }
+    }
+
+    /**
+     * Paginates a list of items to render a data subset in a table
+     * @param array $data
+     * @param array $options
+     * @return array
+     */
+    private function paginate($data, $options) {
+        $amount = count($data);
+        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
+        $total = ceil($amount / $rows);
+        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
+        $start = ($page - 1) * $rows;
+        $list = array();
+
+        $data = array_slice($data, ($page - 1) * $rows, $rows);
+
+        return array(
+            'offset' => $start,
+            'length' => count($list),
+            'amount' => $amount,
+            'total'  => $total,
+            'page'   => $page,
+            'rows'   => $rows,
+            'data'   => $data
+        );
+    }
+
+    /**
+     * Gets the request options
+     *
+     * @return array
+     */
+    private function getRequestOptions() {
+
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : 1;
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : 15;
+        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
+        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
+        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+
+        return array(
+            'page' => $page,
+            'rows' => $rows,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+            'filter' => $filter,
+        );
+
     }
 
     /**
@@ -190,32 +288,14 @@ class TaoProctoring extends \tao_actions_CommonModule {
         try {
 
             $id = $this->getRequestParameter('id');
+            $requestOptions = $this->getRequestOptions();
+            $diagnostics = $this->getReadinessChecks($id);
+            
+            $this->setData('title', __('Readiness Check for test site %s', $id));
             $this->setPage('diagnostic', array(
                 'id' => $id,
-                'title' => __('Readiness Check for test site %s', $id),
-                'list' => array(
-                    array(
-                        'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
-                        'label' => __('This page is under construction. Please go back later...'),
-                        'text' => __('Refresh'),  
-                    ),
-                ),
-                'breadcrumbs' => $this->getBreadcrumbs($id, array(
-                    'id' => 'diagnostic',
-                    'label' => __('Readiness Check'),
-                    'entries' => array(
-                        array(
-                            'id' => 'deliveries',
-                            'url' => _url('index', 'ProctorDelivery', null, array('id' => $id)),
-                            'label' => __('Deliveries'),
-                        ),
-                        array(
-                            'id' => 'report',
-                            'url' => _url('report', 'TaoProctoring', null, array('id' => $id)),
-                            'label' => __('Assessment Activity Reporting'),
-                        ),
-                    ),
-                )),
+                'set' => $this->paginate($diagnostics, $requestOptions),
+                'breadcrumbs' => $this->getBreadcrumbs($id, 'diagnostic'),
             ));
 
         } catch (ServiceNotFoundException $e) {
@@ -243,22 +323,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
                         'text' => __('Refresh'),  
                     ),
                 ),
-                'breadcrumbs' => $this->getBreadcrumbs($id, array(
-                    'id' => 'report',
-                    'label' => __('Assessment Activity Reporting'),
-                    'entries' => array(
-                        array(
-                            'id' => 'diagnostic',
-                            'url' => _url('diagnostic', 'TaoProctoring', null, array('id' => $id)),
-                            'label' => __('Readiness Check'),
-                        ),
-                        array(
-                            'id' => 'deliveries',
-                            'url' => _url('index', 'ProctorDelivery', null, array('id' => $id)),
-                            'label' => __('Deliveries'),
-                        ),
-                    ),
-                )),
+                'breadcrumbs' => $this->getBreadcrumbs($id, 'report'),
             ));
 
         } catch (ServiceNotFoundException $e) {
