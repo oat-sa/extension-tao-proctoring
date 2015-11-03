@@ -23,9 +23,12 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
-    'ui/listbox',
-    'ui/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
+    'util/encode',
+    'ui/feedback',
+    'ui/dialog',
+    'ui/breadcrumbs',
+    'ui/datatable'
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
     'use strict';
 
     /**
@@ -48,52 +51,111 @@ define([
          */
         start : function start() {
             var $container = $(cssScope);
-            var boxes = $container.data('list');
+            var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
-            var id = $container.data('id');
-            var title = $container.data('title');
-            var list = listBox({
-                title: title,
-                textEmpty: false,
-                textNumber: false,
-                textLoading: __("Loading"),
-                renderTo: $container.find('.content'),
-                replace: true
-            });
+            var dataset = $container.data('set');
+            var testSiteId = $container.data('id');
+            var serviceUrl = helpers._url('report', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
+
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            var serviceUrl = helpers._url('report', 'TaoProctoring', 'taoProctoring');
 
-            // update the index from a JSON array
-            var update = function(boxes) {
-                list.update(boxes);
-                loadingBar.stop();
+            // request the server with a selection of reports
+            var request = function(url, selection, message) {
+                if (selection && selection.length) {
+                    loadingBar.start();
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            tt: selection
+                        },
+                        dataType : 'json',
+                        type: 'POST',
+                        error: function() {
+                            loadingBar.stop();
+                        }
+                    }).done(function(response) {
+                        loadingBar.stop();
+
+                        if (response && response.success) {
+                            if (message) {
+                                feedback().success(message);
+                            }
+                            $list.datatable('refresh');
+                        } else {
+                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
+                        }
+                    });
+                }
             };
 
-            // refresh the index
-            var refresh = function() {
-                loadingBar.start();
-                list.setLoading(true);
-
-                $.ajax({
-                    url: serviceUrl,
-                    cache: false,
-                    dataType : 'json',
-                    type: 'GET'
-                }).done(function(response) {
-                    boxes = response && response.list;
-                    update(boxes);
+            var notYet = function() {
+                dialog({
+                    message: __('Not yet implemented!'),
+                    autoRender: true,
+                    autoDestroy: true,
+                    buttons: 'ok'
                 });
             };
 
-            if (!boxes) {
-                refresh();
-            } else {
-                update(boxes);
-            }
+            $list
+                .on('query.datatable', function() {
+                    loadingBar.start();
+                })
+                .on('load.datatable', function() {
+                    loadingBar.stop();
+                })
+                .datatable({
+                    url: serviceUrl,
+                    data: dataset,
+                    status: {
+                        empty: __('No reports to display!'),
+                        available: __('Available reports'),
+                        loading: __('Loading')
+                    },
+                    tools: [{
+                        id: 'download',
+                        icon: 'download',
+                        title: __('Download the selected reports to a CSV file'),
+                        label: __('Download CSV'),
+                        action: function() {
+                            notYet();
+                        }
+                    }],
+                    selectable: true,
+                    model: [{
+                        id: 'delivery',
+                        label: __('Delivery')
+                    }, {
+                        id: 'testtaker',
+                        label: __('Test Taker')
+                    }, {
+                        id: 'proctor',
+                        label: __('Proctor')
+                    }, {
+                        id: 'status',
+                        label: __('Status')
+                    }, {
+                        id: 'start',
+                        label: __('Start')
+                    }, {
+                        id: 'end',
+                        label: __('End')
+                    }, {
+                        id: 'pause',
+                        label: __('Pause #')
+                    }, {
+                        id: 'resume',
+                        label: __('Resume #')
+                    }, {
+                        id: 'irregularities',
+                        label: __('Irregularities')
+                    }]
+                });
         }
     };
 

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 use oat\generisHard\models\hardapi\Exception;
 use \common_session_SessionManager;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\oatbox\user\User;
 
 /**
  * Sample controller
@@ -49,7 +50,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
     }
 
     /**
-     * Gets the list of readiness chechks related to a test site
+     * Gets the list of readiness checks related to a test site
      * 
      * @param $id
      * @return array
@@ -76,6 +77,72 @@ class TaoProctoring extends \tao_actions_CommonModule {
             ); 
         }
         
+        return $results;
+    }
+
+    /**
+     * Gets the list of assessment reports related to a test site
+     *
+     * @param $id
+     * @return array
+     */
+    private function getReports($id) {
+        $count = 10;
+
+        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+        
+        function getTestTakers($deliveryId, $deliveryService)  {
+            static $cache = array();
+            if (!isset($cache[$deliveryId])) {
+                $cache[$deliveryId] = $deliveryService->getDeliveryTestTakers($deliveryId);
+            }
+            return $cache[$deliveryId];
+        }
+
+        function getUserStringProp($user, $property) {
+            $value = $user->getPropertyValues($property);
+            return empty($value) ? '' : current($value);
+        }
+        
+        function getUserName($user) {
+            $firstName = getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
+            $lastName = getUserStringProp($user, PROPERTY_USER_LASTNAME);
+            if (empty($firstName) && empty($lastName)) {
+                $firstName = getUserStringProp($user, RDFS_LABEL);
+            }
+            
+            return $firstName . ' ' . $lastName;
+        }
+        
+        $status = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
+        $date = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
+        $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
+        $breaks = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
+        $results = array();
+
+        for ($i = 0; $i < $count; $i ++) {
+            $id = $i + 1;
+            
+            $delivery = $deliveries[array_rand($deliveries)];
+            $testTakers = getTestTakers($delivery->getId(), $deliveryService);
+            $break = $breaks[array_rand($breaks)];
+            
+            $results[] = array(
+                'id' => $id,
+                'delivery' => $delivery->getLabel(),
+                'testtaker' => getUserName($testTakers[array_rand($testTakers)]),
+                'proctor' => getUserName($currentUser),
+                'status' => $status[array_rand($status)],
+                'start' => $date[array_rand($date)],
+                'end' => $date[array_rand($date)],
+                'pause' => $break,
+                'resume' => $break,
+                'irregularities' => $irregularity[array_rand($irregularity)],
+            );
+        }
+
         return $results;
     }
     
@@ -313,16 +380,13 @@ class TaoProctoring extends \tao_actions_CommonModule {
         try {
 
             $id = $this->getRequestParameter('id');
+            $requestOptions = $this->getRequestOptions();
+            $reports = $this->getReports($id);
+
+            $this->setData('title', __('Assessment Activity Reporting for test site %s', $id));
             $this->setPage('report', array(
                 'id' => $id,
-                'title' => __('Assessment Activity Reporting for test site %s', $id),
-                'list' => array(
-                    array(
-                        'url' => _url('report', 'TaoProctoring', null, array('id' => $id)),
-                        'label' => __('This page is under construction. Please go back later...'),
-                        'text' => __('Refresh'),  
-                    ),
-                ),
+                'set' => $this->paginate($reports, $requestOptions),
                 'breadcrumbs' => $this->getBreadcrumbs($id, 'report'),
             ));
 

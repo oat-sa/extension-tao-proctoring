@@ -41,7 +41,7 @@ define([
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring readyness check page
+     * Controls the taoProctoring readiness check page
      *
      * @type {Object}
      */
@@ -64,7 +64,7 @@ define([
                 replace: true
             });
 
-            // request the server with a selection of test takers
+            // request the server with a selection of readiness check results
             var request = function(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
@@ -94,7 +94,7 @@ define([
                 }
             };
 
-            var notYet = function(selection) {
+            var notYet = function() {
                 dialog({
                     message: __('Not yet implemented!'),
                     autoRender: true,
