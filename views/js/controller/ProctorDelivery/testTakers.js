@@ -42,7 +42,7 @@ define([
     /**
      * Controls the ProctorDelivery test takers assign page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
     var proctorDeliveryAssignCtlr = {
         /**

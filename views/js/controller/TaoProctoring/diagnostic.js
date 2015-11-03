@@ -23,9 +23,12 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
-    'ui/listbox',
-    'ui/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
+    'util/encode',
+    'ui/feedback',
+    'ui/dialog',
+    'ui/breadcrumbs',
+    'ui/datatable'
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
     'use strict';
 
     /**
@@ -38,7 +41,7 @@ define([
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring readyness check page
+     * Controls the taoProctoring readiness check page
      *
      * @type {Object}
      */
@@ -48,52 +51,140 @@ define([
          */
         start : function start() {
             var $container = $(cssScope);
-            var boxes = $container.data('list');
+            var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
-            var id = $container.data('id');
-            var title = $container.data('title');
-            var list = listBox({
-                title: title,
-                textEmpty: false,
-                textNumber: false,
-                textLoading: __("Loading"),
-                renderTo: $container.find('.content'),
-                replace: true
-            });
+            var dataset = $container.data('set');
+            var testSiteId = $container.data('id');
+            var removeUrl = helpers._url('removeDiagnostic', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
+            var serviceUrl = helpers._url('diagnostic', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
+
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            var serviceUrl = helpers._url('diagnostic', 'TaoProctoring', 'taoProctoring');
 
-            // update the index from a JSON array
-            var update = function(boxes) {
-                list.update(boxes);
-                loadingBar.stop();
+            // request the server with a selection of readiness check results
+            var request = function(url, selection, message) {
+                if (selection && selection.length) {
+                    loadingBar.start();
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            tt: selection
+                        },
+                        dataType : 'json',
+                        type: 'POST',
+                        error: function() {
+                            loadingBar.stop();
+                        }
+                    }).done(function(response) {
+                        loadingBar.stop();
+
+                        if (response && response.success) {
+                            if (message) {
+                                feedback().success(message);
+                            }
+                            $list.datatable('refresh');
+                        } else {
+                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
+                        }
+                    });
+                }
             };
 
-            // refresh the index
-            var refresh = function() {
-                loadingBar.start();
-                list.setLoading(true);
-
-                $.ajax({
-                    url: serviceUrl,
-                    cache: false,
-                    dataType : 'json',
-                    type: 'GET'
-                }).done(function(response) {
-                    boxes = response && response.list;
-                    update(boxes);
+            var notYet = function() {
+                dialog({
+                    message: __('Not yet implemented!'),
+                    autoRender: true,
+                    autoDestroy: true,
+                    buttons: 'ok'
                 });
             };
 
-            if (!boxes) {
-                refresh();
-            } else {
-                update(boxes);
-            }
+            // request the server to remove the selected diagnostic
+            var remove = function(selection) {
+                notYet();
+                //request(removeUrl, selection, __('The readiness check result have been removed'));
+            };
+
+            $list
+                .on('query.datatable', function() {
+                    loadingBar.start();
+                })
+                .on('load.datatable', function() {
+                    loadingBar.stop();
+                })
+                .datatable({
+                    url: serviceUrl,
+                    data: dataset,
+                    status: {
+                        empty: __('No readiness checks have been done!'),
+                        available: __('Readiness checks already done'),
+                        loading: __('Loading')
+                    },
+                    tools: [{
+                        id: 'launch',
+                        icon: 'play',
+                        title: __('Launch another readiness check'),
+                        label: __('Launch readiness check'),
+                        action: function() {
+                            notYet();
+                        }
+                    }, {
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the selected readiness check results'),
+                        label: __('Remove'),
+                        massAction: true,
+                        action: function(selection) {
+                            dialog({
+                                message: __('The selected readiness check results will be removed. Continue ?'),
+                                autoRender: true,
+                                autoDestroy: true,
+                                onOkBtn: function() {
+                                    remove(selection);
+                                }
+                            });
+                        }
+                    }],
+                    actions: [{
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the readiness check result?'),
+                        action: function(id) {
+                            dialog({
+                                autoRender: true,
+                                autoDestroy: true,
+                                message: __('The readiness check result will be removed. Continue ?'),
+                                onOkBtn: function() {
+                                    remove([id]);
+                                }
+                            });
+                        }
+                    }],
+                    selectable: true,
+                    model: [{
+                        id: 'workstation',
+                        label: __('Workstation')
+                    }, {
+                        id: 'os',
+                        label: __('OS')
+                    }, {
+                        id: 'browser',
+                        label: __('Browser')
+                    }, {
+                        id: 'performance',
+                        label: __('Performance')
+                    }, {
+                        id: 'bandwidth',
+                        label: __('Bandwidth')
+                    }, {
+                        id: 'date',
+                        label: __('Date')
+                    }]
+                });
         }
     };
 

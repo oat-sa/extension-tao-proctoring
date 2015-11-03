@@ -37,4 +37,19 @@
             text-align: center;
         }
     }
+
+    .diagnostic, .report {
+        .content {
+            width: 100%;
+            padding: 0 20px;
+        }
+    }
+
+    .list-box {
+        .dark {
+            .box {
+                background: blacken($uiClickableDefaultBg, .1);
+            }
+        }
+    }
 }
