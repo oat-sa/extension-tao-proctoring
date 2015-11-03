@@ -39,7 +39,7 @@ class TestCenter extends Proctoring
     /**
      * Displays the index page of the extension: list all available deliveries.
      */
-    public function testCenters()
+    public function index()
     {
 
         $testCenters = $this->getTestCenters();

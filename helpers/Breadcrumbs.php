@@ -30,7 +30,7 @@ class Breadcrumbs
     {
         return array(
             'id' => 'testCenters',
-            'url' => _url('testCenters', 'TestCenter'),
+            'url' => _url('index', 'TestCenter'),
             'label' => __('Home'),
         );
     }
@@ -59,7 +59,7 @@ class Breadcrumbs
     {
         $breadcrumbs = array(
             'id' => 'deliveries',
-            'url' => _url('deliveries', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
+            'url' => _url('index', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
             'label' => __('deliveries')
         );
         if(count($alternativeRoutes)){

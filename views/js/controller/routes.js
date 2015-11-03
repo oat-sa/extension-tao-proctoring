@@ -2,7 +2,7 @@ define(function(){
     return {
         'TestCenter' : {
             'actions' : {
-                'testCenters' : 'controller/TaoProctoring/index',
+                'index' : 'controller/TaoProctoring/index',
                 'testCenter' : 'controller/TaoProctoring/testsite'
             }
         },
@@ -18,7 +18,7 @@ define(function(){
         },
         'Delivery' : {
             'actions' : {
-                'deliveries' : 'controller/ProctorDelivery/index',
+                'index' : 'controller/ProctorDelivery/index',
                 'monitoring' : 'controller/ProctorDelivery/delivery',
                 'testTakers' : 'controller/ProctorDelivery/testTakers'
             }

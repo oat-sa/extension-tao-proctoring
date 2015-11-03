@@ -38,7 +38,7 @@ class Delivery extends Proctoring
     /**
      * Displays the index page of the extension: list all available deliveries.
      */
-    public function deliveries()
+    public function index()
     {
 
         $testCenter = $this->getCurrentTestCenter();
