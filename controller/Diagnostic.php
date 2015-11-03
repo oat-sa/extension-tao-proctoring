@@ -33,22 +33,23 @@ use oat\taoProctoring\helpers\Breadcrumbs;
  */
 class Diagnostic extends Proctoring
 {
+
+    /**
+     * Display the list of all readiness checks performed on the given test center
+     * It also allows launching new ones.
+     */
     public function index(){
 
         $testCenter = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+        $diagnostics = $this->getDiagnostics($testCenter);
 
+        $this->setData('title', __('Readiness Check for test site %s', $testCenter->getLabel()));
         $this->composeView(
             'diagnostic',
             array(
                 'id' => $testCenter->getUri(),
-                'title' => __('Readiness Check for test site %s', $testCenter->getLabel()),
-                'list' => array(
-                    array(
-                        'url' => _url('index', 'Diagnostic', null, array('testCenter' => $testCenter->getUri())),
-                        'label' => __('This page is under construction. Please go back later...'),
-                        'text' => __('Refresh'),
-                    ),
-                )
+                'set' => $this->paginate($diagnostics, $requestOptions)
             ),
             array(
             Breadcrumbs::testCenters(),
@@ -59,6 +60,37 @@ class Diagnostic extends Proctoring
                 Breadcrumbs::reporting($testCenter)
             ))
         ));
+    }
+
+    /**
+     * Gets the list of readiness checks related to a test site
+     *
+     * @param $testCenter
+     * @return array
+     */
+    private function getDiagnostics($testCenter) {
+        $count = 10;
+        $os = array('WinXP', 'Win7', 'Win8', 'Win10', 'Linux', 'Mac OS X');
+        $browser = array('IE11', 'Edge', 'Firefox', 'Chrome', 'Safari', 'Opera');
+        $performances = array('bad', 'medium', 'good');
+        $bandwidth = array('30', '50', '70', '>100');
+        $date = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
+        $results = array();
+
+        for ($i = 0; $i < $count; $i ++) {
+            $id = $i + 1;
+            $results[] = array(
+                'id' => $id,
+                'workstation' => 'Computer ' . $id,
+                'os' => $os[array_rand($os)],
+                'browser' => $browser[array_rand($browser)],
+                'performance' => $performances[array_rand($performances)],
+                'bandwidth' => $bandwidth[array_rand($bandwidth)],
+                'date' => $date[array_rand($date)],
+            );
+        }
+
+        return $results;
     }
    
 }

@@ -36,7 +36,7 @@ class Delivery extends Proctoring
 {
 
     /**
-     * Displays the index page of the extension: list all available deliveries.
+     * Displays the index page of the deliveries list all available deliveries for the current test center
      */
     public function index()
     {
@@ -60,6 +60,9 @@ class Delivery extends Proctoring
         ));
     }
 
+    /**
+     * Display all delivery executions of the selected delivery and test center
+     */
     public function monitoring()
     {
 
@@ -193,29 +196,6 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Gets the request options
-     *
-     * @return array
-     */
-    private function getRequestOptions() {
-
-        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : 1;
-        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : 15;
-        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
-        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
-        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
-
-        return array(
-            'page' => $page,
-            'rows' => $rows,
-            'sortBy' => $sortBy,
-            'sortOrder' => $sortOrder,
-            'filter' => $filter,
-        );
-
-    }
-
-    /**
      * Gets the list of test takers assigned to a delivery
      *
      * @throws \common_Exception
@@ -227,13 +207,14 @@ class Delivery extends Proctoring
 
         try {
 
-            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-
-            $requestOptions = $this->getRequestOptions();
-            $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
-            $testTakers = $this->getTestTakersPage($users, $requestOptions);
-
-            $this->returnJson($testTakers);
+//            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+//
+//            $requestOptions = $this->getRequestOptions();
+//            $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
+//            $testTakers = $this->getTestTakersPage($users, $requestOptions);
+   
+            //@TODO mock list of test taker
+            $this->returnJson(array());
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');

@@ -36,6 +36,11 @@ class Proctoring extends \tao_actions_CommonModule
     protected $currentTestCenter = null;
     protected $currentDelivery   = null;
 
+    /**
+     * Temporary method to return a dummy delivery
+     *
+     * @return core_kernel_classes_Resource
+     */
     private function _getDummyDelivery(){
         
         $fakeUri = 'my_local_ns#i9999999999999999';
@@ -47,6 +52,11 @@ class Proctoring extends \tao_actions_CommonModule
         return $delivery;
     }
 
+    /**
+     * Temporary method to return a dummy test center
+     * 
+     * @return core_kernel_classes_Resource
+     */
     private function _getDummyTestCenter(){
 
         $fakeUri = 'my_local_ns#i111111111111111';
@@ -58,6 +68,13 @@ class Proctoring extends \tao_actions_CommonModule
         return $testCenter;
     }
 
+    /**
+     * Get the requested test center resource
+     * Use this to identify which test center is currently being selected buy the proctor
+     *
+     * @return core_kernel_classes_Resource
+     * @throws \common_Exception
+     */
     protected function getCurrentTestCenter()
     {
         if (is_null($this->currentTestCenter)) {
@@ -78,6 +95,13 @@ class Proctoring extends \tao_actions_CommonModule
         return $this->currentTestCenter;
     }
 
+    /**
+     * Get the requested delivery resource
+     * Use this to identify which delivery is currently being selected buy the proctor
+     * 
+     * @return core_kernel_classes_Resource
+     * @throws \common_Exception
+     */
     protected function getCurrentDelivery()
     {
         if (is_null($this->currentDelivery)) {
@@ -97,6 +121,13 @@ class Proctoring extends \tao_actions_CommonModule
         return $this->currentDelivery;
     }
 
+    /**
+     * Main method to render a view for all proctoring related controller actions
+     * 
+     * @param string $cssClass
+     * @param array $data
+     * @param array $breadcrumbs
+     */
     protected function composeView($cssClass, $data = array(), $breadcrumbs = array())
     {
         $data['breadcrumbs'] = $breadcrumbs;
@@ -182,8 +213,53 @@ class Proctoring extends \tao_actions_CommonModule
         return $entries;
     }
 
-    public function getBreadcrumb()
-    {
-        
+    /**
+     * Paginates a list of items to render a data subset in a table
+     * @param array $data
+     * @param array $options
+     * @return array
+     */
+    protected function paginate($data, $options) {
+        $amount = count($data);
+        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
+        $total = ceil($amount / $rows);
+        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
+        $start = ($page - 1) * $rows;
+        $list = array();
+
+        $data = array_slice($data, ($page - 1) * $rows, $rows);
+
+        return array(
+            'offset' => $start,
+            'length' => count($list),
+            'amount' => $amount,
+            'total'  => $total,
+            'page'   => $page,
+            'rows'   => $rows,
+            'data'   => $data
+        );
+    }
+
+    /**
+     * Gets the request options
+     *
+     * @return array
+     */
+    protected function getRequestOptions() {
+
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : 1;
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : 15;
+        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
+        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
+        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+
+        return array(
+            'page' => $page,
+            'rows' => $rows,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+            'filter' => $filter,
+        );
+
     }
 }

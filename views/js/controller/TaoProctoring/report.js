@@ -55,7 +55,7 @@ define([
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
             var testSiteId = $container.data('id');
-            var serviceUrl = helpers._url('report', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
+            var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testSiteId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,

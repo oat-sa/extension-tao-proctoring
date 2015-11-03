@@ -103,7 +103,7 @@ class Breadcrumbs
         $breadcrumbs = array(
             'id' => 'diagnostics',
             'url' => _url('index', 'Diagnostic', null, array('testCenter' => $testCenter->getUri())),
-            'label' => __('diagnostics')
+            'label' => __('readiness check')
         );
         if(count($alternativeRoutes)){
             $breadcrumbs['entries'] = $alternativeRoutes;
@@ -116,7 +116,7 @@ class Breadcrumbs
         $breadcrumbs = array(
             'id' => 'reporting',
             'url' => _url('index', 'Reporting', null, array('testCenter' => $testCenter->getUri())),
-            'label' => __('reporting')
+            'label' => __('activity reporting')
         );
         if(count($alternativeRoutes)){
             $breadcrumbs['entries'] = $alternativeRoutes;

@@ -62,10 +62,10 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('id');
             var testSiteId = $container.data('testsite');
-            var assignUrl = helpers._url('testTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
-            var removeUrl = helpers._url('remove', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
-            var authoriseUrl = helpers._url('authorise', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
+            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
+            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
+            var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
+            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
             
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -73,10 +73,8 @@ define([
                 replace: true
             });
             
-            //prevent data table to be loaded for now...
-            loadingBar.stop();
-            console.log(crumbs);
-            return;
+            //@TODO format the incoming data before displaying in the datatable
+            
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
                 if (selection && selection.length) {

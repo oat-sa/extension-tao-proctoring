@@ -70,7 +70,7 @@ define([
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            var serviceUrl = helpers._url('index', 'TaoProctoring', 'taoProctoring');
+            var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
 
             // update the index from a JSON array
