@@ -55,6 +55,7 @@ define([
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
             var testSiteId = $container.data('id');
+            var downloadUrl = helpers._url('reportDownload', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
             var serviceUrl = helpers._url('report', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
 
             var bc = breadcrumbs({
@@ -111,7 +112,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No reports to display!'),
                         available: __('Available reports'),
@@ -124,9 +124,10 @@ define([
                         label: __('Download CSV'),
                         action: function() {
                             notYet();
+                            //request(downloadUrl, selection, __('The reports selection are downloading'));
                         }
                     }],
-                    selectable: true,
+                    //selectable: true,
                     model: [{
                         id: 'delivery',
                         label: __('Delivery')
@@ -155,7 +156,7 @@ define([
                         id: 'irregularities',
                         label: __('Irregularities')
                     }]
-                });
+                }, dataset);
         }
     };
 
