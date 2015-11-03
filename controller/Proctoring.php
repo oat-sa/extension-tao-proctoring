@@ -109,7 +109,7 @@ class Proctoring extends \tao_actions_CommonModule
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
             $this->setData('cls', $cssClass);
             $this->setData('data', $data);
-            $this->setData('content-template', 'index.tpl');
+            $this->setData('content-template', 'pages/index.tpl');
             $this->setView('layout.tpl');
         }
     }
