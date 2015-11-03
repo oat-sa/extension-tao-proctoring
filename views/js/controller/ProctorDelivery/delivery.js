@@ -66,13 +66,17 @@ define([
             var removeUrl = helpers._url('remove', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
             var authoriseUrl = helpers._url('authorise', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId, testsite : testSiteId});
-
+            
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-
+            
+            //prevent data table to be loaded for now...
+            loadingBar.stop();
+            console.log(crumbs);
+            return;
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
                 if (selection && selection.length) {

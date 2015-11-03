@@ -43,7 +43,8 @@ class ProctoringEntryPoint extends Configurable implements Entrypoint
     }
     
     public function getUrl() {
-        return _url("index", "TaoProctoring", "taoProctoring");
+        return _url("testCenters", "TestCenter", "taoProctoring");
+//        return _url("index", "TaoProctoring", "taoProctoring");
     }
 
 }

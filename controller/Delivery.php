@@ -22,6 +22,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
+use \core_kernel_classes_Resource;
 
 /**
  * Proctoring Delivery controllers
@@ -44,58 +45,48 @@ class Delivery extends Proctoring
         $deliveries = $this->getDeliveries($testCenter);
 
         $this->setData('deliveries', $deliveries);
-        $this->composeView('Proctoring/deliveries.tpl',
+        $this->composeView(
+            'deliveries-listing',
+            array(
+                'list' => $deliveries
+            ),
             array(
             Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter),
-            Breadcrumbs::deliveries($testCenter, $testCenter)
+            Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+            Breadcrumbs::deliveries($testCenter,
+                array(
+                Breadcrumbs::diagnostics($testCenter),
+                Breadcrumbs::reporting($testCenter)
+            ))
         ));
     }
 
-    public function deliveryMonitoring()
+    public function monitoring()
     {
 
         $testCenter    = $this->getCurrentTestCenter();
         $delivery      = $this->getCurrentDelivery();
         $executionData = $this->getDeliveryExecutions($delivery);
 
-        $this->setData('executionsData', $executionData);
-        $this->composeView('Proctoring/testCenter.tpl',
+        $this->composeView(
+            'delivery-manager',
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter),
-            Breadcrumbs::deliveries($testCenter),
-            Breadcrumbs::deliveryMonitoring($delivery)
-        ));
-    }
-
-    /**
-     * Gets the list of available deliveries for the selected test center
-     *
-     * @return array
-     */
-    private function getDeliveries(core_kernel_classes_Resource $testCenter)
-    {
-
-        $entries = array();
-
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i2000000001')),
-            'label' => 'Test A',
-            'text' => __('Go to')
+                'id' => $delivery->getUri(), //change key to delivery for better consistency
+                'testSite' => $testCenter->getUri(), //change key to delivery for better consistency
+                'set' => $executionData //change this to list for better consistency
+            ),
+            array(
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                Breadcrumbs::deliveries($testCenter,
+                    array(
+                        Breadcrumbs::diagnostics($testCenter),
+                        Breadcrumbs::reporting($testCenter)
+                    )
+                ),
+                Breadcrumbs::deliveryMonitoring($testCenter, $delivery, $this->getDeliveries())
+            )
         );
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i2000000002')),
-            'label' => 'Test B',
-            'text' => __('Manage')
-        );
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i2000000003')),
-            'label' => 'Test C',
-            'text' => __('Manage')
-        );
-
-        return $entries;
     }
 
     /**

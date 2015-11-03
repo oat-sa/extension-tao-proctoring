@@ -1,22 +1,30 @@
 define(function(){
     return {
-        'TaoProctoring' : {
+        'TestCenter' : {
             'actions' : {
-                'index' : 'controller/TaoProctoring/index',
-                'testSite' : 'controller/TaoProctoring/testsite',
-                'diagnostic' : 'controller/TaoProctoring/diagnostic',
-                'report' : 'controller/TaoProctoring/report'
-        }
-    },
-        'ProctorDelivery' : {
+                'testCenters' : 'controller/TaoProctoring/index',
+                'testCenter' : 'controller/TaoProctoring/testsite'
+            }
+        },
+        'Diagnostic' : {
             'actions' : {
-                'index' : 'controller/ProctorDelivery/index',
-                'delivery' : 'controller/ProctorDelivery/delivery',
+                'index' : 'controller/TaoProctoring/diagnostic'
+            }
+        },
+        'Reporting' : {
+            'actions' : {
+                'index' : 'controller/TaoProctoring/reporting'
+            }
+        },
+        'Delivery' : {
+            'actions' : {
+                'deliveries' : 'controller/ProctorDelivery/index',
+                'monitoring' : 'controller/ProctorDelivery/delivery',
                 'testTakers' : 'controller/ProctorDelivery/testTakers'
             }
         },
-        'Main': {
-            'actions': {
+        'Main' : {
+            'actions' : {
                 'index' : 'controller/Main/index'
             }
         }

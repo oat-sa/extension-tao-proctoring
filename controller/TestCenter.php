@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
+use \core_kernel_classes_Resource;
 
 /**
  * Proctoring Test Center controllers
@@ -43,10 +44,14 @@ class TestCenter extends Proctoring
 
         $testCenters = $this->getTestCenters();
 
-        $this->setData('testCenters', $testCenters);
-        $this->composeView('Proctoring/testCenters.tpl', array(
-            Breadcrumbs::testCenters()
-        ));
+        $this->composeView(
+            'testsites-listing',
+            array(
+                'list' => $testCenters
+            ), array(
+                Breadcrumbs::testCenters()
+            )
+        );
     }
 
     /**
@@ -54,42 +59,60 @@ class TestCenter extends Proctoring
      */
     public function testCenter()
     {
-        $testCenter =  $this->getCurrentTestCenter();
+        $testCenters = $this->getTestCenters();
+        $testCenter  = $this->getCurrentTestCenter();
 
-        $this->setData('label', $testCenter->getLabel());
-        $this->composeView('Proctoring/testCenter.tpl',
+        $this->composeView(
+            'testsite',
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter)
-        ));
+                'id' => $testCenter->getUri(), //change key to testCenter for better consistency
+                'title' => __('Test site %d', $testCenter->getLabel()),
+                'list' => $this->getTestCenterActions($testCenter)
+            ),
+            array(
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, $testCenters)
+            )
+        );
     }
 
     /**
-     * Gets a list of available Test Centers for the current proctor
+     * Gets a list of entries available for a test site
      *
+     * @param $testCenter core_kernel_classes_Resource
      * @return array
+     * @throws ServiceNotFoundException
+     * @throws \common_Exception
+     * @throws \common_exception_Error
      */
-    private function getTestCenters()
+    protected function getTestCenterActions(core_kernel_classes_Resource $testCenter)
     {
 
-        $entries = array();
+        $actionDiagnostics = Breadcrumbs::diagnostics($testCenter);
+        $actionDeliveries  = Breadcrumbs::deliveries($testCenter);
+        $actionReporting   = Breadcrumbs::reporting($testCenter);
 
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i1000000001')),
-            'label' => 'Room A',
-            'text' => __('Go to')
-        );
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i1000000002')),
-            'label' => 'Room B',
-            'text' => __('Go to')
-        );
-        $entries[] = array(
-            'url' => _url('index', 'TestCenter', null, array('uri' => 'locam_ns#i1000000003')),
-            'label' => 'Room C',
-            'text' => __('Go to')
+        $actions = array(
+            array(
+                'url' => $actionDiagnostics['url'],
+                'label' => __('Readiness Check'),
+                'content' => __('Check the compatibility of the current workstation and see the results'),
+                'text' => __('Go')
+            ),
+            array(
+                'url' => $actionDeliveries['url'],
+                'label' => __('Deliveries'),
+                'content' => __('Monitor and manage the deliveries of the test site'),
+                'text' => __('Go')
+            ),
+            array(
+                'url' => $actionReporting['url'],
+                'label' => __('Assessment Activity Reporting'),
+                'content' => __('Generate and review test histories'),
+                'text' => __('Go')
+            ),
         );
 
-        return $entries;
+        return $actions;
     }
 }

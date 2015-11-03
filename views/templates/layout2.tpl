@@ -47,9 +47,8 @@ use oat\tao\model\theme\Theme;
                     </div>
                 </nav>
             </header>
-
             <div id="feedback-box"></div>
-
+            <?php Template::inc('blocks/breadcrumbs.tpl'); ?>
             <?php Template::inc(get_data('content-template')); ?>
         </div>
 
