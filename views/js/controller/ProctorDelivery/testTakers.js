@@ -56,7 +56,7 @@ define([
             var deliveryId = $container.data('id');
             var serviceUrl = helpers._url('availableTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
             var assignUrl = helpers._url('assign', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var indexUrl = helpers._url('index', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var indexUrl = helpers._url('delivery', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -101,7 +101,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No available test takers to assign'),
                         available: __('Available test takers'),
@@ -144,7 +143,7 @@ define([
                         id: 'company',
                         label: __('Company name')
                     }]
-                });
+                }, dataset);
         }
     };
 

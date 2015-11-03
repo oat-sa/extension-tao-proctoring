@@ -118,7 +118,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No readiness checks have been done!'),
                         available: __('Readiness checks already done'),
@@ -184,7 +183,7 @@ define([
                         id: 'date',
                         label: __('Date')
                     }]
-                });
+                }, dataset);
         }
     };
 

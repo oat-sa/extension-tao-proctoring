@@ -268,13 +268,11 @@ class TaoProctoring extends \tao_actions_CommonModule {
         $total = ceil($amount / $rows);
         $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
         $start = ($page - 1) * $rows;
-        $list = array();
-
         $data = array_slice($data, ($page - 1) * $rows, $rows);
 
         return array(
             'offset' => $start,
-            'length' => count($list),
+            'length' => count($data),
             'amount' => $amount,
             'total'  => $total,
             'page'   => $page,

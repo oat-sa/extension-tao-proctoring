@@ -130,7 +130,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No assigned test takers'),
                         available: __('Assigned test takers'),
@@ -223,7 +222,7 @@ define([
                         id: 'status',
                         label: __('Status')
                     }]
-                });
+                }, dataset);
         }
     };
 
