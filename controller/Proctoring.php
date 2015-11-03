@@ -99,13 +99,13 @@ class Proctoring extends \tao_actions_CommonModule
 
     protected function composeView($cssClass, $data = array(), $breadcrumbs = array())
     {
-        $data['userLabel']   = SessionManager::getSession()->getUserLabel();
         $data['breadcrumbs'] = $breadcrumbs;
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             $this->returnJson($data);
         } else {
             $this->defaultData();
+            $this->setData('userLabel', SessionManager::getSession()->getUserLabel());
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
             $this->setData('cls', $cssClass);
             $this->setData('data', $data);
