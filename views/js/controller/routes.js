@@ -13,7 +13,7 @@ define(function(){
         },
         'Reporting' : {
             'actions' : {
-                'index' : 'controller/TaoProctoring/reporting'
+                'index' : 'controller/TaoProctoring/report'
             }
         },
         'Delivery' : {

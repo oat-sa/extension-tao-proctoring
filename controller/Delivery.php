@@ -44,7 +44,6 @@ class Delivery extends Proctoring
         $testCenter = $this->getCurrentTestCenter();
         $deliveries = $this->getDeliveries($testCenter);
 
-        $this->setData('deliveries', $deliveries);
         $this->composeView(
             'deliveries-listing',
             array(
