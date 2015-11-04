@@ -63,7 +63,7 @@ define([
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                list: boxes
+                list: process(boxes)
             });
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -72,15 +72,21 @@ define([
             });
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
-
-            // update the index from a JSON array
-            var update = function(boxes) {
+            
+            function process(boxes){
+                console.log(boxes);
+                return boxes;
+            }
+            
+            // update the index from a JSON array   
+            function update(boxes) {
+                
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
                 }
 
-                list.update(boxes);
+                list.update(process(boxes));
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
@@ -90,7 +96,7 @@ define([
             };
 
             // refresh the index
-            var refresh = function() {
+            function refresh() {
                 loadingBar.start();
                 list.setLoading(true);
 

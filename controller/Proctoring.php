@@ -195,19 +195,34 @@ class Proctoring extends \tao_actions_CommonModule
             'id' => 'locam_ns#i2000000001',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000001', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test A',
-            'text' => __('Monitor')
+            'text' => __('Monitor'),
+            'stats' => array(
+                'awaitingApproval' => 3,
+                'inProgress' => 32,
+                'paused' => 12
+            )
         );
         $entries[] = array(
             'id' => 'locam_ns#i2000000002',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000002', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test B',
-            'text' => __('Monitor')
+            'text' => __('Monitor'),
+            'stats' => array(
+                'awaitingApproval' => 0,
+                'inProgress' => 15,
+                'paused' => 1
+            )
         );
         $entries[] = array(
             'id' => 'locam_ns#i2000000003',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000003', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test C',
-            'text' => __('Monitor')
+            'text' => __('Monitor'),
+            'stats' => array(
+                'awaitingApproval' => 1,
+                'inProgress' => 10,
+                'pause' => 8
+            )
         );
 
         return $entries;
