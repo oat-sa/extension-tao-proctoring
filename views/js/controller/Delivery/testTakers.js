@@ -25,27 +25,26 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
-    'ui/dialog',
     'ui/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbs) {
     'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.report';
+    var cssScope = '.delivery-testtakers';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring report page
+     * Controls the ProctorDelivery test takers assign page
      *
      * @type {Object}
      */
-    var taoProctoringReportCtlr = {
+    var proctorDeliveryAssignCtlr = {
         /**
          * Entry point of the page
          */
@@ -54,9 +53,11 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testSiteId = $container.data('id');
-			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testSiteId});
-            var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testSiteId});
+            var deliveryId = $container.data('delivery');
+            var testCenterId = $container.data('testCenter');
+            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter:testCenterId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -64,13 +65,13 @@ define([
                 replace: true
             });
 
-            // request the server with a selection of reports
-            var request = function(url, selection, message) {
+            // send the selection to the server and redirect to the index page
+            var assign = function(selection) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
-                        url: url,
+                        url: assignUrl,
                         data: {
                             tt: selection
                         },
@@ -83,10 +84,8 @@ define([
                         loadingBar.stop();
 
                         if (response && response.success) {
-                            if (message) {
-                                feedback().success(message);
-                            }
-                            $list.datatable('refresh');
+                            feedback().success(__('Test takers have been added'));
+                            location.href = indexUrl;
                         } else {
                             feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
@@ -94,70 +93,60 @@ define([
                 }
             };
 
-            var notYet = function() {
-                dialog({
-                    message: __('Not yet implemented!'),
-                    autoRender: true,
-                    autoDestroy: true,
-                    buttons: 'ok'
-                });
-            };
-            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function() {
+                .on('load.datatable', function(event, response) {
                     loadingBar.stop();
                 })
                 .datatable({
                     url: serviceUrl,
                     status: {
-                        empty: __('No reports to display!'),
-                        available: __('Available reports'),
+                        empty: __('No available test takers to assign'),
+                        available: __('Available test takers'),
                         loading: __('Loading')
                     },
                     tools: [{
-                        id: 'download',
-                        icon: 'download',
-                        title: __('Download the selected reports to a CSV file'),
-                        label: __('Download CSV'),
+                        id: 'back',
+                        icon: 'left',
+                        title: __('Return to the delivery'),
+                        label: __('Back'),
                         action: function() {
-                            notYet();
+                            history.back();
+                        }
+                    }, {
+                        id: 'assign',
+                        icon: 'add',
+                        title: __('Assign the selected test takers to the delivery'),
+                        label: __('Assign the selected test takers'),
+                        massAction: true,
+                        action: function(selection) {
+                            assign(selection);
+                        }
+                    }],
+                    actions: [{
+                        id: 'assign',
+                        icon: 'add',
+                        title: __('Assign the test taker to the delivery'),
+                        action: function(id) {
+                            assign([id]);
                         }
                     }],
                     selectable: true,
                     model: [{
-                        id: 'delivery',
-                        label: __('Delivery')
+                        id: 'firstname',
+                        label: __('First name')
                     }, {
-                        id: 'testtaker',
-                        label: __('Test Taker')
+                        id: 'lastname',
+                        label: __('Last name')
                     }, {
-                        id: 'proctor',
-                        label: __('Proctor')
-                    }, {
-                        id: 'status',
-                        label: __('Status')
-                    }, {
-                        id: 'start',
-                        label: __('Start')
-                    }, {
-                        id: 'end',
-                        label: __('End')
-                    }, {
-                        id: 'pause',
-                        label: __('Pause #')
-                    }, {
-                        id: 'resume',
-                        label: __('Resume #')
-                    }, {
-                        id: 'irregularities',
-                        label: __('Irregularities')
+                        id: 'company',
+                        label: __('Company name')
                     }]
                 }, dataset);
         }
     };
 
-    return taoProctoringReportCtlr;
+    return proctorDeliveryAssignCtlr;
 });

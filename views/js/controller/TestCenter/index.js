@@ -38,17 +38,17 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.deliveries-listing';
+    var cssScope = '.testcenters-index';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the ProctorDelivery index page
+     * Controls the taoProctoring index page
      *
      * @type {Object}
      */
-    var taoProctoringCtlr = {
+    var taoProctoringIndexCtlr = {
         /**
          * Entry point of the page
          */
@@ -57,13 +57,12 @@ define([
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
             var list = listBox({
-                title: __("My Deliveries"),
-                textEmpty: __("No deliveries available"),
+                title: __("My Test sites"),
+                textEmpty: __("No test site available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
-                replace: true,
-                list: boxes
+                replace: true
             });
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -108,10 +107,10 @@ define([
             if (!boxes) {
                 refresh();
             } else {
-                loadingBar.stop();
+                update(boxes);
             }
         }
     };
 
-    return taoProctoringCtlr;
+    return taoProctoringIndexCtlr;
 });

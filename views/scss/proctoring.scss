@@ -21,13 +21,13 @@
         margin: auto;
     }
 
-    .testsites-listing, .deliveries-listing {
+    .testcenters-index, .delivery-index {
         .content {
             width: 500px;
         }
     }
 
-    .diagnostic, .report, .delivery-manager, .assign-test-takers {
+    .diagnostic-index, .reporting-index, .delivery-monitoring, .delivery-testtakers {
         .content {
             width: 800px;
         }
@@ -38,7 +38,7 @@
         }
     }
 
-    .diagnostic, .report {
+    .diagnostic-index, .reporting-index {
         .content {
             width: 100%;
             padding: 0 20px;

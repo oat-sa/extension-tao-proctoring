@@ -46,7 +46,7 @@ class Reporting extends Proctoring
 
         $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
         $this->composeView(
-            'report',
+            'reporting-index',
             array(
                 'id' => $testCenter->getUri(),
                 'set' => $this->paginate($reports, $requestOptions),

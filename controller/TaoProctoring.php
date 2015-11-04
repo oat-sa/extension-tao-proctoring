@@ -311,7 +311,7 @@ class TaoProctoring extends \tao_actions_CommonModule {
 
         try {
 
-            $this->setPage('testsites-listing', array(
+            $this->setPage('testcenters-index', array(
                 'list' => $this->getTestSites(),
                 'breadcrumbs' => $this->getBreadcrumbs(),
             ));

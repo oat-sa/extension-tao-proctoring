@@ -32,26 +32,20 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.delivery-manager';
+    var cssScope = '.diagnostic-index';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring delivery page
+     * Controls the taoProctoring readiness check page
      *
      * @type {Object}
      */
-    var proctorDeliveryIndexCtlr = {
+    var taoProctoringDiagnosticCtlr = {
         /**
          * Entry point of the page
          */
@@ -60,22 +54,17 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var deliveryId = $container.data('id');
-            var testSiteId = $container.data('testsite');
-            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
-            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
-            var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testSiteId});
-            
+            var testCenterId = $container.data('testCenter');
+            var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+            var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            
-            //@TODO format the incoming data before displaying in the datatable
-            
-            // request the server with a selection of test takers
+
+            // request the server with a selection of readiness check results
             var request = function(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
@@ -105,22 +94,21 @@ define([
                 }
             };
 
-            // request the server to authorise the selected test takers
-            var authorise = function(selection) {
+            var notYet = function() {
                 dialog({
                     message: __('Not yet implemented!'),
                     autoRender: true,
                     autoDestroy: true,
                     buttons: 'ok'
                 });
-                //request(authoriseUrl, selection, __('Test takers have been authorised'));
             };
 
-            // request the server to remove the selected test takers
+            // request the server to remove the selected diagnostic-index
             var remove = function(selection) {
-                request(removeUrl, selection, __('Test takers have been removed'));
+                notYet();
+                //request(removeUrl, selection, __('The readiness check result have been removed'));
             };
-
+            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -131,43 +119,27 @@ define([
                 .datatable({
                     url: serviceUrl,
                     status: {
-                        empty: __('No assigned test takers'),
-                        available: __('Assigned test takers'),
+                        empty: __('No readiness checks have been done!'),
+                        available: __('Readiness checks already done'),
                         loading: __('Loading')
                     },
                     tools: [{
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
+                        id: 'launch',
+                        icon: 'play',
+                        title: __('Launch another readiness check'),
+                        label: __('Launch readiness check'),
                         action: function() {
-                            location.href = assignUrl;
-                        }
-                    }, {
-                        id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the selected test takers to run the delivery'),
-                        label: __('Authorise'),
-                        massAction: true,
-                        action: function(selection) {
-                            dialog({
-                                message: __('The test takers will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    authorise(selection);
-                                }
-                            });
+                            notYet();
                         }
                     }, {
                         id: 'remove',
                         icon: 'remove',
-                        title: __('Remove the selected test takers from the delivery'),
+                        title: __('Remove the selected readiness check results'),
                         label: __('Remove'),
                         massAction: true,
                         action: function(selection) {
                             dialog({
-                                message: __('The test takers will be removed from this delivery. Continue ?'),
+                                message: __('The selected readiness check results will be removed. Continue ?'),
                                 autoRender: true,
                                 autoDestroy: true,
                                 onOkBtn: function() {
@@ -177,31 +149,14 @@ define([
                         }
                     }],
                     actions: [{
-                        id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the test taker to run the delivery'),
-                        hidden: function() {
-                            return !!this.authorised;
-                        },
-                        action: function(id) {
-                            dialog({
-                                message: __('The test taker will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    authorise([id]);
-                                }
-                            });
-                        }
-                    }, {
                         id: 'remove',
                         icon: 'remove',
-                        title: __('Remove the test taker from the delivery'),
+                        title: __('Remove the readiness check result?'),
                         action: function(id) {
                             dialog({
                                 autoRender: true,
                                 autoDestroy: true,
-                                message: __('The test taker will be removed from this delivery. Continue ?'),
+                                message: __('The readiness check result will be removed. Continue ?'),
                                 onOkBtn: function() {
                                     remove([id]);
                                 }
@@ -210,21 +165,27 @@ define([
                     }],
                     selectable: true,
                     model: [{
-                        id: 'firstname',
-                        label: __('First name')
+                        id: 'workstation',
+                        label: __('Workstation')
                     }, {
-                        id: 'lastname',
-                        label: __('Last name')
+                        id: 'os',
+                        label: __('OS')
                     }, {
-                        id: 'company',
-                        label: __('Company name')
+                        id: 'browser',
+                        label: __('Browser')
                     }, {
-                        id: 'status',
-                        label: __('Status')
+                        id: 'performance',
+                        label: __('Performance')
+                    }, {
+                        id: 'bandwidth',
+                        label: __('Bandwidth')
+                    }, {
+                        id: 'date',
+                        label: __('Date')
                     }]
                 }, dataset);
         }
     };
 
-    return proctorDeliveryIndexCtlr;
+    return taoProctoringDiagnosticCtlr;
 });

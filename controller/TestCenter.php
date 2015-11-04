@@ -45,7 +45,7 @@ class TestCenter extends Proctoring
         $testCenters = $this->getTestCenters();
 
         $this->composeView(
-            'testsites-listing',
+            'testcenters-index',
             array(
                 'list' => $testCenters
             ), array(
@@ -63,10 +63,10 @@ class TestCenter extends Proctoring
         $testCenter  = $this->getCurrentTestCenter();
 
         $this->composeView(
-            'testsite',
+            'testcenters-testcenter',
             array(
-                'id' => $testCenter->getUri(), //change key to testCenter for better consistency
-                'title' => __('Test site %d', $testCenter->getLabel()),
+                'testCenter' => $testCenter->getUri(),
+                'title' => __('Test site %s', $testCenter->getLabel()),
                 'list' => $this->getTestCenterActions($testCenter)
             ),
             array(

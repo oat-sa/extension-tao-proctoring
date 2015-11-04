@@ -184,7 +184,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
         try {
 
             $testSiteId = $this->getRequestParameter('id');
-            $this->setPage('deliveries-listing', array(
+            $this->setPage('delivery-index', array(
                 'list' => $this->getDeliveries($testSiteId),
                 'breadcrumbs' => $this->getBreadcrumbs($testSiteId)
             ));
@@ -224,7 +224,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
             $this->setData('title', $delivery->getLabel());
 
-            $this->setPage('delivery-manager', array(
+            $this->setPage('delivery-monitoring', array(
                 'id' => $delivery->getUri(),
                 'testsite' => $testSiteId,
                 'set' => $testTakers,
@@ -268,7 +268,7 @@ class ProctorDelivery extends \tao_actions_CommonModule {
 
             $this->setData('title', __('Assign test takers to %s', $delivery->getLabel()));
 
-            $this->setPage('assign-test-takers', array(
+            $this->setPage('delivery-testtakers', array(
                 'id' => $delivery->getUri(),
                 'testsite' => $testSiteId,
                 'set' => $testTakers,
