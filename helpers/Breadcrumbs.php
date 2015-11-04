@@ -23,9 +23,16 @@ namespace oat\taoProctoring\helpers;
 
 use \core_kernel_classes_Resource;
 
+/**
+ * Allow creating breakcrumbs easily
+ */
 class Breadcrumbs
 {
 
+    /**
+     * Create breadcrumb for TestCenter::index
+     * @return array
+     */
     public static function testCenters()
     {
         return array(
@@ -35,6 +42,13 @@ class Breadcrumbs
         );
     }
 
+    /**
+     * Create breadcrumb for TestCenter::testCenter
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $testCenters
+     * @return array
+     */
     public static function testCenter(core_kernel_classes_Resource $testCenter, $testCenters = array())
     {
         //list also other available test centers
@@ -55,6 +69,13 @@ class Breadcrumbs
         return $breadcrumbs;
     }
 
+    /**
+     * Create breadcrumb for Delivery::index
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $alternativeRoutes
+     * @return array
+     */
     public static function deliveries(core_kernel_classes_Resource $testCenter, $alternativeRoutes = array())
     {
         $breadcrumbs = array(
@@ -68,6 +89,14 @@ class Breadcrumbs
         return $breadcrumbs;
     }
 
+    /**
+     * Create breadcrumb for Delivery::monitoring
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param core_kernel_classes_Resource $delivery
+     * @param array $deliveries
+     * @return array
+     */
     public static function deliveryMonitoring(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery, $deliveries = array())
     {
         //list also other available deliveries
@@ -88,6 +117,14 @@ class Breadcrumbs
         return $breadcrumbs;
     }
 
+    /**
+     * Create breadcrumb for Delivery::testTaker
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param core_kernel_classes_Resource $delivery
+     * @param array $deliveries
+     * @return array
+     */
     public static function deliveryTestTaker(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery)
     {
         //list also other available deliveries
@@ -98,6 +135,13 @@ class Breadcrumbs
         );
     }
 
+    /**
+     * Create breadcrumb for Diagnostic::index
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $alternativeRoutes
+     * @return array
+     */
     public static function diagnostics(core_kernel_classes_Resource $testCenter, $alternativeRoutes = array())
     {
         $breadcrumbs = array(
@@ -111,6 +155,13 @@ class Breadcrumbs
         return $breadcrumbs;
     }
 
+    /**
+     * Create breadcrumb for Reporting::index
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $alternativeRoutes
+     * @return array
+     */
     public static function reporting(core_kernel_classes_Resource $testCenter, $alternativeRoutes = array())
     {
         $breadcrumbs = array(
