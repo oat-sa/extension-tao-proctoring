@@ -35,7 +35,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.diagnostic';
+    var cssScope = '.diagnostic-index';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -103,7 +103,7 @@ define([
                 });
             };
 
-            // request the server to remove the selected diagnostic
+            // request the server to remove the selected diagnostic-index
             var remove = function(selection) {
                 notYet();
                 //request(removeUrl, selection, __('The readiness check result have been removed'));

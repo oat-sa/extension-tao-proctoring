@@ -38,7 +38,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.deliveries-listing';
+    var cssScope = '.delivery-index';
 
     // the page is always loading data when starting
     loadingBar.start();

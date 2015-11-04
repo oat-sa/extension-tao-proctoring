@@ -46,7 +46,7 @@ class Diagnostic extends Proctoring
 
         $this->setData('title', __('Readiness Check for test site %s', $testCenter->getLabel()));
         $this->composeView(
-            'diagnostic',
+            'diagnostic-index',
             array(
                 'id' => $testCenter->getUri(),
                 'set' => $this->paginate($diagnostics, $requestOptions)

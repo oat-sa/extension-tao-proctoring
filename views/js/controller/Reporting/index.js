@@ -35,13 +35,13 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.report';
+    var cssScope = '.reporting-index';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the taoProctoring report page
+     * Controls the taoProctoring reporting-index page
      *
      * @type {Object}
      */

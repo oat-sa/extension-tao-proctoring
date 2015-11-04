@@ -34,7 +34,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.assign-test-takers';
+    var cssScope = '.delivery-testtakers';
 
     // the page is always loading data when starting
     loadingBar.start();

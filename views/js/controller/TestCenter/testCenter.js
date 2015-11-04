@@ -32,7 +32,7 @@ define([
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.testsite';
+    var cssScope = '.testcenters-testcenter';
 
     // the page is always loading data when starting
     loadingBar.start();
