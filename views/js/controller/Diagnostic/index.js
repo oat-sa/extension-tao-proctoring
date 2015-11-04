@@ -54,9 +54,9 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testSiteId = $container.data('id');
-            var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testSiteId});
-            var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testSiteId});
+            var testCenterId = $container.data('id');
+            var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+            var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
