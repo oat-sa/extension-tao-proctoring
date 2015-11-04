@@ -66,7 +66,7 @@ class TestCenter extends Proctoring
             'testcenters-testcenter',
             array(
                 'id' => $testCenter->getUri(), //change key to testCenter for better consistency
-                'title' => __('Test site %d', $testCenter->getLabel()),
+                'title' => __('Test site %s', $testCenter->getLabel()),
                 'list' => $this->getTestCenterActions($testCenter)
             ),
             array(
