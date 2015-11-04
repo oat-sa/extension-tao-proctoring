@@ -60,8 +60,8 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var deliveryId = $container.data('id');
-            var testCenterId = $container.data('testsite');
+            var deliveryId = $container.data('delivery');
+            var testCenterId = $container.data('testCenter');
             var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});

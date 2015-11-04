@@ -76,9 +76,9 @@ class Delivery extends Proctoring
         $this->composeView(
             'delivery-monitoring',
             array(
-                'id' => $delivery->getUri(), //change key to delivery for better consistency
-                'testSite' => $testCenter->getUri(), //change key to delivery for better consistency
-                'set' => $this->paginate($executionData, $requestOptions) //change this to list for better consistency
+                'delivery' => $delivery->getUri(),
+                'testCenter' => $testCenter->getUri(),
+                'set' => $this->paginate($executionData, $requestOptions)
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -119,9 +119,9 @@ class Delivery extends Proctoring
             $this->composeView(
                 'delivery-testtakers',
                 array(
-                    'id' => $delivery->getUri(),
+                    'delivery' => $delivery->getUri(),
                     'title' =>  __('Assign test takers to %s', $delivery->getLabel()),
-                    'testsite' => $testCenter->getUri(),
+                    'testCenter' => $testCenter->getUri(),
                     'set' => $testTakers //change it to list for consistency
                 ),array(
                     Breadcrumbs::testCenters(),

@@ -48,7 +48,7 @@ class Diagnostic extends Proctoring
         $this->composeView(
             'diagnostic-index',
             array(
-                'id' => $testCenter->getUri(),
+                'testCenter' => $testCenter->getUri(),
                 'set' => $this->paginate($diagnostics, $requestOptions)
             ),
             array(

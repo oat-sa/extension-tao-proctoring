@@ -54,7 +54,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testCenterId = $container.data('id');
+            var testCenterId = $container.data('testCenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
 

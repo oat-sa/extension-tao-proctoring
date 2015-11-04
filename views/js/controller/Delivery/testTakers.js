@@ -53,10 +53,11 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var deliveryId = $container.data('id');
-            var serviceUrl = helpers._url('availableTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var assignUrl = helpers._url('assign', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var indexUrl = helpers._url('delivery', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var deliveryId = $container.data('delivery');
+            var testCenterId = $container.data('testCenter');
+            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter:testCenterId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,

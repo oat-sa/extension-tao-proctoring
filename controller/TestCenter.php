@@ -65,7 +65,7 @@ class TestCenter extends Proctoring
         $this->composeView(
             'testcenters-testcenter',
             array(
-                'id' => $testCenter->getUri(), //change key to testCenter for better consistency
+                'testCenter' => $testCenter->getUri(),
                 'title' => __('Test site %s', $testCenter->getLabel()),
                 'list' => $this->getTestCenterActions($testCenter)
             ),
