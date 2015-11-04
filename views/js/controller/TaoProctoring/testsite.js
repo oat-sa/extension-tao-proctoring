@@ -66,7 +66,7 @@ define([
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            var serviceUrl = helpers._url('testSite', 'TaoProctoring', 'taoProctoring');
+            var serviceUrl = helpers._url('testCenter', 'TestCenter', 'taoProctoring');
 
             // update the index from a JSON array
             var update = function(boxes) {

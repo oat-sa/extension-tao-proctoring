@@ -55,8 +55,8 @@ define([
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
             var testSiteId = $container.data('id');
-            var removeUrl = helpers._url('removeDiagnostic', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
-            var serviceUrl = helpers._url('diagnostic', 'TaoProctoring', 'taoProctoring', {id : testSiteId});
+            var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testSiteId});
+            var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testSiteId});
 
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -108,7 +108,7 @@ define([
                 notYet();
                 //request(removeUrl, selection, __('The readiness check result have been removed'));
             };
-
+            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();

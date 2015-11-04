@@ -22,12 +22,9 @@
 namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
-use \common_ext_ExtensionsManager;
-use \tao_install_ExtensionInstaller;
-use oat\tao\model\ThemeRegistry;
-use oat\tao\model\websource\DirectWebSource;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\implementation\TestSiteService;
+
 /**
  * 
  * @author Joel Bout <joel@taotesting.com>
