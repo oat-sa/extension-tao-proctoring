@@ -102,7 +102,7 @@ define([
                     buttons: 'ok'
                 });
             };
-            console.log(dataset);
+            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
