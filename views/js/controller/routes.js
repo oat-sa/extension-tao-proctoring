@@ -2,25 +2,25 @@ define(function(){
     return {
         'TestCenter' : {
             'actions' : {
-                'index' : 'controller/TaoProctoring/index',
-                'testCenter' : 'controller/TaoProctoring/testsite'
+                'index' : 'controller/TestCenter/index',
+                'testCenter' : 'controller/TestCenter/testCenter'
             }
         },
         'Diagnostic' : {
             'actions' : {
-                'index' : 'controller/TaoProctoring/diagnostic'
+                'index' : 'controller/Diagnostic/index'
             }
         },
         'Reporting' : {
             'actions' : {
-                'index' : 'controller/TaoProctoring/report'
+                'index' : 'controller/Reporting/index'
             }
         },
         'Delivery' : {
             'actions' : {
-                'index' : 'controller/ProctorDelivery/index',
-                'monitoring' : 'controller/ProctorDelivery/delivery',
-                'testTakers' : 'controller/ProctorDelivery/testTakers'
+                'index' : 'controller/Delivery/index',
+                'monitoring' : 'controller/Delivery/monitoring',
+                'testTakers' : 'controller/Delivery/testTakers'
             }
         }
     };
