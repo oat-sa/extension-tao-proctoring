@@ -206,7 +206,7 @@ class Proctoring extends \tao_actions_CommonModule
             'id' => 'locam_ns#i2000000002',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000002', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test B',
-            'text' => __('Monitor'),
+            'html' => '<h1>pause</h1>',
             'stats' => array(
                 'awaitingApproval' => 0,
                 'inProgress' => 15,
