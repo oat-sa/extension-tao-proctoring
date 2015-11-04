@@ -52,11 +52,13 @@ class Delivery extends Proctoring
             array(
             Breadcrumbs::testCenters(),
             Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
-            Breadcrumbs::deliveries($testCenter,
+            Breadcrumbs::deliveries(
+                $testCenter,
                 array(
-                Breadcrumbs::diagnostics($testCenter),
-                Breadcrumbs::reporting($testCenter)
-            ))
+                    Breadcrumbs::diagnostics($testCenter),
+                    Breadcrumbs::reporting($testCenter)
+                )
+            )
         ));
     }
 
@@ -68,6 +70,7 @@ class Delivery extends Proctoring
 
         $testCenter    = $this->getCurrentTestCenter();
         $delivery      = $this->getCurrentDelivery();
+        $requestOptions = $this->getRequestOptions();
         $executionData = $this->getDeliveryExecutions($delivery);
 
         $this->composeView(
@@ -75,12 +78,13 @@ class Delivery extends Proctoring
             array(
                 'id' => $delivery->getUri(), //change key to delivery for better consistency
                 'testSite' => $testCenter->getUri(), //change key to delivery for better consistency
-                'set' => $executionData //change this to list for better consistency
+                'set' => $this->paginate($executionData, $requestOptions) //change this to list for better consistency
             ),
             array(
                 Breadcrumbs::testCenters(),
                 Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
-                Breadcrumbs::deliveries($testCenter,
+                Breadcrumbs::deliveries(
+                    $testCenter,
                     array(
                         Breadcrumbs::diagnostics($testCenter),
                         Breadcrumbs::reporting($testCenter)
@@ -122,7 +126,8 @@ class Delivery extends Proctoring
                 ),array(
                     Breadcrumbs::testCenters(),
                     Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
-                    Breadcrumbs::deliveries($testCenter,
+                    Breadcrumbs::deliveries(
+                        $testCenter,
                         array(
                             Breadcrumbs::diagnostics($testCenter),
                             Breadcrumbs::reporting($testCenter)
@@ -141,33 +146,16 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Gets the value of a string property from a user
-     * @param User $user
-     * @param string $property
-     * @return mixed|string
-     */
-    private function getUserStringProp($user, $property) {
-        $value = $user->getPropertyValues($property);
-        return empty($value) ? '' : current($value);
-    }
-
-    /**
      * Get a list of test takers usable in a table page
      * @param User[] $users
      * @param array $options
      * @return array
      */
     private function getTestTakersPage($users, $options) {
-        $amount = count($users);
-        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
-        $total = ceil($amount / $rows);
-        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
-        $start = ($page - 1) * $rows;
+        $page = $this->paginate($users, $options);
+
         $list = array();
-
-        $users = array_slice($users, ($page - 1) * $rows, $rows);
-
-        foreach($users as $user) {
+        foreach($page['data'] as $user) {
             /* @var $user User */
             $firstName = $this->getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
             $lastName = $this->getUserStringProp($user, PROPERTY_USER_LASTNAME);
@@ -184,15 +172,9 @@ class Delivery extends Proctoring
             );
         }
 
-        return array(
-            'offset' => $start,
-            'length' => count($list),
-            'amount' => $amount,
-            'total'  => $total,
-            'page'   => $page,
-            'rows'   => $rows,
-            'data'   => $list
-        );
+        $page['data'] = $list;
+
+        return $page;
     }
 
     /**

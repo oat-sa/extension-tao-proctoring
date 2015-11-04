@@ -52,14 +52,17 @@ class Diagnostic extends Proctoring
                 'set' => $this->paginate($diagnostics, $requestOptions)
             ),
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
-            Breadcrumbs::diagnostics($testCenter,
-                array(
-                Breadcrumbs::deliveries($testCenter),
-                Breadcrumbs::reporting($testCenter)
-            ))
-        ));
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                Breadcrumbs::diagnostics(
+                    $testCenter,
+                    array(
+                        Breadcrumbs::deliveries($testCenter),
+                        Breadcrumbs::reporting($testCenter)
+                    )
+                )
+            )
+        );
     }
 
     /**

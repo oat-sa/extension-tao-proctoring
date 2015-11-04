@@ -128,7 +128,7 @@ class Proctoring extends \tao_actions_CommonModule
      * @param array $data
      * @param array $breadcrumbs
      */
-    protected function composeView($cssClass, $data = array(), $breadcrumbs = array())
+    protected function composeView($cssClass, $data = array(), $breadcrumbs = array(), $template = '')
     {
         $data['breadcrumbs'] = $breadcrumbs;
 
@@ -140,7 +140,7 @@ class Proctoring extends \tao_actions_CommonModule
             $this->setData('clientConfigUrl', $this->getClientConfigUrl());
             $this->setData('cls', $cssClass);
             $this->setData('data', $data);
-            $this->setData('content-template', 'pages/index.tpl');
+            $this->setData('content-template', empty($template) ? 'pages/index.tpl' : $template);
             $this->setView('layout.tpl');
         }
     }
@@ -241,7 +241,7 @@ class Proctoring extends \tao_actions_CommonModule
     }
 
     /**
-     * Gets the request options
+     * Gets the data table request options
      *
      * @return array
      */
@@ -261,5 +261,16 @@ class Proctoring extends \tao_actions_CommonModule
             'filter' => $filter,
         );
 
+    }
+
+    /**
+     * Gets the value of a string property from a user
+     * @param User $user
+     * @param string $property
+     * @return mixed|string
+     */
+    protected function getUserStringProp($user, $property) {
+        $value = $user->getPropertyValues($property);
+        return empty($value) ? '' : current($value);
     }
 }

@@ -108,7 +108,7 @@ define([
                 notYet();
                 //request(removeUrl, selection, __('The readiness check result have been removed'));
             };
-
+            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();

@@ -48,17 +48,19 @@ class Reporting extends Proctoring
         $this->composeView(
             'report',
             array(
-            'id' => $testCenter->getUri(),
-            'set' => $this->paginate($reports, $requestOptions),
+                'id' => $testCenter->getUri(),
+                'set' => $this->paginate($reports, $requestOptions),
             ),
             array(
             Breadcrumbs::testCenters(),
             Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
-            Breadcrumbs::reporting($testCenter,
+            Breadcrumbs::reporting(
+                $testCenter,
                 array(
-                Breadcrumbs::diagnostics($testCenter),
-                Breadcrumbs::deliveries($testCenter),
-            ))
+                    Breadcrumbs::diagnostics($testCenter),
+                    Breadcrumbs::deliveries($testCenter),
+                )
+            )
         ));
     }
 
@@ -107,12 +109,11 @@ class Reporting extends Proctoring
         $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
         $results      = array();
         
-        if (!empty($deliveries)) {
+        if (!empty($deliveries) && !empty($testTakers)) {
             for ($i = 0; $i < $count; $i ++) {
                 $id = $i + 1;
 
                 $delivery   = $deliveries[array_rand($deliveries)];
-                var_dump($delivery);
                 $testTakers = getTestTakers($delivery->getId(), $deliveryService);
                 $break      = $breaks[array_rand($breaks)];
 

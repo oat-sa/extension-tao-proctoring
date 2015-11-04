@@ -102,7 +102,7 @@ define([
                     buttons: 'ok'
                 });
             };
-
+            console.log(dataset);
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -112,7 +112,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No reports to display!'),
                         available: __('Available reports'),
@@ -156,7 +155,7 @@ define([
                         id: 'irregularities',
                         label: __('Irregularities')
                     }]
-                });
+                }, dataset);
         }
     };
 
