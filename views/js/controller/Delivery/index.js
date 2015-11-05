@@ -122,7 +122,13 @@ define([
                     update(boxes);
                 });
             };
-
+            
+            $container.on('click', '.pause', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                console.log('pausing');
+            });
+            
             if (!boxes) {
                 refresh();
             } else {

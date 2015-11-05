@@ -76,6 +76,9 @@
                 span {
                     margin-right:10px;
                 }
+                &:hover {
+                    color: $info;
+                }
             }
         }
     }
