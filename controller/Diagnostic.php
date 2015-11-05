@@ -76,7 +76,7 @@ class Diagnostic extends Proctoring
         $os = array('WinXP', 'Win7', 'Win8', 'Win10', 'Linux', 'Mac OS X');
         $browser = array('IE11', 'Edge', 'Firefox', 'Chrome', 'Safari', 'Opera');
         $performances = array('bad', 'medium', 'good');
-        $bandwidth = array('30', '50', '70', '>100');
+        $bandwidth = array(30, 50, 70, 100, 120);
         $date = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
         $results = array();
 
