@@ -27,8 +27,9 @@ define([
     'ui/feedback',
     'ui/dialog',
     'ui/breadcrumbs',
+    'tpl!taoProctoring/tpl/item-progress',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs, itemProgressTpl) {
     'use strict';
 
     /**
@@ -45,6 +46,42 @@ define([
 
     // the page is always loading data when starting
     loadingBar.start();
+
+    /**
+     * Format a number to string with leading zeros
+     * @param {Number} n
+     * @param {Number} len
+     * @returns {String}
+     * @private
+     */
+    var _leadingZero = function(n, len) {
+        var value = n.toString();
+        while (value.length < len) {
+            value = '0' + value;
+        }
+        return value;
+    };
+
+    /**
+     * Formats a time value to string
+     * @param {Number} time
+     * @returns {String}
+     * @private
+     */
+    var _timerFormat = function(time) {
+        var seconds = Math.floor(time % 60);
+        var minutes = Math.floor(time / 60) % 60;
+        var hours = Math.floor(time / 3600);
+        var parts = [];
+
+        if (hours) {
+            parts.push(hours);
+        }
+        parts.push(_leadingZero(minutes, 2));
+        parts.push(_leadingZero(seconds, 2));
+
+        return parts.join(':');
+    };
 
     /**
      * Controls the taoProctoring delivery page
@@ -66,15 +103,15 @@ define([
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            
+
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
                 renderTo: $container.find('.header'),
                 replace: true
             });
-            
+
             //@TODO format the incoming data before displaying in the datatable
-            
+
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
                 if (selection && selection.length) {
@@ -211,16 +248,46 @@ define([
                     selectable: true,
                     model: [{
                         id: 'firstname',
-                        label: __('First name')
+                        label: __('First name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.firstName || '';
+
+                        }
                     }, {
                         id: 'lastname',
-                        label: __('Last name')
+                        label: __('Last name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.lastName || '';
+
+                        }
                     }, {
                         id: 'company',
-                        label: __('Company name')
+                        label: __('Company name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.companyName || '';
+                        }
                     }, {
                         id: 'status',
-                        label: __('Status')
+                        label: __('Status'),
+                        transform: function(value, row) {
+                            return row && row.state && row.state.status || '';
+                        }
+                    }, {
+                        id: 'progress',
+                        label: __('Progress'),
+                        transform: function(value, row) {
+                            var state = row && row.state;
+                            var item = state && state.item;
+                            var time = item && item.time;
+                            if (time && time.elapsed) {
+                                if (time.total) {
+                                    time.remainingStr = _timerFormat(time.total - time.elapsed);
+                                }
+                                time.elapsedStr = _timerFormat(time.elapsed);
+                                time.display = !!(time.elapsedStr || time.remainingStr);
+                            }
+                            return itemProgressTpl(row && row.state);
+                        }
                     }]
                 }, dataset);
         }

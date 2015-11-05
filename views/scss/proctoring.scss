@@ -15,6 +15,23 @@
         [class^="icon-"] {
           padding: 0;
         }
+
+        td {
+            font-size: 90%;
+            font-weight: normal;
+        }
+
+        .progress {
+            .state:not(:first-child):before {
+                content: ' - ';
+            }
+            .item-time:before {
+                content: ' (';
+            }
+            .item-time:after {
+                content: ')';
+            }
+        }
     }
 
     .content {
