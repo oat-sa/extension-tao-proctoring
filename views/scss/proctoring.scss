@@ -52,6 +52,7 @@
                     background: blacken($uiClickableDefaultBg, .2);
                     h3, [class^="icon-"], [class*=" icon-"] {
                        text-shadow: none;
+                       font-weight: bold;
                     }
                     .listbox-actions{
                         color: $info;
