@@ -19,13 +19,16 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
+    'lodash',
     'jquery',
     'i18n',
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'ui/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
+    'ui/breadcrumbs',
+    'tpl!taoProctoring/tpl/delivery/listBoxActions',
+    'tpl!taoProctoring/tpl/delivery/listBoxStats'
+], function (_, $, __, helpers, loadingBar, listBox, breadcrumbs, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -57,7 +60,7 @@ define([
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
             var list = listBox({
-                title: __("My Deliveries"),
+                title: __("Deliveries"),
                 textEmpty: __("No deliveries available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
@@ -75,6 +78,15 @@ define([
             
             function process(boxes){
                 console.log(boxes);
+                _.each(boxes, function(box){
+                    box.html = actionsTpl();
+                    box.content = statsTpl({
+                        locked : box.stats.awaitingApproval,
+                        inProgress : box.stats.inProgress,
+                        paused : box.stats.paused
+                    });
+                });
+                
                 return boxes;
             }
             

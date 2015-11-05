@@ -44,11 +44,38 @@
             padding: 0 20px;
         }
     }
-
-    .list-box {
-        .dark {
-            .box {
-                background: blacken($uiClickableDefaultBg, .1);
+    
+    .delivery-index{
+        .list-box {
+            .dark {
+                .box {
+                    background: blacken($uiClickableDefaultBg, .2);
+                }
+            }
+        }
+        .listbox-stats {
+            color : whiten($info, .2);
+            .number {
+                margin : 0 12px 0 6px;
+                top: -2px;
+                position: relative;
+            }
+        }
+        .listbox-actions{
+            position: absolute;
+            right: -1px;
+            bottom: -1px;
+            color: $uiClickableHoverBg;
+            outline: 0;
+            .action{
+                display: inline-block;
+                padding: 20px;
+                border-bottom: 3px solid !important;
+                height: 62px;
+                margin-left: -3px;
+                span {
+                    margin-right:10px;
+                }
             }
         }
     }
