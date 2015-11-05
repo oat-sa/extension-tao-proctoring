@@ -50,14 +50,31 @@
             .dark {
                 .box {
                     background: blacken($uiClickableDefaultBg, .2);
+                    h3, [class^="icon-"], [class*=" icon-"] {
+                       text-shadow: none;
+                    }
+                    .listbox-actions{
+                        color: $info;
+                        .action{
+                            /*color : blacken($info, .2);*/
+                            &:hover, &:hover [class^="icon-"], [class*=" icon-"]{
+                                color : $uiClickableHoverBg
+                            }
+                        }
+                    }
                 }
             }
         }
         .listbox-stats {
-            color : whiten($info, .2);
+            .icon-lock{
+                font-size: 12px;
+            }
+            .icon-pause, .icon-play{
+                font-size: 11px;
+            }
             .number {
                 margin : 0 12px 0 6px;
-                top: -2px;
+                top: -1px;
                 position: relative;
             }
         }

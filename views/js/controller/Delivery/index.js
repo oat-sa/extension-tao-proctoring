@@ -126,7 +126,7 @@ define([
             $container.on('click', '.pause', function(e){
                 e.stopPropagation();
                 e.preventDefault();
-                console.log('pausing');
+                alert('Pausing action is currently not available.');
             });
             
             if (!boxes) {
