@@ -111,7 +111,6 @@ class Breadcrumbs
         });
 
         if (count($otherDeliveries)) {
-//            array_unshift($otherDeliveries, self::deliveryMonitoringAll($testCenter));
             $breadcrumbs['entries'] = $otherDeliveries;
         }
 
@@ -134,8 +133,12 @@ class Breadcrumbs
             'label' =>  __('All Deliveries')
         );
 
-        if (count($deliveries)) {
-            $breadcrumbs['entries'] = $deliveries;
+        $otherDeliveries = array_filter($deliveries, function($value) {
+            return $value['id'] != 'all';
+        });
+
+        if (count($otherDeliveries)) {
+            $breadcrumbs['entries'] = $otherDeliveries;
         }
 
         return $breadcrumbs;
