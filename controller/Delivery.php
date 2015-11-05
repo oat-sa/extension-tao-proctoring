@@ -94,6 +94,37 @@ class Delivery extends Proctoring
             )
         );
     }
+    
+    /**
+     * Display all delivery executions of ALL deliveries in the test center
+     */
+    public function monitoringAll()
+    {
+
+        $testCenter    = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+        $executionData = $this->getAllDeliveryExecutions();
+
+        $this->composeView(
+            'delivery-monitoring',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'set' => $this->paginate($executionData, $requestOptions)
+            ),
+            array(
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                Breadcrumbs::deliveries(
+                    $testCenter,
+                    array(
+                        Breadcrumbs::diagnostics($testCenter),
+                        Breadcrumbs::reporting($testCenter)
+                    )
+                ),
+                Breadcrumbs::deliveryMonitoringAll($testCenter, $this->getDeliveries())
+            )
+        );
+    }
 
     /**
      * List available test takers to assign to a delivery
@@ -410,5 +441,10 @@ class Delivery extends Proctoring
         );
 
         return $entries;
+    }
+    
+    private function getAllDeliveryExecutions(){
+        //for test purpose, returns the same mock data
+        return $this->getDeliveryExecutions(new core_kernel_classes_Resource('dummy'));
     }
 }

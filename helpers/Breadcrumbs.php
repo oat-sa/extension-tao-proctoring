@@ -111,7 +111,31 @@ class Breadcrumbs
         });
 
         if (count($otherDeliveries)) {
+//            array_unshift($otherDeliveries, self::deliveryMonitoringAll($testCenter));
             $breadcrumbs['entries'] = $otherDeliveries;
+        }
+
+        return $breadcrumbs;
+    }
+    
+    /**
+     * Create breadcrumb for Delivery::monitoring
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $deliveries
+     * @return array
+     */
+    public static function deliveryMonitoringAll(core_kernel_classes_Resource $testCenter, $deliveries = array())
+    {
+        //list also other available deliveries
+        $breadcrumbs =  array(
+            'id' => 'deliveryMonitoring',
+            'url' => _url('monitoring', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
+            'label' =>  __('All Deliveries')
+        );
+
+        if (count($deliveries)) {
+            $breadcrumbs['entries'] = $deliveries;
         }
 
         return $breadcrumbs;
