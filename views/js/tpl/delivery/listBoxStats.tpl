@@ -1,10 +1,10 @@
 {{#if showProperties}}
 <ul class="plain listbox-properties">
     <li>
-        <label>{{__ "Start"}} :</label>{{periodStart}}
+        <label>{{__ "Start"}}</label>: {{periodStart}}
     </li>
     <li>
-        <label>{{__ "End"}} :</label>{{periodEnd}}
+        <label>{{__ "End"}}</label>: {{periodEnd}}
     </li>
 </ul>
 {{/if}}
