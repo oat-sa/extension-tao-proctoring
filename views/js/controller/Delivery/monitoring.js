@@ -98,7 +98,7 @@ define([
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
-            var testCenterId = $container.data('testCenter');
+            var testCenterId = $container.data('testcenter');
             var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -286,7 +286,7 @@ define([
                                 time.elapsedStr = _timerFormat(time.elapsed);
                                 time.display = !!(time.elapsedStr || time.remainingStr);
                             }
-                            return itemProgressTpl(row && row.state);
+                            return itemProgressTpl(state);
                         }
                     }]
                 }, dataset);

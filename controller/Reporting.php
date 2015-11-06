@@ -22,6 +22,8 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
+use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
 
 /**
  * Proctoring Delivery controllers
@@ -42,18 +44,17 @@ class Reporting extends Proctoring
 
         $testCenter     = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
-        $reports        = $this->getReports($testCenter);
 
         $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
         $this->composeView(
             'reporting-index',
             array(
                 'id' => $testCenter->getUri(),
-                'set' => $this->paginate($reports, $requestOptions),
+                'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
             ),
             array(
             Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
             Breadcrumbs::reporting(
                 $testCenter,
                 array(
@@ -64,73 +65,4 @@ class Reporting extends Proctoring
         ));
     }
 
-    /**
-     * Gets the list of assessment reports related to a test site
-     *
-     * @param $testCenter
-     * @return array
-     */
-    private function getReports($testCenter)
-    {
-        $count = 10;
-
-        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-        $currentUser     = \common_session_SessionManager::getSession()->getUser();
-        $deliveries      = $deliveryService->getProctorableDeliveries($currentUser);
-
-        function getTestTakers($deliveryId, $deliveryService)
-        {
-            static $cache = array();
-            if (!isset($cache[$deliveryId])) {
-                $cache[$deliveryId] = $deliveryService->getDeliveryTestTakers($deliveryId);
-            }
-            return $cache[$deliveryId];
-        }
-
-        function getUserStringProp($user, $property)
-        {
-            $value = $user->getPropertyValues($property);
-            return empty($value) ? '' : current($value);
-        }
-
-        function getUserName($user)
-        {
-            $firstName = getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-            $lastName  = getUserStringProp($user, PROPERTY_USER_LASTNAME);
-            if (empty($firstName) && empty($lastName)) {
-                $firstName = getUserStringProp($user, RDFS_LABEL);
-            }
-
-            return $firstName.' '.$lastName;
-        }
-        $status       = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
-        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
-        $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
-        $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
-        $results      = array();
-        
-        if (!empty($deliveries) && !empty($testTakers)) {
-            for ($i = 0; $i < $count; $i ++) {
-                $id = $i + 1;
-
-                $delivery   = $deliveries[array_rand($deliveries)];
-                $testTakers = getTestTakers($delivery->getId(), $deliveryService);
-                $break      = $breaks[array_rand($breaks)];
-
-                $results[] = array(
-                    'id' => $id,
-                    'delivery' => $delivery->getLabel(),
-                    'testtaker' => getUserName($testTakers[array_rand($testTakers)]),
-                    'proctor' => getUserName($currentUser),
-                    'status' => $status[array_rand($status)],
-                    'start' => $date[array_rand($date)],
-                    'end' => $date[array_rand($date)],
-                    'pause' => $break,
-                    'resume' => $break,
-                    'irregularities' => $irregularity[array_rand($irregularity)],
-                );
-            }
-        }
-        return $results;
-    }
 }

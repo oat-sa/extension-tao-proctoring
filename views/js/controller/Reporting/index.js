@@ -22,13 +22,14 @@ define([
     'jquery',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
     'ui/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbs) {
     'use strict';
 
     /**
@@ -141,10 +142,18 @@ define([
                         label: __('Status')
                     }, {
                         id: 'start',
-                        label: __('Start')
+                        label: __('Start'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }, {
                         id: 'end',
-                        label: __('End')
+                        label: __('End'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }, {
                         id: 'pause',
                         label: __('Pause #')

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
+use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 use \core_kernel_classes_Resource;
 
 /**
@@ -42,7 +43,7 @@ class TestCenter extends Proctoring
     public function index()
     {
 
-        $testCenters = $this->getTestCenters();
+        $testCenters = TestCenterHelper::getTestCenters();
 
         $this->composeView(
             'testcenters-index',
@@ -59,7 +60,7 @@ class TestCenter extends Proctoring
      */
     public function testCenter()
     {
-        $testCenters = $this->getTestCenters();
+        $testCenters = TestCenterHelper::getTestCenters();
         $testCenter  = $this->getCurrentTestCenter();
 
         $this->composeView(

@@ -23,6 +23,8 @@ namespace oat\taoProctoring\controller;
 
 use \common_session_SessionManager as SessionManager;
 use \core_kernel_classes_Resource;
+use oat\taoProctoring\helpers\Delivery;
+use oat\taoProctoring\helpers\TestCenter;
 
 /**
  *
@@ -37,38 +39,6 @@ class Proctoring extends \tao_actions_CommonModule
     protected $currentDelivery   = null;
 
     /**
-     * Temporary method to return a dummy delivery
-     *
-     * @return core_kernel_classes_Resource
-     */
-    private function _getDummyDelivery(){
-        
-        $fakeUri = 'my_local_ns#i9999999999999999';
-        $delivery = new core_kernel_classes_Resource($fakeUri);
-        if(!$delivery->exists()){
-            $objectClass = new \core_kernel_classes_Class(TAO_OBJECT_CLASS);
-            $delivery = $objectClass->createInstance('Dummy Delivery', 'temporarly generated delivery', $fakeUri);
-        }
-        return $delivery;
-    }
-
-    /**
-     * Temporary method to return a dummy test center
-     * 
-     * @return core_kernel_classes_Resource
-     */
-    private function _getDummyTestCenter(){
-
-        $fakeUri = 'my_local_ns#i111111111111111';
-        $testCenter = new core_kernel_classes_Resource($fakeUri);
-        if(!$testCenter->exists()){
-            $objectClass = new \core_kernel_classes_Class(TAO_OBJECT_CLASS);
-            $testCenter = $objectClass->createInstance('Dummy Test Center', 'temporarly generated test center', $fakeUri);
-        }
-        return $testCenter;
-    }
-
-    /**
      * Get the requested test center resource
      * Use this to identify which test center is currently being selected buy the proctor
      *
@@ -80,12 +50,9 @@ class Proctoring extends \tao_actions_CommonModule
         if (is_null($this->currentTestCenter)) {
             if($this->hasRequestParameter('testCenter')){
 
-                //@todo remove me
-                return $this->_getDummyTestCenter();
-
                 //get test center resource from its uri
                 $testCenterUri           = $this->getRequestParameter('testCenter');
-                $this->currentTestCenter = new core_kernel_classes_Resource($testCenterUri);
+                $this->currentTestCenter = TestCenter::getTestCenter($testCenterUri);
             }else{
                 //@todo use a better exception
                 throw new \common_Exception('no current test center');
@@ -107,12 +74,9 @@ class Proctoring extends \tao_actions_CommonModule
         if (is_null($this->currentDelivery)) {
             if($this->hasRequestParameter('delivery')){
 
-                //@todo remove me
-                return $this->_getDummyDelivery();
-
                 //get test center resource from its uri
                 $deliveryUri           = $this->getRequestParameter('delivery');
-                $this->currentDelivery = new core_kernel_classes_Resource($deliveryUri);
+                $this->currentDelivery = Delivery::getDelivery($deliveryUri);
             }else{
                 //@todo use a better exception
                 throw new \common_Exception('no current delivery');
@@ -146,101 +110,6 @@ class Proctoring extends \tao_actions_CommonModule
     }
 
     /**
-     * Gets a list of available Test Centers for the current proctor
-     *
-     * @return array
-     */
-    protected function getTestCenters()
-    {
-        $user = SessionManager::getSession()->getUser();
-        //get allowed test centers based on current proctor...
-
-        $entries = array();
-
-        $entries[] = array(
-            'id' => 'locam_ns#i1000000001',
-            'url' => _url('testCenter', 'TestCenter', null, array('testCenter' => 'locam_ns#i1000000001')),
-            'label' => 'Room A',
-            'text' => __('Go to')
-        );
-        $entries[] = array(
-            'id' => 'locam_ns#i1000000002',
-            'url' => _url('testCenter', 'TestCenter', null, array('testCenter' => 'locam_ns#i1000000002')),
-            'label' => 'Room B',
-            'text' => __('Go to')
-        );
-        $entries[] = array(
-            'id' => 'locam_ns#i1000000003',
-            'url' => _url('testCenter', 'TestCenter', null, array('testCenter' => 'locam_ns#i1000000003')),
-            'label' => 'Room C',
-            'text' => __('Go to')
-        );
-
-        return $entries;
-    }
-
-    /**
-     * Gets the list of available deliveries for the selected test center
-     *
-     * @return array
-     */
-    protected function getDeliveries()
-    {
-
-        $testCenter = $this->getCurrentTestCenter();
-
-        $entries = array();
-
-        $entries[] = array(
-            'id' => 'locam_ns#i2000000001',
-            'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000001', 'testCenter' => $testCenter->getUri())),
-            'label' => 'Test A',
-            'text' => __('Monitor')
-        );
-        $entries[] = array(
-            'id' => 'locam_ns#i2000000002',
-            'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000002', 'testCenter' => $testCenter->getUri())),
-            'label' => 'Test B',
-            'text' => __('Monitor')
-        );
-        $entries[] = array(
-            'id' => 'locam_ns#i2000000003',
-            'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000003', 'testCenter' => $testCenter->getUri())),
-            'label' => 'Test C',
-            'text' => __('Monitor')
-        );
-
-        return $entries;
-    }
-
-    /**
-     * Paginates a list of items to render a data subset in a table
-     * @param array $data
-     * @param array $options
-     * @return array
-     */
-    protected function paginate($data, $options) {
-        $amount = count($data);
-        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
-        $total = ceil($amount / $rows);
-        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
-        $start = ($page - 1) * $rows;
-        $list = array();
-
-        $data = array_slice($data, ($page - 1) * $rows, $rows);
-
-        return array(
-            'offset' => $start,
-            'length' => count($list),
-            'amount' => $amount,
-            'total'  => $total,
-            'page'   => $page,
-            'rows'   => $rows,
-            'data'   => $data
-        );
-    }
-
-    /**
      * Gets the data table request options
      *
      * @return array
@@ -261,16 +130,5 @@ class Proctoring extends \tao_actions_CommonModule
             'filter' => $filter,
         );
 
-    }
-
-    /**
-     * Gets the value of a string property from a user
-     * @param User $user
-     * @param string $property
-     * @return mixed|string
-     */
-    protected function getUserStringProp($user, $property) {
-        $value = $user->getPropertyValues($property);
-        return empty($value) ? '' : current($value);
     }
 }
