@@ -24,8 +24,8 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'ui/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbs) {
+    'taoProctoring/helper/breadcrumbs'
+], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -64,11 +64,7 @@ define([
                 renderTo: $container.find('.content'),
                 replace: true
             });
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
 
