@@ -26,8 +26,8 @@ define([
     'layout/loading-bar',
     'ui/listbox',
     'ui/breadcrumbs',
-    'tpl!taoProctoring/tpl/delivery/listBoxActions',
-    'tpl!taoProctoring/tpl/delivery/listBoxStats'
+    'tpl!taoProctoring/templates/delivery/listBoxActions',
+    'tpl!taoProctoring/templates/delivery/listBoxStats'
 ], function (_, $, __, helpers, loadingBar, listBox, breadcrumbs, actionsTpl, statsTpl) {
     'use strict';
 
