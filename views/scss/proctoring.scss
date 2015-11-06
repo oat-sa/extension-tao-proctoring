@@ -28,6 +28,9 @@
             .item-time:before {
                 content: ' (';
             }
+            .item-time .total:before {
+                content: ' / ';
+            }
             .item-time:after {
                 content: ')';
             }

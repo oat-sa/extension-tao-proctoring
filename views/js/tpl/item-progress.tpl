@@ -8,9 +8,9 @@
     {{#with time}}
         {{#if display}}
     <span class="item-time">
-            {{#if elapsedStr}}<span class="elapsed" title="{{__ 'Elapsed time'}}">{{elapsedStr}}</span>{{/if}}
         <span class="icon icon-time"></span>
-            {{#if remainingStr}}<span class="remaining" title="{{__ 'Remaining time'}}">{{remainingStr}}</span>{{/if}}
+            {{#if elapsedStr}}<span class="elapsed" title="{{__ 'Elapsed time'}}">{{elapsedStr}}</span>{{/if}}
+            {{#if totalStr}}<span class="total" title="{{__ 'Total time'}}">{{totalStr}}</span>{{/if}}
     </span>
         {{/if}}
     {{/with}}

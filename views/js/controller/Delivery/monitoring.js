@@ -48,39 +48,13 @@ define([
     loadingBar.start();
 
     /**
-     * Format a number to string with leading zeros
-     * @param {Number} n
-     * @param {Number} len
-     * @returns {String}
-     * @private
-     */
-    var _leadingZero = function(n, len) {
-        var value = n.toString();
-        while (value.length < len) {
-            value = '0' + value;
-        }
-        return value;
-    };
-
-    /**
      * Formats a time value to string
      * @param {Number} time
      * @returns {String}
      * @private
      */
     var _timerFormat = function(time) {
-        var seconds = Math.floor(time % 60);
-        var minutes = Math.floor(time / 60) % 60;
-        var hours = Math.floor(time / 3600);
-        var parts = [];
-
-        if (hours) {
-            parts.push(hours);
-        }
-        parts.push(_leadingZero(minutes, 2));
-        parts.push(_leadingZero(seconds, 2));
-
-        return parts.join(':');
+        return __('%d min', Math.floor(time / 60));
     };
 
     /**
@@ -280,11 +254,12 @@ define([
                             var item = state && state.item;
                             var time = item && item.time;
                             if (time && time.elapsed) {
-                                if (time.total) {
-                                    time.remainingStr = _timerFormat(time.total - time.elapsed);
-                                }
+                                //if (time.total) {
+                                //    time.remainingStr = _timerFormat(time.total - time.elapsed);
+                                //}
                                 time.elapsedStr = _timerFormat(time.elapsed);
-                                time.display = !!(time.elapsedStr || time.remainingStr);
+                                time.totalStr = _timerFormat(time.total);
+                                time.display = !!(time.elapsedStr || time.totalStr);
                             }
                             return itemProgressTpl(state);
                         }
