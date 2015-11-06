@@ -32,16 +32,81 @@ class Delivery extends Proctoring
         $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
 
         $entries = array();
+
+        $all = array(
+            'id' => 'all',
+            'url' => _url('monitoringAll', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
+            'label' => __('All Deliveries'),
+            'cls' => 'dark',
+            'stats' => array(
+                'awaitingApproval' => 0,
+                'inProgress' => 0,
+                'paused' => 0
+            )
+        );
+
+        $mocks = array(
+            array(
+                'stats' => array(
+                    'awaitingApproval' => 0,
+                    'inProgress' => 0,
+                    'paused' => 0
+                ),
+                'properties' => array(),
+            ),
+            array(
+                'stats' => array(
+                    'awaitingApproval' => 3,
+                    'inProgress' => 32,
+                    'paused' => 12
+                ),
+                'properties' => array(
+                    'periodStart' => '2015-11-09 00:00',
+                    'periodEnd' => '2015-11-17 09:20'
+                )
+            ),
+            array(
+                'stats' => array(
+                    'awaitingApproval' => 0,
+                    'inProgress' => 15,
+                    'paused' => 1
+                ),
+                'properties' => array(
+                    'periodStart' => '2015-11-09 00:00',
+                    'periodEnd' => '2015-11-17 09:20'
+                )
+            ),
+            array(
+                'stats' => array(
+                    'awaitingApproval' => 1,
+                    'inProgress' => 10,
+                    'paused' => 8
+                ),
+                'properties' => array(
+                    'periodStart' => '2015-11-09 00:00',
+                    'periodEnd' => '2015-11-17 09:20'
+                )
+            ),
+        );
+
         foreach ($deliveries as $delivery) {
-            $entries[] = array(
+            $entries[] = array_merge(array(
                 'id' => $delivery->getUri(),
                 'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri(), 'testCenter' => $testCenter->getUri())),
                 'label' => $delivery->getLabel(),
                 'text' => __('Monitor')
-            );
-
+            ), $mocks[array_rand($mocks)]);
         }
 
+        $all = array_reduce($entries, function($carry, $element){
+            $carry['stats']['awaitingApproval'] += $element['stats']['awaitingApproval'];
+            $carry['stats']['inProgress'] += $element['stats']['inProgress'];
+            $carry['stats']['paused'] += $element['stats']['paused'];
+            return $carry;
+        }, $all);
+
+        //prepend the all delivery element to the begining of the array
+        array_unshift($entries, $all);
         return $entries;
     }
 
@@ -158,6 +223,25 @@ class Delivery extends Proctoring
         $page['data'] = $testTakers;
 
         return $page;
+    }
+
+    /**
+     * Mock all deliveries executions from the current test center
+     *
+     * @param $testCenter
+     * @param array [$options]
+     * @return array
+     */
+    public static function getAllDeliveryTestTakers($testCenter, $options = array()){
+        $currentUser = common_session_SessionManager::getSession()->getUser();
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        if (count($deliveries)) {
+            return self::getDeliveryTestTakers(current($deliveries), $options);
+        } else {
+            return self::paginate(array(), $options);
+        }
     }
 
     /**

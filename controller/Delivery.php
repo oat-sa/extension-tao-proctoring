@@ -96,6 +96,36 @@ class Delivery extends Proctoring
             )
         );
     }
+    
+    /**
+     * Display all delivery executions of ALL deliveries in the test center
+     */
+    public function monitoringAll()
+    {
+
+        $testCenter    = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+
+        $this->composeView(
+            'delivery-monitoring',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'set' => DeliveryHelper::getAllDeliveryTestTakers($testCenter, $requestOptions)
+            ),
+            array(
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                Breadcrumbs::deliveries(
+                    $testCenter,
+                    array(
+                        Breadcrumbs::diagnostics($testCenter),
+                        Breadcrumbs::reporting($testCenter)
+                    )
+                ),
+                Breadcrumbs::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter))
+            )
+        );
+    }
 
     /**
      * List available test takers to assign to a delivery

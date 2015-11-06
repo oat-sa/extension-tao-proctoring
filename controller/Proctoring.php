@@ -91,6 +91,7 @@ class Proctoring extends \tao_actions_CommonModule
      * @param string $cssClass
      * @param array $data
      * @param array $breadcrumbs
+     * @param String $template
      */
     protected function composeView($cssClass, $data = array(), $breadcrumbs = array(), $template = '')
     {
