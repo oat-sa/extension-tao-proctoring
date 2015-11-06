@@ -66,7 +66,7 @@ define([
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                list: process(boxes),
+                list: format(boxes),
                 width:12
             });
             var bc = breadcrumbs({
@@ -77,7 +77,7 @@ define([
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
             
-            function process(boxes){
+            function format(boxes){
                 _.each(boxes, function(box){
                     
                     var props = box.properties;
@@ -111,7 +111,7 @@ define([
                     pollTo = null;
                 }
 
-                list.update(process(boxes));
+                list.update(format(boxes));
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index

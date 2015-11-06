@@ -442,7 +442,12 @@ class Delivery extends Proctoring
 
         return $entries;
     }
-    
+
+    /**
+     * Mock all deliveries executions from the current test center
+     * 
+     * @return array
+     */
     private function getAllDeliveryExecutions(){
         //for test purpose, returns the same mock data
         return $this->getDeliveryExecutions(new core_kernel_classes_Resource('dummy'));
