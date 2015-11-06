@@ -66,7 +66,8 @@ define([
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                list: process(boxes)
+                list: process(boxes),
+                width:12
             });
             var bc = breadcrumbs({
                 breadcrumbs : crumbs,
@@ -77,14 +78,26 @@ define([
             var pollTo = null;
             
             function process(boxes){
-                console.log(boxes);
                 _.each(boxes, function(box){
-                    box.html = actionsTpl();
-                    box.content = statsTpl({
+                    
+                    var props = box.properties;
+                    var tplData = {
                         locked : box.stats.awaitingApproval,
                         inProgress : box.stats.inProgress,
                         paused : box.stats.paused
-                    });
+                    };
+                    
+                    if(props && props.periodStart && props.periodEnd){
+                        tplData.showProperties = true;
+                        tplData.periodStart = props.periodStart;
+                        tplData.periodEnd = props.periodEnd;
+                        
+                        //add a special class for boxes that have more information to display
+                        box.cls = 'has-properties-displayed'; 
+                    }
+                    
+                    box.html = actionsTpl();
+                    box.content = statsTpl(tplData);
                 });
                 
                 return boxes;

@@ -211,6 +211,10 @@ class Proctoring extends \tao_actions_CommonModule
                 'awaitingApproval' => 3,
                 'inProgress' => 32,
                 'paused' => 12
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
             )
         );
         $entries[] = array(
@@ -221,6 +225,10 @@ class Proctoring extends \tao_actions_CommonModule
                 'awaitingApproval' => 0,
                 'inProgress' => 15,
                 'paused' => 1
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
             )
         );
         $entries[] = array(
@@ -231,6 +239,10 @@ class Proctoring extends \tao_actions_CommonModule
                 'awaitingApproval' => 1,
                 'inProgress' => 10,
                 'paused' => 8
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
             )
         );
         
