@@ -21,6 +21,7 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoProctoring\model\mock\WebServiceMock;
 use \core_kernel_classes_Resource;
 
 class TestCenter extends Proctoring
@@ -156,22 +157,24 @@ class TestCenter extends Proctoring
             for ($i = 0; $i < $count; $i ++) {
                 $id = $i + 1;
 
-                $delivery   = $deliveries[array_rand($deliveries)];
-                $testTakers = getTestTakers($delivery->getId(), $deliveryService);
-                $break      = $breaks[array_rand($breaks)];
+                $delivery   = WebServiceMock::random($deliveries);
+                if (is_object($delivery)) {
+                    $testTakers = getTestTakers($delivery->getId(), $deliveryService);
+                    $break      = WebServiceMock::random($breaks);
 
-                $results[] = array(
-                    'id' => $id,
-                    'delivery' => $delivery->getLabel(),
-                    'testtaker' => self::getUserName($testTakers[array_rand($testTakers)]),
-                    'proctor' => self::getUserName($currentUser),
-                    'status' => $status[array_rand($status)],
-                    'start' => $date[array_rand($date)],
-                    'end' => $date[array_rand($date)],
-                    'pause' => $break,
-                    'resume' => $break,
-                    'irregularities' => $irregularity[array_rand($irregularity)],
-                );
+                    $results[] = array(
+                        'id' => $id,
+                        'delivery' => $delivery->getLabel(),
+                        'testtaker' => self::getUserName(WebServiceMock::random($testTakers)),
+                        'proctor' => self::getUserName($currentUser),
+                        'status' => WebServiceMock::random($status),
+                        'start' => WebServiceMock::random($date),
+                        'end' => WebServiceMock::random($date),
+                        'pause' => $break,
+                        'resume' => $break,
+                        'irregularities' => WebServiceMock::random($irregularity),
+                    );
+                }
             }
         }
 

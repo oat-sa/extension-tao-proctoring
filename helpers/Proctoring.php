@@ -60,8 +60,11 @@ class Proctoring
      */
     public static function getUserStringProp($user, $property)
     {
-        $value = $user->getPropertyValues($property);
-        return empty($value) ? '' : current($value);
+        if (is_object($user)) {
+            $value = $user->getPropertyValues($property);
+            return empty($value) ? '' : current($value);
+        }
+        return '';
     }
 
     /**

@@ -88,6 +88,18 @@ class WebServiceMock
     }
 
     /**
+     * Get an item from a random place in a collection
+     * @param array $collection
+     * @return mixed
+     */
+    public static function random($collection) {
+        if (count($collection)) {
+            return $collection[array_rand($collection)];
+        }
+        return array();
+    }
+
+    /**
      * Extract a page from a collection
      *
      * @param array $collection The collection to slice

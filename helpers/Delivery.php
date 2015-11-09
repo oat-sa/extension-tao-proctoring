@@ -24,6 +24,7 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use \core_kernel_classes_Resource;
 use \common_session_SessionManager;
+use oat\taoProctoring\model\mock\WebServiceMock;
 
 class Delivery extends Proctoring
 {
@@ -107,7 +108,7 @@ class Delivery extends Proctoring
                 'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri(), 'testCenter' => $testCenter->getUri())),
                 'label' => $delivery->getLabel(),
                 'text' => __('Monitor')
-            ), $mocks[array_rand($mocks)]);
+            ), WebServiceMock::random($mocks));
         }
 
         $all = array_reduce($entries, function($carry, $element){
@@ -228,7 +229,7 @@ class Delivery extends Proctoring
                 'delivery' => array(
                     'label' => $delivery->getLabel(),
                 ),
-                'state' => $mocks[array_rand($mocks)],
+                'state' => WebServiceMock::random($mocks),
             );
         }
 
