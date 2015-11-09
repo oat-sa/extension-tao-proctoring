@@ -25,10 +25,10 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
-], function (_, $, __, helpers, loadingBar, listBox, breadcrumbs, actionsTpl, statsTpl) {
+], function (_, $, __, helpers, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -69,43 +69,39 @@ define([
                 list: format(boxes),
                 width:12
             });
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
-            
+
             function format(boxes){
                 _.each(boxes, function(box){
-                    
+
                     var props = box.properties;
                     var tplData = {
                         locked : box.stats.awaitingApproval,
                         inProgress : box.stats.inProgress,
                         paused : box.stats.paused
                     };
-                    
+
                     if(props && props.periodStart && props.periodEnd){
                         tplData.showProperties = true;
                         tplData.periodStart = props.periodStart;
                         tplData.periodEnd = props.periodEnd;
-                        
+
                         //add a special class for boxes that have more information to display
-                        box.cls = 'has-properties-displayed'; 
+                        box.cls = 'has-properties-displayed';
                     }
-                    
+
                     box.html = actionsTpl();
                     box.content = statsTpl(tplData);
                 });
-                
+
                 return boxes;
             }
-            
-            // update the index from a JSON array   
+
+            // update the index from a JSON array
             function update(boxes) {
-                
+
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
@@ -135,13 +131,13 @@ define([
                     update(boxes);
                 });
             };
-            
+
             $container.on('click', '.pause', function(e){
                 e.stopPropagation();
                 e.preventDefault();
                 alert('Pausing action is currently not available.');
             });
-            
+
             if (!boxes) {
                 refresh();
             } else {

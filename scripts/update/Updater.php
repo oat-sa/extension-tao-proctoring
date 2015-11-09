@@ -23,7 +23,7 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\taoProctoring\model\implementation\DeliveryService;
-use oat\taoProctoring\model\implementation\TestSiteService;
+use oat\taoProctoring\model\implementation\TestCenterService;
 
 /**
  * 
@@ -47,8 +47,8 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         if ($currentVersion == '0.2') {
-            $service = new TestSiteService();
-            $ext->setConfig('testSite', $service);
+            $service = new TestCenterService();
+            $ext->setConfig('testCenter', $service);
             $currentVersion = '0.3';
         }
 

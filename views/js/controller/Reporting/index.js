@@ -28,11 +28,11 @@ define([
     'tpl!taoProctoring/templates/reporting/datepicker',
     'ui/feedback',
     'ui/dialog',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -58,15 +58,11 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testCenterId = $container.data('testCenter');
+            var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
 
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of reports
             var request = function(url, selection, message) {
@@ -145,10 +141,18 @@ define([
                         label: __('Status')
                     }, {
                         id: 'start',
-                        label: __('Start')
+                        label: __('Start'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }, {
                         id: 'end',
-                        label: __('End')
+                        label: __('End'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }, {
                         id: 'pause',
                         label: __('Pause #')
@@ -196,7 +200,7 @@ define([
             refresh();
         });
         
-        refresh();
+//        refresh();
         
         /**
          * Refresh the data table with new date range 

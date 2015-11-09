@@ -22,13 +22,14 @@ define([
     'jquery',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -58,11 +59,7 @@ define([
             var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
 
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of readiness check results
             var request = function(url, selection, message) {
@@ -178,10 +175,23 @@ define([
                         label: __('Performance')
                     }, {
                         id: 'bandwidth',
-                        label: __('Bandwidth')
+                        label: __('Bandwidth'),
+                        transform: function(value) {
+                            var bandwidth = value;
+
+                            if (value > 100) {
+                                bandwidth = '> 100';
+                            }
+
+                            return bandwidth + ' Mbs';
+                        }
                     }, {
                         id: 'date',
-                        label: __('Date')
+                        label: __('Date'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }]
                 }, dataset);
         }

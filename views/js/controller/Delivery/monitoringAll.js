@@ -28,8 +28,9 @@ define([
     'ui/dialog',
     'taoProctoring/helper/breadcrumbs',
     'tpl!taoProctoring/tpl/item-progress',
+    'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
 
     /**
@@ -73,10 +74,9 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
-            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('allDeliveriesTestTakers', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
 
@@ -151,14 +151,6 @@ define([
                             $list.datatable('refresh');
                         }
                     }, {
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
-                        action: function() {
-                            location.href = assignUrl;
-                        }
-                    }, {
                         id: 'authorise',
                         icon: 'checkbox-checked',
                         title: __('Authorise the selected test takers to run the delivery'),
@@ -225,6 +217,18 @@ define([
                     }],
                     selectable: true,
                     model: [{
+                        id: 'delivery',
+                        label: __('Delivery'),
+                        transform: function(value, row) {
+                            var delivery = row && row.delivery;
+                            if (delivery) {
+                                delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri, testCenter : testCenterId});
+                                value = deliveryLinkTpl(delivery);
+                            }
+                            return value;
+
+                        }
+                    }, {
                         id: 'firstname',
                         label: __('First name'),
                         transform: function(value, row) {

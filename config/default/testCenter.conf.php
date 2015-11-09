@@ -19,4 +19,4 @@
  * 
  */  
 
-return new oat\taoProctoring\model\implementation\TestSiteService();
+return new oat\taoProctoring\model\implementation\TestCenterService();

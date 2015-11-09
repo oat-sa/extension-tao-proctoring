@@ -10,41 +10,80 @@
         @include font-size(18);
         margin: 30px 0 10px;
     }
-    
+
+    .breadcrumbs{
+        overflow: visible;
+        font-size : 14px;
+        padding-bottom: 2px;
+        a {
+            color : white;
+        }
+        li.breadcrumb{
+            bottom : 2px;
+            background : inherit;
+            ul {
+                padding-top : 22px;
+                background : inherit;
+                padding-top : 2px;
+                border : none;
+            }
+        }
+    }
+
     table.datatable {
         [class^="icon-"] {
             padding: 0;
         }
+
+        td {
+            font-size: 90%;
+            font-weight: normal;
+        }
+
+        .progress {
+            .state:not(:first-child):before {
+                content: ' - ';
+            }
+            .item-time:before {
+                content: ' (';
+            }
+            .item-time .total:before {
+                content: ' / ';
+            }
+            .item-time:after {
+                content: ')';
+            }
+        }
     }
-    
+
     .content {
         margin: auto;
     }
-    
+
     .testcenters-index, .delivery-index {
         .content {
             width: 500px;
         }
     }
-    
-    .diagnostic-index, .reporting-index, .delivery-monitoring, .delivery-testtakers {
+
+    .diagnostic-index, .reporting-index, .delivery-testtakers {
         .content {
             width: 800px;
         }
-        
+
         .message {
             padding: 8px;
             text-align: center;
         }
     }
-    
-    .diagnostic-index, .reporting-index {
+
+    .diagnostic-index, .reporting-index, .delivery-monitoring {
         .content {
             width: 100%;
             padding: 0 20px;
         }
     }
-    
+
     .delivery-index{
         .list-box {
             .dark {
