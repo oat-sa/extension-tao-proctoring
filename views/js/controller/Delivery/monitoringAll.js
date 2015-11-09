@@ -76,7 +76,7 @@ define([
             var testCenterId = $container.data('testcenter');
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('allDeliveriesTestTakers', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
 
@@ -148,8 +148,8 @@ define([
                         title: __('Refresh the page'),
                         label: __('Refresh'),
                         action: function() {
-                            location.href = location.href;
-                    }
+                            $list.datatable('refresh');
+                        }
                     }, {
                         id: 'authorise',
                         icon: 'checkbox-checked',

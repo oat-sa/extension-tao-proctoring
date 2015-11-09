@@ -196,6 +196,29 @@ class Delivery extends Proctoring
     }
 
     /**
+     * Gets the list of test takers assigned to all deliveries
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function allDeliveriesTestTakers() {
+
+        try {
+
+            $testCenter      = $this->getCurrentTestCenter();
+            $requestOptions = $this->getRequestOptions();
+            
+            $this->returnJson(DeliveryHelper::getAllDeliveryTestTakers($testCenter, $requestOptions));
+            
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
      * Gets the list of test takers available for the proctor
      *
      * @throws \common_Exception
