@@ -22,6 +22,9 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
+use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
+use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
 use \core_kernel_classes_Resource;
 
 /**
@@ -42,7 +45,7 @@ class Delivery extends Proctoring
     {
 
         $testCenter = $this->getCurrentTestCenter();
-        $deliveries = $this->getDeliveries($testCenter);
+        $deliveries = DeliveryHelper::getDeliveries($testCenter);
 
         $this->composeView(
             'delivery-index',
@@ -51,7 +54,7 @@ class Delivery extends Proctoring
             ),
             array(
             Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
             Breadcrumbs::deliveries(
                 $testCenter,
                 array(
@@ -71,18 +74,17 @@ class Delivery extends Proctoring
         $testCenter    = $this->getCurrentTestCenter();
         $delivery      = $this->getCurrentDelivery();
         $requestOptions = $this->getRequestOptions();
-        $executionData = $this->getDeliveryExecutions($delivery);
 
         $this->composeView(
             'delivery-monitoring',
             array(
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
-                'set' => $this->paginate($executionData, $requestOptions)
+                'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions)
             ),
             array(
                 Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
                 Breadcrumbs::deliveries(
                     $testCenter,
                     array(
@@ -90,7 +92,7 @@ class Delivery extends Proctoring
                         Breadcrumbs::reporting($testCenter)
                     )
                 ),
-                Breadcrumbs::deliveryMonitoring($testCenter, $delivery, $this->getDeliveries())
+                Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
             )
         );
     }
@@ -103,17 +105,16 @@ class Delivery extends Proctoring
 
         $testCenter    = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
-        $executionData = $this->getAllDeliveryExecutions();
 
         $this->composeView(
             'delivery-monitoring',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'set' => $this->paginate($executionData, $requestOptions)
+                'set' => DeliveryHelper::getAllDeliveryTestTakers($testCenter, $requestOptions)
             ),
             array(
                 Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
                 Breadcrumbs::deliveries(
                     $testCenter,
                     array(
@@ -121,7 +122,7 @@ class Delivery extends Proctoring
                         Breadcrumbs::reporting($testCenter)
                     )
                 ),
-                Breadcrumbs::deliveryMonitoringAll($testCenter, $this->getDeliveries())
+                Breadcrumbs::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter))
             )
         );
     }
@@ -140,12 +141,8 @@ class Delivery extends Proctoring
         
         try {
 
-            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-            $currentUser = \common_session_SessionManager::getSession()->getUser();
-
             $requestOptions = $this->getRequestOptions();
-            $users = $deliveryService->getAvailableTestTakers($currentUser, $delivery->getUri(), $requestOptions);
-            $testTakers = $this->getTestTakersPage($users, $requestOptions);
+            $testTakers = DeliveryHelper::getAvailableTestTakers($delivery->getUri(), $requestOptions);
 
             $this->composeView(
                 'delivery-testtakers',
@@ -156,7 +153,7 @@ class Delivery extends Proctoring
                     'set' => $testTakers //change it to list for consistency
                 ),array(
                     Breadcrumbs::testCenters(),
-                    Breadcrumbs::testCenter($testCenter, $this->getTestCenters()),
+                    Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
                     Breadcrumbs::deliveries(
                         $testCenter,
                         array(
@@ -164,7 +161,7 @@ class Delivery extends Proctoring
                             Breadcrumbs::reporting($testCenter)
                         )
                     ),
-                    Breadcrumbs::deliveryMonitoring($testCenter, $delivery, $this->getDeliveries()),
+                    Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
                     Breadcrumbs::deliveryTestTaker($testCenter, $delivery)
                 )
             );
@@ -177,38 +174,6 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Get a list of test takers usable in a table page
-     * @param User[] $users
-     * @param array $options
-     * @return array
-     */
-    private function getTestTakersPage($users, $options) {
-        $page = $this->paginate($users, $options);
-
-        $list = array();
-        foreach($page['data'] as $user) {
-            /* @var $user User */
-            $firstName = $this->getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-            $lastName = $this->getUserStringProp($user, PROPERTY_USER_LASTNAME);
-            if (empty($firstName) && empty($lastName)) {
-                $firstName = $this->getUserStringProp($user, RDFS_LABEL);
-            }
-
-            $list[] = array(
-                'id' => $user->getIdentifier(),
-                'firstname' => $firstName,
-                'lastname' => $lastName,
-                'company' => '',
-                'status' => ''
-            );
-        }
-
-        $page['data'] = $list;
-
-        return $page;
-    }
-
-    /**
      * Gets the list of test takers assigned to a delivery
      *
      * @throws \common_Exception
@@ -216,18 +181,12 @@ class Delivery extends Proctoring
      */
     public function deliveryTestTakers() {
 
-        $deliveryId = $this->getRequestParameter('id');
-
         try {
 
-//            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-//
-//            $requestOptions = $this->getRequestOptions();
-//            $users = $deliveryService->getDeliveryTestTakers($deliveryId, $requestOptions);
-//            $testTakers = $this->getTestTakersPage($users, $requestOptions);
-   
-            //@TODO mock list of test taker
-            $this->returnJson(array());
+            $delivery      = $this->getCurrentDelivery();
+            $requestOptions = $this->getRequestOptions();
+
+            $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -248,13 +207,8 @@ class Delivery extends Proctoring
 
         try {
 
-            $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-
             $requestOptions = $this->getRequestOptions();
-            $proctor = \common_session_SessionManager::getSession()->getUser();
-            $users = $deliveryService->getAvailableTestTakers($proctor, $deliveryId, $requestOptions);
-            $testTakers = $this->getTestTakersPage($users, $requestOptions);
-
+            $testTakers = DeliveryHelper::getAvailableTestTakers($deliveryId, $requestOptions);
             $this->returnJson($testTakers);
 
         } catch (ServiceNotFoundException $e) {
@@ -367,89 +321,5 @@ class Delivery extends Proctoring
             $this->returnError('Proctoring interface not available');
         }
 
-    }
-
-    /**
-     * Get the agregated data for a filtered set of delivery executions of a given delivery
-     * This is performance critical, would need to find a way to optimize to obtain such information
-     *
-     * @return array
-     */
-    private function getDeliveryExecutions(core_kernel_classes_Resource $delivery)
-    {
-
-        $entries = array();
-
-        $entries[] = array(
-            'uri' => 'locam_ns#i4000000001',
-            'testTaker' => array(
-                'firstName' => 'Giacomo',
-                'lastName' => 'Guilizzoni',
-                'companyName' => 'Company ABC',
-            ),
-            'delivery' => array(
-                'label' => 'Test A',
-            ),
-            'state' => array(
-                //client will infer possible action based on the current status
-                'status' => 'inProgress',
-                'section' => array(
-                    'label' => 'section B',
-                    'position' => 2,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question X',
-                    'position' => 1,
-                    'total' => 9,
-                    'time' => array(
-                        //time unit in second, does not require microsecond precision for human monitoring
-                        'elapsed' => 60,
-                        'total' => 600
-                    )
-                )
-            )
-        );
-
-        $entries[] = array(
-            'uri' => 'locam_ns#i4000000002',
-            'testTaker' => array(
-                'firstName' => 'Marco',
-                'lastName' => 'Botton',
-                'companyName' => 'Company ABC',
-            ),
-            'delivery' => array(
-                'label' => 'Test A',
-            ),
-            'state' => array(
-                'status' => 'inProgress',
-                'section' => array(
-                    'label' => 'section A',
-                    'position' => 1,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question X',
-                    'position' => 5,
-                    'total' => 8,
-                    'time' => array(
-                        'elapsed' => 540,
-                        'total' => 600
-                    )
-                )
-            )
-        );
-
-        return $entries;
-    }
-
-    /**
-     * Mock all deliveries executions from the current test center
-     * 
-     * @return array
-     */
-    private function getAllDeliveryExecutions(){
-        //for test purpose, returns the same mock data
-        return $this->getDeliveryExecutions(new core_kernel_classes_Resource('dummy'));
     }
 }

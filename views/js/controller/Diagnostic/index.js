@@ -22,13 +22,14 @@ define([
     'jquery',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
+], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -174,10 +175,23 @@ define([
                         label: __('Performance')
                     }, {
                         id: 'bandwidth',
-                        label: __('Bandwidth')
+                        label: __('Bandwidth'),
+                        transform: function(value) {
+                            var bandwidth = value;
+
+                            if (value > 100) {
+                                bandwidth = '> 100';
+                            }
+
+                            return bandwidth + ' Mbs';
+                        }
                     }, {
                         id: 'date',
-                        label: __('Date')
+                        label: __('Date'),
+                        transform: function(value) {
+                            var d = new moment(value);
+                            return d.toString();
+                        }
                     }]
                 }, dataset);
         }

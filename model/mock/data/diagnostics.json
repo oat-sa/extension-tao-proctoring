@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "workstation": "Computer 1",
+    "os": "WinXP",
+    "browser": "Chrome",
+    "performance": "medium",
+    "bandwidth": "30",
+    "date": "2015-09-23 15:28:12"
+  },
+  {
+    "id": 2,
+    "workstation": "Computer 2",
+    "os": "Win8",
+    "browser": "IE11",
+    "performance": "good",
+    "bandwidth": "50",
+    "date": "2015-09-24 09:11:09"
+  },
+  {
+    "id": 3,
+    "workstation": "Computer 3",
+    "os": "Max OS X",
+    "browser": "Safari",
+    "performance": "good",
+    "bandwidth": "40",
+    "date": "2015-10-01 10:33:10"
+  },
+  {
+    "id": 4,
+    "workstation": "Computer 4",
+    "os": "Win10",
+    "browser": "Edge",
+    "performance": "good",
+    "bandwidth": "60",
+    "date": "2015-10-02 12:11:23"
+  },
+  {
+    "id": 5,
+    "workstation": "Computer 5",
+    "os": "Linux",
+    "browser": "Firefox",
+    "performance": "good",
+    "bandwidth": "60",
+    "date": "2015-10-11 16:13:33"
+  },
+  {
+    "id": 6,
+    "workstation": "Computer 6",
+    "os": "Win7",
+    "browser": "IE11",
+    "performance": "medium",
+    "bandwidth": "46",
+    "date": "2015-11-01 11:23:11"
+  },
+  {
+    "id": 7,
+    "workstation": "Computer 7",
+    "os": "WinXP",
+    "browser": "Firefox",
+    "performance": "bad",
+    "bandwidth": "12",
+    "date": "2015-09-12 15:20:22"
+  },
+  {
+    "id": 8,
+    "workstation": "Computer 8",
+    "os": "Linux",
+    "browser": "Firefox",
+    "performance": "medium",
+    "bandwidth": "55",
+    "date": "2015-09-29 14:09:11"
+  },
+  {
+    "id": 9,
+    "workstation": "Computer 9",
+    "os": "Mac OS X",
+    "browser": "Chrome",
+    "performance": "good",
+    "bandwidth": "35",
+    "date": "2015-11-01 17:56:22"
+  }
+]
