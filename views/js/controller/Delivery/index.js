@@ -19,13 +19,16 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
+    'lodash',
     'jquery',
     'i18n',
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'taoProctoring/helper/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory) {
+    'taoProctoring/helper/breadcrumbs',
+    'tpl!taoProctoring/templates/delivery/listBoxActions',
+    'tpl!taoProctoring/templates/delivery/listBoxStats'
+], function (_, $, __, helpers, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -57,26 +60,54 @@ define([
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
             var list = listBox({
-                title: __("My Deliveries"),
+                title: __("Deliveries"),
                 textEmpty: __("No deliveries available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                list: boxes
+                list: format(boxes),
+                width:12
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var pollTo = null;
 
+            function format(boxes){
+                _.each(boxes, function(box){
+
+                    var props = box.properties;
+                    var tplData = {
+                        locked : box.stats.awaitingApproval,
+                        inProgress : box.stats.inProgress,
+                        paused : box.stats.paused
+                    };
+
+                    if(props && props.periodStart && props.periodEnd){
+                        tplData.showProperties = true;
+                        tplData.periodStart = props.periodStart;
+                        tplData.periodEnd = props.periodEnd;
+
+                        //add a special class for boxes that have more information to display
+                        box.cls = 'has-properties-displayed';
+                    }
+
+                    box.html = actionsTpl();
+                    box.content = statsTpl(tplData);
+                });
+
+                return boxes;
+            }
+
             // update the index from a JSON array
-            var update = function(boxes) {
+            function update(boxes) {
+
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
                 }
 
-                list.update(boxes);
+                list.update(format(boxes));
                 loadingBar.stop();
 
                 // poll the server at regular interval to refresh the index
@@ -86,7 +117,7 @@ define([
             };
 
             // refresh the index
-            var refresh = function() {
+            function refresh() {
                 loadingBar.start();
                 list.setLoading(true);
 
@@ -100,6 +131,12 @@ define([
                     update(boxes);
                 });
             };
+
+            $container.on('click', '.pause', function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                alert('Pausing action is currently not available.');
+            });
 
             if (!boxes) {
                 refresh();

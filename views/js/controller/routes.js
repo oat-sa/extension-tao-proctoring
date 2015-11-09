@@ -20,6 +20,7 @@ define(function(){
             'actions' : {
                 'index' : 'controller/Delivery/index',
                 'monitoring' : 'controller/Delivery/monitoring',
+                'monitoringAll' : 'controller/Delivery/monitoring',
                 'testTakers' : 'controller/Delivery/testTakers'
             }
         }

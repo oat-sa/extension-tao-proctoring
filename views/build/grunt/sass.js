@@ -10,7 +10,7 @@ module.exports = function(grunt) {
     sass.taoproctoring.files[root + 'css/proctoring.css'] = root + 'scss/proctoring.scss';
 
     watch.taoproctoringsass = {
-        files : [root + 'views/scss/**/*.scss'],
+        files : [root + 'views/scss/*.scss', root + 'views/scss/**/*.scss'],
         tasks : ['sass:taoproctoring', 'notify:taoproctoringsass'],
         options : {
             debounceDelay : 1000

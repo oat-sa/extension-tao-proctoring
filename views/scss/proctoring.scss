@@ -10,7 +10,7 @@
         @include font-size(18);
         margin: 30px 0 10px;
     }
-    
+
     .breadcrumbs{
         overflow: visible;
         font-size : 14px;
@@ -27,12 +27,12 @@
                 padding-top : 2px;
                 border : none;
             }
-        } 
+        }
     }
-    
+
     table.datatable {
         [class^="icon-"] {
-          padding: 0;
+            padding: 0;
         }
     }
 
@@ -64,10 +64,74 @@
         }
     }
 
-    .list-box {
-        .dark {
-            .box {
-                background: blacken($uiClickableDefaultBg, .1);
+    .delivery-index{
+        .list-box {
+            .dark {
+                .box {
+                    background: blacken($uiClickableDefaultBg, .15);
+                    h3, [class^="icon-"], [class*=" icon-"] {
+                        text-shadow: none;
+                        font-weight: bold;
+                    }
+                    .listbox-actions{
+                        color: $info;
+                        .action{
+                            &:hover, &:hover [class^="icon-"], [class*=" icon-"]{
+                                color : $uiClickableHoverBg
+                            }
+                        }
+                    }
+                }
+            }
+            .has-properties-displayed{
+                .box {
+                    h3{
+                        margin-top: 5px;
+                    }
+                    .listbox-properties{
+                        margin-bottom : 3px;
+                        li label{
+                            margin-bottom : -1px;
+                            min-width : 30px;
+                            padding-right: 0;
+                        }
+                    }
+                }
+            }
+        }
+        .listbox-stats {
+            padding : 0 1px;
+            [class^="icon-"], [class*=" icon-"]{
+                color: whiten($textColor, .2);
+                font-size: 11px;
+            }
+            .icon-lock{
+                font-size: 12px;
+            }
+            .number {
+                margin : 0 12px 0 6px;
+                top: -1px;
+                position: relative;
+            }
+        }
+        .listbox-actions{
+            position: absolute;
+            right: -1px;
+            bottom: -1px;
+            color: $uiClickableHoverBg;
+            outline: 0;
+            .action{
+                display: inline-block;
+                padding: 20px;
+                border-bottom: 3px solid !important;
+                height: 62px;
+                margin-left: -3px;
+                span {
+                    margin-right:10px;
+                }
+                &:hover {
+                    color: $info;
+                }
             }
         }
     }

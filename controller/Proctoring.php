@@ -191,25 +191,70 @@ class Proctoring extends \tao_actions_CommonModule
 
         $entries = array();
 
+        $all = array(
+            'id' => 'all',
+            'url' => _url('monitoringAll', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
+            'label' => __('All Deliveries'),
+            'cls' => 'dark',
+            'stats' => array(
+                'awaitingApproval' => 0,
+                'inProgress' => 0,
+                'paused' => 0
+            )
+        );
+        
         $entries[] = array(
             'id' => 'locam_ns#i2000000001',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000001', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test A',
-            'text' => __('Monitor')
+            'stats' => array(
+                'awaitingApproval' => 3,
+                'inProgress' => 32,
+                'paused' => 12
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
+            )
         );
         $entries[] = array(
             'id' => 'locam_ns#i2000000002',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000002', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test B',
-            'text' => __('Monitor')
+            'stats' => array(
+                'awaitingApproval' => 0,
+                'inProgress' => 15,
+                'paused' => 1
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
+            )
         );
         $entries[] = array(
             'id' => 'locam_ns#i2000000003',
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => 'locam_ns#i2000000003', 'testCenter' => $testCenter->getUri())),
             'label' => 'Test C',
-            'text' => __('Monitor')
+            'stats' => array(
+                'awaitingApproval' => 1,
+                'inProgress' => 10,
+                'paused' => 8
+            ),
+            'properties' => array(
+                'periodStart' => '2015-11-09 00:00',
+                'periodEnd' => '2015-11-17 09:20'
+            )
         );
-
+        
+        $all = array_reduce($entries, function($carry, $element){
+            $carry['stats']['awaitingApproval'] += $element['stats']['awaitingApproval'];
+            $carry['stats']['inProgress'] += $element['stats']['inProgress'];
+            $carry['stats']['paused'] += $element['stats']['paused'];
+            return $carry;
+        }, $all);
+        
+        //prepend the all delivery element to the begining of the array
+        array_unshift($entries, $all);
         return $entries;
     }
 
