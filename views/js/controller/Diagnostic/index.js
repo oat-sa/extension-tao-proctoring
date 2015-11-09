@@ -26,9 +26,9 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -58,11 +58,7 @@ define([
             var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
 
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of readiness check results
             var request = function(url, selection, message) {

@@ -26,9 +26,9 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -67,11 +67,7 @@ define([
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
             
             //@TODO format the incoming data before displaying in the datatable
             
