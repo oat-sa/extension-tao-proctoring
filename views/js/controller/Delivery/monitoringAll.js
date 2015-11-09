@@ -77,9 +77,9 @@ define([
             var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            
+
             var bc = breadcrumbsFactory($container, crumbs);
-            
+
             //@TODO format the incoming data before displaying in the datatable
 
             // request the server with a selection of test takers
@@ -143,6 +143,14 @@ define([
                         loading: __('Loading')
                     },
                     tools: [{
+                        id: 'refresh',
+                        icon: 'refresh',
+                        title: __('Refresh the page'),
+                        label: __('Refresh'),
+                        action: function() {
+                            location.href = location.href;
+                    }
+                    }, {
                         id: 'authorise',
                         icon: 'checkbox-checked',
                         title: __('Authorise the selected test takers to run the delivery'),
