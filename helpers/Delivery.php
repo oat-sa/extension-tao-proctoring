@@ -251,7 +251,21 @@ class Delivery extends Proctoring
         $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
 
         if (count($deliveries)) {
-            return self::getDeliveryTestTakers(current($deliveries), $options);
+            $all = array();
+            foreach($deliveries as $delivery) {
+                $testTakers = self::getDeliveryTestTakers($delivery);
+                if (isset($testTakers['data'])) {
+                    foreach($testTakers['data'] as $testTaker) {
+                        $testTaker['delivery'] = array(
+                            'uri' => $delivery->getUri(),
+                            'label' => $delivery->getLabel(),
+                        );
+                        $all[] = $testTaker;
+                    }
+                }
+            }
+
+            return self::paginate($all, $options);
         } else {
             return self::paginate(array(), $options);
         }
