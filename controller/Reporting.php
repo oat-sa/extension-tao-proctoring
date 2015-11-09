@@ -43,13 +43,14 @@ class Reporting extends Proctoring
         $testCenter     = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
         $reports        = $this->getReports($testCenter);
+        $reports        = $this->filterDatetime($reports, $requestOptions);
 
         $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
         $this->composeView(
             'reporting-index',
             array(
-                'id' => $testCenter->getUri(),
-                'set' => $this->paginate($reports, $requestOptions),
+            'id' => $testCenter->getUri(),
+            'set' => $this->paginate($reports, $requestOptions),
             ),
             array(
             Breadcrumbs::testCenters(),
@@ -57,8 +58,8 @@ class Reporting extends Proctoring
             Breadcrumbs::reporting(
                 $testCenter,
                 array(
-                    Breadcrumbs::diagnostics($testCenter),
-                    Breadcrumbs::deliveries($testCenter),
+                Breadcrumbs::diagnostics($testCenter),
+                Breadcrumbs::deliveries($testCenter),
                 )
             )
         ));
@@ -104,11 +105,11 @@ class Reporting extends Proctoring
             return $firstName.' '.$lastName;
         }
         $status       = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
-        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
+        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53', '2015-11-8 09:36');
         $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
         $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
         $results      = array();
-        
+
         if (!empty($deliveries) && !empty($testTakers)) {
             for ($i = 0; $i < $count; $i ++) {
                 $id = $i + 1;
@@ -132,5 +133,36 @@ class Reporting extends Proctoring
             }
         }
         return $results;
+    }
+
+    /**
+     * Add a simple php level report filtering
+     *
+     * @todo replace this with an actually filtering on the db query ?
+     * @param type $deliveries
+     * @param type $requestOptions
+     * @return type
+     */
+    private function filterDatetime($deliveries, $requestOptions)
+    {
+        $returnValues = array();
+        $start        = isset($requestOptions['start']) ? new DateTime($requestOptions['start']) : null;
+        $end          = isset($requestOptions['end']) ? new DateTime($requestOptions['end']) : null;
+        
+        if (!is_null($start) || !is_null($end)) {
+            foreach ($deliveries as $delivery) {
+                $_start = new DateTime($delivery['start']);
+                $_end   = new DateTime($delivery['end']);
+                if (!is_null($start) && $start > $_end) {
+                    continue;
+                }
+                if (!is_null($end) && $end < $_start) {
+                    continue;
+                }
+                $returnValues[] = $delivery;
+            }
+        }
+
+        return $returnValues;
     }
 }

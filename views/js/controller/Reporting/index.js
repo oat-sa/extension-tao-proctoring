@@ -24,6 +24,7 @@ define([
     'helpers',
     'layout/loading-bar',
     'util/encode',
+    'moment',
     'tpl!taoProctoring/templates/reporting/datepicker',
     'ui/feedback',
     'ui/dialog',
@@ -31,7 +32,7 @@ define([
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, datepickerTpl, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbs) {
     'use strict';
 
     /**
@@ -168,24 +169,48 @@ define([
     function dateRangePicker($container, $list){
         
         var $panel = $container.find('.panel');
-        $panel.append(datepickerTpl());
-        $panel.find('input').datepicker({
-            dateFormat: 'yy-mm-dd',
-            autoSize: true
-        }).on('change', function(){
-            $list.datatable('refresh');
-        });
+        var today = moment().format('YYYY-MM-DD');
+        var periodStart = today;
+        var periodEnd = today;
+        $panel.append(datepickerTpl({
+            start : periodStart,
+            end : periodEnd
+        }));
         
         var $periodStart = $panel.find('input[name=periodStart]');
         var $periodEnd = $panel.find('input[name=periodEnd]');
-        $periodStart.change(function(){
-            var date = $periodStart.val();
-            $periodEnd.datepicker('option', 'minDate', date);
+        $periodStart.datepicker({
+            dateFormat: 'yy-mm-dd',
+            autoSize: true
+        }).change(function(){
+            periodStart = $periodStart.val();
+            $periodEnd.datepicker('option', 'minDate', periodStart);
+            refresh();
         });
-        $periodEnd.change(function(){
-            var date = $periodStart.val();
-            $periodStart.datepicker('option', 'maxDate', date);
+        $periodEnd.datepicker({
+            dateFormat: 'yy-mm-dd',
+            autoSize: true
+        }).change(function(){
+            periodEnd = $periodEnd.val();
+            $periodStart.datepicker('option', 'maxDate', periodEnd);
+            refresh();
         });
+        
+        refresh();
+        
+        /**
+         * Refresh the data table with new date range 
+         * @returns {undefined}
+         */
+        function refresh(){
+            $list.datatable('options', {
+                params:
+                    {
+                        periodStart : periodStart,
+                        periodEnd : periodEnd
+                    }
+            }).datatable('refresh');
+        }
     }
     
     return taoProctoringReportCtlr;

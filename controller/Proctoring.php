@@ -297,6 +297,8 @@ class Proctoring extends \tao_actions_CommonModule
         $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
         $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
         $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+        $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : null;
+        $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : null;
 
         return array(
             'page' => $page,
@@ -304,6 +306,8 @@ class Proctoring extends \tao_actions_CommonModule
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
             'filter' => $filter,
+            'periodStart' => $periodStart,
+            'periodEnd' => $periodEnd
         );
 
     }
