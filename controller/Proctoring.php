@@ -25,6 +25,7 @@ use \common_session_SessionManager as SessionManager;
 use \core_kernel_classes_Resource;
 use oat\taoProctoring\helpers\Delivery;
 use oat\taoProctoring\helpers\TestCenter;
+use \DateTime;
 
 /**
  *
@@ -117,11 +118,14 @@ class Proctoring extends \tao_actions_CommonModule
      */
     protected function getRequestOptions() {
 
+        $today = new DateTime();
         $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : 1;
         $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : 15;
         $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
         $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
         $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+        $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $today->format('Y-m-d');
+        $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $today->format('Y-m-d');
 
         return array(
             'page' => $page,
@@ -129,6 +133,8 @@ class Proctoring extends \tao_actions_CommonModule
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
             'filter' => $filter,
+            'periodStart' => $periodStart,
+            'periodEnd' => $periodEnd
         );
 
     }

@@ -49,7 +49,7 @@ class Reporting extends Proctoring
         $this->composeView(
             'reporting-index',
             array(
-                'id' => $testCenter->getUri(),
+                'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
             ),
             array(
@@ -65,4 +65,12 @@ class Reporting extends Proctoring
         ));
     }
 
+    /**
+     * Returns array of reports to datatable
+     */
+    public function reports(){
+        $testCenter     = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+        $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
+    }
 }

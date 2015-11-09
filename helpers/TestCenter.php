@@ -23,6 +23,7 @@ namespace oat\taoProctoring\helpers;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use \core_kernel_classes_Resource;
+use \DateTime;
 
 class TestCenter extends Proctoring
 {
@@ -176,6 +177,25 @@ class TestCenter extends Proctoring
                     );
                 }
             }
+        }
+
+        $start        = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
+        $end          = isset($options['periodEnd']) ? new DateTime($options['periodEnd']) : null;
+
+        if (!is_null($start) || !is_null($end)) {
+            $returnValues = array();
+            foreach ($results as $delivery) {
+                $_start = new DateTime($delivery['start']);
+                $_end   = new DateTime($delivery['end']);
+                if (!is_null($start) && $start > $_end) {
+                    continue;
+                }
+                if (!is_null($end) && $end < $_start) {
+                    continue;
+                }
+                $returnValues[] = $delivery;
+            }
+            $results = $returnValues;
         }
 
         return self::paginate($results, $options);

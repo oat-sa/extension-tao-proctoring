@@ -22,14 +22,17 @@ define([
     'jquery',
     'i18n',
     'helpers',
-    'moment',
     'layout/loading-bar',
     'util/encode',
+    'moment',
+    'tpl!taoProctoring/templates/reporting/datepicker',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/helper/breadcrumbs',
-    'ui/datatable'
-], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
+    'ui/datatable',
+    'jqueryui',
+    'jquery.timePicker'
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -55,10 +58,9 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testCenterId = $container.data('testCenter');
+            var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
-            var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
-
+            var serviceUrl = helpers._url('reports', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of reports
@@ -99,6 +101,8 @@ define([
                     buttons: 'ok'
                 });
             };
+            
+            var today = moment().format('YYYY-MM-DD');
             
             $list
                 .on('query.datatable', function() {
@@ -159,10 +163,67 @@ define([
                     }, {
                         id: 'irregularities',
                         label: __('Irregularities')
-                    }]
+                    }],
+                    params:{
+                        periodStart : today,
+                        periodEnd : today
+                    }
                 }, dataset);
+            
+            //init date range picker
+            dateRangePicker(today, $container, $list);
         }
     };
-
+    
+    /**
+     * Create a data range picker for reporting index
+     * 
+     * @param {JQuery} $container
+     * @param {JQuery} $list
+     */
+    function dateRangePicker(date, $container, $list){
+        
+        var $panel = $container.find('.panel');
+        var periodStart = date;
+        var periodEnd = date;
+        $panel.append(datepickerTpl({
+            start : periodStart,
+            end : periodEnd
+        }));
+        
+        var $periodStart = $panel.find('input[name=periodStart]');
+        var $periodEnd = $panel.find('input[name=periodEnd]');
+        $periodStart.datepicker({
+            dateFormat: 'yy-mm-dd',
+            autoSize: true
+        }).change(function(){
+            periodStart = $periodStart.val();
+            $periodEnd.datepicker('option', 'minDate', periodStart);
+            refresh();
+        });
+        $periodEnd.datepicker({
+            dateFormat: 'yy-mm-dd',
+            autoSize: true
+        }).change(function(){
+            periodEnd = $periodEnd.val();
+            $periodStart.datepicker('option', 'maxDate', periodEnd);
+            refresh();
+        });
+        
+        /**
+         * Refresh the data table with new date range 
+         * @returns {undefined}
+         */
+        function refresh(){
+            $list.datatable('options', {
+                params:
+                    {
+                        periodStart : periodStart,
+                        periodEnd : periodEnd
+                    }
+            }).datatable('refresh');
+        }
+    }
+    
     return taoProctoringReportCtlr;
 });
