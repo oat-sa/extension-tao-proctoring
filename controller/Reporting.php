@@ -64,5 +64,13 @@ class Reporting extends Proctoring
             )
         ));
     }
-    
+
+    /**
+     * Returns array of reports to datatable
+     */
+    public function reports(){
+        $testCenter     = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+        $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
+    }
 }

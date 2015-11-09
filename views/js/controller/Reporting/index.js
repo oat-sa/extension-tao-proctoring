@@ -60,8 +60,7 @@ define([
             var dataset = $container.data('set');
             var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
-            var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
-
+            var serviceUrl = helpers._url('reports', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of reports
@@ -102,6 +101,8 @@ define([
                     buttons: 'ok'
                 });
             };
+            
+            var today = moment().format('YYYY-MM-DD');
             
             $list
                 .on('query.datatable', function() {
@@ -162,20 +163,29 @@ define([
                     }, {
                         id: 'irregularities',
                         label: __('Irregularities')
-                    }]
+                    }],
+                    params:{
+                        periodStart : today,
+                        periodEnd : today
+                    }
                 }, dataset);
             
             //init date range picker
-            dateRangePicker($container, $list);
+            dateRangePicker(today, $container, $list);
         }
     };
     
-    function dateRangePicker($container, $list){
+    /**
+     * Create a data range picker for reporting index
+     * 
+     * @param {JQuery} $container
+     * @param {JQuery} $list
+     */
+    function dateRangePicker(date, $container, $list){
         
         var $panel = $container.find('.panel');
-        var today = moment().format('YYYY-MM-DD');
-        var periodStart = today;
-        var periodEnd = today;
+        var periodStart = date;
+        var periodEnd = date;
         $panel.append(datepickerTpl({
             start : periodStart,
             end : periodEnd
@@ -199,8 +209,6 @@ define([
             $periodStart.datepicker('option', 'maxDate', periodEnd);
             refresh();
         });
-        
-//        refresh();
         
         /**
          * Refresh the data table with new date range 
