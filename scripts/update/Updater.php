@@ -48,14 +48,8 @@ class Updater extends common_ext_ExtensionUpdater {
 
         if ($currentVersion == '0.2') {
             $service = new TestCenterService();
-            $ext->setConfig('testSite', $service);
-            $currentVersion = '0.3';
-        }
-
-        if ($currentVersion == '0.3') {
-            $service = new TestCenterService();
             $ext->setConfig('testCenter', $service);
-            $currentVersion = '0.4';
+            $currentVersion = '0.3';
         }
 
         return $currentVersion;
