@@ -24,11 +24,14 @@ define([
     'helpers',
     'layout/loading-bar',
     'util/encode',
+    'tpl!taoProctoring/templates/reporting/datepicker',
     'ui/feedback',
     'ui/dialog',
     'ui/breadcrumbs',
-    'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbs) {
+    'ui/datatable',
+    'jqueryui',
+    'jquery.timePicker'
+], function ($, __, helpers, loadingBar, encode, datepickerTpl, feedback, dialog, breadcrumbs) {
     'use strict';
 
     /**
@@ -156,8 +159,36 @@ define([
                         label: __('Irregularities')
                     }]
                 }, dataset);
+            
+            //init date range picker
+            dateRangePicker($container, $list);
         }
     };
-
+    
+    function dateRangePicker($container, $list){
+        
+        var $panel = $container.find('.panel');
+        $panel.append(datepickerTpl());
+        $panel.find('input').datepicker({
+            dateFormat: 'yy-mm-dd',
+            autoSize: true
+        }).on('change', function(){
+            
+            console.log($(this).attr('name'), $(this).val());
+            $list.datatable('refesh');
+        });
+        
+        var $periodStart = $panel.find('input[name=periodStart]');
+        var $periodEnd = $panel.find('input[name=periodEnd]');
+        $periodStart.change(function(){
+            var date = $periodStart.val();
+            $periodEnd.datepicker('option', 'minDate', date);
+        });
+        $periodEnd.change(function(){
+            var date = $periodStart.val();
+            $periodStart.datepicker('option', 'maxDate', date);
+        });
+    }
+    
     return taoProctoringReportCtlr;
 });
