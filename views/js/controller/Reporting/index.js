@@ -173,9 +173,7 @@ define([
             dateFormat: 'yy-mm-dd',
             autoSize: true
         }).on('change', function(){
-            
-            console.log($(this).attr('name'), $(this).val());
-            $list.datatable('refesh');
+            $list.datatable('refresh');
         });
         
         var $periodStart = $panel.find('input[name=periodStart]');
