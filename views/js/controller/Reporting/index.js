@@ -27,9 +27,9 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbs) {
+], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -59,11 +59,7 @@ define([
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
 
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of reports
             var request = function(url, selection, message) {

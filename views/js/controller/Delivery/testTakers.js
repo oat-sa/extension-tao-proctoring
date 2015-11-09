@@ -25,9 +25,9 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
-    'ui/breadcrumbs',
+    'taoProctoring/helper/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbs) {
+], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -59,11 +59,7 @@ define([
             var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter:testCenterId});
 
-            var bc = breadcrumbs({
-                breadcrumbs : crumbs,
-                renderTo: $container.find('.header'),
-                replace: true
-            });
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // send the selection to the server and redirect to the index page
             var assign = function(selection) {
