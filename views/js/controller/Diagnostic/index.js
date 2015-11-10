@@ -69,7 +69,7 @@ define([
                     $.ajax({
                         url: url,
                         data: {
-                            tt: selection
+                            report: selection
                         },
                         dataType : 'json',
                         type: 'POST',

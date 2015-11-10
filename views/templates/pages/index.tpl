@@ -1,8 +1,6 @@
-<div class="container <?= get_data('cls'); ?>"<?php
-    foreach(get_data('data') as $name => $value) {
-        echo ' data-' . $name . '="' .(is_string($value) ? $value : _dh(json_encode($value))) . '"';
-    }
-?>>
+<div class="container <?= get_data('cls'); ?>"<?php foreach(get_data('data') as $name => $value): ?>
+ data-<?= $name; ?>="<?= _dh($value); ?>"
+<?php endforeach; ?>>
     <div class="header"></div>
     <div class="content">
 <?php if(get_data('title')): ?>

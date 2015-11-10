@@ -23,8 +23,9 @@ namespace oat\taoProctoring\controller;
 
 use \common_session_SessionManager as SessionManager;
 use \core_kernel_classes_Resource;
-use oat\taoProctoring\helpers\Delivery;
-use oat\taoProctoring\helpers\TestCenter;
+use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
+use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
 use \DateTime;
 
 /**
@@ -53,7 +54,7 @@ class Proctoring extends \tao_actions_CommonModule
 
                 //get test center resource from its uri
                 $testCenterUri           = $this->getRequestParameter('testCenter');
-                $this->currentTestCenter = TestCenter::getTestCenter($testCenterUri);
+                $this->currentTestCenter = TestCenterHelper::getTestCenter($testCenterUri);
             }else{
                 //@todo use a better exception
                 throw new \common_Exception('no current test center');
@@ -77,13 +78,22 @@ class Proctoring extends \tao_actions_CommonModule
 
                 //get test center resource from its uri
                 $deliveryUri           = $this->getRequestParameter('delivery');
-                $this->currentDelivery = Delivery::getDelivery($deliveryUri);
+                $this->currentDelivery = DeliveryHelper::getDelivery($deliveryUri);
             }else{
                 //@todo use a better exception
                 throw new \common_Exception('no current delivery');
             }
         }
         return $this->currentDelivery;
+    }
+
+    /**
+     * Checks if the current page has been called using AJAX
+     * @return bool
+     */
+    protected function isXmlHttpRequest() {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 
     /**
@@ -98,17 +108,19 @@ class Proctoring extends \tao_actions_CommonModule
     {
         $data['breadcrumbs'] = $breadcrumbs;
 
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            $this->returnJson($data);
-        } else {
-            $this->defaultData();
-            $this->setData('userLabel', SessionManager::getSession()->getUserLabel());
-            $this->setData('clientConfigUrl', $this->getClientConfigUrl());
-            $this->setData('cls', $cssClass);
-            $this->setData('data', $data);
-            $this->setData('content-template', empty($template) ? 'pages/index.tpl' : $template);
-            $this->setView('layout.tpl');
+        foreach($data as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                $data[$key] = json_encode($value);
+            }
         }
+
+        $this->defaultData();
+        $this->setData('userLabel', SessionManager::getSession()->getUserLabel());
+        $this->setData('clientConfigUrl', $this->getClientConfigUrl());
+        $this->setData('cls', $cssClass);
+        $this->setData('data', $data);
+        $this->setData('content-template', empty($template) ? 'pages/index.tpl' : $template);
+        $this->setView('layout.tpl');
     }
 
     /**
@@ -119,8 +131,8 @@ class Proctoring extends \tao_actions_CommonModule
     protected function getRequestOptions() {
 
         $today = new DateTime();
-        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : 1;
-        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : 15;
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : ProctoringHelper::DEFAULT_PAGE;
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : ProctoringHelper::DEFAULT_ROWS;
         $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
         $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
         $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;

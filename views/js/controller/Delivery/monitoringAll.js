@@ -34,12 +34,6 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
@@ -90,7 +84,7 @@ define([
                     $.ajax({
                         url: url,
                         data: {
-                            tt: selection
+                            testtaker: selection
                         },
                         dataType : 'json',
                         type: 'POST',

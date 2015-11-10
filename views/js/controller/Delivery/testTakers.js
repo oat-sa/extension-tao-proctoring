@@ -57,7 +57,7 @@ define([
             var testCenterId = $container.data('testCenter');
             var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
-            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter:testCenterId});
+            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
 
@@ -69,7 +69,7 @@ define([
                     $.ajax({
                         url: assignUrl,
                         data: {
-                            tt: selection
+                            testtaker: selection
                         },
                         dataType : 'json',
                         type: 'POST',

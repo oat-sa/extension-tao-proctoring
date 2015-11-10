@@ -20,12 +20,9 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
-use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
-use \core_kernel_classes_Resource;
 
 /**
  * Proctoring Delivery controllers
@@ -53,15 +50,15 @@ class Delivery extends Proctoring
                 'list' => $deliveries
             ),
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-            Breadcrumbs::deliveries(
-                $testCenter,
-                array(
-                    Breadcrumbs::diagnostics($testCenter),
-                    Breadcrumbs::reporting($testCenter)
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                Breadcrumbs::deliveries(
+                    $testCenter,
+                    array(
+                        Breadcrumbs::diagnostics($testCenter),
+                        Breadcrumbs::reporting($testCenter)
+                    )
                 )
-            )
         ));
     }
 
@@ -226,7 +223,7 @@ class Delivery extends Proctoring
      */
     public function availableTestTakers() {
 
-        $deliveryId = $this->getRequestParameter('id');
+        $deliveryId = $this->getRequestParameter('delivery');
 
         try {
 
@@ -249,8 +246,8 @@ class Delivery extends Proctoring
      */
     public function assign() {
 
-        $deliveryId = $this->getRequestParameter('id');
-        $testTakerId = $this->getRequestParameter('tt');
+        $deliveryId = $this->getRequestParameter('delivery');
+        $testTakerId = $this->getRequestParameter('testtaker');
 
         if (!is_array($testTakerId)) {
             $testTakerId = array($testTakerId);
@@ -284,8 +281,8 @@ class Delivery extends Proctoring
      */
     public function authorise() {
 
-        $deliveryId = $this->getRequestParameter('id');
-        $testTakerId = $this->getRequestParameter('tt');
+        $deliveryId = $this->getRequestParameter('delivery');
+        $testTakerId = $this->getRequestParameter('testtaker');
 
         if (!is_array($testTakerId)) {
             $testTakerId = array($testTakerId);
@@ -319,8 +316,8 @@ class Delivery extends Proctoring
      */
     public function remove() {
 
-        $deliveryId = $this->getRequestParameter('id');
-        $testTakerId = $this->getRequestParameter('tt');
+        $deliveryId = $this->getRequestParameter('delivery');
+        $testTakerId = $this->getRequestParameter('testtaker');
 
         if (!is_array($testTakerId)) {
             $testTakerId = array($testTakerId);

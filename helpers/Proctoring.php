@@ -25,6 +25,16 @@ use oat\oatbox\user\User;
 class Proctoring
 {
     /**
+     * The default number of rows displayed in a data page
+     */
+    const DEFAULT_ROWS = 25;
+
+    /**
+     * The index of the default data page
+     */
+    const DEFAULT_PAGE = 1;
+
+    /**
      * Paginates a list of items to render a data subset in a table
      * @param array $data
      * @param array $options
@@ -33,9 +43,9 @@ class Proctoring
     public static function paginate($data, $options)
     {
         $amount = count($data);
-        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : 25)));
+        $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : self::DEFAULT_ROWS)));
         $total = ceil($amount / $rows);
-        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : 1, $total)));
+        $page = max(1, floor(min(isset($options['page']) ? $options['page'] : self::DEFAULT_PAGE, $total)));
         $start = ($page - 1) * $rows;
         $list = array();
 

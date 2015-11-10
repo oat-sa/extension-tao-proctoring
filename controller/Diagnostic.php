@@ -20,13 +20,11 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
-use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
 
 /**
- * Proctoring Delivery controllers
+ * Proctoring controller related to Readyness Check tool
  *
  * @author Open Assessment Technologies SA
  * @package taoProctoring

@@ -33,12 +33,6 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
@@ -90,7 +84,7 @@ define([
                     $.ajax({
                         url: url,
                         data: {
-                            tt: selection
+                            testtaker: selection
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -258,9 +252,6 @@ define([
                             var item = state && state.item;
                             var time = item && item.time;
                             if (time && time.elapsed) {
-                                //if (time.total) {
-                                //    time.remainingStr = _timerFormat(time.total - time.elapsed);
-                                //}
                                 time.elapsedStr = _timerFormat(time.elapsed);
                                 time.totalStr = _timerFormat(time.total);
                                 time.display = !!(time.elapsedStr || time.totalStr);

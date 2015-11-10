@@ -21,10 +21,8 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\controller\Proctoring;
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
-use \core_kernel_classes_Resource;
 
 /**
  * Proctoring Test Center controllers
@@ -42,17 +40,22 @@ class TestCenter extends Proctoring
      */
     public function index()
     {
-
         $testCenters = TestCenterHelper::getTestCenters();
-
-        $this->composeView(
-            'testcenters-index',
-            array(
-                'list' => $testCenters
-            ), array(
-                Breadcrumbs::testCenters()
-            )
+        $data = array(
+            'list' => $testCenters
         );
+
+        if ($this->isXmlHttpRequest()) {
+            $this->returnJson($data);
+        } else {
+            $this->composeView(
+                'testcenters-index',
+                $data,
+                array(
+                    Breadcrumbs::testCenters()
+                )
+            );
+        }
     }
 
     /**
@@ -62,58 +65,23 @@ class TestCenter extends Proctoring
     {
         $testCenters = TestCenterHelper::getTestCenters();
         $testCenter  = $this->getCurrentTestCenter();
-
-        $this->composeView(
-            'testcenters-testcenter',
-            array(
-                'testCenter' => $testCenter->getUri(),
-                'title' => __('Test site %s', $testCenter->getLabel()),
-                'list' => $this->getTestCenterActions($testCenter)
-            ),
-            array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, $testCenters)
-            )
-        );
-    }
-
-    /**
-     * Gets a list of entries available for a test site
-     *
-     * @param $testCenter core_kernel_classes_Resource
-     * @return array
-     * @throws ServiceNotFoundException
-     * @throws \common_Exception
-     * @throws \common_exception_Error
-     */
-    protected function getTestCenterActions(core_kernel_classes_Resource $testCenter)
-    {
-
-        $actionDiagnostics = Breadcrumbs::diagnostics($testCenter);
-        $actionDeliveries  = Breadcrumbs::deliveries($testCenter);
-        $actionReporting   = Breadcrumbs::reporting($testCenter);
-
-        $actions = array(
-            array(
-                'url' => $actionDiagnostics['url'],
-                'label' => __('Readiness Check'),
-                'content' => __('Check the compatibility of the current workstation and see the results'),
-                'text' => __('Go')
-            ),
-            array(
-                'url' => $actionDeliveries['url'],
-                'label' => __('Deliveries'),
-                'content' => __('Monitor and manage the deliveries of the test site'),
-                'text' => __('Go')
-            ),
-            array(
-                'url' => $actionReporting['url'],
-                'label' => __('Assessment Activity Reporting'),
-                'content' => __('Generate and review test histories'),
-                'text' => __('Go')
-            ),
+        $data = array(
+            'testCenter' => $testCenter->getUri(),
+            'title' => __('Test site %s', $testCenter->getLabel()),
+            'list' => TestCenterHelper::getTestCenterActions($testCenter)
         );
 
-        return $actions;
+        if ($this->isXmlHttpRequest()) {
+            $this->returnJson($data);
+        } else {
+            $this->composeView(
+                'testcenters-testcenter',
+                $data,
+                array(
+                    Breadcrumbs::testCenters(),
+                    Breadcrumbs::testCenter($testCenter, $testCenters)
+                )
+            );
+        }
     }
 }
