@@ -45,7 +45,7 @@ class TestCenter extends Proctoring
             'list' => $testCenters
         );
 
-        if ($this->isXmlHttpRequest()) {
+        if (\tao_helpers_Request::isAjax()) {
             $this->returnJson($data);
         } else {
             $this->composeView(
@@ -71,7 +71,7 @@ class TestCenter extends Proctoring
             'list' => TestCenterHelper::getTestCenterActions($testCenter)
         );
 
-        if ($this->isXmlHttpRequest()) {
+        if (\tao_helpers_Request::isAjax()) {
             $this->returnJson($data);
         } else {
             $this->composeView(

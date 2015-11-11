@@ -88,15 +88,6 @@ class Proctoring extends \tao_actions_CommonModule
     }
 
     /**
-     * Checks if the current page has been called using AJAX
-     * @return bool
-     */
-    protected function isXmlHttpRequest() {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
-    }
-
-    /**
      * Main method to render a view for all proctoring related controller actions
      * 
      * @param string $cssClass
