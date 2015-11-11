@@ -25,7 +25,7 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'taoProctoring/helper/breadcrumbs',
+    'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
 ], function (_, $, __, helpers, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {

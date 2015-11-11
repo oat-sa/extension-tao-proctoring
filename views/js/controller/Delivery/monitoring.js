@@ -26,7 +26,7 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'taoProctoring/helper/breadcrumbs',
+    'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/tpl/item-progress',
     'ui/datatable'
 ], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl) {

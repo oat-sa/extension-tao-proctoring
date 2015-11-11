@@ -18,6 +18,13 @@
  */
 define(['ui/breadcrumbs'], function(breadcrumbs){
     
+    /**
+     * Wrap the generic breadcrumbs component into a very specialized
+     * 
+     * @param {JQyery} $container
+     * @param {type} crumbs
+     * @returns {unresolved}
+     */
     return function breadcrumbFactory($container, crumbs){
         return breadcrumbs({
             breadcrumbs : crumbs,

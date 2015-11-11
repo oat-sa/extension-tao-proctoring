@@ -28,7 +28,7 @@ define([
     'tpl!taoProctoring/templates/reporting/datepicker',
     'ui/feedback',
     'ui/dialog',
-    'taoProctoring/helper/breadcrumbs',
+    'taoProctoring/component/breadcrumbs',
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'

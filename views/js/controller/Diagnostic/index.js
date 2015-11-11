@@ -27,7 +27,7 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'taoProctoring/helper/breadcrumbs',
+    'taoProctoring/component/breadcrumbs',
     'ui/datatable'
 ], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';

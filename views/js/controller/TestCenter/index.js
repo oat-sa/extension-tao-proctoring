@@ -24,7 +24,7 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'taoProctoring/helper/breadcrumbs'
+    'taoProctoring/component/breadcrumbs'
 ], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory) {
     'use strict';
 

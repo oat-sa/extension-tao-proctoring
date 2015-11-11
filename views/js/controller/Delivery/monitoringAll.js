@@ -26,7 +26,7 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'taoProctoring/helper/breadcrumbs',
+    'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
