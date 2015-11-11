@@ -220,7 +220,7 @@ class Delivery extends Proctoring
             }
 
             $testTakers[] = array(
-                'uri' => $user->getIdentifier(),
+                'id' => $user->getIdentifier(),
                 'testTaker' => array(
                     'firstName' => $firstName,
                     'lastName' => $lastName,
