@@ -29,7 +29,8 @@ use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
 use \DateTime;
 
 /**
- *
+ * Base proctoring interface controller
+ * 
  * @author Open Assessment Technologies SA
  * @package taoProctoring
  * @license GPL-2.0

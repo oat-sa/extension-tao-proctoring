@@ -22,6 +22,11 @@ namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\user\User;
 
+/**
+ * This temporary helpers is a temporary way to return data to the controller.
+ * This helps isolating the mock code from the real controller one.
+ * It will be replaced by a real service afterward.
+ */
 class Proctoring
 {
     /**

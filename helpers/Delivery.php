@@ -26,6 +26,11 @@ use \core_kernel_classes_Resource;
 use \common_session_SessionManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 
+/**
+ * This temporary helpers is a temporary way to return data to the controller.
+ * This helps isolating the mock code from the real controller one.
+ * It will be replaced by a real service afterward.
+ */
 class Delivery extends Proctoring
 {
     /**

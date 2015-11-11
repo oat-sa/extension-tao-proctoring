@@ -24,7 +24,7 @@ use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 
 /**
- * Proctoring controller related to Readyness Check tool
+ * Proctoring Diagnostic controller for the readiness check screen
  *
  * @author Open Assessment Technologies SA
  * @package taoProctoring

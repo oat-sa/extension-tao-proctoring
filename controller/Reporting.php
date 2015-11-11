@@ -24,7 +24,7 @@ use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 
 /**
- * Proctoring Delivery controllers
+ * Proctoring Reporting controllers for the assessment activity reporting screen.
  *
  * @author Open Assessment Technologies SA
  * @package taoProctoring

@@ -25,7 +25,7 @@ use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 
 /**
- * Proctoring Test Center controllers
+ * Proctoring Test Center controllers for test center screens
  *
  * @author Open Assessment Technologies SA
  * @package taoProctoring
