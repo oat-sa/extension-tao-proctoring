@@ -26,42 +26,55 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
+    'taoProctoring/component/breadcrumbs',
+    'tpl!taoProctoring/tpl/item-progress',
+    'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
-
-    /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.delivery-manager';
+    var cssScope = '.delivery-monitoring';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the ProctorDelivery index page
+     * Formats a time value to string
+     * @param {Number} time
+     * @returns {String}
+     * @private
+     */
+    var _timerFormat = function(time) {
+        return __('%d min', Math.floor(time / 60));
+    };
+
+    /**
+     * Controls the taoProctoring delivery page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
     var proctorDeliveryIndexCtlr = {
         /**
          * Entry point of the page
          */
         start : function start() {
-            var $list = $(cssScope + ' .list');
-            var dataset = $list.data('set');
-            var deliveryId = $list.data('id');
-            var assignUrl = helpers._url('testTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var removeUrl = helpers._url('remove', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var authoriseUrl = helpers._url('authorise', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var $container = $(cssScope);
+            var $list = $container.find('.list');
+            var crumbs = $container.data('breadcrumbs');
+            var dataset = $container.data('set');
+            var deliveryId = $container.data('delivery');
+            var testCenterId = $container.data('testcenter');
+            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('allDeliveriesTestTakers', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
+
+            var bc = breadcrumbsFactory($container, crumbs);
+
+            //@TODO format the incoming data before displaying in the datatable
 
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
@@ -71,7 +84,7 @@ define([
                     $.ajax({
                         url: url,
                         data: {
-                            tt: selection
+                            testtaker: selection
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -118,19 +131,18 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No assigned test takers'),
                         available: __('Assigned test takers'),
                         loading: __('Loading')
                     },
                     tools: [{
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
+                        id: 'refresh',
+                        icon: 'refresh',
+                        title: __('Refresh the page'),
+                        label: __('Refresh'),
                         action: function() {
-                            location.href = assignUrl;
+                            $list.datatable('refresh');
                         }
                     }, {
                         id: 'authorise',
@@ -199,19 +211,62 @@ define([
                     }],
                     selectable: true,
                     model: [{
+                        id: 'delivery',
+                        label: __('Delivery'),
+                        transform: function(value, row) {
+                            var delivery = row && row.delivery;
+                            if (delivery) {
+                                delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri, testCenter : testCenterId});
+                                value = deliveryLinkTpl(delivery);
+                            }
+                            return value;
+
+                        }
+                    }, {
                         id: 'firstname',
-                        label: __('First name')
+                        label: __('First name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.firstName || '';
+
+                        }
                     }, {
                         id: 'lastname',
-                        label: __('Last name')
+                        label: __('Last name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.lastName || '';
+
+                        }
                     }, {
                         id: 'company',
-                        label: __('Company name')
+                        label: __('Company name'),
+                        transform: function(value, row) {
+                            return row && row.testTaker && row.testTaker.companyName || '';
+                        }
                     }, {
                         id: 'status',
-                        label: __('Status')
+                        label: __('Status'),
+                        transform: function(value, row) {
+                            return row && row.state && row.state.status || '';
+                        }
+                    }, {
+                        id: 'progress',
+                        label: __('Progress'),
+                        transform: function(value, row) {
+                            var state = row && row.state;
+                            var item = state && state.item;
+                            var time = item && item.time;
+                            if (time && time.elapsed) {
+                                //if (time.total) {
+                                //    time.remainingStr = _timerFormat(time.total - time.elapsed);
+                                //}
+                                time.elapsedStr = _timerFormat(time.elapsed);
+                                time.totalStr = _timerFormat(time.total);
+                                time.display = !!(time.elapsedStr || time.totalStr);
+                            }
+                            return itemProgressTpl(state);
+                        }
                     }]
-                });
+                }, dataset);
         }
     };
 

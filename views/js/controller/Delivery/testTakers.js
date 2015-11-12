@@ -25,15 +25,16 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
+    'taoProctoring/component/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback) {
+], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbsFactory) {
     'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.assign-test-takers';
+    var cssScope = '.delivery-testtakers';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -41,19 +42,24 @@ define([
     /**
      * Controls the ProctorDelivery test takers assign page
      *
-     * @type {{start: Function}}
+     * @type {Object}
      */
     var proctorDeliveryAssignCtlr = {
         /**
          * Entry point of the page
          */
         start : function start() {
-            var $list = $(cssScope + ' .list');
-            var dataset = $list.data('set');
-            var deliveryId = $list.data('id');
-            var serviceUrl = helpers._url('availableTestTakers', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var assignUrl = helpers._url('assign', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
-            var indexUrl = helpers._url('index', 'ProctorDelivery', 'taoProctoring', {id : deliveryId});
+            var $container = $(cssScope);
+            var $list = $container.find('.list');
+            var crumbs = $container.data('breadcrumbs');
+            var dataset = $container.data('set');
+            var deliveryId = $container.data('delivery');
+            var testCenterId = $container.data('testCenter');
+            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+
+            var bc = breadcrumbsFactory($container, crumbs);
 
             // send the selection to the server and redirect to the index page
             var assign = function(selection) {
@@ -63,7 +69,7 @@ define([
                     $.ajax({
                         url: assignUrl,
                         data: {
-                            tt: selection
+                            testtaker: selection
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -92,7 +98,6 @@ define([
                 })
                 .datatable({
                     url: serviceUrl,
-                    data: dataset,
                     status: {
                         empty: __('No available test takers to assign'),
                         available: __('Available test takers'),
@@ -135,7 +140,7 @@ define([
                         id: 'company',
                         label: __('Company name')
                     }]
-                });
+                }, dataset);
         }
     };
 

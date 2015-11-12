@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -14,36 +13,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
  *
  */
-namespace oat\taoProctoring\model\entrypoint;
-
-use oat\oatbox\Configurable;
-use oat\tao\model\entryPoint\Entrypoint;
-
-class ProctoringEntryPoint extends Configurable implements Entrypoint
-{
-
-    public function getId() {
-        return 'proctoring';
-    }
+define(['ui/breadcrumbs'], function(breadcrumbs){
     
-    public function getTitle() {
-        return __('Proctors');
-    }
-    
-    public function getLabel() {
-        return __('Proctoring interface');
-    }
-    
-    public function getDescription() {
-        return __('Administer a test');
-    }
-    
-    public function getUrl() {
-        return _url("index", "TestCenter", "taoProctoring");
-    }
+    /**
+     * Wrap the generic breadcrumbs component into a very specialized
+     * 
+     * @param {JQyery} $container
+     * @param {type} crumbs
+     * @returns {unresolved}
+     */
+    return function breadcrumbFactory($container, crumbs){
+        return breadcrumbs({
+            breadcrumbs : crumbs,
+            renderTo: $container.find('.header'),
+            replace: true,
+            cls : 'action-bar horizontal-action-bar'
+        });
+    };
+});
 
-}

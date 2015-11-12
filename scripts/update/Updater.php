@@ -22,11 +22,9 @@
 namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
-use \common_ext_ExtensionsManager;
-use \tao_install_ExtensionInstaller;
-use oat\tao\model\ThemeRegistry;
-use oat\tao\model\websource\DirectWebSource;
 use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\implementation\TestCenterService;
+
 /**
  * 
  * @author Joel Bout <joel@taotesting.com>
@@ -46,6 +44,12 @@ class Updater extends common_ext_ExtensionUpdater {
             $service = new DeliveryService();
             $ext->setConfig('delivery', $service);
             $currentVersion = '0.2';
+        }
+
+        if ($currentVersion == '0.2') {
+            $service = new TestCenterService();
+            $ext->setConfig('testCenter', $service);
+            $currentVersion = '0.3';
         }
 
         return $currentVersion;
