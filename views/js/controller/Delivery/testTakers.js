@@ -56,7 +56,7 @@ define([
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
             var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
-            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+            var assignUrl = helpers._url('assignTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
             var managerUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
