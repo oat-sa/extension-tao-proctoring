@@ -67,14 +67,13 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
-            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var terminateUrl = helpers._url('terminate', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var pauseUrl = helpers._url('pause', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
-
-            //@TODO format the incoming data before displaying in the datatable
 
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
@@ -117,11 +116,6 @@ define([
                 //request(authoriseUrl, selection, __('Test takers have been authorised'));
             };
 
-            // request the server to remove the selected test takers
-            var remove = function(selection) {
-                request(removeUrl, selection, __('Test takers have been removed'));
-            };
-
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -138,19 +132,19 @@ define([
                     },
                     tools: [{
                         id: 'refresh',
-                        icon: 'refresh',
+                        icon: 'reset',
                         title: __('Refresh the page'),
                         label: __('Refresh'),
                         action: function() {
                             $list.datatable('refresh');
                         }
                     }, {
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
+                        id: 'manage',
+                        icon: 'property-advanced',
+                        title: __('Manage the deliveries'),
+                        label: __('Manage'),
                         action: function() {
-                            location.href = assignUrl;
+                            location.href = manageUrl;
                         }
                     }, {
                         id: 'authorise',
@@ -165,22 +159,6 @@ define([
                                 autoDestroy: true,
                                 onOkBtn: function() {
                                     authorise(selection);
-                                }
-                            });
-                        }
-                    }, {
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the selected test takers from the delivery'),
-                        label: __('Remove'),
-                        massAction: true,
-                        action: function(selection) {
-                            dialog({
-                                message: __('The test takers will be removed from this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    remove(selection);
                                 }
                             });
                         }
@@ -202,20 +180,6 @@ define([
                                 }
                             });
                         }
-                    }, {
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the test taker from the delivery'),
-                        action: function(id) {
-                            dialog({
-                                autoRender: true,
-                                autoDestroy: true,
-                                message: __('The test taker will be removed from this delivery. Continue ?'),
-                                onOkBtn: function() {
-                                    remove([id]);
-                                }
-                            });
-                        }
                     }],
                     selectable: true,
                     model: [{
@@ -233,10 +197,10 @@ define([
 
                         }
                     }, {
-                        id: 'company',
-                        label: __('Company name'),
+                        id: 'identifier',
+                        label: __('Identifier'),
                         transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.companyName || '';
+                            return row && row.testTaker && row.testTaker.id || '';
                         }
                     }, {
                         id: 'status',
