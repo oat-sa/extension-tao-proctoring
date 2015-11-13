@@ -57,7 +57,7 @@ define([
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
             var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var removeUrl = helpers._url('removeTestTaker', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var removeUrl = helpers._url('removeTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
