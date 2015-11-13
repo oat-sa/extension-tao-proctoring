@@ -25,6 +25,9 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoFrontOffice\model\interfaces\DeliveryExecution as  DeliveryExecutionInt;
+
 /**
  * Sample Delivery Service for proctoring
  * 
@@ -34,7 +37,13 @@ class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
 
-    public function getProctorableDeliveries(User $proctor)
+    /**
+     * Gets all deliveries available for a proctor
+     * @param User $proctor
+     * @param array $options
+     * @return array
+     */
+    public function getProctorableDeliveries(User $proctor, $options = array())
     {
         $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
         $allDeliveries = array();
@@ -48,12 +57,34 @@ class DeliveryService extends ConfigurableService
      * Gets the executions of a delivery
      *
      * @param $deliveryId
-     * @return taoDelivery_models_classes_execution_DeliveryExecution[]
+     * @param array $options
+     * @return DeliveryExecution[]
      */
-    public function getDeliveryExecutions($deliveryId)
+    public function getDeliveryExecutions($deliveryId, $options = array())
     {
         $resource = new \core_kernel_classes_Resource($deliveryId);
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getExecutionsByDelivery($resource);
+    }
+
+    /**
+     * Gets the active or paused executions of a delivery
+     *
+     * @param $deliveryId
+     * @param array $options
+     * @return DeliveryExecution[]
+     */
+    public function getCurrentDeliveryExecutions($deliveryId, $options = array())
+    {
+        $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
+        $executions = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            $status = $deliveryExecution->getState()->getUri();
+            if (DeliveryExecutionInt::STATE_ACTIVE == $status || DeliveryExecutionInt::STATE_PAUSED == $status) {
+                $executions[] = $deliveryExecution;
+            }
+        }
+
+        return $executions;
     }
 
     /**
@@ -150,6 +181,7 @@ class DeliveryService extends ConfigurableService
      * 
      * @param unknown $deliveryId
      * @return string
+     * @throws \common_Exception
      */
     private function findGroup($deliveryId)
     {
