@@ -276,8 +276,43 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Get the aggregated data for a filtered set of delivery executions of a given delivery
+     * Gets all deliveries executions from the current test center
      * This is performance critical, would need to find a way to optimize to obtain such information
+     *
+     * @param $testCenter
+     * @param array $options
+     * @return array
+     * @throws \Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
+        $currentUser = common_session_SessionManager::getSession()->getUser();
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        if (count($deliveries)) {
+            $all = array();
+            foreach($deliveries as $delivery) {
+                $executions = self::getCurrentDeliveryExecutions($delivery);
+                if (isset($executions['data'])) {
+                    foreach($executions['data'] as $execution) {
+                        $execution['delivery'] = array(
+                            'uri' => $delivery->getUri(),
+                            'label' => $delivery->getLabel(),
+                        );
+                        $all[] = $execution;
+                    }
+                }
+            }
+
+            return self::paginate($all, $options);
+        } else {
+            return self::paginate(array(), $options);
+        }
+    }
+
+    /**
+     * Gets the list of test takers assigned to a delivery
      *
      * @param string $deliveryId
      * @param array [$options]
@@ -301,50 +336,15 @@ class Delivery extends Proctoring
 
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
         $users = $deliveryService->getDeliveryTestTakers($deliveryId, $options);
+        $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($deliveryId, $options);
+        $usersStatus = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            $userId = $deliveryExecution->getUserIdentifier();
+            $status = $deliveryExecution->getState()->getLabel();
+            $usersStatus[$userId][] = $status;
+        }
 
         $page = self::paginate($users, $options);
-
-        $mocks = array(
-            array(
-                'status' => 'idle',
-            ),
-            array(
-                //client will infer possible action based on the current status
-                'status' => 'inProgress',
-                'section' => array(
-                    'label' => 'section B',
-                    'position' => 2,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question X',
-                    'position' => 1,
-                    'total' => 9,
-                    'time' => array(
-                        //time unit in second, does not require microsecond precision for human monitoring
-                        'elapsed' => 60,
-                        'total' => 600
-                    )
-                )
-            ),
-            array(
-                'status' => 'inProgress',
-                'section' => array(
-                    'label' => 'section A',
-                    'position' => 1,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question X',
-                    'position' => 5,
-                    'total' => 8,
-                    'time' => array(
-                        'elapsed' => 540,
-                        'total' => 600
-                    )
-                )
-            ),
-        );
 
         $testTakers = array();
         foreach($page['data'] as $user) {
@@ -356,17 +356,17 @@ class Delivery extends Proctoring
                 $firstName = self::getUserStringProp($user, RDFS_LABEL);
             }
 
+            $status = '';
+            if (isset($usersStatus[$user->getIdentifier()])) {
+                $status = implode(', ', array_unique($usersStatus[$user->getIdentifier()]));
+            }
+
             $testTakers[] = array(
                 'id' => $user->getIdentifier(),
-                'testTaker' => array(
-                    'firstName' => $firstName,
-                    'lastName' => $lastName,
-                    'companyName' => '',
-                ),
-                'delivery' => array(
-                    'label' => $delivery->getLabel(),
-                ),
-                'state' => WebServiceMock::random($mocks),
+                'firstname' => $firstName,
+                'lastname' => $lastName,
+                'identifier' => $user->getIdentifier(),
+                'status' => $status,
             );
         }
 
@@ -376,7 +376,7 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Mock all deliveries executions from the current test center
+     * Gets the list of test takers assigned to all deliveries
      *
      * @param $testCenter
      * @param array [$options]
@@ -440,8 +440,7 @@ class Delivery extends Proctoring
                 'id' => $user->getIdentifier(),
                 'firstname' => $firstName,
                 'lastname' => $lastName,
-                'company' => '',
-                'status' => ''
+                'identifier' => $user->getIdentifier(),
             );
         }
 
