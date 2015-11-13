@@ -23,12 +23,13 @@ define([
     'jquery',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'ui/listbox',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
-], function (_, $, __, helpers, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {
+], function (_, $, __, helpers, moment, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -85,8 +86,8 @@ define([
 
                     if(props && props.periodStart && props.periodEnd){
                         tplData.showProperties = true;
-                        tplData.periodStart = props.periodStart;
-                        tplData.periodEnd = props.periodEnd;
+                        tplData.periodStart = moment(props.periodStart).toString();
+                        tplData.periodEnd = moment(props.periodEnd).toString();
 
                         //add a special class for boxes that have more information to display
                         box.cls = 'has-properties-displayed';
