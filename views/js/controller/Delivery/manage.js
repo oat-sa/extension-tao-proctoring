@@ -25,26 +25,27 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
+    'ui/dialog',
     'taoProctoring/component/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, breadcrumbsFactory) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.delivery-testtakers';
+    var cssScope = '.delivery-manager';
 
     // the page is always loading data when starting
     loadingBar.start();
 
     /**
-     * Controls the ProctorDelivery test takers assign page
+     * Controls the taoProctoring delivery page
      *
      * @type {Object}
      */
-    var proctorDeliveryAssignCtlr = {
+    var proctorDeliveryIndexCtlr = {
         /**
          * Entry point of the page
          */
@@ -55,19 +56,20 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
-            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
-            var assignUrl = helpers._url('assignTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
-            var managerUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var removeUrl = helpers._url('removeTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
 
-            // send the selection to the server and redirect to the index page
-            var assign = function(selection) {
+            // request the server with a selection of test takers
+            var request = function(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
-                        url: assignUrl,
+                        url: url,
                         data: {
                             testtaker: selection
                         },
@@ -80,8 +82,10 @@ define([
                         loadingBar.stop();
 
                         if (response && response.success) {
-                            feedback().success(__('Test takers have been added'));
-                            location.href = managerUrl;
+                            if (message) {
+                                feedback().success(message);
+                            }
+                            $list.datatable('refresh');
                         } else {
                             feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
@@ -89,29 +93,26 @@ define([
                 }
             };
 
+            // request the server to remove the selected test takers
+            var remove = function(selection) {
+                request(removeUrl, selection, __('Test takers have been removed'));
+            };
+
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function(event, response) {
+                .on('load.datatable', function() {
                     loadingBar.stop();
                 })
                 .datatable({
                     url: serviceUrl,
                     status: {
-                        empty: __('No available test takers to assign'),
-                        available: __('Available test takers'),
+                        empty: __('No assigned test takers'),
+                        available: __('Assigned test takers'),
                         loading: __('Loading')
                     },
                     tools: [{
-                        id: 'back',
-                        icon: 'left',
-                        title: __('Return to the delivery manager'),
-                        label: __('Back'),
-                        action: function() {
-                            location.href = managerUrl;
-                        }
-                    }, {
                         id: 'refresh',
                         icon: 'reset',
                         title: __('Refresh the page'),
@@ -120,21 +121,51 @@ define([
                             $list.datatable('refresh');
                         }
                     }, {
+                        id: 'back',
+                        icon: 'preview',
+                        title: __('Return to the delivery monitoring'),
+                        label: __('Monitoring'),
+                        action: function() {
+                            location.href = monitoringUrl;
+                        }
+                    }, {
                         id: 'assign',
                         icon: 'add',
-                        title: __('Assign the selected test takers to the delivery'),
-                        label: __('Assign the selected test takers'),
+                        title: __('Assign more test takers to this delivery'),
+                        label: __('Add test takers'),
+                        action: function() {
+                            location.href = assignUrl;
+                        }
+                    }, {
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the selected test takers from the delivery'),
+                        label: __('Remove'),
                         massAction: true,
                         action: function(selection) {
-                            assign(selection);
+                            dialog({
+                                message: __('The test takers will be removed from this delivery. Continue ?'),
+                                autoRender: true,
+                                autoDestroy: true,
+                                onOkBtn: function() {
+                                    remove(selection);
+                                }
+                            });
                         }
                     }],
                     actions: [{
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign the test taker to the delivery'),
+                        id: 'remove',
+                        icon: 'remove',
+                        title: __('Remove the test taker from the delivery'),
                         action: function(id) {
-                            assign([id]);
+                            dialog({
+                                autoRender: true,
+                                autoDestroy: true,
+                                message: __('The test taker will be removed from this delivery. Continue ?'),
+                                onOkBtn: function() {
+                                    remove([id]);
+                                }
+                            });
                         }
                     }],
                     selectable: true,
@@ -147,10 +178,13 @@ define([
                     }, {
                         id: 'identifier',
                         label: __('Identifier')
+                    }, {
+                        id: 'status',
+                        label: __('Status')
                     }]
                 }, dataset);
         }
     };
 
-    return proctorDeliveryAssignCtlr;
+    return proctorDeliveryIndexCtlr;
 });

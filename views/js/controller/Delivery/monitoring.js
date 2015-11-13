@@ -51,6 +51,29 @@ define([
         return __('%d min', Math.floor(time / 60));
     };
 
+    var notYet = function() {
+        dialog({
+            message: __('Not yet implemented!'),
+            autoRender: true,
+            autoDestroy: true,
+            buttons: 'ok'
+        });
+    };
+
+    /**
+     * Displays a confirm message
+     * @param message
+     * @param callback
+     */
+    var confirmMessage = function(message, callback) {
+        dialog({
+            message: message,
+            autoRender: true,
+            autoDestroy: true,
+            onOkBtn: callback
+        });
+    };
+
     /**
      * Controls the taoProctoring delivery page
      *
@@ -67,14 +90,13 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
-            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
-
-            //@TODO format the incoming data before displaying in the datatable
 
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
@@ -106,20 +128,27 @@ define([
                 }
             };
 
-            // request the server to authorise the selected test takers
+            // request the server to authorise the selected delivery executions
             var authorise = function(selection) {
-                dialog({
-                    message: __('Not yet implemented!'),
-                    autoRender: true,
-                    autoDestroy: true,
-                    buttons: 'ok'
-                });
-                //request(authoriseUrl, selection, __('Test takers have been authorised'));
+                notYet();
+                //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
             };
 
-            // request the server to remove the selected test takers
-            var remove = function(selection) {
-                request(removeUrl, selection, __('Test takers have been removed'));
+            // request the server to pause the selected delivery executions
+            var pause = function(selection) {
+                notYet();
+                //request(pauseUrl, selection, __('Delivery executions have been paused'));
+            };
+
+            // request the server to terminate the selected delivery executions
+            var terminate = function(selection) {
+                notYet();
+                //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+            };
+
+            // report irregularities on the selected delivery executions
+            var report = function(selection) {
+                notYet();
             };
 
             $list
@@ -132,89 +161,126 @@ define([
                 .datatable({
                     url: serviceUrl,
                     status: {
-                        empty: __('No assigned test takers'),
-                        available: __('Assigned test takers'),
+                        empty: __('No delivery executions'),
+                        available: __('Current delivery executions'),
                         loading: __('Loading')
                     },
                     tools: [{
                         id: 'refresh',
-                        icon: 'refresh',
+                        icon: 'reset',
                         title: __('Refresh the page'),
                         label: __('Refresh'),
                         action: function() {
                             $list.datatable('refresh');
                         }
                     }, {
-                        id: 'assign',
-                        icon: 'add',
-                        title: __('Assign test takers to this delivery'),
-                        label: __('Add test takers'),
+                        id: 'manage',
+                        icon: 'property-advanced',
+                        title: __('Manage the deliveries'),
+                        label: __('Manage'),
                         action: function() {
-                            location.href = assignUrl;
+                            location.href = manageUrl;
                         }
                     }, {
                         id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the selected test takers to run the delivery'),
+                        icon: 'play',
+                        title: __('Authorise the selected delivery executions'),
                         label: __('Authorise'),
                         massAction: true,
                         action: function(selection) {
-                            dialog({
-                                message: __('The test takers will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
+                            confirmMessage(
+                                __('The selected delivery executions will be authorized. Continue ?'),
+                                function() {
                                     authorise(selection);
                                 }
-                            });
+                            );
                         }
                     }, {
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the selected test takers from the delivery'),
-                        label: __('Remove'),
+                        id: 'pause',
+                        icon: 'pause',
+                        title: __('Pause delivery executions'),
+                        label: __('Pause'),
                         massAction: true,
                         action: function(selection) {
-                            dialog({
-                                message: __('The test takers will be removed from this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    remove(selection);
+                            confirmMessage(
+                                __('The selected delivery executions will be paused. Continue ?'),
+                                function() {
+                                    pause(selection);
                                 }
-                            });
+                            );
+                        }
+                    }, {
+                        id: 'terminate',
+                        icon: 'stop',
+                        title: __('Terminate delivery executions'),
+                        label: __('Terminate'),
+                        massAction: true,
+                        action: function(selection) {
+                            confirmMessage(
+                                __('The selected delivery executions will be terminated. Continue ?'),
+                                function() {
+                                    terminate(selection);
+                                }
+                            );
+                        }
+                    }, {
+                        id: 'irregularity',
+                        icon: 'delivery-small',
+                        title: __('Report irregularities'),
+                        label: __('Report'),
+                        massAction: true,
+                        action: function(selection) {
+                            report(selection);
                         }
                     }],
                     actions: [{
                         id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the test taker to run the delivery'),
+                        icon: 'play',
+                        title: __('Authorise the delivery execution'),
                         hidden: function() {
-                            return !!this.authorised;
+                            return !this.state || !this.state.awaiting;
                         },
                         action: function(id) {
-                            dialog({
-                                message: __('The test taker will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
+                            confirmMessage(
+                                __('The delivery execution will be authorized. Continue ?'),
+                                function() {
                                     authorise([id]);
                                 }
-                            });
+                            );
                         }
                     }, {
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the test taker from the delivery'),
+                        id: 'pause',
+                        icon: 'pause',
+                        title: __('Pause the delivery execution'),
+                        hidden: function() {
+                            return !this.state || !this.state.authorised;
+                        },
                         action: function(id) {
-                            dialog({
-                                autoRender: true,
-                                autoDestroy: true,
-                                message: __('The test taker will be removed from this delivery. Continue ?'),
-                                onOkBtn: function() {
-                                    remove([id]);
+                            confirmMessage(
+                                __('The delivery execution will be paused. Continue ?'),
+                                function() {
+                                    authorise([id]);
                                 }
-                            });
+                            );
+                        }
+                    }, {
+                        id: 'terminate',
+                        icon: 'stop',
+                        title: __('Terminate the delivery execution'),
+                        action: function(id) {
+                            confirmMessage(
+                                __('The delivery execution will be terminated. Continue ?'),
+                                function() {
+                                    authorise([id]);
+                                }
+                            );
+                        }
+                    }, {
+                        id: 'irregularity',
+                        icon: 'delivery-small',
+                        title: __('Report irregularities'),
+                        action: function(id) {
+                            report([id]);
                         }
                     }],
                     selectable: true,
@@ -233,10 +299,10 @@ define([
 
                         }
                     }, {
-                        id: 'company',
-                        label: __('Company name'),
+                        id: 'identifier',
+                        label: __('Identifier'),
                         transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.companyName || '';
+                            return row && row.testTaker && row.testTaker.id || '';
                         }
                     }, {
                         id: 'status',

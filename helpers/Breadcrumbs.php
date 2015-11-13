@@ -145,20 +145,50 @@ class Breadcrumbs
     }
 
     /**
-     * Create breadcrumb for Delivery::testTaker
+     * Create breadcrumb for Delivery::manage
      *
      * @param core_kernel_classes_Resource $testCenter
      * @param core_kernel_classes_Resource $delivery
      * @param array $deliveries
      * @return array
      */
-    public static function deliveryTestTaker(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery)
+    public static function deliveryManage(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery)
     {
-        //list also other available deliveries
+        return array(
+            'id' => 'deliveryManager',
+            'url' => _url('manage', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+            'label' => __('Manage'),
+            'entries' => array(
+                array(
+                    'id' => 'deliveryMonitoring',
+                    'url' => _url('testTakers', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+                    'label' => __('Add Test Takers'),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Create breadcrumb for Delivery::testTakers
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param core_kernel_classes_Resource $delivery
+     * @param array $deliveries
+     * @return array
+     */
+    public static function deliveryTestTakers(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery)
+    {
         return array(
             'id' => 'deliveryMonitoring',
-            'url' => _url('testTaker', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
-            'label' => __('Add Test Takers')
+            'url' => _url('testTakers', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+            'label' => __('Add Test Takers'),
+            'entries' => array(
+                array(
+                    'id' => 'deliveryManager',
+                    'url' => _url('manage', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+                    'label' => __('Manage'),
+                )
+            ),
         );
     }
 

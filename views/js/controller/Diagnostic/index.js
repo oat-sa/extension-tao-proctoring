@@ -189,8 +189,7 @@ define([
                         id: 'date',
                         label: __('Date'),
                         transform: function(value) {
-                            var d = new moment(value);
-                            return d.toString();
+                            return moment(value).toString();
                         }
                     }]
                 }, dataset);
