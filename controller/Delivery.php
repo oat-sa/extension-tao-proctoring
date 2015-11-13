@@ -77,7 +77,7 @@ class Delivery extends Proctoring
             array(
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
-                'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions)
+                'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions)
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -95,7 +95,7 @@ class Delivery extends Proctoring
     }
     
     /**
-     * Display all delivery executions of ALL deliveries in the test center
+     * Displays all delivery executions of ALL deliveries in the test center
      */
     public function monitoringAll()
     {
@@ -107,7 +107,7 @@ class Delivery extends Proctoring
             'delivery-monitoring',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'set' => DeliveryHelper::getAllDeliveryTestTakers($testCenter, $requestOptions)
+                'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions)
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -125,7 +125,52 @@ class Delivery extends Proctoring
     }
 
     /**
-     * List available test takers to assign to a delivery
+     * Lists the test takers assigned to a delivery
+     *
+     * @throws \Exception
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function manage() {
+
+        $delivery = $this->getCurrentDelivery();
+        $testCenter = $this->getCurrentTestCenter();
+
+        try {
+
+            $requestOptions = $this->getRequestOptions();
+
+            $this->composeView(
+                'delivery-manager',
+                array(
+                    'title' =>  __('Test takers currently assigned to %s', $delivery->getLabel()),
+                    'delivery' => $delivery->getUri(),
+                    'testCenter' => $testCenter->getUri(),
+                    'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions),
+                ),array(
+                    Breadcrumbs::testCenters(),
+                    Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                    Breadcrumbs::deliveries(
+                        $testCenter,
+                        array(
+                            Breadcrumbs::diagnostics($testCenter),
+                            Breadcrumbs::reporting($testCenter)
+                        )
+                    ),
+                    Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
+                    Breadcrumbs::deliveryManage($testCenter, $delivery)
+                )
+            );
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
+     * Lists the available test takers to assign to a delivery
      *
      * @throws \Exception
      * @throws \common_Exception
@@ -159,9 +204,53 @@ class Delivery extends Proctoring
                         )
                     ),
                     Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
-                    Breadcrumbs::deliveryTestTaker($testCenter, $delivery)
+                    Breadcrumbs::deliveryTestTakers($testCenter, $delivery)
                 )
             );
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
+     * Gets the list of current executions for a delivery
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function deliveryExecutions() {
+
+        try {
+
+            $delivery      = $this->getCurrentDelivery();
+            $requestOptions = $this->getRequestOptions();
+
+            $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
+     * Gets the list of current executions for a delivery
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function allDeliveriesExecutions() {
+
+        try {
+
+            $delivery      = $this->getCurrentDelivery();
+            $requestOptions = $this->getRequestOptions();
+
+            $this->returnJson(DeliveryHelper::getAllCurrentDeliveriesExecutions($delivery, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -239,7 +328,7 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Assign a test taker to a delivery
+     * Assigns a test taker to a delivery
      *
      * @throws \common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
@@ -274,7 +363,7 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Authorise a test taker to run the delivery
+     * Authorises a test taker to run the delivery
      *
      * @throws \common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
@@ -309,7 +398,7 @@ class Delivery extends Proctoring
     }
 
     /**
-     * Remove a test taker from a delivery
+     * Removes a test taker from a delivery
      *
      * @throws \common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
