@@ -54,10 +54,10 @@ define([
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
-            var testCenterId = $container.data('testCenter');
-            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId});
-            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId});
-            var indexUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+            var testCenterId = $container.data('testcenter');
+            var serviceUrl = helpers._url('availableTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+            var assignUrl = helpers._url('assign', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
+            var managerUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
 
@@ -81,7 +81,7 @@ define([
 
                         if (response && response.success) {
                             feedback().success(__('Test takers have been added'));
-                            location.href = indexUrl;
+                            location.href = managerUrl;
                         } else {
                             feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
@@ -106,10 +106,18 @@ define([
                     tools: [{
                         id: 'back',
                         icon: 'left',
-                        title: __('Return to the delivery'),
+                        title: __('Return to the delivery manager'),
                         label: __('Back'),
                         action: function() {
-                            history.back();
+                            location.href = managerUrl;
+                        }
+                    }, {
+                        id: 'refresh',
+                        icon: 'reset',
+                        title: __('Refresh the page'),
+                        label: __('Refresh'),
+                        action: function() {
+                            $list.datatable('refresh');
                         }
                     }, {
                         id: 'assign',
@@ -137,8 +145,8 @@ define([
                         id: 'lastname',
                         label: __('Last name')
                     }, {
-                        id: 'company',
-                        label: __('Company name')
+                        id: 'identifier',
+                        label: __('Identifier')
                     }]
                 }, dataset);
         }
