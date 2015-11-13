@@ -96,7 +96,39 @@ class DeliveryService extends ConfigurableService
     {
         return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
     }
-    
+
+    /**
+     * Gets the properties of a particular delivery
+     *
+     * @param core_kernel_classes_Resource $delivery
+     * @return mixed
+     */
+    public function getDeliveryProperties($delivery)
+    {
+        if (is_object($delivery) && !($delivery instanceof \core_kernel_classes_Resource)) {
+            $delivery = $delivery->getUri();
+        }
+
+        if (is_string($delivery)) {
+            $delivery = new \core_kernel_classes_Resource($delivery);
+        }
+
+        $deliveryProps = $delivery->getPropertiesValues(array(
+            new \core_kernel_classes_Property(TAO_DELIVERY_MAXEXEC_PROP),
+            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
+            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
+        ));
+
+        $propMaxExec = current($deliveryProps[TAO_DELIVERY_MAXEXEC_PROP]);
+        $propStartExec = current($deliveryProps[TAO_DELIVERY_START_PROP]);
+        $propEndExec = current($deliveryProps[TAO_DELIVERY_END_PROP]);
+
+        $settings[TAO_DELIVERY_MAXEXEC_PROP] = (!(is_object($propMaxExec)) or ($propMaxExec=="")) ? 0 : $propMaxExec->literal;
+        $settings[TAO_DELIVERY_START_PROP] = (!(is_object($propStartExec)) or ($propStartExec=="")) ? null : $propStartExec->literal;
+        $settings[TAO_DELIVERY_END_PROP] = (!(is_object($propEndExec)) or ($propEndExec=="")) ? null : $propEndExec->literal;
+
+        return $settings;
+    }
     
     /**
      * Gets the test takers assigned to a delivery

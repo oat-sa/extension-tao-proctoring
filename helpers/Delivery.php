@@ -26,6 +26,7 @@ use \core_kernel_classes_Resource;
 use \common_session_SessionManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoFrontOffice\model\interfaces\DeliveryExecution as  DeliveryExecutionInt;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -64,65 +65,50 @@ class Delivery extends Proctoring
             )
         );
 
-        $mocks = array(
-            array(
-                'stats' => array(
-                    'awaitingApproval' => 0,
-                    'inProgress' => 0,
-                    'paused' => 0
-                ),
-                'properties' => array(),
-            ),
-            array(
-                'stats' => array(
-                    'awaitingApproval' => 3,
-                    'inProgress' => 32,
-                    'paused' => 12
-                ),
-                'properties' => array(
-                    'periodStart' => '2015-11-09 00:00',
-                    'periodEnd' => '2015-11-17 09:20'
-                )
-            ),
-            array(
-                'stats' => array(
-                    'awaitingApproval' => 0,
-                    'inProgress' => 15,
-                    'paused' => 1
-                ),
-                'properties' => array(
-                    'periodStart' => '2015-11-09 00:00',
-                    'periodEnd' => '2015-11-17 09:20'
-                )
-            ),
-            array(
-                'stats' => array(
-                    'awaitingApproval' => 1,
-                    'inProgress' => 10,
-                    'paused' => 8
-                ),
-                'properties' => array(
-                    'periodStart' => '2015-11-09 00:00',
-                    'periodEnd' => '2015-11-17 09:20'
-                )
-            ),
-        );
-
         foreach ($deliveries as $delivery) {
-            $entries[] = array_merge(array(
+            /* @var $delivery \taoDelivery_models_classes_DeliveryRdf */
+            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri());
+            $active = 0;
+            $paused = 0;
+            $awaiting = 0;
+            foreach($executions as $execution) {
+                /* @var $execution DeliveryExecution */
+                $executionState = $execution->getState()->getUri();
+                if (DeliveryExecutionInt::STATE_ACTIVE == $executionState) {
+                    $active ++;
+                }
+                if (DeliveryExecutionInt::STATE_PAUSED == $executionState) {
+                    $paused ++;
+                }
+            }
+
+            $deliveryProperties = $deliveryService->getDeliveryProperties($delivery);
+            $properties = array();
+
+            if (!empty($deliveryProperties[TAO_DELIVERY_START_PROP])) {
+                $properties['periodStart'] = date('Y-m-d H:i:s', $deliveryProperties[TAO_DELIVERY_START_PROP]);
+            }
+            if (!empty($deliveryProperties[TAO_DELIVERY_END_PROP])) {
+                $properties['periodEnd'] = date('Y-m-d H:i:s', $deliveryProperties[TAO_DELIVERY_END_PROP]);
+            }
+
+            $entries[] = array(
                 'id' => $delivery->getUri(),
                 'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri(), 'testCenter' => $testCenter->getUri())),
                 'label' => $delivery->getLabel(),
-                'text' => __('Monitor')
-            ), WebServiceMock::random($mocks));
-        }
+                'text' => __('Monitor'),
+                'stats' => array(
+                    'awaitingApproval' => $awaiting,
+                    'inProgress' => $active,
+                    'paused' => $paused
+                ),
+                'properties' => $properties
+            );
 
-        $all = array_reduce($entries, function($carry, $element){
-            $carry['stats']['awaitingApproval'] += $element['stats']['awaitingApproval'];
-            $carry['stats']['inProgress'] += $element['stats']['inProgress'];
-            $carry['stats']['paused'] += $element['stats']['paused'];
-            return $carry;
-        }, $all);
+            $all['stats']['awaitingApproval'] += $awaiting;
+            $all['stats']['inProgress'] += $active;
+            $all['stats']['paused'] += $paused;
+        }
 
         //prepend the all delivery element to the begining of the array
         array_unshift($entries, $all);
@@ -236,8 +222,12 @@ class Delivery extends Proctoring
             $userId = $deliveryExecution->getUserIdentifier();
             $executionState = $deliveryExecution->getState();
             $status = $executionState->getLabel();
+            $statusCode = $executionState->getUri();
             $state = array(
                 'status' => $status,
+                'awaiting' => false,
+                'authorized' => false,
+                'paused' => DeliveryExecutionInt::STATE_PAUSED == $statusCode,
             );
             $testTaker = array();
 
