@@ -66,7 +66,7 @@
         }
     }
     
-    .diagnostic-index, .reporting-index, .delivery-testtakers {
+    .diagnostic-index, .reporting-index, .delivery-testtakers, .delivery-manager {
         .content {
             width: 800px;
         }
@@ -76,8 +76,12 @@
             text-align: center;
         }
     }
+
+    .delivery-testtakers .list {
+        background-color: $canvas;
+    }
     
-    .diagnostic-index, .reporting-index, .delivery-monitoring, .delivery-manager {
+    .diagnostic-index, .reporting-index, .delivery-monitoring {
         .content {
             width: 100%;
             padding: 0 20px;
