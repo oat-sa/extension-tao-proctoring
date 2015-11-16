@@ -22,12 +22,12 @@ define(['ui/breadcrumbs'], function(breadcrumbs){
      * Wrap the generic breadcrumbs component into a very specialized
      * 
      * @param {JQyery} $container
-     * @param {type} crumbs
+     * @param {Array} [crumbs]
      * @returns {unresolved}
      */
     return function breadcrumbFactory($container, crumbs){
         return breadcrumbs({
-            breadcrumbs : crumbs,
+            breadcrumbs : crumbs || $container.data('breadcrumbs'),
             renderTo: $container.find('.header'),
             replace: true,
             cls : 'action-bar horizontal-action-bar'

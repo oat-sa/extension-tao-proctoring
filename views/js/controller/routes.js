@@ -18,8 +18,9 @@ define({
     'Delivery' : {
         'actions' : {
             'index' : 'controller/Delivery/index',
+            'manage' : 'controller/Delivery/manage',
             'monitoring' : 'controller/Delivery/monitoring',
-            'monitoringAll' : 'controller/Delivery/monitoringAll',
+            'monitoringAll' : 'controller/Delivery/monitoring',
             'testTakers' : 'controller/Delivery/testTakers'
         }
     }

@@ -144,15 +144,13 @@ define([
                         id: 'start',
                         label: __('Start'),
                         transform: function(value) {
-                            var d = new moment(value);
-                            return d.toString();
+                            return moment(value).toString();
                         }
                     }, {
                         id: 'end',
                         label: __('End'),
                         transform: function(value) {
-                            var d = new moment(value);
-                            return d.toString();
+                            return moment(value).toString();
                         }
                     }, {
                         id: 'pause',

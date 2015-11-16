@@ -27,30 +27,18 @@ define([
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
-    'tpl!taoProctoring/tpl/item-progress',
-    'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.delivery-monitoring';
+    var cssScope = '.delivery-manager';
 
     // the page is always loading data when starting
     loadingBar.start();
-
-    /**
-     * Formats a time value to string
-     * @param {Number} time
-     * @returns {String}
-     * @private
-     */
-    var _timerFormat = function(time) {
-        return __('%d min', Math.floor(time / 60));
-    };
 
     /**
      * Controls the taoProctoring delivery page
@@ -68,13 +56,12 @@ define([
             var dataset = $container.data('set');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
-            var removeUrl = helpers._url('remove', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var authoriseUrl = helpers._url('authorise', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('allDeliveriesTestTakers', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
+            var assignUrl = helpers._url('testTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var removeUrl = helpers._url('removeTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('deliveryTestTakers', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter: testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
-
-            //@TODO format the incoming data before displaying in the datatable
 
             // request the server with a selection of test takers
             var request = function(url, selection, message) {
@@ -106,17 +93,6 @@ define([
                 }
             };
 
-            // request the server to authorise the selected test takers
-            var authorise = function(selection) {
-                dialog({
-                    message: __('Not yet implemented!'),
-                    autoRender: true,
-                    autoDestroy: true,
-                    buttons: 'ok'
-                });
-                //request(authoriseUrl, selection, __('Test takers have been authorised'));
-            };
-
             // request the server to remove the selected test takers
             var remove = function(selection) {
                 request(removeUrl, selection, __('Test takers have been removed'));
@@ -138,27 +114,27 @@ define([
                     },
                     tools: [{
                         id: 'refresh',
-                        icon: 'refresh',
+                        icon: 'reset',
                         title: __('Refresh the page'),
                         label: __('Refresh'),
                         action: function() {
                             $list.datatable('refresh');
                         }
                     }, {
-                        id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the selected test takers to run the delivery'),
-                        label: __('Authorise'),
-                        massAction: true,
-                        action: function(selection) {
-                            dialog({
-                                message: __('The test takers will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    authorise(selection);
-                                }
-                            });
+                        id: 'back',
+                        icon: 'preview',
+                        title: __('Return to the delivery monitoring'),
+                        label: __('Monitoring'),
+                        action: function() {
+                            location.href = monitoringUrl;
+                        }
+                    }, {
+                        id: 'assign',
+                        icon: 'add',
+                        title: __('Assign more test takers to this delivery'),
+                        label: __('Add test takers'),
+                        action: function() {
+                            location.href = assignUrl;
                         }
                     }, {
                         id: 'remove',
@@ -178,23 +154,6 @@ define([
                         }
                     }],
                     actions: [{
-                        id: 'authorise',
-                        icon: 'checkbox-checked',
-                        title: __('Authorise the test taker to run the delivery'),
-                        hidden: function() {
-                            return !!this.authorised;
-                        },
-                        action: function(id) {
-                            dialog({
-                                message: __('The test taker will be authorized to start this delivery. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    authorise([id]);
-                                }
-                            });
-                        }
-                    }, {
                         id: 'remove',
                         icon: 'remove',
                         title: __('Remove the test taker from the delivery'),
@@ -211,60 +170,17 @@ define([
                     }],
                     selectable: true,
                     model: [{
-                        id: 'delivery',
-                        label: __('Delivery'),
-                        transform: function(value, row) {
-                            var delivery = row && row.delivery;
-                            if (delivery) {
-                                delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri, testCenter : testCenterId});
-                                value = deliveryLinkTpl(delivery);
-                            }
-                            return value;
-
-                        }
-                    }, {
                         id: 'firstname',
-                        label: __('First name'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.firstName || '';
-
-                        }
+                        label: __('First name')
                     }, {
                         id: 'lastname',
-                        label: __('Last name'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.lastName || '';
-
-                        }
+                        label: __('Last name')
                     }, {
-                        id: 'company',
-                        label: __('Company name'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.companyName || '';
-                        }
+                        id: 'identifier',
+                        label: __('Identifier')
                     }, {
                         id: 'status',
-                        label: __('Status'),
-                        transform: function(value, row) {
-                            return row && row.state && row.state.status || '';
-                        }
-                    }, {
-                        id: 'progress',
-                        label: __('Progress'),
-                        transform: function(value, row) {
-                            var state = row && row.state;
-                            var item = state && state.item;
-                            var time = item && item.time;
-                            if (time && time.elapsed) {
-                                //if (time.total) {
-                                //    time.remainingStr = _timerFormat(time.total - time.elapsed);
-                                //}
-                                time.elapsedStr = _timerFormat(time.elapsed);
-                                time.totalStr = _timerFormat(time.total);
-                                time.display = !!(time.elapsedStr || time.totalStr);
-                            }
-                            return itemProgressTpl(state);
-                        }
+                        label: __('Status')
                     }]
                 }, dataset);
         }

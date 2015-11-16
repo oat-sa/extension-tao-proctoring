@@ -145,21 +145,42 @@ class Breadcrumbs
     }
 
     /**
-     * Create breadcrumb for Delivery::testTaker
+     * Create breadcrumb for Delivery::manage
      *
      * @param core_kernel_classes_Resource $testCenter
      * @param core_kernel_classes_Resource $delivery
-     * @param array $deliveries
+     * @param string $page
      * @return array
      */
-    public static function deliveryTestTaker(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery)
+    public static function manageTestTakers(core_kernel_classes_Resource $testCenter, core_kernel_classes_Resource $delivery, $page)
     {
-        //list also other available deliveries
-        return array(
-            'id' => 'deliveryMonitoring',
-            'url' => _url('testTaker', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
-            'label' => __('Add Test Takers')
+        $entries = array(
+            array(
+                'id' => 'manage',
+                'url' => _url('manage', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+                'label' => __('Manage Test Takers')
+            ),
+            array(
+                'id' => 'testTakers',
+                'url' => _url('testTakers', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
+                'label' => __('Add Test Takers')
+            ),
         );
+
+        $currentPage = array_filter($entries, function($value) use($page) {
+            return $value['id'] == $page;
+
+        });
+
+        $otherPages = array_filter($entries, function($value) use($page) {
+            return $value['id'] != $page;
+
+        });
+
+        $breadcrumbs = current($currentPage);
+        $breadcrumbs['entries'] = $otherPages;
+
+        return $breadcrumbs;
     }
 
     /**
