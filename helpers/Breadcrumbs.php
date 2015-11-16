@@ -158,12 +158,12 @@ class Breadcrumbs
             array(
                 'id' => 'manage',
                 'url' => _url('manage', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
-                'label' => __('Manage'),
+                'label' => __('Manage Test Takers')
             ),
             array(
                 'id' => 'testTakers',
                 'url' => _url('testTakers', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
-                'label' => __('Add Test Takers'),
+                'label' => __('Add Test Takers')
             ),
         );
 
