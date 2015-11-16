@@ -207,6 +207,39 @@ class DeliveryService extends ConfigurableService
         $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId));
         return GroupsService::singleton()->removeUser($testTakerId, $deliveryGroup);
     }
+
+    /**
+     * Authorises a delivery execution
+     *
+     * @param string $executionId
+     * @return bool
+     */
+    public function authoriseExecution($executionId)
+    {
+        return true;
+    }
+
+    /**
+     * Terminates a delivery execution
+     *
+     * @param string $executionId
+     * @return bool
+     */
+    public function terminateExecution($executionId)
+    {
+        return true;
+    }
+
+    /**
+     * Pauses a delivery execution
+     *
+     * @param string $executionId
+     * @return bool
+     */
+    public function pauseExecution($executionId)
+    {
+        return true;
+    }
     
     /**
      * Returns a group assinged to the delivery
