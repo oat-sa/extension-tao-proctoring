@@ -76,9 +76,18 @@
             text-align: center;
         }
     }
-
-    .delivery-testtakers .list {
-        background-color: $canvas;
+    
+    .delivery-testtakers, .delivery-manager {
+        .list{
+            margin-top : 20px;
+            @include simple-border();
+            background-color: whiten($canvas, .6);
+            padding : 15px;
+        }
+    }
+    
+    .delivery-testtakers .list{
+        background-color: whiten($canvas, .1);
     }
     
     .diagnostic-index, .reporting-index, .delivery-monitoring {
