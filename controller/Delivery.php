@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\ReasonCategory;
 
 /**
  * Proctoring Delivery controllers
@@ -77,7 +78,8 @@ class Delivery extends Proctoring
             array(
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
-                'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions)
+                'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions),
+                'categories' => $this->getAllReasonsCategories()
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -107,7 +109,8 @@ class Delivery extends Proctoring
             'delivery-monitoring',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions)
+                'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions),
+                'categories' => $this->getAllReasonsCategories()
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -480,5 +483,11 @@ class Delivery extends Proctoring
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
+    }
+
+    private function getAllReasonsCategories(){
+        return array(
+            'irregularity' => ReasonCategory::irregularity()
+        );
     }
 }

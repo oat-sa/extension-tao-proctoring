@@ -20,17 +20,19 @@
  */
 define([
     'jquery',
+    'lodash',
     'i18n',
     'helpers',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
+    'ui/bulkActionPopup',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
+], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
 
     /**
@@ -86,9 +88,11 @@ define([
          */
         start : function start() {
             var $container = $(cssScope);
+            var $content = $container.find('.content');
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -149,10 +153,71 @@ define([
             var terminate = function(selection) {
                 request(terminateUrl, selection, __('Delivery executions have been terminated'));
             };
-
+            
+            var stateCheck = {
+                irregularity : function irregularity(action, state){
+                    return {
+                        allowed : true
+                    };
+                },
+                terminate : function terminate(action, state){
+                    var checkStatus = {allowed : false};
+                    switch(action.state.status){
+                        case 'awaiting':
+                        case 'awaiting':
+                        case 'awaiting':
+                            return checkStatus;
+                        case 'terminate':
+                            
+                    }
+                    return checkStatus;
+                }
+            };
+            
+            function verifyTestTaker(testTakerData, action){
+                var formatted = {
+                    id : testTakerData.id,
+                    label : testTakerData.firstname+' '+testTakerData.lastname
+                };
+                var stateCheckStatus = stateCheck.irregularity(action, testTakerData.state);
+                formatted.allowed = stateCheckStatus.allowed;
+                if(!stateCheckStatus.allowed){
+                    formatted.reason = stateCheckStatus.reason;
+                }
+                return formatted;
+            }
+            
+            function execBulkAction(actionName, actionTitle, selection){
+                var allowedTestTakers = [];
+                var forbiddenTestTakers = [];
+                _.each(selection, function(uri){
+                    var testTaker = _.find(dataset.data, {id : uri});
+                    if(testTaker){
+                        var checkedTestTaker = verifyTestTaker(testTaker, actionName);
+                        if(checkedTestTaker.allowed){
+                            allowedTestTakers.push(checkedTestTaker);
+                        }else{
+                            forbiddenTestTakers.push(checkedTestTaker);
+                        }
+                    }
+                });
+                var config = _.defaults(categories.irregularity, {
+                    renderTo : $content,
+                    actionName : actionTitle,
+                    resourceType : 'test taker',
+                    allowedResources : allowedTestTakers,
+                    deniedResources : forbiddenTestTakers
+                });
+                console.log(categories, selection, dataset, config);
+                bulkActionPopup(config).on('ok', function(reason){
+                    console.log(actionTitle, 'trigger action to ', allowedTestTakers);
+                    notYet();
+                });
+            }
+            
             // report irregularities on the selected delivery executions
             var report = function(selection) {
-                notYet();
+                execBulkAction('irregularity', __('Report Irregularity'), selection);
             };
 
             // tool: page refresh
