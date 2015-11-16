@@ -438,4 +438,113 @@ class Delivery extends Proctoring
 
         return $page;
     }
+
+    /**
+     * Add a list of test takers to a delivery.
+     * Returns the list of successfully added test takers.
+     *
+     * @param array $testTakers
+     * @param string $deliveryId
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function assignTestTakers($testTakers, $deliveryId)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($testTakers as $testTaker) {
+            if ($deliveryService->assignTestTaker($testTaker, $deliveryId)) {
+                $result[] = $testTaker;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Removes a list of test takers from a delivery.
+     * Returns the list of successfully removed test takers.
+     *
+     * @param array $testTakers
+     * @param string $deliveryId
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function unassignTestTakers($testTakers, $deliveryId)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($testTakers as $testTaker) {
+            if ($deliveryService->unassignTestTaker($testTaker, $deliveryId)) {
+                $result[] = $testTaker;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Authorises a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function authoriseExecutions($deliveryExecutions)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if ($deliveryService->authoriseExecution($deliveryExecution)) {
+                $result[] = $deliveryExecution;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Terminates a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function terminateExecutions($deliveryExecutions)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if ($deliveryService->terminateExecution($deliveryExecution)) {
+                $result[] = $deliveryExecution;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Pauses a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function pauseExecutions($deliveryExecutions)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if ($deliveryService->pauseExecution($deliveryExecution)) {
+                $result[] = $deliveryExecution;
+            }
+        }
+
+        return $result;
+    }
 }
