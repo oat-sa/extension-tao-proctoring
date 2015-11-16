@@ -157,7 +157,7 @@ class Delivery extends Proctoring
                         )
                     ),
                     Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
-                    Breadcrumbs::deliveryManage($testCenter, $delivery)
+                    Breadcrumbs::manageTestTakers($testCenter, $delivery, 'manage')
                 )
             );
 
@@ -202,7 +202,7 @@ class Delivery extends Proctoring
                         )
                     ),
                     Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
-                    Breadcrumbs::deliveryTestTakers($testCenter, $delivery)
+                    Breadcrumbs::manageTestTakers($testCenter, $delivery, 'testTakers')
                 )
             );
 
