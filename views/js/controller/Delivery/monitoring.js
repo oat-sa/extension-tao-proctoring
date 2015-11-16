@@ -201,13 +201,13 @@ define([
                         }
                     }
                 });
-                var config = _.defaults(categories.irregularity, {
+                var config = _.assign({
                     renderTo : $content,
                     actionName : actionTitle,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
-                });
+                }, categories.irregularity);
                 console.log(categories, selection, dataset, config);
                 bulkActionPopup(config).on('ok', function(reason){
                     console.log(actionTitle, 'trigger action to ', allowedTestTakers);
@@ -217,6 +217,7 @@ define([
             
             // report irregularities on the selected delivery executions
             var report = function(selection) {
+                console.log('report', selection);
                 execBulkAction('irregularity', __('Report Irregularity'), selection);
             };
 
