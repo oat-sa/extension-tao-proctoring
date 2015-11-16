@@ -28,8 +28,9 @@ define([
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/tpl/item-progress',
+    'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
 
     /**
@@ -95,6 +96,10 @@ define([
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
+            var tools = [];
+            var actions = [];
+            var model = [];
 
             var bc = breadcrumbsFactory($container, crumbs);
 
@@ -106,7 +111,7 @@ define([
                     $.ajax({
                         url: url,
                         data: {
-                            testtaker: selection
+                            execution: selection
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -142,8 +147,7 @@ define([
 
             // request the server to terminate the selected delivery executions
             var terminate = function(selection) {
-                notYet();
-                //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+                request(terminateUrl, selection, __('Delivery executions have been terminated'));
             };
 
             // report irregularities on the selected delivery executions
@@ -151,6 +155,227 @@ define([
                 notYet();
             };
 
+            // tool: page refresh
+            tools.push({
+                id: 'refresh',
+                icon: 'reset',
+                title: __('Refresh the page'),
+                label: __('Refresh'),
+                action: function() {
+                    $list.datatable('refresh');
+                }
+            });
+
+            // tool: manage test takers (only for unique delivery)
+            if (deliveryId) {
+                tools.push({
+                    id: 'manage',
+                    icon: 'property-advanced',
+                    title: __('Manage the deliveries'),
+                    label: __('Manage'),
+                    action: function() {
+                        location.href = manageUrl;
+                    }
+                });
+            }
+
+            // tool: authorise the executions
+            tools.push({
+                id: 'authorise',
+                icon: 'play',
+                title: __('Authorise the selected delivery executions'),
+                label: __('Authorise'),
+                massAction: true,
+                action: function(selection) {
+                    confirmMessage(
+                        __('The selected delivery executions will be authorized. Continue ?'),
+                        function() {
+                            authorise(selection);
+                        }
+                    );
+                }
+            });
+
+            // tool: pause the executions
+            tools.push({
+                id: 'pause',
+                icon: 'pause',
+                title: __('Pause delivery executions'),
+                label: __('Pause'),
+                massAction: true,
+                action: function(selection) {
+                    confirmMessage(
+                        __('The selected delivery executions will be paused. Continue ?'),
+                        function() {
+                            pause(selection);
+                        }
+                    );
+                }
+            });
+
+            // tool: terminate the executions
+            tools.push({
+                id: 'terminate',
+                icon: 'stop',
+                title: __('Terminate delivery executions'),
+                label: __('Terminate'),
+                massAction: true,
+                action: function(selection) {
+                    confirmMessage(
+                        __('The selected delivery executions will be terminated. Continue ?'),
+                        function() {
+                            terminate(selection);
+                        }
+                    );
+                }
+            });
+
+            // tool: report irregularities
+            tools.push({
+                id: 'irregularity',
+                icon: 'delivery-small',
+                title: __('Report irregularities'),
+                label: __('Report'),
+                massAction: true,
+                action: function(selection) {
+                    report(selection);
+                }
+            });
+
+            // action: authorise the execution
+            actions.push({
+                id: 'authorise',
+                icon: 'play',
+                title: __('Authorise the delivery execution'),
+                hidden: function() {
+                    return !this.state || !this.state.awaiting;
+                },
+                action: function(id) {
+                    confirmMessage(
+                        __('The delivery execution will be authorized. Continue ?'),
+                        function() {
+                            authorise([id]);
+                        }
+                    );
+                }
+            });
+
+            // action: pause the execution
+            actions.push({
+                id: 'pause',
+                icon: 'pause',
+                title: __('Pause the delivery execution'),
+                hidden: function() {
+                    return !this.state || !this.state.authorised;
+                },
+                action: function(id) {
+                    confirmMessage(
+                        __('The delivery execution will be paused. Continue ?'),
+                        function() {
+                            pause([id]);
+                        }
+                    );
+                }
+            });
+
+            // action: terminate the execution
+            actions.push({
+                id: 'terminate',
+                icon: 'stop',
+                title: __('Terminate the delivery execution'),
+                action: function(id) {
+                    confirmMessage(
+                        __('The delivery execution will be terminated. Continue ?'),
+                        function() {
+                            terminate([id]);
+                        }
+                    );
+                }
+            });
+
+            // action: report irregularities
+            actions.push({
+                id: 'irregularity',
+                icon: 'delivery-small',
+                title: __('Report irregularities'),
+                action: function(id) {
+                    report([id]);
+                }
+            });
+
+            // column: delivery (only for all deliveries view)
+            if (!deliveryId) {
+                model.push({
+                    id: 'delivery',
+                    label: __('Delivery'),
+                    transform: function(value, row) {
+                        var delivery = row && row.delivery;
+                        if (delivery) {
+                            delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri, testCenter : testCenterId});
+                            value = deliveryLinkTpl(delivery);
+                        }
+                        return value;
+
+                    }
+                });
+            }
+
+            // column: test taker first name
+            model.push({
+                id: 'firstname',
+                label: __('First name'),
+                transform: function(value, row) {
+                    return row && row.testTaker && row.testTaker.firstName || '';
+
+                }
+            });
+
+            // column: test taker last name
+            model.push({
+                id: 'lastname',
+                label: __('Last name'),
+                transform: function(value, row) {
+                    return row && row.testTaker && row.testTaker.lastName || '';
+
+                }
+            });
+
+            // column: test taker identifier
+            model.push({
+                id: 'identifier',
+                label: __('Identifier'),
+                transform: function(value, row) {
+                    return row && row.testTaker && row.testTaker.id || '';
+                }
+            });
+
+            // column: delivery execution status
+            model.push({
+                id: 'status',
+                label: __('Status'),
+                transform: function(value, row) {
+                    return row && row.state && row.state.status || '';
+                }
+            });
+
+            // column: delivery execution progress
+            model.push({
+                id: 'progress',
+                label: __('Progress'),
+                transform: function(value, row) {
+                    var state = row && row.state;
+                    var item = state && state.item;
+                    var time = item && item.time;
+                    if (time && time.elapsed) {
+                        time.elapsedStr = _timerFormat(time.elapsed);
+                        time.totalStr = _timerFormat(time.total);
+                        time.display = !!(time.elapsedStr || time.totalStr);
+                    }
+                    return itemProgressTpl(state);
+                }
+            });
+
+            // renders the datatable
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -159,172 +384,16 @@ define([
                     loadingBar.stop();
                 })
                 .datatable({
-                    url: serviceUrl,
+                    url: deliveryId ? serviceUrl : serviceAllUrl,
                     status: {
                         empty: __('No delivery executions'),
                         available: __('Current delivery executions'),
                         loading: __('Loading')
                     },
-                    tools: [{
-                        id: 'refresh',
-                        icon: 'reset',
-                        title: __('Refresh the page'),
-                        label: __('Refresh'),
-                        action: function() {
-                            $list.datatable('refresh');
-                        }
-                    }, {
-                        id: 'manage',
-                        icon: 'property-advanced',
-                        title: __('Manage the deliveries'),
-                        label: __('Manage'),
-                        action: function() {
-                            location.href = manageUrl;
-                        }
-                    }, {
-                        id: 'authorise',
-                        icon: 'play',
-                        title: __('Authorise the selected delivery executions'),
-                        label: __('Authorise'),
-                        massAction: true,
-                        action: function(selection) {
-                            confirmMessage(
-                                __('The selected delivery executions will be authorized. Continue ?'),
-                                function() {
-                                    authorise(selection);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'pause',
-                        icon: 'pause',
-                        title: __('Pause delivery executions'),
-                        label: __('Pause'),
-                        massAction: true,
-                        action: function(selection) {
-                            confirmMessage(
-                                __('The selected delivery executions will be paused. Continue ?'),
-                                function() {
-                                    pause(selection);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'terminate',
-                        icon: 'stop',
-                        title: __('Terminate delivery executions'),
-                        label: __('Terminate'),
-                        massAction: true,
-                        action: function(selection) {
-                            confirmMessage(
-                                __('The selected delivery executions will be terminated. Continue ?'),
-                                function() {
-                                    terminate(selection);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'irregularity',
-                        icon: 'delivery-small',
-                        title: __('Report irregularities'),
-                        label: __('Report'),
-                        massAction: true,
-                        action: function(selection) {
-                            report(selection);
-                        }
-                    }],
-                    actions: [{
-                        id: 'authorise',
-                        icon: 'play',
-                        title: __('Authorise the delivery execution'),
-                        hidden: function() {
-                            return !this.state || !this.state.awaiting;
-                        },
-                        action: function(id) {
-                            confirmMessage(
-                                __('The delivery execution will be authorized. Continue ?'),
-                                function() {
-                                    authorise([id]);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'pause',
-                        icon: 'pause',
-                        title: __('Pause the delivery execution'),
-                        hidden: function() {
-                            return !this.state || !this.state.authorised;
-                        },
-                        action: function(id) {
-                            confirmMessage(
-                                __('The delivery execution will be paused. Continue ?'),
-                                function() {
-                                    authorise([id]);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'terminate',
-                        icon: 'stop',
-                        title: __('Terminate the delivery execution'),
-                        action: function(id) {
-                            confirmMessage(
-                                __('The delivery execution will be terminated. Continue ?'),
-                                function() {
-                                    authorise([id]);
-                                }
-                            );
-                        }
-                    }, {
-                        id: 'irregularity',
-                        icon: 'delivery-small',
-                        title: __('Report irregularities'),
-                        action: function(id) {
-                            report([id]);
-                        }
-                    }],
-                    selectable: true,
-                    model: [{
-                        id: 'firstname',
-                        label: __('First name'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.firstName || '';
-
-                        }
-                    }, {
-                        id: 'lastname',
-                        label: __('Last name'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.lastName || '';
-
-                        }
-                    }, {
-                        id: 'identifier',
-                        label: __('Identifier'),
-                        transform: function(value, row) {
-                            return row && row.testTaker && row.testTaker.id || '';
-                        }
-                    }, {
-                        id: 'status',
-                        label: __('Status'),
-                        transform: function(value, row) {
-                            return row && row.state && row.state.status || '';
-                        }
-                    }, {
-                        id: 'progress',
-                        label: __('Progress'),
-                        transform: function(value, row) {
-                            var state = row && row.state;
-                            var item = state && state.item;
-                            var time = item && item.time;
-                            if (time && time.elapsed) {
-                                time.elapsedStr = _timerFormat(time.elapsed);
-                                time.totalStr = _timerFormat(time.total);
-                                time.display = !!(time.elapsedStr || time.totalStr);
-                            }
-                            return itemProgressTpl(state);
-                        }
-                    }]
+                    tools: tools,
+                    actions: actions,
+                    model: model,
+                    selectable: true
                 }, dataset);
         }
     };

@@ -397,7 +397,7 @@ class Delivery extends Proctoring
      */
     public function authoriseExecutions()
     {
-        $deliveryExecution = $this->getRequestParameter('deliveryExecution');
+        $deliveryExecution = $this->getRequestParameter('execution');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -428,7 +428,7 @@ class Delivery extends Proctoring
      */
     public function terminateExecutions()
     {
-        $deliveryExecution = $this->getRequestParameter('deliveryExecution');
+        $deliveryExecution = $this->getRequestParameter('execution');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -459,7 +459,7 @@ class Delivery extends Proctoring
      */
     public function pauseExecutions()
     {
-        $deliveryExecution = $this->getRequestParameter('deliveryExecution');
+        $deliveryExecution = $this->getRequestParameter('execution');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
