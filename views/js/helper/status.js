@@ -81,10 +81,20 @@ define(['lodash', 'i18n'], function(_, __){
         }
     };
     
+    /**
+     * Get the status model from its name
+     * @param {string} statusName
+     * @returns {object}
+     */
     function getStatus(statusName){
         return _status[statusName];
     }
     
+    /**
+     * Get the status model from its code
+     * @param {string} statusName
+     * @returns {object}
+     */
     function getStatusByCode(statusCode){
         return _.find(_status, {code : statusCode});
     }
