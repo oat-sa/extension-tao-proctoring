@@ -26,7 +26,10 @@ use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoFrontOffice\model\interfaces\DeliveryExecution as  DeliveryExecutionInt;
+use oat\taoFrontOffice\model\interfaces\DeliveryExecution as DeliveryExecutionInt;
+use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
+use oat\taoQtiTest\models\TestSessionMetaData;
+use qtism\runtime\storage\common\AbstractStorage;
 
 /**
  * Sample Delivery Service for proctoring
@@ -36,6 +39,11 @@ use oat\taoFrontOffice\model\interfaces\DeliveryExecution as  DeliveryExecutionI
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
+    /**
+     * QtiSm AssessmentTestSession Storage Service
+     * @var AbstractStorage
+     */
+    private $storage;
 
     /**
      * Gets all deliveries available for a proctor
@@ -64,6 +72,18 @@ class DeliveryService extends ConfigurableService
     {
         $resource = new \core_kernel_classes_Resource($deliveryId);
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getExecutionsByDelivery($resource);
+    }
+
+    /**
+     * Gets a delivery execution from its identifier
+     *
+     * @param string $executionId
+     * @return \taoDelivery_models_classes_execution_DeliveryExecution
+     */
+    public function getDeliveryExecution($executionId)
+    {
+        $executionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        return $executionService->getDeliveryExecution($executionId);
     }
 
     /**
@@ -216,6 +236,12 @@ class DeliveryService extends ConfigurableService
      */
     public function authoriseExecution($executionId)
     {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $session = $this->getTestSession($deliveryExecution);
+
+        $session->resume();
+
+        $this->getStorage()->persist($session);
         return true;
     }
 
@@ -227,6 +253,19 @@ class DeliveryService extends ConfigurableService
      */
     public function terminateExecution($executionId)
     {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $session = $this->getTestSession($deliveryExecution);
+
+        $testSessionMetaData = new TestSessionMetaData($session);
+        $testSessionMetaData->save(array(
+            'TEST' => array('TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED),
+            'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
+        ));
+
+        $session->endTestSession();
+        $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
+
+        $this->getStorage()->persist($session);
         return true;
     }
 
@@ -238,6 +277,12 @@ class DeliveryService extends ConfigurableService
      */
     public function pauseExecution($executionId)
     {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $session = $this->getTestSession($deliveryExecution);
+
+        $session->suspend();
+
+        $this->getStorage()->persist($session);
         return true;
     }
     
@@ -260,5 +305,60 @@ class DeliveryService extends ConfigurableService
         }
         return reset($groups);
     }
-    
+
+    /**
+     * Gets the test session for a particular deliveryExecution
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return \qtism\runtime\tests\AssessmentTestSession
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     */
+    private function getTestSession(DeliveryExecution $deliveryExecution)
+    {
+        $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
+
+        $compiledDelivery = $deliveryExecution->getDelivery();
+        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+
+        $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+        $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
+
+        $sessionManager = new \taoQtiTest_helpers_SessionManager($resultServer, $testResource);
+
+        $qtiStorage = new \taoQtiTest_helpers_TestSessionStorage(
+            $sessionManager,
+            new BinaryAssessmentTestSeeker($testDefinition), $deliveryExecution->getUserIdentifier()
+        );
+        $this->setStorage($qtiStorage);
+
+        $session = $qtiStorage->retrieve($testDefinition, $deliveryExecution->getIdentifier());
+        $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
+        $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());
+
+        $resultServer->setValue('resultServerUri', $resultServerUri->getUri());
+        $resultServer->setValue('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
+        $resultServer->setValue('resultServer_deliveryResultIdentifier', $deliveryExecution->getIdentifier());
+
+        return $session;
+    }
+
+    /**
+     * Get the QtiSm AssessmentTestSession Storage Service.
+     *
+     * @return AbstractStorage An AssessmentTestSession Storage Service.
+     */
+    private function getStorage() {
+        return $this->storage;
+    }
+
+    /**
+     * Set the QtiSm AssessmentTestSession Storage Service.
+     *
+     * @param AbstractStorage $storage An AssessmentTestSession Storage Service.
+     */
+    private function setStorage(AbstractStorage $storage) {
+        $this->storage = $storage;
+    }
 }
