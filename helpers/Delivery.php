@@ -26,8 +26,7 @@ use \core_kernel_classes_Resource;
 use \common_session_SessionManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoFrontOffice\model\interfaces\DeliveryExecution as  DeliveryExecutionInt;
-
+use oat\taoProctoring\model\implementation\DeliveryService;
 /**
  * This temporary helpers is a temporary way to return data to the controller.
  * This helps isolating the mock code from the real controller one.
@@ -68,17 +67,24 @@ class Delivery extends Proctoring
         foreach ($deliveries as $delivery) {
             /* @var $delivery \taoDelivery_models_classes_DeliveryRdf */
             $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri());
-            $active = 0;
+            $inprogress = 0;
             $paused = 0;
             $awaiting = 0;
             foreach($executions as $execution) {
                 /* @var $execution DeliveryExecution */
-                $executionState = $execution->getState()->getUri();
-                if (DeliveryExecutionInt::STATE_ACTIVE == $executionState) {
-                    $active ++;
-                }
-                if (DeliveryExecutionInt::STATE_PAUSED == $executionState) {
-                    $paused ++;
+                $executionState = $deliveryService->getState($execution);
+                switch($executionState){
+                    case DeliveryService::STATE_AWAITING:
+                        $awaiting++;
+                        break;
+                    case DeliveryService::STATE_INPROGRESS:
+                        $inprogress++;
+                        break;
+                    case DeliveryService::STATE_PAUSED:
+                        $paused++;
+                        break;
+                    default:
+                        continue;
                 }
             }
 
@@ -99,14 +105,14 @@ class Delivery extends Proctoring
                 'text' => __('Monitor'),
                 'stats' => array(
                     'awaitingApproval' => $awaiting,
-                    'inProgress' => $active,
+                    'inProgress' => $inprogress,
                     'paused' => $paused
                 ),
                 'properties' => $properties
             );
 
             $all['stats']['awaitingApproval'] += $awaiting;
-            $all['stats']['inProgress'] += $active;
+            $all['stats']['inProgress'] += $inprogress;
             $all['stats']['paused'] += $paused;
         }
 
@@ -218,16 +224,10 @@ class Delivery extends Proctoring
 
         $executions = array();
         foreach($page['data'] as $deliveryExecution) {
-            /* @var $deliveryExecution DeliveryExecution */
+            
             $userId = $deliveryExecution->getUserIdentifier();
-            $executionState = $deliveryExecution->getState();
-            $status = $executionState->getLabel();
-            $statusCode = $executionState->getUri();
             $state = array(
-                'status' => $status,
-                'awaiting' => false,
-                'authorized' => false,
-                'paused' => DeliveryExecutionInt::STATE_PAUSED == $statusCode,
+                'status' => $deliveryService->getState($deliveryExecution),
             );
             $testTaker = array();
 

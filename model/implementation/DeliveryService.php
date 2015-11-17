@@ -45,6 +45,14 @@ class DeliveryService extends ConfigurableService
      */
     private $storage;
 
+    const STATE_AWAITING = 'AWAITING';
+    const STATE_AUTHORIZED = 'AUTHORIZED';
+    const STATE_INPROGRESS = 'INPROGRESS';
+    const STATE_PAUSED = 'PAUSED';
+    const STATE_COMPLETED = 'COMPLETED';
+    const STATE_FINISHED = 'FINISHED';
+
+    
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
@@ -98,13 +106,37 @@ class DeliveryService extends ConfigurableService
         $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
         $executions = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            $status = $deliveryExecution->getState()->getUri();
-            if (DeliveryExecutionInt::STATE_ACTIVE == $status || DeliveryExecutionInt::STATE_PAUSED == $status) {
+            $status = $this->getState($deliveryExecution);
+            if($status != self::STATE_COMPLETED && $status != self::STATE_FINISHED){
                 $executions[] = $deliveryExecution;
             }
         }
 
         return $executions;
+    }
+
+    /**
+     * Compute the state of the delivery and returns one of the extended state code
+     * 
+     * @param \oat\taoDelivery\models\classes\execution\DeliveryExecution $deliveryExecution
+     * @returns string
+     */
+    public function getState(DeliveryExecution $deliveryExecution)
+    {
+        $status = $deliveryExecution->getState()->getUri();
+        //compute the state for the delivery exec
+
+        $allowedValues = array(
+            self::STATE_AWAITING,
+            self::STATE_AUTHORIZED,
+            self::STATE_INPROGRESS,
+            self::STATE_PAUSED,
+            self::STATE_COMPLETED,
+            self::STATE_FINISHED
+        );
+
+        //@todo implement me please
+        return $allowedValues[2];
     }
 
     /**
