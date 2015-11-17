@@ -20,17 +20,20 @@
  */
 define([
     'jquery',
+    'lodash',
     'i18n',
     'helpers',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
+    'ui/bulkActionPopup',
     'taoProctoring/component/breadcrumbs',
+    'taoProctoring/helper/status',
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
+], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, _status, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
 
     /**
@@ -60,21 +63,7 @@ define([
             buttons: 'ok'
         });
     };
-
-    /**
-     * Displays a confirm message
-     * @param message
-     * @param callback
-     */
-    var confirmMessage = function(message, callback) {
-        dialog({
-            message: message,
-            autoRender: true,
-            autoDestroy: true,
-            onOkBtn: callback
-        });
-    };
-
+    
     /**
      * Controls the taoProctoring delivery page
      *
@@ -86,9 +75,11 @@ define([
          */
         start : function start() {
             var $container = $(cssScope);
+            var $content = $container.find('.content');
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -104,7 +95,7 @@ define([
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of test takers
-            var request = function(url, selection, message) {
+            function request(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
@@ -131,29 +122,103 @@ define([
                         }
                     });
                 }
-            };
+            }
 
             // request the server to authorise the selected delivery executions
-            var authorise = function(selection) {
-                notYet();
-                //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
-            };
+            function authorise(selection) {
+                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(){
+                    notYet();
+                    //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
+                });
+            }
 
             // request the server to pause the selected delivery executions
-            var pause = function(selection) {
-                notYet();
-                //request(pauseUrl, selection, __('Delivery executions have been paused'));
-            };
+            function pause(selection) {
+                execBulkAction('pause', __('Pause Delivery Session'), selection, function(){
+                    notYet();
+                    //request(pauseUrl, selection, __('Delivery executions have been paused'));
+                });
+            }
 
             // request the server to terminate the selected delivery executions
-            var terminate = function(selection) {
-                request(terminateUrl, selection, __('Delivery executions have been terminated'));
-            };
-
+            function terminate(selection) {
+                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(){
+                    notYet();
+                    //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+                });
+            }
+            
             // report irregularities on the selected delivery executions
-            var report = function(selection) {
-                notYet();
-            };
+            function report(selection) {
+                execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
+                    console.log('reported', selection, 'with reason', reason);
+                    notYet();
+                });
+            }
+            
+            /**
+             * Verify and reformat test taker data for the execBulkAction's need
+             * @param {Object} testTakerData
+             * @param {String} actionName
+             * @returns {Object}
+             */
+            function verifyTestTaker(testTakerData, actionName){
+                var formatted = {
+                    id : testTakerData.id,
+                    label : testTakerData.firstname+' '+testTakerData.lastname
+                };
+                var status = _status.getStatusByCode(testTakerData.state.status);
+                if(status){
+                    formatted.allowed = (status.can[actionName] === true);
+                    if(!formatted.allowed){
+                        formatted.reason = status.can[actionName];
+                    }
+                }
+                return formatted;
+            }
+            
+            /**
+             * Exec 
+             * @param {String} actionName
+             * @param {String} actionTitle
+             * @param {Array|String} selection
+             * @param {type} cb
+             * @returns {undefined}
+             */
+            function execBulkAction(actionName, actionTitle, selection, cb){
+                
+                var allowedTestTakers = [];
+                var forbiddenTestTakers = [];
+                var _selection = _.isArray(selection) ? selection : [selection];
+                
+                _.each(_selection, function(uri){
+                    var testTaker = _.find(dataset.data, {id : uri});
+                    var checkedTestTaker;
+                    if(testTaker){
+                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
+                        if(checkedTestTaker.allowed){
+                            allowedTestTakers.push(checkedTestTaker);
+                        }else{
+                            forbiddenTestTakers.push(checkedTestTaker);
+                        }
+                    }
+                });
+                var config = _.assign({
+                    renderTo : $content,
+                    actionName : actionTitle,
+                    reason : true,
+                    resourceType : 'test taker',
+                    allowedResources : allowedTestTakers,
+                    deniedResources : forbiddenTestTakers
+                }, categories[actionName]);
+                
+                bulkActionPopup(config).on('ok', function(reason){
+                    //execute callback
+                    if(_.isFunction(cb)){
+                        cb(_selection, reason);
+                    }
+                });
+            }
 
             // tool: page refresh
             tools.push({
@@ -186,14 +251,7 @@ define([
                 title: __('Authorise the selected delivery executions'),
                 label: __('Authorise'),
                 massAction: true,
-                action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be authorized. Continue ?'),
-                        function() {
-                            authorise(selection);
-                        }
-                    );
-                }
+                action: authorise
             });
 
             // tool: pause the executions
@@ -203,14 +261,7 @@ define([
                 title: __('Pause delivery executions'),
                 label: __('Pause'),
                 massAction: true,
-                action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be paused. Continue ?'),
-                        function() {
-                            pause(selection);
-                        }
-                    );
-                }
+                action: pause
             });
 
             // tool: terminate the executions
@@ -220,14 +271,7 @@ define([
                 title: __('Terminate delivery executions'),
                 label: __('Terminate'),
                 massAction: true,
-                action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be terminated. Continue ?'),
-                        function() {
-                            terminate(selection);
-                        }
-                    );
-                }
+                action: terminate
             });
 
             // tool: report irregularities
@@ -237,9 +281,7 @@ define([
                 title: __('Report irregularities'),
                 label: __('Report'),
                 massAction: true,
-                action: function(selection) {
-                    report(selection);
-                }
+                action: report
             });
 
             // action: authorise the execution
@@ -248,16 +290,14 @@ define([
                 icon: 'play',
                 title: __('Authorise the delivery execution'),
                 hidden: function() {
-                    return !this.state || !this.state.awaiting;
+                    var status;
+                    if(this.state && this.state.status){
+                        status = _status.getStatusByCode(this.state.status);
+                        return !status || status.can.authorize !== true;
+                    }
+                    return true;
                 },
-                action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be authorized. Continue ?'),
-                        function() {
-                            authorise([id]);
-                        }
-                    );
-                }
+                action: authorise
             });
 
             // action: pause the execution
@@ -266,16 +306,14 @@ define([
                 icon: 'pause',
                 title: __('Pause the delivery execution'),
                 hidden: function() {
-                    return !this.state || !this.state.authorised;
+                    var status;
+                    if(this.state && this.state.status){
+                        status = _status.getStatusByCode(this.state.status);
+                        return !status || status.can.pause !== true;
+                    }
+                    return true;
                 },
-                action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be paused. Continue ?'),
-                        function() {
-                            pause([id]);
-                        }
-                    );
-                }
+                action: pause
             });
 
             // action: terminate the execution
@@ -283,14 +321,15 @@ define([
                 id: 'terminate',
                 icon: 'stop',
                 title: __('Terminate the delivery execution'),
-                action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be terminated. Continue ?'),
-                        function() {
-                            terminate([id]);
-                        }
-                    );
-                }
+                hidden: function() {
+                    var status;
+                    if(this.state && this.state.status){
+                        status = _status.getStatusByCode(this.state.status);
+                        return !status || status.can.terminate !== true;
+                    }
+                    return true;
+                },
+                action: terminate
             });
 
             // action: report irregularities
@@ -298,9 +337,7 @@ define([
                 id: 'irregularity',
                 icon: 'delivery-small',
                 title: __('Report irregularities'),
-                action: function(id) {
-                    report([id]);
-                }
+                action: report
             });
 
             // column: delivery (only for all deliveries view)
@@ -354,7 +391,13 @@ define([
                 id: 'status',
                 label: __('Status'),
                 transform: function(value, row) {
-                    return row && row.state && row.state.status || '';
+                    if(row && row.state && row.state.status){
+                        var status = _status.getStatusByCode(row.state.status);
+                        if(status){
+                            return status.label;
+                        }
+                    }
+                    return '';
                 }
             });
 
