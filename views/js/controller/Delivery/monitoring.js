@@ -62,21 +62,78 @@ define([
             buttons: 'ok'
         });
     };
-
-    /**
-     * Displays a confirm message
-     * @param message
-     * @param callback
-     */
-    var confirmMessage = function(message, callback) {
-        dialog({
-            message: message,
-            autoRender: true,
-            autoDestroy: true,
-            onOkBtn: callback
-        });
+    
+    var _status = {
+        awaiting : {
+            code : 'AWAITING',
+            label : __('Awaiting'),
+            can : {
+                authorize : true,
+                pause : __('not in progress'),
+                terminate : true,
+                report : true
+            }
+        },
+        authorized : {
+            code : 'AUTHORIZED',
+            label : __('Authorized but not started'),
+            can : {
+                authorize : __('already authorized'),
+                pause : __('not started'),//not in progress
+                terminate :true,
+                report : true
+            }
+        },
+        inprogress : {
+            code : 'INPROGRESS',
+            label : __('In Progress'),
+            can : {
+                authorize : __('already authorized'),
+                pause : true,
+                terminate :true,
+                report : true
+            }
+        },
+        paused : {
+            code : 'PAUSED',
+            label : __('Paused'),
+            can : {
+                authorize : __('is paused'),
+                pause : __('is already paused'),
+                terminate :true,
+                report : true
+            }
+        },
+        completed : {
+            code : 'COMPLETED',
+            label : __('Completed'),
+            can : {
+                authorize : __('is completed'),
+                pause : __('is completed'),
+                terminate : __('is completed'),
+                report : true
+            }
+        },
+        terminated : {
+            code : 'TERMINATED',
+            label : __('Terminated'),
+            can : {
+                authorize : __('is terminated'),
+                pause : __('is terminated'),
+                terminate : __('is terminated'),
+                report : true
+            }
+        }
     };
-
+    
+    function getStatus(statusName){
+        return _status[statusName];
+    }
+    
+    function getStatusByCode(statusCode){
+        return _.find(_status, {code : statusCode});
+    }
+    
     /**
      * Controls the taoProctoring delivery page
      *
@@ -108,7 +165,7 @@ define([
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of test takers
-            var request = function(url, selection, message) {
+            function request(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
@@ -135,65 +192,56 @@ define([
                         }
                     });
                 }
-            };
+            }
 
             // request the server to authorise the selected delivery executions
-            var authorise = function(selection) {
-                notYet();
-                //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
-            };
+            function authorise(selection) {
+                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(){
+                    notYet();
+                    //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
+                });
+            }
 
             // request the server to pause the selected delivery executions
-            var pause = function(selection) {
-                notYet();
-                //request(pauseUrl, selection, __('Delivery executions have been paused'));
-            };
+            function pause(selection) {
+                execBulkAction('pause', __('Pause Delivery Session'), selection, function(){
+                    notYet();
+                    //request(pauseUrl, selection, __('Delivery executions have been paused'));
+                });
+            }
 
             // request the server to terminate the selected delivery executions
-            var terminate = function(selection) {
-                request(terminateUrl, selection, __('Delivery executions have been terminated'));
-            };
+            function terminate(selection) {
+                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(){
+                    notYet();
+                    //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+                });
+            }
             
-            var stateCheck = {
-                irregularity : function irregularity(action, state){
-                    return {
-                        allowed : true
-                    };
-                },
-                terminate : function terminate(action, state){
-                    var checkStatus = {allowed : false};
-                    switch(action.state.status){
-                        case 'awaiting':
-                        case 'awaiting':
-                        case 'awaiting':
-                            return checkStatus;
-                        case 'terminate':
-                            
-                    }
-                    return checkStatus;
-                }
-            };
-            
-            function verifyTestTaker(testTakerData, action){
+            function verifyTestTaker(testTakerData, actionName){
                 var formatted = {
                     id : testTakerData.id,
                     label : testTakerData.firstname+' '+testTakerData.lastname
                 };
-                var stateCheckStatus = stateCheck.irregularity(action, testTakerData.state);
-                formatted.allowed = stateCheckStatus.allowed;
-                if(!stateCheckStatus.allowed){
-                    formatted.reason = stateCheckStatus.reason;
+                var status = getStatusByCode(testTakerData.state.status);
+                if(status){
+                    formatted.allowed = (status.can[actionName] === true);
+                    if(!formatted.allowed){
+                        formatted.reason = status.can[actionName];
+                    }
                 }
                 return formatted;
             }
             
-            function execBulkAction(actionName, actionTitle, selection){
+            function execBulkAction(actionName, actionTitle, selection, cb){
+                
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
                 _.each(selection, function(uri){
                     var testTaker = _.find(dataset.data, {id : uri});
+                    var checkedTestTaker;
                     if(testTaker){
-                        var checkedTestTaker = verifyTestTaker(testTaker, actionName);
+                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
                         if(checkedTestTaker.allowed){
                             allowedTestTakers.push(checkedTestTaker);
                         }else{
@@ -207,18 +255,22 @@ define([
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
-                }, categories.irregularity);
-                console.log(categories, selection, dataset, config);
+                }, categories[actionName]);
+                
                 bulkActionPopup(config).on('ok', function(reason){
-                    console.log(actionTitle, 'trigger action to ', allowedTestTakers);
-                    notYet();
+                    //execute callback
+                    if(_.isFunction(cb)){
+                        cb(selection, reason);
+                    }
                 });
             }
             
             // report irregularities on the selected delivery executions
             var report = function(selection) {
-                console.log('report', selection);
-                execBulkAction('irregularity', __('Report Irregularity'), selection);
+                execBulkAction('report', __('Report Irregularity'), selection, function(selection, reason){
+                    console.log('reported', selection, 'with reason', reason);
+                    notYet();
+                });
             };
 
             // tool: page refresh
@@ -253,12 +305,7 @@ define([
                 label: __('Authorise'),
                 massAction: true,
                 action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be authorized. Continue ?'),
-                        function() {
-                            authorise(selection);
-                        }
-                    );
+                    authorise(selection);
                 }
             });
 
@@ -270,12 +317,7 @@ define([
                 label: __('Pause'),
                 massAction: true,
                 action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be paused. Continue ?'),
-                        function() {
-                            pause(selection);
-                        }
-                    );
+                    pause(selection);
                 }
             });
 
@@ -287,12 +329,7 @@ define([
                 label: __('Terminate'),
                 massAction: true,
                 action: function(selection) {
-                    confirmMessage(
-                        __('The selected delivery executions will be terminated. Continue ?'),
-                        function() {
-                            terminate(selection);
-                        }
-                    );
+                    terminate(selection);
                 }
             });
 
@@ -314,15 +351,15 @@ define([
                 icon: 'play',
                 title: __('Authorise the delivery execution'),
                 hidden: function() {
-                    return !this.state || !this.state.awaiting;
+                    var status;
+                    if(this.state && this.state.status){
+                        status = getStatusByCode(this.state.status);
+                        return !status || status.can.authorize !== true;
+                    }
+                    return true;
                 },
                 action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be authorized. Continue ?'),
-                        function() {
-                            authorise([id]);
-                        }
-                    );
+                    authorise([id]);
                 }
             });
 
@@ -332,15 +369,15 @@ define([
                 icon: 'pause',
                 title: __('Pause the delivery execution'),
                 hidden: function() {
-                    return !this.state || !this.state.authorised;
+                    var status;
+                    if(this.state && this.state.status){
+                        status = getStatusByCode(this.state.status);
+                        return !status || status.can.pause !== true;
+                    }
+                    return true;
                 },
                 action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be paused. Continue ?'),
-                        function() {
-                            pause([id]);
-                        }
-                    );
+                    pause([id]);
                 }
             });
 
@@ -349,13 +386,16 @@ define([
                 id: 'terminate',
                 icon: 'stop',
                 title: __('Terminate the delivery execution'),
+                hidden: function() {
+                    var status;
+                    if(this.state && this.state.status){
+                        status = getStatusByCode(this.state.status);
+                        return !status || status.can.terminate !== true;
+                    }
+                    return true;
+                },
                 action: function(id) {
-                    confirmMessage(
-                        __('The delivery execution will be terminated. Continue ?'),
-                        function() {
-                            terminate([id]);
-                        }
-                    );
+                    terminate([id]);
                 }
             });
 
@@ -420,7 +460,13 @@ define([
                 id: 'status',
                 label: __('Status'),
                 transform: function(value, row) {
-                    return row && row.state && row.state.status || '';
+                    if(row && row.state && row.state.status){
+                        var status = getStatusByCode(row.state.status);
+                        if(status){
+                            return status.label;
+                        }
+                    }
+                    return '';
                 }
             });
 

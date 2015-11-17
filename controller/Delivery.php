@@ -487,7 +487,10 @@ class Delivery extends Proctoring
 
     private function getAllReasonsCategories(){
         return array(
-            'irregularity' => ReasonCategory::irregularity()
+            'authorize' => array(),
+            'pause' => ReasonCategory::irregularity(),
+            'terminate' => ReasonCategory::irregularity(),
+            'report' => ReasonCategory::irregularity()
         );
     }
 }
