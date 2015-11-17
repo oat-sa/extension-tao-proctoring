@@ -29,10 +29,11 @@ define([
     'ui/dialog',
     'ui/bulkActionPopup',
     'taoProctoring/component/breadcrumbs',
+    'taoProctoring/helper/status',
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, itemProgressTpl, deliveryLinkTpl) {
+], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, _status, itemProgressTpl, deliveryLinkTpl) {
     'use strict';
 
     /**
@@ -62,77 +63,6 @@ define([
             buttons: 'ok'
         });
     };
-    
-    var _status = {
-        awaiting : {
-            code : 'AWAITING',
-            label : __('Awaiting'),
-            can : {
-                authorize : true,
-                pause : __('not in progress'),
-                terminate : true,
-                report : true
-            }
-        },
-        authorized : {
-            code : 'AUTHORIZED',
-            label : __('Authorized but not started'),
-            can : {
-                authorize : __('already authorized'),
-                pause : __('not started'),//not in progress
-                terminate :true,
-                report : true
-            }
-        },
-        inprogress : {
-            code : 'INPROGRESS',
-            label : __('In Progress'),
-            can : {
-                authorize : __('already authorized'),
-                pause : true,
-                terminate :true,
-                report : true
-            }
-        },
-        paused : {
-            code : 'PAUSED',
-            label : __('Paused'),
-            can : {
-                authorize : __('is paused'),
-                pause : __('is already paused'),
-                terminate :true,
-                report : true
-            }
-        },
-        completed : {
-            code : 'COMPLETED',
-            label : __('Completed'),
-            can : {
-                authorize : __('is completed'),
-                pause : __('is completed'),
-                terminate : __('is completed'),
-                report : true
-            }
-        },
-        terminated : {
-            code : 'TERMINATED',
-            label : __('Terminated'),
-            can : {
-                authorize : __('is terminated'),
-                pause : __('is terminated'),
-                terminate : __('is terminated'),
-                report : true
-            }
-        }
-    };
-    
-    function getStatus(statusName){
-        return _status[statusName];
-    }
-    
-    function getStatusByCode(statusCode){
-        return _.find(_status, {code : statusCode});
-    }
     
     /**
      * Controls the taoProctoring delivery page
@@ -223,7 +153,7 @@ define([
                     id : testTakerData.id,
                     label : testTakerData.firstname+' '+testTakerData.lastname
                 };
-                var status = getStatusByCode(testTakerData.state.status);
+                var status = _status.getStatusByCode(testTakerData.state.status);
                 if(status){
                     formatted.allowed = (status.can[actionName] === true);
                     if(!formatted.allowed){
@@ -353,7 +283,7 @@ define([
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
-                        status = getStatusByCode(this.state.status);
+                        status = _status.getStatusByCode(this.state.status);
                         return !status || status.can.authorize !== true;
                     }
                     return true;
@@ -371,7 +301,7 @@ define([
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
-                        status = getStatusByCode(this.state.status);
+                        status = _status.getStatusByCode(this.state.status);
                         return !status || status.can.pause !== true;
                     }
                     return true;
@@ -389,7 +319,7 @@ define([
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
-                        status = getStatusByCode(this.state.status);
+                        status = _status.getStatusByCode(this.state.status);
                         return !status || status.can.terminate !== true;
                     }
                     return true;
@@ -461,7 +391,7 @@ define([
                 label: __('Status'),
                 transform: function(value, row) {
                     if(row && row.state && row.state.status){
-                        var status = getStatusByCode(row.state.status);
+                        var status = _status.getStatusByCode(row.state.status);
                         if(status){
                             return status.label;
                         }
