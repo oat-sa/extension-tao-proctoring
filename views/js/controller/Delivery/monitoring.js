@@ -182,6 +182,7 @@ define([
                 var config = _.assign({
                     renderTo : $content,
                     actionName : actionTitle,
+                    reason : true,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
