@@ -22,8 +22,10 @@
 namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
+use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\implementation\TestCenterService;
+use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 
 /**
  * 
@@ -50,6 +52,22 @@ class Updater extends common_ext_ExtensionUpdater {
             $service = new TestCenterService();
             $ext->setConfig('testCenter', $service);
             $currentVersion = '0.3';
+        }
+
+        if ($currentVersion == '0.3') {
+            //grant access to test taker
+            $testTakerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $accessService->grantModuleAccess($testTakerRole, 'taoProctoring', 'DeliveryServer');
+
+            $mpManagerRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+            $accessService->revokeModuleAccess($mpManagerRole, 'taoProctoring', 'DeliveryServer');
+
+            //replace delivery server
+            $entryPointService = EntryPointService::getRegistry();
+            $entryPointService->overrideEntryPoint('deliveryServer', new ProctoringDeliveryServer());
+            $this->getServiceManager()->register(EntryPointService::SERVICE_ID, $entryPointService);
+            $currentVersion = '0.4';
         }
 
         return $currentVersion;
