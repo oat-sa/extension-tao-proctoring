@@ -17,7 +17,7 @@
  *
  */
 define(['lodash', 'i18n'], function(_, __){
-    
+   'use strict'; 
    var _status = {
         awaiting : {
             code : 'AWAITING',
