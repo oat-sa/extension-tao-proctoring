@@ -485,6 +485,11 @@ class Delivery extends Proctoring
         }
     }
 
+    /**
+     * Get the list of all available categories, sorted by action names
+     *
+     * @return array
+     */
     private function getAllReasonsCategories(){
         return array(
             'authorize' => array(),
