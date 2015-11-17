@@ -148,6 +148,20 @@ define([
                 });
             }
             
+            // report irregularities on the selected delivery executions
+            function report(selection) {
+                execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
+                    console.log('reported', selection, 'with reason', reason);
+                    notYet();
+                });
+            }
+            
+            /**
+             * Verify and reformat test taker data for the execBulkAction's need
+             * @param {Object} testTakerData
+             * @param {String} actionName
+             * @returns {Object}
+             */
             function verifyTestTaker(testTakerData, actionName){
                 var formatted = {
                     id : testTakerData.id,
@@ -163,11 +177,21 @@ define([
                 return formatted;
             }
             
+            /**
+             * Exec 
+             * @param {String} actionName
+             * @param {String} actionTitle
+             * @param {Array|String} selection
+             * @param {type} cb
+             * @returns {undefined}
+             */
             function execBulkAction(actionName, actionTitle, selection, cb){
                 
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
-                _.each(selection, function(uri){
+                var _selection = _.isArray(selection) ? selection : [selection];
+                
+                _.each(_selection, function(uri){
                     var testTaker = _.find(dataset.data, {id : uri});
                     var checkedTestTaker;
                     if(testTaker){
@@ -191,18 +215,10 @@ define([
                 bulkActionPopup(config).on('ok', function(reason){
                     //execute callback
                     if(_.isFunction(cb)){
-                        cb(selection, reason);
+                        cb(_selection, reason);
                     }
                 });
             }
-            
-            // report irregularities on the selected delivery executions
-            var report = function(selection) {
-                execBulkAction('report', __('Report Irregularity'), selection, function(selection, reason){
-                    console.log('reported', selection, 'with reason', reason);
-                    notYet();
-                });
-            };
 
             // tool: page refresh
             tools.push({
@@ -235,9 +251,7 @@ define([
                 title: __('Authorise the selected delivery executions'),
                 label: __('Authorise'),
                 massAction: true,
-                action: function(selection) {
-                    authorise(selection);
-                }
+                action: authorise
             });
 
             // tool: pause the executions
@@ -247,9 +261,7 @@ define([
                 title: __('Pause delivery executions'),
                 label: __('Pause'),
                 massAction: true,
-                action: function(selection) {
-                    pause(selection);
-                }
+                action: pause
             });
 
             // tool: terminate the executions
@@ -259,9 +271,7 @@ define([
                 title: __('Terminate delivery executions'),
                 label: __('Terminate'),
                 massAction: true,
-                action: function(selection) {
-                    terminate(selection);
-                }
+                action: terminate
             });
 
             // tool: report irregularities
@@ -271,9 +281,7 @@ define([
                 title: __('Report irregularities'),
                 label: __('Report'),
                 massAction: true,
-                action: function(selection) {
-                    report(selection);
-                }
+                action: report
             });
 
             // action: authorise the execution
@@ -289,9 +297,7 @@ define([
                     }
                     return true;
                 },
-                action: function(id) {
-                    authorise([id]);
-                }
+                action: authorise
             });
 
             // action: pause the execution
@@ -307,9 +313,7 @@ define([
                     }
                     return true;
                 },
-                action: function(id) {
-                    pause([id]);
-                }
+                action: pause
             });
 
             // action: terminate the execution
@@ -325,9 +329,7 @@ define([
                     }
                     return true;
                 },
-                action: function(id) {
-                    terminate([id]);
-                }
+                action: terminate
             });
 
             // action: report irregularities
@@ -335,9 +337,7 @@ define([
                 id: 'irregularity',
                 icon: 'delivery-small',
                 title: __('Report irregularities'),
-                action: function(id) {
-                    report([id]);
-                }
+                action: report
             });
 
             // column: delivery (only for all deliveries view)
