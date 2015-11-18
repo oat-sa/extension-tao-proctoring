@@ -30,6 +30,7 @@ use oat\taoFrontOffice\model\interfaces\DeliveryExecution as DeliveryExecutionIn
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
+use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
  * Sample Delivery Service for proctoring
@@ -45,6 +46,13 @@ class DeliveryService extends ConfigurableService
      */
     private $storage;
 
+    /**
+     * temporary variable until proper servicemanager integration
+     * @var ExtendedStateService
+     */
+    private $extendedStateService;
+
+    const STATE_ACTIVE = 'ACTIVE';
     const STATE_AWAITING = 'AWAITING';
     const STATE_AUTHORIZED = 'AUTHORIZED';
     const STATE_INPROGRESS = 'INPROGRESS';
@@ -52,7 +60,7 @@ class DeliveryService extends ConfigurableService
     const STATE_COMPLETED = 'COMPLETED';
     const STATE_FINISHED = 'FINISHED';
 
-    
+
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
@@ -86,12 +94,38 @@ class DeliveryService extends ConfigurableService
      * Gets a delivery execution from its identifier
      *
      * @param string $executionId
-     * @return \taoDelivery_models_classes_execution_DeliveryExecution
+     * @return DeliveryExecution
      */
     public function getDeliveryExecution($executionId)
     {
+        if ($executionId instanceof DeliveryExecution) {
+            return $executionId;
+        }
+
         $executionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
         return $executionService->getDeliveryExecution($executionId);
+    }
+
+    /**
+     * Extract the started time of a delivery execution as a timestamp
+     * @param DeliveryExecution $deliveryExecution
+     * @return float
+     */
+    public function getStartTime($deliveryExecution) {
+        $time = explode(' ', $deliveryExecution->getStartTime());
+        if (count($time) > 1) {
+            return $time[1];
+        }
+        return $time[0];
+    }
+
+    /**
+     * @param DeliveryExecution $a
+     * @param DeliveryExecution $b
+     * @return int
+     */
+    public function cmpDeliveryExecution($a, $b) {
+        return $this->getStartTime($b) - $this->getStartTime($a);
     }
 
     /**
@@ -104,15 +138,8 @@ class DeliveryService extends ConfigurableService
     public function getCurrentDeliveryExecutions($deliveryId, $options = array())
     {
         $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
-        $executions = array();
-        foreach($deliveryExecutions as $deliveryExecution) {
-            $status = $this->getState($deliveryExecution);
-            if($status != self::STATE_COMPLETED && $status != self::STATE_FINISHED){
-                $executions[] = $deliveryExecution;
-            }
-        }
-
-        return $executions;
+        usort($deliveryExecutions, array($this, 'cmpDeliveryExecution'));
+        return $deliveryExecutions;
     }
 
     /**
@@ -123,10 +150,71 @@ class DeliveryService extends ConfigurableService
      */
     public function getState(DeliveryExecution $deliveryExecution)
     {
-        $status = $deliveryExecution->getState()->getUri();
-        //compute the state for the delivery exec
+        $executionStatus = $deliveryExecution->getState()->getUri();
 
-        $allowedValues = array(
+        $status = self::STATE_FINISHED;
+        if (DeliveryExecutionInt::STATE_FINISHIED != $executionStatus) {
+            $proctoringState = $this->getProctoringState($deliveryExecution);
+
+            if ($proctoringState['status']) {
+                $status = $proctoringState['status'];
+            } else if (DeliveryExecutionInt::STATE_ACTIVE == $executionStatus) {
+                $status = self::STATE_ACTIVE;
+            } else if (DeliveryExecutionInt::STATE_PAUSED == $executionStatus) {
+                $status = self::STATE_PAUSED;
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * Sets a proctoring state on a delivery execution
+     * @param string|DeliveryExecution $executionId
+     * @param string $state
+     * @param array $reason
+     */
+    public function setProctoringState($executionId, $state, $reason = null)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $stateService = $this->getExtendedStateService();
+        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+
+        $proctoringState['status'] = $state;
+        $proctoringState['reason'] = $reason;
+        $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
+    }
+
+    /**
+     * Gets a proctoring state from a delivery execution
+     * @param string|DeliveryExecution $executionId
+     * @return array
+     */
+    public function getProctoringState($executionId)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $stateService = $this->getExtendedStateService();
+        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+
+        if (!isset($proctoringState['status'])) {
+            $proctoringState['status'] = null;
+        }
+
+        if (!isset($proctoringState['reason'])) {
+            $proctoringState['reason'] = null;
+        }
+
+        return $proctoringState;
+    }
+
+    /**
+     * Gets the list of allowed states
+     * @return array
+     */
+    public function getAllowedState()
+    {
+        return array(
+            self::STATE_ACTIVE,
             self::STATE_AWAITING,
             self::STATE_AUTHORIZED,
             self::STATE_INPROGRESS,
@@ -134,13 +222,10 @@ class DeliveryService extends ConfigurableService
             self::STATE_COMPLETED,
             self::STATE_FINISHED
         );
-
-        //@todo implement me please
-        return $allowedValues[2];
     }
 
     /**
-     * 
+     *
      * @param string $deliveryId
      * @return \taoDelivery_models_classes_DeliveryRdf
      */
@@ -181,7 +266,7 @@ class DeliveryService extends ConfigurableService
 
         return $settings;
     }
-    
+
     /**
      * Gets the test takers assigned to a delivery
      *
@@ -200,7 +285,7 @@ class DeliveryService extends ConfigurableService
         }
         return $users;
     }
-    
+
     /**
      * Gets the test takers available for a delivery
      *
@@ -212,12 +297,12 @@ class DeliveryService extends ConfigurableService
     public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array())
     {
         $class = new  \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
-        
+
         $excludeIds = array();
         foreach ($this->getDeliveryTestTakers($deliveryId) as $user) {
             $excludeIds[] = $user->getIdentifier();
         }
-        
+
         $users = array();
         foreach ($class->getInstances(true) as $userResource) {
             // assume Tao Users
@@ -227,14 +312,14 @@ class DeliveryService extends ConfigurableService
         }
         return $users;
     }
-    
+
     /**
      * Assign a test taker to a delivery
-     * 
+     *
      * Assumes:
      * Deliveries are assigned via groups
      * Users are in the ontology
-     * 
+     *
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorAssignment::assignTestTaker()
      */
@@ -243,14 +328,14 @@ class DeliveryService extends ConfigurableService
         $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId));
         return GroupsService::singleton()->addUser($testTakerId, $deliveryGroup);
     }
-    
+
     /**
      * Unassign (remove) a test taker to a delivery
      *
      * Assumes:
      * Deliveries are assigned via groups
      * Users are in the ontology
-     * 
+     *
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorAssignment::unassignTestTaker()
      */
@@ -261,29 +346,89 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Authorises a delivery execution
+     * Sets a delivery execution in the awaiting state
      *
      * @param string $executionId
      * @return bool
      */
-    public function authoriseExecution($executionId)
+    public function waitExecution($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
-        $session = $this->getTestSession($deliveryExecution);
+        $executionState = $this->getState($deliveryExecution);
+        $result = false;
 
-        $session->resume();
+        if (self::STATE_ACTIVE == $executionState || self::STATE_PAUSED == $executionState) {
+            $this->setProctoringState($deliveryExecution, self::STATE_AWAITING);
 
-        $this->getStorage()->persist($session);
-        return true;
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sets a delivery execution in the inprogress state
+     *
+     * @param string $executionId
+     * @return bool
+     */
+    public function processExecution($executionId)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $executionState = $this->getState($deliveryExecution);
+        $result = false;
+
+        if (self::STATE_AUTHORIZED == $executionState) {
+            $this->setProctoringState($deliveryExecution, self::STATE_INPROGRESS);
+
+            $session = $this->getTestSession($deliveryExecution);
+            if ($session->getState() == AssessmentTestSessionState::SUSPENDED) {
+                $session->resume();
+                $this->getStorage()->persist($session);
+            }
+
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Authorises a delivery execution
+     *
+     * @param string $executionId
+     * @param array $reason
+     * @return bool
+     */
+    public function authoriseExecution($executionId, $reason = null)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $executionState = $this->getState($deliveryExecution);
+        $result = false;
+
+        if (self::STATE_AWAITING == $executionState) {
+            $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);
+
+            $session = $this->getTestSession($deliveryExecution);
+            if ($session->getState() == AssessmentTestSessionState::SUSPENDED) {
+                $session->resume();
+                $this->getStorage()->persist($session);
+            }
+
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**
      * Terminates a delivery execution
      *
      * @param string $executionId
+     * @param array $reason
      * @return bool
      */
-    public function terminateExecution($executionId)
+    public function terminateExecution($executionId, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $session = $this->getTestSession($deliveryExecution);
@@ -293,6 +438,8 @@ class DeliveryService extends ConfigurableService
             'TEST' => array('TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED),
             'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
         ));
+
+        $this->setProctoringState($deliveryExecution, self::STATE_FINISHED, $reason);
 
         $session->endTestSession();
         $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
@@ -305,22 +452,31 @@ class DeliveryService extends ConfigurableService
      * Pauses a delivery execution
      *
      * @param string $executionId
+     * @param array $reason
      * @return bool
      */
-    public function pauseExecution($executionId)
+    public function pauseExecution($executionId, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
-        $session = $this->getTestSession($deliveryExecution);
+        $executionState = $this->getState($deliveryExecution);
+        $result = false;
 
-        $session->suspend();
+        if (self::STATE_FINISHED != $executionState) {
+            $this->setProctoringState($deliveryExecution, self::STATE_PAUSED, $reason);
 
-        $this->getStorage()->persist($session);
-        return true;
+            $session = $this->getTestSession($deliveryExecution);
+            $session->suspend();
+            $this->getStorage()->persist($session);
+
+            $result = true;
+        }
+
+        return $result;
     }
-    
+
     /**
      * Returns a group assinged to the delivery
-     * 
+     *
      * @param unknown $deliveryId
      * @return string
      * @throws \common_Exception
@@ -392,5 +548,17 @@ class DeliveryService extends ConfigurableService
      */
     private function setStorage(AbstractStorage $storage) {
         $this->storage = $storage;
+    }
+
+    /**
+     * temporary helper until proper servicemanager integration
+     * @return ExtendedStateService
+     */
+    private function getExtendedStateService()
+    {
+        if (!isset($this->extendedStateService)) {
+            $this->extendedStateService = new ExtendedStateService();
+        }
+        return $this->extendedStateService;
     }
 }
