@@ -75,15 +75,7 @@ define([
             });
             var $content = $container.find('.listbox .content');
 
-
             loadingBar.start();
-
-            function authorized(){
-                loadingBar.stop();
-                //@todo it would be nice to smoothen the transition
-                $container.removeClass('authorization-in-progress');
-                $content.html(authSuccessTpl({message : __('Authorization done. You may proceed now.')}));
-            }
 
             polling({
                 action : function (){
@@ -103,6 +95,15 @@ define([
                 autoStart : true
             });
             
+            /**
+             * Function to be called when the delivery execution has been authorized
+             */
+            function authorized(){
+                loadingBar.stop();
+                //@todo it would be nice to smoothen the transition
+                $container.removeClass('authorization-in-progress');
+                $content.html(authSuccessTpl({message : __('Authorization done. You may proceed now.')}));
+            }
         }
     };
 
