@@ -23,6 +23,7 @@ define([
     'lodash',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
@@ -33,7 +34,22 @@ define([
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, _status, itemProgressTpl, deliveryLinkTpl) {
+], function (
+    $,
+    _,
+    __,
+    helpers,
+    moment,
+    loadingBar,
+    encode,
+    feedback,
+    dialog,
+    bulkActionPopup,
+    breadcrumbsFactory,
+    _status,
+    itemProgressTpl,
+    deliveryLinkTpl
+) {
     'use strict';
 
     /**
@@ -381,6 +397,15 @@ define([
                 label: __('Identifier'),
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.id || '';
+                }
+            });
+
+            // column: start time
+            model.push({
+                id: 'date',
+                label: __('Started at'),
+                transform: function(value) {
+                    return moment(value).toString();
                 }
             });
 

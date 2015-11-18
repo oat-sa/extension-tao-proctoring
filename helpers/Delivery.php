@@ -255,6 +255,7 @@ class Delivery extends Proctoring
                 'delivery' => array(
                     'label' => $deliveryExecution->getLabel(),
                 ),
+                'date' => date('Y-m-d H:i:s', $deliveryService->getStartTime($deliveryExecution)),
                 'testTaker' => $testTaker,
                 'state' => $state,
             );
