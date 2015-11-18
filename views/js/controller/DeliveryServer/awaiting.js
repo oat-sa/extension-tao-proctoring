@@ -26,24 +26,22 @@ define([
     'moment',
     'layout/loading-bar',
     'ui/listbox',
+    'core/polling',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, moment, loadingBar, listBox, authSuccessTpl){
+], function (_, $, __, helpers, moment, loadingBar, listBox, polling, authSuccessTpl){
     'use strict';
 
     /**
      * The polling delay used to refresh the list
      * @type {Number}
      */
-    var refreshPolling = 60 * 1000; // once per minute
+    var refreshPolling = 10 * 1000; // once every 10 seconds
 
     /**
      * The CSS scope
      * @type {String}
      */
     var cssScope = '.awaiting-authorization';
-
-    // the page is always loading data when starting
-    loadingBar.start();
 
     /**
      * Controls the ProctorDelivery index page
@@ -55,17 +53,19 @@ define([
          * Entry point of the page
          */
         start : function start(config){
-            
+
             var $container = $(cssScope);
+            var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
+            var runDeliveryUrl = helpers._url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
             var boxes = [{
                     id : 'goToDelivery',
                     label : config.deliveryLabel,
-                    url : helpers._url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution}),
+                    url : runDeliveryUrl,
                     content : __('Please wait, authorization in process ...'),
                     text : __('Proceed')
                 }];
             var list = listBox({
-                title : '',
+                title : config.deliveryInit ? __('Start Delivery') : __('Resume Delivery'),
                 textEmpty : '',
                 textNumber : '',
                 textLoading : '',
@@ -74,95 +74,35 @@ define([
                 width : 12
             });
             var $content = $container.find('.listbox .content');
-            var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
+
 
             loadingBar.start();
-            
+
             function authorized(){
                 loadingBar.stop();
                 //@todo it would be nice to smoothen the transition
                 $container.removeClass('authorization-in-progress');
-                $content.html(authSuccessTpl({message:__('Authorization done. You may proceed now.')}));
-            }
-            
-            setTimeout(authorized, 2000);
-            
-            return;
-            var pollTo = null;
-
-
-            function format(boxes){
-                _.each(boxes, function (box){
-
-                    var props = box.properties;
-                    var tplData = {
-                        locked : box.stats.awaitingApproval,
-                        inProgress : box.stats.inProgress,
-                        paused : box.stats.paused
-                    };
-
-                    if(props && props.periodStart && props.periodEnd){
-                        tplData.showProperties = true;
-                        tplData.periodStart = moment(props.periodStart).toString();
-                        tplData.periodEnd = moment(props.periodEnd).toString();
-
-                        //add a special class for boxes that have more information to display
-                        box.cls = 'has-properties-displayed';
-                    }
-
-                    box.html = actionsTpl();
-                    box.content = statsTpl(tplData);
-                });
-
-                return boxes;
+                $content.html(authSuccessTpl({message : __('Authorization done. You may proceed now.')}));
             }
 
-            // update the index from a JSON array
-            function update(boxes){
-
-                if(pollTo){
-                    clearTimeout(pollTo);
-                    pollTo = null;
-                }
-
-                list.update(format(boxes));
-                loadingBar.stop();
-
-                // poll the server at regular interval to refresh the index
-                if(refreshPolling){
-                    pollTo = setTimeout(refresh, refreshPolling);
-                }
-            }
-            ;
-
-            // refresh the index
-            function refresh(){
-                loadingBar.start();
-                list.setLoading(true);
-
-                $.ajax({
-                    url : serviceUrl,
-                    cache : false,
-                    dataType : 'json',
-                    type : 'GET'
-                }).done(function (response){
-                    boxes = response && response.list;
-                    update(boxes);
-                });
-            }
-            ;
-
-            $container.on('click', '.pause', function (e){
-                e.stopPropagation();
-                e.preventDefault();
-                alert('Pausing action is currently not available.');
+            polling({
+                action : function (){
+                    var async = this.async();
+                    $.get(isAuthorizedUrl, function(result){
+                        if(result.authorized){
+                            // stop immediately the polling
+                            async.reject();
+                            authorized();
+                        }else{
+                            // continue the polling
+                            async.resolve();
+                        }
+                    });
+                },
+                interval : refreshPolling,
+                autoStart : true
             });
-
-            if(!boxes){
-                refresh();
-            }else{
-                loadingBar.stop();
-            }
+            
         }
     };
 
