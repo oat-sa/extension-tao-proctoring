@@ -1,15 +1,20 @@
 @import "inc/bootstrap";
 
 .awaiting-authorization {
+    padding-top:40px;
     &.authorization-in-progress .listbox .list-box {
         .text-link, .title{
             color: #999;
         }
-        .content {
-            display : block;
+    }
+    .listbox {
+        width : 500px;
+        .list-box .entry {
+            margin-left : 0;
         }
     }
-    .listbox .list-box .content{
-        display: none;
+    .success-message .icon-result-ok{
+        margin-left: 6px;
+        color : $success;
     }
 }

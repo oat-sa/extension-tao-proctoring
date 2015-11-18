@@ -1,2 +1,2 @@
-.awaiting-authorization.authorization-in-progress .listbox .list-box .text-link,.awaiting-authorization.authorization-in-progress .listbox .list-box .title{color:#999}.awaiting-authorization.authorization-in-progress .listbox .list-box .content{display:block}.awaiting-authorization .listbox .list-box .content{display:none}
+.awaiting-authorization{padding-top:40px}.awaiting-authorization.authorization-in-progress .listbox .list-box .text-link,.awaiting-authorization.authorization-in-progress .listbox .list-box .title{color:#999}.awaiting-authorization .listbox{width:500px}.awaiting-authorization .listbox .list-box .entry{margin-left:0}.awaiting-authorization .success-message .icon-result-ok{margin-left:6px;color:#0e914b}
 /*# sourceMappingURL=deliveryServer.css.map */

@@ -25,8 +25,9 @@ define([
     'helpers',
     'moment',
     'layout/loading-bar',
-    'ui/listbox'
-], function (_, $, __, helpers, moment, loadingBar, listBox){
+    'ui/listbox',
+    'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
+], function (_, $, __, helpers, moment, loadingBar, listBox, authSuccessTpl){
     'use strict';
 
     /**
@@ -61,10 +62,10 @@ define([
                     label : config.deliveryLabel,
                     url : helpers._url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution}),
                     content : __('Please wait, authorization in process ...'),
-                    text : __('Continue')
+                    text : __('Proceed')
                 }];
             var list = listBox({
-                title : __("Awaiting Proctor's Authorization"),
+                title : '',
                 textEmpty : '',
                 textNumber : '',
                 textLoading : '',
@@ -72,7 +73,7 @@ define([
                 list : boxes,
                 width : 12
             });
-            var $title = $container.find('.listbox h1');
+            var $content = $container.find('.listbox .content');
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
 
             loadingBar.start();
@@ -81,7 +82,7 @@ define([
                 loadingBar.stop();
                 //@todo it would be nice to smoothen the transition
                 $container.removeClass('authorization-in-progress');
-                $title.html(__('You have been authorized'));
+                $content.html(authSuccessTpl({message:__('Authorization done. You may proceed now.')}));
             }
             
             setTimeout(authorized, 2000);
