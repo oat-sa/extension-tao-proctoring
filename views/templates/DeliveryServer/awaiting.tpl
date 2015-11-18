@@ -7,11 +7,7 @@ use oat\tao\helpers\Template;
         </section>
     </div>
 </div>
-<style>
-    .authorization-in-progress .listbox .list-box .text-link{
-        color: #CCC;
-    }
-</style>
+<link rel="stylesheet" href="<?= Template::css('deliveryServer.css', 'taoProctoring') ?>"/>
 <script src="<?=Template::js('lib/require.js', 'tao')?>"></script>
 <script>
     (function (){

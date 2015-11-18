@@ -1,0 +1,15 @@
+@import "inc/bootstrap";
+
+.awaiting-authorization {
+    &.authorization-in-progress .listbox .list-box {
+        .text-link, .title{
+            color: #999;
+        }
+        .content {
+            display : block;
+        }
+    }
+    .listbox .list-box .content{
+        display: none;
+    }
+}
