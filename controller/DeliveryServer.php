@@ -40,7 +40,6 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         parent::__construct();
     }
 
-
     /**
      * Override the content extension data
      * @see {@link \taoDelivery_actions_DeliveryServer}
@@ -60,11 +59,18 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         return _url('index', 'DeliveryServer', 'taoProctoring');
     }
     
+    /**
+     * Overwrite the parent initDeliveryExecution()
+     * Forward the test taker to the awaitingAuthorization page after delivery initialization
+     */
     public function initDeliveryExecution() {
         $deliveryExecution = $this->_initDeliveryExecution();
 	    $this->redirect(_url('awaitingAuthorization', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
 	}
     
+    /**
+     * The awaiting authorization screen
+     */
     public function awaitingAuthorization() {
         
         $deliveryExecution = $this->getCurrentDeliveryExecution();
@@ -83,6 +89,9 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         $this->setView('DeliveryServer/layout.tpl', 'taoDelivery');
     }
     
+    /**
+     * The action called to check if the requested delivery execution has been authorized by the proctor
+     */
     public function isAuthorized(){
         
         $deliveryExecution = $this->getCurrentDeliveryExecution();
