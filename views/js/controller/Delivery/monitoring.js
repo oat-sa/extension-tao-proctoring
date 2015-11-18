@@ -213,7 +213,6 @@ define([
                 }, categories[actionName]);
                 
                 bulkActionPopup(config).on('ok', function(reason){
-                    console.log(reason);
                     //execute callback
                     if(_.isFunction(cb)){
                         cb(_selection, reason);
