@@ -23,10 +23,5 @@ define({
             'monitoringAll' : 'controller/Delivery/monitoring',
             'testTakers' : 'controller/Delivery/testTakers'
         }
-    },
-    'DeliveryServer' : {
-        'actions' : {
-            'awaitingAuthorization' : 'controller/DeliveryServer/awaiting'
-        }
     }
 });
