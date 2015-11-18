@@ -489,16 +489,17 @@ class Delivery extends Proctoring
      * Authorises a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function authoriseExecutions($deliveryExecutions)
+    public static function authoriseExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->authoriseExecution($deliveryExecution)) {
+            if ($deliveryService->authoriseExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -510,16 +511,17 @@ class Delivery extends Proctoring
      * Terminates a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function terminateExecutions($deliveryExecutions)
+    public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->terminateExecution($deliveryExecution)) {
+            if ($deliveryService->terminateExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -531,16 +533,17 @@ class Delivery extends Proctoring
      * Pauses a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function pauseExecutions($deliveryExecutions)
+    public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->pauseExecution($deliveryExecution)) {
+            if ($deliveryService->pauseExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }

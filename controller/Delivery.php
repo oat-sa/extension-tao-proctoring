@@ -401,6 +401,7 @@ class Delivery extends Proctoring
     public function authoriseExecutions()
     {
         $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -408,7 +409,7 @@ class Delivery extends Proctoring
 
         try {
 
-            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution);
+            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
 
             $this->returnJson(array(
@@ -432,6 +433,7 @@ class Delivery extends Proctoring
     public function terminateExecutions()
     {
         $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -439,7 +441,7 @@ class Delivery extends Proctoring
 
         try {
 
-            $terminated = DeliveryHelper::terminateExecutions($deliveryExecution);
+            $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
             $notTerminated = array_diff($deliveryExecution, $terminated);
 
             $this->returnJson(array(
@@ -463,6 +465,7 @@ class Delivery extends Proctoring
     public function pauseExecutions()
     {
         $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -470,7 +473,7 @@ class Delivery extends Proctoring
 
         try {
 
-            $paused = DeliveryHelper::pauseExecutions($deliveryExecution);
+            $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
             $notPaused = array_diff($deliveryExecution, $paused);
 
             $this->returnJson(array(

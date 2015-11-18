@@ -95,14 +95,15 @@ define([
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of test takers
-            function request(url, selection, message) {
+            function request(url, selection, reason, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
                         url: url,
                         data: {
-                            execution: selection
+                            execution: selection,
+                            reason: reason
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -126,25 +127,22 @@ define([
 
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
-                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(){
-                    notYet();
-                    //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
+                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(selection, reason){
+                    request(authoriseUrl, selection, reason, __('Delivery executions have been authorised'));
                 });
             }
 
             // request the server to pause the selected delivery executions
             function pause(selection) {
-                execBulkAction('pause', __('Pause Delivery Session'), selection, function(){
-                    notYet();
-                    //request(pauseUrl, selection, __('Delivery executions have been paused'));
+                execBulkAction('pause', __('Pause Delivery Session'), selection, function(selection, reason){
+                    request(pauseUrl, selection, reason, __('Delivery executions have been paused'));
                 });
             }
 
             // request the server to terminate the selected delivery executions
             function terminate(selection) {
-                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(){
-                    notYet();
-                    //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(selection, reason){
+                    request(terminateUrl, selection, reason, __('Delivery executions have been terminated'));
                 });
             }
             
@@ -182,7 +180,7 @@ define([
              * @param {String} actionName
              * @param {String} actionTitle
              * @param {Array|String} selection
-             * @param {type} cb
+             * @param {Function} cb
              * @returns {undefined}
              */
             function execBulkAction(actionName, actionTitle, selection, cb){
