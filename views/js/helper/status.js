@@ -19,6 +19,16 @@
 define(['lodash', 'i18n'], function(_, __){
     
    var _status = {
+        active : {
+            code : 'ACTIVE',
+            label : __('Active'),
+            can : {
+                authorize : __('not awaiting'),
+                pause : __('not in progress'),
+                terminate : true,
+                report : true
+            }
+        },
         awaiting : {
             code : 'AWAITING',
             label : __('Awaiting'),
@@ -69,8 +79,8 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true
             }
         },
-        terminated : {
-            code : 'TERMINATED',
+       FINISHED : {
+            code : 'FINISHED',
             label : __('Terminated'),
             can : {
                 authorize : __('is terminated'),
