@@ -72,15 +72,20 @@ define([
                 list : boxes,
                 width : 12
             });
+            var $title = $container.find('.listbox h1');
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
 
             loadingBar.start();
-
-            console.log(config);
-            setTimeout(function(){
+            
+            function authorized(){
                 loadingBar.stop();
+                //@todo it would be nice to smoothen the transition
                 $container.removeClass('authorization-in-progress');
-            }, 2000);
+                $title.html(__('You have been authorized'));
+            }
+            
+            setTimeout(authorized, 2000);
+            
             return;
             var pollTo = null;
 
