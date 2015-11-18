@@ -30,6 +30,7 @@ use oat\taoFrontOffice\model\interfaces\DeliveryExecution as DeliveryExecutionIn
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
+use qtism\runtime\tests\AssessmentTestSession;
 use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
@@ -410,6 +411,9 @@ class DeliveryService extends ConfigurableService
             $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);
 
             $session = $this->getTestSession($deliveryExecution);
+
+            $this->setTestVariable($session, 'TEST_AUTHORISE', $reason);
+
             if ($session->getState() == AssessmentTestSessionState::SUSPENDED) {
                 $session->resume();
                 $this->getStorage()->persist($session);
@@ -431,21 +435,32 @@ class DeliveryService extends ConfigurableService
     public function terminateExecution($executionId, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
-        $session = $this->getTestSession($deliveryExecution);
+        $executionState = $this->getState($deliveryExecution);
+        $result = false;
 
-        $testSessionMetaData = new TestSessionMetaData($session);
-        $testSessionMetaData->save(array(
-            'TEST' => array('TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED),
-            'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
-        ));
+        if (self::STATE_FINISHED != $executionState) {
+            $this->setProctoringState($deliveryExecution, self::STATE_FINISHED, $reason);
 
-        $this->setProctoringState($deliveryExecution, self::STATE_FINISHED, $reason);
+            $session = $this->getTestSession($deliveryExecution);
 
-        $session->endTestSession();
-        $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
+            $testSessionMetaData = new TestSessionMetaData($session);
+            $testSessionMetaData->save(array(
+                'TEST' => array(
+                    'TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED,
+                    'TEST_TERMINATE' => $this->encodeTestVariable($reason)
+                ),
+                'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
+            ));
 
-        $this->getStorage()->persist($session);
-        return true;
+            $session->endTestSession();
+            $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
+
+            $this->getStorage()->persist($session);
+
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**
@@ -465,6 +480,9 @@ class DeliveryService extends ConfigurableService
             $this->setProctoringState($deliveryExecution, self::STATE_PAUSED, $reason);
 
             $session = $this->getTestSession($deliveryExecution);
+
+            $this->setTestVariable($session, 'TEST_PAUSE', $reason);
+
             $session->suspend();
             $this->getStorage()->persist($session);
 
@@ -560,5 +578,40 @@ class DeliveryService extends ConfigurableService
             $this->extendedStateService = new ExtendedStateService();
         }
         return $this->extendedStateService;
+    }
+
+    /**
+     * Encodes a test variable
+     * @param mixed $value
+     * @return string
+     */
+    private function encodeTestVariable($value)
+    {
+        return json_encode(array(
+            'timestamp' => microtime(),
+            'details' => $value
+        ));
+    }
+
+    /**
+     * Sets a test variable with name automatic suffix
+     * @param AssessmentTestSession $session
+     * @param string $name
+     * @param mixe $value
+     */
+    private function setTestVariable(AssessmentTestSession $session, $name, $value)
+    {
+        $testSessionMetaData = new TestSessionMetaData($session);
+        $varName = array(
+            $name,
+            $session->getCurrentAssessmentItemRef(),
+            $session->getCurrentAssessmentItemRefOccurence(),
+        );
+
+        $testSessionMetaData->save(array(
+            'TEST' => array(
+                implode('.', $varName) => $this->encodeTestVariable($value)
+            )
+        ));
     }
 }
