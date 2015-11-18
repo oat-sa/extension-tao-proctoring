@@ -1,5 +1,9 @@
 @import "inc/bootstrap";
 
+.dark-bar .infoControl[data-control="logout"]{
+    display : none;
+}
+
 .awaiting-authorization {
     padding-top:40px;
     &.authorization-in-progress .listbox .list-box {
