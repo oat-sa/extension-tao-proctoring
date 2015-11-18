@@ -11,7 +11,7 @@ $availableDeliveries = get_data('availableDeliveries');
 
         <ul class="entry-point-box plain">
             <?php foreach ($startedDeliveries as $deliveryExecution): ?>
-                <?php $url = _url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier())); ?>
+                <?php $url = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier())); ?>
                 <li>
                     <a class="block entry-point entry-point-started-deliveries" href="<?= $url ?>">
                         <h3><?= _dh($deliveryExecution->getLabel()) ?></h3>
