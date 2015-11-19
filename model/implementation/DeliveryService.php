@@ -447,7 +447,7 @@ class DeliveryService extends ConfigurableService
             $testSessionMetaData->save(array(
                 'TEST' => array(
                     'TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED,
-                    'TEST_TERMINATE' => $this->encodeTestVariable($reason)
+                    $this->nameTestVariable($session, 'TEST_TERMINATE') => $this->encodeTestVariable($reason)
                 ),
                 'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
             ));
@@ -594,6 +594,22 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Build a variable name based on the current position inside the test
+     * @param AssessmentTestSession $session
+     * @param string $name
+     * @return string
+     */
+    private function nameTestVariable(AssessmentTestSession $session, $name)
+    {
+        $varName = array(
+            $name,
+            $session->getCurrentAssessmentItemRef(),
+            $session->getCurrentAssessmentItemRefOccurence(),
+        );
+        return implode('.', $varName);
+    }
+
+    /**
      * Sets a test variable with name automatic suffix
      * @param AssessmentTestSession $session
      * @param string $name
@@ -602,15 +618,9 @@ class DeliveryService extends ConfigurableService
     private function setTestVariable(AssessmentTestSession $session, $name, $value)
     {
         $testSessionMetaData = new TestSessionMetaData($session);
-        $varName = array(
-            $name,
-            $session->getCurrentAssessmentItemRef(),
-            $session->getCurrentAssessmentItemRefOccurence(),
-        );
-
         $testSessionMetaData->save(array(
             'TEST' => array(
-                implode('.', $varName) => $this->encodeTestVariable($value)
+                $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
     }
