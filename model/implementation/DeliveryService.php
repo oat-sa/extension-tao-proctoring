@@ -20,7 +20,6 @@
  */
 namespace oat\taoProctoring\model\implementation;
 
-use Aws\CloudFront\Exception\Exception;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\ProctorAssignment;
@@ -32,7 +31,6 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
-use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
  * Sample Delivery Service for proctoring
@@ -145,15 +143,15 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Compute the state of the delivery and returns one of the extended state code
+     * Computes the state of the delivery and returns one of the extended state code
      * 
-     * @param \oat\taoDelivery\models\classes\execution\DeliveryExecution $deliveryExecution
-     * @returns string
+     * @param DeliveryExecution $deliveryExecution
+     * @return null|string
+     * @throws \common_Exception
      */
     public function getState(DeliveryExecution $deliveryExecution)
     {
         $executionStatus = $deliveryExecution->getState()->getUri();
-
         $proctoringState = $this->getProctoringState($deliveryExecution);
 
         $status = null;
@@ -383,13 +381,12 @@ class DeliveryService extends ConfigurableService
         $result = false;
 
         if (self::STATE_AUTHORIZED == $executionState) {
-            $this->setProctoringState($deliveryExecution, self::STATE_INPROGRESS);
-
             $session = $this->getTestSession($deliveryExecution);
-            if ($session->getState() == AssessmentTestSessionState::SUSPENDED) {
-                $session->resume();
-                $this->getStorage()->persist($session);
+            if ($session) {
+                $this->resumeSession($session);
             }
+
+            $this->setProctoringState($deliveryExecution, self::STATE_INPROGRESS);
 
             $result = true;
         }
@@ -411,11 +408,13 @@ class DeliveryService extends ConfigurableService
         $result = false;
 
         if (self::STATE_AWAITING == $executionState) {
-            $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);
-
             $session = $this->getTestSession($deliveryExecution);
+            if ($session) {
+                $this->setTestVariable($session, 'TEST_AUTHORISE', $reason);
+                $this->getStorage()->persist($session);
+            }
 
-            $this->setTestVariable($session, 'TEST_AUTHORISE', $reason);
+            $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);
 
             $result = true;
         }
@@ -437,23 +436,22 @@ class DeliveryService extends ConfigurableService
         $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
-            $this->setProctoringState($deliveryExecution, self::STATE_TERMINATED, $reason);
-
             $session = $this->getTestSession($deliveryExecution);
+            if ($session) {
+                $testSessionMetaData = new TestSessionMetaData($session);
+                $testSessionMetaData->save(array(
+                    'TEST' => array(
+                        'TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED,
+                        $this->nameTestVariable($session, 'TEST_TERMINATE') => $this->encodeTestVariable($reason)
+                    ),
+                    'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
+                ));
 
-            $testSessionMetaData = new TestSessionMetaData($session);
-            $testSessionMetaData->save(array(
-                'TEST' => array(
-                    'TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED,
-                    $this->nameTestVariable($session, 'TEST_TERMINATE') => $this->encodeTestVariable($reason)
-                ),
-                'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
-            ));
+                $this->finishSession($session);
+            }
 
-            $session->endTestSession();
             $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
-
-            $this->getStorage()->persist($session);
+            $this->setProctoringState($deliveryExecution, self::STATE_TERMINATED, $reason);
 
             $result = true;
         }
@@ -475,19 +473,58 @@ class DeliveryService extends ConfigurableService
         $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
-            $this->setProctoringState($deliveryExecution, self::STATE_PAUSED, $reason);
-
             $session = $this->getTestSession($deliveryExecution);
+            if ($session) {
+                $this->setTestVariable($session, 'TEST_PAUSE', $reason);
+                $this->suspendSession($session);
+            }
 
-            $this->setTestVariable($session, 'TEST_PAUSE', $reason);
-
-            $session->suspend();
-            $this->getStorage()->persist($session);
+            $this->setProctoringState($deliveryExecution, self::STATE_PAUSED, $reason);
 
             $result = true;
         }
 
         return $result;
+    }
+
+    /**
+     * Finishes the session of a delivery execution
+     *
+     * @param AssessmentTestSession $session
+     * @throws \qtism\runtime\tests\AssessmentTestSessionException
+     */
+    public function finishSession(AssessmentTestSession $session)
+    {
+        if ($session) {
+            $session->endTestSession();
+            $this->getStorage()->persist($session);
+        }
+    }
+
+    /**
+     * Suspends the session of a delivery execution
+     *
+     * @param AssessmentTestSession $session
+     */
+    public function suspendSession(AssessmentTestSession $session)
+    {
+        if ($session) {
+            $session->suspend();
+            $this->getStorage()->persist($session);
+        }
+    }
+
+    /**
+     * Resumes the session of a delivery execution
+     *
+     * @param AssessmentTestSession $session
+     */
+    public function resumeSession(AssessmentTestSession $session)
+    {
+        if ($session) {
+            $session->resume();
+            $this->getStorage()->persist($session);
+        }
     }
 
     /**
@@ -520,30 +557,35 @@ class DeliveryService extends ConfigurableService
      */
     private function getTestSession(DeliveryExecution $deliveryExecution)
     {
-        $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
+        try {
+            $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
-        $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
-        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+            $compiledDelivery = $deliveryExecution->getDelivery();
+            $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+            $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
-        $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
-        $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
+            $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+            $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
 
-        $sessionManager = new \taoQtiTest_helpers_SessionManager($resultServer, $testResource);
+            $sessionManager = new \taoQtiTest_helpers_SessionManager($resultServer, $testResource);
 
-        $qtiStorage = new \taoQtiTest_helpers_TestSessionStorage(
-            $sessionManager,
-            new BinaryAssessmentTestSeeker($testDefinition), $deliveryExecution->getUserIdentifier()
-        );
-        $this->setStorage($qtiStorage);
+            $qtiStorage = new \taoQtiTest_helpers_TestSessionStorage(
+                $sessionManager,
+                new BinaryAssessmentTestSeeker($testDefinition), $deliveryExecution->getUserIdentifier()
+            );
+            $this->setStorage($qtiStorage);
 
-        $session = $qtiStorage->retrieve($testDefinition, $deliveryExecution->getIdentifier());
-        $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
-        $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());
+            $session = $qtiStorage->retrieve($testDefinition, $deliveryExecution->getIdentifier());
 
-        $resultServer->setValue('resultServerUri', $resultServerUri->getUri());
-        $resultServer->setValue('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
-        $resultServer->setValue('resultServer_deliveryResultIdentifier', $deliveryExecution->getIdentifier());
+            $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
+            $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());
+            $resultServer->setValue('resultServerUri', $resultServerUri->getUri());
+            $resultServer->setValue('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
+            $resultServer->setValue('resultServer_deliveryResultIdentifier', $deliveryExecution->getIdentifier());
+        } catch (\qtism\runtime\storage\common\StorageException $e) {
+            \common_Logger::i(get_called_class() . '::getTestSession(): ' . $e->getMessage());
+            $session = null;
+        }
 
         return $session;
     }
