@@ -18,7 +18,17 @@
  *               
  * 
  */
+use oat\oatbox\service\ServiceManager;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoProctoring\model\entrypoint\ProctoringEntryPoint;
+use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 
-EntryPointService::getRegistry()->registerEntryPoint(new ProctoringEntryPoint());
+$serviceManager = ServiceManager::getServiceManager();
+$entryPointService = $serviceManager->get(EntryPointService::SERVICE_ID);
+
+//register proctoring entry point
+$entryPointService->registerEntryPoint(new ProctoringEntryPoint());
+
+//replace delivery server
+$entryPointService->overrideEntryPoint('deliveryServer', new ProctoringDeliveryServer());
+$serviceManager->register(EntryPointService::SERVICE_ID, $entryPointService);
