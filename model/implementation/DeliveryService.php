@@ -153,18 +153,20 @@ class DeliveryService extends ConfigurableService
     {
         $executionStatus = $deliveryExecution->getState()->getUri();
         $proctoringState = $this->getProctoringState($deliveryExecution);
+        $status = $proctoringState['status'];
 
-        $status = null;
-        if ($proctoringState['status']) {
-            $status = $proctoringState['status'];
-        } else if (DeliveryExecutionInt::STATE_ACTIVE == $executionStatus) {
-            $status = self::STATE_INIT;
-        } else if (DeliveryExecutionInt::STATE_PAUSED == $executionStatus) {
-            $status = self::STATE_PAUSED;
-        } else if (DeliveryExecutionInt::STATE_FINISHIED == $executionStatus) {
-            $status = self::STATE_COMPLETED;
-        } else {
-            throw new \common_Exception('Unknown state for delivery execution ' . $deliveryExecution->getIdentifier());
+        if (DeliveryExecutionInt::STATE_FINISHIED == $executionStatus) {
+            if (self::STATE_TERMINATED != $status) {
+                $status = self::STATE_COMPLETED;
+            }
+        } else if (!$status) {
+            if (DeliveryExecutionInt::STATE_ACTIVE == $executionStatus) {
+                $status = self::STATE_INIT;
+            } else if (DeliveryExecutionInt::STATE_PAUSED == $executionStatus) {
+                $status = self::STATE_PAUSED;
+            } else {
+                throw new \common_Exception('Unknown state for delivery execution ' . $deliveryExecution->getIdentifier());
+            }
         }
 
         return $status;
