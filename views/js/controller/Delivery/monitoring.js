@@ -446,7 +446,8 @@ define([
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function() {
+                .on('load.datatable', function(e, newDataset) {
+                    dataset = newDataset;
                     loadingBar.stop();
                 })
                 .datatable({
