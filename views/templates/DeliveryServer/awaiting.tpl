@@ -14,6 +14,7 @@ use oat\tao\helpers\Template;
         require(['<?=get_data('client_config_url')?>'], function (){
             require(['taoProctoring/controller/DeliveryServer/awaiting'], function (awaiting){
                 awaiting.start({
+                    returnUrl : '<?=get_data('returnUrl')?>',
                     deliveryExecution : '<?=get_data('deliveryExecution')?>',
                     deliveryLabel : '<?=get_data('deliveryLabel')?>',
                     deliveryInit : <?=get_data('init') ? 'true' : 'false'?>
