@@ -505,13 +505,13 @@ class Delivery extends Proctoring
 
         try {
 
-            $paused = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
-            $notPaused = array_diff($deliveryExecution, $paused);
+            $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
+            $notReported = array_diff($deliveryExecution, $reported);
 
             $this->returnJson(array(
-                'success' => !count($notPaused),
-                'processed' => $paused,
-                'unprocessed' => $notPaused
+                'success' => !count($notReported),
+                'processed' => $reported,
+                'unprocessed' => $notReported
             ));
 
         } catch (ServiceNotFoundException $e) {
