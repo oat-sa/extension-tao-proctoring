@@ -26,10 +26,14 @@ define([
     'moment',
     'layout/loading-bar',
     'ui/listbox',
+    'util/encode',
+    'ui/feedback',
+    'ui/bulkActionPopup',
+    'taoProctoring/helper/status',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
-], function (_, $, __, helpers, moment, loadingBar, listBox, breadcrumbsFactory, actionsTpl, statsTpl) {
+], function (_, $, __, helpers, moment, loadingBar, listBox, encode, feedback, bulkActionPopup, _status, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -60,6 +64,8 @@ define([
             var $container = $(cssScope);
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
+            var categories = $container.data('categories');
+            var testCenterId = $container.data('testcenter');
             var list = listBox({
                 title: __("Deliveries"),
                 textEmpty: __("No deliveries available"),
@@ -71,10 +77,11 @@ define([
                 width:12
             });
             var bc = breadcrumbsFactory($container, crumbs);
-            var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
+            var serviceUrl = helpers._url('deliveries', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var pollTo = null;
-
+            
             function format(boxes){
+                console.log(boxes);
                 _.each(boxes, function(box){
 
                     var props = box.properties;
@@ -92,8 +99,9 @@ define([
                         //add a special class for boxes that have more information to display
                         box.cls = 'has-properties-displayed';
                     }
-
-                    box.html = actionsTpl();
+                    box.html = actionsTpl({
+                        id : box.id
+                    });
                     box.content = statsTpl(tplData);
                 });
 
@@ -102,7 +110,7 @@ define([
 
             // update the index from a JSON array
             function update(boxes) {
-
+                
                 if (pollTo) {
                     clearTimeout(pollTo);
                     pollTo = null;
@@ -127,18 +135,90 @@ define([
                     cache: false,
                     dataType : 'json',
                     type: 'GET'
-                }).done(function(response) {
-                    boxes = response && response.list;
+                }).done(function(boxes) {
                     update(boxes);
                 });
             };
-
+            
+            /**
+             * Exec 
+             * @param {String} actionName
+             * @param {String} actionTitle
+             * @param {Array} selection
+             * @param {Function} cb
+             * @returns {undefined}
+             */
+            function pause(deliveryId, selection){
+                
+                var allowed  = _.map(selection, function(data){
+                    return {
+                        id : data.id,
+                        label : data.testTaker.firstName + ' ' + data.testTaker.lastName
+                    };
+                });
+                
+                bulkActionPopup({
+                    renderTo : $container,
+                    actionName : __('Pause Delivery Session'),
+                    reason : true,
+                    resourceType : 'test taker',
+                    allowedResources : allowed,
+                    categoriesDefinitions : categories.pause.categoriesDefinitions,
+                    categories : categories.pause.categories
+                }).on('ok', function(reason){
+                    //execute callback
+                    $.ajax({
+                        url: helpers._url('pauseExecutions', 'Delivery', 'taoProctoring'),
+                        data: {
+                            delivery : deliveryId,
+                            testCenter : testCenterId,
+                            execution: _.pluck(selection, 'id'),
+                            reason: reason
+                        },
+                        dataType : 'json',
+                        type: 'POST',
+                        error: function() {
+                            loadingBar.stop();
+                        }
+                    }).done(function(response) {
+                        loadingBar.stop();
+                        if (response && response.success) {
+                            feedback().success('Selected deliveries successfully paused');
+                            refresh();
+                        } else {
+                            console.log(response.error);
+                            feedback().warning(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
+                        }
+                    });
+                });
+            }
+            
             $container.on('click', '.pause', function(e){
+                
+                var deliveryId = $(this).data('delivery');
+                var pauseUrl = (deliveryId === 'all') ? 
+                    helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId}) :
+                    helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+                
+                //prevent clicking the parent link that goes to the monitoring screen
                 e.stopPropagation();
                 e.preventDefault();
-                alert('Pausing action is currently not available.');
+                
+                //get list of all test taker for the selected delivery
+                $.get(pauseUrl, function(res){
+                    if(_.isPlainObject(res) && _.isArray(res.data)){
+                        var inProgressExecs = _.filter(res.data, function(data){
+                            return (data.state && data.state.status === _status.getStatus('inprogress').code);
+                        });
+                        if(inProgressExecs.length){
+                            pause(deliveryId, inProgressExecs);
+                        }else{
+                            feedback().info(__('There is no delivery in progress'));
+                        }
+                    }
+                });
             });
-
+            
             if (!boxes) {
                 refresh();
             } else {

@@ -168,7 +168,7 @@ class DeliveryService extends ConfigurableService
                 throw new \common_Exception('Unknown state for delivery execution ' . $deliveryExecution->getIdentifier());
             }
         }
-
+        
         return $status;
     }
 

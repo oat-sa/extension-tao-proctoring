@@ -1,5 +1,5 @@
 <span class="listbox-actions">
-    <span class="action pause">
+    <span class="action pause" data-delivery="{{id}}">
         <span class="icon-pause"></span>{{__ "Pause"}}
     </span>
     <span class="action play">
