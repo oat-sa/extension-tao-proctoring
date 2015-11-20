@@ -644,11 +644,11 @@ class DeliveryService extends ConfigurableService
      */
     private function nameTestVariable(AssessmentTestSession $session, $name)
     {
-        $varName = array(
-            $name,
-            $session->getCurrentAssessmentItemRef(),
-            $session->getCurrentAssessmentItemRefOccurence(),
-        );
+        $varName = array($name);
+        if ($session) {
+            $varName[] = $session->getCurrentAssessmentItemRef();
+            $varName[] = $session->getCurrentAssessmentItemRefOccurence();
+        }
         return implode('.', $varName);
     }
 
