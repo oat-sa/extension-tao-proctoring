@@ -210,11 +210,11 @@ define([
              * @returns {undefined}
              */
             function execBulkAction(actionName, actionTitle, selection, cb){
-                
+
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
-                var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions.length);
+                var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 
                 _.each(_selection, function(uri){
                     var testTaker = getExecutionData(uri);
@@ -498,8 +498,7 @@ define([
                     tools: tools,
                     actions: actions,
                     model: model,
-                    selectable: true,
-                    rowSelection : true
+                    selectable: true
                 }, dataset);
                 
         }
