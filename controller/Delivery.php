@@ -489,6 +489,38 @@ class Delivery extends Proctoring
     }
 
     /**
+     * Report irregularities in delivery executions
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function  reportExecutions()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
+
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+
+        try {
+
+            $paused = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
+            $notPaused = array_diff($deliveryExecution, $paused);
+
+            $this->returnJson(array(
+                'success' => !count($notPaused),
+                'processed' => $paused,
+                'unprocessed' => $notPaused
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+
+    /**
      * Get the list of all available categories, sorted by action names
      *
      * @return array

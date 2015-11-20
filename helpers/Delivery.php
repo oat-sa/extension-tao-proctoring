@@ -551,4 +551,26 @@ class Delivery extends Proctoring
 
         return $result;
     }
+
+    /**
+     * Report irregularity to a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @param array $reason
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function reportExecutions($deliveryExecutions, $reason = null)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if ($deliveryService->reportExecution($deliveryExecution, $reason)) {
+                $result[] = $deliveryExecution;
+            }
+        }
+
+        return $result;
+    }
 }

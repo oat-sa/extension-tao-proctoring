@@ -102,6 +102,7 @@ define([
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];
@@ -165,8 +166,7 @@ define([
             // report irregularities on the selected delivery executions
             function report(selection) {
                 execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
-                    console.log('reported', selection, 'with reason', reason);
-                    notYet();
+                    request(reportUrl, selection, reason, __('Delivery executions have been reported'));
                 });
             }
             
@@ -362,6 +362,14 @@ define([
                 id: 'irregularity',
                 icon: 'delivery-small',
                 title: __('Report irregularities'),
+                hidden: function() {
+                    var status;
+                    if(this.state && this.state.status){
+                        status = _status.getStatusByCode(this.state.status);
+                        return !status || status.can.report !== true;
+                    }
+                    return true;
+                },
                 action: report
             });
 

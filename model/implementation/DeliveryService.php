@@ -490,6 +490,25 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Report irregularity to a delivery execution
+     *
+     * @param string $executionId
+     * @param array $reason
+     * @return bool
+     */
+    public function reportExecution($executionId, $reason)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $session = $this->getTestSession($deliveryExecution);
+        //@todo find a way to report it even if the session does not exist
+        if ($session) {
+            $this->setTestVariable($session, 'TEST_IRREGULARITY', $reason);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Finishes the session of a delivery execution
      *
      * @param AssessmentTestSession $session
