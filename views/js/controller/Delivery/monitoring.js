@@ -214,6 +214,7 @@ define([
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
+                var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions.length);
                 
                 _.each(_selection, function(uri){
                     var testTaker = getExecutionData(uri);
@@ -230,7 +231,7 @@ define([
                 var config = _.assign({
                     renderTo : $content,
                     actionName : actionTitle,
-                    reason : true,
+                    reason : askForReason,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
