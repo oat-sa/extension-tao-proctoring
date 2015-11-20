@@ -173,12 +173,12 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Sets a proctoring state on a delivery execution
+     * Sets a proctoring state on a delivery execution. Use the test state storage.
      * @param string|DeliveryExecution $executionId
      * @param string $state
      * @param array $reason
      */
-    public function setProctoringState($executionId, $state, $reason = null)
+    private function setProctoringState($executionId, $state, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -190,11 +190,11 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Gets a proctoring state from a delivery execution
+     * Gets a proctoring state from a delivery execution. Use the test state storage.
      * @param string|DeliveryExecution $executionId
      * @return array
      */
-    public function getProctoringState($executionId)
+    private function getProctoringState($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
