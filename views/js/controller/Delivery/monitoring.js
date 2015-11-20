@@ -107,7 +107,7 @@ define([
             var tools = [];
             var actions = [];
             var model = [];
-
+            var actionButtons;
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of test takers
@@ -192,6 +192,16 @@ define([
             }
             
             /**
+             * Find the execution row data from its uri
+             * 
+             * @param {String} uri
+             * @returns {Object}
+             */
+            function getExecutionData(uri){
+                return _.find(dataset.data, {id : uri});
+            }
+            
+            /**
              * Exec 
              * @param {String} actionName
              * @param {String} actionTitle
@@ -204,9 +214,10 @@ define([
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
+                var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions.length);
                 
                 _.each(_selection, function(uri){
-                    var testTaker = _.find(dataset.data, {id : uri});
+                    var testTaker = getExecutionData(uri);
                     var checkedTestTaker;
                     if(testTaker){
                         checkedTestTaker = verifyTestTaker(testTaker, actionName);
@@ -220,7 +231,7 @@ define([
                 var config = _.assign({
                     renderTo : $content,
                     actionName : actionTitle,
-                    reason : true,
+                    reason : askForReason,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
@@ -440,15 +451,42 @@ define([
                     return itemProgressTpl(state);
                 }
             });
-
+            
             // renders the datatable
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
                 .on('load.datatable', function(e, newDataset) {
+                    //update dateset in memory
                     dataset = newDataset;
+                    
+                    //udate the buttons, which have been reconstructed
+                    actionButtons = _({
+                        authorize : $list.find('.action-bar').children('.tool-authorise'),
+                        pause : $list.find('.action-bar').children('.tool-pause'),
+                        terminate : $list.find('.action-bar').children('.tool-terminate'),
+                        report : $list.find('.action-bar').children('.tool-irregularity')
+                    });
+                    
                     loadingBar.stop();
+                })
+                .on('select.datatable', function(e, newDataset) {
+                    //hide all controls then display each required one individually
+                    actionButtons.each(function($btn){
+                        $btn.hide();
+                    });
+                    _($list.datatable('selection')).map(function(uri){
+                        var row = getExecutionData(uri);
+                        return row.state.status;
+                    }).uniq().each(function(statusCode){
+                        var status = _status.getStatusByCode(statusCode);
+                        actionButtons.forIn(function($btn, action){
+                            if(status && status.can[action] === true){
+                                $btn.show();
+                            }
+                        });
+                    });
                 })
                 .datatable({
                     url: deliveryId ? serviceUrl : serviceAllUrl,
@@ -460,8 +498,10 @@ define([
                     tools: tools,
                     actions: actions,
                     model: model,
-                    selectable: true
+                    selectable: true,
+                    rowSelection : true
                 }, dataset);
+                
         }
     };
 
