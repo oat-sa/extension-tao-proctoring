@@ -81,7 +81,7 @@ define([
             var pollTo = null;
             
             function format(boxes){
-                console.log(boxes);
+                
                 _.each(boxes, function(box){
 
                     var props = box.properties;
@@ -186,7 +186,6 @@ define([
                             feedback().success('Selected deliveries successfully paused');
                             refresh();
                         } else {
-                            console.log(response.error);
                             feedback().warning(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
                     });
