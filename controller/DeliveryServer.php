@@ -81,7 +81,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         if (DeliveryService::STATE_AUTHORIZED == $executionState) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
-            $deliveryService->processExecution($deliveryExecution);
+            $deliveryService->resumeExecution($deliveryExecution);
             $executionState = $deliveryService->getState($deliveryExecution);
         }
 

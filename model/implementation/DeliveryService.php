@@ -376,7 +376,7 @@ class DeliveryService extends ConfigurableService
      * @param string $executionId
      * @return bool
      */
-    public function processExecution($executionId)
+    public function resumeExecution($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $executionState = $this->getState($deliveryExecution);
