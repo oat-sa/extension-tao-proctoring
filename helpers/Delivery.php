@@ -160,107 +160,9 @@ class Delivery extends Proctoring
 
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
         $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($deliveryId, $options);
-        $testTakers = self::collectionToMap($deliveryService->getDeliveryTestTakers($deliveryId, $options));
 
         $page = self::paginate($deliveryExecutions, $options);
-
-        /**** to be replaced by real stuff ****/
-        // Seeds the random number generator with a fixed value to avoid changes on refresh
-        srand(count($deliveryExecutions));
-        // Sets some mock data for delivery states
-        $mocks = array(
-            array(
-                //client will infer possible action based on the current status
-                'section' => array(
-                    'label' => 'section B',
-                    'position' => 2,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question X',
-                    'position' => 1,
-                    'total' => 9,
-                    'time' => array(
-                        //time unit in second, does not require microsecond precision for human monitoring
-                        'elapsed' => 340,
-                        'total' => 600
-                    )
-                )
-            ),
-            array(
-                'section' => array(
-                    'label' => 'section A',
-                    'position' => 1,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question Y',
-                    'position' => 5,
-                    'total' => 8,
-                    'time' => array(
-                        'elapsed' => 60,
-                        'total' => 600
-                    )
-                )
-            ),
-            array(
-                'section' => array(
-                    'label' => 'section C',
-                    'position' => 3,
-                    'total' => 3
-                ),
-                'item' => array(
-                    'label' => 'question Z',
-                    'position' => 2,
-                    'total' => 4,
-                    'time' => array(
-                        'elapsed' => 540,
-                        'total' => 600
-                    )
-                )
-            ),
-        );
-        /********/
-
-        $executions = array();
-        foreach($page['data'] as $deliveryExecution) {
-            
-            $userId = $deliveryExecution->getUserIdentifier();
-            $state = array(
-                'status' => $deliveryService->getState($deliveryExecution),
-            );
-            $testTaker = array();
-
-            /**** to be replaced by real stuff ****/
-            $state = array_merge($state, WebServiceMock::random($mocks));
-            /********/
-
-            $user = isset($testTakers[$userId]) ? $testTakers[$userId] : null;
-            if ($user) {
-                /* @var $user User */
-                $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-                $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
-
-                if (empty($firstName) && empty($lastName)) {
-                    $firstName = self::getUserStringProp($user, RDFS_LABEL);
-                }
-
-                $testTaker['id'] = $user->getIdentifier();
-                $testTaker['firstName'] = $firstName;
-                $testTaker['lastName'] = $lastName;
-            }
-
-            $executions[] = array(
-                'id' => $deliveryExecution->getIdentifier(),
-                'delivery' => array(
-                    'label' => $deliveryExecution->getLabel(),
-                ),
-                'testTaker' => $testTaker,
-                'state' => $state,
-            );
-        }
-
-        $page['data'] = $executions;
+        $page['data'] = self::adjustDeliveryExecutions($delivery, $page['data']);
 
         return $page;
     }
@@ -283,17 +185,11 @@ class Delivery extends Proctoring
         if (count($deliveries)) {
             $all = array();
             foreach($deliveries as $delivery) {
-                $executions = self::getCurrentDeliveryExecutions($delivery);
-                if (isset($executions['data'])) {
-                    foreach($executions['data'] as $execution) {
-                        $execution['delivery'] = array(
-                            'uri' => $delivery->getUri(),
-                            'label' => $delivery->getLabel(),
-                        );
-                        $all[] = $execution;
-                    }
-                }
+                $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $options);
+                $all = array_merge($all, self::adjustDeliveryExecutions($delivery, $deliveryExecutions));
             }
+
+            usort($all, array('\\oat\\taoProctoring\\helpers\\Delivery', 'sortExecutionsByState'));
 
             return self::paginate($all, $options);
         } else {
@@ -489,16 +385,17 @@ class Delivery extends Proctoring
      * Authorises a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function authoriseExecutions($deliveryExecutions)
+    public static function authoriseExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->authoriseExecution($deliveryExecution)) {
+            if ($deliveryService->authoriseExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -510,16 +407,17 @@ class Delivery extends Proctoring
      * Terminates a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function terminateExecutions($deliveryExecutions)
+    public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->terminateExecution($deliveryExecution)) {
+            if ($deliveryService->terminateExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -531,20 +429,202 @@ class Delivery extends Proctoring
      * Pauses a list of delivery executions
      *
      * @param array $deliveryExecutions
+     * @param array $reason
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function pauseExecutions($deliveryExecutions)
+    public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryService->pauseExecution($deliveryExecution)) {
+            if ($deliveryService->pauseExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Report irregularity to a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @param array $reason
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function reportExecutions($deliveryExecutions, $reason = null)
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if ($deliveryService->reportExecution($deliveryExecution, $reason)) {
+                $result[] = $deliveryExecution;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sort delivery executions by state.
+     * Not to be used on DeliveryExecution instances. This is only designed to sort adjusted array of executions.
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    public static function sortExecutionsByState($a, $b)
+    {
+        $allowedStates = Delivery::getAllowedStates();
+        $aState = isset($allowedStates[$a['state']['status']]) ? $allowedStates[$a['state']['status']] : 0;
+        $bState = isset($allowedStates[$b['state']['status']]) ? $allowedStates[$b['state']['status']] : 0;
+        $result = $aState - $bState;
+
+        if (!$result) {
+            $result = strcmp($a['date'], $b['date']);
+        }
+
+        if (!$result) {
+            $result = strcmp($a['delivery']['label'], $b['delivery']['label']);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Hash table for allowed states
+     * @var array
+     */
+    private static $allowedStates;
+
+    /**
+     * Gets a hash table to translate allowed states in state numerical identifier (position for sorting)
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    private static function getAllowedStates()
+    {
+        if (!self::$allowedStates) {
+            $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+            self::$allowedStates = array_flip($deliveryService->getAllowedStates());
+        }
+        return self::$allowedStates;
+    }
+
+    /**
+     * Adjusts a list of delivery executions: add information, format the result
+     *
+     * @param core_kernel_classes_Resource$delivery
+     * @param DeliveryExecution[] $deliveryExecutions
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    private static function adjustDeliveryExecutions($delivery, $deliveryExecutions) {
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $testTakers = self::collectionToMap($deliveryService->getDeliveryTestTakers($delivery->getUri()));
+
+        /**** to be replaced by real stuff ****/
+        // Seeds the random number generator with a fixed value to avoid changes on refresh
+        srand(count($deliveryExecutions));
+        // Sets some mock data for delivery states
+        $mocks = array(
+            array(
+                //client will infer possible action based on the current status
+                'section' => array(
+                    'label' => 'section B',
+                    'position' => 2,
+                    'total' => 3
+                ),
+                'item' => array(
+                    'label' => 'question X',
+                    'position' => 1,
+                    'total' => 9,
+                    'time' => array(
+                        //time unit in second, does not require microsecond precision for human monitoring
+                        'elapsed' => 340,
+                        'total' => 600
+                    )
+                )
+            ),
+            array(
+                'section' => array(
+                    'label' => 'section A',
+                    'position' => 1,
+                    'total' => 3
+                ),
+                'item' => array(
+                    'label' => 'question Y',
+                    'position' => 5,
+                    'total' => 8,
+                    'time' => array(
+                        'elapsed' => 60,
+                        'total' => 600
+                    )
+                )
+            ),
+            array(
+                'section' => array(
+                    'label' => 'section C',
+                    'position' => 3,
+                    'total' => 3
+                ),
+                'item' => array(
+                    'label' => 'question Z',
+                    'position' => 2,
+                    'total' => 4,
+                    'time' => array(
+                        'elapsed' => 540,
+                        'total' => 600
+                    )
+                )
+            ),
+        );
+        /********/
+
+        $executions = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+
+            $userId = $deliveryExecution->getUserIdentifier();
+            $state = array(
+                'status' => $deliveryService->getState($deliveryExecution),
+            );
+            $testTaker = array();
+
+            /**** to be replaced by real stuff ****/
+            $state = array_merge($state, WebServiceMock::random($mocks));
+            /********/
+
+            $user = isset($testTakers[$userId]) ? $testTakers[$userId] : null;
+            if ($user) {
+                /* @var $user User */
+                $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
+                $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
+
+                if (empty($firstName) && empty($lastName)) {
+                    $firstName = self::getUserStringProp($user, RDFS_LABEL);
+                }
+
+                $testTaker['id'] = $user->getIdentifier();
+                $testTaker['firstName'] = $firstName;
+                $testTaker['lastName'] = $lastName;
+            }
+
+            $executions[] = array(
+                'id' => $deliveryExecution->getIdentifier(),
+                'delivery' => array(
+                    'uri' => $delivery->getUri(),
+                    'label' => $delivery->getLabel(),
+                ),
+                'date' => date('Y-m-d H:i:s', $deliveryService->getStartTime($deliveryExecution)),
+                'testTaker' => $testTaker,
+                'state' => $state,
+            );
+        }
+
+        return $executions;
     }
 }

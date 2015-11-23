@@ -26,9 +26,10 @@ define([
     'moment',
     'layout/loading-bar',
     'ui/listbox',
+    'ui/dialog/alert',
     'core/polling',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, moment, loadingBar, listBox, polling, authSuccessTpl){
+], function (_, $, __, helpers, moment, loadingBar, listBox, dialogAlert, polling, authSuccessTpl){
     'use strict';
 
     /**
@@ -81,12 +82,23 @@ define([
                 action : function (){
                     var async = this.async();
                     $.get(isAuthorizedUrl, function(result){
-                        if(result.authorized){
-                            // stop immediately the polling
-                            async.reject();
+                        var stop = false;
+
+                        if (!result.success) {
+                            stop = true;
+                            if (result.message) {
+                                dialogAlert(result.message, exit);
+                            } else {
+                                exit();
+                            }
+                        } else if (result.authorized) {
+                            stop = true;
                             authorized();
-                        }else{
-                            // continue the polling
+                        }
+
+                        if (stop) {
+                            async.reject();
+                        } else {
                             async.resolve();
                         }
                     });
@@ -103,6 +115,13 @@ define([
                 //@todo it would be nice to smoothen the transition
                 $container.removeClass('authorization-in-progress');
                 $content.html(authSuccessTpl({message : __('Authorization done. You may proceed now.')}));
+            }
+
+            /**
+             * Goes back to the delivery index
+             */
+            function exit() {
+                location.href = config.returnUrl;
             }
         }
     };

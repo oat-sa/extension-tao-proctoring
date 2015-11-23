@@ -23,6 +23,7 @@ define([
     'lodash',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
@@ -33,7 +34,22 @@ define([
     'tpl!taoProctoring/tpl/item-progress',
     'tpl!taoProctoring/tpl/delivery-link',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, feedback, dialog, bulkActionPopup, breadcrumbsFactory, _status, itemProgressTpl, deliveryLinkTpl) {
+], function (
+    $,
+    _,
+    __,
+    helpers,
+    moment,
+    loadingBar,
+    encode,
+    feedback,
+    dialog,
+    bulkActionPopup,
+    breadcrumbsFactory,
+    _status,
+    itemProgressTpl,
+    deliveryLinkTpl
+) {
     'use strict';
 
     /**
@@ -86,23 +102,25 @@ define([
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];
             var actions = [];
             var model = [];
-
+            var actionButtons;
             var bc = breadcrumbsFactory($container, crumbs);
 
             // request the server with a selection of test takers
-            function request(url, selection, message) {
+            function request(url, selection, reason, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
                         url: url,
                         data: {
-                            execution: selection
+                            execution: selection,
+                            reason: reason
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -126,33 +144,29 @@ define([
 
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
-                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(){
-                    notYet();
-                    //request(authoriseUrl, selection, __('Delivery executions have been authorised'));
+                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(selection, reason){
+                    request(authoriseUrl, selection, reason, __('Delivery executions have been authorised'));
                 });
             }
 
             // request the server to pause the selected delivery executions
             function pause(selection) {
-                execBulkAction('pause', __('Pause Delivery Session'), selection, function(){
-                    notYet();
-                    //request(pauseUrl, selection, __('Delivery executions have been paused'));
+                execBulkAction('pause', __('Pause Delivery Session'), selection, function(selection, reason){
+                    request(pauseUrl, selection, reason, __('Delivery executions have been paused'));
                 });
             }
 
             // request the server to terminate the selected delivery executions
             function terminate(selection) {
-                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(){
-                    notYet();
-                    //request(terminateUrl, selection, __('Delivery executions have been terminated'));
+                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(selection, reason){
+                    request(terminateUrl, selection, reason, __('Delivery executions have been terminated'));
                 });
             }
             
             // report irregularities on the selected delivery executions
             function report(selection) {
                 execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
-                    console.log('reported', selection, 'with reason', reason);
-                    notYet();
+                    request(reportUrl, selection, reason, __('Delivery executions have been reported'));
                 });
             }
             
@@ -178,21 +192,32 @@ define([
             }
             
             /**
+             * Find the execution row data from its uri
+             * 
+             * @param {String} uri
+             * @returns {Object}
+             */
+            function getExecutionData(uri){
+                return _.find(dataset.data, {id : uri});
+            }
+            
+            /**
              * Exec 
              * @param {String} actionName
              * @param {String} actionTitle
              * @param {Array|String} selection
-             * @param {type} cb
+             * @param {Function} cb
              * @returns {undefined}
              */
             function execBulkAction(actionName, actionTitle, selection, cb){
-                
+
                 var allowedTestTakers = [];
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
+                var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 
                 _.each(_selection, function(uri){
-                    var testTaker = _.find(dataset.data, {id : uri});
+                    var testTaker = getExecutionData(uri);
                     var checkedTestTaker;
                     if(testTaker){
                         checkedTestTaker = verifyTestTaker(testTaker, actionName);
@@ -206,7 +231,7 @@ define([
                 var config = _.assign({
                     renderTo : $content,
                     actionName : actionTitle,
-                    reason : true,
+                    reason : askForReason,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
@@ -337,6 +362,14 @@ define([
                 id: 'irregularity',
                 icon: 'delivery-small',
                 title: __('Report irregularities'),
+                hidden: function() {
+                    var status;
+                    if(this.state && this.state.status){
+                        status = _status.getStatusByCode(this.state.status);
+                        return !status || status.can.report !== true;
+                    }
+                    return true;
+                },
                 action: report
             });
 
@@ -386,6 +419,15 @@ define([
                 }
             });
 
+            // column: start time
+            model.push({
+                id: 'date',
+                label: __('Started at'),
+                transform: function(value) {
+                    return moment(value).toString();
+                }
+            });
+
             // column: delivery execution status
             model.push({
                 id: 'status',
@@ -417,14 +459,42 @@ define([
                     return itemProgressTpl(state);
                 }
             });
-
+            
             // renders the datatable
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function() {
+                .on('load.datatable', function(e, newDataset) {
+                    //update dateset in memory
+                    dataset = newDataset;
+                    
+                    //udate the buttons, which have been reconstructed
+                    actionButtons = _({
+                        authorize : $list.find('.action-bar').children('.tool-authorise'),
+                        pause : $list.find('.action-bar').children('.tool-pause'),
+                        terminate : $list.find('.action-bar').children('.tool-terminate'),
+                        report : $list.find('.action-bar').children('.tool-irregularity')
+                    });
+                    
                     loadingBar.stop();
+                })
+                .on('select.datatable', function(e, newDataset) {
+                    //hide all controls then display each required one individually
+                    actionButtons.each(function($btn){
+                        $btn.hide();
+                    });
+                    _($list.datatable('selection')).map(function(uri){
+                        var row = getExecutionData(uri);
+                        return row.state.status;
+                    }).uniq().each(function(statusCode){
+                        var status = _status.getStatusByCode(statusCode);
+                        actionButtons.forIn(function($btn, action){
+                            if(status && status.can[action] === true){
+                                $btn.show();
+                            }
+                        });
+                    });
                 })
                 .datatable({
                     url: deliveryId ? serviceUrl : serviceAllUrl,
@@ -438,6 +508,7 @@ define([
                     model: model,
                     selectable: true
                 }, dataset);
+                
         }
     };
 

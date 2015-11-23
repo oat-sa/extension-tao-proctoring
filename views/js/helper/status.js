@@ -17,8 +17,18 @@
  *
  */
 define(['lodash', 'i18n'], function(_, __){
-   'use strict'; 
-   var _status = {
+    'use strict';
+    var _status = {
+        init : {
+            code : 'INIT',
+            label : __('Init'),
+            can : {
+                authorize : __('not awaiting'),
+                pause : __('not in progress'),
+                terminate : true,
+                report : true
+            }
+        },
         awaiting : {
             code : 'AWAITING',
             label : __('Awaiting'),
@@ -34,8 +44,8 @@ define(['lodash', 'i18n'], function(_, __){
             label : __('Authorized but not started'),
             can : {
                 authorize : __('already authorized'),
-                pause : __('not started'),//not in progress
-                terminate :true,
+                pause : __('not started'), //not in progress
+                terminate : true,
                 report : true
             }
         },
@@ -45,7 +55,7 @@ define(['lodash', 'i18n'], function(_, __){
             can : {
                 authorize : __('already authorized'),
                 pause : true,
-                terminate :true,
+                terminate : true,
                 report : true
             }
         },
@@ -55,7 +65,7 @@ define(['lodash', 'i18n'], function(_, __){
             can : {
                 authorize : __('is paused'),
                 pause : __('is already paused'),
-                terminate :true,
+                terminate : true,
                 report : true
             }
         },
@@ -66,7 +76,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is completed'),
                 pause : __('is completed'),
                 terminate : __('is completed'),
-                report : true
+                report : __('is completed')
             }
         },
         terminated : {
@@ -76,11 +86,11 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is terminated'),
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
-                report : true
+                report : __('is terminated')
             }
         }
     };
-    
+
     /**
      * Get the status model from its name
      * @param {string} statusName
@@ -89,7 +99,7 @@ define(['lodash', 'i18n'], function(_, __){
     function getStatus(statusName){
         return _status[statusName];
     }
-    
+
     /**
      * Get the status model from its code
      * @param {string} statusName
@@ -98,10 +108,32 @@ define(['lodash', 'i18n'], function(_, __){
     function getStatusByCode(statusCode){
         return _.find(_status, {code : statusCode});
     }
-    
+
+    /**
+     * Verify and reformat test taker data for the execBulkAction's need
+     * @param {Object} testTakerData
+     * @param {String} actionName
+     * @returns {Object}
+     */
+    function verifyTestTaker(testTakerData, actionName){
+        var formatted = {
+            id : testTakerData.id,
+            label : testTakerData.firstname + ' ' + testTakerData.lastname
+        };
+        var status = _status.getStatusByCode(testTakerData.state.status);
+        if(status){
+            formatted.allowed = (status.can[actionName] === true);
+            if(!formatted.allowed){
+                formatted.reason = status.can[actionName];
+            }
+        }
+        return formatted;
+    }
+
     return {
         getStatus : getStatus,
-        getStatusByCode : getStatusByCode
+        getStatusByCode : getStatusByCode,
+        verifyTestTaker : verifyTestTaker
     };
 });
 
