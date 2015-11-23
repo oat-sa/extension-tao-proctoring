@@ -673,6 +673,7 @@ class DeliveryService extends ConfigurableService
         if ($session) {
             $varName[] = $session->getCurrentAssessmentItemRef();
             $varName[] = $session->getCurrentAssessmentItemRefOccurence();
+            $varName[] = time();
         }
         return implode('.', $varName);
     }
