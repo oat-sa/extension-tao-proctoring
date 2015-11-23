@@ -28,7 +28,8 @@ return array(
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
 	   'tao' => '>=2.8.0',
-	   'taoDelivery' => '>=2.7.0'
+	   'taoDelivery' => '>=2.7.0',
+	   'taoQtiTest' => '>=2.16.0'
     ),
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Delivery')),
