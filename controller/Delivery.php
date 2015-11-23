@@ -48,7 +48,9 @@ class Delivery extends Proctoring
         $this->composeView(
             'delivery-index',
             array(
-                'list' => $deliveries
+                'testcenter' => $testCenter->getUri(),
+                'list' => $deliveries,
+                'categories' => $this->getAllReasonsCategories()
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -208,6 +210,27 @@ class Delivery extends Proctoring
                     Breadcrumbs::manageTestTakers($testCenter, $delivery, 'testTakers')
                 )
             );
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+
+    }
+
+    /**
+     * Gets the list of the deliveries for the current test center
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function deliveries() {
+
+        try {
+
+            $testCenter = $this->getCurrentTestCenter();
+            $deliveries = DeliveryHelper::getDeliveries($testCenter);
+            $this->returnJson($deliveries);
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
