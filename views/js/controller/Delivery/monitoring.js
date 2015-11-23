@@ -145,7 +145,7 @@ define([
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
                 execBulkAction('authorize', __('Authorize Session'), selection, function(selection, reason){
-                    request(authoriseUrl, selection, reason, __('Session authorized'));
+                    request(authoriseUrl, selection, reason, __('Sessions authorized'));
                 });
             }
 
