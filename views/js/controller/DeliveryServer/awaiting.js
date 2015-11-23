@@ -28,8 +28,9 @@ define([
     'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
+    'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, moment, loadingBar, listBox, dialogAlert, polling, authSuccessTpl){
+], function (_, $, __, helpers, moment, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
     'use strict';
 
     /**
@@ -75,6 +76,9 @@ define([
                 width : 12
             });
             var $content = $container.find('.listbox .content');
+
+            // we need to reset the local timer to avoid loss of time inside the assessment test session
+            keepAfterResume().reset();
 
             loadingBar.start();
 
