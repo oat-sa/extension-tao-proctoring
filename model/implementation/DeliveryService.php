@@ -60,6 +60,20 @@ class DeliveryService extends ConfigurableService
     const STATE_COMPLETED = 'COMPLETED';
     const STATE_TERMINATED = 'TERMINATED';
 
+    /**
+     * Ordered list of allowed states
+     * @var array
+     */
+    private static $allowedStates = array(
+        self::STATE_INIT,
+        self::STATE_AWAITING,
+        self::STATE_AUTHORIZED,
+        self::STATE_INPROGRESS,
+        self::STATE_PAUSED,
+        self::STATE_COMPLETED,
+        self::STATE_TERMINATED
+    );
+
 
     /**
      * Gets all deliveries available for a proctor
@@ -215,17 +229,9 @@ class DeliveryService extends ConfigurableService
      * Gets the list of allowed states
      * @return array
      */
-    public function getAllowedState()
+    public function getAllowedStates()
     {
-        return array(
-            self::STATE_INIT,
-            self::STATE_AWAITING,
-            self::STATE_AUTHORIZED,
-            self::STATE_INPROGRESS,
-            self::STATE_PAUSED,
-            self::STATE_COMPLETED,
-            self::STATE_TERMINATED
-        );
+        return self::$allowedStates;
     }
 
     /**
