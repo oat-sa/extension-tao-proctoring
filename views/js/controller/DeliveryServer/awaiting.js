@@ -67,7 +67,7 @@ define([
                     text : __('Proceed')
                 }];
             var list = listBox({
-                title : config.deliveryInit ? __('Start Delivery') : __('Resume Delivery'),
+                title : config.deliveryInit ? __('Start Test') : __('Resume Test'),
                 textEmpty : '',
                 textNumber : '',
                 textLoading : '',
@@ -118,7 +118,7 @@ define([
                 loadingBar.stop();
                 //@todo it would be nice to smoothen the transition
                 $container.removeClass('authorization-in-progress');
-                $content.html(authSuccessTpl({message : __('Authorization done. You may proceed now.')}));
+                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
             }
 
             /**

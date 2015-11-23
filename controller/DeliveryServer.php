@@ -151,12 +151,12 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
 
         if (DeliveryService::STATE_TERMINATED == $executionState || DeliveryService::STATE_COMPLETED == $executionState) {
             $success = false;
-            $message = __('The assessment test has been terminated!');
+            $message = __('This test has been terminated');
         }
 
         if (DeliveryService::STATE_PAUSED == $executionState) {
             $success = false;
-            $message = __('The assessment test has been suspended!');
+            $message = __('This test has been suspended');
         }
 
         $this->returnJson(array(

@@ -67,8 +67,8 @@ define([
             var categories = $container.data('categories');
             var testCenterId = $container.data('testcenter');
             var list = listBox({
-                title: __("Deliveries"),
-                textEmpty: __("No deliveries available"),
+                title: __("Sessions"),
+                textEmpty: __("No sessions available"),
                 textNumber: __("Available"),
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
@@ -159,7 +159,7 @@ define([
                 
                 bulkActionPopup({
                     renderTo : $container,
-                    actionName : __('Pause Delivery Session'),
+                    actionName : __('Pause Session'),
                     reason : true,
                     resourceType : 'test taker',
                     allowedResources : allowed,
