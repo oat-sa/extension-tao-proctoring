@@ -81,7 +81,7 @@ class Breadcrumbs
         $breadcrumbs = array(
             'id' => 'deliveries',
             'url' => _url('index', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
-            'label' => __('Deliveries')
+            'label' => __('Sessions')
         );
         if(count($alternativeRoutes)){
             $breadcrumbs['entries'] = $alternativeRoutes;
@@ -130,7 +130,7 @@ class Breadcrumbs
         $breadcrumbs =  array(
             'id' => 'deliveryMonitoring',
             'url' => _url('monitoring', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
-            'label' =>  __('All Deliveries')
+            'label' =>  __('All Sessions')
         );
 
         $otherDeliveries = array_filter($deliveries, function($value) {

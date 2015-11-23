@@ -123,7 +123,7 @@ define([
                     }, {
                         id: 'back',
                         icon: 'preview',
-                        title: __('Return to the delivery monitoring'),
+                        title: __('Return to the session monitoring'),
                         label: __('Monitoring'),
                         action: function() {
                             location.href = monitoringUrl;
@@ -131,7 +131,7 @@ define([
                     }, {
                         id: 'assign',
                         icon: 'add',
-                        title: __('Assign more test takers to this delivery'),
+                        title: __('Assign more test takers to this session'),
                         label: __('Add test takers'),
                         action: function() {
                             location.href = assignUrl;
@@ -139,12 +139,12 @@ define([
                     }, {
                         id: 'remove',
                         icon: 'remove',
-                        title: __('Remove the selected test takers from the delivery'),
+                        title: __('Remove the selected test takers from the session'),
                         label: __('Remove'),
                         massAction: true,
                         action: function(selection) {
                             dialog({
-                                message: __('The test takers will be removed from this delivery. Continue ?'),
+                                message: __('The test takers will be removed from this session. Continue ?'),
                                 autoRender: true,
                                 autoDestroy: true,
                                 onOkBtn: function() {
@@ -156,12 +156,12 @@ define([
                     actions: [{
                         id: 'remove',
                         icon: 'remove',
-                        title: __('Remove the test taker from the delivery'),
+                        title: __('Remove the test taker from the session'),
                         action: function(id) {
                             dialog({
                                 autoRender: true,
                                 autoDestroy: true,
-                                message: __('The test taker will be removed from this delivery. Continue ?'),
+                                message: __('The test taker will be removed from this session. Continue ?'),
                                 onOkBtn: function() {
                                     remove([id]);
                                 }

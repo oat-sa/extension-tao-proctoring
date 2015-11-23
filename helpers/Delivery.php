@@ -55,7 +55,7 @@ class Delivery extends Proctoring
         $all = array(
             'id' => 'all',
             'url' => _url('monitoringAll', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
-            'label' => __('All Deliveries'),
+            'label' => __('All Sessions'),
             'cls' => 'dark',
             'stats' => array(
                 'awaitingApproval' => 0,

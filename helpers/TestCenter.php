@@ -100,8 +100,8 @@ class TestCenter extends Proctoring
             ),
             array(
                 'url' => $actionDeliveries['url'],
-                'label' => __('Deliveries'),
-                'content' => __('Monitor and manage the deliveries of the test site'),
+                'label' => __('Sessions'),
+                'content' => __('Monitor and manage sessions for the test site'),
                 'text' => __('Go')
             ),
             array(

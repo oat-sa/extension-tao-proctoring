@@ -130,7 +130,7 @@ define([
                     selectable: true,
                     model: [{
                         id: 'delivery',
-                        label: __('Delivery')
+                        label: __('Test')
                     }, {
                         id: 'testtaker',
                         label: __('Test Taker')

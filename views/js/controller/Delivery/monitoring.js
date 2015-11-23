@@ -144,29 +144,29 @@ define([
 
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
-                execBulkAction('authorize', __('Authorize Delivery Session'), selection, function(selection, reason){
-                    request(authoriseUrl, selection, reason, __('Delivery executions have been authorised'));
+                execBulkAction('authorize', __('Authorize Session'), selection, function(selection, reason){
+                    request(authoriseUrl, selection, reason, __('Sessions authorized'));
                 });
             }
 
             // request the server to pause the selected delivery executions
             function pause(selection) {
-                execBulkAction('pause', __('Pause Delivery Session'), selection, function(selection, reason){
-                    request(pauseUrl, selection, reason, __('Delivery executions have been paused'));
+                execBulkAction('pause', __('Pause Session'), selection, function(selection, reason){
+                    request(pauseUrl, selection, reason, __('Sessions paused'));
                 });
             }
 
             // request the server to terminate the selected delivery executions
             function terminate(selection) {
-                execBulkAction('terminate', __('Terminate Delivery Session'), selection, function(selection, reason){
-                    request(terminateUrl, selection, reason, __('Delivery executions have been terminated'));
+                execBulkAction('terminate', __('Terminate Session'), selection, function(selection, reason){
+                    request(terminateUrl, selection, reason, __('Sessions terminated'));
                 });
             }
             
             // report irregularities on the selected delivery executions
             function report(selection) {
                 execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
-                    request(reportUrl, selection, reason, __('Delivery executions have been reported'));
+                    request(reportUrl, selection, reason, __('Sessions reported'));
                 });
             }
             
@@ -261,7 +261,7 @@ define([
                 tools.push({
                     id: 'manage',
                     icon: 'property-advanced',
-                    title: __('Manage the deliveries'),
+                    title: __('Manage sessions'),
                     label: __('Manage'),
                     action: function() {
                         location.href = manageUrl;
@@ -273,7 +273,7 @@ define([
             tools.push({
                 id: 'authorise',
                 icon: 'play',
-                title: __('Authorise the selected delivery executions'),
+                title: __('Authorize sessions'),
                 label: __('Authorise'),
                 massAction: true,
                 action: authorise
@@ -283,7 +283,7 @@ define([
             tools.push({
                 id: 'pause',
                 icon: 'pause',
-                title: __('Pause delivery executions'),
+                title: __('Pause sessions'),
                 label: __('Pause'),
                 massAction: true,
                 action: pause
@@ -293,7 +293,7 @@ define([
             tools.push({
                 id: 'terminate',
                 icon: 'stop',
-                title: __('Terminate delivery executions'),
+                title: __('Terminate sessions'),
                 label: __('Terminate'),
                 massAction: true,
                 action: terminate
@@ -313,7 +313,7 @@ define([
             actions.push({
                 id: 'authorise',
                 icon: 'play',
-                title: __('Authorise the delivery execution'),
+                title: __('Authorize session'),
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
@@ -329,7 +329,7 @@ define([
             actions.push({
                 id: 'pause',
                 icon: 'pause',
-                title: __('Pause the delivery execution'),
+                title: __('Pause session'),
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
@@ -345,7 +345,7 @@ define([
             actions.push({
                 id: 'terminate',
                 icon: 'stop',
-                title: __('Terminate the delivery execution'),
+                title: __('Terminate session'),
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
@@ -361,7 +361,7 @@ define([
             actions.push({
                 id: 'irregularity',
                 icon: 'delivery-small',
-                title: __('Report irregularities'),
+                title: __('Report irregularity'),
                 hidden: function() {
                     var status;
                     if(this.state && this.state.status){
@@ -377,7 +377,7 @@ define([
             if (!deliveryId) {
                 model.push({
                     id: 'delivery',
-                    label: __('Delivery'),
+                    label: __('Session'),
                     transform: function(value, row) {
                         var delivery = row && row.delivery;
                         if (delivery) {
@@ -499,8 +499,8 @@ define([
                 .datatable({
                     url: deliveryId ? serviceUrl : serviceAllUrl,
                     status: {
-                        empty: __('No delivery executions'),
-                        available: __('Current delivery executions'),
+                        empty: __('No sessions'),
+                        available: __('Current sessions'),
                         loading: __('Loading')
                     },
                     tools: tools,

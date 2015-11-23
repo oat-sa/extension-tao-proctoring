@@ -106,7 +106,7 @@ define([
                     tools: [{
                         id: 'back',
                         icon: 'left',
-                        title: __('Return to the delivery manager'),
+                        title: __('Return to the session manager'),
                         label: __('Back'),
                         action: function() {
                             location.href = managerUrl;
@@ -122,7 +122,7 @@ define([
                     }, {
                         id: 'assign',
                         icon: 'add',
-                        title: __('Assign the selected test takers to the delivery'),
+                        title: __('Assign the selected test takers to the session'),
                         label: __('Assign the selected test takers'),
                         massAction: true,
                         action: function(selection) {
@@ -132,7 +132,7 @@ define([
                     actions: [{
                         id: 'assign',
                         icon: 'add',
-                        title: __('Assign the test taker to the delivery'),
+                        title: __('Assign the test taker to the session'),
                         action: function(id) {
                             assign([id]);
                         }
