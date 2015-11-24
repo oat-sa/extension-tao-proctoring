@@ -8,7 +8,12 @@ module.exports = function(grunt) {
     var libs        = grunt.option('mainlibs');
     var ext         = require(root + '/tao/views/build/tasks/helpers/extensions')(grunt, root);
     var out         = 'output';
-
+    
+    var paths = {
+        'taoProctoring' : root + '/taoProctoring/views/js',
+        'taoQtiTest' : root + '/taoQtiTest/views/js'
+    };
+    
     /**
      * Remove bundled and bundling files
      */
@@ -22,7 +27,7 @@ module.exports = function(grunt) {
             baseUrl : '../js',
             dir : out,
             mainConfigFile : './config/requirejs.build.js',
-            paths : { 'taoProctoring' : root + '/taoProctoring/views/js'},
+            paths : paths,
             modules : [{
                 name: 'taoProctoring/controller/routes',
                 include : ext.getExtensionsControllers(['taoProctoring']),
