@@ -46,9 +46,8 @@ class Delivery extends Proctoring
      */
     public static function getDeliveries($testCenter)
     {
-        $currentUser = common_session_SessionManager::getSession()->getUser();
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
-        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+        $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         $entries = array();
 
@@ -178,9 +177,8 @@ class Delivery extends Proctoring
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
-        $currentUser = common_session_SessionManager::getSession()->getUser();
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
-        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+        $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         if (count($deliveries)) {
             $all = array();
@@ -269,9 +267,8 @@ class Delivery extends Proctoring
      * @return array
      */
     public static function getAllDeliveryTestTakers($testCenter, $options = array()){
-        $currentUser = common_session_SessionManager::getSession()->getUser();
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
-        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+        $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         if (count($deliveries)) {
             $all = array();

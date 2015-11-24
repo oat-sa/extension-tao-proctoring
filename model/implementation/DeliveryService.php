@@ -60,6 +60,8 @@ class DeliveryService extends ConfigurableService
     const STATE_COMPLETED = 'COMPLETED';
     const STATE_TERMINATED = 'TERMINATED';
 
+    const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
+
     /**
      * Ordered list of allowed states
      * @var array
@@ -90,7 +92,32 @@ class DeliveryService extends ConfigurableService
         }
         return $allDeliveries;
     }
-    
+
+    /**
+     * Gets all deliveries available for a test center
+     * @param string|core_kernel_classes_Resource $testCenterId
+     * @return \taoDelivery_models_classes_DeliveryRdf[]
+     */
+    public function getTestCenterDeliveries($testCenterId)
+    {
+        if (is_object($testCenterId) && $testCenterId instanceof \core_kernel_classes_Resource) {
+            $testCenter = $testCenterId;
+            $testCenterId = $testCenter->getUri();
+        }
+
+        if (is_string($testCenterId)) {
+            $testCenter = new \core_kernel_classes_Resource($testCenterId);
+        }
+
+        $deliveryProp = new \core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI);
+
+        $deliveries = array();
+        foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
+            $deliveries[] = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+        }
+        return $deliveries;
+    }
+
     /**
      * Gets the executions of a delivery
      *

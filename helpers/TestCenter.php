@@ -44,8 +44,9 @@ class TestCenter extends Proctoring
     public static function getTestCenters($options = array())
     {
         $testCenterService = ServiceManager::getServiceManager()->get('taoProctoring/testCenter');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
 
-        $testCenters = $testCenterService->getTestCenters($options);
+        $testCenters = $testCenterService->getTestCentersByProctor($currentUser, $options);
         $entries = array();
         foreach ($testCenters as $testCenter) {
             $entries[] = array(
