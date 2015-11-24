@@ -198,8 +198,13 @@ class DeliveryService extends ConfigurableService
         $stateService = $this->getExtendedStateService();
         $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
 
+        $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
+
         $proctoringState['status'] = $state;
         $proctoringState['reason'] = $reason;
+        if ($currentUser !== null && $state === self::STATE_AUTHORIZED) {
+            $proctoringState['authorized_by'] = $currentUser->getUri();
+        }
         $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
     }
 
