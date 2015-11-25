@@ -31,8 +31,9 @@ use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
  * @license GPL-2.0
  *
  */
-class Reporting extends Proctoring
+class Reporting extends \tao_actions_CommonModule implements ProctoringInterface
 {
+    use ProctoringTrait;
 
     /**
      * Display the activity reporting of the current test center

@@ -21,22 +21,22 @@
 
 namespace oat\taoProctoring\controller;
 
-use \common_session_SessionManager as SessionManager;
-use \core_kernel_classes_Resource;
+use common_session_SessionManager as SessionManager;
+use core_kernel_classes_Resource;
 use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
-use \DateTime;
+use DateTime;
 
 /**
  * Base proctoring interface controller
- * 
+ *
  * @author Open Assessment Technologies SA
  * @package taoProctoring
  * @license GPL-2.0
  *
  */
-class Proctoring extends \tao_actions_CommonModule
+trait ProctoringTrait
 {
     protected $currentTestCenter = null;
     protected $currentDelivery   = null;
@@ -60,7 +60,7 @@ class Proctoring extends \tao_actions_CommonModule
                 //@todo use a better exception
                 throw new \common_Exception('no current test center');
             }
-            
+
         }
         return $this->currentTestCenter;
     }
@@ -68,7 +68,7 @@ class Proctoring extends \tao_actions_CommonModule
     /**
      * Get the requested delivery resource
      * Use this to identify which delivery is currently being selected buy the proctor
-     * 
+     *
      * @return core_kernel_classes_Resource
      * @throws \common_Exception
      */
@@ -90,7 +90,7 @@ class Proctoring extends \tao_actions_CommonModule
 
     /**
      * Main method to render a view for all proctoring related controller actions
-     * 
+     *
      * @param string $cssClass
      * @param array $data
      * @param array $breadcrumbs

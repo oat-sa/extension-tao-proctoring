@@ -33,8 +33,9 @@ use oat\taoProctoring\helpers\ReasonCategory;
  * @license GPL-2.0
  *
  */
-class Delivery extends Proctoring
+class Delivery extends \tao_actions_CommonModule implements ProctoringInterface
 {
+    use ProctoringTrait;
 
     /**
      * Displays the index page of the deliveries list all available deliveries for the current test center

@@ -32,8 +32,9 @@ use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
  * @license GPL-2.0
  *
  */
-class TestCenter extends Proctoring
+class TestCenter extends \tao_actions_CommonModule implements ProctoringInterface
 {
+    use ProctoringTrait;
 
     /**
      * Displays the index page of the extension: list all available deliveries.
