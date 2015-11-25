@@ -100,13 +100,10 @@ class DeliveryService extends ConfigurableService
      */
     public function getTestCenterDeliveries($testCenterId)
     {
-        if (is_object($testCenterId) && $testCenterId instanceof \core_kernel_classes_Resource) {
-            $testCenter = $testCenterId;
-            $testCenterId = $testCenter->getUri();
-        }
-
         if (is_string($testCenterId)) {
             $testCenter = new \core_kernel_classes_Resource($testCenterId);
+        } else {
+            $testCenter = $testCenterId;
         }
 
         $deliveryProp = new \core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI);
@@ -274,15 +271,11 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets the properties of a particular delivery
      *
-     * @param core_kernel_classes_Resource $delivery
+     * @param string|core_kernel_classes_Resource $delivery
      * @return mixed
      */
     public function getDeliveryProperties($delivery)
     {
-        if (is_object($delivery) && !($delivery instanceof \core_kernel_classes_Resource)) {
-            $delivery = $delivery->getUri();
-        }
-
         if (is_string($delivery)) {
             $delivery = new \core_kernel_classes_Resource($delivery);
         }
