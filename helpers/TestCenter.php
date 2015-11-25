@@ -22,6 +22,7 @@ namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\TestCenterService;
 use \core_kernel_classes_Resource;
 use \DateTime;
 
@@ -43,7 +44,7 @@ class TestCenter extends Proctoring
      */
     public static function getTestCenters($options = array())
     {
-        $testCenterService = ServiceManager::getServiceManager()->get('taoProctoring/testCenter');
+        $testCenterService = TestCenterService::singleton();
         $currentUser = \common_session_SessionManager::getSession()->getUser();
 
         $testCenters = $testCenterService->getTestCentersByProctor($currentUser, $options);
@@ -71,7 +72,7 @@ class TestCenter extends Proctoring
      */
     public static function getTestCenter($testCenterId)
     {
-        $testCenterService = ServiceManager::getServiceManager()->get('taoProctoring/testCenter');
+        $testCenterService = TestCenterService::singleton();
 
         return $testCenterService->getTestCenter($testCenterId);
     }
@@ -125,8 +126,7 @@ class TestCenter extends Proctoring
      */
     public static function getDiagnostics($testCenterId, $options = array())
     {
-        $testCenterService = ServiceManager::getServiceManager()->get('taoProctoring/testCenter');
-        $diagnostics = $testCenterService->getDiagnostics($testCenterId);
+        $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
         return self::paginate($diagnostics, $options);
     }
 

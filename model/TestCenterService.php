@@ -18,32 +18,42 @@
  *
  *
  */
-namespace oat\taoProctoring\model\implementation;
+namespace oat\taoProctoring\model;
 
-use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
-use oat\taoProctoring\model\mock\WebServiceMock;
-use \core_kernel_classes_Resource;
-use \core_kernel_classes_Class;
+use core_kernel_classes_Resource;
+use core_kernel_classes_Class;
+use tao_models_classes_ClassService;
 
 /**
- * Sample TestCenter Service for proctoring
+ * TestCenter Service for proctoring
  * 
  */
-class TestCenterService extends ConfigurableService
+class TestCenterService extends tao_models_classes_ClassService
 {
+    const CLASS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter';
 
     const PROPERTY_PROCTORS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor';
+
+    /**
+     * return the test center top level class
+     *
+     * @access public
+     * @return core_kernel_classes_Class
+     */
+    public function getRootClass()
+    {
+        return new core_kernel_classes_Class(self::CLASS_URI);
+    }
 
     /**
      * Get test centers administered by a proctor
      *
      * @param User $user
-     * @param array $options
      * @return core_kernel_classes_Resource[]
      * @throws \common_exception_Error
      */
-    public function getTestCentersByProctor(User $user, $options = array()) {
+    public function getTestCentersByProctor(User $user) {
         $testCenters = array();
         foreach ($user->getPropertyValues(self::PROPERTY_PROCTORS_URI) as $id) {
             $testCenters[] = new core_kernel_classes_Resource($id);
@@ -54,22 +64,10 @@ class TestCenterService extends ConfigurableService
     /**
      * Gets test center
      *
-     * @param string $id
+     * @param string $testCenterUri
      * @return core_kernel_classes_Resource
      */
-    public function getTestCenter($id) {
-        return new core_kernel_classes_Resource($id);
+    public function getTestCenter($testCenterUri) {
+        return new core_kernel_classes_Resource($testCenterUri);
     }
-
-    /**
-     * Gets a list of available test centers
-     *
-     * @param string $testCenterId
-     * @param array [$options]
-     * @return array
-     */
-    public function getDiagnostics($testCenterId) {
-        return WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-    }
-    
 }
