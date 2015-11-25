@@ -21,6 +21,7 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\user\User;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use \core_kernel_classes_Resource;
 use \core_kernel_classes_Class;
@@ -31,20 +32,21 @@ use \core_kernel_classes_Class;
  */
 class TestCenterService extends ConfigurableService
 {
+
+    const PROPERTY_PROCTORS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor';
+
     /**
-     * Gets a list of available test centers
+     * Get test centers administered by a proctor
      *
-     * @return array
+     * @param User $user
+     * @param array $options
+     * @return core_kernel_classes_Resource[]
+     * @throws \common_exception_Error
      */
-    public function getTestCenters() {
-        $testCenters = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/test-centers.json');
-        foreach($testCenters as $k => $val) {
-            $testCenter = new core_kernel_classes_Resource($val['id']);
-            if (!$testCenter->exists()) {
-                $objectClass = new \core_kernel_classes_Class(TAO_OBJECT_CLASS);
-                $testCenter = $objectClass->createInstance($val['label'], 'temporarily generated test center', $val['id']);
-            }
-            $testCenters[$k] = $testCenter;
+    public function getTestCentersByProctor(User $user, $options = array()) {
+        $testCenters = array();
+        foreach ($user->getPropertyValues(self::PROPERTY_PROCTORS_URI) as $id) {
+            $testCenters[] = new core_kernel_classes_Resource($id);
         }
         return $testCenters;
     }
@@ -53,17 +55,10 @@ class TestCenterService extends ConfigurableService
      * Gets test center
      *
      * @param string $id
-     * @return array
+     * @return core_kernel_classes_Resource
      */
     public function getTestCenter($id) {
-        $testCenter = WebServiceMock::filter($this->getTestCenters(), function($center) use($id) {
-            return !strnatcasecmp($id, $center->getUri());
-        });
-
-        if (count($testCenter)) {
-            return current($testCenter);
-        }
-        return null;
+        return new core_kernel_classes_Resource($id);
     }
 
     /**
