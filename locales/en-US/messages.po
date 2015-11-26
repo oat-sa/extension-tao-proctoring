@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint02\n"
-"PO-Revision-Date: 2015-07-13T16:13:46\n"
+"Project-Id-Version: TAO 3.1.0-sprint12\n"
+"PO-Revision-Date: 2015-11-26T14:58:48\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -13,14 +13,608 @@ msgstr ""
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
 
-msgid "Hello World"
+msgid "%d min"
+msgstr ""
+
+msgid "%s of %s"
+msgstr ""
+
+msgid "ACT"
+msgstr ""
+
+msgid "Add Test Takers"
+msgstr ""
+
+msgid "Add test takers"
+msgstr ""
+
+msgid "Administer deliveries"
+msgstr ""
+
+msgid "All Sessions"
+msgstr ""
+
+msgid "already authorized"
+msgstr ""
+
+msgid "Assessment Activity Reporting"
+msgstr ""
+
+msgid "Assessment Activity Reporting for test site %s"
+msgstr ""
+
+msgid "Assign more test takers to this session"
+msgstr ""
+
+msgid "Assign the selected test takers"
+msgstr ""
+
+msgid "Assign the selected test takers to the session"
+msgstr ""
+
+msgid "Assign the test taker to the session"
+msgstr ""
+
+msgid "Assigned test takers"
+msgstr ""
+
+msgid "Attempt"
+msgstr ""
+
+msgid "Attempts"
+msgstr ""
+
+msgid "Authorise"
+msgstr ""
+
+msgid "Authorize session"
+msgstr ""
+
+msgid "Authorize Session"
+msgstr ""
+
+msgid "Authorize sessions"
+msgstr ""
+
+msgid "Authorized but not started"
+msgstr ""
+
+msgid "Authorized, you may proceed"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Available from %s"
+msgstr ""
+
+msgid "Available reports"
+msgstr ""
+
+msgid "Available test takers"
+msgstr ""
+
+msgid "Awaiting"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Bandwidth"
+msgstr ""
+
+msgid "Behaviour"
+msgstr ""
+
+msgid "Browser"
+msgstr ""
+
+msgid "Check the compatibility of the current workstation and see the results"
+msgstr ""
+
+msgid "Comfort"
+msgstr ""
+
+msgid "Complaint"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Compliance"
+msgstr ""
+
+msgid "Current sessions"
+msgstr ""
+
+msgid "Date"
 msgstr ""
 
 #, tao-public
-msgid "Proctoring"
+msgid "Delete"
+msgstr ""
+
+msgid "Disturbance"
+msgstr ""
+
+msgid "Download CSV"
+msgstr ""
+
+msgid "Download the selected reports to a CSV file"
 msgstr ""
 
 #, tao-public
-msgid "Template"
+msgid "Duplicate"
+msgstr ""
+
+msgid "Edit test center"
+msgstr ""
+
+msgid "Elapsed time"
+msgstr ""
+
+msgid "End"
+msgstr ""
+
+msgid "Environment"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Examinee"
+msgstr ""
+
+#, tao-public
+msgid "Export"
+msgstr ""
+
+#, tao-public
+msgid "Filter"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+msgid "Freezing"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "Generate and review test histories"
+msgstr ""
+
+msgid "Go"
+msgstr ""
+
+msgid "Go to"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "ID/Authorization"
+msgstr ""
+
+msgid "Identifier"
+msgstr ""
+
+msgid "Illness"
+msgstr ""
+
+#, tao-public
+msgid "Import"
+msgstr ""
+
+msgid "In progress"
+msgstr ""
+
+msgid "In Progress"
+msgstr ""
+
+msgid "Init"
+msgstr ""
+
+msgid "Irregularities"
+msgstr ""
+
+msgid "is already paused"
+msgstr ""
+
+msgid "is completed"
+msgstr ""
+
+msgid "is paused"
+msgstr ""
+
+msgid "is terminated"
+msgstr ""
+
+msgid "Issue Category"
+msgstr ""
+
+msgid "item"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Late"
+msgstr ""
+
+msgid "Launch another readiness check"
+msgstr ""
+
+msgid "Launch readiness check"
+msgstr ""
+
+msgid "Launching"
+msgstr ""
+
+msgid "Loading"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Manage"
+msgstr ""
+
+msgid "Manage sessions"
+msgstr ""
+
+#, tao-public
+msgid "Manage Test Center"
+msgstr ""
+
+msgid "Manage Test Takers"
+msgstr ""
+
+msgid "Monitor"
+msgstr ""
+
+msgid "Monitor and manage sessions for the test site"
+msgstr ""
+
+msgid "Monitoring"
+msgstr ""
+
+#, tao-public
+msgid "Move"
+msgstr ""
+
+msgid "My Test sites"
+msgstr ""
+
+msgid "My Tests"
+msgstr ""
+
+msgid "Navigation"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+#, tao-public
+msgid "New class"
+msgstr ""
+
+#, tao-public
+msgid "New Test Center"
+msgstr ""
+
+msgid "No assigned test takers"
+msgstr ""
+
+msgid "No available test takers to assign"
+msgstr ""
+
+msgid "No readiness checks have been done!"
+msgstr ""
+
+msgid "No reports to display!"
+msgstr ""
+
+msgid "No sessions"
+msgstr ""
+
+msgid "No sessions available"
+msgstr ""
+
+msgid "No Show"
+msgstr ""
+
+msgid "No test site available"
+msgstr ""
+
+msgid "Noise"
+msgstr ""
+
+msgid "not awaiting"
+msgstr ""
+
+msgid "not in progress"
+msgstr ""
+
+msgid "not started"
+msgstr ""
+
+msgid "Not yet implemented!"
+msgstr ""
+
+msgid "OS"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Pause"
+msgstr ""
+
+msgid "Pause #"
+msgstr ""
+
+msgid "Pause Session"
+msgstr ""
+
+msgid "Pause session"
+msgstr ""
+
+msgid "Pause sessions"
+msgstr ""
+
+msgid "Paused"
+msgstr ""
+
+msgid "Performance"
+msgstr ""
+
+msgid "Please wait, authorization in process ..."
+msgstr ""
+
+msgid "Power Outage"
+msgstr ""
+
+msgid "Printing"
+msgstr ""
+
+msgid "Proceed"
+msgstr ""
+
+msgid "Proctor"
+msgstr ""
+
+msgid "Proctor/Staff"
+msgstr ""
+
+msgid "Proctored Delivery Server"
+msgstr ""
+
+msgid "Proctored Test-Takers"
+msgstr ""
+
+msgid "Proctoring interface"
+msgstr ""
+
+msgid "Proctors"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+#, tao-public
+msgid "Properties"
+msgstr ""
+
+msgid "Readiness check"
+msgstr ""
+
+msgid "Readiness Check"
+msgstr ""
+
+msgid "Readiness Check for test site %s"
+msgstr ""
+
+msgid "Readiness checks already done"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Refresh the page"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Remove the readiness check result?"
+msgstr ""
+
+msgid "Remove the selected readiness check results"
+msgstr ""
+
+msgid "Remove the selected test takers from the session"
+msgstr ""
+
+msgid "Remove the test taker from the session"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Report irregularities"
+msgstr ""
+
+msgid "Report irregularity"
+msgstr ""
+
+msgid "Report Irregularity"
+msgstr ""
+
+msgid "Resume"
+msgstr ""
+
+msgid "Resume #"
+msgstr ""
+
+msgid "Resume Test"
+msgstr ""
+
+msgid "Return to the session manager"
+msgstr ""
+
+msgid "Return to the session monitoring"
+msgstr ""
+
+#, tao-public
+msgid "Search"
+msgstr ""
+
+msgid "section"
+msgstr ""
+
+msgid "Select deliveries available at the test center"
+msgstr ""
+
+msgid "Select proctors for the test center"
+msgstr ""
+
+msgid "Select test-takers for the test center"
+msgstr ""
+
+msgid "Session"
+msgstr ""
+
+msgid "Sessions"
+msgstr ""
+
+msgid "Sessions authorized"
+msgstr ""
+
+msgid "Sessions paused"
+msgstr ""
+
+msgid "Sessions reported"
+msgstr ""
+
+msgid "Sessions terminated"
+msgstr ""
+
+msgid "Something went wrong ..."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start Test"
+msgstr ""
+
+msgid "Started at"
+msgstr ""
+
+msgid "Started at "
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Subcategory"
+msgstr ""
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr ""
+
+msgid "Technical"
+msgstr ""
+
+msgid "Terminate"
+msgstr ""
+
+msgid "Terminate session"
+msgstr ""
+
+msgid "Terminate Session"
+msgstr ""
+
+msgid "Terminate sessions"
+msgstr ""
+
+msgid "Terminated"
+msgstr ""
+
+msgid "Test"
+msgstr ""
+
+#, tao-public
+msgid "Test center contains test taker and groups and are administer by a proctor"
+msgstr ""
+
+#, tao-public
+msgid "Test Center List"
+msgstr ""
+
+msgid "Test center saved"
+msgstr ""
+
+#, tao-public
+msgid "Test Centers"
+msgstr ""
+
+msgid "Test site %s"
+msgstr ""
+
+msgid "Test Taker"
+msgstr ""
+
+msgid "Test takers have been added"
+msgstr ""
+
+msgid "Test takers have been removed"
+msgstr ""
+
+msgid "Testing Workstation"
+msgstr ""
+
+msgid "The readiness check result have been removed"
+msgstr ""
+
+msgid "The readiness check result will be removed. Continue ?"
+msgstr ""
+
+msgid "The selected readiness check results will be removed. Continue ?"
+msgstr ""
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr ""
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr ""
+
+msgid "There is no delivery in progress"
+msgstr ""
+
+msgid "This test has been suspended"
+msgstr ""
+
+msgid "This test has been terminated"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "to %s"
+msgstr ""
+
+msgid "Total time"
+msgstr ""
+
+msgid "unlimited"
+msgstr ""
+
+msgid "Weather"
+msgstr ""
+
+msgid "Workstation"
 msgstr ""
 
