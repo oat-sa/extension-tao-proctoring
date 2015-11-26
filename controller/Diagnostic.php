@@ -31,10 +31,8 @@ use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
  * @license GPL-2.0
  *
  */
-class Diagnostic extends \tao_actions_CommonModule implements ProctoringInterface
+class Diagnostic extends ProctoringModule
 {
-    use ProctoringTrait;
-
     /**
      * Display the list of all readiness checks performed on the given test center
      * It also allows launching new ones.

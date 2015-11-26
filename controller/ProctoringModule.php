@@ -36,7 +36,7 @@ use DateTime;
  * @license GPL-2.0
  *
  */
-trait ProctoringTrait
+class ProctoringModule extends \tao_actions_CommonModule
 {
     protected $currentTestCenter = null;
     protected $currentDelivery   = null;
