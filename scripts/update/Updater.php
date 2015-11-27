@@ -48,7 +48,13 @@ class Updater extends common_ext_ExtensionUpdater {
             $currentVersion = '0.2';
         }
 
-        if ($currentVersion == '0.2' || $currentVersion == '0.3') {
+        if ($currentVersion == '0.2') {
+//            $service = new TestCenterService();
+//            $ext->setConfig('testCenter', $service);
+            $currentVersion = '0.3';
+        }
+
+        if ($currentVersion == '0.3') {
             //grant access to test taker
             $testTakerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
             $accessService = \funcAcl_models_classes_AccessService::singleton();
@@ -67,6 +73,28 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($currentVersion == '0.4') {
             OntologyUpdater::syncModels();
             $ext->unsetConfig('testCenter');
+
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $roleService = \tao_models_classes_RoleService::singleton();
+
+            $testCenterManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager');
+            $globalManager = new \core_kernel_Classes_Resource('http://www.tao.lu/Ontologies/TAO.rdf#ManagementRole');
+            $testTakerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+
+            //grant access right to proctoring manager
+            $roleService->includeRole($globalManager, $testCenterManager);
+            $accessService->grantExtensionAccess($testCenterManager, 'taoProctoring');
+
+            //revoke access to legacy delivery server
+            $accessService->revokeModuleAccess($testTakerRole, 'taoDelivery', 'DeliveryServer');
+
+            //grant access to proctor role
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Delivery');
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Diagnostic');
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Reporting');
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'TestCenter');
+
             $currentVersion = '0.5';
         }
 
