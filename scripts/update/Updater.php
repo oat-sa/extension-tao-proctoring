@@ -77,19 +77,18 @@ class Updater extends common_ext_ExtensionUpdater {
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $roleService = \tao_models_classes_RoleService::singleton();
 
-            $testCenterManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager');
-            $globalManager = new \core_kernel_Classes_Resource('http://www.tao.lu/Ontologies/TAO.rdf#ManagementRole');
-            $testTakerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
-            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
-
             //grant access right to proctoring manager
+            $testCenterManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager');
+            $globalManager = new \core_kernel_Classes_Resource('http://www.tao.lu/Ontologies/TAO.rdf#BackOfficeRole');
             $roleService->includeRole($globalManager, $testCenterManager);
-            $accessService->grantExtensionAccess($testCenterManager, 'taoProctoring');
+            $accessService->grantModuleAccess($testCenterManager, 'taoProctoring', 'TestCenterManager');
 
             //revoke access to legacy delivery server
+            $testTakerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
             $accessService->revokeModuleAccess($testTakerRole, 'taoDelivery', 'DeliveryServer');
 
             //grant access to proctor role
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Delivery');
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Diagnostic');
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'Reporting');
