@@ -31,15 +31,15 @@ class ProctoringDeliveryServer extends Configurable implements Entrypoint
     }
     
     public function getTitle() {
-        return __('Proctoring Delivery');
+        return __('Proctored Test-Takers');
     }
     
     public function getLabel() {
-        return __('Proctoring Delivery');
+        return __('Proctored Delivery Server');
     }
     
     public function getDescription() {
-        return __('Administer a test controlled by a proctor');
+        return __('Take or continue a test controlled by a proctor');
     }
     
     public function getUrl() {
