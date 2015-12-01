@@ -62,6 +62,23 @@ class Reporting extends ProctoringModule
         ));
     }
 
+    public function printReport()
+    {
+        if (!$this->hasRequestParameter('id')) {
+            throw new \common_exception_MissingParameter('id');
+        }
+        $idList = $this->getRequestParameter('id');
+        if (!is_array($idList)) {
+            $idList = [$idList];
+        }
+        $result = [];
+
+        foreach ($idList as $deliveryExecutionId) {
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            var_dump($deliveryExecution);
+        }
+    }
+
     /**
      * Returns array of reports to datatable
      */

@@ -177,20 +177,14 @@ class TestCenter extends Proctoring
             return $cache[$deliveryId];
         }
 
-        /*$status       = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
-        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
-        $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
-        $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
-        $results      = array();*/
         $results = [];
-
 
         foreach ($deliveryExecutions as $deliveryExecution) {
             $results[] = [
                 'id' => $deliveryExecution->getIdentifier(),
                 'proctor' => self::getUserName($currentUser),
-                'start' => $deliveryExecution->getStartTime(),
-                'end' => $deliveryExecution->getFinishTime(),
+                'start' => DateHelper::getTimeStamp($deliveryExecution->getStartTime()),
+                'end' => DateHelper::getTimeStamp($deliveryExecution->getFinishTime()),
                 'delivery' => $delivery->getLabel(),
                 'testtaker' => $deliveryExecution->getUserIdentifier(),
                 'status' => $deliveryService->getState($deliveryExecution),
@@ -198,27 +192,6 @@ class TestCenter extends Proctoring
                 'resume' => 0, //TODO implement counter
                 'irregularities' => '', //WebServiceMock::random($irregularity),
             ];
-        }
-
-
-
-        $start        = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
-        $end          = isset($options['periodEnd']) ? new DateTime($options['periodEnd']) : null;
-
-        if (!is_null($start) || !is_null($end)) {
-            $returnValues = array();
-            foreach ($results as $delivery) {
-                $_start = new DateTime($delivery['start']);
-                $_end   = new DateTime($delivery['end']);
-                if (!is_null($start) && $start > $_end) {
-                    continue;
-                }
-                if (!is_null($end) && $end < $_start) {
-                    continue;
-                }
-                $returnValues[] = $delivery;
-            }
-            $results = $returnValues;
         }
 
         return self::paginate($results, $options);
