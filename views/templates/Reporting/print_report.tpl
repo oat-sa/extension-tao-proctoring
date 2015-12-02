@@ -97,5 +97,8 @@ $reports = get_data("reports");
                 <div class="end-page"></div>
             <?php endforeach; ?>
         </div>
+    <script>
+        window.print();
+    </script>
     </body>
 </html>
