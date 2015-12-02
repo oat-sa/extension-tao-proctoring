@@ -102,22 +102,12 @@ define([
                 });
             };
 
+            /**
+             * Open new tab with page to be printed
+             * @param string|array rowId
+             */
             var printReport = function printReport(rowId) {
-                loadingBar.start();
-                $.ajax({
-                    url : helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}),
-                    type : 'GET',
-                    success : function (result) {
-                        console.log(result);
-                        $list.datatable('refresh');
-                        loadingBar.stop();
-                    },
-                    error : function (xhr, err) {
-                        var message = getRequestErrorMessage(xhr);
-                        feedback().error(message, {encodeHtml : false});
-                        loadingBar.stop();
-                    }
-                });
+                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}));
             }
 
             var today = moment().format('YYYY-MM-DD');

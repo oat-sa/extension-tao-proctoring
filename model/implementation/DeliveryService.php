@@ -90,7 +90,7 @@ class DeliveryService extends ConfigurableService
 
         $deliveries = [];
         foreach ($testCenters as $testCenter) {
-            $deliveries = $deliveries + $this->getTestCenterDeliveries($testCenter);
+            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
         }
 
         return $deliveries;

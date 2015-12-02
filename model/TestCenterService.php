@@ -122,8 +122,11 @@ class TestCenterService extends tao_models_classes_ClassService
         $deliveryProp = new core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI);
 
         $deliveries = array();
-        foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new taoDelivery_models_classes_DeliveryRdf($delResource);
+        foreach ($testCenter->getPropertyValues($deliveryProp) as $deliveryUri) {
+            $delivery = new taoDelivery_models_classes_DeliveryRdf($deliveryUri);
+            if ($delivery->exists()) {
+                $deliveries[] = $delivery;
+            }
         }
         return $deliveries;
     }

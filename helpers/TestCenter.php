@@ -148,7 +148,7 @@ class TestCenter extends Proctoring
 
         $deliveryExecutions = [];
         foreach ($deliveries as $delivery) {
-            $deliveryExecutions = $deliveryExecutions + $deliveryService->getDeliveryExecutions($delivery->getId());
+            $deliveryExecutions = array_merge($deliveryExecutions, $deliveryService->getDeliveryExecutions($delivery->getId()));
         }
 
         $start = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
