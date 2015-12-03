@@ -74,22 +74,30 @@ $reports = get_data("reports");
                         <p class="table-title"><?= $itemResult['label'] ?></p>
                         <div class="avoid-page-break table-container clearfix">
                             <table>
+                                <?php if (isset($itemResult['duration'])): ?>
                                 <tr>
                                     <td><?= __('Duration') ?></td>
                                     <td><?= $itemResult['duration'] ?></td>
                                 </tr>
+                                <?php endif; ?>
+                                <?php if (isset($itemResult['completionStatus'])): ?>
                                 <tr>
                                     <td><?= __('Status') ?></td>
                                     <td><?= $itemResult['completionStatus'] ?></td>
                                 </tr>
+                                <?php endif; ?>
+                                <?php if (isset($itemResult['numAttempts'])): ?>
                                 <tr>
                                     <td><?= __('Attempts') ?></td>
                                     <td><?= $itemResult['numAttempts'] ?></td>
                                 </tr>
+                                <?php endif; ?>
+                                <?php if (isset($itemResult['SCORE'])): ?>
                                 <tr>
                                     <td><?= __('Score') ?></td>
                                     <td><?= $itemResult['SCORE'] ?></td>
                                 </tr>
+                                <?php endif; ?>
                             </table>
                         </div>
                     <?php endforeach; ?>
