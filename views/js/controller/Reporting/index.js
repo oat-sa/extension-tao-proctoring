@@ -101,7 +101,15 @@ define([
                     buttons: 'ok'
                 });
             };
-            
+
+            /**
+             * Open new tab with page to be printed
+             * @param string|array rowId
+             */
+            var printReport = function printReport(rowId) {
+                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}));
+            }
+
             var today = moment().format('YYYY-MM-DD');
             
             $list
@@ -118,16 +126,33 @@ define([
                         available: __('Available reports'),
                         loading: __('Loading')
                     },
-                    tools: [{
-                        id: 'download',
-                        icon: 'download',
-                        title: __('Download the selected reports to a CSV file'),
-                        label: __('Download CSV'),
-                        action: function() {
-                            notYet();
+                    tools: [
+                        {
+                            id: 'download',
+                            icon: 'download',
+                            title: __('Download the selected reports to a CSV file'),
+                            label: __('Download CSV'),
+                            action: function() {
+                                notYet();
+                            },
+                        }, {
+                            id : 'printReport',
+                            title : __('Print the assessment results'),
+                            icon : 'print',
+                            label : __('Print report'),
+                            action : printReport
                         }
-                    }],
+                    ],
                     selectable: true,
+                    'actions' : {
+                        'printReport' : {
+                            action : printReport,
+                            id : 'printReport',
+                            title : __('Print the assessment results'),
+                            icon : 'print',
+                            label : __('Print report')
+                        },
+                    },
                     model: [{
                         id: 'delivery',
                         label: __('Test')
@@ -144,13 +169,13 @@ define([
                         id: 'start',
                         label: __('Start'),
                         transform: function(value) {
-                            return moment(value).toString();
+                            return moment((value * 1000)).toString();
                         }
                     }, {
                         id: 'end',
                         label: __('End'),
                         transform: function(value) {
-                            return moment(value).toString();
+                            return moment((value * 1000)).toString();
                         }
                     }, {
                         id: 'pause',

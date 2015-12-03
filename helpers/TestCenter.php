@@ -25,6 +25,7 @@ use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use \core_kernel_classes_Resource;
 use \DateTime;
+use tao_helpers_Date as DateHelper;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -142,8 +143,30 @@ class TestCenter extends Proctoring
         $count = 10;
 
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
-        $currentUser     = \common_session_SessionManager::getSession()->getUser();
-        $deliveries      = $deliveryService->getProctorableDeliveries($currentUser);
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        $deliveryExecutions = [];
+        foreach ($deliveries as $delivery) {
+            $deliveryExecutions = array_merge($deliveryExecutions, $deliveryService->getDeliveryExecutions($delivery->getId()));
+        }
+
+        $start = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
+        $end = isset($options['periodEnd']) ? new DateTime($options['periodEnd']) : null;
+        if ($end !== null) {
+            $end->add(new \DateInterval('P1D'));
+        }
+
+        $deliveryExecutions = array_filter($deliveryExecutions, function ($deliveryExecution) use($start, $end) {
+            $result = true;
+            if ($start !== null) {
+                $result = $result && $start->getTimestamp() < DateHelper::getTimeStamp($deliveryExecution->getStartTime());
+            }
+            if ($end !== null) {
+                $result = $result && $end->getTimestamp() > DateHelper::getTimeStamp($deliveryExecution->getFinishTime());
+            }
+            return $result;
+        });
 
         function getTestTakers($deliveryId, $deliveryService)
         {
@@ -154,54 +177,21 @@ class TestCenter extends Proctoring
             return $cache[$deliveryId];
         }
 
-        $status       = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
-        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
-        $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
-        $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
-        $results      = array();
+        $results = [];
 
-        if (!empty($deliveries)) {
-            for ($i = 0; $i < $count; $i ++) {
-                $id = $i + 1;
-
-                $delivery   = WebServiceMock::random($deliveries);
-                if (is_object($delivery)) {
-                    $testTakers = getTestTakers($delivery->getId(), $deliveryService);
-                    $break      = WebServiceMock::random($breaks);
-
-                    $results[] = array(
-                        'id' => $id,
-                        'delivery' => $delivery->getLabel(),
-                        'testtaker' => self::getUserName(WebServiceMock::random($testTakers)),
-                        'proctor' => self::getUserName($currentUser),
-                        'status' => WebServiceMock::random($status),
-                        'start' => WebServiceMock::random($date),
-                        'end' => WebServiceMock::random($date),
-                        'pause' => $break,
-                        'resume' => $break,
-                        'irregularities' => WebServiceMock::random($irregularity),
-                    );
-                }
-            }
-        }
-
-        $start        = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
-        $end          = isset($options['periodEnd']) ? new DateTime($options['periodEnd']) : null;
-
-        if (!is_null($start) || !is_null($end)) {
-            $returnValues = array();
-            foreach ($results as $delivery) {
-                $_start = new DateTime($delivery['start']);
-                $_end   = new DateTime($delivery['end']);
-                if (!is_null($start) && $start > $_end) {
-                    continue;
-                }
-                if (!is_null($end) && $end < $_start) {
-                    continue;
-                }
-                $returnValues[] = $delivery;
-            }
-            $results = $returnValues;
+        foreach ($deliveryExecutions as $deliveryExecution) {
+            $results[] = [
+                'id' => $deliveryExecution->getIdentifier(),
+                'proctor' => self::getUserName($currentUser),
+                'start' => DateHelper::getTimeStamp($deliveryExecution->getStartTime()),
+                'end' => DateHelper::getTimeStamp($deliveryExecution->getFinishTime()),
+                'delivery' => $delivery->getLabel(),
+                'testtaker' => $deliveryExecution->getUserIdentifier(),
+                'status' => $deliveryService->getState($deliveryExecution),
+                'pause' => 0, //TODO implement counter
+                'resume' => 0, //TODO implement counter
+                'irregularities' => '', //WebServiceMock::random($irregularity),
+            ];
         }
 
         return self::paginate($results, $options);

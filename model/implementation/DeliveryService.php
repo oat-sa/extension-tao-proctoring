@@ -31,6 +31,7 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoProctoring\model\TestCenterService;
 
 /**
  * Sample Delivery Service for proctoring
@@ -80,17 +81,19 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
-     * @param array $options
      * @return array
      */
-    public function getProctorableDeliveries(User $proctor, $options = array())
+    public function getProctorableDeliveries(User $proctor)
     {
-        $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
-        $allDeliveries = array();
-        foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+        $testCenterService = TestCenterService::singleton();
+        $testCenters = $testCenterService->getTestCentersByProctor($proctor);
+
+        $deliveries = [];
+        foreach ($testCenters as $testCenter) {
+            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
         }
-        return $allDeliveries;
+
+        return $deliveries;
     }
 
     /**

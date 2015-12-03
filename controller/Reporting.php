@@ -22,6 +22,8 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\ReportingService;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -62,6 +64,44 @@ class Reporting extends ProctoringModule
         ));
     }
 
+    public function printReport()
+    {
+        if (!$this->hasRequestParameter('id')) {
+            throw new \common_exception_MissingParameter('id');
+        }
+        $idList = $this->getRequestParameter('id');
+        if (!is_array($idList)) {
+            $idList = [$idList];
+        }
+        $result = [];
+
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
+        foreach ($idList as $deliveryExecutionId) {
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $delivery = $deliveryExecution->getDelivery();
+            if (!isset($deliveries[$delivery->getUri()])) {
+                \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
+                continue;
+            }
+            $result[] = [
+                'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
+                'testData' => $assessmentResultsService->getTestData($deliveryExecution),
+                'resultsData' => $assessmentResultsService->getResultsData($deliveryExecution),
+                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+            ];
+        }
+
+        $this->setData('reports', $result);
+
+        $this->setView('Reporting/print_report.tpl');
+    }
+
     /**
      * Returns array of reports to datatable
      */
@@ -70,4 +110,5 @@ class Reporting extends ProctoringModule
         $requestOptions = $this->getRequestOptions();
         $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
     }
+
 }
