@@ -603,6 +603,27 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return array
+     * Exapmple:
+     * <pre>
+     * array(
+     *   'QtiTestCompilation' => 'http://sample/first.rdf#i14369768868163155-|http://sample/first.rdf#i1436976886612156+',
+     *   'QtiTestDefinition' => 'http://sample/first.rdf#i14369752345581135'
+     * )
+     * </pre>
+     */
+    public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
+    {
+        $compiledDelivery = $deliveryExecution->getDelivery();
+        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+
+        return $inputParameters;
+    }
+
+    /**
      * Gets the test session for a particular deliveryExecution
      *
      * @param DeliveryExecution $deliveryExecution
@@ -610,13 +631,12 @@ class DeliveryService extends ConfigurableService
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      */
-    private function getTestSession(DeliveryExecution $deliveryExecution)
+    public function getTestSession(DeliveryExecution $deliveryExecution)
     {
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
-        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+        $inputParameters = $this->getRuntimeInputParameters($deliveryExecution);
 
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
         $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);

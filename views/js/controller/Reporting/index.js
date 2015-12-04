@@ -106,8 +106,16 @@ define([
              * Open new tab with page to be printed
              * @param string|array rowId
              */
-            var printReport = function printReport(rowId) {
+            var printResults = function printReport(rowId) {
                 window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}));
+            }
+
+            /**
+             * Print rubric blocks with item tagged with tao-print tag
+             * @param string|array rowId
+             */
+            var printRubric = function printReport(rowId) {
+                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : rowId}));
             }
 
             var today = moment().format('YYYY-MM-DD');
@@ -139,19 +147,32 @@ define([
                             id : 'printReport',
                             title : __('Print the assessment results'),
                             icon : 'print',
-                            label : __('Print report'),
-                            action : printReport
+                            label : __('Print results'),
+                            action : printResults
+                        }, {
+                            id : 'printRubric',
+                            title : __('Print rubric block with item tagged with tao-print tag'),
+                            icon : 'print',
+                            label : __('Print Score Report'),
+                            action : printRubric
                         }
                     ],
                     selectable: true,
                     'actions' : {
                         'printReport' : {
-                            action : printReport,
+                            action : printResults,
                             id : 'printReport',
                             title : __('Print the assessment results'),
                             icon : 'print',
-                            label : __('Print report')
+                            label : __('Print results')
                         },
+                        printRubrick : {
+                            id : 'printRubric',
+                            title : __('Print rubric block with item tagged with tao-print tag'),
+                            icon : 'print',
+                            label : __('Print Score Report'),
+                            action : printRubric
+                        }
                     },
                     model: [{
                         id: 'delivery',

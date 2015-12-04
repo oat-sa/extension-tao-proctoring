@@ -19,4 +19,8 @@
  * 
  */  
 
-return new oat\taoProctoring\model\AssessmentResultsService();
+use oat\taoProctoring\model\AssessmentResultsService;
+
+return new AssessmentResultsService([
+    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'tao-print',
+]);

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 use \oat\taoOutcomeUi\model\ResultsService;
 use \oat\oatbox\service\ConfigurableService;
+use qtism\data\View;
 
 /**
  * Class AssessmentResultsService
@@ -35,6 +36,8 @@ use \oat\oatbox\service\ConfigurableService;
 class AssessmentResultsService extends ConfigurableService
 {
     const CONFIG_ID = 'taoProctoring/AssessmentResults';
+
+    const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
 
     /**
      * Get test taker data as associative array
@@ -81,15 +84,15 @@ class AssessmentResultsService extends ConfigurableService
 
         $itemsData = $resultService->getItemVariableDataFromDeliveryResult($deliveryExecution, 'lastSubmitted');
 
-        foreach($itemsData as $itemData) {
+        foreach ($itemsData as $itemData) {
             $rawResult = [];
             $rawResult['label'] = $itemData['label'];
             foreach ($itemData['sortedVars'] as $variables) {
-                 $variableValues = array_map(function ($variable) {
+                $variableValues = array_map(function ($variable) {
                     $variable = current($variable);
                     return $variable['var']->getValue();
-                 }, $variables);
-                 $rawResult = array_merge($rawResult, $variableValues);
+                }, $variables);
+                $rawResult = array_merge($rawResult, $variableValues);
             };
             $result[] = $rawResult;
         }
@@ -109,6 +112,65 @@ class AssessmentResultsService extends ConfigurableService
             'label' => $deliveryExecution->getLabel()
         ];
         return $result;
+    }
+
+
+    /**
+     * Get rubric to be printed
+     * Rubric is considered printed if it included to the section which has an item tagged by specified tag
+     * (@see )
+     *
+     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     */
+    public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    {
+        /** @var DeliveryService $deliveryService */
+        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $session = $deliveryService->getTestSession($deliveryExecution);
+
+        $inputParameters = $deliveryService->getRuntimeInputParameters($deliveryExecution);
+        $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+        $sections = $testDefinition->getComponentsByClassName('assessmentSection');
+
+        $tag = $this->getOption(self::OPTION_PRINTABLE_RUBRIC_TAG);
+
+        $directoryIds = explode('|', $inputParameters['QtiTestCompilation']);
+        $compilationDirs = array(
+            'private' => \tao_models_classes_service_FileStorage::singleton()->getDirectoryById($directoryIds[0]),
+            'public' => \tao_models_classes_service_FileStorage::singleton()->getDirectoryById($directoryIds[1]),
+        );
+
+        $rubrics = [];
+
+        // -- variables used in the included rubric block templates.
+        // base path (base URI to be used for resource inclusion).
+        $basePathVarName = TAOQTITEST_BASE_PATH_NAME;
+        $$basePathVarName = $compilationDirs['public']->getPublicAccessUrl();
+
+        // state name (the variable to access to get the state of the assessmentTestSession).
+        $stateName = TAOQTITEST_RENDERING_STATE_NAME;
+        $$stateName = $session;
+
+        // views name (the variable to be accessed for the visibility of rubric blocks).
+        $viewsName = TAOQTITEST_VIEWS_NAME;
+        $$viewsName = array(View::CANDIDATE);
+
+        foreach ($sections as $section) {
+            $assessmentItemsRef = $section->getComponentsByClassName('assessmentItemRef');
+            foreach ($assessmentItemsRef as $item) {
+                foreach($item->getCategories() as $category) {
+                    if ($category === $tag) {
+                        foreach ($section->getRubricBlockRefs() as $rubric) {
+                            ob_start();
+                            include($compilationDirs['private']->getPath() . $rubric->getHref());
+                            $rubrics[] = ob_get_clean();
+                        }
+                    }
+                };
+            };
+        }
+
+        return $rubrics;
     }
 
     /**
