@@ -29,10 +29,11 @@ define([
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
+    'taoProctoring/helper/status',
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory) {
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
@@ -103,6 +104,14 @@ define([
             };
             
             var today = moment().format('YYYY-MM-DD');
+
+            // renderer for date strings
+            function transformDate(date) {
+                if (date) {
+                    return moment(date).toString();
+                }
+                return '';
+            }
             
             $list
                 .on('query.datatable', function() {
@@ -139,19 +148,22 @@ define([
                         label: __('Proctor')
                     }, {
                         id: 'status',
-                        label: __('Status')
+                        label: __('Status'),
+                        transform: function(value) {
+                            var status = _status.getStatusByCode(value);
+                            if(status){
+                                return status.label;
+                            }
+                            return '';
+                        }
                     }, {
                         id: 'start',
                         label: __('Start'),
-                        transform: function(value) {
-                            return moment(value).toString();
-                        }
+                        transform: transformDate
                     }, {
                         id: 'end',
                         label: __('End'),
-                        transform: function(value) {
-                            return moment(value).toString();
-                        }
+                        transform: transformDate
                     }, {
                         id: 'pause',
                         label: __('Pause #')
