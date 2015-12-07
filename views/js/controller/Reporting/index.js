@@ -203,6 +203,7 @@ define([
         
         var $periodStart = $panel.find('input[name=periodStart]');
         var $periodEnd = $panel.find('input[name=periodEnd]');
+        var $filterBtn = $panel.find('[data-control="filter"]');
         $periodStart.datepicker({
             dateFormat: 'yy-mm-dd',
             autoSize: true
@@ -217,6 +218,12 @@ define([
         }).change(function(){
             periodEnd = $periodEnd.val();
             $periodStart.datepicker('option', 'maxDate', periodEnd);
+            refresh();
+        });
+        $filterBtn.on('click', function(event) {
+            event.preventDefault();
+            periodStart = $periodStart.val();
+            periodEnd = $periodEnd.val();
             refresh();
         });
         
