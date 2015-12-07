@@ -165,6 +165,19 @@ class TestCenter extends Proctoring
     }
 
     /**
+     * Format a date from a timestamp if any
+     * @param int $time
+     * @return string
+     */
+    private static function getDate($time)
+    {
+        if ($time) {
+            return date('Y-m-d H:i:s', $time);
+        }
+        return '';
+    }
+
+    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter
@@ -189,8 +202,8 @@ class TestCenter extends Proctoring
                     'testtaker' => self::getUserName($user),
                     'proctor' => self::getUserName($currentUser),
                     'status' => $deliveryService->getState($deliveryExecution),
-                    'start' => date('Y-m-d H:i:s', $deliveryService->getStartTime($deliveryExecution)),
-                    'end' => date('Y-m-d H:i:s', $deliveryService->getFinishTime($deliveryExecution)),
+                    'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
+                    'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
                     'pause' => '',
                     'resume' => '',
                     'irregularities' => '',
