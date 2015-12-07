@@ -221,7 +221,7 @@ class DeliveryService extends ConfigurableService
      * @param string $state
      * @param array $reason
      */
-    private function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -242,7 +242,7 @@ class DeliveryService extends ConfigurableService
      * @param string|DeliveryExecution $executionId
      * @return array
      */
-    private function getProctoringState($executionId)
+    public function getProctoringState($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();

@@ -23,8 +23,9 @@ namespace oat\taoProctoring\helpers;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
-use \core_kernel_classes_Resource;
-use \DateTime;
+use core_kernel_classes_Resource;
+use core_kernel_users_GenerisUser;
+use DateTime;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -144,7 +145,7 @@ class TestCenter extends Proctoring
             foreach($testTakers as $testTaker) {
                 $map[$testTaker->getIdentifier()] = $testTaker;
             }
-            $cache[$deliveryId] = $map  ;
+            $cache[$deliveryId] = $map;
         }
         return $cache[$deliveryId];
     }
@@ -162,6 +163,20 @@ class TestCenter extends Proctoring
             return $testTakers[$userId];
         }
         return null;
+    }
+
+    /**
+     * Gets a user from a URI
+     * @param string $userId
+     * @return core_kernel_users_GenerisUser
+     */
+    private static function getUser($userId)
+    {
+        static $cache = array();
+        if (!isset($cache[$userId])) {
+            $cache[$userId] = new core_kernel_users_GenerisUser(new core_kernel_classes_Resource($userId));
+        }
+        return $cache[$userId];
     }
 
     /**
@@ -189,18 +204,24 @@ class TestCenter extends Proctoring
         $reports = array();
 
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
-        $currentUser     = \common_session_SessionManager::getSession()->getUser();
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
         foreach($deliveries as $delivery) {
             $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
             foreach($deliveryExecutions as $deliveryExecution) {
                 $userId = $deliveryExecution->getUserIdentifier();
                 $user = self::getTestTaker($userId, $delivery->getUri());
+
+                $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
+                $proctor = '';
+                if (!empty($state['authorized_by'])) {
+                    $proctor = self::getUserName(self::getUser($state['authorized_by']));
+                }
+
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
                     'delivery' => $delivery->getLabel(),
                     'testtaker' => self::getUserName($user),
-                    'proctor' => self::getUserName($currentUser),
+                    'proctor' => $proctor,
                     'status' => $deliveryService->getState($deliveryExecution),
                     'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
                     'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
