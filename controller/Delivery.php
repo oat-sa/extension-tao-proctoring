@@ -539,5 +539,5 @@ class Delivery extends ProctoringModule
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
-
+    }
 }
