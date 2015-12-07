@@ -150,11 +150,16 @@ class DeliveryService extends ConfigurableService
      * @return float
      */
     public function getStartTime($deliveryExecution) {
-        $time = explode(' ', $deliveryExecution->getStartTime());
-        if (count($time) > 1) {
-            return $time[1];
-        }
-        return $time[0];
+        return $this->getDatetime($deliveryExecution->getStartTime());
+    }
+
+    /**
+     * Extract the end time of a delivery execution as a timestamp
+     * @param DeliveryExecution $deliveryExecution
+     * @return float
+     */
+    public function getFinishTime($deliveryExecution) {
+        return $this->getDatetime($deliveryExecution->getFinishTime());
     }
 
     /**
@@ -717,5 +722,19 @@ class DeliveryService extends ConfigurableService
                 $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
+    }
+
+    /**
+     * Extract time from a timestamp (can be a microtime or an epoch timestamp)
+     * @param $time
+     * @return mixed
+     */
+    private function getDatetime($time)
+    {
+        $time = explode(' ', $time);
+        if (count($time) > 1) {
+            return $time[1];
+        }
+        return $time[0];
     }
 }
