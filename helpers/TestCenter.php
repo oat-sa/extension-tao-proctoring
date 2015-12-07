@@ -131,6 +131,40 @@ class TestCenter extends Proctoring
     }
 
     /**
+     * Gets a list of testtaker for a particular $delivery
+     * @param string $deliveryId
+     * @return array
+     */
+    private static function getTestTakers($deliveryId)
+    {
+        static $cache = array();
+        if (!isset($cache[$deliveryId])) {
+            $testTakers = ServiceManager::getServiceManager()->get('taoProctoring/delivery')->getDeliveryTestTakers($deliveryId);
+            $map = array();
+            foreach($testTakers as $testTaker) {
+                $map[$testTaker->getIdentifier()] = $testTaker;
+            }
+            $cache[$deliveryId] = $map  ;
+        }
+        return $cache[$deliveryId];
+    }
+
+    /**
+     * Get a test taker related to a delivery
+     * @param string $userId
+     * @param string $deliveryId
+     * @return User
+     */
+    private static function getTestTaker($userId, $deliveryId)
+    {
+        $testTakers = self::getTestTakers($deliveryId);
+        if (isset($testTakers[$userId])) {
+            return $testTakers[$userId];
+        }
+        return null;
+    }
+
+    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter
@@ -139,71 +173,31 @@ class TestCenter extends Proctoring
      */
     public static function getReports($testCenter, $options = array())
     {
-        $count = 10;
+        $reports = array();
 
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
         $currentUser     = \common_session_SessionManager::getSession()->getUser();
-        $deliveries      = $deliveryService->getProctorableDeliveries($currentUser);
-
-        function getTestTakers($deliveryId, $deliveryService)
-        {
-            static $cache = array();
-            if (!isset($cache[$deliveryId])) {
-                $cache[$deliveryId] = $deliveryService->getDeliveryTestTakers($deliveryId);
-            }
-            return $cache[$deliveryId];
-        }
-
-        $status       = array('Completed', 'Terminated', 'Pending', 'Paused', 'Running');
-        $date         = array('2015-09-16 13:04', '2015-09-21 10:23', '2015-10-06 09:34', '2015-10-18 11:43', '2015-10-29 14:53');
-        $irregularity = array('', '', 'cell phone ringing', '', '', 'sickness break / restroom for 10 min', '', '');
-        $breaks       = array(0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0);
-        $results      = array();
-
-        if (!empty($deliveries)) {
-            for ($i = 0; $i < $count; $i ++) {
-                $id = $i + 1;
-
-                $delivery   = WebServiceMock::random($deliveries);
-                if (is_object($delivery)) {
-                    $testTakers = getTestTakers($delivery->getId(), $deliveryService);
-                    $break      = WebServiceMock::random($breaks);
-
-                    $results[] = array(
-                        'id' => $id,
-                        'delivery' => $delivery->getLabel(),
-                        'testtaker' => self::getUserName(WebServiceMock::random($testTakers)),
-                        'proctor' => self::getUserName($currentUser),
-                        'status' => WebServiceMock::random($status),
-                        'start' => WebServiceMock::random($date),
-                        'end' => WebServiceMock::random($date),
-                        'pause' => $break,
-                        'resume' => $break,
-                        'irregularities' => WebServiceMock::random($irregularity),
-                    );
-                }
+        $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
+        foreach($deliveries as $delivery) {
+            $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
+            foreach($deliveryExecutions as $deliveryExecution) {
+                $userId = $deliveryExecution->getUserIdentifier();
+                $user = self::getTestTaker($userId, $delivery->getUri());
+                $reports[] = array(
+                    'id' => $deliveryExecution->getIdentifier(),
+                    'delivery' => $delivery->getLabel(),
+                    'testtaker' => self::getUserName($user),
+                    'proctor' => self::getUserName($currentUser),
+                    'status' => $deliveryService->getState($deliveryExecution),
+                    'start' => date('Y-m-d H:i:s', $deliveryService->getStartTime($deliveryExecution)),
+                    'end' => date('Y-m-d H:i:s', $deliveryService->getFinishTime($deliveryExecution)),
+                    'pause' => '',
+                    'resume' => '',
+                    'irregularities' => '',
+                );
             }
         }
 
-        $start        = isset($options['periodStart']) ? new DateTime($options['periodStart']) : null;
-        $end          = isset($options['periodEnd']) ? new DateTime($options['periodEnd']) : null;
-
-        if (!is_null($start) || !is_null($end)) {
-            $returnValues = array();
-            foreach ($results as $delivery) {
-                $_start = new DateTime($delivery['start']);
-                $_end   = new DateTime($delivery['end']);
-                if (!is_null($start) && $start > $_end) {
-                    continue;
-                }
-                if (!is_null($end) && $end < $_start) {
-                    continue;
-                }
-                $returnValues[] = $delivery;
-            }
-            $results = $returnValues;
-        }
-
-        return self::paginate($results, $options);
+        return self::paginate($reports, $options);
     }
 }
