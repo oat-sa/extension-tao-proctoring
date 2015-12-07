@@ -17,8 +17,6 @@ Template::inc('form_context.tpl', 'tao');
 
 <div class="data-container-wrapper flex-container-remainder">
     
-    <?=get_data('childrenForm')?>
-
     <?=get_data('proctorForm')?>
 
     <?php if(has_data('memberForm')): ?>
@@ -28,6 +26,8 @@ Template::inc('form_context.tpl', 'tao');
     <?=get_data('deliveryForm')?>
 
     <?php endif;?>
+
+    <?=get_data('childrenForm')?>
 
 </div>
 
