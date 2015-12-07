@@ -217,6 +217,10 @@ class TestCenter extends Proctoring
                     $proctor = self::getUserName(self::getUser($state['authorized_by']));
                 }
 
+                $irregularities = '';
+                $pauses = 0;
+                $resumes = 0;
+
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
                     'delivery' => $delivery->getLabel(),
@@ -225,11 +229,31 @@ class TestCenter extends Proctoring
                     'status' => $deliveryService->getState($deliveryExecution),
                     'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
                     'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
-                    'pause' => '',
-                    'resume' => '',
-                    'irregularities' => '',
+                    'pause' => $pauses,
+                    'resume' => $resumes,
+                    'irregularities' => $irregularities,
                 );
             }
+        }
+
+        // filter the reports by dates
+        $start = isset($options['periodStart']) ? new DateTime(substr($options['periodStart'], 0, 10) . ' 00:00:00') : null;
+        $end   = isset($options['periodEnd']) ? new DateTime(substr($options['periodEnd'], 0, 10) . ' 23:59:59') : null;
+
+        if (!is_null($start) || !is_null($end)) {
+            $returnValues = array();
+            foreach ($reports as $delivery) {
+                $_start = new DateTime($delivery['start']);
+                $_end   = new DateTime($delivery['end']);
+                if (!is_null($start) && $start > $_end) {
+                    continue;
+                }
+                if (!is_null($end) && $end < $_start) {
+                    continue;
+                }
+                $returnValues[] = $delivery;
+            }
+            $reports = $returnValues;
         }
 
         return self::paginate($reports, $options);
