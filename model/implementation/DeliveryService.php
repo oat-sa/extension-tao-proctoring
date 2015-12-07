@@ -40,6 +40,8 @@ use qtism\runtime\tests\AssessmentTestSession;
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
+    const CONFIG_ID = 'taoProctoring/delivery';
+    
     /**
      * QtiSm AssessmentTestSession Storage Service
      * @var AbstractStorage
@@ -150,11 +152,16 @@ class DeliveryService extends ConfigurableService
      * @return float
      */
     public function getStartTime($deliveryExecution) {
-        $time = explode(' ', $deliveryExecution->getStartTime());
-        if (count($time) > 1) {
-            return $time[1];
-        }
-        return $time[0];
+        return $this->getDatetime($deliveryExecution->getStartTime());
+    }
+
+    /**
+     * Extract the end time of a delivery execution as a timestamp
+     * @param DeliveryExecution $deliveryExecution
+     * @return float
+     */
+    public function getFinishTime($deliveryExecution) {
+        return $this->getDatetime($deliveryExecution->getFinishTime());
     }
 
     /**
@@ -216,7 +223,7 @@ class DeliveryService extends ConfigurableService
      * @param string $state
      * @param array $reason
      */
-    private function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -237,7 +244,7 @@ class DeliveryService extends ConfigurableService
      * @param string|DeliveryExecution $executionId
      * @return array
      */
-    private function getProctoringState($executionId)
+    public function getProctoringState($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -607,7 +614,7 @@ class DeliveryService extends ConfigurableService
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      */
-    private function getTestSession(DeliveryExecution $deliveryExecution)
+    public function getTestSession(DeliveryExecution $deliveryExecution)
     {
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
@@ -717,5 +724,19 @@ class DeliveryService extends ConfigurableService
                 $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
+    }
+
+    /**
+     * Extract time from a timestamp (can be a microtime or an epoch timestamp)
+     * @param $time
+     * @return mixed
+     */
+    private function getDatetime($time)
+    {
+        $time = explode(' ', $time);
+        if (count($time) > 1) {
+            return $time[1];
+        }
+        return $time[0];
     }
 }

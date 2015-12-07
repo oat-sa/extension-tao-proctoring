@@ -48,6 +48,7 @@ class Reporting extends ProctoringModule
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
+                'categories' => $this->getAllReasonsCategories(),
             ),
             array(
             Breadcrumbs::testCenters(),

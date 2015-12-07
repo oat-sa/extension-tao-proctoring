@@ -26,13 +26,15 @@ define([
     'util/encode',
     'moment',
     'tpl!taoProctoring/templates/reporting/datepicker',
+    'tpl!taoProctoring/templates/reporting/irregularities',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
+    'taoProctoring/helper/status',
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory) {
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
@@ -58,6 +60,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var categories = $container.data('categories');
             var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('reports', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
@@ -103,6 +106,14 @@ define([
             };
             
             var today = moment().format('YYYY-MM-DD');
+
+            // renderer for date strings
+            function transformDate(date) {
+                if (date) {
+                    return moment(date).toString();
+                }
+                return '';
+            }
             
             $list
                 .on('query.datatable', function() {
@@ -139,19 +150,22 @@ define([
                         label: __('Proctor')
                     }, {
                         id: 'status',
-                        label: __('Status')
+                        label: __('Status'),
+                        transform: function(value) {
+                            var status = _status.getStatusByCode(value);
+                            if(status){
+                                return status.label;
+                            }
+                            return '';
+                        }
                     }, {
                         id: 'start',
                         label: __('Start'),
-                        transform: function(value) {
-                            return moment(value).toString();
-                        }
+                        transform: transformDate
                     }, {
                         id: 'end',
                         label: __('End'),
-                        transform: function(value) {
-                            return moment(value).toString();
-                        }
+                        transform: transformDate
                     }, {
                         id: 'pause',
                         label: __('Pause #')
@@ -160,7 +174,44 @@ define([
                         label: __('Resume #')
                     }, {
                         id: 'irregularities',
-                        label: __('Irregularities')
+                        label: __('Irregularities'),
+                        transform: function(value) {
+                            _.forEach(value, function(log) {
+                                var cat = categories[log.type];
+
+                                log[log.type] = true;
+                                log.timestamp = transformDate(log.timestamp);
+
+                                switch (log.type) {
+                                    case 'pause':
+                                        log.type = __('Pause');
+                                        break;
+
+                                    case 'resume':
+                                        log.type = __('Resume');
+                                        break;
+
+                                    case 'terminate':
+                                        log.type = __('Terminate');
+                                        break;
+
+                                    default:
+                                        log.type = __('Irregularity');
+                                        break;
+                                }
+
+                                if (cat) {
+                                    log.reason = '';
+                                    if (log.category) {
+                                        log.reason += log.category;
+                                    }
+                                    if (log.subCategory) {
+                                        log.reason += '/' + log.subCategory;
+                                    }
+                                }
+                            });
+                            return irregularitiesTpl(value);
+                        }
                     }],
                     params:{
                         periodStart : today,
@@ -191,6 +242,7 @@ define([
         
         var $periodStart = $panel.find('input[name=periodStart]');
         var $periodEnd = $panel.find('input[name=periodEnd]');
+        var $filterBtn = $panel.find('[data-control="filter"]');
         $periodStart.datepicker({
             dateFormat: 'yy-mm-dd',
             autoSize: true
@@ -205,6 +257,12 @@ define([
         }).change(function(){
             periodEnd = $periodEnd.val();
             $periodStart.datepicker('option', 'maxDate', periodEnd);
+            refresh();
+        });
+        $filterBtn.on('click', function(event) {
+            event.preventDefault();
+            periodStart = $periodStart.val();
+            periodEnd = $periodEnd.val();
             refresh();
         });
         
