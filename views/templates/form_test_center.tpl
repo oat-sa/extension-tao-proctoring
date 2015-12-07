@@ -16,13 +16,16 @@ Template::inc('form_context.tpl', 'tao');
 </div>
 
 <div class="data-container-wrapper flex-container-remainder">
+    
+    <?=get_data('childrenForm')?>
+
     <?=get_data('proctorForm')?>
 
     <?php if(has_data('memberForm')): ?>
 
     <?=get_data('memberForm')?>
 
-    <?=get_data('groupForm')?>
+    <?=get_data('deliveryForm')?>
 
     <?php endif;?>
 

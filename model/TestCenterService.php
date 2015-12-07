@@ -42,6 +42,8 @@ class TestCenterService extends tao_models_classes_ClassService
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
 
+    const PROPERTY_CHILDREN_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#children';
+    
     /**
      * return the test center top level class
      *

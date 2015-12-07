@@ -70,15 +70,21 @@ class TestCenterManager extends \tao_actions_SaSModule
             }
         }
 
+        $childrenProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_CHILDREN_URI);
+        $childrenForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $childrenProperty);
+        $childrenForm->setHiddenNodes(array($testCenter->getUri()));
+        $childrenForm->setTitle(__('Select children test centers'));
+        $this->setData('childrenForm', $childrenForm->render());
+
         $memberProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_MEMBERS_URI);
         $memberForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $memberProperty);
         $memberForm->setData('title', __('Select test-takers for the test center'));
         $this->setData('memberForm', $memberForm->render());
 
-        $groupProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_DELIVERY_URI);
-        $groupForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $groupProperty);
-        $groupForm->setData('title', __('Select deliveries available at the test center'));
-        $this->setData('groupForm', $groupForm->render());
+        $deliveryProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_DELIVERY_URI);
+        $deliveryForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $deliveryProperty);
+        $deliveryForm->setData('title', __('Select deliveries available at the test center'));
+        $this->setData('deliveryForm', $deliveryForm->render());
 
         $proctorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_PROCTORS_URI);
         $proctorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $proctorProperty);
