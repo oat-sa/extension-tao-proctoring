@@ -26,6 +26,7 @@ define([
     'util/encode',
     'moment',
     'tpl!taoProctoring/templates/reporting/datepicker',
+    'tpl!taoProctoring/templates/reporting/irregularities',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
@@ -33,7 +34,7 @@ define([
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, feedback, dialog, breadcrumbsFactory, _status) {
+], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
@@ -59,6 +60,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var categories = $container.data('categories');
             var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('reports', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
@@ -172,7 +174,44 @@ define([
                         label: __('Resume #')
                     }, {
                         id: 'irregularities',
-                        label: __('Irregularities')
+                        label: __('Irregularities'),
+                        transform: function(value) {
+                            _.forEach(value, function(log) {
+                                var cat = categories[log.type];
+
+                                log[log.type] = true;
+                                log.timestamp = transformDate(log.timestamp);
+
+                                switch (log.type) {
+                                    case 'pause':
+                                        log.type = __('Pause');
+                                        break;
+
+                                    case 'resume':
+                                        log.type = __('Resume');
+                                        break;
+
+                                    case 'terminate':
+                                        log.type = __('Terminate');
+                                        break;
+
+                                    default:
+                                        log.type = __('Irregularity');
+                                        break;
+                                }
+
+                                if (cat) {
+                                    log.reason = '';
+                                    if (log.category) {
+                                        log.reason += log.category;
+                                    }
+                                    if (log.subCategory) {
+                                        log.reason += '/' + log.subCategory;
+                                    }
+                                }
+                            });
+                            return irregularitiesTpl(value);
+                        }
                     }],
                     params:{
                         periodStart : today,

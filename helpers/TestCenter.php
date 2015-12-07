@@ -189,6 +189,12 @@ class TestCenter extends Proctoring
     private static function getDate($time)
     {
         if ($time) {
+            $parts = explode(' ', $time);
+            if (count($parts) > 1) {
+                $time = $parts[1];
+            } else {
+                $time = $parts[0];
+            }
             return date('Y-m-d H:i:s', $time);
         }
         return '';
@@ -258,7 +264,11 @@ class TestCenter extends Proctoring
 
         return self::paginate($reports, $options);
     }
-    
+
+    /**
+     * @param $deliveryExecution
+     * @return array
+     */
     protected static function getProctorActions($deliveryExecution)
     {
         $ds = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
@@ -267,7 +277,7 @@ class TestCenter extends Proctoring
         $actions = array(
             'pause' => 0,
             'resume' => 0,
-            'irregularities' => 0
+            'irregularities' => array()
         );
 
         if (!is_null($session)) {
@@ -278,16 +288,44 @@ class TestCenter extends Proctoring
                 $var = reset($arr)->variable;
                 if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
                     $actions['pause']++;
+                    $log = self::getProctorIrregularity($var);
+                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'pause');
                 } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
                     $actions['resume']++;
+                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'resume');
+                } elseif (substr($var->identifier, 0, strlen('TEST_TERMINATE')) == 'TEST_TERMINATE') {
+                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'terminate');
                 } elseif (substr($var->identifier, 0, strlen('TEST_IRREGULARITY')) == 'TEST_IRREGULARITY') {
-                    $actions['irregularities']++;
-                    // for more details:
-                    // $details = json_decode($var->trace, true)['details'];
+                    $actions['irregularities'][] = self::getProctorIrregularity($var);
                 }
                 
             }
         }
         return $actions;
+    }
+
+    /**
+     * @param $var
+     * @param string $type
+     * @return array
+     */
+    protected static function getProctorIrregularity($var, $type = 'irregularity')
+    {
+        $trace = json_decode($var->trace, true);
+        $data = array(
+            'timestamp' => self::getDate($trace['timestamp']),
+            'type' => $type
+        );
+
+        if (isset($trace['details'])) {
+            if (!empty($trace['details']['reasons'])) {
+                $data = array_merge($data, $trace['details']['reasons']);
+            }
+            if (!empty($trace['details']['comment'])) {
+                $data['comment'] = $trace['details']['comment'];
+            }
+        }
+
+        return $data;
     }
 }

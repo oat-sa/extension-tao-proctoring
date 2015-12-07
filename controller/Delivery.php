@@ -23,7 +23,6 @@ namespace oat\taoProctoring\controller;
 use oat\taoProctoring\helpers\Breadcrumbs;
 use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
-use oat\taoProctoring\helpers\ReasonCategory;
 
 /**
  * Proctoring Delivery controllers
@@ -540,19 +539,5 @@ class Delivery extends ProctoringModule
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
-    }
 
-    /**
-     * Get the list of all available categories, sorted by action names
-     *
-     * @return array
-     */
-    private function getAllReasonsCategories(){
-        return array(
-            'authorize' => array(),
-            'pause' => ReasonCategory::irregularity(),
-            'terminate' => ReasonCategory::irregularity(),
-            'report' => ReasonCategory::irregularity()
-        );
-    }
 }
