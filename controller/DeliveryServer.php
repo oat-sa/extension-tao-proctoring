@@ -22,13 +22,14 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\model\implementation\DeliveryService;
 use \common_session_SessionManager;
+use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
 
 /**
  * Override the default DeliveryServer Controller
  *
  * @package taoProctoring
  */
-class DeliveryServer extends \taoDelivery_actions_DeliveryServer
+class DeliveryServer extends DefaultDeliveryServer
 {
 
     /**
@@ -38,16 +39,6 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
     public function __construct()
     {
         parent::__construct();
-    }
-
-    /**
-     * Override the content extension data
-     * @see {@link \taoDelivery_actions_DeliveryServer}
-     */
-    public function index()
-    {
-        parent::index();
-        $this->setData('content-extension', 'taoProctoring');
     }
 
     /**

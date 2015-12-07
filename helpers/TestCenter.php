@@ -166,7 +166,7 @@ class TestCenter extends Proctoring
 
                 $delivery   = WebServiceMock::random($deliveries);
                 if (is_object($delivery)) {
-                    $testTakers = getTestTakers($delivery->getId(), $deliveryService);
+                    $testTakers = getTestTakers($delivery->getUri(), $deliveryService);
                     $break      = WebServiceMock::random($breaks);
 
                     $results[] = array(

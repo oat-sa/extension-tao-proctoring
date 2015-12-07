@@ -26,11 +26,13 @@ use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoFrontOffice\model\interfaces\DeliveryExecution as DeliveryExecutionInt;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInt;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoDelivery\model\AssignmentService;
 
 /**
  * Sample Delivery Service for proctoring
@@ -85,10 +87,10 @@ class DeliveryService extends ConfigurableService
      */
     public function getProctorableDeliveries(User $proctor, $options = array())
     {
-        $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
+        $service = DeliveryAssemblyService::singleton();
         $allDeliveries = array();
         foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+            $allDeliveries[] = new \core_kernel_classes_Resource($deliveryResource);
         }
         return $allDeliveries;
     }
@@ -110,7 +112,7 @@ class DeliveryService extends ConfigurableService
 
         $deliveries = array();
         foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            $deliveries[] = new \core_kernel_classes_Resource($delResource);
         }
         return $deliveries;
     }
@@ -270,7 +272,7 @@ class DeliveryService extends ConfigurableService
      */
     public function getDelivery($deliveryId)
     {
-        return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
+        return new \core_kernel_classes_Resource($deliveryId);
     }
 
     /**
@@ -311,8 +313,7 @@ class DeliveryService extends ConfigurableService
      */
     public function getDeliveryTestTakers($deliveryId, $options = array())
     {
-        $delivery = new \core_kernel_classes_Resource($deliveryId);
-        $userIds = \taoDelivery_models_classes_AssignmentService::singleton()->getAssignedUsers($delivery);
+        $userIds = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getAssignedUsers($deliveryId);
         $users = array();
         foreach ($userIds as $id) {
             // assume Tao Users
@@ -612,7 +613,7 @@ class DeliveryService extends ConfigurableService
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $runtime = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery);
         $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
