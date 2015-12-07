@@ -40,6 +40,8 @@ use qtism\runtime\tests\AssessmentTestSession;
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
+    const CONFIG_ID = 'taoProctoring/delivery';
+    
     /**
      * QtiSm AssessmentTestSession Storage Service
      * @var AbstractStorage
@@ -612,7 +614,7 @@ class DeliveryService extends ConfigurableService
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      */
-    private function getTestSession(DeliveryExecution $deliveryExecution)
+    public function getTestSession(DeliveryExecution $deliveryExecution)
     {
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 

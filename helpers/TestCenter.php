@@ -26,6 +26,8 @@ use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use core_kernel_users_GenerisUser;
 use DateTime;
+use oat\taoQtiTest\models\TestSessionMetaData;
+use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -216,10 +218,8 @@ class TestCenter extends Proctoring
                 if (!empty($state['authorized_by'])) {
                     $proctor = self::getUserName(self::getUser($state['authorized_by']));
                 }
-
-                $irregularities = '';
-                $pauses = 0;
-                $resumes = 0;
+                
+                $procActions = self::getProctorActions($deliveryExecution);
 
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
@@ -229,9 +229,9 @@ class TestCenter extends Proctoring
                     'status' => $deliveryService->getState($deliveryExecution),
                     'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
                     'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
-                    'pause' => $pauses,
-                    'resume' => $resumes,
-                    'irregularities' => $irregularities,
+                    'pause' => $procActions['pause'],
+                    'resume' => $procActions['resume'],
+                    'irregularities' => $procActions['irregularities'],
                 );
             }
         }
@@ -257,5 +257,37 @@ class TestCenter extends Proctoring
         }
 
         return self::paginate($reports, $options);
+    }
+    
+    protected static function getProctorActions($deliveryExecution)
+    {
+        $ds = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $session = $ds->getTestSession($deliveryExecution);
+        
+        $actions = array(
+            'pause' => 0,
+            'resume' => 0,
+            'irregularities' => 0
+        );
+
+        if (!is_null($session)) {
+            $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
+            $vars = $resultServer->getVariables($session->getSessionId());
+            
+            foreach ($vars as $arr) {
+                $var = reset($arr)->variable;
+                if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
+                    $actions['pause']++;
+                } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
+                    $actions['resume']++;
+                } elseif (substr($var->identifier, 0, strlen('TEST_IRREGULARITY')) == 'TEST_IRREGULARITY') {
+                    $actions['irregularities']++;
+                    // for more details:
+                    // $details = json_decode($var->trace, true)['details'];
+                }
+                
+            }
+        }
+        return $actions;
     }
 }
