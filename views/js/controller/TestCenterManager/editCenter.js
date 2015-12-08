@@ -26,12 +26,7 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'ui/bulkActionPopup',
-    'taoProctoring/component/breadcrumbs',
-    'taoProctoring/helper/status',
-    'tpl!taoProctoring/tpl/item-progress',
-    'tpl!taoProctoring/tpl/delivery-link',
-    'ui/datatable'
+    'generis.tree.select'
 ], function (
     $,
     _,
@@ -43,11 +38,7 @@ define([
     encode,
     feedback,
     dialog,
-    bulkActionPopup,
-    breadcrumbsFactory,
-    _status,
-    itemProgressTpl,
-    deliveryLinkTpl
+    GenerisTreeSelectClass
 ) {
     'use strict';
 
@@ -56,7 +47,28 @@ define([
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-
+    
+    /**
+     * Builds group tree inside target container
+     * @param {jQueryElement} selector
+     */
+    function buildTestTakerTree(selector, testTakers) {
+        
+        var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
+            actionId: 'treeOptions.actionId',
+            saveUrl: 'treeOptions.saveUrl',
+            saveData: {},
+            checkedNodes: _.pluck(testTakers, 'idEncoded'),
+            serverParameters: {
+                openParentNodes: _.pluck(testTakers, 'id'),
+                rootNode: 'http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject'
+            },
+            paginate: 10
+        });
+        
+        return tree;
+    }
+    
     /**
      * Controls the taoProctoring delivery page
      *
@@ -70,7 +82,8 @@ define([
             
             var $container = $(cssScope);
             var $list = $container.find('.list');
-            var dataset = $container.data('set');
+            var deliveries = $container.data('deliveries');
+            var dataset = $container.data('eligibilities');
             var testCenterId = $container.data('testcenter');
             var serviceUrl = helpers._url('getEligibilities', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
             var addUrl = helpers._url('addEligibility', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
@@ -79,7 +92,9 @@ define([
             var tools = [];
             var actions = [];
             var model = [];
-
+            
+            buildTestTakerTree('#eligible-testTaker-tree', []);
+            
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
                 if (selection && selection.length) {
