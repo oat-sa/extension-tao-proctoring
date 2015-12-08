@@ -28,6 +28,7 @@ use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use tao_helpers_Date as DateHelper;
+use oat\tao\helpers\UserHelper;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -235,12 +236,8 @@ class Delivery extends Proctoring
         $testTakers = array();
         foreach($page['data'] as $user) {
             /* @var $user User */
-            $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-            $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
-
-            if (empty($firstName) && empty($lastName)) {
-                $firstName = self::getUserStringProp($user, RDFS_LABEL);
-            }
+            $lastName = UserHelper::getUserLastName($user);
+            $firstName = UserHelper::getUserFirstName($user, empty($lastName));
 
             $status = '';
             if (isset($usersStatus[$user->getIdentifier()])) {
@@ -314,12 +311,8 @@ class Delivery extends Proctoring
         $testTakers = array();
         foreach($page['data'] as $user) {
             /* @var $user User */
-            $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-            $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
-
-            if (empty($firstName) && empty($lastName)) {
-                $firstName = self::getUserStringProp($user, RDFS_LABEL);
-            }
+            $lastName = UserHelper::getUserLastName($user);
+            $firstName = UserHelper::getUserFirstName($user, empty($lastName));
 
             $testTakers[] = array(
                 'id' => $user->getIdentifier(),
@@ -603,16 +596,9 @@ class Delivery extends Proctoring
             $user = isset($testTakers[$userId]) ? $testTakers[$userId] : null;
             if ($user) {
                 /* @var $user User */
-                $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-                $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
-
-                if (empty($firstName) && empty($lastName)) {
-                    $firstName = self::getUserStringProp($user, RDFS_LABEL);
-                }
-
                 $testTaker['id'] = $user->getIdentifier();
-                $testTaker['firstName'] = $firstName;
-                $testTaker['lastName'] = $lastName;
+                $testTaker['lastName'] = UserHelper::getUserLastName($user);
+                $testTaker['firstName'] = UserHelper::getUserFirstName($user, empty($testTaker['lastName']));
             }
 
             $executions[] = array(

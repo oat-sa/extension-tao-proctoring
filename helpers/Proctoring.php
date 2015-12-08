@@ -66,35 +66,4 @@ class Proctoring
             'data' => $data
         );
     }
-
-    /**
-     * Gets the value of a string property from a user
-     * @param User $user
-     * @param string $property
-     * @return mixed|string
-     */
-    public static function getUserStringProp($user, $property)
-    {
-        if (is_object($user)) {
-            $value = $user->getPropertyValues($property);
-            return empty($value) ? '' : current($value);
-        }
-        return '';
-    }
-
-    /**
-     * Gets the full user name
-     * @param User $user
-     * @return string
-     */
-    public static function getUserName($user)
-    {
-        $firstName = self::getUserStringProp($user, PROPERTY_USER_FIRSTNAME);
-        $lastName = self::getUserStringProp($user, PROPERTY_USER_LASTNAME);
-        if (empty($firstName) && empty($lastName)) {
-            $firstName = self::getUserStringProp($user, RDFS_LABEL);
-        }
-
-        return trim($firstName . ' ' . $lastName);
-    }
 }

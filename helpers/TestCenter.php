@@ -27,6 +27,7 @@ use core_kernel_classes_Resource;
 use core_kernel_users_GenerisUser;
 use DateTime;
 use tao_helpers_Date as DateHelper;
+use oat\tao\helpers\UserHelper;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
 
@@ -154,35 +155,6 @@ class TestCenter extends Proctoring
     }
 
     /**
-     * Get a test taker related to a delivery
-     * @param string $userId
-     * @param string $deliveryId
-     * @return User
-     */
-    private static function getTestTaker($userId, $deliveryId)
-    {
-        $testTakers = self::getTestTakers($deliveryId);
-        if (isset($testTakers[$userId])) {
-            return $testTakers[$userId];
-        }
-        return self::getUser($userId);
-    }
-
-    /**
-     * Gets a user from a URI
-     * @param string $userId
-     * @return core_kernel_users_GenerisUser
-     */
-    private static function getUser($userId)
-    {
-        static $cache = array();
-        if (!isset($cache[$userId])) {
-            $cache[$userId] = new core_kernel_users_GenerisUser(new core_kernel_classes_Resource($userId));
-        }
-        return $cache[$userId];
-    }
-
-    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter
@@ -199,12 +171,12 @@ class TestCenter extends Proctoring
             $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
             foreach($deliveryExecutions as $deliveryExecution) {
                 $userId = $deliveryExecution->getUserIdentifier();
-                $user = self::getTestTaker($userId, $delivery->getUri());
+                $user = UserHelper::getUser($userId);
 
                 $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
                 $proctor = '';
                 if (!empty($state['authorized_by'])) {
-                    $proctor = self::getUserName(self::getUser($state['authorized_by']));
+                    $proctor = UserHelper::getUserName(UserHelper::getUser($state['authorized_by']), true);
                 }
                 
                 $procActions = self::getProctorActions($deliveryExecution);
@@ -214,7 +186,7 @@ class TestCenter extends Proctoring
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
                     'delivery' => $delivery->getLabel(),
-                    'testtaker' => self::getUserName($user),
+                    'testtaker' => UserHelper::getUserName($user, true),
                     'proctor' => $proctor,
                     'status' => $deliveryService->getState($deliveryExecution),
                     'start' => $startTime ? DateHelper::displayeDate($startTime) : '',
