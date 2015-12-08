@@ -73,7 +73,7 @@ class TestCenterManager extends \tao_actions_SaSModule
         $childrenProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_CHILDREN_URI);
         $childrenForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $childrenProperty);
         $childrenForm->setHiddenNodes(array($testCenter->getUri()));
-        $childrenForm->setTitle(__('Set "children" test-centers'));
+        $childrenForm->setTitle(__('Define sub-centers'));
         $this->setData('childrenForm', $childrenForm->render());
 
         $memberProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_MEMBERS_URI);
