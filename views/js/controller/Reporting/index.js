@@ -107,14 +107,6 @@ define([
             
             var today = moment().format('YYYY-MM-DD');
 
-            // renderer for date strings
-            function transformDate(date) {
-                if (date) {
-                    return moment(date).toString();
-                }
-                return '';
-            }
-            
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -160,12 +152,10 @@ define([
                         }
                     }, {
                         id: 'start',
-                        label: __('Start'),
-                        transform: transformDate
+                        label: __('Start')
                     }, {
                         id: 'end',
-                        label: __('End'),
-                        transform: transformDate
+                        label: __('End')
                     }, {
                         id: 'pause',
                         label: __('Pause #')
@@ -180,7 +170,6 @@ define([
                                 var cat = categories[log.type];
 
                                 log[log.type] = true;
-                                log.timestamp = transformDate(log.timestamp);
 
                                 switch (log.type) {
                                     case 'pause':

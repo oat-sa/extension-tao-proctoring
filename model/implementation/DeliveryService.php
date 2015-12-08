@@ -31,6 +31,7 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use tao_helpers_Date as DateHelper;
 
 /**
  * Sample Delivery Service for proctoring
@@ -147,30 +148,12 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Extract the started time of a delivery execution as a timestamp
-     * @param DeliveryExecution $deliveryExecution
-     * @return float
-     */
-    public function getStartTime($deliveryExecution) {
-        return $this->getDatetime($deliveryExecution->getStartTime());
-    }
-
-    /**
-     * Extract the end time of a delivery execution as a timestamp
-     * @param DeliveryExecution $deliveryExecution
-     * @return float
-     */
-    public function getFinishTime($deliveryExecution) {
-        return $this->getDatetime($deliveryExecution->getFinishTime());
-    }
-
-    /**
      * @param DeliveryExecution $a
      * @param DeliveryExecution $b
      * @return int
      */
     public function cmpDeliveryExecution($a, $b) {
-        return $this->getStartTime($b) - $this->getStartTime($a);
+        return DateHelper::getTimeStamp($b->getStartTime()) - DateHelper::getTimeStamp($a->getStartTime());
     }
 
     /**
@@ -724,19 +707,5 @@ class DeliveryService extends ConfigurableService
                 $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
-    }
-
-    /**
-     * Extract time from a timestamp (can be a microtime or an epoch timestamp)
-     * @param $time
-     * @return mixed
-     */
-    private function getDatetime($time)
-    {
-        $time = explode(' ', $time);
-        if (count($time) > 1) {
-            return $time[1];
-        }
-        return $time[0];
     }
 }

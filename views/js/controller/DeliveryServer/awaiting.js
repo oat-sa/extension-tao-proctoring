@@ -23,14 +23,13 @@ define([
     'jquery',
     'i18n',
     'helpers',
-    'moment',
     'layout/loading-bar',
     'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, moment, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
     'use strict';
 
     /**

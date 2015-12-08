@@ -26,6 +26,7 @@ use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use core_kernel_users_GenerisUser;
 use DateTime;
+use tao_helpers_Date as DateHelper;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
 
@@ -182,25 +183,6 @@ class TestCenter extends Proctoring
     }
 
     /**
-     * Format a date from a timestamp if any
-     * @param int $time
-     * @return string
-     */
-    private static function getDate($time)
-    {
-        if ($time) {
-            $parts = explode(' ', $time);
-            if (count($parts) > 1) {
-                $time = $parts[1];
-            } else {
-                $time = $parts[0];
-            }
-            return date('Y-m-d H:i:s', $time);
-        }
-        return '';
-    }
-
-    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter
@@ -226,6 +208,8 @@ class TestCenter extends Proctoring
                 }
                 
                 $procActions = self::getProctorActions($deliveryExecution);
+                $startTime = $deliveryExecution->getStartTime();
+                $finishTime = $deliveryExecution->getFinishTime();
 
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
@@ -233,8 +217,8 @@ class TestCenter extends Proctoring
                     'testtaker' => self::getUserName($user),
                     'proctor' => $proctor,
                     'status' => $deliveryService->getState($deliveryExecution),
-                    'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
-                    'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
+                    'start' => $startTime ? DateHelper::displayeDate($startTime) : '',
+                    'end' => $finishTime ? DateHelper::displayeDate($finishTime) : '',
                     'pause' => $procActions['pause'],
                     'resume' => $procActions['resume'],
                     'irregularities' => $procActions['irregularities'],
@@ -313,7 +297,7 @@ class TestCenter extends Proctoring
     {
         $trace = json_decode($var->trace, true);
         $data = array(
-            'timestamp' => self::getDate($trace['timestamp']),
+            'timestamp' => DateHelper::displayeDate($trace['timestamp']),
             'type' => $type
         );
 

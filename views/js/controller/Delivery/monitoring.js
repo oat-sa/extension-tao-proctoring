@@ -23,7 +23,6 @@ define([
     'lodash',
     'i18n',
     'helpers',
-    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
@@ -39,7 +38,6 @@ define([
     _,
     __,
     helpers,
-    moment,
     loadingBar,
     encode,
     feedback,
@@ -422,10 +420,7 @@ define([
             // column: start time
             model.push({
                 id: 'date',
-                label: __('Started at'),
-                transform: function(value) {
-                    return moment(value).toString();
-                }
+                label: __('Started at')
             });
 
             // column: delivery execution status

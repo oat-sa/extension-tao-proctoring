@@ -22,11 +22,13 @@ namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
-use \core_kernel_classes_Resource;
-use \common_session_SessionManager;
+use core_kernel_classes_Resource;
+use common_session_SessionManager;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
+use tao_helpers_Date as DateHelper;
+
 /**
  * This temporary helpers is a temporary way to return data to the controller.
  * This helps isolating the mock code from the real controller one.
@@ -91,10 +93,10 @@ class Delivery extends Proctoring
             $properties = array();
 
             if (!empty($deliveryProperties[TAO_DELIVERY_START_PROP])) {
-                $properties['periodStart'] = date('Y-m-d H:i:s', $deliveryProperties[TAO_DELIVERY_START_PROP]);
+                $properties['periodStart'] = DateHelper::displayeDate($deliveryProperties[TAO_DELIVERY_START_PROP]);
             }
             if (!empty($deliveryProperties[TAO_DELIVERY_END_PROP])) {
-                $properties['periodEnd'] = date('Y-m-d H:i:s', $deliveryProperties[TAO_DELIVERY_END_PROP]);
+                $properties['periodEnd'] = DateHelper::displayeDate($deliveryProperties[TAO_DELIVERY_END_PROP]);
             }
 
             $entries[] = array(
@@ -616,7 +618,7 @@ class Delivery extends Proctoring
                     'uri' => $delivery->getUri(),
                     'label' => $delivery->getLabel(),
                 ),
-                'date' => date('Y-m-d H:i:s', $deliveryService->getStartTime($deliveryExecution)),
+                'date' => DateHelper::displayeDate($deliveryExecution->getStartTime()),
                 'testTaker' => $testTaker,
                 'state' => $state,
             );
