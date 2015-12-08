@@ -26,6 +26,7 @@ use core_kernel_classes_Resource;
 use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
 use oat\taoProctoring\helpers\Proctoring as ProctoringHelper;
+use oat\taoProctoring\helpers\ReasonCategory;
 use DateTime;
 
 /**
@@ -141,5 +142,19 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'periodEnd' => $periodEnd
         );
 
+    }
+
+    /**
+     * Get the list of all available categories, sorted by action names
+     *
+     * @return array
+     */
+    protected function getAllReasonsCategories(){
+        return array(
+            'authorize' => array(),
+            'pause' => ReasonCategory::irregularity(),
+            'terminate' => ReasonCategory::irregularity(),
+            'report' => ReasonCategory::irregularity()
+        );
     }
 }

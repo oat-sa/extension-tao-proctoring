@@ -56,6 +56,7 @@ class Reporting extends ProctoringModule
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
                 'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+                'categories' => $this->getAllReasonsCategories(),
             ),
             array(
                 Breadcrumbs::testCenters(),
@@ -160,5 +161,4 @@ class Reporting extends ProctoringModule
         $requestOptions = $this->getRequestOptions();
         $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
     }
-
 }
