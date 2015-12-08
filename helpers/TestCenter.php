@@ -164,7 +164,7 @@ class TestCenter extends Proctoring
         if (isset($testTakers[$userId])) {
             return $testTakers[$userId];
         }
-        return null;
+        return self::getUser($userId);
     }
 
     /**
