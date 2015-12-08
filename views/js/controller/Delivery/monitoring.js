@@ -30,8 +30,8 @@ define([
     'ui/bulkActionPopup',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'tpl!taoProctoring/tpl/item-progress',
-    'tpl!taoProctoring/tpl/delivery-link',
+    'tpl!taoProctoring/templates/delivery/itemProgress',
+    'tpl!taoProctoring/templates/delivery/deliveryLink',
     'ui/datatable'
 ], function (
     $,
