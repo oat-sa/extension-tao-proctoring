@@ -57,14 +57,16 @@ class EligibilityService extends tao_models_classes_ClassService
      * 
      * @param Resource $testCenter
      * @param Resource $delivery
-     * @return bool
+     * @return boolean
      */
     public function createEligibility(Resource $testCenter, Resource $delivery) {
-        // verify it doesn't exist yet
+        if (!is_null($this->getEligiblity($testCenter, $delivery))) {
+            // already exists, don't recreate
+            return false;
+        }
         $eligibilty = $this->getRootClass()->createInstanceWithProperties(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter,
-            self::PROPERTY_DELIVERY_URI => $delivery,
-            RDFS_LABEL => $delivery->getLabel()
+            self::PROPERTY_DELIVERY_URI => $delivery
         ));
         return true;
     }
@@ -76,17 +78,29 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return Resource[]
      */
     public function getEligibleDeliveries(Resource $testCenter) {
-        return array();
+        $eligibles = $this->getRootClass()->searchInstances(array(
+            self::PROPERTY_TESTCENTER_URI => $testCenter
+        ), array('recursive' => false, 'like' => false));
+        $deliveries = array();
+        foreach ($eligibles as $eligible) {
+            $deliveries[] = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
+        }
+        return $deliveries;
     }
     
     /**
      * Removes an eligibility
      * 
-     * @param Resource $eligibility
-     * @return bool
+     * @param Resource $testCenter
+     * @param Resource $delivery
+     * @throws IneligibileException
+     * @return boolean
      */
     public function removeEligibility(Resource $testCenter, Resource $delivery) {
-        
+        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        if (is_null($eligibility)) {
+            throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
+        }
         return $eligibility->delete();
     }
     
@@ -98,18 +112,30 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return string[] identifiers of the test-takers
      */
     public function getEligibleTestTakers(Resource $testCenter, Resource $delivery) {
-        //$found = $this->getRootClass()->searchInstances(array(), array());
-        return array();
+        $eligible = array();
+        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        if (!is_null($eligibility)) {
+            foreach ($eligibility->getPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI)) as $testTaker) {
+                $eligible[] = $testTaker instanceof Resource ? $testTaker->getUri() : $testTaker->literal;
+            }
+        }
+        return $eligible;
     }
     
     /**
      * Allow test-taker to be eligible for this testcenter/delivery context
      *
-     * @param Resource $eligibility
+     * @param Resource $testCenter
+     * @param Resource $delivery
      * @param string[] $testTakerIds
-     * @return bool
+     * @throws IneligibileException
+     * @return boolean
      */
     public function setEligibleTestTakers(Resource $testCenter, Resource $delivery, $testTakerIds) {
+        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        if (is_null($eligibility)) {
+            throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
+        }
         return $eligibility->editPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI). $testTakerIds);
     }
     
@@ -118,11 +144,21 @@ class EligibilityService extends tao_models_classes_ClassService
      *  
      * @param Resource $testCenter
      * @param Resource $delivery
+     * @throws \common_exception_InconsistentData
      * @return Resource eligibility resource
      */
     protected function getEligiblity(Resource $testCenter, Resource $delivery) {
-        //$found = $this->getRootClass()->searchInstances(array(), array());
-        return null;
+        $eligibles = $this->getRootClass()->searchInstances(array(
+            self::PROPERTY_TESTCENTER_URI => $testCenter,
+            self::PROPERTY_DELIVERY_URI => $delivery
+        ), array('recursive' => false, 'like' => false));
+        if (count($eligibles) == 0) {
+            return null;
+        }
+        if (count($eligibles) > 1) {
+            throw new \common_exception_InconsistentData('Multiple eligibilities for testcenter '.$testCenter->getUri().' and delivery '.$delivery->getUri());
+        }
+        return reset($eligibles);
     }
     
 }
