@@ -48,7 +48,7 @@ class Delivery extends Proctoring
      */
     public static function getDeliveries($testCenter)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         $entries = array();
@@ -133,7 +133,7 @@ class Delivery extends Proctoring
      */
     public static function getDelivery($deliveryId)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         return $deliveryService->getDelivery($deliveryId);
     }
 
@@ -159,7 +159,7 @@ class Delivery extends Proctoring
             $deliveryId = $delivery->getUri();
         }
 
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($deliveryId, $options);
 
         $page = self::paginate($deliveryExecutions, $options);
@@ -179,7 +179,7 @@ class Delivery extends Proctoring
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         if (count($deliveries)) {
@@ -220,7 +220,7 @@ class Delivery extends Proctoring
             $deliveryId = $delivery->getUri();
         }
 
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $users = $deliveryService->getDeliveryTestTakers($deliveryId, $options);
         $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($deliveryId, $options);
         $usersStatus = array();
@@ -269,7 +269,7 @@ class Delivery extends Proctoring
      * @return array
      */
     public static function getAllDeliveryTestTakers($testCenter, $options = array()){
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
 
         if (count($deliveries)) {
@@ -306,7 +306,7 @@ class Delivery extends Proctoring
     public static function getAvailableTestTakers($deliveryId, $options = array())
     {
         $currentUser = common_session_SessionManager::getSession()->getUser();
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $users = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $options);
 
         $page = self::paginate($users, $options);
@@ -345,7 +345,7 @@ class Delivery extends Proctoring
      */
     public static function assignTestTakers($testTakers, $deliveryId)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($testTakers as $testTaker) {
@@ -368,7 +368,7 @@ class Delivery extends Proctoring
      */
     public static function unassignTestTakers($testTakers, $deliveryId)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($testTakers as $testTaker) {
@@ -390,7 +390,7 @@ class Delivery extends Proctoring
      */
     public static function authoriseExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -412,7 +412,7 @@ class Delivery extends Proctoring
      */
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -434,7 +434,7 @@ class Delivery extends Proctoring
      */
     public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -456,7 +456,7 @@ class Delivery extends Proctoring
      */
     public static function reportExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -508,7 +508,7 @@ class Delivery extends Proctoring
     private static function getAllowedStates()
     {
         if (!self::$allowedStates) {
-            $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+            $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
             self::$allowedStates = array_flip($deliveryService->getAllowedStates());
         }
         return self::$allowedStates;
@@ -523,7 +523,7 @@ class Delivery extends Proctoring
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     private static function adjustDeliveryExecutions($delivery, $deliveryExecutions) {
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $testTakers = self::collectionToMap($deliveryService->getDeliveryTestTakers($delivery->getUri()));
 
         /**** to be replaced by real stuff ****/

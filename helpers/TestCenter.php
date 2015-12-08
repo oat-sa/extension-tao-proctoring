@@ -143,7 +143,7 @@ class TestCenter extends Proctoring
     {
         static $cache = array();
         if (!isset($cache[$deliveryId])) {
-            $testTakers = ServiceManager::getServiceManager()->get('taoProctoring/delivery')->getDeliveryTestTakers($deliveryId);
+            $testTakers = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID)->getDeliveryTestTakers($deliveryId);
             $map = array();
             foreach($testTakers as $testTaker) {
                 $map[$testTaker->getIdentifier()] = $testTaker;
@@ -193,7 +193,7 @@ class TestCenter extends Proctoring
     {
         $reports = array();
 
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
         foreach($deliveries as $delivery) {
             $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
