@@ -97,20 +97,4 @@ class Proctoring
 
         return trim($firstName . ' ' . $lastName);
     }
-
-    /**
-     * Builds a hash map from a collection of resources
-     * @param $collection
-     * @return array
-     */
-    public static function collectionToMap($collection) {
-        $map = array();
-        if (is_array($collection)) {
-            foreach($collection as $resource) {
-                $id = $resource->getIdentifier();
-                $map[$id] = $resource;
-            }
-        }
-        return $map;
-    }
 }

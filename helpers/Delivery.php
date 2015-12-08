@@ -524,7 +524,10 @@ class Delivery extends Proctoring
      */
     private static function adjustDeliveryExecutions($delivery, $deliveryExecutions) {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $testTakers = self::collectionToMap($deliveryService->getDeliveryTestTakers($delivery->getUri()));
+        $testTakers = array();
+        foreach($deliveryService->getDeliveryTestTakers($delivery->getUri()) as $resource) {
+            $testTakers[$resource->getIdentifier()] = $resource;
+        }
 
         /**** to be replaced by real stuff ****/
         // Seeds the random number generator with a fixed value to avoid changes on refresh
