@@ -5,6 +5,11 @@ define({
             'testCenter' : 'controller/TestCenter/testCenter'
         }
     },
+    'TestCenterManager' : {
+        'actions' : {
+            'editCenter' : 'controller/TestCenterManager/editCenter'
+        }
+    },
     'Diagnostic' : {
         'actions' : {
             'index' : 'controller/Diagnostic/index'
