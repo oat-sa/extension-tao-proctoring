@@ -57,7 +57,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * 
      * @param Resource $testCenter
      * @param Resource $delivery
-     * @return Resource Eligibility
+     * @return bool
      */
     public function createEligibility(Resource $testCenter, Resource $delivery) {
         // verify it doesn't exist yet
@@ -66,22 +66,17 @@ class EligibilityService extends tao_models_classes_ClassService
             self::PROPERTY_DELIVERY_URI => $delivery,
             RDFS_LABEL => $delivery->getLabel()
         ));
-        return $eligibility;
+        return true;
     }
     
     /**
-     * Allow test-taker to be eligible for this testcenter/delivery context
+     * Get deliveries eligible at a testcenter
      * 
-     * @param Resource $eligibility
-     * @param string[] $testTakerIds
-     * @return bool
+     * @param Resource $testCenter
+     * @return Resource[]
      */
-    public function setEligibleTestTakers(Resource $eligibility, $testTakerIds) {
-        
-//  alternativ: public function setEligibleTestTakers(Resource $testCenter, Resource $delivery, $testTakerIds) {
-            
-        
-        return $eligibility->editPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI). $testTakerIds);
+    public function getEligibleDeliveries(Resource $testCenter) {
+        return array();
     }
     
     /**
@@ -90,9 +85,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @param Resource $eligibility
      * @return bool
      */
-    public function deleteEligibility(Resource $eligibility) {
-
-//  alternativ: public function deleteEligibility(Resource $testCenter, Resource $delivery) {
+    public function removeEligibility(Resource $testCenter, Resource $delivery) {
         
         return $eligibility->delete();
     }
@@ -102,10 +95,34 @@ class EligibilityService extends tao_models_classes_ClassService
      * 
      * @param Resource $testCenter
      * @param Resource $delivery
-     * @return string[]:
+     * @return string[] identifiers of the test-takers
      */
     public function getEligibleTestTakers(Resource $testCenter, Resource $delivery) {
         //$found = $this->getRootClass()->searchInstances(array(), array());
         return array();
     }
+    
+    /**
+     * Allow test-taker to be eligible for this testcenter/delivery context
+     *
+     * @param Resource $eligibility
+     * @param string[] $testTakerIds
+     * @return bool
+     */
+    public function setEligibleTestTakers(Resource $testCenter, Resource $delivery, $testTakerIds) {
+        return $eligibility->editPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI). $testTakerIds);
+    }
+    
+    /**
+     * Returns the eligibility representing the link, or null if not found
+     *  
+     * @param Resource $testCenter
+     * @param Resource $delivery
+     * @return Resource eligibility resource
+     */
+    protected function getEligiblity(Resource $testCenter, Resource $delivery) {
+        //$found = $this->getRootClass()->searchInstances(array(), array());
+        return null;
+    }
+    
 }
