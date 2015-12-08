@@ -58,6 +58,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var printReportButton = $container.data('printreportbutton');
             var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('reports', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
@@ -119,7 +120,53 @@ define([
             }
 
             var today = moment().format('YYYY-MM-DD');
-            
+
+            var datatableTools = [
+                {
+                    id: 'download',
+                    icon: 'download',
+                    title: __('Download the selected reports to a CSV file'),
+                    label: __('Download CSV'),
+                    action: function() {
+                        notYet();
+                    },
+                }, {
+                    id : 'printRubric',
+                    title : __('Print rubric block with item tagged with tao-print tag'),
+                    icon : 'print',
+                    label : __('Print Score Report'),
+                    action : printRubric
+                }
+            ];
+            if (printReportButton) {
+                datatableTools.push({
+                    id : 'printReport',
+                        title : __('Print the assessment results'),
+                    icon : 'print',
+                    label : __('Print results'),
+                    action : printResults
+                });
+            }
+
+            var datatableActions =  {
+                printRubrick : {
+                    id : 'printRubric',
+                    title : __('Print rubric block with item tagged with tao-print tag'),
+                    icon : 'print',
+                    label : __('Print Score Report'),
+                    action : printRubric
+                }
+            };
+            if (printReportButton) {
+                datatableActions.printReport = {
+                    action : printResults,
+                        id : 'printReport',
+                        title : __('Print the assessment results'),
+                        icon : 'print',
+                        label : __('Print results')
+                }
+            }
+
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -134,46 +181,9 @@ define([
                         available: __('Available reports'),
                         loading: __('Loading')
                     },
-                    tools: [
-                        {
-                            id: 'download',
-                            icon: 'download',
-                            title: __('Download the selected reports to a CSV file'),
-                            label: __('Download CSV'),
-                            action: function() {
-                                notYet();
-                            },
-                        }, {
-                            id : 'printReport',
-                            title : __('Print the assessment results'),
-                            icon : 'print',
-                            label : __('Print results'),
-                            action : printResults
-                        }, {
-                            id : 'printRubric',
-                            title : __('Print rubric block with item tagged with tao-print tag'),
-                            icon : 'print',
-                            label : __('Print Score Report'),
-                            action : printRubric
-                        }
-                    ],
+                    tools: datatableTools,
                     selectable: true,
-                    'actions' : {
-                        'printReport' : {
-                            action : printResults,
-                            id : 'printReport',
-                            title : __('Print the assessment results'),
-                            icon : 'print',
-                            label : __('Print results')
-                        },
-                        printRubrick : {
-                            id : 'printRubric',
-                            title : __('Print rubric block with item tagged with tao-print tag'),
-                            icon : 'print',
-                            label : __('Print Score Report'),
-                            action : printRubric
-                        }
-                    },
+                    'actions' : datatableActions,
                     model: [{
                         id: 'delivery',
                         label: __('Test')

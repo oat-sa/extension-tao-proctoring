@@ -38,6 +38,7 @@ class AssessmentResultsService extends ConfigurableService
     const CONFIG_ID = 'taoProctoring/AssessmentResults';
 
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
+    const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
 
     /**
      * Get test taker data as associative array

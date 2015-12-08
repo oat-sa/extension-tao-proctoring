@@ -46,23 +46,30 @@ class Reporting extends ProctoringModule
         $requestOptions = $this->getRequestOptions();
 
         $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
         $this->composeView(
             'reporting-index',
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
+                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
             ),
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-            Breadcrumbs::reporting(
-                $testCenter,
-                array(
-                    Breadcrumbs::diagnostics($testCenter),
-                    Breadcrumbs::deliveries($testCenter),
+                Breadcrumbs::testCenters(),
+                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+
+                Breadcrumbs::reporting(
+                    $testCenter,
+                    array(
+                        Breadcrumbs::diagnostics($testCenter),
+                        Breadcrumbs::deliveries($testCenter),
+                    )
                 )
             )
-        ));
+        );
     }
 
     /**

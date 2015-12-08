@@ -28,28 +28,12 @@ $rubrics = get_data("rubrics");
                 <?php endif; ?>
                 <header>
                     <h1>
-                        <?= $rubric['testData']['Label'] ?> <?=__('results')?>
+                        <?= $rubric['testData']['Label'] ?>
                     </h1>
                     <h2>
                         <?= DateHelper::displayeDate($rubric['deliveryData']['start'], DateHelper::FORMAT_LONG); ?> - <?= DateHelper::displayeDate($rubric['deliveryData']['end'], DateHelper::FORMAT_LONG); ?>
                     </h2>
                 </header>
-                <hr>
-                <div>
-                    <p class="title">
-                        <?=__('Test taker')?>
-                    </p>
-                    <div class="avoid-page-break table-container clearfix">
-                        <table>
-                            <?php foreach($rubric['testTakerData'] as $key => $val): ?>
-                            <tr>
-                                <td><?= $key ?></td>
-                                <td><?= $val ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </table>
-                    </div>
-                </div>
                 <hr>
                 <div>
                     <p class="title">

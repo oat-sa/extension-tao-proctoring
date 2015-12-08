@@ -104,7 +104,8 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
                 $service = new AssessmentResultsService([
-                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'tao-print',
+                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
+                    AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
                 ]);
                 $service->setServiceManager($this->getServiceManager());
 
