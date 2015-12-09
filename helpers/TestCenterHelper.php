@@ -37,7 +37,7 @@ use oat\taoProctoring\model\implementation\DeliveryService;
  * This helps isolating the mock code from the real controller one.
  * It will be replaced by a real service afterward.
  */
-class TestCenter extends Proctoring
+class TestCenterHelper
 {
     /**
      * Gets a list of available test sites
@@ -95,9 +95,9 @@ class TestCenter extends Proctoring
     public static function getTestCenterActions(core_kernel_classes_Resource $testCenter)
     {
 
-        $actionDiagnostics = Breadcrumbs::diagnostics($testCenter);
-        $actionDeliveries = Breadcrumbs::deliveries($testCenter);
-        $actionReporting = Breadcrumbs::reporting($testCenter);
+        $actionDiagnostics = BreadcrumbsHelper::diagnostics($testCenter);
+        $actionDeliveries = BreadcrumbsHelper::deliveries($testCenter);
+        $actionReporting = BreadcrumbsHelper::reporting($testCenter);
 
         $actions = array(
             array(
@@ -133,7 +133,7 @@ class TestCenter extends Proctoring
     public static function getDiagnostics($testCenterId, $options = array())
     {
         $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-        return self::paginate($diagnostics, $options);
+        return DataTableHelper::paginate($diagnostics, $options);
     }
 
     /**
@@ -198,7 +198,7 @@ class TestCenter extends Proctoring
             }
         }
 
-        return self::paginate($reports, $options, function($deliveryExecutions) use ($deliveryService) {
+        return DataTableHelper::paginate($reports, $options, function($deliveryExecutions) use ($deliveryService) {
             $reports = [];
             
             foreach($deliveryExecutions as $deliveryExecution) {

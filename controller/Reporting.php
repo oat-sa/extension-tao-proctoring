@@ -20,8 +20,8 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -51,16 +51,17 @@ class Reporting extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories(),
             ),
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-            Breadcrumbs::reporting(
-                $testCenter,
-                array(
-                    Breadcrumbs::diagnostics($testCenter),
-                    Breadcrumbs::deliveries($testCenter),
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::reporting(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::deliveries($testCenter),
+                    )
                 )
             )
-        ));
+        );
     }
 
     /**

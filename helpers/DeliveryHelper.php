@@ -35,7 +35,7 @@ use oat\tao\helpers\UserHelper;
  * This helps isolating the mock code from the real controller one.
  * It will be replaced by a real service afterward.
  */
-class Delivery extends Proctoring
+class DeliveryHelper
 {
     /**
      * Gets a list of available deliveries for a test site
@@ -163,7 +163,7 @@ class Delivery extends Proctoring
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($deliveryId, $options);
 
-        $page = self::paginate($deliveryExecutions, $options);
+        $page = DataTableHelper::paginate($deliveryExecutions, $options);
         $page['data'] = self::adjustDeliveryExecutions($delivery, $page['data']);
 
         return $page;
@@ -190,11 +190,11 @@ class Delivery extends Proctoring
                 $all = array_merge($all, self::adjustDeliveryExecutions($delivery, $deliveryExecutions));
             }
 
-            usort($all, array('\\oat\\taoProctoring\\helpers\\Delivery', 'sortExecutionsByState'));
+            usort($all, array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'sortExecutionsByState'));
 
-            return self::paginate($all, $options);
+            return DataTableHelper::paginate($all, $options);
         } else {
-            return self::paginate(array(), $options);
+            return DataTableHelper::paginate(array(), $options);
         }
     }
 
@@ -231,7 +231,7 @@ class Delivery extends Proctoring
             $usersStatus[$userId][] = $status;
         }
 
-        $page = self::paginate($users, $options);
+        $page = DataTableHelper::paginate($users, $options);
 
         $testTakers = array();
         foreach($page['data'] as $user) {
@@ -284,9 +284,9 @@ class Delivery extends Proctoring
                 }
             }
 
-            return self::paginate($all, $options);
+            return DataTableHelper::paginate($all, $options);
         } else {
-            return self::paginate(array(), $options);
+            return DataTableHelper::paginate(array(), $options);
         }
     }
 
@@ -306,7 +306,7 @@ class Delivery extends Proctoring
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $users = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $options);
 
-        $page = self::paginate($users, $options);
+        $page = DataTableHelper::paginate($users, $options);
 
         $testTakers = array();
         foreach($page['data'] as $user) {
@@ -471,7 +471,7 @@ class Delivery extends Proctoring
      */
     public static function sortExecutionsByState($a, $b)
     {
-        $allowedStates = Delivery::getAllowedStates();
+        $allowedStates = DeliveryHelper::getAllowedStates();
         $aState = isset($allowedStates[$a['state']['status']]) ? $allowedStates[$a['state']['status']] : 0;
         $bState = isset($allowedStates[$b['state']['status']]) ? $allowedStates[$b['state']['status']] : 0;
         $result = $aState - $bState;
