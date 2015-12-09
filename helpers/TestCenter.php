@@ -21,6 +21,7 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
@@ -163,13 +164,48 @@ class TestCenter extends Proctoring
      */
     public static function getReports($testCenter, $options = array())
     {
+        $periodStart = null;
+        $periodEnd = null;
         $reports = array();
+        
+        if (isset($options['periodStart'])) {
+            $periodStart = new DateTime($options['periodStart']);
+            $periodStart->setTime(0, 0, 0);
+            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
+        }
+        if (isset($options['periodEnd'])) {
+            $periodEnd = new DateTime($options['periodEnd']);
+            $periodEnd->setTime(23, 59, 59);
+            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+        }        
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
         foreach($deliveries as $delivery) {
             $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
             foreach($deliveryExecutions as $deliveryExecution) {
+                $startTime = $deliveryExecution->getStartTime();
+                $finishTime = $deliveryExecution->getFinishTime();
+                
+                if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
+                    continue;
+                }
+                if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
+                    continue;
+                }
+                
+                $reports[] = $deliveryExecution;
+            }
+        }
+
+        return self::paginate($reports, $options, function($deliveryExecutions) use ($deliveryService) {
+            $reports = [];
+            
+            foreach($deliveryExecutions as $deliveryExecution) {
+                /* @var $deliveryExecution DeliveryExecution */
+                $startTime = $deliveryExecution->getStartTime();
+                $finishTime = $deliveryExecution->getFinishTime();
+
                 $userId = $deliveryExecution->getUserIdentifier();
                 $user = UserHelper::getUser($userId);
 
@@ -178,14 +214,11 @@ class TestCenter extends Proctoring
                 if (!empty($state['authorized_by'])) {
                     $proctor = UserHelper::getUserName(UserHelper::getUser($state['authorized_by']), true);
                 }
-                
-                $procActions = self::getProctorActions($deliveryExecution);
-                $startTime = $deliveryExecution->getStartTime();
-                $finishTime = $deliveryExecution->getFinishTime();
 
+                $procActions = self::getProctorActions($deliveryExecution);
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
-                    'delivery' => $delivery->getLabel(),
+                    'delivery' => $deliveryExecution->getDelivery()->getLabel(),
                     'testtaker' => UserHelper::getUserName($user, true),
                     'proctor' => $proctor,
                     'status' => $deliveryService->getState($deliveryExecution),
@@ -196,29 +229,9 @@ class TestCenter extends Proctoring
                     'irregularities' => $procActions['irregularities'],
                 );
             }
-        }
-
-        // filter the reports by dates
-        $start = isset($options['periodStart']) ? new DateTime(substr($options['periodStart'], 0, 10) . ' 00:00:00') : null;
-        $end   = isset($options['periodEnd']) ? new DateTime(substr($options['periodEnd'], 0, 10) . ' 23:59:59') : null;
-
-        if (!is_null($start) || !is_null($end)) {
-            $returnValues = array();
-            foreach ($reports as $delivery) {
-                $_start = new DateTime($delivery['start']);
-                $_end   = new DateTime($delivery['end']);
-                if (!is_null($start) && $start > $_end) {
-                    continue;
-                }
-                if (!is_null($end) && $end < $_start) {
-                    continue;
-                }
-                $returnValues[] = $delivery;
-            }
-            $reports = $returnValues;
-        }
-
-        return self::paginate($reports, $options);
+            
+            return $reports;
+        });
     }
 
     /**

@@ -43,9 +43,10 @@ class Proctoring
      * Paginates a list of items to render a data subset in a table
      * @param array $data
      * @param array $options
+     * @param function $dataRenderer
      * @return array
      */
-    public static function paginate($data, $options)
+    public static function paginate($data, $options, $dataRenderer = null)
     {
         $amount = count($data);
         $rows = max(1, abs(ceil(isset($options['rows']) ? $options['rows'] : self::DEFAULT_ROWS)));
@@ -55,6 +56,10 @@ class Proctoring
         $list = array();
 
         $data = array_slice($data, ($page - 1) * $rows, $rows);
+
+        if ($dataRenderer) {
+            $data = $dataRenderer($data);
+        }
 
         return array(
             'offset' => $start,
