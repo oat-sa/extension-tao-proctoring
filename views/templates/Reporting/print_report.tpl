@@ -24,9 +24,11 @@ $reports = get_data("reports");
         <div class="assessment_results">
             <?php foreach($reports as $report): ?>
                 <header>
+                    <?php if (isset($report['testData']['Label']) && !empty($report['testData']['Label'])): ?>
                     <h1>
                         <?= $report['testData']['Label'] ?> <?=__('results')?>
                     </h1>
+                    <?php endif; ?>
                     <h2>
                         <?= DateHelper::displayeDate($report['deliveryData']['start'], DateHelper::FORMAT_LONG); ?> - <?= DateHelper::displayeDate($report['deliveryData']['end'], DateHelper::FORMAT_LONG); ?>
                     </h2>
@@ -54,10 +56,12 @@ $reports = get_data("reports");
                     </p>
                     <div class="avoid-page-break table-container clearfix">
                         <table>
+                            <?php if (isset($report['testData']['Label']) && !empty($report['testData']['Label'])): ?>
                             <tr>
                                 <td><?= __('Label') ?></td>
                                 <td><?= $report['testData']['Label'] ?></td>
                             </tr>
+                            <?php endif; ?>
                             <tr>
                                 <td><?= __('Outcome') ?></td>
                                 <td><?= $report['testData']['LtiOutcome'] ?></td>
@@ -107,6 +111,7 @@ $reports = get_data("reports");
         </div>
         <script>
             window.print();
+            setTimeout(window.close, 500);
         </script>
     </body>
 </html>

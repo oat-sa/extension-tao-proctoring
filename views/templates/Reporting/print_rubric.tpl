@@ -27,9 +27,11 @@ $rubrics = get_data("rubrics");
                     <div class="end-page"></div>
                 <?php endif; ?>
                 <header>
+                    <?php if (isset($rubric['testData']['Label']) && !empty($rubric['testData']['Label'])): ?>
                     <h1>
                         <?= $rubric['testData']['Label'] ?>
                     </h1>
+                    <?php endif; ?>
                     <h2>
                         <?= DateHelper::displayeDate($rubric['deliveryData']['start'], DateHelper::FORMAT_LONG); ?> - <?= DateHelper::displayeDate($rubric['deliveryData']['end'], DateHelper::FORMAT_LONG); ?>
                     </h2>
@@ -49,6 +51,7 @@ $rubrics = get_data("rubrics");
         </div>
         <script>
             window.print();
+            setTimeout(window.close, 500);
         </script>
     </body>
 </html>

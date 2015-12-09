@@ -108,15 +108,15 @@ define([
              * @param string|array rowId
              */
             var printResults = function printReport(rowId) {
-                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}));
+                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printReport' + JSON.stringify(rowId));
             }
 
             /**
              * Print rubric blocks with item tagged with tao-print tag
              * @param string|array rowId
              */
-            var printRubric = function printReport(rowId) {
-                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : rowId}));
+            var printRubric = function printRubric(rowId) {
+                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printRubric' + JSON.stringify(rowId));
             }
 
             var today = moment().format('YYYY-MM-DD');
@@ -135,6 +135,7 @@ define([
                     title : __('Print rubric block with item tagged with tao-print tag'),
                     icon : 'print',
                     label : __('Print Score Report'),
+                    massAction: true,
                     action : printRubric
                 }
             ];
@@ -144,6 +145,7 @@ define([
                         title : __('Print the assessment results'),
                     icon : 'print',
                     label : __('Print results'),
+                    massAction: true,
                     action : printResults
                 });
             }
@@ -159,12 +161,12 @@ define([
             };
             if (printReportButton) {
                 datatableActions.printReport = {
-                    action : printResults,
-                        id : 'printReport',
-                        title : __('Print the assessment results'),
-                        icon : 'print',
-                        label : __('Print results')
-                }
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'print',
+                    label : __('Print results'),
+                    action : printResults
+                };
             }
 
             $list
