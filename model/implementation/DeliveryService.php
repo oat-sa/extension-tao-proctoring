@@ -31,6 +31,7 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoProctoring\model\TestCenterService;
 
 /**
  * Sample Delivery Service for proctoring
@@ -82,17 +83,19 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
-     * @param array $options
      * @return array
      */
-    public function getProctorableDeliveries(User $proctor, $options = array())
+    public function getProctorableDeliveries(User $proctor)
     {
-        $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
-        $allDeliveries = array();
-        foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+        $testCenterService = TestCenterService::singleton();
+        $testCenters = $testCenterService->getTestCentersByProctor($proctor);
+
+        $deliveries = [];
+        foreach ($testCenters as $testCenter) {
+            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
         }
-        return $allDeliveries;
+
+        return $deliveries;
     }
 
     /**
@@ -607,6 +610,27 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return array
+     * Exapmple:
+     * <pre>
+     * array(
+     *   'QtiTestCompilation' => 'http://sample/first.rdf#i14369768868163155-|http://sample/first.rdf#i1436976886612156+',
+     *   'QtiTestDefinition' => 'http://sample/first.rdf#i14369752345581135'
+     * )
+     * </pre>
+     */
+    public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
+    {
+        $compiledDelivery = $deliveryExecution->getDelivery();
+        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+
+        return $inputParameters;
+    }
+
+    /**
      * Gets the test session for a particular deliveryExecution
      *
      * @param DeliveryExecution $deliveryExecution
@@ -619,8 +643,7 @@ class DeliveryService extends ConfigurableService
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
-        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+        $inputParameters = $this->getRuntimeInputParameters($deliveryExecution);
 
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
         $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
