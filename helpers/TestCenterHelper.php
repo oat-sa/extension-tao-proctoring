@@ -137,25 +137,6 @@ class TestCenterHelper
     }
 
     /**
-     * Gets a list of testtaker for a particular $delivery
-     * @param string $deliveryId
-     * @return array
-     */
-    private static function getTestTakers($deliveryId)
-    {
-        static $cache = array();
-        if (!isset($cache[$deliveryId])) {
-            $testTakers = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID)->getDeliveryTestTakers($deliveryId);
-            $map = array();
-            foreach($testTakers as $testTaker) {
-                $map[$testTaker->getIdentifier()] = $testTaker;
-            }
-            $cache[$deliveryId] = $map;
-        }
-        return $cache[$deliveryId];
-    }
-
-    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter
@@ -166,7 +147,6 @@ class TestCenterHelper
     {
         $periodStart = null;
         $periodEnd = null;
-        $reports = array();
         
         if (isset($options['periodStart'])) {
             $periodStart = new DateTime($options['periodStart']);
@@ -181,24 +161,27 @@ class TestCenterHelper
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
+        $filteredExecutions = array();
         foreach($deliveries as $delivery) {
-            $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
-            foreach($deliveryExecutions as $deliveryExecution) {
-                $startTime = $deliveryExecution->getStartTime();
-                $finishTime = $deliveryExecution->getFinishTime();
-                
-                if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
-                    continue;
+            if ($delivery->exists()) {
+                $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
+                foreach ($deliveryExecutions as $deliveryExecution) {
+                    $startTime = $deliveryExecution->getStartTime();
+                    $finishTime = $deliveryExecution->getFinishTime();
+
+                    if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
+                        continue;
+                    }
+                    if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
+                        continue;
+                    }
+
+                    $filteredExecutions[] = $deliveryExecution;
                 }
-                if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
-                    continue;
-                }
-                
-                $reports[] = $deliveryExecution;
             }
         }
 
-        return DataTableHelper::paginate($reports, $options, function($deliveryExecutions) use ($deliveryService) {
+        return DataTableHelper::paginate($filteredExecutions, $options, function($deliveryExecutions) use ($deliveryService) {
             $reports = [];
             
             foreach($deliveryExecutions as $deliveryExecution) {
