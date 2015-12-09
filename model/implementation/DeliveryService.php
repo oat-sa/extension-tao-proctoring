@@ -91,7 +91,10 @@ class DeliveryService extends ConfigurableService
         $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
         $allDeliveries = array();
         foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+            $delivery = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+            if ($delivery->exists()) {
+                $allDeliveries[] = $delivery;
+            }
         }
         return $allDeliveries;
     }
@@ -113,7 +116,10 @@ class DeliveryService extends ConfigurableService
 
         $deliveries = array();
         foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            $delivery = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            if ($delivery->exists()) {
+                $deliveries[] = $delivery;
+            }
         }
         return $deliveries;
     }
