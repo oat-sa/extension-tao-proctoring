@@ -257,7 +257,6 @@ class TestCenterHelper
                 $var = reset($arr)->variable;
                 if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
                     $actions['pause']++;
-                    $log = self::getProctorIrregularity($var);
                     $actions['irregularities'][] = self::getProctorIrregularity($var, 'pause');
                 } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
                     $actions['resume']++;
