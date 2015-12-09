@@ -214,31 +214,33 @@ class TestCenter extends Proctoring
         $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
         foreach($deliveries as $delivery) {
-            $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
-            foreach($deliveryExecutions as $deliveryExecution) {
-                $userId = $deliveryExecution->getUserIdentifier();
-                $user = self::getTestTaker($userId, $delivery->getUri());
-
-                $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
-                $proctor = '';
-                if (!empty($state['authorized_by'])) {
-                    $proctor = self::getUserName(self::getUser($state['authorized_by']));
+            if ($delivery->exists()) {
+                $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
+                foreach($deliveryExecutions as $deliveryExecution) {
+                    $userId = $deliveryExecution->getUserIdentifier();
+                    $user = self::getTestTaker($userId, $delivery->getUri());
+    
+                    $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
+                    $proctor = '';
+                    if (!empty($state['authorized_by'])) {
+                        $proctor = self::getUserName(self::getUser($state['authorized_by']));
+                    }
+                    
+                    $procActions = self::getProctorActions($deliveryExecution);
+    
+                    $reports[] = array(
+                        'id' => $deliveryExecution->getIdentifier(),
+                        'delivery' => $delivery->getLabel(),
+                        'testtaker' => self::getUserName($user),
+                        'proctor' => $proctor,
+                        'status' => $deliveryService->getState($deliveryExecution),
+                        'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
+                        'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
+                        'pause' => $procActions['pause'],
+                        'resume' => $procActions['resume'],
+                        'irregularities' => $procActions['irregularities'],
+                    );
                 }
-                
-                $procActions = self::getProctorActions($deliveryExecution);
-
-                $reports[] = array(
-                    'id' => $deliveryExecution->getIdentifier(),
-                    'delivery' => $delivery->getLabel(),
-                    'testtaker' => self::getUserName($user),
-                    'proctor' => $proctor,
-                    'status' => $deliveryService->getState($deliveryExecution),
-                    'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
-                    'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
-                    'pause' => $procActions['pause'],
-                    'resume' => $procActions['resume'],
-                    'irregularities' => $procActions['irregularities'],
-                );
             }
         }
 
