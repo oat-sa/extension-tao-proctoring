@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\model\EligibilityService;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -91,6 +92,28 @@ class TestCenterManager extends \tao_actions_SaSModule
         $proctorForm->setData('title', __('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
 
+        $eligibilityService = EligibilityService::singleton();
+        $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
+        $eligibilitiesFormated = array_map(function($delivery) use ($eligibilityService, $testCenter){
+            return array(
+                'delivery' => $delivery->getUri(),
+                'testTakers' => $eligibilityService->getEligibleTestTakers($testCenter, $delivery)
+            );
+        }, $eligibilities);
+
+        $deliveryClass = new \core_kernel_classes_Class(TAO_DELIVERY_CLASS);
+        $deliveries = $deliveryClass->getInstances(true);
+        $deliveriesFormated = array_map(function($delivery){
+            return array(
+                'uri' => $delivery->getUri(),
+                'label' => $delivery->getLabel()
+            );
+        }, array_values($deliveries));
+
+        
+
+        $this->setData('eligibilities', json_encode($eligibilitiesFormated));
+        $this->setData('deliveries', json_encode($deliveriesFormated));
         $this->setData('formTitle', __('Edit test center'));
         $this->setData('testCenter', $testCenter->getUri());
         $this->setData('myForm', $myForm->render());

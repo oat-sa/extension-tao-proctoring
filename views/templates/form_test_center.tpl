@@ -17,25 +17,17 @@ Template::inc('form_context.tpl', 'tao');
 </div>
 
 <div class="data-container-wrapper flex-container-remainder">
-<!--
+
     <?=get_data('proctorForm')?>
 
     <?=get_data('childrenForm')?>
--->
-    <div class="eligible-deliveries" data-testcenter="<?=get_data('testCenter')?>">
+
+    <div class="eligible-deliveries"
+         data-testcenter="<?=get_data('testCenter')?>"
+         data-deliveries="<?=_dh(get_data('deliveries'))?>"
+         data-eligibilities="<?=_dh(get_data('eligibilities'))?>">
         <div class="list"></div>
-        <div class="modal-form">
-            <section id="eligible-testTaker-tree-container">
-                <header>
-                    <h1><?=__('Eligible test takers')?></h1>
-                </header>
-                <div>
-                    <div id="eligible-testTaker-tree"></div>
-                </div>
-                <footer>
-                </footer>
-            </section>
-        </div>
+        <div class="eligibility-editor-container"></div>
     </div>
     
 </div>
