@@ -43,7 +43,11 @@ define([
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-
+    
+    function formatEligibilities(eligibilities){
+        return eligibilities;
+    }
+            
     /**
      * Controls the taoProctoring delivery page
      *
@@ -108,9 +112,8 @@ define([
                 title : __('Add'),
                 label : __('Add'),
                 action : function(){
-
-                    //open modal to select test taker
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, eligibilities, deliveries);
+                    //open modal to select delivery + test takers
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries);
                     eligEditor.on('ok', function(eligibility){
                         request(addUrl, eligibility, __('New eligible delivery added'));
                     });
@@ -122,10 +125,11 @@ define([
                 icon : 'edit',
                 title : __('Edit eligibile test takers'),
                 action : function(selection){
-                    console.log('do remove');
-
-                    //then refresh
-                    $list.datatable('refresh');
+                    //open modal to select test takers
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries, selection);
+                    eligEditor.on('ok', function(eligibility){
+                        request(editUrl, eligibility, __('Eligible test takers updated'));
+                    });
                 }
             });
 
@@ -134,10 +138,8 @@ define([
                 icon : 'trash',
                 title : __('Remove eligibility'),
                 action : function(selection){
-                    console.log('do remove');
-
-                    //then refresh
-                    $list.datatable('refresh');
+                    //open modal to select test takers
+                    request(removeUrl, {delivery : selection}, __('Eligible delivery removed'));
                 }
             });
 
