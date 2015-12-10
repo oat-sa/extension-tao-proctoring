@@ -36,6 +36,17 @@
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
   </rdf:Description>
   
+  <!-- A user can be a manager of a test center -->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administrator">
+  	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Administrator]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[the administrator of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#User"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  
   <!-- A user can administer a test center-->
   <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor">
   	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>

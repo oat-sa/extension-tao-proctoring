@@ -78,15 +78,10 @@ class TestCenterManager extends \tao_actions_SaSModule
         $childrenForm->setTitle(__('Define sub-centers'));
         $this->setData('childrenForm', $childrenForm->render());
 
-        $memberProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_MEMBERS_URI);
-        $memberForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $memberProperty);
-        $memberForm->setData('title', __('Assign test-takers'));
-        $this->setData('memberForm', $memberForm->render());
-
-        $deliveryProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_DELIVERY_URI);
-        $deliveryForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $deliveryProperty);
-        $deliveryForm->setData('title', __('Assign available deliveries'));
-        $this->setData('deliveryForm', $deliveryForm->render());
+        $administratorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_ADMINISTRATOR_URI);
+        $administratorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $administratorProperty);
+        $administratorForm->setData('title', __('Assign administrator'));
+        $this->setData('administratorForm', $administratorForm->render());
 
         $proctorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_PROCTORS_URI);
         $proctorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $proctorProperty);
