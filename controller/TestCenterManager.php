@@ -119,4 +119,26 @@ class TestCenterManager extends \tao_actions_SaSModule
         $this->setData('myForm', $myForm->render());
         $this->setView('form_test_center.tpl');
     }
+    
+    public function allowDelivery()
+    {
+        $delivery = new \core_kernel_classes_Resource('https://tao31.bout/my_tao31.rdf#i1449654679931281');
+        $testCenter = new \core_kernel_classes_Resource($this->getRequestParameter('testCenter'));
+        $success = EligibilityService::singleton()->createEligibility($testCenter, $delivery);
+        $this->returnJson(array('success' => $success));
+    }
+    
+    public function getEligibilities()
+    {
+        $testCenter = new \core_kernel_classes_Resource($this->getRequestParameter('testCenter'));
+        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
+        
+        $deliveryData = array();
+        foreach ($deliveries as $delivery) {
+            $deliveryData[$delivery->getUri()] = $delivery->getLabel(); 
+        }
+        return $this->returnJson(array(
+            'delivieries' => $deliveryData
+        ));
+    }   
 }
