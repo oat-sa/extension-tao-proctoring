@@ -158,9 +158,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     
     public function getEligibilities()
     {
-        return $this->returnJson(array(
-            'delivieries' => $this->_getEligibilities()
-        ));
+        return $this->returnJson($this->_getEligibilities());
     }   
 
     public function addEligibility()
