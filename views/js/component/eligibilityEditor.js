@@ -28,9 +28,9 @@ define([
     'select2',
     'ui/modal'
 ], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl, deliverySelectorTpl){
-    
+
     var _ns = '.eligibility-editor';
-    
+
     /**
      * Builds group tree inside target container
      * 
@@ -60,7 +60,7 @@ define([
 
         return tree;
     }
-    
+
     /**
      * Build the delivery selector combobox
      * 
@@ -115,7 +115,7 @@ define([
 
         modalConfig = _.defaults(modalConfig || {}, _modalDefaults);
 
-        instance.$container
+        instance.$container.children('.eligibility-editor')
             .addClass('modal')
             .on('closed.modal', function(){
                 //one shot only, on close, destroy the widget
@@ -123,18 +123,18 @@ define([
             })
             .modal(modalConfig)
             .on('click' + _ns, '.actions .done', function(e){
-                
+
                 instance.trigger('ok', instance.eligibility);
                 destroy(instance);
-                
+
             }).on('click' + _ns, '.actions .cancel', function(e){
-                
-                e.preventDefault();
-                instance.trigger('cancel');
-                destroy(instance);
-            });
+
+            e.preventDefault();
+            instance.trigger('cancel');
+            destroy(instance);
+        });
     }
-    
+
     /**
      * Destroy the eligibility editor
      * 
@@ -142,14 +142,9 @@ define([
      * @returns {undefined}
      */
     function destroy(instance){
-        
-        instance.$container
-            .empty()
-            .off(_ns)
-            .removeClass('modal')
-            .modal('destroy');
+        instance.$container.children('.eligibility-editor').remove();
     }
-    
+
     /**
      * Create an eligibility editor into a $container
      * 
@@ -170,11 +165,11 @@ define([
         var treeId = _.uniqueId('eligible-testTaker-tree-');//generating the generis tree id, because it requires one to work
         var $deliverySelector;
         var creationMode = true;
-        
+
         if(!_.isArray(eligibilities) || !_.isArray(deliveries)){
             throw 'the egibility editor requires an array of eligibilities and an array of deliveries';
         }
-        
+
         if(delivery && delivery.uri && delivery.label){
             var eligibility = _.find(eligibilities, {delivery : delivery.uri});
             if(eligibility){
@@ -184,7 +179,7 @@ define([
                 throw ('given delivery does not exist in the list of eligibilities');
             }
         }
-        
+
         instance.$container = $container;
         $container.append(layoutTpl({
             title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
