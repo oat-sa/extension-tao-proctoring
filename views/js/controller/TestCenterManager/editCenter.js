@@ -43,11 +43,53 @@ define([
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-    
-    function formatEligibilities(eligibilities){
-        return eligibilities;
+
+    function formatEligibilities(dataset){
+        if(dataset.data && _.isArray(dataset.data)){
+            return _.map(dataset.data, function(eligibility){
+                return {
+                    delivery : eligibility.id,
+                    testTakers : _.pluck(eligibility.testTakers, 'encodedUri')
+                };
+            });
+        }
+        return [];
     }
-            
+
+    //test mock
+    var _eligibilities = {
+        page : 1,
+        total : 1,
+        data : [
+            {
+                id : 'http://tao.local/mytao.rdf#i1449752331825885',
+                "testTakers" : [
+                    {
+                        uri : 'ttA',
+                        label : 'testTakerA'
+                    },
+                    {
+                        uri : 'ttB',
+                        label : 'testTakerB'
+                    },
+                    {
+                        uri : 'ttC',
+                        label : 'testTakerC'
+                    }
+                ]
+            },
+            {
+                id : 'http://tao.local/mytao.rdf#i14497523428335109',
+                "testTakers" : [
+                    {
+                        uri : 'ttA',
+                        label : 'testTakerA'
+                    }
+                ]
+            }
+        ]
+    };
+
     /**
      * Controls the taoProctoring delivery page
      *
@@ -74,10 +116,17 @@ define([
             var actions = [];
             var model = [];
             console.log(deliveries, eligibilities);
-            
+
+            function _getDelivery(uri){
+                return _.find(deliveries, {uri : uri});
+            }
+
             // request the server with a selection of test takers
-            function request(url, eligibility, message){
+            function _request(url, eligibility, message){
                 if(eligibility){
+
+                    console.log(eligibility);
+
                     loadingBar.start();
 
                     $.ajax({
@@ -115,7 +164,7 @@ define([
                     //open modal to select delivery + test takers
                     eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries);
                     eligEditor.on('ok', function(eligibility){
-                        request(addUrl, eligibility, __('New eligible delivery added'));
+                        _request(addUrl, eligibility, __('New eligible delivery added'));
                     });
                 }
             });
@@ -123,33 +172,35 @@ define([
             actions.push({
                 id : 'edit',
                 icon : 'edit',
+                label : __('Edit'),
                 title : __('Edit eligibile test takers'),
-                action : function(selection){
+                action : function(uri){
                     //open modal to select test takers
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries, selection);
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries, _getDelivery(uri));
                     eligEditor.on('ok', function(eligibility){
-                        request(editUrl, eligibility, __('Eligible test takers updated'));
+                        _request(editUrl, eligibility, __('Eligible test takers updated'));
                     });
                 }
             });
 
             actions.push({
                 id : 'remove',
-                icon : 'trash',
+                icon : 'bin',
+                label : __('Remove'),
                 title : __('Remove eligibility'),
-                action : function(selection){
+                action : function(uri){
                     //open modal to select test takers
-                    request(removeUrl, {delivery : selection}, __('Eligible delivery removed'));
+                    _request(removeUrl, {delivery : uri}, __('Eligible delivery removed'));
                 }
             });
 
 
             // column: delivery
             model.push({
-                id : 'delivery',
+                id : 'del',
                 label : __('Delivery'),
                 transform : function(value, row){
-                    return row.delivery;
+                    return _getDelivery(row.id).label;
 
                 }
             });
@@ -159,9 +210,7 @@ define([
                 id : 'ttakers',
                 label : __('Eligible Test Takers'),
                 transform : function(value, row){
-                    console.log(row);
-                    return value;
-
+                    return row.testTakers.length;
                 }
             });
 

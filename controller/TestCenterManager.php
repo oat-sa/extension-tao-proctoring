@@ -105,16 +105,33 @@ class TestCenterManager extends \tao_actions_SaSModule
         $this->setView('form_test_center.tpl');
     }
 
+    /**
+     * get eligible deliveries data formated in a way that is compatible with the client ui/datatable component
+     *
+     * @return {array}
+     */
     private function _getEligibilities(){
+
         $testCenter = $this->getCurrentInstance();
         $eligibilityService = $this->eligibilityService;
         $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
-        return array_map(function($delivery) use ($eligibilityService, $testCenter){
+        $data = array_map(function($delivery) use ($eligibilityService, $testCenter){
             return array(
-                'delivery' => $delivery->getUri(),
-                'testTakers' => $eligibilityService->getEligibleTestTakers($testCenter, $delivery)
+                'id' => $delivery->getUri(),
+                'testTakers' => array_map(function($testTakerId){
+                    return array(
+                        'uri' => $testTakerId,
+                        'encodedUri' => \tao_helpers_Uri::encode($testTakerId)//jstree use id formated this way...
+                    );
+                }, $eligibilityService->getEligibleTestTakers($testCenter, $delivery))
             );
         }, $eligibilities);
+
+        return array(
+            'data' => $data,
+            'page' => 1,
+            'total' => 1
+        );
     }
 
     private function getRequestEligibility(){

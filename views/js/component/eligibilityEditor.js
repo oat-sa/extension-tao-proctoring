@@ -156,7 +156,9 @@ define([
      * @param {JQuery} $container
      * @param {Array} eligibilities
      * @param {Array} deliveries
-     * @param {String} [delivery]
+     * @param {Object} [delivery]
+     * @param {String} [delivery.label]
+     * @param {String} [delivery.uri]
      * @returns {Object} the eligibility editor instance
      */
     function init($container, eligibilities, deliveries, delivery){
@@ -173,10 +175,10 @@ define([
             throw 'the egibility editor requires an array of eligibilities and an array of deliveries';
         }
         
-        if(delivery){
-            var eligibility = _.find(eligibilities, {uri : delivery});
+        if(delivery && delivery.uri && delivery.label){
+            var eligibility = _.find(eligibilities, {delivery : delivery.uri});
             if(eligibility){
-                instance.eligibility = eligibility.testTakers;
+                instance.eligibility = eligibility;
                 creationMode = false;
             }else{
                 throw ('given delivery does not exist in the list of eligibilities');
