@@ -193,17 +193,17 @@ class TestCenterHelper
                 $user = UserHelper::getUser($userId);
 
                 $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
-                $proctor = '';
+                $proctor = null;
                 if (!empty($state['authorized_by'])) {
-                    $proctor = UserHelper::getUserName(UserHelper::getUser($state['authorized_by']), true);
+                    $proctor = UserHelper::getUser($state['authorized_by']);
                 }
 
                 $procActions = self::getProctorActions($deliveryExecution);
                 $reports[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
                     'delivery' => $deliveryExecution->getDelivery()->getLabel(),
-                    'testtaker' => UserHelper::getUserName($user, true),
-                    'proctor' => $proctor,
+                    'testtaker' => $user ? UserHelper::getUserName($user, true) : '',
+                    'proctor' => $proctor ? UserHelper::getUserName($proctor, true) : '',
                     'status' => $deliveryService->getState($deliveryExecution),
                     'start' => $startTime ? DateHelper::displayeDate($startTime) : '',
                     'end' => $finishTime ? DateHelper::displayeDate($finishTime) : '',
