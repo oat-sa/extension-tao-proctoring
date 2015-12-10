@@ -20,13 +20,10 @@
  */
 namespace oat\taoProctoring\model;
 
-use oat\oatbox\user\User;
-use oat\taoTestTaker\models\TestTakerService;
 use core_kernel_classes_Resource as Resource;
 use core_kernel_classes_Class;
 use core_kernel_classes_Property as Property;
 use tao_models_classes_ClassService;
-use taoDelivery_models_classes_DeliveryRdf;
 
 /**
  * Service to manage eligible deliveries
@@ -60,7 +57,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return boolean
      */
     public function createEligibility(Resource $testCenter, Resource $delivery) {
-        if (!is_null($this->getEligiblity($testCenter, $delivery))) {
+        if (!is_null($this->getEligibility($testCenter, $delivery))) {
             // already exists, don't recreate
             return false;
         }
@@ -97,7 +94,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return boolean
      */
     public function removeEligibility(Resource $testCenter, Resource $delivery) {
-        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        $eligibility = $this->getEligibility($testCenter, $delivery);
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
         }
@@ -113,7 +110,7 @@ class EligibilityService extends tao_models_classes_ClassService
      */
     public function getEligibleTestTakers(Resource $testCenter, Resource $delivery) {
         $eligible = array();
-        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        $eligibility = $this->getEligibility($testCenter, $delivery);
         if (!is_null($eligibility)) {
             foreach ($eligibility->getPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI)) as $testTaker) {
                 $eligible[] = $testTaker instanceof Resource ? $testTaker->getUri() : $testTaker->literal;
@@ -132,7 +129,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return boolean
      */
     public function setEligibleTestTakers(Resource $testCenter, Resource $delivery, $testTakerIds) {
-        $eligibility = $this->getEligiblity($testCenter, $delivery);
+        $eligibility = $this->getEligibility($testCenter, $delivery);
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
         }
@@ -147,7 +144,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @throws \common_exception_InconsistentData
      * @return Resource eligibility resource
      */
-    protected function getEligiblity(Resource $testCenter, Resource $delivery) {
+    protected function getEligibility(Resource $testCenter, Resource $delivery) {
         $eligibles = $this->getRootClass()->searchInstances(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter,
             self::PROPERTY_DELIVERY_URI => $delivery
