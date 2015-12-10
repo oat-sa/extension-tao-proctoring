@@ -341,21 +341,38 @@ class DeliveryService extends ConfigurableService
     */
     public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array())
     {
-        $class = new  \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
+        $testCenterService = TestCenterService::singleton();
 
+        // test takers already assigned are excluded
         $excludeIds = array();
         foreach ($this->getDeliveryTestTakers($deliveryId) as $user) {
-            $excludeIds[] = $user->getIdentifier();
+            $excludeIds[$user->getIdentifier()] = true;
         }
 
-        $users = array();
-        foreach ($class->getInstances(true) as $userResource) {
-            // assume Tao Users
-            if (!in_array($userResource->getUri(), $excludeIds)) {
-                $users[] = new core_kernel_users_GenerisUser($userResource);
+        // determine testcenters managed per proctor with delivery available
+        $availableIn = array();
+        foreach ($testCenterService->getTestCentersByDelivery($deliveryId) as $testCenter) {
+            $availableIn[$testCenter->getUri()] = true;
+        }
+
+        $testCenters = array();
+        foreach ($testCenterService->getTestCentersByProctor($proctor) as $testCenter) {
+            if (array_key_exists($testCenter->getUri(), $availableIn)) {
+                $testCenters[] = $testCenter;
             }
         }
-        return $users;
+
+        // get testtakers from those centers that are not excluded
+        $users = array();
+        foreach ($testCenters as $testCenter) {
+            foreach ($testCenterService->getTestTakers($testCenter->getUri()) as $userResource) {
+                $uri = $userResource->getUri();
+                if (!array_key_exists($uri, $excludeIds) && !array_key_exists($uri, $users)) {
+                    $users[$uri] = new \core_kernel_users_GenerisUser($userResource);
+                }
+            }
+        }
+        return array_values($users);
     }
 
     /**
