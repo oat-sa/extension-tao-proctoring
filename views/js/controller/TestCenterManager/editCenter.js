@@ -57,29 +57,29 @@ define([
 
             var $container = $(cssScope);
             var $list = $container.find('.list');
+            var eligEditor;
             var $eligibilityEditor = $container.find('.eligibility-editor-container');
             var deliveries = $container.data('deliveries');
             var eligibilities = $container.data('eligibilities');
             var testCenterId = $container.data('testcenter');
-            var serviceUrl = helpers._url('getEligibilities', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
-            var addUrl = helpers._url('addEligibility', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
-            var editUrl = helpers._url('editEligibility', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
-            var removeUrl = helpers._url('removeEligibility', 'TestCenterManager', 'taoProctoring', {testCenter : testCenterId});
+            var serviceUrl = helpers._url('getEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var addUrl = helpers._url('addEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var editUrl = helpers._url('editEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var removeUrl = helpers._url('removeEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
             var tools = [];
             var actions = [];
             var model = [];
             console.log(deliveries, eligibilities);
             
             // request the server with a selection of test takers
-            function request(url, selection, reason, message){
-                if(selection && selection.length){
+            function request(url, eligibility, message){
+                if(eligibility){
                     loadingBar.start();
 
                     $.ajax({
                         url : url,
                         data : {
-                            execution : selection,
-                            reason : reason
+                            eligibility : eligibility
                         },
                         dataType : 'json',
                         type : 'POST',
@@ -110,10 +110,10 @@ define([
                 action : function(){
 
                     //open modal to select test taker
-                    eligibilityEditor.init($eligibilityEditor, eligibilities, deliveries);
-                    
-                    //then refresh
-                    $list.datatable('refresh');
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, eligibilities, deliveries);
+                    eligEditor.on('ok', function(eligibility){
+                        request(addUrl, eligibility, __('New eligible delivery added'));
+                    });
                 }
             });
 

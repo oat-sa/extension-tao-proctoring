@@ -136,7 +136,7 @@ class EligibilityService extends tao_models_classes_ClassService
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
         }
-        return $eligibility->editPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI). $testTakerIds);
+        return $eligibility->editPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI), $testTakerIds);
     }
     
     /**

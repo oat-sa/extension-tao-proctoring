@@ -41,6 +41,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     {
         parent::__construct();
         $this->service = $this->getClassService();
+        $this->eligibilityService = EligibilityService::singleton();
     }
 
     protected function getClassService()
@@ -92,15 +93,6 @@ class TestCenterManager extends \tao_actions_SaSModule
         $proctorForm->setData('title', __('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
 
-        $eligibilityService = EligibilityService::singleton();
-        $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
-        $eligibilitiesFormated = array_map(function($delivery) use ($eligibilityService, $testCenter){
-            return array(
-                'delivery' => $delivery->getUri(),
-                'testTakers' => $eligibilityService->getEligibleTestTakers($testCenter, $delivery)
-            );
-        }, $eligibilities);
-
         $deliveryClass = new \core_kernel_classes_Class(TAO_DELIVERY_CLASS);
         $deliveries = $deliveryClass->getInstances(true);
         $deliveriesFormated = array_map(function($delivery){
@@ -110,35 +102,85 @@ class TestCenterManager extends \tao_actions_SaSModule
             );
         }, array_values($deliveries));
 
-        
-
-        $this->setData('eligibilities', json_encode($eligibilitiesFormated));
+        $this->setData('eligibilities', json_encode($this->_getEligibilities()));
         $this->setData('deliveries', json_encode($deliveriesFormated));
         $this->setData('formTitle', __('Edit test center'));
         $this->setData('testCenter', $testCenter->getUri());
         $this->setData('myForm', $myForm->render());
         $this->setView('form_test_center.tpl');
     }
-    
-    public function allowDelivery()
-    {
-        $delivery = new \core_kernel_classes_Resource('https://tao31.bout/my_tao31.rdf#i1449654679931281');
-        $testCenter = new \core_kernel_classes_Resource($this->getRequestParameter('testCenter'));
-        $success = EligibilityService::singleton()->createEligibility($testCenter, $delivery);
-        $this->returnJson(array('success' => $success));
+
+    private function _getEligibilities(){
+        $testCenter = $this->getCurrentInstance();
+        $eligibilityService = $this->eligibilityService;
+        $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
+        return array_map(function($delivery) use ($eligibilityService, $testCenter){
+            return array(
+                'delivery' => $delivery->getUri(),
+                'testTakers' => $eligibilityService->getEligibleTestTakers($testCenter, $delivery)
+            );
+        }, $eligibilities);
+    }
+
+    private function getRequestEligibility(){
+        if($this->hasRequestParameter('eligibility')){
+            $eligibility = $this->getRequestParameter('eligibility');
+            if(isset($eligibility['delivery']) && !empty($eligibility['delivery'])){
+                $formatted = array(
+                    'delivery' => new \core_kernel_classes_Resource($eligibility['delivery'])
+                );
+                if(isset($eligibility['testTakers']) && is_array($eligibility['testTakers'])){
+                    $formatted['testTakers'] = array_map(function($testTakerId){
+                        return \tao_helpers_Uri::decode($testTakerId);
+                    }, $eligibility['testTakers']);
+                }
+                return $formatted;
+            }else{
+                throw new \common_Exception('eligibility requires a delivery');
+            }
+        }else{
+            throw new \common_Exception('no eligibility in request');
+        }
     }
     
     public function getEligibilities()
     {
-        $testCenter = new \core_kernel_classes_Resource($this->getRequestParameter('testCenter'));
-        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
-        
-        $deliveryData = array();
-        foreach ($deliveries as $delivery) {
-            $deliveryData[$delivery->getUri()] = $delivery->getLabel(); 
-        }
         return $this->returnJson(array(
-            'delivieries' => $deliveryData
+            'delivieries' => $this->_getEligibilities()
         ));
     }   
+
+    public function addEligibility()
+    {
+        $success = false;
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->getRequestEligibility();
+        if($this->eligibilityService->createEligibility($testCenter, $eligibility['delivery'])){
+            $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+        }
+        return $this->returnJson(array(
+            'sucess' => $success
+        ));
+    }
+
+    public function editEligibility()
+    {
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->getRequestEligibility();
+        $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+        return $this->returnJson(array(
+            'sucess' => $success
+        ));
+    }
+
+    public function removeEligibility()
+    {
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->getRequestEligibility();
+        $success = $this->eligibilityService->removeEligibility($testCenter, $eligibility['delivery']);
+        return $this->returnJson(array(
+            'sucess' => $success
+        ));
+    }
+
 }
