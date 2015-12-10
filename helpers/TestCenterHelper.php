@@ -147,7 +147,7 @@ class TestCenterHelper
     {
         $periodStart = null;
         $periodEnd = null;
-        
+
         if (isset($options['periodStart'])) {
             $periodStart = new DateTime($options['periodStart']);
             $periodStart->setTime(0, 0, 0);
@@ -157,7 +157,7 @@ class TestCenterHelper
             $periodEnd = new DateTime($options['periodEnd']);
             $periodEnd->setTime(23, 59, 59);
             $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
-        }        
+        }
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
@@ -183,7 +183,7 @@ class TestCenterHelper
 
         return DataTableHelper::paginate($filteredExecutions, $options, function($deliveryExecutions) use ($deliveryService) {
             $reports = [];
-            
+
             foreach($deliveryExecutions as $deliveryExecution) {
                 /* @var $deliveryExecution DeliveryExecution */
                 $startTime = $deliveryExecution->getStartTime();
@@ -212,7 +212,7 @@ class TestCenterHelper
                     'irregularities' => $procActions['irregularities'],
                 );
             }
-            
+
             return $reports;
         });
     }

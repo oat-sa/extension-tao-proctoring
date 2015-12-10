@@ -60,6 +60,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var printReportButton = $container.data('printreportbutton');
             var categories = $container.data('categories');
             var testCenterId = $container.data('testcenter');
 			var downloadUrl = helpers._url('download', 'Reporting', 'taoProctoring', {testCenter : testCenterId});
@@ -104,8 +105,81 @@ define([
                     buttons: 'ok'
                 });
             };
-            
+
+            /**
+             * Open new tab with page to be printed
+             * @param string|array rowId
+             */
+            var printResults = function printReport(rowId) {
+                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printReport' + JSON.stringify(rowId));
+            };
+
+            /**
+             * Print rubric blocks with item tagged with tao-print tag
+             * @param string|array rowId
+             */
+            var printRubric = function printRubric(rowId) {
+                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printRubric' + JSON.stringify(rowId));
+            };
+
             var today = moment().format('YYYY-MM-DD');
+
+            // renderer for date strings
+            function transformDate(date) {
+                if (date) {
+                    return moment(date).toString();
+                }
+                return '';
+            }
+
+            var datatableTools = [
+                {
+                    id: 'download',
+                    icon: 'download',
+                    title: __('Download the selected reports to a CSV file'),
+                    label: __('Download CSV'),
+                    action: function() {
+                        notYet();
+                    }
+                }, {
+                    id : 'printRubric',
+                    title : __('Print rubric block with item tagged with tao-print tag'),
+                    icon : 'print',
+                    label : __('Print Score Report'),
+                    massAction: true,
+                    action : printRubric
+                }
+            ];
+            if (printReportButton) {
+                datatableTools.push({
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'print',
+                    label : __('Print results'),
+                    massAction: true,
+                    action : printResults
+                });
+            }
+
+            var datatableActions =  {
+                printRubrick : {
+                    id : 'printRubric',
+                    title : __('Print rubric block with item tagged with tao-print tag'),
+                    icon : 'print',
+                    label : __('Print Score Report'),
+                    action : printRubric
+                }
+            };
+            if (printReportButton) {
+                datatableActions.printReport = {
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'print',
+                    label : __('Print results'),
+                    action : printResults
+                };
+            }
+
 
             $list
                 .on('query.datatable', function() {
@@ -121,16 +195,9 @@ define([
                         available: __('Available reports'),
                         loading: __('Loading')
                     },
-                    tools: [{
-                        id: 'download',
-                        icon: 'download',
-                        title: __('Download the selected reports to a CSV file'),
-                        label: __('Download CSV'),
-                        action: function() {
-                            notYet();
-                        }
-                    }],
+                    tools: datatableTools,
                     selectable: true,
+                    actions : datatableActions,
                     model: [{
                         id: 'delivery',
                         label: __('Test')
