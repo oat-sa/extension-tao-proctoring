@@ -229,10 +229,9 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $testCenter = new core_kernel_classes_Resource('myTestCenter');
         $delivery = new core_kernel_classes_Resource('myDelivery');
 
-        $testTaker1 = new core_kernel_classes_Resource('TestTaker1');
-        $testTaker2 = new core_kernel_classes_Resource('TestTaker2');
         $testTaker3 = new core_kernel_classes_Resource('TestTaker3');
-        $testTakers = array($testTaker1, $testTaker2, $testTaker3);
+        $testTaker2 = new \core_kernel_classes_Literal('TestTaker2');
+        $testTakers = array('TestTaker1', $testTaker2, $testTaker3);
 
         $eligibilityProphet = $this->prophesize('core_kernel_classes_Resource');
         $eligibilityProphet
