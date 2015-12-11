@@ -113,7 +113,7 @@ class EligibilityService extends tao_models_classes_ClassService
         $eligibility = $this->getEligibility($testCenter, $delivery);
         if (!is_null($eligibility)) {
             foreach ($eligibility->getPropertyValues(new Property(self::PROPERTY_TESTTAKER_URI)) as $testTaker) {
-                $eligible[] = $testTaker;
+                $eligible[] = $testTaker instanceof Resource ? $testTaker->getUri() : (string)$testTaker;
             }
         }
         return $eligible;
@@ -129,7 +129,6 @@ class EligibilityService extends tao_models_classes_ClassService
      * @return boolean
      */
     public function setEligibleTestTakers(Resource $testCenter, Resource $delivery, $testTakerIds) {
-        
         $eligibility = $this->getEligibility($testCenter, $delivery);
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
