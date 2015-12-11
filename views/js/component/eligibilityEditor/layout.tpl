@@ -1,15 +1,11 @@
-<div class="eligibility-editor modal-form">
+<div class="eligibility-editor">
     <h2 class="title">{{title}}</h2>
     <section class="eligible-delivery-select"></section>
     <section class="eligible-testTaker-tree-container">
-        <header>
-            <h1><?= __('Eligible test takers') ?></h1>
-        </header>
+        <label>{{__ 'Eligible Test Takers'}}</label>
         <div>
             <div id="{{treeId}}"></div>
         </div>
-        <footer>
-        </footer>
     </section>
     <div class="actions">
         <button class="btn btn-info small done">{{__ "OK"}}</button>

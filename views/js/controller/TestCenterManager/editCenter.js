@@ -24,7 +24,8 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
-    'taoProctoring/component/eligibilityEditor'
+    'taoProctoring/component/eligibilityEditor',
+    'css!taoProctoringCss/testCenterManager'
 ], function(
     $,
     _,

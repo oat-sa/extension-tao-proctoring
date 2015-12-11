@@ -9,6 +9,7 @@ module.exports = function(grunt) {
     sass.taoproctoring.files = { };
     sass.taoproctoring.files[root + 'css/proctoring.css'] = root + 'scss/proctoring.scss';
     sass.taoproctoring.files[root + 'css/deliveryServer.css'] = root + 'scss/deliveryServer.scss';
+    sass.taoproctoring.files[root + 'css/testCenterManager.css'] = root + 'scss/testCenterManager.scss';
 
     watch.taoproctoringsass = {
         files : [root + 'views/scss/*.scss', root + 'views/scss/**/*.scss'],
