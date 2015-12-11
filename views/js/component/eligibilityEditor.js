@@ -39,13 +39,14 @@ define([
      * @param {Array} [testTakers] - array of selected test takers
      */
     function buildTestTakerTree(instance, selector, testTakers){
+        
         var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
             actionId : 'treeOptions.actionId',
             saveUrl : 'treeOptions.saveUrl',
             saveData : {},
-            checkedNodes : _.pluck(testTakers, 'idEncoded'), //generis tree uses "encoded uri" to check nodes
+            checkedNodes : _.pluck(testTakers, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
             serverParameters : {
-                openParentNodes : _.pluck(testTakers, 'id'), //generis tree uses normal if to open nodes...
+                openParentNodes : _.pluck(testTakers, 'uri'), //generis tree uses normal if to open nodes...
                 rootNode : 'http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject'
             },
             paginate : 10,
@@ -142,7 +143,9 @@ define([
      * @returns {undefined}
      */
     function destroy(instance){
-        instance.$container.children('.eligibility-editor').remove();
+        instance.$container.children('.eligibility-editor')
+            .modal('destroy')
+            .remove();
     }
 
     /**
@@ -179,7 +182,6 @@ define([
                 throw ('given delivery does not exist in the list of eligibilities');
             }
         }
-
         instance.$container = $container;
         $container.append(layoutTpl({
             title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
@@ -193,7 +195,7 @@ define([
         }
 
         //init test taker selector
-        buildTestTakerTree(instance, '#' + treeId, testTakers);
+        buildTestTakerTree(instance, '#' + treeId, instance.eligibility.testTakers || []);
 
         //init modal
         initModal(instance);

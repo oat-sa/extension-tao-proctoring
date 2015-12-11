@@ -120,7 +120,9 @@ class TestCenterManager extends \tao_actions_SaSModule
             return array(
                 'id' => $delivery->getUri(),
                 'testTakers' => array_map(function($testTakerId){
+                    $ttaker = new \core_kernel_classes_Resource($testTakerId);
                     return array(
+                        'label' => $ttaker->getLabel(),
                         'uri' => $testTakerId,
                         'encodedUri' => \tao_helpers_Uri::encode($testTakerId)//jstree use id formated this way...
                     );
@@ -176,9 +178,12 @@ class TestCenterManager extends \tao_actions_SaSModule
 
     public function editEligibility()
     {
+        $success = false;
         $testCenter = $this->getCurrentInstance();
         $eligibility = $this->getRequestEligibility();
-        $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+        if(isset($eligibility['testTakers'])){
+            $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+        }
         return $this->returnJson(array(
             'success' => $success
         ));

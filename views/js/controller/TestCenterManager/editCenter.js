@@ -49,7 +49,7 @@ define([
             return _.map(dataset.data, function(eligibility){
                 return {
                     delivery : eligibility.id,
-                    testTakers : _.pluck(eligibility.testTakers, 'encodedUri')
+                    testTakers : eligibility.testTakers
                 };
             });
         }
@@ -115,7 +115,7 @@ define([
             var tools = [];
             var actions = [];
             var model = [];
-            console.log(deliveries, eligibilities);
+            console.log('init data', deliveries, eligibilities);
 
             function _getDelivery(uri){
                 return _.find(deliveries, {uri : uri});
@@ -128,7 +128,7 @@ define([
                     console.log(eligibility);
 
                     loadingBar.start();
-
+                    
                     $.ajax({
                         url : url,
                         data : {
@@ -222,7 +222,7 @@ define([
                 .on('load.datatable', function(e, newDataset){
                     //update dateset in memory
                     eligibilities = newDataset;
-
+                    console.log('reloaded data', eligibilities);
                     loadingBar.stop();
                 })
                 .on('select.datatable', function(e, newDataset){
