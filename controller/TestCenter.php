@@ -21,8 +21,8 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -51,7 +51,7 @@ class TestCenter extends ProctoringModule
                 'testcenters-index',
                 $data,
                 array(
-                    Breadcrumbs::testCenters()
+                    BreadcrumbsHelper::testCenters()
                 )
             );
         }
@@ -77,8 +77,8 @@ class TestCenter extends ProctoringModule
                 'testcenters-testcenter',
                 $data,
                 array(
-                    Breadcrumbs::testCenters(),
-                    Breadcrumbs::testCenter($testCenter, $testCenters)
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::testCenter($testCenter, $testCenters)
                 )
             );
         }

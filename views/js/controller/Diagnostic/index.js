@@ -22,14 +22,13 @@ define([
     'jquery',
     'i18n',
     'helpers',
-    'moment',
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
     'ui/datatable'
-], function ($, __, helpers, moment, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -187,10 +186,7 @@ define([
                         }
                     }, {
                         id: 'date',
-                        label: __('Date'),
-                        transform: function(value) {
-                            return moment(value).toString();
-                        }
+                        label: __('Date')
                     }]
                 }, dataset);
         }

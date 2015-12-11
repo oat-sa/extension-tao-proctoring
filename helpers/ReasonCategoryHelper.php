@@ -23,7 +23,7 @@ namespace oat\taoProctoring\helpers;
 /**
  * Provides methods to return the list of available categories and subcategories
  */
-class ReasonCategory
+class ReasonCategoryHelper
 {
 
     public static function irregularity()

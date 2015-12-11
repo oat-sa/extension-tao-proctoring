@@ -20,8 +20,8 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\helpers\ReportingService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -59,14 +59,13 @@ class Reporting extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories(),
             ),
             array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-
-                Breadcrumbs::reporting(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::reporting(
                     $testCenter,
                     array(
-                        Breadcrumbs::diagnostics($testCenter),
-                        Breadcrumbs::deliveries($testCenter),
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::deliveries($testCenter),
                     )
                 )
             )
