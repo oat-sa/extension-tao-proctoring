@@ -20,6 +20,7 @@
  */
 define([
     'jquery',
+    'lodash',
     'i18n',
     'helpers',
     'layout/loading-bar',
@@ -34,7 +35,7 @@ define([
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
+], function ($, _, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
