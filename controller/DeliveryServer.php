@@ -114,7 +114,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
             // the test taker is not allowed to run the delivery
             // so we redirect him/her to the awaiting page
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
-            return $this->redirect(_url('awaitingAuthorization', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
+            return $this->redirect(_url('awaitingAuthorization', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
         // ok, the delivery execution can be processed
@@ -135,7 +135,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         // if the test taker tries to directly access this page, the security key may not be initialized (i.e. just logged in)
         if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->hasSecurityKey()) {
             $this->grantAuthorization();
-            return $this->redirect(_url('runDeliveryExecution', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
+            return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
         // from this page the test taker must wait for proctor authorization
