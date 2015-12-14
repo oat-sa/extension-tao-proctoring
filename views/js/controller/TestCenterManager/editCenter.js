@@ -23,7 +23,6 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
-    'ui/dialog',
     'taoProctoring/component/eligibilityEditor',
     'css!taoProctoringCss/testCenterManager'
 ], function(
@@ -34,7 +33,6 @@ define([
     loadingBar,
     encode,
     feedback,
-    dialog,
     eligibilityEditor
     ){
     'use strict';
@@ -44,7 +42,13 @@ define([
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-
+    
+    /**
+     * Format the raw eligibility from the dataset to the expected format for the eligibility editor
+     * 
+     * @param {Object} dataset
+     * @returns {Array}
+     */
     function formatEligibilities(dataset){
         if(dataset.data && _.isArray(dataset.data)){
             return _.map(dataset.data, function(eligibility){
@@ -57,46 +61,12 @@ define([
         return [];
     }
 
-    //test mock
-    var _eligibilities = {
-        page : 1,
-        total : 1,
-        data : [
-            {
-                id : 'http://tao.local/mytao.rdf#i1449752331825885',
-                "testTakers" : [
-                    {
-                        uri : 'ttA',
-                        label : 'testTakerA'
-                    },
-                    {
-                        uri : 'ttB',
-                        label : 'testTakerB'
-                    },
-                    {
-                        uri : 'ttC',
-                        label : 'testTakerC'
-                    }
-                ]
-            },
-            {
-                id : 'http://tao.local/mytao.rdf#i14497523428335109',
-                "testTakers" : [
-                    {
-                        uri : 'ttA',
-                        label : 'testTakerA'
-                    }
-                ]
-            }
-        ]
-    };
-
     /**
-     * Controls the taoProctoring delivery page
+     * Controls the test center manager screen
      *
      * @type {Object}
      */
-    var proctorDeliveryIndexCtlr = {
+    var editCenterCtlr = {
         /**
          * Entry point of the page
          */
@@ -116,7 +86,6 @@ define([
             var tools = [];
             var actions = [];
             var model = [];
-            console.log('init data', deliveries, eligibilities);
 
             function _getDelivery(uri){
                 return _.find(deliveries, {uri : uri});
@@ -125,8 +94,6 @@ define([
             // request the server with a selection of test takers
             function _request(url, eligibility, message){
                 if(eligibility){
-
-                    console.log(eligibility);
 
                     loadingBar.start();
                     
@@ -223,7 +190,6 @@ define([
                 .on('load.datatable', function(e, newDataset){
                     //update dateset in memory
                     eligibilities = newDataset;
-                    console.log('reloaded data', eligibilities);
                     loadingBar.stop();
                 })
                 .on('select.datatable', function(e, newDataset){
@@ -245,5 +211,5 @@ define([
         }
     };
 
-    return proctorDeliveryIndexCtlr;
+    return editCenterCtlr;
 });

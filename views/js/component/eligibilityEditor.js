@@ -87,7 +87,6 @@ define([
 
         //add event handler
         $select.on('change', function(e){
-            console.log('aaaa', e);
             if(e.val){
                 instance.eligibility.delivery = e.val;
                 instance.trigger('change', instance.eligibility);
