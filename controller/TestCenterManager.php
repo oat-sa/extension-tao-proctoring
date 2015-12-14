@@ -132,6 +132,7 @@ class TestCenterManager extends \tao_actions_SaSModule
 
         return array(
             'data' => $data,
+            'amount' => count($data),
             'page' => 1,
             'total' => 1
         );
