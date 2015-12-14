@@ -23,7 +23,6 @@ define([
     'jquery',
     'i18n',
     'helpers',
-    'moment',
     'layout/loading-bar',
     'ui/listbox',
     'util/encode',
@@ -33,7 +32,7 @@ define([
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
-], function (_, $, __, helpers, moment, loadingBar, listBox, encode, feedback, bulkActionPopup, _status, breadcrumbsFactory, actionsTpl, statsTpl) {
+], function (_, $, __, helpers, loadingBar, listBox, encode, feedback, bulkActionPopup, _status, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -74,7 +73,12 @@ define([
                 renderTo: $container.find('.content'),
                 replace: true,
                 list: format(boxes),
-                width:12
+                width:12,
+
+                // discard the "all sessions" box from available count
+                countRenderer: function(count) {
+                    return count - 1;
+                }
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('deliveries', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
@@ -93,8 +97,8 @@ define([
 
                     if(props && props.periodStart && props.periodEnd){
                         tplData.showProperties = true;
-                        tplData.periodStart = moment(props.periodStart).toString();
-                        tplData.periodEnd = moment(props.periodEnd).toString();
+                        tplData.periodStart = props.periodStart;
+                        tplData.periodEnd = props.periodEnd;
 
                         //add a special class for boxes that have more information to display
                         box.cls = 'has-properties-displayed';
@@ -123,7 +127,7 @@ define([
                 if (refreshPolling) {
                     pollTo = setTimeout(refresh, refreshPolling);
                 }
-            };
+            }
 
             // refresh the index
             function refresh() {
@@ -138,7 +142,7 @@ define([
                 }).done(function(boxes) {
                     update(boxes);
                 });
-            };
+            }
             
             /**
              * Exec 

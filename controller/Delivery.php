@@ -20,10 +20,9 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\Delivery as DeliveryHelper;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
-use oat\taoProctoring\helpers\ReasonCategory;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\DeliveryHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
 
 /**
  * Proctoring Delivery controllers
@@ -52,13 +51,13 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                Breadcrumbs::deliveries(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::deliveries(
                     $testCenter,
                     array(
-                        Breadcrumbs::diagnostics($testCenter),
-                        Breadcrumbs::reporting($testCenter)
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
         ));
@@ -83,16 +82,16 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                Breadcrumbs::deliveries(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::deliveries(
                     $testCenter,
                     array(
-                        Breadcrumbs::diagnostics($testCenter),
-                        Breadcrumbs::reporting($testCenter)
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
-                Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
+                BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
             )
         );
     }
@@ -114,16 +113,16 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                Breadcrumbs::deliveries(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::deliveries(
                     $testCenter,
                     array(
-                        Breadcrumbs::diagnostics($testCenter),
-                        Breadcrumbs::reporting($testCenter)
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
-                Breadcrumbs::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter))
+                BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter))
             )
         );
     }
@@ -151,17 +150,17 @@ class Delivery extends ProctoringModule
                     'testCenter' => $testCenter->getUri(),
                     'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions),
                 ),array(
-                    Breadcrumbs::testCenters(),
-                    Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                    Breadcrumbs::deliveries(
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                    BreadcrumbsHelper::deliveries(
                         $testCenter,
                         array(
-                            Breadcrumbs::diagnostics($testCenter),
-                            Breadcrumbs::reporting($testCenter)
+                            BreadcrumbsHelper::diagnostics($testCenter),
+                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
-                    Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
-                    Breadcrumbs::manageTestTakers($testCenter, $delivery, 'manage')
+                    BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
+                    BreadcrumbsHelper::manageTestTakers($testCenter, $delivery, 'manage')
                 )
             );
 
@@ -196,17 +195,17 @@ class Delivery extends ProctoringModule
                     'testCenter' => $testCenter->getUri(),
                     'set' => $testTakers //change it to list for consistency
                 ),array(
-                    Breadcrumbs::testCenters(),
-                    Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                    Breadcrumbs::deliveries(
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                    BreadcrumbsHelper::deliveries(
                         $testCenter,
                         array(
-                            Breadcrumbs::diagnostics($testCenter),
-                            Breadcrumbs::reporting($testCenter)
+                            BreadcrumbsHelper::diagnostics($testCenter),
+                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
-                    Breadcrumbs::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
-                    Breadcrumbs::manageTestTakers($testCenter, $delivery, 'testTakers')
+                    BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
+                    BreadcrumbsHelper::manageTestTakers($testCenter, $delivery, 'testTakers')
                 )
             );
 
@@ -296,29 +295,6 @@ class Delivery extends ProctoringModule
             $requestOptions = $this->getRequestOptions();
 
             $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions));
-
-        } catch (ServiceNotFoundException $e) {
-            \common_Logger::w('No delivery service defined for proctoring');
-            $this->returnError('Proctoring interface not available');
-        }
-
-    }
-
-    /**
-     * Gets the list of test takers assigned to all deliveries
-     *
-     * @throws \common_Exception
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public function allDeliveriesTestTakers() {
-
-        try {
-
-            $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
-            
-            $this->returnJson(DeliveryHelper::getAllDeliveryTestTakers($testCenter, $requestOptions));
-            
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -516,7 +492,7 @@ class Delivery extends ProctoringModule
      * @throws \common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public function  reportExecutions()
+    public function reportExecutions()
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
@@ -540,19 +516,5 @@ class Delivery extends ProctoringModule
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
-    }
-
-    /**
-     * Get the list of all available categories, sorted by action names
-     *
-     * @return array
-     */
-    private function getAllReasonsCategories(){
-        return array(
-            'authorize' => array(),
-            'pause' => ReasonCategory::irregularity(),
-            'terminate' => ReasonCategory::irregularity(),
-            'report' => ReasonCategory::irregularity()
-        );
     }
 }
