@@ -54,7 +54,7 @@ define([
                 _.delay(function(){
                     //requires a delay to let the node status to be updated
                     instance.eligibility.testTakers = _.uniq(tree.getChecked());
-                    instance.trigger('change');
+                    instance.trigger('change', instance.eligibility);
                 }, 100);
             }
         });
@@ -87,9 +87,10 @@ define([
 
         //add event handler
         $select.on('change', function(e){
+            console.log('aaaa', e);
             if(e.val){
                 instance.eligibility.delivery = e.val;
-                instance.trigger('change');
+                instance.trigger('change', instance.eligibility);
             }
         });
 
