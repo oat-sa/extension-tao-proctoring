@@ -122,7 +122,7 @@ define([
                 if (refreshPolling) {
                     pollTo = setTimeout(refresh, refreshPolling);
                 }
-            };
+            }
 
             // refresh the index
             function refresh() {
@@ -137,7 +137,7 @@ define([
                 }).done(function(boxes) {
                     update(boxes);
                 });
-            };
+            }
             
             /**
              * Exec 
