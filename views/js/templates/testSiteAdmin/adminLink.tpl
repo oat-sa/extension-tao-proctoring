@@ -1,0 +1,1 @@
+<a class="admin-link">{{__ 'Manage Proctors'}}</a>

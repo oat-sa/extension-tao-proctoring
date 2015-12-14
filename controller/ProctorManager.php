@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -14,25 +14,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
  *
  */
-
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 
 /**
- * Proctoring Test Center controllers for test center screens
+ * Proctor manager controller
  *
  * @author Open Assessment Technologies SA
  * @package taoProctoring
  * @license GPL-2.0
  *
  */
-class TestCenter extends ProctoringModule
+class ProctorManager extends ProctoringModule
 {
     /**
      * Displays the index page of the extension: list all available deliveries.
@@ -61,7 +59,7 @@ class TestCenter extends ProctoringModule
     /**
      * Displays the three action box for the test center
      */
-    public function testCenter()
+    public function addProctor()
     {
         $testCenters = TestCenterHelper::getTestCenters();
         $testCenter  = $this->getCurrentTestCenter();
