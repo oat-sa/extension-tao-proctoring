@@ -20,6 +20,7 @@
  */
 define([
     'jquery',
+    'lodash',
     'i18n',
     'helpers',
     'layout/loading-bar',
@@ -34,7 +35,7 @@ define([
     'ui/datatable',
     'jqueryui',
     'jquery.timePicker'
-], function ($, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
+], function ($, _, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
@@ -112,7 +113,7 @@ define([
              */
             var printResults = function printReport(rowId) {
                 window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printReport' + JSON.stringify(rowId));
-            }
+            };
 
             /**
              * Print rubric blocks with item tagged with tao-print tag
@@ -120,7 +121,7 @@ define([
              */
             var printRubric = function printRubric(rowId) {
                 window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : rowId}), 'printRubric' + JSON.stringify(rowId));
-            }
+            };
 
             var today = moment().format('YYYY-MM-DD');
 
@@ -140,7 +141,7 @@ define([
                     label: __('Download CSV'),
                     action: function() {
                         notYet();
-                    },
+                    }
                 }, {
                     id : 'printRubric',
                     title : __('Print rubric block with item tagged with tao-print tag'),
@@ -153,7 +154,7 @@ define([
             if (printReportButton) {
                 datatableTools.push({
                     id : 'printReport',
-                        title : __('Print the assessment results'),
+                    title : __('Print the assessment results'),
                     icon : 'print',
                     label : __('Print results'),
                     massAction: true,
@@ -180,7 +181,7 @@ define([
                 };
             }
 
-            
+
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
@@ -197,7 +198,7 @@ define([
                     },
                     tools: datatableTools,
                     selectable: true,
-                    'actions' : datatableActions,
+                    actions : datatableActions,
                     model: [{
                         id: 'delivery',
                         label: __('Test')
@@ -219,12 +220,10 @@ define([
                         }
                     }, {
                         id: 'start',
-                        label: __('Start'),
-                        transform: transformDate
+                        label: __('Start')
                     }, {
                         id: 'end',
-                        label: __('End'),
-                        transform: transformDate
+                        label: __('End')
                     }, {
                         id: 'pause',
                         label: __('Pause #')
@@ -239,7 +238,6 @@ define([
                                 var cat = categories[log.type];
 
                                 log[log.type] = true;
-                                log.timestamp = transformDate(log.timestamp);
 
                                 switch (log.type) {
                                     case 'pause':

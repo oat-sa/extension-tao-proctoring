@@ -21,11 +21,14 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use core_kernel_users_GenerisUser;
 use DateTime;
+use tao_helpers_Date as DateHelper;
+use oat\tao\helpers\UserHelper;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
 
@@ -34,7 +37,7 @@ use oat\taoProctoring\model\implementation\DeliveryService;
  * This helps isolating the mock code from the real controller one.
  * It will be replaced by a real service afterward.
  */
-class TestCenter extends Proctoring
+class TestCenterHelper
 {
     /**
      * Gets a list of available test sites
@@ -92,9 +95,9 @@ class TestCenter extends Proctoring
     public static function getTestCenterActions(core_kernel_classes_Resource $testCenter)
     {
 
-        $actionDiagnostics = Breadcrumbs::diagnostics($testCenter);
-        $actionDeliveries = Breadcrumbs::deliveries($testCenter);
-        $actionReporting = Breadcrumbs::reporting($testCenter);
+        $actionDiagnostics = BreadcrumbsHelper::diagnostics($testCenter);
+        $actionDeliveries = BreadcrumbsHelper::deliveries($testCenter);
+        $actionReporting = BreadcrumbsHelper::reporting($testCenter);
 
         $actions = array(
             array(
@@ -130,74 +133,7 @@ class TestCenter extends Proctoring
     public static function getDiagnostics($testCenterId, $options = array())
     {
         $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-        return self::paginate($diagnostics, $options);
-    }
-
-    /**
-     * Gets a list of testtaker for a particular $delivery
-     * @param string $deliveryId
-     * @return array
-     */
-    private static function getTestTakers($deliveryId)
-    {
-        static $cache = array();
-        if (!isset($cache[$deliveryId])) {
-            $testTakers = ServiceManager::getServiceManager()->get('taoProctoring/delivery')->getDeliveryTestTakers($deliveryId);
-            $map = array();
-            foreach($testTakers as $testTaker) {
-                $map[$testTaker->getIdentifier()] = $testTaker;
-            }
-            $cache[$deliveryId] = $map;
-        }
-        return $cache[$deliveryId];
-    }
-
-    /**
-     * Get a test taker related to a delivery
-     * @param string $userId
-     * @param string $deliveryId
-     * @return User
-     */
-    private static function getTestTaker($userId, $deliveryId)
-    {
-        $testTakers = self::getTestTakers($deliveryId);
-        if (isset($testTakers[$userId])) {
-            return $testTakers[$userId];
-        }
-        return null;
-    }
-
-    /**
-     * Gets a user from a URI
-     * @param string $userId
-     * @return core_kernel_users_GenerisUser
-     */
-    private static function getUser($userId)
-    {
-        static $cache = array();
-        if (!isset($cache[$userId])) {
-            $cache[$userId] = new core_kernel_users_GenerisUser(new core_kernel_classes_Resource($userId));
-        }
-        return $cache[$userId];
-    }
-
-    /**
-     * Format a date from a timestamp if any
-     * @param int $time
-     * @return string
-     */
-    private static function getDate($time)
-    {
-        if ($time) {
-            $parts = explode(' ', $time);
-            if (count($parts) > 1) {
-                $time = $parts[1];
-            } else {
-                $time = $parts[0];
-            }
-            return date('Y-m-d H:i:s', $time);
-        }
-        return '';
+        return DataTableHelper::paginate($diagnostics, $options);
     }
 
     /**
@@ -209,62 +145,76 @@ class TestCenter extends Proctoring
      */
     public static function getReports($testCenter, $options = array())
     {
-        $reports = array();
+        $periodStart = null;
+        $periodEnd = null;
 
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        if (isset($options['periodStart'])) {
+            $periodStart = new DateTime($options['periodStart']);
+            $periodStart->setTime(0, 0, 0);
+            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
+        }
+        if (isset($options['periodEnd'])) {
+            $periodEnd = new DateTime($options['periodEnd']);
+            $periodEnd->setTime(23, 59, 59);
+            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+        }
+
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
+        $filteredExecutions = array();
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {
                 $deliveryExecutions = $deliveryService->getDeliveryExecutions($delivery->getUri());
-                foreach($deliveryExecutions as $deliveryExecution) {
-                    $userId = $deliveryExecution->getUserIdentifier();
-                    $user = self::getTestTaker($userId, $delivery->getUri());
-    
-                    $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
-                    $proctor = '';
-                    if (!empty($state['authorized_by'])) {
-                        $proctor = self::getUserName(self::getUser($state['authorized_by']));
+                foreach ($deliveryExecutions as $deliveryExecution) {
+                    $startTime = $deliveryExecution->getStartTime();
+                    $finishTime = $deliveryExecution->getFinishTime();
+
+                    if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
+                        continue;
                     }
-                    
-                    $procActions = self::getProctorActions($deliveryExecution);
-    
-                    $reports[] = array(
-                        'id' => $deliveryExecution->getIdentifier(),
-                        'delivery' => $delivery->getLabel(),
-                        'testtaker' => self::getUserName($user),
-                        'proctor' => $proctor,
-                        'status' => $deliveryService->getState($deliveryExecution),
-                        'start' => self::getDate($deliveryService->getStartTime($deliveryExecution)),
-                        'end' => self::getDate($deliveryService->getFinishTime($deliveryExecution)),
-                        'pause' => $procActions['pause'],
-                        'resume' => $procActions['resume'],
-                        'irregularities' => $procActions['irregularities'],
-                    );
+                    if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
+                        continue;
+                    }
+
+                    $filteredExecutions[] = $deliveryExecution;
                 }
             }
         }
 
-        // filter the reports by dates
-        $start = isset($options['periodStart']) ? new DateTime(substr($options['periodStart'], 0, 10) . ' 00:00:00') : null;
-        $end   = isset($options['periodEnd']) ? new DateTime(substr($options['periodEnd'], 0, 10) . ' 23:59:59') : null;
+        return DataTableHelper::paginate($filteredExecutions, $options, function($deliveryExecutions) use ($deliveryService) {
+            $reports = [];
 
-        if (!is_null($start) || !is_null($end)) {
-            $returnValues = array();
-            foreach ($reports as $delivery) {
-                $_start = new DateTime($delivery['start']);
-                $_end   = new DateTime($delivery['end']);
-                if (!is_null($start) && $start > $_end) {
-                    continue;
+            foreach($deliveryExecutions as $deliveryExecution) {
+                /* @var $deliveryExecution DeliveryExecution */
+                $startTime = $deliveryExecution->getStartTime();
+                $finishTime = $deliveryExecution->getFinishTime();
+
+                $userId = $deliveryExecution->getUserIdentifier();
+                $user = UserHelper::getUser($userId);
+
+                $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
+                $proctor = null;
+                if (!empty($state['authorized_by'])) {
+                    $proctor = UserHelper::getUser($state['authorized_by']);
                 }
-                if (!is_null($end) && $end < $_start) {
-                    continue;
-                }
-                $returnValues[] = $delivery;
+
+                $procActions = self::getProctorActions($deliveryExecution);
+                $reports[] = array(
+                    'id' => $deliveryExecution->getIdentifier(),
+                    'delivery' => $deliveryExecution->getDelivery()->getLabel(),
+                    'testtaker' => $user ? UserHelper::getUserName($user, true) : '',
+                    'proctor' => $proctor ? UserHelper::getUserName($proctor, true) : '',
+                    'status' => $deliveryService->getState($deliveryExecution),
+                    'start' => $startTime ? DateHelper::displayeDate($startTime) : '',
+                    'end' => $finishTime ? DateHelper::displayeDate($finishTime) : '',
+                    'pause' => $procActions['pause'],
+                    'resume' => $procActions['resume'],
+                    'irregularities' => $procActions['irregularities'],
+                );
             }
-            $reports = $returnValues;
-        }
 
-        return self::paginate($reports, $options);
+            return $reports;
+        });
     }
 
     /**
@@ -290,7 +240,6 @@ class TestCenter extends Proctoring
                 $var = reset($arr)->variable;
                 if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
                     $actions['pause']++;
-                    $log = self::getProctorIrregularity($var);
                     $actions['irregularities'][] = self::getProctorIrregularity($var, 'pause');
                 } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
                     $actions['resume']++;
@@ -315,7 +264,7 @@ class TestCenter extends Proctoring
     {
         $trace = json_decode($var->trace, true);
         $data = array(
-            'timestamp' => self::getDate($trace['timestamp']),
+            'timestamp' => DateHelper::displayeDate($trace['timestamp']),
             'type' => $type
         );
 

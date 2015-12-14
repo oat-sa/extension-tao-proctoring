@@ -26,7 +26,7 @@ use \core_kernel_classes_Resource;
 /**
  * Allow creating breakcrumbs easily
  */
-class Breadcrumbs
+class BreadcrumbsHelper
 {
 
     /**

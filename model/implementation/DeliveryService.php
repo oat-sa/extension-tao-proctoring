@@ -31,6 +31,7 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\TestCenterService;
 
 /**
@@ -115,7 +116,10 @@ class DeliveryService extends ConfigurableService
 
         $deliveries = array();
         foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            $delivery = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            if ($delivery->exists()) {
+                $deliveries[] = $delivery;
+            }
         }
         return $deliveries;
     }
@@ -150,30 +154,12 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Extract the started time of a delivery execution as a timestamp
-     * @param DeliveryExecution $deliveryExecution
-     * @return float
-     */
-    public function getStartTime($deliveryExecution) {
-        return $this->getDatetime($deliveryExecution->getStartTime());
-    }
-
-    /**
-     * Extract the end time of a delivery execution as a timestamp
-     * @param DeliveryExecution $deliveryExecution
-     * @return float
-     */
-    public function getFinishTime($deliveryExecution) {
-        return $this->getDatetime($deliveryExecution->getFinishTime());
-    }
-
-    /**
      * @param DeliveryExecution $a
      * @param DeliveryExecution $b
      * @return int
      */
     public function cmpDeliveryExecution($a, $b) {
-        return $this->getStartTime($b) - $this->getStartTime($a);
+        return DateHelper::getTimeStamp($b->getStartTime()) - DateHelper::getTimeStamp($a->getStartTime());
     }
 
     /**
@@ -341,21 +327,38 @@ class DeliveryService extends ConfigurableService
     */
     public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array())
     {
-        $class = new  \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
+        $testCenterService = TestCenterService::singleton();
 
+        // test takers already assigned are excluded
         $excludeIds = array();
         foreach ($this->getDeliveryTestTakers($deliveryId) as $user) {
-            $excludeIds[] = $user->getIdentifier();
+            $excludeIds[$user->getIdentifier()] = true;
         }
 
-        $users = array();
-        foreach ($class->getInstances(true) as $userResource) {
-            // assume Tao Users
-            if (!in_array($userResource->getUri(), $excludeIds)) {
-                $users[] = new core_kernel_users_GenerisUser($userResource);
+        // determine testcenters managed per proctor with delivery available
+        $availableIn = array();
+        foreach ($testCenterService->getTestCentersByDelivery($deliveryId) as $testCenter) {
+            $availableIn[$testCenter->getUri()] = true;
+        }
+
+        $testCenters = array();
+        foreach ($testCenterService->getTestCentersByProctor($proctor) as $testCenter) {
+            if (array_key_exists($testCenter->getUri(), $availableIn)) {
+                $testCenters[] = $testCenter;
             }
         }
-        return $users;
+
+        // get testtakers from those centers that are not excluded
+        $users = array();
+        foreach ($testCenters as $testCenter) {
+            foreach ($testCenterService->getTestTakers($testCenter->getUri()) as $userResource) {
+                $uri = $userResource->getUri();
+                if (!array_key_exists($uri, $excludeIds) && !array_key_exists($uri, $users)) {
+                    $users[$uri] = new \core_kernel_users_GenerisUser($userResource);
+                }
+            }
+        }
+        return array_values($users);
     }
 
     /**
@@ -747,19 +750,5 @@ class DeliveryService extends ConfigurableService
                 $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
-    }
-
-    /**
-     * Extract time from a timestamp (can be a microtime or an epoch timestamp)
-     * @param $time
-     * @return mixed
-     */
-    private function getDatetime($time)
-    {
-        $time = explode(' ', $time);
-        if (count($time) > 1) {
-            return $time[1];
-        }
-        return $time[0];
     }
 }

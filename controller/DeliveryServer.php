@@ -75,7 +75,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
      */
     public function runDeliveryExecution() {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $executionState = $deliveryService->getState($deliveryExecution);
 
         if (DeliveryService::STATE_AUTHORIZED == $executionState) {
@@ -102,7 +102,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
     public function awaitingAuthorization() {
 
         $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $executionState = $deliveryService->getState($deliveryExecution);
 
         // if the test taker is already authorized, straight forward to the execution
@@ -142,7 +142,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
     public function isAuthorized(){
         
         $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
+        $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $executionState = $deliveryService->getState($deliveryExecution);
 
         $authorized = DeliveryService::STATE_AUTHORIZED == $executionState || DeliveryService::STATE_INPROGRESS == $executionState;
