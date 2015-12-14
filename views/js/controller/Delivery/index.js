@@ -73,7 +73,12 @@ define([
                 renderTo: $container.find('.content'),
                 replace: true,
                 list: format(boxes),
-                width:12
+                width:12,
+
+                // discard the "all sessions" box from available count
+                countRenderer: function(count) {
+                    return count - 1;
+                }
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('deliveries', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
