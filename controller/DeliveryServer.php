@@ -117,6 +117,9 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
             return $this->redirect(_url('awaitingAuthorization', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
+        // ensure the result server object is properly set to avoid test runner issue 
+        $this->ensureResultServerObject($deliveryExecution);
+
         // ok, the delivery execution can be processed
         parent::runDeliveryExecution();
     }
@@ -268,5 +271,23 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
         $session = PHPSession::singleton();
         return $session->hasAttribute(self::ACCESS_KEY_NAME) && 
                $session->getAttribute(self::ACCESS_KEY_NAME) == $this->getSecurityKey();
+    }
+
+    /**
+     * Ensures the result server object is properly set
+     * 
+     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     */
+    protected function ensureResultServerObject($deliveryExecution)
+    {
+        $session = PHPSession::singleton();
+        if (!$session->hasAttribute('resultServerObject') || !$session->getAttribute('resultServerObject')) {
+            $compiledDelivery = $deliveryExecution->getDelivery();
+            $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
+            $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());
+
+            $session->setAttribute('resultServerUri', $resultServerUri->getUri());
+            $session->setAttribute('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
+        }
     }
 }
