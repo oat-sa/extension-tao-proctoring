@@ -20,8 +20,8 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
 
 /**
  * Proctoring Diagnostic controller for the readiness check screen
@@ -50,13 +50,13 @@ class Diagnostic extends ProctoringModule
                 'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions)
             ),
             array(
-                Breadcrumbs::testCenters(),
-                Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                Breadcrumbs::diagnostics(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::diagnostics(
                     $testCenter,
                     array(
-                        Breadcrumbs::deliveries($testCenter),
-                        Breadcrumbs::reporting($testCenter)
+                        BreadcrumbsHelper::deliveries($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
             )

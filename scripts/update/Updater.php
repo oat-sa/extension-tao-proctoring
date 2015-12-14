@@ -26,6 +26,8 @@ use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoProctoring\model\AssessmentResultsService;
+use oat\oatbox\service\ServiceNotFoundException;
 
 /**
  * 
@@ -97,11 +99,26 @@ class Updater extends common_ext_ExtensionUpdater {
             $currentVersion = '0.5';
         }
 
-        if($currentVersion == '0.5'){
-            OntologyUpdater::syncModels();
+        if ($currentVersion == '0.5') {
+            try {
+                $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new AssessmentResultsService([
+                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
+                    AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
+                ]);
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
+            }
             $currentVersion = '0.6';
         }
         
+        if($currentVersion == '0.6'){
+            OntologyUpdater::syncModels();
+            $currentVersion = '0.7';
+        }
+
         return $currentVersion;
     }
 

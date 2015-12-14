@@ -20,8 +20,11 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\taoProctoring\helpers\Breadcrumbs;
-use oat\taoProctoring\helpers\TestCenter as TestCenterHelper;
+use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\helpers\ReportingService;
+use oat\oatbox\service\ServiceManager;
+use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -43,23 +46,110 @@ class Reporting extends ProctoringModule
         $requestOptions = $this->getRequestOptions();
 
         $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
         $this->composeView(
             'reporting-index',
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
+                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+                'categories' => $this->getAllReasonsCategories(),
             ),
             array(
-            Breadcrumbs::testCenters(),
-            Breadcrumbs::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-            Breadcrumbs::reporting(
-                $testCenter,
-                array(
-                    Breadcrumbs::diagnostics($testCenter),
-                    Breadcrumbs::deliveries($testCenter),
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::reporting(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::deliveries($testCenter),
+                    )
                 )
             )
-        ));
+        );
+    }
+
+    /**
+     * Render page with assessment(s) result.
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function printReport()
+    {
+        if (!$this->hasRequestParameter('id')) {
+            throw new \common_exception_MissingParameter('id');
+        }
+        $idList = $this->getRequestParameter('id');
+        if (!is_array($idList)) {
+            $idList = [$idList];
+        }
+        $result = [];
+
+        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        $currentUser = \common_session_SessionManager::getSession()->getUser();
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
+        foreach ($idList as $deliveryExecutionId) {
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $delivery = $deliveryExecution->getDelivery();
+            if (!isset($deliveries[$delivery->getUri()])) {
+                \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
+                continue;
+            }
+            $result[] = [
+                'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
+                'testData' => $assessmentResultsService->getTestData($deliveryExecution),
+                'resultsData' => $assessmentResultsService->getResultsData($deliveryExecution),
+                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+            ];
+        }
+
+        $this->setData('reports', $result);
+        $this->setData('content-template', 'Reporting/print_report.tpl');
+        $this->setView('Reporting/layout.tpl');
+    }
+
+    /**
+     * Render printable rubrics
+     *
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function printRubric()
+    {
+        if (!$this->hasRequestParameter('id')) {
+            throw new \common_exception_MissingParameter('id');
+        }
+        $idList = $this->getRequestParameter('id');
+        if (!is_array($idList)) {
+            $idList = [$idList];
+        }
+        $result = [];
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
+        foreach ($idList as $deliveryExecutionId) {
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $result[] = [
+                'testData' => $assessmentResultsService->getTestData($deliveryExecution),
+                'rubricContent' => $assessmentResultsService->getPrintableRubric($deliveryExecution),
+                'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
+                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+            ];
+        }
+
+        $this->setData('rubrics', $result);
+        $this->setData('content-template', 'Reporting/print_rubric.tpl');
+        $this->setView('Reporting/layout.tpl');
     }
 
     /**

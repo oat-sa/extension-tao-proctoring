@@ -30,7 +30,8 @@ return array(
         'tao' => '>=2.8.0',
         'taoDelivery' => '>=2.7.0',
         'taoTestTaker' => '>=2.6.0',
-	    'taoQtiTest' => '>=2.16.0'
+	    'taoQtiTest' => '>=2.16.0',
+	    'taoOutcomeUi' => '>=2.6.6',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(

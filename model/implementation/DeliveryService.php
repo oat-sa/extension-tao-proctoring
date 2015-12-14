@@ -31,6 +31,8 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use tao_helpers_Date as DateHelper;
+use oat\taoProctoring\model\TestCenterService;
 
 /**
  * Sample Delivery Service for proctoring
@@ -40,6 +42,8 @@ use qtism\runtime\tests\AssessmentTestSession;
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
+    const CONFIG_ID = 'taoProctoring/delivery';
+    
     /**
      * QtiSm AssessmentTestSession Storage Service
      * @var AbstractStorage
@@ -80,17 +84,19 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
-     * @param array $options
      * @return array
      */
-    public function getProctorableDeliveries(User $proctor, $options = array())
+    public function getProctorableDeliveries(User $proctor)
     {
-        $service = \taoDelivery_models_classes_DeliveryAssemblyService::singleton();
-        $allDeliveries = array();
-        foreach ($service->getRootClass()->getInstances(true) as $deliveryResource) {
-            $allDeliveries[] = new \taoDelivery_models_classes_DeliveryRdf($deliveryResource);
+        $testCenterService = TestCenterService::singleton();
+        $testCenters = $testCenterService->getTestCentersByProctor($proctor);
+
+        $deliveries = [];
+        foreach ($testCenters as $testCenter) {
+            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
         }
-        return $allDeliveries;
+
+        return $deliveries;
     }
 
     /**
@@ -110,7 +116,10 @@ class DeliveryService extends ConfigurableService
 
         $deliveries = array();
         foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            $delivery = new \taoDelivery_models_classes_DeliveryRdf($delResource);
+            if ($delivery->exists()) {
+                $deliveries[] = $delivery;
+            }
         }
         return $deliveries;
     }
@@ -145,25 +154,12 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Extract the started time of a delivery execution as a timestamp
-     * @param DeliveryExecution $deliveryExecution
-     * @return float
-     */
-    public function getStartTime($deliveryExecution) {
-        $time = explode(' ', $deliveryExecution->getStartTime());
-        if (count($time) > 1) {
-            return $time[1];
-        }
-        return $time[0];
-    }
-
-    /**
      * @param DeliveryExecution $a
      * @param DeliveryExecution $b
      * @return int
      */
     public function cmpDeliveryExecution($a, $b) {
-        return $this->getStartTime($b) - $this->getStartTime($a);
+        return DateHelper::getTimeStamp($b->getStartTime()) - DateHelper::getTimeStamp($a->getStartTime());
     }
 
     /**
@@ -216,7 +212,7 @@ class DeliveryService extends ConfigurableService
      * @param string $state
      * @param array $reason
      */
-    private function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -237,7 +233,7 @@ class DeliveryService extends ConfigurableService
      * @param string|DeliveryExecution $executionId
      * @return array
      */
-    private function getProctoringState($executionId)
+    public function getProctoringState($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -331,21 +327,38 @@ class DeliveryService extends ConfigurableService
     */
     public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array())
     {
-        $class = new  \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
+        $testCenterService = TestCenterService::singleton();
 
+        // test takers already assigned are excluded
         $excludeIds = array();
         foreach ($this->getDeliveryTestTakers($deliveryId) as $user) {
-            $excludeIds[] = $user->getIdentifier();
+            $excludeIds[$user->getIdentifier()] = true;
         }
 
-        $users = array();
-        foreach ($class->getInstances(true) as $userResource) {
-            // assume Tao Users
-            if (!in_array($userResource->getUri(), $excludeIds)) {
-                $users[] = new core_kernel_users_GenerisUser($userResource);
+        // determine testcenters managed per proctor with delivery available
+        $availableIn = array();
+        foreach ($testCenterService->getTestCentersByDelivery($deliveryId) as $testCenter) {
+            $availableIn[$testCenter->getUri()] = true;
+        }
+
+        $testCenters = array();
+        foreach ($testCenterService->getTestCentersByProctor($proctor) as $testCenter) {
+            if (array_key_exists($testCenter->getUri(), $availableIn)) {
+                $testCenters[] = $testCenter;
             }
         }
-        return $users;
+
+        // get testtakers from those centers that are not excluded
+        $users = array();
+        foreach ($testCenters as $testCenter) {
+            foreach ($testCenterService->getTestTakers($testCenter->getUri()) as $userResource) {
+                $uri = $userResource->getUri();
+                if (!array_key_exists($uri, $excludeIds) && !array_key_exists($uri, $users)) {
+                    $users[$uri] = new \core_kernel_users_GenerisUser($userResource);
+                }
+            }
+        }
+        return array_values($users);
     }
 
     /**
@@ -600,6 +613,27 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return array
+     * Exapmple:
+     * <pre>
+     * array(
+     *   'QtiTestCompilation' => 'http://sample/first.rdf#i14369768868163155-|http://sample/first.rdf#i1436976886612156+',
+     *   'QtiTestDefinition' => 'http://sample/first.rdf#i14369752345581135'
+     * )
+     * </pre>
+     */
+    public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
+    {
+        $compiledDelivery = $deliveryExecution->getDelivery();
+        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+
+        return $inputParameters;
+    }
+
+    /**
      * Gets the test session for a particular deliveryExecution
      *
      * @param DeliveryExecution $deliveryExecution
@@ -607,13 +641,12 @@ class DeliveryService extends ConfigurableService
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      */
-    private function getTestSession(DeliveryExecution $deliveryExecution)
+    public function getTestSession(DeliveryExecution $deliveryExecution)
     {
         $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
-        $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
+        $inputParameters = $this->getRuntimeInputParameters($deliveryExecution);
 
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
         $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
