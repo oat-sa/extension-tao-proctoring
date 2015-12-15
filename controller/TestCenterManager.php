@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\helpers\DataTableHelper;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -130,15 +131,16 @@ class TestCenterManager extends \tao_actions_SaSModule
             );
         }, $eligibilities);
 
-        return array(
-            'data' => $data,
-            'amount' => count($data),
-            'page' => 1,
-            'total' => 1
-        );
+        return DataTableHelper::paginate($data, $this->getRequestOptions());
     }
 
-    private function getRequestEligibility(){
+    /**
+     * Get the requested eligibility to be edited
+     * 
+     * @return type
+     * @throws \common_Exception
+     */
+    private function _getRequestEligibility(){
         if($this->hasRequestParameter('eligibility')){
             $eligibility = $this->getRequestParameter('eligibility');
             if(isset($eligibility['deliveries']) && is_array($eligibility['deliveries'])){
@@ -171,7 +173,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     public function addEligibilities()
     {
         $testCenter = $this->getCurrentInstance();
-        $eligibility = $this->getRequestEligibility();
+        $eligibility = $this->_getRequestEligibility();
         foreach($eligibility['deliveries'] as $delivery){
             $success = $this->eligibilityService->createEligibility($testCenter, $delivery);
             if($success && isset($eligibility['testTakers'])){
@@ -189,7 +191,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     {
         $success = false;
         $testCenter = $this->getCurrentInstance();
-        $eligibility = $this->getRequestEligibility();
+        $eligibility = $this->_getRequestEligibility();
         if(isset($eligibility['testTakers'])){
             foreach($eligibility['deliveries'] as $delivery){
                 $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
@@ -203,7 +205,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     public function removeEligibilities()
     {
         $testCenter = $this->getCurrentInstance();
-        $eligibility = $this->getRequestEligibility();
+        $eligibility = $this->_getRequestEligibility();
         foreach($eligibility['deliveries'] as $delivery){
             $success = $this->eligibilityService->removeEligibility($testCenter, $delivery);
         }
@@ -212,4 +214,26 @@ class TestCenterManager extends \tao_actions_SaSModule
         ));
     }
 
+    /**
+     * Gets the data table request options
+     *
+     * @return array
+     */
+    protected function getRequestOptions() {
+
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : DataTableHelper::DEFAULT_PAGE;
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : DataTableHelper::DEFAULT_ROWS;
+        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'Delivery';
+        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
+        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+
+        return array(
+            'page' => $page,
+            'rows' => $rows,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+            'filter' => $filter
+        );
+
+    }
 }
