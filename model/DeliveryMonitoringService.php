@@ -50,7 +50,7 @@ namespace oat\taoProctoring\model;
  *   'limit' => 10,
  *   'order' = >'id ASC',
  * ]);
- *
+ * ```
  *
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
