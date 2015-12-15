@@ -25,15 +25,16 @@ define([
     'generis.tree.select',
     'tpl!taoProctoring/component/eligibilityEditor/layout',
     'select2',
-    'ui/modal'
+    'ui/modal',
+    'css!taoProctoringCss/eligibilityEditor'
 ], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl){
 
     var _ns = '.eligibility-editor';
-    
+
     var _modalDefaults = {
-        width : 800
+        width : 600
     };
-    
+
     /**
      * Builds group tree inside target container
      * 
@@ -42,7 +43,7 @@ define([
      * @param {Array} [testTakers] - array of selected test takers
      */
     function buildTestTakerTree(instance, selector, testTakers){
-        
+
         var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
             actionId : 'treeOptions.actionId',
             saveUrl : 'treeOptions.saveUrl',
@@ -64,7 +65,7 @@ define([
 
         return tree;
     }
-    
+
     /**
      * Builds delivery tree inside target container
      * 
@@ -73,7 +74,7 @@ define([
      * @param {Array} [deliveries] - array of selected deliveries
      */
     function buildDeliveryTree(instance, selector, deliveries){
-        
+
         var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
             actionId : 'treeOptions.actionId',
             saveUrl : 'treeOptions.saveUrl',
@@ -174,13 +175,14 @@ define([
         instance.$container = $container;
         $container.append(layoutTpl({
             title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
+            editingMode : !creationMode,
             subjectTreeId : subjectTreeId,
             deliveryTreeId : deliveryTreeId
         }));
 
         if(creationMode){
             //init delivery selector only when no delivery is selected
-            $deliverySelector = $container.find('.eligible-delivery-select');
+            $deliverySelector = $container.find('.eligible-delivery');
             buildDeliveryTree(instance, '#' + deliveryTreeId, []);
         }
 
@@ -188,7 +190,9 @@ define([
         buildTestTakerTree(instance, '#' + subjectTreeId, instance.eligibility.testTakers || []);
 
         //init modal
-        initModal(instance);
+        initModal(instance, {
+            width : creationMode ? 650 : 300
+        });
 
         return instance;
     }

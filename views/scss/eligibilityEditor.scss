@@ -19,20 +19,23 @@
 @import "inc/bootstrap";
 
 .eligibility-editor{
-    padding-bottom : 20px;
     h2.title {
         margin-top : 0;
-        margin-bottom : 30px
+    }
+    .tree-container{
+        label {
+            top : 10px;
+        }
     }
     .tree{
         border: none;
     }
-    .eligible-delivery-select{
-        margin-bottom: 20px;
-    }
-    .eligible-testTaker-tree-container{
-        & > label {
-            top : 10px;
+    &.editing{
+        .eligible-delivery{
+            display : none;
+        }
+        .eligible-testTaker{
+            margin-left : 0;
         }
     }
     .actions{

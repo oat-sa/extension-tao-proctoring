@@ -46,8 +46,8 @@ define([
             }
         ];
         var editor = eligibilityEditor.init($container, eligibilities, deliveries);
-        editor.on('change', function(){
-           debugger; 
+        editor.on('change', function(eligibility){
+            console.log('change', eligibility)
         });
         return;
         var $editorContainer = $container.children('.eligibility-editor');
@@ -58,8 +58,8 @@ define([
         assert.equal($select.length, 1, 'delivery selector found');
         assert.equal($select.children('option').length, 4, 'options found (1 placeholdre + 3 delivery choices');
 
-        assert.equal($editorContainer.children('.eligible-testTaker-tree-container').length, 1, 'tree container found');
-        assert.equal($editorContainer.children('.eligible-testTaker-tree-container').find('.tree.tree-checkbox').length, 1, 'tree found');
+        assert.equal($editorContainer.children('.eligible-testTaker').length, 1, 'tree container found');
+        assert.equal($editorContainer.children('.eligible-testTaker').find('.tree.tree-checkbox').length, 1, 'tree found');
 
     });
 

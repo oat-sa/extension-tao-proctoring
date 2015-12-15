@@ -23,8 +23,7 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
-    'taoProctoring/component/eligibilityEditor',
-    'css!taoProctoringCss/testCenterManager'
+    'taoProctoring/component/eligibilityEditor'
 ], function(
     $,
     _,
