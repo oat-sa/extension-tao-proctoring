@@ -24,10 +24,10 @@ define([
     'core/eventifier',
     'generis.tree.select',
     'tpl!taoProctoring/component/eligibilityEditor/layout',
-    'select2',
+    'ui/feedback',
     'ui/modal',
     'css!taoProctoringCss/eligibilityEditor'
-], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl){
+], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl, feedback){
     'use strict';
     
     var _ns = '.eligibility-editor';
@@ -116,16 +116,20 @@ define([
             })
             .modal(modalConfig)
             .on('click' + _ns, '.actions .done', function(e){
-
-                instance.trigger('ok', instance.eligibility);
-                destroy(instance);
+                
+                if(instance.eligibility && instance.eligibility.deliveries && instance.eligibility.deliveries.length){
+                    instance.trigger('ok', instance.eligibility);
+                    destroy(instance);
+                }else{
+                    feedback(instance.$container).warning(__('At least one delivery need to be selected to create'));
+                }
 
             }).on('click' + _ns, '.actions .cancel', function(e){
 
-            e.preventDefault();
-            instance.trigger('cancel');
-            destroy(instance);
-        });
+                e.preventDefault();
+                instance.trigger('cancel');
+                destroy(instance);
+            });
     }
 
     /**

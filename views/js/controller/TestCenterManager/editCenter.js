@@ -94,9 +94,9 @@ define([
             // request the server with a selection of test takers
             function _request(url, eligibility, message){
                 if(eligibility){
-
+                    
                     loadingBar.start();
-                    debugger;
+                    
                     $.ajax({
                         url : url,
                         data : {
@@ -108,6 +108,7 @@ define([
                             loadingBar.stop();
                         }
                     }).done(function(response){
+                        
                         loadingBar.stop();
 
                         if(response && response.success){
