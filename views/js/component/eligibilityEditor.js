@@ -24,13 +24,16 @@ define([
     'core/eventifier',
     'generis.tree.select',
     'tpl!taoProctoring/component/eligibilityEditor/layout',
-    'tpl!taoProctoring/component/eligibilityEditor/deliverySelector',
     'select2',
     'ui/modal'
-], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl, deliverySelectorTpl){
+], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl){
 
     var _ns = '.eligibility-editor';
-
+    
+    var _modalDefaults = {
+        width : 800
+    };
+    
     /**
      * Builds group tree inside target container
      * 
@@ -61,50 +64,37 @@ define([
 
         return tree;
     }
-
+    
     /**
-     * Build the delivery selector combobox
+     * Builds delivery tree inside target container
      * 
-     * @param {Object} instance
-     * @param {JQuery} $container
-     * @param {Array} deliveries
-     * @param {Array} eligibles
-     * @returns {undefined}
+     * @param {Object} the eligibility editor instance
+     * @param {String} selector - the selector for the tree (generis tree works with selector only)
+     * @param {Array} [deliveries] - array of selected deliveries
      */
-    function buildDeliverySelector(instance, $container, deliveries, eligibles){
-
-        var selectables = _.reject(deliveries, function(delivery){
-            //remove all deliveries that are already eligible
-            return (_.indexOf(eligibles, delivery.uri) >= 0);
-        });
-        var $selectorContainer = $(deliverySelectorTpl({
-            deliveries : selectables
-        }));
-
-
-        //init select 2 on $comboBox
-        var $select = $selectorContainer.find('select');
-
-        //add event handler
-        $select.on('change', function(e){
-            if(e.val){
-                instance.eligibility.delivery = e.val;
-                instance.trigger('change', instance.eligibility);
+    function buildDeliveryTree(instance, selector, deliveries){
+        
+        var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
+            actionId : 'treeOptions.actionId',
+            saveUrl : 'treeOptions.saveUrl',
+            saveData : {},
+            checkedNodes : _.pluck(deliveries, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
+            serverParameters : {
+                openParentNodes : _.pluck(deliveries, 'uri'), //generis tree uses normal if to open nodes...
+                rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#Delivery'
+            },
+            paginate : 10,
+            onChangeCallback : function(){
+                _.delay(function(){
+                    //requires a delay to let the node status to be updated
+                    instance.eligibility.deliveries = _.uniq(tree.getChecked());
+                    instance.trigger('change', instance.eligibility);
+                }, 100);
             }
         });
 
-        $select.select2({
-            dropdownAutoWidth : true,
-            placeholder : __('select...'),
-            minimumResultsForSearch : -1
-        });
-
-        $container.append($selectorContainer);
+        return tree;
     }
-
-    var _modalDefaults = {
-        width : 400
-    };
 
     /**
      * Add the editor into a popup and display it
@@ -153,24 +143,23 @@ define([
      * 
      * @param {JQuery} $container
      * @param {Array} eligibilities
-     * @param {Array} deliveries
      * @param {Object} [delivery]
      * @param {String} [delivery.label]
      * @param {String} [delivery.uri]
      * @returns {Object} the eligibility editor instance
      */
-    function init($container, eligibilities, deliveries, delivery){
+    function init($container, eligibilities, delivery){
 
         var instance = eventifier({
             eligibility : {}
         });
-        var testTakers = [];
-        var treeId = _.uniqueId('eligible-testTaker-tree-');//generating the generis tree id, because it requires one to work
+        var subjectTreeId = _.uniqueId('eligible-testTaker-tree-');//generating the generis tree id, because it requires one to work
+        var deliveryTreeId = _.uniqueId('eligible-delivery-tree-');//generating the generis tree id, because it requires one to work
         var $deliverySelector;
         var creationMode = true;
 
-        if(!_.isArray(eligibilities) || !_.isArray(deliveries)){
-            throw 'the egibility editor requires an array of eligibilities and an array of deliveries';
+        if(!_.isArray(eligibilities)){
+            throw 'the egibility editor requires an array of eligibilities';
         }
 
         if(delivery && delivery.uri && delivery.label){
@@ -185,17 +174,18 @@ define([
         instance.$container = $container;
         $container.append(layoutTpl({
             title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
-            treeId : treeId
+            subjectTreeId : subjectTreeId,
+            deliveryTreeId : deliveryTreeId
         }));
 
         if(creationMode){
             //init delivery selector only when no delivery is selected
             $deliverySelector = $container.find('.eligible-delivery-select');
-            buildDeliverySelector(instance, $deliverySelector, deliveries, _.pluck(eligibilities, 'delivery'));
+            buildDeliveryTree(instance, '#' + deliveryTreeId, []);
         }
 
         //init test taker selector
-        buildTestTakerTree(instance, '#' + treeId, instance.eligibility.testTakers || []);
+        buildTestTakerTree(instance, '#' + subjectTreeId, instance.eligibility.testTakers || []);
 
         //init modal
         initModal(instance);

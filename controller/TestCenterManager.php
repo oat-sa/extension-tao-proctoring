@@ -115,7 +115,7 @@ class TestCenterManager extends \tao_actions_SaSModule
         $testCenter = $this->getCurrentInstance();
         $eligibilityService = $this->eligibilityService;
         $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
-        
+
         $data = array_map(function($delivery) use ($eligibilityService, $testCenter){
             return array(
                 'id' => $delivery->getUri(),
@@ -141,15 +141,19 @@ class TestCenterManager extends \tao_actions_SaSModule
     private function getRequestEligibility(){
         if($this->hasRequestParameter('eligibility')){
             $eligibility = $this->getRequestParameter('eligibility');
-            if(isset($eligibility['delivery']) && !empty($eligibility['delivery'])){
-                $formatted = array(
-                    'delivery' => new \core_kernel_classes_Resource($eligibility['delivery'])
-                );
+            if(isset($eligibility['deliveries']) && is_array($eligibility['deliveries'])){
+
+                $formatted = array();
+                $formatted['deliveries'] = array_map(function($deliveryUri){
+                        return new \core_kernel_classes_Resource(\tao_helpers_Uri::decode($deliveryUri));
+                    }, $eligibility['deliveries']);
+
                 if(isset($eligibility['testTakers']) && is_array($eligibility['testTakers'])){
                     $formatted['testTakers'] = array_map(function($testTakerId){
                         return \tao_helpers_Uri::decode($testTakerId);
                     }, $eligibility['testTakers']);
                 }
+
                 return $formatted;
             }else{
                 throw new \common_Exception('eligibility requires a delivery');
@@ -158,43 +162,51 @@ class TestCenterManager extends \tao_actions_SaSModule
             throw new \common_Exception('no eligibility in request');
         }
     }
-    
+
     public function getEligibilities()
     {
         return $this->returnJson($this->_getEligibilities());
-    }   
+    }
 
-    public function addEligibility()
+    public function addEligibilities()
     {
         $testCenter = $this->getCurrentInstance();
         $eligibility = $this->getRequestEligibility();
-        $success = $this->eligibilityService->createEligibility($testCenter, $eligibility['delivery']);
-        if($success && isset($eligibility['testTakers'])){
-            $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+        foreach($eligibility['deliveries'] as $delivery){
+            $success = $this->eligibilityService->createEligibility($testCenter, $delivery);
+            if($success && isset($eligibility['testTakers'])){
+                $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+            }
         }
+
         return $this->returnJson(array(
-            'success' => $success
+            'success' => $success,
+            'eligibility' => $eligibility
         ));
     }
 
-    public function editEligibility()
+    public function editEligibilities()
     {
         $success = false;
         $testCenter = $this->getCurrentInstance();
         $eligibility = $this->getRequestEligibility();
         if(isset($eligibility['testTakers'])){
-            $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $eligibility['delivery'], $eligibility['testTakers']);
+            foreach($eligibility['deliveries'] as $delivery){
+                $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+            }
         }
         return $this->returnJson(array(
             'success' => $success
         ));
     }
 
-    public function removeEligibility()
+    public function removeEligibilities()
     {
         $testCenter = $this->getCurrentInstance();
         $eligibility = $this->getRequestEligibility();
-        $success = $this->eligibilityService->removeEligibility($testCenter, $eligibility['delivery']);
+        foreach($eligibility['deliveries'] as $delivery){
+            $success = $this->eligibilityService->removeEligibility($testCenter, $delivery);
+        }
         return $this->returnJson(array(
             'success' => $success
         ));

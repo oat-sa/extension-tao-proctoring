@@ -80,13 +80,13 @@ define([
             var eligibilities = $container.data('eligibilities');
             var testCenterId = $container.data('testcenter');
             var serviceUrl = helpers._url('getEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var addUrl = helpers._url('addEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var editUrl = helpers._url('editEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var removeUrl = helpers._url('removeEligibility', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var addUrl = helpers._url('addEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var editUrl = helpers._url('editEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
+            var removeUrl = helpers._url('removeEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
             var tools = [];
             var actions = [];
             var model = [];
-
+            
             function _getDelivery(uri){
                 return _.find(deliveries, {uri : uri});
             }
@@ -96,7 +96,7 @@ define([
                 if(eligibility){
 
                     loadingBar.start();
-                    
+                    debugger;
                     $.ajax({
                         url : url,
                         data : {
@@ -130,7 +130,7 @@ define([
                 label : __('Add'),
                 action : function(){
                     //open modal to select delivery + test takers
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries);
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities));
                     eligEditor.on('ok', function(eligibility){
                         _request(addUrl, eligibility, __('New eligible delivery added'));
                     });
@@ -144,7 +144,7 @@ define([
                 title : __('Edit eligibile test takers'),
                 action : function(uri){
                     //open modal to select test takers
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), deliveries, _getDelivery(uri));
+                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), _getDelivery(uri));
                     eligEditor.on('ok', function(eligibility){
                         _request(editUrl, eligibility, __('Eligible test takers updated'));
                     });
@@ -158,7 +158,7 @@ define([
                 title : __('Remove eligibility'),
                 action : function(uri){
                     //open modal to select test takers
-                    _request(removeUrl, {delivery : uri}, __('Eligible delivery removed'));
+                    _request(removeUrl, {deliveries : [uri]}, __('Eligible delivery removed'));
                 }
             });
 
