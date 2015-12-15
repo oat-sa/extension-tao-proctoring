@@ -113,8 +113,16 @@ class Updater extends common_ext_ExtensionUpdater {
             }
             $currentVersion = '0.6';
         }
+        
+        // save progess so far
+        $this->setVersion($currentVersion);
+        
+        // nothign to do
+        if ($this->isVersion('0.6')) {
+            $this->setVersion('0.7.0');
+        }
 
-        return $currentVersion;
+        return null;
     }
 
 }
