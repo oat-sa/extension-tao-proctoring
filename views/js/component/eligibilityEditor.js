@@ -158,7 +158,8 @@ define([
         var deliveryTreeId = _.uniqueId('eligible-delivery-tree-');//generating the generis tree id, because it requires one to work
         var $deliverySelector;
         var creationMode = true;
-
+        var deliveryName = '';
+        
         if(!_.isArray(eligibilities)){
             throw 'the egibility editor requires an array of eligibilities';
         }
@@ -168,6 +169,7 @@ define([
             if(eligibility){
                 instance.eligibility = eligibility;
                 creationMode = false;
+                deliveryName = delivery.label;
             }else{
                 throw ('given delivery does not exist in the list of eligibilities');
             }
@@ -177,7 +179,8 @@ define([
             title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
             editingMode : !creationMode,
             subjectTreeId : subjectTreeId,
-            deliveryTreeId : deliveryTreeId
+            deliveryTreeId : deliveryTreeId,
+            deliveryName : deliveryName
         }));
 
         if(creationMode){
@@ -191,7 +194,7 @@ define([
 
         //init modal
         initModal(instance, {
-            width : creationMode ? 650 : 300
+            width : creationMode ? 650 : 400
         });
 
         return instance;

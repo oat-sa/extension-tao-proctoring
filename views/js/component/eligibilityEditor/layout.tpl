@@ -6,7 +6,7 @@
                 <div id="{{deliveryTreeId}}"></div>
         </div>
         <div class="{{#if editingMode}}flex-col-12{{else}}flex-col-6{{/if}} tree-container eligible-testTaker">
-            <label>{{__ 'Eligible Test Takers'}}</label>
+            <label>{{__ 'Eligible Test Takers'}} {{#if editingMode}}{{__ 'for'}} <span class="delivery-name">{{deliveryName}}</span> :{{/if}}</label>
                 <div id="{{subjectTreeId}}"></div>
         </div>
     </div>

@@ -30,12 +30,18 @@
     .tree{
         border: none;
     }
+    .eligible-delivery{
+        margin-left : 0;
+    }
     &.editing{
         .eligible-delivery{
             display : none;
         }
         .eligible-testTaker{
             margin-left : 0;
+            .delivery-name{
+                font-weight:bold;
+            }
         }
     }
     .actions{
