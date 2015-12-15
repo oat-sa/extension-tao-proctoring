@@ -23,7 +23,8 @@ define([
     'layout/loading-bar',
     'util/encode',
     'ui/feedback',
-    'taoProctoring/component/eligibilityEditor'
+    'taoProctoring/component/eligibilityEditor',
+    'ui/datatable'
 ], function(
     $,
     _,
@@ -120,8 +121,8 @@ define([
                     });
                 }
             }
-
-            // tool: page refresh
+            
+            //tool : add new eligibility
             tools.push({
                 id : 'add',
                 icon : 'add',
@@ -135,7 +136,8 @@ define([
                     });
                 }
             });
-
+            
+            //action : edit existing eligibility
             actions.push({
                 id : 'edit',
                 icon : 'edit',
@@ -149,7 +151,8 @@ define([
                     });
                 }
             });
-
+            
+            //action : remove existing eligibility
             actions.push({
                 id : 'remove',
                 icon : 'bin',
@@ -190,9 +193,6 @@ define([
                     //update dateset in memory
                     eligibilities = newDataset;
                     loadingBar.stop();
-                })
-                .on('select.datatable', function(e, newDataset){
-
                 })
                 .datatable({
                     url : serviceUrl,

@@ -28,7 +28,8 @@ define([
     'ui/modal',
     'css!taoProctoringCss/eligibilityEditor'
 ], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl){
-
+    'use strict';
+    
     var _ns = '.eligibility-editor';
 
     var _modalDefaults = {
