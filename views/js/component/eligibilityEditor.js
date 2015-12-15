@@ -172,9 +172,14 @@ define([
         if(delivery && delivery.uri && delivery.label){
             var eligibility = _.find(eligibilities, {delivery : delivery.uri});
             if(eligibility){
-                instance.eligibility = eligibility;
                 creationMode = false;
                 deliveryName = delivery.label;
+                
+                //the format expected for the returned value
+                instance.eligibility = _.defaults(eligibility , {
+                    deliveries : [delivery.uri],
+                    testTakers : []
+                });
             }else{
                 throw ('given delivery does not exist in the list of eligibilities');
             }

@@ -92,7 +92,7 @@ define([
             }
 
             // request the server with a selection of test takers
-            function _request(url, eligibility, message){
+            function _request(url, eligibility, message, errorCallback){
                 if(eligibility){
                     
                     loadingBar.start();
@@ -116,6 +116,9 @@ define([
                                 feedback().success(message);
                             }
                             $list.datatable('refresh');
+                        }else if(_.isFunction(errorCallback)){
+                            //execute a final callback if needed
+                            errorCallback(response);
                         }else{
                             feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml : false});
                         }
@@ -133,7 +136,10 @@ define([
                     //open modal to select delivery + test takers
                     eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities));
                     eligEditor.on('ok', function(eligibility){
-                        _request(addUrl, eligibility, __('New eligible delivery added'));
+                        _request(addUrl, eligibility, __('New eligible delivery added'), function(res){
+                            feedback().warning(__('The following delivery(ies) are already eligible : ')+res.failed.join(', '));
+                            $list.datatable('refresh');
+                        });
                     });
                 }
             });

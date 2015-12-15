@@ -174,16 +174,22 @@ class TestCenterManager extends \tao_actions_SaSModule
     {
         $testCenter = $this->getCurrentInstance();
         $eligibility = $this->_getRequestEligibility();
+        $failures = array();
+        $success = true;
         foreach($eligibility['deliveries'] as $delivery){
-            $success = $this->eligibilityService->createEligibility($testCenter, $delivery);
-            if($success && isset($eligibility['testTakers'])){
-                $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+            if($this->eligibilityService->createEligibility($testCenter, $delivery)){
+                if(isset($eligibility['testTakers'])){
+                    $success &= $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+                }
+            }else{
+                $success = false;
+                $failures[] = $delivery->getLabel();
             }
         }
 
         return $this->returnJson(array(
             'success' => $success,
-            'eligibility' => $eligibility
+            'failed' => $failures
         ));
     }
 
@@ -196,6 +202,9 @@ class TestCenterManager extends \tao_actions_SaSModule
             foreach($eligibility['deliveries'] as $delivery){
                 $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
             }
+        }else{
+            //nothing to save, so consider it done
+            $success = true;
         }
         return $this->returnJson(array(
             'success' => $success
