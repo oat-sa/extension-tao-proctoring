@@ -123,10 +123,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
 
-            $this->setVersion('0.8');
+            $this->setVersion('0.7');
         }
-
-        return $currentVersion;
     }
 
 }
