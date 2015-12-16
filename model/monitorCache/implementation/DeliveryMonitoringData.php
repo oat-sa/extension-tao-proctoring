@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
 
 /**
  * class DeliveryMonitoringData

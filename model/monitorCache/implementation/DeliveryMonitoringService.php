@@ -21,9 +21,9 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use \oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
+use oat\oatbox\service\ConfigurableService;
 
 /**
  * Class DeliveryMonitoringService
@@ -81,6 +81,11 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     private $persistence;
 
     /**
+     * @var array
+     */
+    private $primaryTableColumns;
+
+    /**
      * @param array $criteria
      * @param array $options
      * @return DeliveryMonitoringData[]
@@ -96,16 +101,43 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
+        $result = false;
+        if ($deliveryMonitoring->validate()) {
+            $data = $deliveryMonitoring->get();
 
+            $primaryTableData = $this->extractPrimaryData($data);
+            $kvTableData = $this->extractKvData($data);
+
+            $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData);
+            $id = $this->persistence->lastInsertId(self::TABLE_NAME);
+
+            foreach($kvTableData as $kvDataKey => $kvDataValue) {
+                $this->getPersistence()->insert(
+                    self::KV_TABLE_NAME,
+                    array(
+                        self::KV_COLUMN_PARENT_ID => $id,
+                        self::KV_COLUMN_KEY => $kvDataKey,
+                        self::KV_COLUMN_VALUE => $kvDataValue,
+                    )
+                );
+            }
+            $result = true;
+        }
+        return $result;
     }
 
     /**
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return mixed
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoringData
+     * @return boolean
      */
-    public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function delete(DeliveryMonitoringDataInterface $deliveryMonitoringData)
     {
+        $data = $deliveryMonitoringData->get();
 
+        $sql = 'DELETE FROM ' . self::TABLE_NAME . '
+                WHERE ' . self::COLUMN_DELIVERY_EXECUTION_ID . '=?';
+
+        return $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]) === 1;
     }
 
     /**
@@ -117,5 +149,51 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             $this->persistence = \common_persistence_Manager::getPersistence('default');
         }
         return $this->persistence;
+    }
+
+    /**
+     * Get list of table column names
+     * @return array
+     */
+    private function getPrimaryColumns()
+    {
+        if ($this->primaryTableColumns === null) {
+            $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $this->primaryTableColumns = array_keys($schema->getTable(self::TABLE_NAME)->getColumns());
+        }
+        return $this->primaryTableColumns;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function extractPrimaryData(array $data)
+    {
+        $result = [];
+        $primaryTableCols = $this->getPrimaryColumns();
+        foreach ($primaryTableCols as $primaryTableCol) {
+            if (isset($data[$primaryTableCol])) {
+                $result[$primaryTableCol] = $data[$primaryTableCol];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function extractKvData(array $data)
+    {
+        $result = [];
+        $primaryTableCols = $this->getPrimaryColumns();
+        foreach ($data as $key => $val) {
+            if (!in_array($key, $primaryTableCols)) {
+                $result[$key] = $val;
+            }
+        }
+        return $result;
     }
 }

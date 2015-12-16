@@ -51,10 +51,18 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     public function tearDown()
     {
-        $sql = 'DELETE FROM ' . DeliveryMonitoringService::TABLE_NAME .
-            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . ' = ' . $this->deliveryExecutionId;
+        $this->deleteTestData();
+    }
 
-        $this->persistence->exec($sql, $this->createdRecords);
+    /**
+     * @after
+     */
+    public function deleteTestData()
+    {
+        $sql = 'DELETE FROM ' . DeliveryMonitoringService::TABLE_NAME .
+            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . ' = ?';
+
+        $this->persistence->exec($sql, [$this->deliveryExecutionId]);
     }
 
     public function testSave()
@@ -62,6 +70,11 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $data = [
             DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_id',
             DeliveryMonitoringService::COLUMN_STATUS => 'active',
+        ];
+
+        $secondaryData = [
+            'secondary_data_key' => 'secondary_data_val',
+            'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
         $dataModel = new DeliveryMonitoringData($this->deliveryExecutionId);
@@ -75,6 +88,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $dataModel->add($key, $val);
         }
 
+        foreach ($secondaryData as $secKey => $secVal) {
+            $dataModel->add($secKey, $secVal);
+        }
+
         $this->assertTrue($this->service->save($dataModel));
         $this->assertEmpty($dataModel->getErrors());
 
@@ -85,6 +102,62 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         foreach ($data as $key => $val) {
             $this->assertEquals($insertedData[0][$key], $val);
         }
+
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0]['id']);
+
+        $this->assertNotEmpty($insertedKvData);
+        $this->assertEquals(count($insertedKvData), count($secondaryData));
+
+        foreach ($insertedKvData as $kvData) {
+            $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
+            $val = $kvData[DeliveryMonitoringService::KV_COLUMN_VALUE];
+            $this->assertTrue(isset($secondaryData[$key]));
+            $this->assertEquals($secondaryData[$key], $val);
+        }
+    }
+
+
+    public function testDelete()
+    {
+        $data = [
+            DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_id',
+            DeliveryMonitoringService::COLUMN_STATUS => 'active',
+            'secondary_data_key' => 'secondary_data_val',
+            'secondary_data_key_2' => 'secondary_data_val_2',
+        ];
+
+        $dataModel = new DeliveryMonitoringData($this->deliveryExecutionId);
+
+        foreach ($data as $key => $val) {
+            $dataModel->add($key, $val);
+        }
+
+        $this->assertTrue($this->service->save($dataModel));
+        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
+        $this->assertNotEmpty($insertedData);
+
+        $this->assertTrue($this->service->delete($dataModel));
+
+        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
+        $this->assertEmpty($insertedData);
+    }
+
+
+    /**
+     * @dataProvider loadFixture
+     */
+    public function testFind($data)
+    {
+        var_dump($data);
+        $this->assertTrue(true);
+    }
+
+    public function loadFixture()
+    {
+        //TODO LOAD data
+        return [
+            [1]
+        ];
     }
 
     private function getRecordByDeliveryExecutionId($id)
@@ -92,6 +165,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $sql = 'SELECT * FROM ' . DeliveryMonitoringService::TABLE_NAME .
             ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '=?';
 
-        return $this->persistence->query($sql, [$this->deliveryExecutionId])->fetchAll();
+        return $this->persistence->query($sql, [$id])->fetchAll();
+    }
+
+    private function getKvRecordsByParentId($parentId)
+    {
+        $sql = 'SELECT * FROM ' . DeliveryMonitoringService::KV_TABLE_NAME .
+            ' WHERE ' . DeliveryMonitoringService::KV_COLUMN_PARENT_ID . '=?';
+
+        return $this->persistence->query($sql, [$parentId])->fetchAll();
     }
 }
