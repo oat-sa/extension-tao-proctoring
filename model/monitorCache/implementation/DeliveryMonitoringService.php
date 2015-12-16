@@ -78,6 +78,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
+    private $persistence;
+
     /**
      * @param array $criteria
      * @param array $options
@@ -104,5 +106,16 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
 
+    }
+
+    /**
+     * @return \common_persistence_SqlPersistence
+     */
+    private function getPersistence()
+    {
+        if ($this->persistence === null) {
+            $this->persistence = \common_persistence_Manager::getPersistence('default');
+        }
+        return $this->persistence;
     }
 }

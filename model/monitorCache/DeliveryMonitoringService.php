@@ -21,37 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
-
 /**
  * Interface DeliveryMonitoringService
- *
- * Usage example:
- *
- * Save
- * ----
- *
- * ```php
- * $data = new DeliveryMonitoringData();
- * $data->set([
- *  'test_taker' => 'John',
- *  'status' => 'ACTIVE',
- *  'current_item' => 'http://sample/first.rdf#i145018936535755'
- * ]);
- * $deliveryMonitoringService->save($data);
- * ```
- *
- * Find
- * ----
- *
- * ```php
- * $data = $deliveryMonitoringService->find([
- *   'state' => 'ACTIVE'
- * ],[
- *   'limit' => 10,
- *   'order' = >'id ASC',
- * ]);
- * ```
  *
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
