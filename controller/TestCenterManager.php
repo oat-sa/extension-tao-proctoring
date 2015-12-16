@@ -177,6 +177,9 @@ class TestCenterManager extends \tao_actions_SaSModule
         $failures = array();
         $success = true;
         foreach($eligibility['deliveries'] as $delivery){
+            if($delivery->isClass()){
+                continue;//prevent assigning eligibility to a class for now
+            }
             if($this->eligibilityService->createEligibility($testCenter, $delivery)){
                 if(isset($eligibility['testTakers'])){
                     $success &= $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
