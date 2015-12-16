@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache;
 
 /**
- * Interface DeliveryMonitoring
+ * Interface DeliveryMonitoringData
  *
  * Represents data model of delivery execution.
  *

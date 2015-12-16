@@ -32,8 +32,8 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecutionInstance);
- * $data->setData([
+ * $data = new DeliveryMonitoringData();
+ * $data->set([
  *  'test_taker' => 'John',
  *  'status' => 'ACTIVE',
  *  'current_item' => 'http://sample/first.rdf#i145018936535755'

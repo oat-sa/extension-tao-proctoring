@@ -24,7 +24,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 
 /**
- * class DeliveryMonitoring
+ * class DeliveryMonitoringData
  *
  * Represents data model of delivery execution.
  *
@@ -34,6 +34,31 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
 class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 {
     private $data;
+
+    /**
+     * DeliveryMonitoringData constructor.
+     * @param string $deliveryExecutionId
+     */
+    public function __construct($deliveryExecutionId)
+    {
+        $this->add('delivery_execution_id', $deliveryExecutionId);
+    }
+
+    /**
+     * Add data
+     * @param string $key
+     * @param string $value
+     * @param boolean $overwrite
+     * @return boolean
+     */
+    public function add($key, $value, $overwrite = false)
+    {
+        $result = false;
+        if (!isset($this->data[$key]) || $overwrite) {
+            $result = $this->set(array_merge($this->get(), [$key => $value]));
+        }
+        return $result;
+    }
 
     /**
      * Save delivery execution data

@@ -34,11 +34,11 @@ use \oat\oatbox\service\ConfigurableService;
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecutionInstance);
+ * $data = new DeliveryMonitoringData($deliveryExecutionId);
  * $data->setData([
- *  'test_taker' => 'John',
+ *  'test_taker' => 'http://sample/first.rdf#i1450190828500474',
  *  'status' => 'ACTIVE',
- *  'current_item' => 'http://sample/first.rdf#i145018936535755'
+ *  'current_assessment_item' => 'http://sample/first.rdf#i145018936535755'
  * ]);
  * $deliveryMonitoringService->save($data);
  * ```
