@@ -15,9 +15,6 @@
  *
  * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
  */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
- */
 define([
     'jquery',
     'lodash',
