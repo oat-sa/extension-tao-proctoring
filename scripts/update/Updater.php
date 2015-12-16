@@ -114,14 +114,16 @@ class Updater extends common_ext_ExtensionUpdater {
             $currentVersion = '0.6';
         }
 
-        if ($currentVersion == '0.6') {
-            
+        $this->setVersion($currentVersion);
+        if ($this->isVersion('0.6')) {
+
+            OntologyUpdater::syncModels();
             //grant access to test site admin role
-            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole');
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
 
-            $currentVersion = '0.8';
+            $this->setVersion('0.8');
         }
 
         return $currentVersion;
