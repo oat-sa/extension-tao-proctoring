@@ -41,13 +41,7 @@ class TestCenterService extends tao_models_classes_ClassService
     const PROPERTY_PROCTORS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor';
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
-
-    const PROPERTY_ADMINISTRATOR_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administrator';
-
-    const PROPERTY_AUTHORIZED_PROCTOR_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor';
-
-    const PROPERTY_ASSIGNED_PROCTOR_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#assignedProctor';
-
+    
     /**
      * return the test center top level class
      *
