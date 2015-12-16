@@ -52,17 +52,19 @@ define([
                 
                 var $form = $(this);
                 var fields = $form.serializeArray();
-                var data = {};
+                var data = {
+                    testCenters : [] //get the testCenter from the test center datalist component
+                };
                 _.each(fields, function(field){
                    data[field.name] = field.value; 
                 });
                 
                 $.post(proctorFormUrl, data, function(res){
-                    console.log(res);
                     if(res.created){
                         feedback().success(__('Proctor created'));
+                        $container.empty();
                     }else{
-                        renderFormFromData($container, formData);
+                        renderFormFromData($container, res);
                     }
                 });
                 
