@@ -87,11 +87,24 @@ define([
             var actions = [];
             var model = [];
             
+            /**
+             * Get the delivery object from its uri
+             * 
+             * @param {String} uri
+             * @returns {Object}
+             */
             function _getDelivery(uri){
                 return _.find(deliveries, {uri : uri});
             }
 
-            // request the server with a selection of test takers
+            /**
+             * request the server with a selection of test takers
+             * 
+             * @param {String} url
+             * @param {Object} eligibility
+             * @param {String} message
+             * @param {Function} errorCallback
+             */
             function _request(url, eligibility, message, errorCallback){
                 if(eligibility){
                     

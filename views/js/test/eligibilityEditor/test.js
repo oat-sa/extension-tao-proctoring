@@ -24,17 +24,13 @@ define([
     'taoProctoring/component/eligibilityEditor'
 ], function($, _, eligibilityEditor){
     'use strict';
-
-    QUnit.test('render', 0, function(assert){
-
+    
+    /**
+     * Only basic test for now. The tree embedded tree component is not easily testatable...
+     */
+    
+    QUnit.test('render (creation mode)', function(assert){
         var $container = $('#fixture-1');
-        var deliveries = [
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515319645147", "label" : "Delivery A"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i1449651502115597", "label" : "Delivery B"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515079910121a", "label" : "Delivery C"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515079910121b", "label" : "Delivery D"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515079910121c", "label" : "Delivery E"}
-        ];
         var eligibilities = [
             {
                 "delivery" : "http:\/\/tao.local\/mytao.rdf#i14496515319645147",
@@ -45,36 +41,20 @@ define([
                 "testTakers" : ['testTakerA']
             }
         ];
-        var editor = eligibilityEditor.init($container, eligibilities, deliveries);
-        editor.on('change', function(eligibility){
-            console.log('change', eligibility)
-        });
-        return;
+        var editor = eligibilityEditor.init($container, eligibilities);
         var $editorContainer = $container.children('.eligibility-editor');
         assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
         assert.ok($editorContainer.hasClass('modal'), 'eligibility in modal window');
-        assert.equal($editorContainer.find('.eligibility-delivery-selector').length, 1, 'eligibility editor dom ok');
-        var $select = $editorContainer.find('.eligibility-delivery-selector').find('select');
-        assert.equal($select.length, 1, 'delivery selector found');
-        assert.equal($select.children('option').length, 4, 'options found (1 placeholdre + 3 delivery choices');
-
-        assert.equal($editorContainer.children('.eligible-testTaker').length, 1, 'tree container found');
-        assert.equal($editorContainer.children('.eligible-testTaker').find('.tree.tree-checkbox').length, 1, 'tree found');
-
+        assert.equal($editorContainer.find('.eligible-delivery').length, 1, 'eligibility editor dom ok');
+        assert.ok($editorContainer.find('.eligible-delivery').is(':visible'), 'delivery selector visible');
+        assert.equal($editorContainer.find('.eligible-testTaker').length, 1, 'eligibility editor dom ok');
+        assert.ok($editorContainer.find('.eligible-testTaker').is(':visible'), 'test taker selector visible');
     });
 
-    QUnit.asyncTest('select delivery', 0, function(assert){
-        QUnit.start();
-        return;
+    QUnit.test('render (edit mode)', function(assert){
+
         var $container = $('#fixture-1');
-        var selectedDelivery = "http:\/\/tao.local\/mytao.rdf#i14496515079910121a";
-        var deliveries = [
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515319645147", "label" : "Delivery A"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i1449651502115597", "label" : "Delivery B"},
-            {"uri" : selectedDelivery, "label" : "Delivery C"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515079910121b", "label" : "Delivery D"},
-            {"uri" : "http:\/\/tao.local\/mytao.rdf#i14496515079910121c", "label" : "Delivery E"}
-        ];
+        var deliveryA = {"uri" : "http:\/\/tao.local\/mytao.rdf#i1449651502115597", "label" : "Delivery A"};
         var eligibilities = [
             {
                 "delivery" : "http:\/\/tao.local\/mytao.rdf#i14496515319645147",
@@ -85,26 +65,13 @@ define([
                 "testTakers" : ['testTakerA']
             }
         ];
-
-        var editor = eligibilityEditor.init($container, eligibilities, deliveries);
-        editor.on('change', function(eligibility){
-
-            assert.ok(_.isPlainObject(eligibility), 'eligibility is an object');
-            assert.equal(eligibility.delivery, selectedDelivery, 'eligibility returns the selected delivery');
-
-        }).on('ok', function(eligibility){
-            assert.ok(_.isPlainObject(eligibility), 'eligibility is an object');
-            assert.equal(eligibility.delivery, selectedDelivery, 'eligibility returns the selected delivery');
-            QUnit.start();
-        });
-
+        var editor = eligibilityEditor.init($container, eligibilities, deliveryA);
         var $editorContainer = $container.children('.eligibility-editor');
-        var $select = $editorContainer.find('.eligibility-delivery-selector').find('select');
-        $select.select2('val', selectedDelivery, true);
-
-        var $ok = $editorContainer.children('.actions').children('.done');
-        assert.equal($ok.length, 1, 'ok button found');
-        $ok.click();
-
+        assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
+        assert.ok($editorContainer.hasClass('modal'), 'eligibility in modal window');
+        assert.equal($editorContainer.find('.eligible-delivery').length, 1, 'eligibility editor dom ok');
+        assert.ok(!$editorContainer.find('.eligible-delivery').is(':visible'), 'delivery selector not visible');
+        assert.equal($editorContainer.find('.eligible-testTaker').length, 1, 'eligibility editor dom ok');
+        assert.ok($editorContainer.find('.eligible-testTaker').is(':visible'), 'test taker selector visible');
     });
 });
