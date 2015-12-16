@@ -28,6 +28,7 @@ use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 
 /**
  * 
@@ -112,6 +113,21 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
             }
             $currentVersion = '0.6';
+        }
+
+        if ($this->isVersion('0.6')) {
+            try {
+                $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryMonitoringService();
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $service);
+            }
+
+            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryMonitoringTables.php');
+
+            $this->setVersion('0.7');
         }
 
         return $currentVersion;

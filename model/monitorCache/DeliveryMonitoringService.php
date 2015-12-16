@@ -19,7 +19,9 @@
  *
  */
 
-namespace oat\taoProctoring\model;
+namespace oat\taoProctoring\model\monitorCache;
+
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 
 /**
  * Interface DeliveryMonitoringService
@@ -56,22 +58,25 @@ namespace oat\taoProctoring\model;
  */
 interface DeliveryMonitoringService
 {
+
+    const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
+
     /**
      * @param array $criteria
      * @param array $options
-     * @return DeliveryMonitoring[]
+     * @return DeliveryMonitoringData[]
      */
     public function find(array $criteria, array $options);
 
     /**
-     * @param DeliveryMonitoring $deliveryMonitoring
+     * @param DeliveryMonitoringData $deliveryMonitoring
      * @return mixed
      */
-    public function save(DeliveryMonitoring $deliveryMonitoring);
+    public function save(DeliveryMonitoringData $deliveryMonitoring);
 
     /**
-     * @param DeliveryMonitoring $deliveryMonitoring
+     * @param DeliveryMonitoringData $deliveryMonitoring
      * @return mixed
      */
-    public function delete(DeliveryMonitoring $deliveryMonitoring);
+    public function delete(DeliveryMonitoringData $deliveryMonitoring);
 }

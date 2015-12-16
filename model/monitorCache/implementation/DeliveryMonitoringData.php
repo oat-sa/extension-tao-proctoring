@@ -19,29 +19,39 @@
  *
  */
 
-namespace oat\taoProctoring\model;
+namespace oat\taoProctoring\model\monitorCache\implementation;
+
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 
 /**
- * Interface DeliveryMonitoring
+ * class DeliveryMonitoring
  *
  * Represents data model of delivery execution.
  *
- * @package oat\taoProctoring\model
+ * @package oat\taoProctoring
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryMonitoringData
+class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 {
+    private $data;
+
     /**
      * Save delivery execution data
      * @param array $data data to be saved (key => value).
      * @return mixed
      */
-    public function set(array $data);
+    public function set(array $data)
+    {
+        $this->data = $data;
+    }
 
     /**
      * Get delivery execution data
      * @return array
      */
-    public function get();
+    public function get()
+    {
+        return $this->data;
+    }
 
 }
