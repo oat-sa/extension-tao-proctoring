@@ -19,8 +19,11 @@
  */
 namespace oat\taoProctoring\controller;
 
+use \tao_helpers_Uri;
+use \tao_helpers_Request;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\controller\form\AddProctor;
 
 /**
  * Proctor manager controller
@@ -43,7 +46,7 @@ class ProctorManager extends ProctoringModule
             'administrator' => true //check if the current user is a test site administrator or not
         );
 
-        if (\tao_helpers_Request::isAjax()) {
+        if (tao_helpers_Request::isAjax()) {
             $this->returnJson($data);
         } else {
             $this->composeView(
@@ -52,7 +55,8 @@ class ProctorManager extends ProctoringModule
                 array(
                     BreadcrumbsHelper::testCenters(),
                     BreadcrumbsHelper::proctorManager()
-                )
+                ),
+                'pages/proctorManager.tpl'
             );
         }
     }
@@ -140,11 +144,45 @@ class ProctorManager extends ProctoringModule
      */
     public function createProctorForm(){
 
-        $form = '<form>';
+        $myFormContainer = new AddProctor();
+        $myForm = $myFormContainer->getForm();
+        $created = false;
+        $form = '';
+        $debug = '';
+
+        if ($myForm->isSubmited()) {
+            if ($myForm->isValid()) {
+                $values = $myForm->getValues();
+                $values[PROPERTY_USER_PASSWORD] = \core_kernel_users_Service::getPasswordHash()->encrypt($values['password1']);
+                unset($values['password1']);
+                unset($values['password2']);
+
+                //force the new user role to be proctorRole
+                $values[PROPERTY_USER_ROLES] = array('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');//@todo use a constant instead
+
+                $binder = new \tao_models_classes_dataBinding_GenerisFormDataBinder($myFormContainer->getUser());
+                $debug = array('$binder' => $binder, 'values' => $values);
+                
+                if(false){
+                    $created = $binder->bind($values);
+                    if ($created) {
+                        $this->setData('message', __('User added'));
+                        $this->setData('exit', true);
+                    }
+                }
+
+            }else{
+                $form = $myForm->render();
+            }
+        }else{
+            $form = $myForm->render();
+        }
         
-        //return data
         return $this->returnJson(array(
-            'form' => $form
+            'form' => $form,
+            'created' => $created,
+            'loginId'=> tao_helpers_Uri::encode(PROPERTY_USER_LOGIN),
+            'debug' => $debug
         ));
     }
 
@@ -160,5 +198,23 @@ class ProctorManager extends ProctoringModule
         return $this->returnJson(array(
             'success' => $success
         ));
+    }
+
+    /**
+     * action used to check if a login can be used
+     * @return void
+     */
+    public function checkLogin()
+    {
+        if (!tao_helpers_Request::isAjax()) {
+            throw new Exception("wrong request mode");
+        }
+
+        $available = false;
+        if ($this->hasRequestParameter('login')) {
+            $available = \tao_models_classes_UserService::singleton()->loginAvailable($this->getRequestParameter('login'));
+        }
+
+        $this->returnJson(array('available' => $available));
     }
 }
