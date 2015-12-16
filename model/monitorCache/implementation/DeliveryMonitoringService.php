@@ -92,7 +92,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return mixed
+     * @return boolean whether data is saved
      */
     public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {

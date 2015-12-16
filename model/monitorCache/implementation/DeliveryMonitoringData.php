@@ -33,7 +33,21 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
  */
 class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 {
-    private $data;
+    /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
+     * @var array
+     */
+    private $errors = [];
+
+    private $requiredFields = [
+        DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
+        DeliveryMonitoringService::COLUMN_TEST_TAKER,
+        DeliveryMonitoringService::COLUMN_STATUS,
+    ];
 
     /**
      * DeliveryMonitoringData constructor.
@@ -68,6 +82,34 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function set(array $data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * Validate data
+     * @return bool whether data is valid and can be saved.
+     */
+    public function validate()
+    {
+        $result = true;
+        $this->errors = [];
+        $data = $this->get();
+
+        foreach ($this->requiredFields as $requiredField) {
+            if (!isset($data[$requiredField])) {
+                $result = false;
+                $this->errors[$requiredField] = 'cannot be empty';
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get list of errors.
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     /**
