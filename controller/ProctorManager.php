@@ -40,46 +40,125 @@ class ProctorManager extends ProctoringModule
         $testCenters = TestCenterHelper::getTestCenters();
         $data = array(
             'list' => $testCenters,
-            'administrator' => true //check current user role
+            'administrator' => true //check if the current user is a test site administrator or not
         );
 
         if (\tao_helpers_Request::isAjax()) {
             $this->returnJson($data);
         } else {
             $this->composeView(
-                'testcenters-index',
+                'proctorManager-index',
                 $data,
                 array(
-                    BreadcrumbsHelper::testCenters()
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::proctorManager()
                 )
             );
         }
     }
 
-    /**
-     * Displays the three action box for the test center
-     */
-    public function addProctor()
-    {
-        $testCenters = TestCenterHelper::getTestCenters();
-        $testCenter  = $this->getCurrentTestCenter();
-        $data = array(
-            'testCenter' => $testCenter->getUri(),
-            'title' => __('Test site %s', $testCenter->getLabel()),
-            'list' => TestCenterHelper::getTestCenterActions($testCenter)
-        );
-
-        if (\tao_helpers_Request::isAjax()) {
-            $this->returnJson($data);
-        } else {
-            $this->composeView(
-                'testcenters-testcenter',
-                $data,
-                array(
-                    BreadcrumbsHelper::testCenters(),
-                    BreadcrumbsHelper::testCenter($testCenter, $testCenters)
-                )
-            );
+    protected function getRequestTestCenters(){
+        if($this->hasRequestParameter('testCenters')){
+            return $this->hasRequestParameter('testCenters');
+        }else{
+            throw new \common_Exception('no testCenters in request param');
         }
+    }
+
+    protected function getRequestProctors(){
+        if($this->hasRequestParameter('proctors')){
+            return $this->hasRequestParameter('proctors');
+        }else{
+            throw new \common_Exception('no proctors in request param');
+        }
+    }
+
+    protected function getAuthorization($testCenters){
+        
+        //call service getProctorsAuthorization($testCenters);
+        $authorizations = array();
+
+        //call service getAssignedProctors($currentUser?)
+        $proctors = array();
+
+        //merge the data from $authorizations and $proctors arrays and format it for the datatable
+        
+
+        //return value
+        return $authorizations;
+    }
+    
+    /**
+     * Get the lists of authorization for the proctor of the selected test centers
+     */
+    public function proctorAuthorizations()
+    {
+        $testCenters = $this->getRequestTestCenters();
+
+        //return data
+        return $this->returnJson(array(
+            'authorization' => $this->getAuthorization($testCenters)
+        ));
+    }
+
+    /**
+     * Authorize the proctors to test centers
+     */
+    public function authorize(){
+
+        $proctors = $this->getRequestProctors();
+        $testCenters = $this->getRequestTestCenters();
+
+        //call service authorizeProctors($proctors, $testCenters);
+        $success = true;
+
+        //return data
+        return $this->returnJson(array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * Unauthorize the proctors from test centers
+     */
+    public function unauthorize(){
+
+        $proctors = $this->getRequestProctors();
+        $testCenters = $this->getRequestTestCenters();
+
+        //call service unauthorizeProctors($proctors, $testCenters);
+        $success = true;
+
+        //return data
+        return $this->returnJson(array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * Returns the proctor creation form
+     */
+    public function createProctorForm(){
+
+        $form = '<form>';
+        
+        //return data
+        return $this->returnJson(array(
+            'form' => $form
+        ));
+    }
+
+    /**
+     * Create a proctor
+     */
+    public function createProctor(){
+
+        //call service
+        $success = true;
+
+        //return data
+        return $this->returnJson(array(
+            'success' => $success
+        ));
     }
 }

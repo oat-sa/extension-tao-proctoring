@@ -1,1 +1,4 @@
-<a href="{{href}}" class="admin-link">{{__ 'Manage Proctors'}}</a>
+<a href="{{href}}" class="admin-link">
+    <span class="icon-users"></span>
+    {{__ 'Manage Proctors'}}
+</a>

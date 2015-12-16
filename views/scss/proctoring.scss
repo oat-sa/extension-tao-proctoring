@@ -97,6 +97,25 @@
         }
     }
     
+    .testcenters-index {
+        .header{
+            position:relative
+        }
+        .admin-link{
+            position: absolute;
+            right: 26px;
+            top: 5px;
+            color: white;
+            opacity : .9;
+            span{
+                margin-right:8px;
+            }
+            &:hover{
+                opacity : 1;
+            }
+        }
+    }
+    
     .delivery-index{
         .list-box {
             .dark {
