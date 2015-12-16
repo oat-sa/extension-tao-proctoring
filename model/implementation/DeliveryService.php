@@ -405,7 +405,7 @@ class DeliveryService extends ConfigurableService
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (self::STATE_INIT == $executionState || self::STATE_PAUSED == $executionState) {
+        if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
             $this->setProctoringState($deliveryExecution, self::STATE_AWAITING);
 
             $result = true;
