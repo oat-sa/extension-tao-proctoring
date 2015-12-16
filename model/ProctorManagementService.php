@@ -117,7 +117,7 @@ class ProctorManagementService extends tao_models_classes_ClassService
     public function getAssignedProctors($testCenterAdminUri){
         $testCenterAdmin = new core_kernel_classes_Resource($testCenterAdminUri);
         $testCenters = $testCenterAdmin->getPropertyValues(new core_kernel_classes_Property(self::PROPERTY_ADMINISTRATOR_URI));
-        $proctorClass = new core_kernel_classes_Class(TestCenterService::PROPERTY_PROCTORS_URI);
+        $proctorClass = $this->getRootClass();
         $users = array();
         foreach($testCenters as $testCenterUri){
             $assignedProctors = $proctorClass->searchInstances(array(
@@ -138,7 +138,7 @@ class ProctorManagementService extends tao_models_classes_ClassService
      * @return array(proctorUri => array(testcenters))
      */
     public function getProctorsAuthorization($testCenters){
-        $proctorClass = new core_kernel_classes_Class(TestCenterService::PROPERTY_PROCTORS_URI);
+        $proctorClass = $this->getRootClass();
         $users = array();
 
         $authorizedProctors = $proctorClass->searchInstances(array(
