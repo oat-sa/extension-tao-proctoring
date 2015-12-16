@@ -32,22 +32,16 @@ namespace oat\taoProctoring\model;
 interface DeliveryMonitoringData
 {
     /**
-     * DeliveryMonitoringData constructor.
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
-     */
-    public function __construct(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution);
-
-    /**
      * Save delivery execution data
      * @param array $data data to be saved (key => value).
      * @return mixed
      */
-    public function setData(array $data);
+    public function set(array $data);
 
     /**
      * Get delivery execution data
      * @return array
      */
-    public function getData();
+    public function get();
 
 }

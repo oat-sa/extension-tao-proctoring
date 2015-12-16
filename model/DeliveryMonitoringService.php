@@ -30,7 +30,6 @@ namespace oat\taoProctoring\model;
  * ----
  *
  * ```php
- *
  * $data = new DeliveryMonitoringData($deliveryExecutionInstance);
  * $data->setData([
  *  'test_taker' => 'John',
