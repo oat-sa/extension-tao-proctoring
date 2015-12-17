@@ -97,10 +97,8 @@ define([
                         });
 
                         e.preventDefault();
-                    });
-
-                    // the misspelling of the css class is normal, don't worry about that
-                    $element.find('button.btn-diasble').on('click', function() {
+                        
+                    }).on('click', 'button.btn-diasble', function() {
                         self.destroy();
                     });
                 });
