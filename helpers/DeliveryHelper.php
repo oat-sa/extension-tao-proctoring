@@ -23,7 +23,7 @@ namespace oat\taoProctoring\helpers;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
-use common_session_SessionManager;
+use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -40,17 +40,17 @@ class DeliveryHelper
     /**
      * Gets a list of available deliveries for a test site
      *
-     * @param string $testCenter
+     * @param core_kernel_classes_Resource $testCenter
      * @param array [$options]
      * @return array
      * @throws ServiceNotFoundException
      * @throws \common_Exception
      * @throws \common_exception_Error
      */
-    public static function getDeliveries($testCenter)
+    public static function getDeliveries(core_kernel_classes_Resource $testCenter)
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
+        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
         $entries = array();
 
@@ -165,7 +165,7 @@ class DeliveryHelper
      */
     public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveries = $deliveryService->getTestCenterDeliveries($testCenter);
+        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
         $all = array();
         foreach($deliveries as $delivery) {
@@ -224,23 +224,28 @@ class DeliveryHelper
     /**
      * Gets the test takers available for a delivery as a table page
      *
-     * @param string $deliveryId
+     * @param core_kernel_classes_Resource $delivery
+     * @param core_kernel_classes_Resource $testCenter
      * @param array [$options]
      * @return array
      * @throws \Exception
      * @throws \common_exception_Error
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getAvailableTestTakers($deliveryId, $options = array())
+    public static function getAvailableTestTakers($delivery, $testCenter, $options = array())
     {
-        $currentUser = common_session_SessionManager::getSession()->getUser();
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $users = $deliveryService->getAvailableTestTakers($currentUser, $deliveryId, $options);
+        $users = EligibilityService::singleton()->getEligibleTestTakers($testCenter, $delivery);
+        $assignedUsers = $deliveryService->getDeliveryTestTakers($delivery->getUri(), $options);
+        array_walk($assignedUsers, function(&$value){
+            $value = $value->getIdentifier();
+        });
+        $users = array_diff($users, $assignedUsers);
 
         return DataTableHelper::paginate($users, $options, function($users) {
             $testTakers = array();
-            foreach($users as $user) {
-                /* @var $user User */
+            foreach($users as $userId) {
+                $user = new \core_kernel_users_GenerisUser(new core_kernel_classes_Resource($userId));
                 $userId = $user->getIdentifier();
                 $lastName = UserHelper::getUserLastName($user);
                 $firstName = UserHelper::getUserFirstName($user, empty($lastName));
