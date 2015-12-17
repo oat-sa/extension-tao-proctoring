@@ -38,7 +38,7 @@ class BreadcrumbsHelper
         return array(
             'id' => 'testCenters',
             'url' => _url('index', 'TestCenter'),
-            'label' => __('Home'),
+            'label' => __('Home')
         );
     }
 
@@ -55,7 +55,7 @@ class BreadcrumbsHelper
         $breadcrumbs = array(
             'id' => 'testCenter',
             'url' => _url('testCenter', 'TestCenter', null, array('testCenter' => $testCenter->getUri())),
-            'label' => $testCenter->getLabel(),
+            'label' => $testCenter->getLabel()
         );
 
         $otherTestSites = array_filter($testCenters, function($value) use ($testCenter) {
@@ -164,7 +164,7 @@ class BreadcrumbsHelper
                 'id' => 'testTakers',
                 'url' => _url('testTakers', 'Delivery', null, array('testCenter' => $testCenter->getUri(), 'delivery' => $delivery->getUri())),
                 'label' => __('Add Test Takers')
-            ),
+            )
         );
 
         $currentPage = array_filter($entries, function($value) use($page) {
@@ -221,5 +221,18 @@ class BreadcrumbsHelper
             $breadcrumbs['entries'] = $alternativeRoutes;
         }
         return $breadcrumbs;
+    }
+
+    /**
+     * Create breadcrumb for ProctorManager::index
+     * @return array
+     */
+    public static function proctorManager()
+    {
+        return array(
+            'id' => 'proctorManager',
+            'url' => _url('index', 'ProctorManager'),
+            'label' => __('Manage Proctors')
+        );
     }
 }

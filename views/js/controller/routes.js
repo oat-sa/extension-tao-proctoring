@@ -5,6 +5,11 @@ define({
             'testCenter' : 'controller/TestCenter/testCenter'
         }
     },
+    'ProctorManager' : {
+        'actions' : {
+            'index' : 'controller/ProctorManager/index'
+        }
+    },
     'Diagnostic' : {
         'actions' : {
             'index' : 'controller/Diagnostic/index'
