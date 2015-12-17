@@ -36,6 +36,9 @@ define([
     var proctorFormUrl = helpers._url('createProctorForm', 'ProctorManager', 'taoProctoring');
     var proctorLoginCheckUrl = helpers._url('checkLogin', 'ProctorManager', 'taoProctoring');
     
+    //initialize legacy components
+    helpers.init();
+    
     /**
      * Render the form from the server provided data
      * 
