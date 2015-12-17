@@ -8,7 +8,13 @@
 <?php endif; ?>
         <div class="panel flex-grid">
             <div class="flex-col-4 test-center-panel"></div>
-            <div class="flex-col-8 proctor-panel"></div>
+            <div class="flex-col-8 proctor-panel">
+                <div class="proctor-list hidden"></div>
+                <div class="proctor-create hidden"></div>
+                <div class="proctor-default">
+                    <div class="message"><?= __('Please select one or more test site to manage proctors'); ?></div>
+                </div>
+            </div>
         </div>
         <div class="list"></div>
     </div>

@@ -79,8 +79,9 @@ define([
 
                         var $form = $(this);
                         var fields = $form.serializeArray();
+                        var list = self.config.testCenterList;
                         var data = {
-                            testCenters : [] //@todo get the testCenter from the test center datalist component (config.testCenterList)
+                            testCenters : list && list.getSelection()
                         };
                         _.each(fields, function(field){
                             data[field.name] = field.value;
@@ -89,13 +90,16 @@ define([
                         $.post(proctorFormUrl, data, function(res){
                             if(res.created){
                                 feedback().success(__('Proctor created'));
-                                $element.empty();
+                                self.destroy();
                             }else{
                                 renderFormFromData($element, res);
                             }
                         });
 
                         e.preventDefault();
+                        
+                    }).on('click', 'button.btn-diasble', function() {
+                        self.destroy();
                     });
                 });
             })
