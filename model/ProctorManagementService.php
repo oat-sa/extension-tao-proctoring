@@ -100,12 +100,15 @@ class ProctorManagementService extends tao_models_classes_ClassService
         $return = true;
         $testCenterAdmin = new core_kernel_classes_Resource($testCenterAdminUri);
         $testCenters = $testCenterAdmin->getPropertyValues(new core_kernel_classes_Property(self::PROPERTY_ADMINISTRATOR_URI));
-        $propertiesValues = array(self::PROPERTY_ASSIGNED_PROCTOR_URI => $testCenters);
-        foreach($proctorsUri as $proctorUri){
-            $proctor = new core_kernel_classes_Resource($proctorUri);
-            $return &= $proctor->setPropertiesValues($propertiesValues);
+        if(!empty($testCenters)){
+            $propertiesValues = array(self::PROPERTY_ASSIGNED_PROCTOR_URI => $testCenters);
+            foreach($proctorsUri as $proctorUri){
+                $proctor = new core_kernel_classes_Resource($proctorUri);
+                $return &= $proctor->setPropertiesValues($propertiesValues);
+            }
+        }else{
+            throw new \common_Exception('proctors cannot be assigned to a test center admin that has no authorized test center');
         }
-
         return (bool) $return;
     }
 

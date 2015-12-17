@@ -21,9 +21,11 @@ namespace oat\taoProctoring\controller;
 
 use \tao_helpers_Uri;
 use \tao_helpers_Request;
+use common_session_SessionManager as SessionManager;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\controller\form\AddProctor;
+use oat\taoProctoring\model\ProctorManagementService;
 
 /**
  * Proctor manager controller
@@ -42,8 +44,7 @@ class ProctorManager extends ProctoringModule
     {
         $testCenters = TestCenterHelper::getTestCenters();
         $data = array(
-            'list' => $testCenters,
-            'administrator' => true //check if the current user is a test site administrator or not
+            'list' => $testCenters
         );
 
         if (tao_helpers_Request::isAjax()) {
@@ -65,7 +66,7 @@ class ProctorManager extends ProctoringModule
         if($this->hasRequestParameter('testCenters')){
             return $this->hasRequestParameter('testCenters');
         }else{
-            throw new \common_Exception('no testCenters in request param');
+            return array();//may be empty
         }
     }
 
@@ -146,12 +147,13 @@ class ProctorManager extends ProctoringModule
 
         $myFormContainer = new AddProctor();
         $myForm = $myFormContainer->getForm();
+        $valid = false;
         $created = false;
         $form = '';
-        $debug = '';
-
+        
         if ($myForm->isSubmited()) {
-            if ($myForm->isValid()) {
+            $valid = $myForm->isValid();
+            if ($valid) {
                 $values = $myForm->getValues();
                 $values[PROPERTY_USER_PASSWORD] = \core_kernel_users_Service::getPasswordHash()->encrypt($values['password1']);
                 unset($values['password1']);
@@ -159,18 +161,17 @@ class ProctorManager extends ProctoringModule
 
                 //force the new user role to be proctorRole
                 $values[PROPERTY_USER_ROLES] = array('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');//@todo use a constant instead
-
-                $binder = new \tao_models_classes_dataBinding_GenerisFormDataBinder($myFormContainer->getUser());
-                $debug = array('$binder' => $binder, 'values' => $values);
-                
-                if(false){
-                    $created = $binder->bind($values);
-                    if ($created) {
-                        $this->setData('message', __('User added'));
-                        $this->setData('exit', true);
+                $proctor = $myFormContainer->getUser();
+                $binder = new \tao_models_classes_dataBinding_GenerisFormDataBinder($proctor);
+                $created = $binder->bind($values);
+                if($created){
+                    //assign then authorize the new proctor to the selected test centers
+                    ProctorManagementService::singleton()->assignProctors(array($proctor->getUri()), SessionManager::getSession()->getUserUri());
+                    $testCenters = $this->getRequestTestCenters();
+                    if(!empty($testCenters)){
+                        ProctorManagementService::singleton()->authorizeProctors(array($proctor->getUri()), $testCenters);
                     }
                 }
-
             }else{
                 $form = $myForm->render();
             }
@@ -178,25 +179,12 @@ class ProctorManager extends ProctoringModule
             $form = $myForm->render();
         }
         
-        return $this->returnJson(array(
+        $this->returnJson(array(
             'form' => $form,
+            'valid' => $valid,
             'created' => $created,
             'loginId'=> tao_helpers_Uri::encode(PROPERTY_USER_LOGIN),
-            'debug' => $debug
-        ));
-    }
-
-    /**
-     * Create a proctor
-     */
-    public function createProctor(){
-
-        //call service
-        $success = true;
-
-        //return data
-        return $this->returnJson(array(
-            'success' => $success
+            'debug' => array('values' => $myForm->getValues())
         ));
     }
 

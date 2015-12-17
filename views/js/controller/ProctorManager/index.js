@@ -65,7 +65,10 @@ define([
             loadingBar.stop();
             
             //call me to initialier the form
-            //proctorForm.init($container.find('.proctor-panel'), {testCenters : []});
+            proctorForm({
+                renderTo : $container.find('.proctor-panel'),
+                testCenterList : {}
+            });
         }
     };
 

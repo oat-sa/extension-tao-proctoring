@@ -65,6 +65,9 @@ class AddProctor extends tao_actions_form_Users
 
     protected function initElements()
     {
+        $title = tao_helpers_form_FormFactory::getElement('title', 'Free');
+        $title->setValue('<h2>'.__('Create and authorize a proctor to the selected test sites').'</h2>');
+        $this->form->addElement($title);
         parent::initElements();
         $this->form->removeElement(\tao_helpers_Uri::encode(PROPERTY_USER_ROLES));
     }
