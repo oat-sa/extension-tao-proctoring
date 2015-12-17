@@ -22,6 +22,8 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\helpers\DataTableHelper;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -40,6 +42,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     {
         parent::__construct();
         $this->service = $this->getClassService();
+        $this->eligibilityService = EligibilityService::singleton();
     }
 
     protected function getClassService()
@@ -70,23 +73,179 @@ class TestCenterManager extends \tao_actions_SaSModule
             }
         }
 
-        $memberProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_MEMBERS_URI);
-        $memberForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $memberProperty);
-        $memberForm->setData('title', __('Select test-takers for the test center'));
-        $this->setData('memberForm', $memberForm->render());
+        $childrenProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_CHILDREN_URI);
+        $childrenForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $childrenProperty);
+        $childrenForm->setHiddenNodes(array($testCenter->getUri()));
+        $childrenForm->setTitle(__('Define sub-centers'));
+        $this->setData('childrenForm', $childrenForm->render());
 
-        $groupProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_DELIVERY_URI);
-        $groupForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $groupProperty);
-        $groupForm->setData('title', __('Select deliveries available at the test center'));
-        $this->setData('groupForm', $groupForm->render());
+        $administratorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_ADMINISTRATOR_URI);
+        $administratorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $administratorProperty);
+        $administratorForm->setData('title', __('Assign administrator'));
+        $this->setData('administratorForm', $administratorForm->render());
 
         $proctorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_PROCTORS_URI);
         $proctorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $proctorProperty);
-        $proctorForm->setData('title', __('Select proctors for the test center'));
+        $proctorForm->setData('title', __('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
 
+        $deliveryClass = new \core_kernel_classes_Class(TAO_DELIVERY_CLASS);
+        $deliveries = $deliveryClass->getInstances(true);
+        $deliveriesFormated = array_map(function($delivery){
+            return array(
+                'uri' => $delivery->getUri(),
+                'label' => $delivery->getLabel()
+            );
+        }, array_values($deliveries));
+
+        $this->setData('eligibilities', json_encode($this->_getEligibilities()));
+        $this->setData('deliveries', json_encode($deliveriesFormated));
         $this->setData('formTitle', __('Edit test center'));
+        $this->setData('testCenter', $testCenter->getUri());
         $this->setData('myForm', $myForm->render());
         $this->setView('form_test_center.tpl');
+    }
+
+    /**
+     * get eligible deliveries data formated in a way that is compatible with the client ui/datatable component
+     *
+     * @return {array}
+     */
+    private function _getEligibilities(){
+
+        $testCenter = $this->getCurrentInstance();
+        $eligibilityService = $this->eligibilityService;
+        $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
+
+        $data = array_map(function($delivery) use ($eligibilityService, $testCenter){
+            return array(
+                'id' => $delivery->getUri(),
+                'testTakers' => array_map(function($testTakerId){
+                    $ttaker = new \core_kernel_classes_Resource($testTakerId);
+                    return array(
+                        'label' => $ttaker->getLabel(),
+                        'uri' => $testTakerId,
+                        'encodedUri' => \tao_helpers_Uri::encode($testTakerId)//jstree use id formated this way...
+                    );
+                }, $eligibilityService->getEligibleTestTakers($testCenter, $delivery))
+            );
+        }, $eligibilities);
+
+        return DataTableHelper::paginate($data, $this->getRequestOptions());
+    }
+
+    /**
+     * Get the requested eligibility to be edited
+     * 
+     * @return type
+     * @throws \common_Exception
+     */
+    private function _getRequestEligibility(){
+        if($this->hasRequestParameter('eligibility')){
+            $eligibility = $this->getRequestParameter('eligibility');
+            if(isset($eligibility['deliveries']) && is_array($eligibility['deliveries'])){
+
+                $formatted = array();
+                $formatted['deliveries'] = array_map(function($deliveryUri){
+                        return new \core_kernel_classes_Resource(\tao_helpers_Uri::decode($deliveryUri));
+                    }, $eligibility['deliveries']);
+
+                if(isset($eligibility['testTakers']) && is_array($eligibility['testTakers'])){
+                    $formatted['testTakers'] = array_map(function($testTakerId){
+                        return \tao_helpers_Uri::decode($testTakerId);
+                    }, $eligibility['testTakers']);
+                }
+
+                return $formatted;
+            }else{
+                throw new \common_Exception('eligibility requires a delivery');
+            }
+        }else{
+            throw new \common_Exception('no eligibility in request');
+        }
+    }
+
+    public function getEligibilities()
+    {
+        return $this->returnJson($this->_getEligibilities());
+    }
+
+    public function addEligibilities()
+    {
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->_getRequestEligibility();
+        $failures = array();
+        $success = true;
+        foreach($eligibility['deliveries'] as $delivery){
+            if($delivery->isClass()){
+                continue;//prevent assigning eligibility to a class for now
+            }
+            if($this->eligibilityService->createEligibility($testCenter, $delivery)){
+                if(isset($eligibility['testTakers'])){
+                    $success &= $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+                }
+            }else{
+                $success = false;
+                $failures[] = $delivery->getLabel();
+            }
+        }
+
+        return $this->returnJson(array(
+            'success' => $success,
+            'failed' => $failures
+        ));
+    }
+
+    public function editEligibilities()
+    {
+        $success = false;
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->_getRequestEligibility();
+        if(isset($eligibility['testTakers'])){
+            foreach($eligibility['deliveries'] as $delivery){
+                $success = $this->eligibilityService->setEligibleTestTakers($testCenter, $delivery, $eligibility['testTakers']);
+            }
+        }else{
+            //nothing to save, so consider it done
+            $success = true;
+        }
+        return $this->returnJson(array(
+            'success' => $success
+        ));
+    }
+
+    public function removeEligibilities()
+    {
+        $testCenter = $this->getCurrentInstance();
+        $eligibility = $this->_getRequestEligibility();
+        foreach($eligibility['deliveries'] as $delivery){
+            $success = $this->eligibilityService->removeEligibility($testCenter, $delivery);
+        }
+        return $this->returnJson(array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * Gets the data table request options
+     *
+     * @return array
+     */
+    protected function getRequestOptions() {
+
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : DataTableHelper::DEFAULT_PAGE;
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : DataTableHelper::DEFAULT_ROWS;
+        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'Delivery';
+        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
+        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
+
+        return array(
+            'page' => $page,
+            'rows' => $rows,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+            'filter' => $filter
+        );
+
     }
 }
