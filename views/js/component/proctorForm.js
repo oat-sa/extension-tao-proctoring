@@ -24,54 +24,87 @@ define([
     'i18n',
     'helpers',
     'users',
-    'layout/loading-bar',
-    'ui/listbox',
-    'util/encode',
     'ui/feedback',
-    'ui/bulkActionPopup',
-    'taoProctoring/component/breadcrumbs'
-], function (_, $, __, helpers, users, loadingBar, listBox, encode, feedback, bulkActionPopup, breadcrumbsFactory) {
+    'ui/component',
+    'tpl!taoProctoring/component/proctorForm/form'
+], function(_, $, __, helpers, users, feedback, component, formTpl){
     'use strict';
-    
+
+    var _ns = '.proctor-form';
+
     //service urls:
     var proctorFormUrl = helpers._url('createProctorForm', 'ProctorManager', 'taoProctoring');
     var proctorLoginCheckUrl = helpers._url('checkLogin', 'ProctorManager', 'taoProctoring');
     
+    //initialize legacy components
+    helpers.init();
+    
+    /**
+     * Render the form from the server provided data
+     * 
+     * @param {JQuery} $container
+     * @param {Object} formData
+     */
     function renderFormFromData($container, formData){
-        $container.html(formData.form);
-            users.checkLogin(formData.loginId, proctorLoginCheckUrl);
+        $container.html(formTpl({
+            form : formData.form
+        }));
+        users.checkLogin(formData.loginId, proctorLoginCheckUrl);
     }
     
-    function init($container){
-        
-        $.get(proctorFormUrl, function(formData){
-            
-            renderFormFromData($container, formData);
-            
-            $container.on('submit', 'form', function(e){
-                
-                var $form = $(this);
-                var fields = $form.serializeArray();
-                var data = {};
-                _.each(fields, function(field){
-                   data[field.name] = field.value; 
-                });
-                
-                $.post(proctorFormUrl, data, function(res){
-                    console.log(res);
-                    if(res.created){
-                        feedback().success(__('Proctor created'));
-                    }else{
-                        renderFormFromData($container, formData);
-                    }
-                });
-                
-                e.preventDefault();
-            });
-        });
-    }
+    /**
+     * Create a proctor creation form
+     * 
+     * @param {type} config
+     * @param {JQuery} config.renderTo - the jQuery container it should be rendered to
+     * @param {Object} config.testCenterList - the test center list component
+     * @returns {proctorForm}
+     */
+    return function proctorFormFactory(config){
 
-    return {
-        init : init
+        return component()
+            .on('destroy', function(){
+                this.getElement().off(_ns).empty();
+            })
+            .on('render', function(){
+
+                var self = this;
+                var $element = this.getElement();
+
+                $.get(proctorFormUrl, function(formData){
+
+                    renderFormFromData($element, formData);
+
+                    $element.on('submit' + _ns, 'form', function(e){
+
+                        var $form = $(this);
+                        var fields = $form.serializeArray();
+                        var list = self.config.testCenterList;
+                        var data = {
+                            testCenters : list && list.getSelection()
+                        };
+                        _.each(fields, function(field){
+                            data[field.name] = field.value;
+                        });
+
+                        $.post(proctorFormUrl, data, function(res){
+                            if(res.created){
+                                feedback().success(__('Proctor created'));
+                                self.destroy();
+                            }else{
+                                renderFormFromData($element, res);
+                            }
+                        });
+
+                        e.preventDefault();
+                    });
+
+                    // the misspelling of the css class is normal, don't worry about that
+                    $element.find('button.btn-diasble').on('click', function() {
+                        self.destroy();
+                    });
+                });
+            })
+            .init(config);
     };
 });

@@ -59,7 +59,7 @@ define([
         1 : __('Partially authorized'),
         2 : __('Authorized')
     };
-            
+
     // the page is always loading data when starting
     loadingBar.start();
 
@@ -159,7 +159,7 @@ define([
                             break;
 
                         case _modes.FORM:
-                            // todo: notify the form
+                            // the form manages itself the selection
                             break;
                     }
                 }
@@ -203,8 +203,13 @@ define([
                         action: function() {
                             var selection = list.getSelection();
                             // switch to proctorForm
-                            // todo: return to list after cancel or submit
-                            proctorForm.init($containerForm, {testCenters : selection});
+                            proctorForm({
+                                renderTo : $containerForm,
+                                testCenterList : list
+                            }).on('destroy', function() {
+                                pageMode = _modes.LIST;
+                                processMode(list.getSelection());
+                            });
                             pageMode = _modes.FORM;
                             processMode(selection);
                         }

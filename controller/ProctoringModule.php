@@ -157,4 +157,14 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'report' => ReasonCategoryHelper::irregularity()
         );
     }
+
+    /**
+     * Check is the current user in session is a proctor admin or not
+     * @return boolean
+     */
+    protected function isAdmin(){
+        $testSiteAdminRoleUri = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole';
+        $roles = SessionManager::getSession()->getUserRoles();
+        return (isset($roles[$testSiteAdminRoleUri]) && $roles[$testSiteAdminRoleUri] = $testSiteAdminRoleUri);
+    }
 }
