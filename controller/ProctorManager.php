@@ -162,9 +162,7 @@ class ProctorManager extends ProctoringModule
         $testCenters = $this->getRequestTestCenters();
 
         //return data
-        $this->returnJson(array(
-            'authorization' => $this->getAuthorization($testCenters)
-        ));
+        $this->returnJson($this->getAuthorization($testCenters));
     }
 
     /**

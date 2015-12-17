@@ -193,7 +193,7 @@ define([
                         title: __('Refresh the page'),
                         label: __('Refresh'),
                         action: function() {
-                            $panelData.datatable('refresh');
+                            $containerList.datatable('refresh');
                         }
                     }, {
                         id: 'create',

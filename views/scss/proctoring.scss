@@ -225,4 +225,11 @@
             }
         }
     }
+
+    .icon-authorize:before {
+        @include icon-result-ok();
+    }
+    .icon-revoke:before {
+        @include icon-result-nok();
+    }
 }
