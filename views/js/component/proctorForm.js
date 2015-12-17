@@ -29,36 +29,39 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/bulkActionPopup',
-    'taoProctoring/component/breadcrumbs'
-], function (_, $, __, helpers, users, loadingBar, listBox, encode, feedback, bulkActionPopup, breadcrumbsFactory) {
+    'taoProctoring/component/breadcrumbs',
+    'tpl!taoProctoring/component/proctorForm/form'
+], function(_, $, __, helpers, users, loadingBar, listBox, encode, feedback, bulkActionPopup, breadcrumbsFactory, formTpl){
     'use strict';
-    
+
     //service urls:
     var proctorFormUrl = helpers._url('createProctorForm', 'ProctorManager', 'taoProctoring');
     var proctorLoginCheckUrl = helpers._url('checkLogin', 'ProctorManager', 'taoProctoring');
-    
+
     function renderFormFromData($container, formData){
-        $container.html(formData.form);
-            users.checkLogin(formData.loginId, proctorLoginCheckUrl);
+        $container.html(formTpl({
+            form : formData.form
+        }));
+        users.checkLogin(formData.loginId, proctorLoginCheckUrl);
     }
-    
+
     function init($container){
-        
+
         $.get(proctorFormUrl, function(formData){
-            
+
             renderFormFromData($container, formData);
-            
+
             $container.on('submit', 'form', function(e){
-                
+
                 var $form = $(this);
                 var fields = $form.serializeArray();
                 var data = {
                     testCenters : [] //get the testCenter from the test center datalist component
                 };
                 _.each(fields, function(field){
-                   data[field.name] = field.value; 
+                    data[field.name] = field.value;
                 });
-                
+
                 $.post(proctorFormUrl, data, function(res){
                     if(res.created){
                         feedback().success(__('Proctor created'));
@@ -67,7 +70,7 @@ define([
                         renderFormFromData($container, res);
                     }
                 });
-                
+
                 e.preventDefault();
             });
         });
