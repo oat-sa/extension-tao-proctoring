@@ -179,7 +179,7 @@ class ProctorManager extends ProctoringModule
             $form = $myForm->render();
         }
         
-        return $this->returnJson(array(
+        $this->returnJson(array(
             'form' => $form,
             'valid' => $valid,
             'created' => $created,

@@ -51,45 +51,9 @@ define([
         }));
         users.checkLogin(formData.loginId, proctorLoginCheckUrl);
     }
-
-    /**
-     * Create the form in the container
-     * @param {type} $container
-     * @returns {undefined}
-     */
-    function init($container){
-
-        $.get(proctorFormUrl, function(formData){
-
-            renderFormFromData($container, formData);
-
-            $container.on('submit' + _ns, 'form', function(e){
-
-                var $form = $(this);
-                var fields = $form.serializeArray();
-                var data = {
-                    testCenters : [] //get the testCenter from the test center datalist component
-                };
-                
-                e.preventDefault();
-                
-                _.each(fields, function(field){
-                    data[field.name] = field.value;
-                });
-
-                $.post(proctorFormUrl, data, function(res){
-                    if(res.created){
-                        feedback().success(__('Proctor created'));
-                        $container.empty();
-                    }else{
-                        renderFormFromData($container, res);
-                    }
-                });
-            });
-        });
-    }
     
     /**
+     * Create a proctor creation form
      * 
      * @param {type} config
      * @param {JQuery} config.renderTo - the jQuery container it should be rendered to
