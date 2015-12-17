@@ -33,11 +33,9 @@ interface DeliveryMonitoringServiceInterface
     const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
 
     /**
-     * @param array $criteria
-     * @param array $options
      * @return DeliveryMonitoringDataInterface[]
      */
-    public function find(array $criteria, array $options);
+    public function find();
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring

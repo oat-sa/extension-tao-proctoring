@@ -87,13 +87,83 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     /**
      * @param array $criteria
+     * [
+     *   ['error_code' => '1'],
+     *   'OR',
+     *   ['error_code' => '2'],
+     * ]
      * @param array $options
      * @return DeliveryMonitoringData[]
      */
-    public function find(array $criteria, array $options)
+    public function find(array $criteria = [], array $options = [])
     {
+        $defaultOptions = [
+            'order' => self::COLUMN_ID." ASC",
+            'offset' => 0,
+        ];
+        $options = array_merge($defaultOptions, $options);
 
+        $whereClause = 'WHERE ';
+        $parameters = [];
+
+        $whereClause .= $this->prepareCondition($criteria, $parameters);
+
+        $sql = "SELECT DISTINCT t.* FROM " . self::TABLE_NAME . " t
+                INNER JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . "
+                $whereClause
+                ORDER BY " . $options['order'];
+
+        if (isset($options['limit']))  {
+            $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
+        }
+
+        $stmt = $this->getPersistence()->query($sql, $parameters);
+
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $result;
     }
+
+
+    public function prepareCondition($condition, &$parameters)
+    {
+        $whereClause = '';
+
+        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
+            $whereClause .= " $condition ";
+        } else if (is_array($condition) && count($condition) > 1) {
+            $whereClause .=  '(';
+            foreach ($condition as $subCondition) {
+                $whereClause .=  $this->prepareCondition($subCondition, $parameters);
+            }
+            $whereClause .=  ')';
+        } else if (is_array($condition) && count($condition) === 1){
+            $primaryColumns = $this->getPrimaryColumns();
+            $key = array_keys($condition)[0];
+            $value = $condition[$key];
+
+            if ($value === null) {
+                $op = 'IS NULL';
+            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
+                $value = $matches[2];
+                $op = $matches[1] ? $matches[1] : "=";
+                $op .= ' ?';
+            }
+
+            if (in_array($key, $primaryColumns)) {
+                $whereClause .= " t.$key $op ";
+            } else {
+                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
+                $parameters[] = trim($key);
+            }
+
+            if ($value !== null) {
+                $parameters[] = trim($value);
+            }
+        }
+        return $whereClause;
+    }
+
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring

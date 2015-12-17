@@ -40,7 +40,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      */
     private $service;
     private $persistence;
-    private $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test';
+    private $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
 
     public function setUp()
     {
@@ -56,13 +56,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     /**
      * @after
+     * @before
      */
     public function deleteTestData()
     {
         $sql = 'DELETE FROM ' . DeliveryMonitoringService::TABLE_NAME .
-            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . ' = ?';
+            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
 
-        $this->persistence->exec($sql, [$this->deliveryExecutionId]);
+        $this->persistence->exec($sql);
     }
 
     public function testSave()
@@ -148,15 +149,91 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      */
     public function testFind($data)
     {
-        var_dump($data);
-        $this->assertTrue(true);
+        /*$this->service->find([
+            ['error_code' => '1'],
+            'OR',
+            ['error_code' => '2'],
+        ]);*/
+        $this->service->find([
+            [['error_code' => '1'], 'AND', [DeliveryMonitoringService::COLUMN_STATUS => 'active']],
+            'OR',
+            ['error_code' => '2'],
+        ]);
+        exit();
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
+        ]);
+        $this->assertEquals(count($result), 1);
+        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
+
+
+        $result = $this->service->find([
+            ['error_code' => '1'],
+            'OR',
+            ['error_code' => '2'],
+        ]);
+        $this->assertEquals(count($result), 2);
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            ['error_code' => '1'],
+        ]);
+        $this->assertEquals(count($result), 0);
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            ['error_code' => '0'],
+        ]);
+        $this->assertEquals(count($result), 1);
     }
 
     public function loadFixture()
     {
-        //TODO LOAD data
+        $this->setUp();
+
+        $data = [
+            [
+                DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
+                DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_1',
+                DeliveryMonitoringService::COLUMN_STATUS => 'active',
+                'error_code' => 1,
+                'session_id' => 'i1450191587554175',
+            ],
+            [
+                DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
+                DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_2',
+                DeliveryMonitoringService::COLUMN_STATUS => 'paused',
+                'error_code' => 2,
+                'session_id' => 'i1450191587554176',
+            ],
+            [
+                DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
+                DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_3',
+                DeliveryMonitoringService::COLUMN_STATUS => 'finished',
+                'error_code' => 3,
+                'session_id' => 'i1450191587554177',
+            ],
+            [
+                DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
+                DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_4',
+                DeliveryMonitoringService::COLUMN_STATUS => 'finished',
+                'error_code' => 0,
+                'session_id' => 'i1450191587554178',
+            ],
+        ];
+
+        foreach ($data as $item) {
+            $dataModel = new DeliveryMonitoringData($item[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
+            $dataModel->set($item);
+            $this->service->save($dataModel);
+        }
+
         return [
-            [1]
+            [$data],
         ];
     }
 
