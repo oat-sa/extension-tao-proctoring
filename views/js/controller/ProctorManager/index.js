@@ -139,9 +139,16 @@ define([
                             pageMode = _modes.LIST;
 
                         case _modes.LIST:
-                            $containerList.datatable('options', {
-                                params: {testCenters: selection}
-                            }).datatable('refresh');
+                            $containerList
+                                // erase previous parameters to prevent the datatable to keep old values
+                                .datatable('options', {
+                                    params: {testCenters: null}
+                                })
+                                // set new parameter value
+                                .datatable('options', {
+                                    params: {testCenters: selection}
+                                })
+                                .datatable('refresh');
                             break;
 
                         case _modes.FORM:
