@@ -19,11 +19,15 @@
  */
 namespace oat\taoProctoring\controller;
 
+use oat\tao\helpers\UserHelper;
+use oat\taoProctoring\helpers\DataTableHelper;
 use \tao_helpers_Uri;
 use \tao_helpers_Request;
+use common_session_SessionManager as SessionManager;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\controller\form\AddProctor;
+use oat\taoProctoring\model\ProctorManagementService;
 
 /**
  * Proctor manager controller
@@ -35,6 +39,21 @@ use oat\taoProctoring\controller\form\AddProctor;
  */
 class ProctorManager extends ProctoringModule
 {
+    /**
+     * The proctor is not authorized on the selected test centers
+     */
+    const NOT_AUTHORIZED = 0;
+
+    /**
+     * The proctor is only authorized on a subset of the selected test centers
+     */
+    const PARTIALLY_AUTHORIZED = 1;
+
+    /**
+     * The proctor is authorized on all the selected test centers
+     */
+    const FULLY_AUTHORIZED = 2;
+
     /**
      * Displays the index page of the extension: list all available deliveries.
      */
@@ -61,6 +80,11 @@ class ProctorManager extends ProctoringModule
         }
     }
 
+    /**
+     * Gets the list of test centers from the request
+     * @return bool
+     * @throws \common_Exception
+     */
     protected function getRequestTestCenters(){
         if($this->hasRequestParameter('testCenters')){
             return $this->hasRequestParameter('testCenters');
@@ -69,6 +93,11 @@ class ProctorManager extends ProctoringModule
         }
     }
 
+    /**
+     * Gets the list of proctors from the request
+     * @return bool
+     * @throws \common_Exception
+     */
     protected function getRequestProctors(){
         if($this->hasRequestParameter('proctors')){
             return $this->hasRequestParameter('proctors');
@@ -77,21 +106,54 @@ class ProctorManager extends ProctoringModule
         }
     }
 
-    protected function getAuthorization($testCenters){
-        
-        //call service getProctorsAuthorization($testCenters);
-        $authorizations = array();
+    /**
+     * Gets the list of authorized proctors for a selection of test centers
+     * @param $testCenters
+     * @return array
+     * @throws \common_exception_Error
+     */
+    protected function getAuthorization($testCenters)
+    {
+        $requestOptions = $this->getRequestOptions();
+        $currentUser = SessionManager::getSession()->getUser();
+        $proctors = ProctorManagementService::singleton()->getAssignedProctors($currentUser->getIdentifier());
 
-        //call service getAssignedProctors($currentUser?)
-        $proctors = array();
+        return DataTableHelper::paginate($proctors, $requestOptions, function($proctors) use($testCenters) {
+            $testCentersByProctors = ProctorManagementService::singleton()->getProctorsAuthorization($testCenters);
+            $nbTestCenters = count($testCenters);
 
-        //merge the data from $authorizations and $proctors arrays and format it for the datatable
-        
+            $authorizations = array();
 
-        //return value
-        return $authorizations;
+            foreach($proctors as $proctor) {
+                $userId = $proctor->getIdentifier();
+                $lastName = UserHelper::getUserLastName($proctor);
+                $firstName = UserHelper::getUserFirstName($proctor, empty($lastName));
+                $login = UserHelper::getUserStringProp($proctor, PROPERTY_USER_LOGIN);;
+
+                if (isset($testCentersByProctors[$userId])) {
+                    $nbAuthorized = count($testCentersByProctors[$userId]);
+                    if ($nbAuthorized == $nbTestCenters) {
+                        $status = self::FULLY_AUTHORIZED;
+                    } else {
+                        $status = self::PARTIALLY_AUTHORIZED;
+                    }
+                } else {
+                    $status = self::NOT_AUTHORIZED;
+                }
+
+                $authorizations[] = array(
+                    'id' => $userId,
+                    'firstname' => $firstName,
+                    'lastname' => $lastName,
+                    'login' => $login,
+                    'status' => $status
+                );
+            }
+
+            return $authorizations;
+        });
     }
-    
+
     /**
      * Get the lists of authorization for the proctor of the selected test centers
      */
@@ -100,7 +162,7 @@ class ProctorManager extends ProctoringModule
         $testCenters = $this->getRequestTestCenters();
 
         //return data
-        return $this->returnJson(array(
+        $this->returnJson(array(
             'authorization' => $this->getAuthorization($testCenters)
         ));
     }
@@ -113,11 +175,10 @@ class ProctorManager extends ProctoringModule
         $proctors = $this->getRequestProctors();
         $testCenters = $this->getRequestTestCenters();
 
-        //call service authorizeProctors($proctors, $testCenters);
-        $success = true;
+        $success = ProctorManagementService::singleton()->authorizeProctors($proctors, $testCenters);
 
         //return data
-        return $this->returnJson(array(
+        $this->returnJson(array(
             'success' => $success
         ));
     }
@@ -130,11 +191,10 @@ class ProctorManager extends ProctoringModule
         $proctors = $this->getRequestProctors();
         $testCenters = $this->getRequestTestCenters();
 
-        //call service unauthorizeProctors($proctors, $testCenters);
-        $success = true;
+        $success = ProctorManagementService::singleton()->unauthorizeProctors($proctors, $testCenters);
 
         //return data
-        return $this->returnJson(array(
+        $this->returnJson(array(
             'success' => $success
         ));
     }

@@ -52,6 +52,13 @@ define([
         LIST: 1,
         FORM: 2
     };
+
+    // translation map for status
+    var _status = {
+        0 : '',
+        1 : __('Partially authorized'),
+        2 : __('Authorized')
+    };
             
     // the page is always loading data when starting
     loadingBar.start();
@@ -247,7 +254,10 @@ define([
                         label: __('Login')
                     }, {
                         id: 'status',
-                        label: __('Status')
+                        label: __('Status'),
+                        transform: function(value) {
+                            return _status[value] || '';
+                        }
                     }]
                 }, []);
 
