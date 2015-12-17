@@ -166,9 +166,11 @@ class ProctorManager extends ProctoringModule
                 $created = $binder->bind($values);
                 if($created){
                     //assign then authorize the new proctor to the selected test centers
-                    $testCenters = $this->getRequestTestCenters();
                     ProctorManagementService::singleton()->assignProctors(array($proctor->getUri()), SessionManager::getSession()->getUserUri());
-                    ProctorManagementService::singleton()->authorizeProctors(array($proctor->getUri()), $testCenters);
+                    $testCenters = $this->getRequestTestCenters();
+                    if(!empty($testCenters)){
+                        ProctorManagementService::singleton()->authorizeProctors(array($proctor->getUri()), $testCenters);
+                    }
                 }
             }else{
                 $form = $myForm->render();
@@ -183,20 +185,6 @@ class ProctorManager extends ProctoringModule
             'created' => $created,
             'loginId'=> tao_helpers_Uri::encode(PROPERTY_USER_LOGIN),
             'debug' => array('values' => $myForm->getValues())
-        ));
-    }
-
-    /**
-     * Create a proctor
-     */
-    public function createProctor(){
-
-        //call service
-        $success = true;
-
-        //return data
-        return $this->returnJson(array(
-            'success' => $success
         ));
     }
 
