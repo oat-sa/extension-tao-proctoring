@@ -236,6 +236,9 @@ define([
                         id: 'authorize',
                         icon: 'authorize',
                         title: __('Authorize the proctor'),
+                        hidden: function() {
+                            return this.status === 2;
+                        },
                         action: function(id) {
                             authorize([id], __('The proctor will be authorized. Continue ?'));
                         }
@@ -243,6 +246,9 @@ define([
                         id: 'revoke',
                         icon: 'revoke',
                         title: __('Revoke the proctor'),
+                        hidden: function() {
+                            return !this.status;
+                        },
                         action: function(id) {
                             revoke([id], __('The proctor will be revoked. Continue ?'));
                         }
@@ -258,10 +264,10 @@ define([
                         id: 'login',
                         label: __('Login')
                     }, {
-                        id: 'status',
+                        id: 'state',
                         label: __('Status'),
-                        transform: function(value) {
-                            return _status[value] || '';
+                        transform: function(value, row) {
+                            return _status[row.status] || '';
                         }
                     }]
                 }, []);
