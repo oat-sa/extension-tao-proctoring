@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
@@ -186,7 +187,7 @@ class Delivery extends ProctoringModule
         try {
 
             $requestOptions = $this->getRequestOptions();
-            $testTakers = DeliveryHelper::getAvailableTestTakers($delivery->getUri(), $requestOptions);
+            $testTakers = DeliveryHelper::getAvailableTestTakers($delivery, $testCenter, $requestOptions);
 
             $this->composeView(
                 'delivery-testtakers',
@@ -311,12 +312,13 @@ class Delivery extends ProctoringModule
      */
     public function availableTestTakers() {
 
-        $deliveryId = $this->getRequestParameter('delivery');
+        $delivery = $this->getCurrentDelivery();
+        $testCenter = $this->getCurrentTestCenter();
 
         try {
 
             $requestOptions = $this->getRequestOptions();
-            $testTakers = DeliveryHelper::getAvailableTestTakers($deliveryId, $requestOptions);
+            $testTakers = DeliveryHelper::getAvailableTestTakers($delivery, $testCenter, $requestOptions);
             $this->returnJson($testTakers);
 
         } catch (ServiceNotFoundException $e) {
