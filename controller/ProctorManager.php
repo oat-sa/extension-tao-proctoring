@@ -86,7 +86,7 @@ class ProctorManager extends ProctoringModule
      */
     protected function getRequestTestCenters(){
         if($this->hasRequestParameter('testCenters')){
-            return $this->hasRequestParameter('testCenters');
+            return $this->getRequestParameter('testCenters');
         }else{
             return array();//may be empty
         }
@@ -99,7 +99,7 @@ class ProctorManager extends ProctoringModule
      */
     protected function getRequestProctors(){
         if($this->hasRequestParameter('proctors')){
-            return $this->hasRequestParameter('proctors');
+            return $this->getRequestParameter('proctors');
         }else{
             throw new \common_Exception('no proctors in request param');
         }
@@ -131,8 +131,8 @@ class ProctorManager extends ProctoringModule
                 $login = UserHelper::getUserStringProp($user, PROPERTY_USER_LOGIN);;
 
                 if (isset($testCentersByProctors[$userId])) {
-                    $nbAuthorized = count($testCentersByProctors[$userId]);
-                    if ($nbAuthorized == $nbTestCenters) {
+                    $authorized = array_intersect($testCentersByProctors[$userId], $testCenters);
+                    if (count($authorized) == $nbTestCenters) {
                         $status = self::FULLY_AUTHORIZED;
                     } else {
                         $status = self::PARTIALLY_AUTHORIZED;
