@@ -31,8 +31,10 @@ define([
     'ui/datalist',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/component/proctorForm',
+    'tpl!taoProctoring/templates/proctorManager/counters',
+    'tpl!taoProctoring/templates/proctorManager/status',
     'ui/datatable'
-], function (_, $, __, helpers, loadingBar, encode, feedback, dialogConfirm, bulkActionPopup, datalist, breadcrumbsFactory, proctorForm) {
+], function (_, $, __, helpers, loadingBar, encode, feedback, dialogConfirm, bulkActionPopup, datalist, breadcrumbsFactory, proctorForm, counterTpl, statusTpl) {
     'use strict';
     
     /**
@@ -51,13 +53,6 @@ define([
         EMPTY: 0,
         LIST: 1,
         FORM: 2
-    };
-
-    // translation map for status
-    var _status = {
-        0 : '',
-        1 : __('Partially authorized'),
-        2 : __('Authorized')
     };
 
     // the page is always loading data when starting
@@ -177,14 +172,37 @@ define([
                 .on('query.datatable', function() {
                     loadingBar.start();
                 })
-                .on('load.datatable', function() {
+                .on('load.datatable', function(e, dataset) {
+                    var partially = 0;
+                    var authorized = 0;
+                    var lines = dataset && dataset.data;
+                    _.forEach(lines, function(line) {
+                        if (line && line.status) {
+                            switch (line.status) {
+                                case 1: partially ++; break;
+                                case 2: authorized ++; break;
+                            }
+                        }
+
+                    });
+
+                    $(this).find('.datatable-wrapper h2').append(counterTpl([{
+                        id: 'authorized-list',
+                        label: __('Authorized proctors'),
+                        count: authorized
+                    }, {
+                        id: 'partially-list',
+                        label: __('Partially authorized proctors'),
+                        count: partially
+                    }]));
+
                     loadingBar.stop();
                 })
                 .datatable({
                     url: proctorsDataUrl,
                     status: {
-                        empty: __('No authorized proctors'),
-                        available: __('Authorized proctors'),
+                        empty: __('No assigned proctors'),
+                        available: __('Assigned proctors'),
                         loading: __('Loading')
                     },
                     tools: [{
@@ -267,7 +285,10 @@ define([
                         id: 'state',
                         label: __('Status'),
                         transform: function(value, row) {
-                            return _status[row.status] || '';
+                            return statusTpl({
+                                partially: row.status === 1,
+                                authorized: row.status === 2
+                            });
                         }
                     }]
                 }, []);
