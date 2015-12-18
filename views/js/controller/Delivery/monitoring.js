@@ -235,6 +235,7 @@ define([
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers,
+
                     categoriesSelector: cascadingComboBox(categories[actionName])
                 };
                 
