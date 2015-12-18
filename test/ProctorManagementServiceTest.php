@@ -93,6 +93,17 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
             10,
             true);
         $this->assertTrue($return);
+
+        $return = $this->proctorManagementService->authorizeProctors(array($proctor1->getUri()), $testCenters);
+        $this->assertEquals(
+            $testCenters,
+            $proctor1->getPropertyValues(new core_kernel_classes_Property(ProctorManagementService::PROPERTY_AUTHORIZED_PROCTOR_URI)),
+            'Proctor is not authorized in the good test centers',
+            0.0,
+            10,
+            true);
+        $this->assertTrue($return);
+
         $proctor1->delete(true);
         $proctor2->delete(true);
         $proctor3->delete(true);

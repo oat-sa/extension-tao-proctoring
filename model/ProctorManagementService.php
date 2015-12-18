@@ -60,10 +60,15 @@ class ProctorManagementService extends tao_models_classes_ClassService
      */
     public function authorizeProctors($proctorsUri, $testCenters){
         $return = true;
-        $propertiesValues = array(self::PROPERTY_AUTHORIZED_PROCTOR_URI => $testCenters);
+        $property = new core_kernel_classes_Property(self::PROPERTY_AUTHORIZED_PROCTOR_URI);
         foreach($proctorsUri as $proctorUri){
             $proctor = new core_kernel_classes_Resource($proctorUri);
-            $return &= $proctor->setPropertiesValues($propertiesValues);
+            $authorizedTestCenters = $proctor->getPropertyValues($property);
+            $newTestCenters = array_diff($testCenters, $authorizedTestCenters);
+            if(!empty($newTestCenters)){
+                $propertiesValues = array(self::PROPERTY_AUTHORIZED_PROCTOR_URI => $newTestCenters);
+                $return &= $proctor->setPropertiesValues($propertiesValues);
+            }
         }
 
         return (bool) $return;
