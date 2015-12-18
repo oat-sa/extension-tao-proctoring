@@ -83,7 +83,7 @@ define([
             checkedNodes : _.pluck(deliveries, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
             serverParameters : {
                 openParentNodes : _.pluck(deliveries, 'uri'), //generis tree uses normal if to open nodes...
-                rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#Delivery'
+                rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery'
             },
             paginate : 10,
             onChangeCallback : function(){
