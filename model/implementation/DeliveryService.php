@@ -607,7 +607,11 @@ class DeliveryService extends ConfigurableService
             'recursive' => true, 'like' => false
         ));
         if (empty($groups)) {
-            throw new \common_Exception('No system group exists for delivery '.$deliveryId);
+            \common_Logger::w('No system group exists for delivery '.$deliveryId.'. creating one');
+            $delivery = new \core_kernel_classes_Resource($deliveryId);
+            $newGroup = GroupsService::singleton()->getRootClass()->createInstance('test takers for deliver '.$delivery->getLabel());
+            $newGroup->setPropertyValue(new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY), $deliveryId);
+            return $newGroup;
         }
         return reset($groups);
     }
