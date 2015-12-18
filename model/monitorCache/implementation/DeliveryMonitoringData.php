@@ -120,5 +120,4 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     {
         return $this->data;
     }
-
 }

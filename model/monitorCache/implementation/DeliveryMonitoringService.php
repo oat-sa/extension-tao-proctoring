@@ -141,10 +141,11 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      *   <li>none of the above: the column must be equal to the given value.</li>
      * </ul>
      * @param boolean $together - whether the secondary data should be fetched together with primary.
-     * @return array
+     * @return DeliveryMonitoringData[]
      */
     public function find(array $criteria = [], array $options = [], $together = false)
     {
+        $result = [];
         $defaultOptions = [
             'order' => self::COLUMN_ID." ASC",
             'offset' => 0,
@@ -169,14 +170,19 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         $stmt = $this->getPersistence()->query($sql, $parameters);
 
-        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if ($together) {
-            foreach ($result as &$row) {
+            foreach ($data as &$row) {
                 $row = array_merge($row, $this->getKvData($row['id']));
             }
         }
 
+        foreach($data as $row) {
+            $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+            $monitoringData->set($row);
+            $result[] = $monitoringData;
+        }
         return $result;
     }
 
@@ -189,13 +195,82 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $result = false;
         if ($deliveryMonitoring->validate()) {
             $data = $deliveryMonitoring->get();
+            $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
 
-            $primaryTableData = $this->extractPrimaryData($data);
+            if ($isNewRecord) {
+                $result = $this->create($deliveryMonitoring);
+            } else {
+                $result = $this->update($deliveryMonitoring);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Create new record
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean whether data is saved
+     */
+    private function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $data = $deliveryMonitoring->get();
+
+        $primaryTableData = $this->extractPrimaryData($data);
+
+        $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
+
+        $id = $this->persistence->lastInsertId(self::TABLE_NAME);
+
+        $data[self::COLUMN_ID] = $id;
+        $deliveryMonitoring->set($data);
+
+        $this->saveKvData($deliveryMonitoring);
+
+        return $result;
+    }
+
+    /**
+     * Update existing record
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean whether data is saved
+     */
+    private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $setClause = '';
+        $params = [':id' => $deliveryMonitoring->get()['id']];
+
+        $data = $deliveryMonitoring->get();
+        $primaryTableData = $this->extractPrimaryData($data);
+
+        unset($primaryTableData['id']);
+        foreach ($primaryTableData as $dataKey => $dataValue) {
+            $setClause .= ($setClause === '') ? "$dataKey = :$dataKey" : ", $dataKey = :$dataKey";
+            $params[":$dataKey"] = $dataValue;
+        }
+
+        $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
+        WHERE " . self::COLUMN_ID . '=:id';
+
+        $this->getPersistence()->exec($sql, $params);
+
+        $this->saveKvData($deliveryMonitoring);
+
+        return true;
+    }
+
+    /**
+     * Delete all related records from secondary table
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     */
+    private function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $data = $deliveryMonitoring->get();
+        $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
+
+        if (!$isNewRecord) {
+            $this->deleteKvData($deliveryMonitoring);
+            $id = $data[self::COLUMN_ID];
             $kvTableData = $this->extractKvData($data);
-
-            $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData);
-            $id = $this->persistence->lastInsertId(self::TABLE_NAME);
-
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
                     self::KV_TABLE_NAME,
@@ -206,23 +281,43 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
                     )
                 );
             }
-            $result = true;
         }
-        return $result;
     }
 
     /**
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoringData
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
-    public function delete(DeliveryMonitoringDataInterface $deliveryMonitoringData)
+    public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $data = $deliveryMonitoringData->get();
+        $data = $deliveryMonitoring->get();
 
         $sql = 'DELETE FROM ' . self::TABLE_NAME . '
                 WHERE ' . self::COLUMN_DELIVERY_EXECUTION_ID . '=?';
 
         return $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]) === 1;
+    }
+
+
+    /**
+     * Delete all related records from secondary table
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean
+     */
+    private function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $result = false;
+        $data = $deliveryMonitoring->get();
+        $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
+
+        if (!$isNewRecord) {
+            $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
+                    WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
+            $this->getPersistence()->exec($sql, [$data['id']]);
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**

@@ -80,7 +80,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $dataModel = new DeliveryMonitoringData($this->deliveryExecutionId);
 
-        //data is now valid
+        //data is not valid
         $this->assertFalse($this->service->save($dataModel));
         //$data->validate() has been called
         $this->assertNotEmpty($dataModel->getErrors());
@@ -95,10 +95,15 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue($this->service->save($dataModel));
         $this->assertEmpty($dataModel->getErrors());
+        //id of new record has been specified
+        $this->assertNotEmpty($dataModel->get()['id']);
+
 
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-
         $this->assertNotEmpty($insertedData);
+        //one row has been inserted
+        $this->assertEquals(count($insertedData), 1);
+        $this->assertEquals($insertedData[0][DeliveryMonitoringService::COLUMN_STATUS], 'active');
 
         foreach ($data as $key => $val) {
             $this->assertEquals($insertedData[0][$key], $val);
@@ -114,6 +119,27 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $val = $kvData[DeliveryMonitoringService::KV_COLUMN_VALUE];
             $this->assertTrue(isset($secondaryData[$key]));
             $this->assertEquals($secondaryData[$key], $val);
+        }
+
+
+        $dataModel->add(DeliveryMonitoringService::COLUMN_STATUS, 'finished', true);
+        $this->assertTrue($this->service->save($dataModel));
+        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
+        //new row has not been inserted
+        $this->assertEquals(count($insertedData), 1);
+        $this->assertEquals($insertedData[0][DeliveryMonitoringService::COLUMN_STATUS], 'finished');
+
+        $data = $dataModel->get();
+        unset($data['secondary_data_key']);
+        $dataModel->set($data);
+
+        $this->assertTrue($this->service->save($dataModel));
+        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0]['id']);
+        foreach ($insertedKvData as $kvData) {
+            $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
+            //key has been removed
+            $this->assertTrue($key !== 'secondary_data_key');
         }
     }
 
@@ -152,7 +178,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
         ]);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
+        $this->assertEquals($result[0]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
 
 
         $result = $this->service->find([
@@ -183,7 +209,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ['error_code' => '0'],
         ]);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
+        $this->assertEquals($result[0]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
 
 
         $result = $this->service->find([
@@ -191,8 +217,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ['error_code' => '0'],
         ], [], true);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
-        $this->assertEquals($result[0]['error_code'], '0');
+        $this->assertEquals($result[0]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
+        $this->assertEquals($result[0]->get()['error_code'], '0');
 
 
         $result = $this->service->find([
@@ -201,8 +227,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals(count($result), 2);
 
         foreach ($result as $resultRow) {
-            $this->assertTrue(isset($resultRow['error_code']));
-            $this->assertTrue(isset($resultRow['session_id']));
+            $this->assertTrue(isset($resultRow->get()['error_code']));
+            $this->assertTrue(isset($resultRow->get()['session_id']));
         }
     }
 
