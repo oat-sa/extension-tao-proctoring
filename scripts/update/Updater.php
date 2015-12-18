@@ -115,6 +115,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $currentVersion = '0.6';
         }
 
+        $this->setVersion($currentVersion);
+
         if ($this->isVersion('0.6')) {
             try {
                 $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -130,7 +132,6 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('0.7');
         }
 
-        return $currentVersion;
     }
 
 }

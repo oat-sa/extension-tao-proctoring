@@ -44,4 +44,10 @@ interface DeliveryMonitoringDataInterface
      */
     public function get();
 
+    /**
+     * Validate data
+     * @return boolean
+     */
+    public function validate();
+
 }
