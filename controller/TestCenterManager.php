@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\model\ProctorManagementService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\helpers\DataTableHelper;
 
@@ -84,7 +85,7 @@ class TestCenterManager extends \tao_actions_SaSModule
         $administratorForm->setData('title', __('Assign administrator'));
         $this->setData('administratorForm', $administratorForm->render());
 
-        $proctorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_PROCTORS_URI);
+        $proctorProperty = new \core_kernel_classes_Property(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI);
         $proctorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $proctorProperty);
         $proctorForm->setData('title', __('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
