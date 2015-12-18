@@ -595,9 +595,8 @@ class DeliveryService extends ConfigurableService
     /**
      * Returns a group assinged to the delivery
      *
-     * @param unknown $deliveryId
+     * @param string $deliveryId
      * @return string
-     * @throws \common_Exception
      */
     private function findGroup($deliveryId)
     {
