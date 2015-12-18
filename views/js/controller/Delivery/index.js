@@ -28,7 +28,7 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/bulkActionPopup',
-    'ui/bulkActionPopup/cascadingComboBox',
+    'ui/cascadingComboBox',
     'taoProctoring/helper/status',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
