@@ -144,23 +144,9 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     }
 
 
-    /**
-     * @dataProvider loadFixture
-     */
-    public function testFind($data)
+    public function testFind()
     {
-        /*$this->service->find([
-            ['error_code' => '1'],
-            'OR',
-            ['error_code' => '2'],
-        ]);*/
-        $this->service->find([
-            [['error_code' => '1'], 'AND', [DeliveryMonitoringService::COLUMN_STATUS => 'active']],
-            'OR',
-            ['error_code' => '2'],
-        ]);
-        exit();
-
+        $this->loadFixture();
 
         $result = $this->service->find([
             [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
@@ -186,12 +172,41 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $result = $this->service->find([
             [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            'AND',
+            [['error_code' => '0'], 'OR', ['error_code' => '1']],
+        ]);
+        $this->assertEquals(count($result), 1);
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
             ['error_code' => '0'],
         ]);
         $this->assertEquals(count($result), 1);
+        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            ['error_code' => '0'],
+        ], [], true);
+        $this->assertEquals(count($result), 1);
+        $this->assertEquals($result[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
+        $this->assertEquals($result[0]['error_code'], '0');
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+        ], [], true);
+        $this->assertEquals(count($result), 2);
+
+        foreach ($result as $resultRow) {
+            $this->assertTrue(isset($resultRow['error_code']));
+            $this->assertTrue(isset($resultRow['session_id']));
+        }
     }
 
-    public function loadFixture()
+    private function loadFixture()
     {
         $this->setUp();
 

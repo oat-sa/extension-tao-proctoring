@@ -86,16 +86,64 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     private $primaryTableColumns;
 
     /**
+     * Find delivery monitoring data.
+     *
+     * Examples:
+     * Find by delivery execution id:
+     * ------------------------------
+     * ```php
+     * $deliveryMonitoringService->find([
+     *     ['delivery_execution_id' => 'http://sample/first.rdf#i1450191587554175']
+     * ]);
+     * ```
+     *
+     * Find by two fields with `AND` operator
+     * --------------------------------------
+     * ```php
+     * $deliveryMonitoringService->find([
+     *     ['status' => 'active'],
+     *     ['start_time' => '>1450428401'],
+     * ]);
+     * ```
+     *
+     * Find by two fields with `OR` operator
+     * -------------------------------------
+     * ```php
+     * $deliveryMonitoringService->find([
+     *     ['status' => 'active'],
+     *     'OR',
+     *     ['start_time' => '>1450428401'],
+     * ]);
+     * ```
+     *
+     *
+     * Combined condition
+     * ------------------
+     * ```php
+     * $deliveryMonitoringService->find([
+     *    ['status' => 'finished'],
+     *    'AND',
+     *    [['error_code' => '0'], 'OR', ['error_code' => '1']],
+     * ]);
+     * ```
      * @param array $criteria
-     * [
-     *   ['error_code' => '1'],
-     *   'OR',
-     *   ['error_code' => '2'],
-     * ]
-     * @param array $options
-     * @return DeliveryMonitoringData[]
+     * @param array $options - criteria to find data.
+     * The comparison operator is determined based on the first few
+     * characters in the given value. It recognizes the following operators
+     * if they appear as the leading characters in the given value:
+     * <ul>
+     *   <li><code>&lt;</code>: the column must be less than the given value.</li>
+     *   <li><code>&gt;</code>: the column must be greater than the given value.</li>
+     *   <li><code>&lt;=</code>: the column must be less than or equal to the given value.</li>
+     *   <li><code>&gt;=</code>: the column must be greater than or equal to the given value.</li>
+     *   <li><code>&lt;&gt;</code>: the column must not be the same as the given value.</li>
+     *   <li><code>=</code>: the column must be equal to the given value.</li>
+     *   <li>none of the above: the column must be equal to the given value.</li>
+     * </ul>
+     * @param boolean $together - whether the secondary data should be fetched together with primary.
+     * @return array
      */
-    public function find(array $criteria = [], array $options = [])
+    public function find(array $criteria = [], array $options = [], $together = false)
     {
         $defaultOptions = [
             'order' => self::COLUMN_ID." ASC",
@@ -106,12 +154,14 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause = 'WHERE ';
         $parameters = [];
 
-        $whereClause .= $this->prepareCondition($criteria, $parameters);
+        $selectClause = "SELECT DISTINCT t.* ";
+        $fromClause = "FROM " . self::TABLE_NAME . " t ";
+        $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
-        $sql = "SELECT DISTINCT t.* FROM " . self::TABLE_NAME . " t
-                INNER JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . "
-                $whereClause
-                ORDER BY " . $options['order'];
+        $sql = $selectClause . $fromClause . PHP_EOL .
+            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
+            $whereClause . PHP_EOL .
+            "ORDER BY " . $options['order'];
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
@@ -121,49 +171,14 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $result;
-    }
-
-
-    public function prepareCondition($condition, &$parameters)
-    {
-        $whereClause = '';
-
-        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
-            $whereClause .= " $condition ";
-        } else if (is_array($condition) && count($condition) > 1) {
-            $whereClause .=  '(';
-            foreach ($condition as $subCondition) {
-                $whereClause .=  $this->prepareCondition($subCondition, $parameters);
-            }
-            $whereClause .=  ')';
-        } else if (is_array($condition) && count($condition) === 1){
-            $primaryColumns = $this->getPrimaryColumns();
-            $key = array_keys($condition)[0];
-            $value = $condition[$key];
-
-            if ($value === null) {
-                $op = 'IS NULL';
-            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
-                $value = $matches[2];
-                $op = $matches[1] ? $matches[1] : "=";
-                $op .= ' ?';
-            }
-
-            if (in_array($key, $primaryColumns)) {
-                $whereClause .= " t.$key $op ";
-            } else {
-                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
-                $parameters[] = trim($key);
-            }
-
-            if ($value !== null) {
-                $parameters[] = trim($value);
+        if ($together) {
+            foreach ($result as &$row) {
+                $row = array_merge($row, $this->getKvData($row['id']));
             }
         }
-        return $whereClause;
-    }
 
+        return $result;
+    }
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
@@ -265,5 +280,78 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             }
         }
         return $result;
+    }
+
+    /**
+     * Get secondary data by parent data id
+     * @param integer $id
+     * @return array
+     */
+    private function getKvData($id)
+    {
+        $result = [];
+        $sql = 'SELECT * FROM ' . self::KV_TABLE_NAME . '
+                WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
+        $secondaryData = $this->getPersistence()->query($sql, [$id])->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($secondaryData as $data) {
+            $result[$data[self::KV_COLUMN_KEY]] = $data[self::KV_COLUMN_VALUE];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $condition
+     * @param $parameters
+     * @param $selectClause
+     * @return string
+     */
+    private function prepareCondition($condition, &$parameters, &$selectClause)
+    {
+        $whereClause = '';
+
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition))) {
+            $condition = current($condition);
+        }
+
+        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
+            $whereClause .= " $condition ";
+        } else if (is_array($condition) && count($condition) > 1) {
+            $whereClause .=  '(';
+            $previousCondition = null;
+            foreach ($condition as $subCondition) {
+                if (is_array($subCondition) && is_array($previousCondition)) {
+                    $whereClause .= 'AND';
+                }
+                $whereClause .=  $this->prepareCondition($subCondition, $parameters, $selectClause);
+                $previousCondition = $subCondition;
+            }
+            $whereClause .=  ')';
+        } else if (is_array($condition) && count($condition) === 1) {
+            $primaryColumns = $this->getPrimaryColumns();
+            $key = array_keys($condition)[0];
+            $value = $condition[$key];
+
+            if ($value === null) {
+                $op = 'IS NULL';
+            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
+                $value = $matches[2];
+                $op = $matches[1] ? $matches[1] : "=";
+                $op .= ' ?';
+            }
+
+            if (in_array($key, $primaryColumns)) {
+                $whereClause .= " t.$key $op ";
+            } else {
+                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
+                $parameters[] = trim($key);
+            }
+
+            if ($value !== null) {
+                $parameters[] = trim($value);
+            }
+        }
+        return $whereClause;
     }
 }
