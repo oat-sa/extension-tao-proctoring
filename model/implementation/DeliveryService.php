@@ -608,7 +608,7 @@ class DeliveryService extends ConfigurableService
         if (empty($groups)) {
             \common_Logger::w('No system group exists for delivery '.$deliveryId.'. creating one');
             $delivery = new \core_kernel_classes_Resource($deliveryId);
-            $newGroup = GroupsService::singleton()->getRootClass()->createInstance('test takers for deliver '.$delivery->getLabel());
+            $newGroup = GroupsService::singleton()->getRootClass()->createInstance('test takers for delivery '.$delivery->getLabel());
             $newGroup->setPropertyValue(new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY), $deliveryId);
             return $newGroup;
         }
