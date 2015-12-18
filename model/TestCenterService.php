@@ -38,15 +38,14 @@ class TestCenterService extends tao_models_classes_ClassService
 
     const PROPERTY_MEMBERS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#member';//deprecated
 
-    const PROPERTY_PROCTORS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor';
-
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';//deprecated
 
     const PROPERTY_CHILDREN_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#children';
 
     const PROPERTY_ADMINISTRATOR_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administrator';
 
-    const PROPERTY_AUTHORIZED_PROCTORS_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor';
+    const PROPERTY_AUTHORIZED_PROCTOR_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor';
+    
     /**
      * return the test center top level class
      *
@@ -67,8 +66,11 @@ class TestCenterService extends tao_models_classes_ClassService
      */
     public function getTestCentersByProctor(User $user) {
         $testCenters = array();
-        foreach ($user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTORS_URI) as $id) {
-            $testCenters[] = new core_kernel_classes_Resource($id);
+        foreach ($user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTOR_URI) as $testCenterUri) {
+            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
+        }
+        foreach ($user->getPropertyValues(self::PROPERTY_ADMINISTRATOR_URI) as $testCenterUri) {
+            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
         }
         return $testCenters;
     }
