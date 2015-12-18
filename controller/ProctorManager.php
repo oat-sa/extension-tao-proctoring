@@ -128,13 +128,18 @@ class ProctorManager extends ProctoringModule
                 $user = UserHelper::getUser($proctor);
                 $lastName = UserHelper::getUserLastName($user);
                 $firstName = UserHelper::getUserFirstName($user, empty($lastName));
-                $login = UserHelper::getUserStringProp($user, PROPERTY_USER_LOGIN);;
+                $login = UserHelper::getUserStringProp($user, PROPERTY_USER_LOGIN);
+                $authorizedLabel = array();
 
                 if (isset($testCentersByProctors[$userId])) {
                     $authorized = array_intersect($testCentersByProctors[$userId], $testCenters);
                     if (count($authorized) == $nbTestCenters) {
                         $status = self::FULLY_AUTHORIZED;
                     } else {
+                        foreach($authorized as $testCenterUri){
+                            $testCenter = new \core_kernel_classes_Resource($testCenterUri);
+                            $authorizedLabel[] = $testCenter->getLabel();
+                        }
                         $status = self::PARTIALLY_AUTHORIZED;
                     }
                 } else {
@@ -146,7 +151,8 @@ class ProctorManager extends ProctoringModule
                     'firstname' => $firstName,
                     'lastname' => $lastName,
                     'login' => $login,
-                    'status' => $status
+                    'status' => $status,
+                    'authorized' => implode(', ', $authorizedLabel)
                 );
             }
 

@@ -286,6 +286,7 @@ define([
                         label: __('Status'),
                         transform: function(value, row) {
                             return statusTpl({
+                                testCenters: row.authorized,
                                 partially: row.status === 1,
                                 authorized: row.status === 2
                             });
