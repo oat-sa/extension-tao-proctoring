@@ -56,6 +56,39 @@ class TestCenterService extends tao_models_classes_ClassService
     {
         return new core_kernel_classes_Class(self::CLASS_URI);
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see tao_models_classes_ClassService::deleteResource()
+     */
+    public function deleteResource(core_kernel_classes_Resource $resource)
+    {
+        $success = parent::deleteResource($resource);
+        if ($success) {
+            $userClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
+            // cleanup proctors
+            $users = $userClass->searchInstances(array(
+                ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI => $resource->getUri()
+            ), array(
+                'recursive' => true, 'like' => false
+            ));
+            foreach ($users as $user) {
+                $user->removePropertyValue(new core_kernel_classes_Property(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI), $resource);
+            }
+            // cleanup admins
+            $users = $userClass->searchInstances(array(
+                ProctorManagementService::PROPERTY_ADMINISTRATOR_URI => $resource->getUri()
+            ), array(
+                'recursive' => true, 'like' => false
+            ));
+            foreach ($users as $user) {
+                $user->removePropertyValue(new core_kernel_classes_Property(ProctorManagementService::PROPERTY_ADMINISTRATOR_URI), $resource);
+            }
+            // @todo cleanup eligibilities
+        }
+        
+        return $success;
+    }
 
     /**
      * Merge several list of resources URIs into one array
