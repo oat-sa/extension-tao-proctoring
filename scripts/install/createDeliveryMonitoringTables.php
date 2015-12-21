@@ -54,6 +54,10 @@ try {
         array(DeliveryMonitoringService::COLUMN_END_TIME),
         'IDX_' . DeliveryMonitoringService::TABLE_NAME . '_' . DeliveryMonitoringService::COLUMN_END_TIME
     );
+    $tableLog->addUniqueIndex(
+        array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
+        'IDX_' . DeliveryMonitoringService::TABLE_NAME . '_' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
+    );
 
     $tableData = $schema->createTable(DeliveryMonitoringService::KV_TABLE_NAME);
     $tableData->addOption('engine', 'InnoDB');

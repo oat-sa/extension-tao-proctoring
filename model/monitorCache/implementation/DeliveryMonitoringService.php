@@ -194,8 +194,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            $data = $deliveryMonitoring->get();
-            $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
+            $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
             if ($isNewRecord) {
                 $result = $this->create($deliveryMonitoring);
@@ -237,19 +236,19 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $setClause = '';
-        $params = [':id' => $deliveryMonitoring->get()['id']];
+        $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
 
         $data = $deliveryMonitoring->get();
         $primaryTableData = $this->extractPrimaryData($data);
 
-        unset($primaryTableData['id']);
+        unset($primaryTableData['delivery_execution_id']);
         foreach ($primaryTableData as $dataKey => $dataValue) {
             $setClause .= ($setClause === '') ? "$dataKey = :$dataKey" : ", $dataKey = :$dataKey";
             $params[":$dataKey"] = $dataValue;
         }
 
         $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
-        WHERE " . self::COLUMN_ID . '=:id';
+        WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
 
         $this->getPersistence()->exec($sql, $params);
 
@@ -265,7 +264,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     private function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
-        $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
+        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
             $this->deleteKvData($deliveryMonitoring);
@@ -308,7 +307,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $result = false;
         $data = $deliveryMonitoring->get();
-        $isNewRecord = empty($data[DeliveryMonitoringService::COLUMN_ID]);
+        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
             $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
@@ -448,5 +447,22 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             }
         }
         return $whereClause;
+    }
+
+    /**
+     * Check if record for delivery execution already exists in the storage.
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean
+     */
+    private function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $deliveryExecutionId = $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID];
+        $sql = "SELECT EXISTS( " . PHP_EOL .
+                "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+                "FROM " . self::TABLE_NAME . PHP_EOL .
+                "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+        $isNewRecord = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+
+        return $isNewRecord === 0;
     }
 }
