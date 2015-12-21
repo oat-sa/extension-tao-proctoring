@@ -30,6 +30,7 @@ define([
     'ui/bulkActionPopup',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
+    'ui/cascadingComboBox',
     'tpl!taoProctoring/templates/delivery/itemProgress',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'ui/datatable'
@@ -45,6 +46,7 @@ define([
     bulkActionPopup,
     breadcrumbsFactory,
     _status,
+    cascadingComboBox,
     itemProgressTpl,
     deliveryLinkTpl
 ) {
@@ -226,14 +228,16 @@ define([
                         }
                     }
                 });
-                var config = _.assign({
+                var config = {
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
                     resourceType : 'test taker',
                     allowedResources : allowedTestTakers,
-                    deniedResources : forbiddenTestTakers
-                }, categories[actionName]);
+                    deniedResources : forbiddenTestTakers,
+
+                    categoriesSelector: cascadingComboBox(categories[actionName])
+                };
                 
                 bulkActionPopup(config).on('ok', function(reason){
                     //execute callback
