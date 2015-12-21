@@ -60,6 +60,7 @@ use oat\oatbox\service\ConfigurableService;
  */
 class DeliveryMonitoringService extends ConfigurableService implements DeliveryMonitoringServiceInterface
 {
+    const OPTION_PERSISTENCE = 'persistence';
 
     const TABLE_NAME = 'delivery_monitoring';
     const COLUMN_ID = 'id';
@@ -77,8 +78,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_KEY = 'monitoring_key';
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
-
-    private $persistence;
 
     /**
      * @var array
@@ -231,7 +230,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
         if ($result) {
-            $id = $this->persistence->lastInsertId(self::TABLE_NAME);
+            $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
 
             $data[self::COLUMN_ID] = $id;
             $deliveryMonitoring->set($data);
@@ -337,10 +336,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     private function getPersistence()
     {
-        if ($this->persistence === null) {
-            $this->persistence = \common_persistence_Manager::getPersistence('default');
-        }
-        return $this->persistence;
+        return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
     }
 
     /**

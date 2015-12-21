@@ -59,7 +59,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testConstruct()
     {
         $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
-        $service = new DeliveryMonitoringService();
+        $service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
 
         $columns = [
             DeliveryMonitoringService::COLUMN_TEST_TAKER => 'http://sample/first.rdf#superUser',

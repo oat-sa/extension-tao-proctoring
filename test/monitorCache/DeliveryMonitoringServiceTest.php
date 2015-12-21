@@ -45,7 +45,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     public function setUp()
     {
         TaoPhpUnitTestRunner::initTest();
-        $this->service = new DeliveryMonitoringService();
+        $this->service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
         $this->persistence = \common_persistence_Manager::getPersistence('default');
     }
 

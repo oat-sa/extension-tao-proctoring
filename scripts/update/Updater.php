@@ -121,7 +121,7 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new DeliveryMonitoringService();
+                $service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
                 $service->setServiceManager($this->getServiceManager());
 
                 $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $service);
