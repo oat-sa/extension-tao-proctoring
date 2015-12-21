@@ -148,14 +148,17 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
     public function testGetEligibleDeliveries() {
         $testCenter = new core_kernel_classes_Resource('myTestCenter');
 
-        $delivery1 = new core_kernel_classes_Resource('myFirstDelivery');
-        $delivery2 = new core_kernel_classes_Resource('mySecondDelivery');
-        $delivery3 = new core_kernel_classes_Resource('myThirdDelivery');
+        $deliveryProphecy1 = $this->prophesize('core_kernel_classes_Resource');
+        $deliveryProphecy2 = $this->prophesize('core_kernel_classes_Resource');
+        $deliveryProphecy3 = $this->prophesize('core_kernel_classes_Resource');
 
-        $deliveryType = new core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAOProctor.rdf#EligibileDelivery');
-        $delivery1->setType($deliveryType);
-        $delivery2->setType($deliveryType);
-        $delivery3->setType($deliveryType);
+        $deliveryProphecy1->exists()->willReturn(true);
+        $deliveryProphecy2->exists()->willReturn(true);
+        $deliveryProphecy3->exists()->willReturn(true);
+
+        $delivery1 = $deliveryProphecy1->reveal();
+        $delivery2 = $deliveryProphecy2->reveal();
+        $delivery3 = $deliveryProphecy3->reveal();
 
         $eligibleProphet1 = $this->prophesize('core_kernel_classes_Resource');
         $eligibleProphet2 = $this->prophesize('core_kernel_classes_Resource');
