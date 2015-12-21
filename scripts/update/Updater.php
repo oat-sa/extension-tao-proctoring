@@ -118,6 +118,17 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->setVersion($currentVersion);
 
         if ($this->isVersion('0.6')) {
+
+            OntologyUpdater::syncModels();
+            //grant access to test site admin role
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole');
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
+
+            $this->setVersion('0.7');
+        }
+
+        if ($this->isVersion('0.7')) {
             try {
                 $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
@@ -129,9 +140,8 @@ class Updater extends common_ext_ExtensionUpdater {
 
             include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryMonitoringTables.php');
 
-            $this->setVersion('0.7');
+            $this->setVersion('0.8.0');
         }
-
     }
 
 }

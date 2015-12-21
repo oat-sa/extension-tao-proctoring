@@ -45,14 +45,6 @@
                             context="instance" group="none" binding="moveNode">
                         <icon id="icon-move-item"/>
                     </action>
-                    <action id="testcenter-import" name="Import" url="/tao/Import/index" context="resource"
-                            group="tree">
-                        <icon id="icon-import"/>
-                    </action>
-                    <action id="testcenter-export" name="Export" url="/tao/Export/index" context="resource"
-                            group="tree">
-                        <icon id="icon-export"/>
-                    </action>
                     <action id="testcenter-duplicate" name="Duplicate" url="/taoProctoring/TestCenterManager/cloneInstance"
                             context="instance" group="tree" binding="duplicateNode">
                         <icon id="icon-copy"/>

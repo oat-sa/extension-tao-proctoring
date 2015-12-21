@@ -16,6 +16,13 @@
     <generis:includesRole rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#BaseUserRole"/>
   </rdf:Description>
 
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole">
+      <rdf:type rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#UserRole"/>
+      <rdfs:label xml:lang="en-US"><![CDATA[Test Center Administrator Role]]></rdfs:label>
+      <rdfs:comment xml:lang="en-US"><![CDATA[Test Center Administrator Role]]></rdfs:comment>
+      <generis:includesRole rdf:resource="http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole"/>
+  </rdf:Description>
+
   <!-- Management Role -->
   <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager">
     <rdf:type rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#ManagementRole"/>
