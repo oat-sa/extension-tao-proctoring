@@ -58,6 +58,28 @@ class TestCenterService extends tao_models_classes_ClassService
     }
 
     /**
+     * Merge several list of resources URIs into one array
+     * @param array $uris
+     * @param array ...
+     * @return array
+     */
+    protected function mergeActualResources($uris) {
+        $resources = array();
+        foreach (func_get_args() as $uris) {
+            if (!is_array($uris)) {
+                $uris = [$uris];
+            }
+            foreach ($uris as $uri) {
+                $resource = new core_kernel_classes_Resource($uri);
+                if ($resource->exists()) {
+                    $resources[$uri] = $resource;
+                }
+            }
+        }
+        return $resources;
+    }
+
+    /**
      * Get test centers administered by a proctor
      *
      * @param User $user
@@ -65,14 +87,10 @@ class TestCenterService extends tao_models_classes_ClassService
      * @throws \common_exception_Error
      */
     public function getTestCentersByProctor(User $user) {
-        $testCenters = array();
-        foreach ($user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTOR_URI) as $testCenterUri) {
-            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
-        }
-        foreach ($user->getPropertyValues(self::PROPERTY_ADMINISTRATOR_URI) as $testCenterUri) {
-            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
-        }
-        return $testCenters;
+        return $this->mergeActualResources(
+            $user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTOR_URI),
+            $user->getPropertyValues(self::PROPERTY_ADMINISTRATOR_URI)
+        );
     }
 
     /**
@@ -84,12 +102,9 @@ class TestCenterService extends tao_models_classes_ClassService
      */
     public function getTestCentersByTestTaker(User $user)
     {
-        $testCenters = $user->getPropertyValues(self::PROPERTY_MEMBERS_URI);
-        array_walk($testCenters, function (&$testCenter) {
-            $testCenter = new core_kernel_classes_Resource($testCenter);
-        });
-
-        return $testCenters;
+        return $this->mergeActualResources(
+            $user->getPropertyValues(self::PROPERTY_MEMBERS_URI)
+        );
     }
 
     /**
