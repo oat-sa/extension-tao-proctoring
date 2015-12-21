@@ -35,14 +35,56 @@ use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringServic
  */
 class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 {
+
+    public $persistence;
+
     public function setUp()
     {
         TaoPhpUnitTestRunner::initTest();
+        $this->persistence = \common_persistence_Manager::getPersistence('default');
+    }
+
+    /**
+     * @after
+     * @before
+     */
+    public function deleteTestData()
+    {
+        $sql = 'DELETE FROM ' . DeliveryMonitoringService::TABLE_NAME .
+            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
+
+        $this->persistence->exec($sql);
+    }
+
+    public function testConstruct()
+    {
+        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
+        $service = new DeliveryMonitoringService();
+
+        $columns = [
+            DeliveryMonitoringService::COLUMN_TEST_TAKER => 'http://sample/first.rdf#superUser',
+            DeliveryMonitoringService::COLUMN_STATUS => 'initial',
+            'arbitrary_key' => 'arbitrary_value',
+        ];
+
+        $data = new DeliveryMonitoringData($deliveryExecutionId);
+        foreach ($columns as $columnKey => $columnVal) {
+            $data->add($columnKey, $columnVal);
+        }
+
+        $this->assertTrue($service->save($data));
+
+        $createdData = new DeliveryMonitoringData($deliveryExecutionId);
+
+        foreach ($columns as $columnKey => $columnVal) {
+            $this->assertNotEmpty($createdData->get()[$columnKey]);
+            $this->assertEquals($createdData->get()[$columnKey], $columnVal);
+        }
     }
 
     public function testAdd()
     {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474';
+        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
         $data = new DeliveryMonitoringData($deliveryExecutionId);
 
         $this->assertEquals($data->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], $deliveryExecutionId);
@@ -61,10 +103,10 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
     public function testSet()
     {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474';
+        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
 
         $newData = [
-            DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450190828500475',
+            DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450190828500475_test_record',
             'new_value' => 'value',
         ];
 
@@ -76,7 +118,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
     public function testValidate()
     {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474';
+        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
         $data = new DeliveryMonitoringData($deliveryExecutionId);
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();

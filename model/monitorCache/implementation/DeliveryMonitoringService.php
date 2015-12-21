@@ -126,8 +126,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      *    [['error_code' => '0'], 'OR', ['error_code' => '1']],
      * ]);
      * ```
-     * @param array $criteria
-     * @param array $options - criteria to find data.
+     * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
      * if they appear as the leading characters in the given value:
@@ -140,6 +139,13 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      *   <li><code>=</code>: the column must be equal to the given value.</li>
      *   <li>none of the above: the column must be equal to the given value.</li>
      * </ul>
+     * @param array $options
+     * <ul>
+     *   <li>string `$options['order']='id ASC'`</li>
+     *   <li>integer `$options['limit']=null`</li>
+     *   <li>integer `$options['offset']=0`</li>
+     *   <li>integer `$options['asArray']=false` whether data should be returned as multidimensional or as array of `DeliveryMonitoringData` instances</li>
+     * </ul>
      * @param boolean $together - whether the secondary data should be fetched together with primary.
      * @return DeliveryMonitoringData[]
      */
@@ -149,6 +155,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $defaultOptions = [
             'order' => self::COLUMN_ID." ASC",
             'offset' => 0,
+            'asArray' => false
         ];
         $options = array_merge($defaultOptions, $options);
 
@@ -178,11 +185,16 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             }
         }
 
-        foreach($data as $row) {
-            $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-            $monitoringData->set($row);
-            $result[] = $monitoringData;
+        if ($options['asArray']) {
+            $result = $data;
+        } else {
+            foreach($data as $row) {
+                $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $monitoringData->set($row);
+                $result[] = $monitoringData;
+            }
         }
+
         return $result;
     }
 

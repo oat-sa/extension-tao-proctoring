@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * class DeliveryMonitoringData
@@ -55,7 +56,15 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     public function __construct($deliveryExecutionId)
     {
-        $this->add('delivery_execution_id', $deliveryExecutionId);
+        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
+            [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecutionId],
+        ], ['asArray' => true], true);
+
+        if (empty($data)) {
+            $this->add('delivery_execution_id', $deliveryExecutionId);
+        } else {
+            $this->set($data[0]);
+        }
     }
 
     /**
