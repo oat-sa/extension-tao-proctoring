@@ -31,6 +31,7 @@ use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\EligibilityService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -160,7 +161,7 @@ class TestCenterHelper
         }
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveries      = $deliveryService->getTestCenterDeliveries($testCenter);
+        $deliveries      = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
         $filteredExecutions = array();
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {

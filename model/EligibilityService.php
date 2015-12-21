@@ -80,7 +80,10 @@ class EligibilityService extends tao_models_classes_ClassService
         ), array('recursive' => false, 'like' => false));
         $deliveries = array();
         foreach ($eligibles as $eligible) {
-            $deliveries[] = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
+            $delivery = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
+            if ($delivery->exists()) {
+                $deliveries[] = $delivery;
+            }
         }
         return $deliveries;
     }
