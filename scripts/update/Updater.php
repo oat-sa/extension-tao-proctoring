@@ -29,6 +29,8 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\oatbox\event\EventManager;
+use oat\taoTests\models\event\TestChangedEvent;
 
 /**
  * 
@@ -141,6 +143,17 @@ class Updater extends common_ext_ExtensionUpdater {
             include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryMonitoringTables.php');
 
             $this->setVersion('0.8.0');
+        }
+        
+        if ($this->isVersion('0.8.0')) {
+
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach(TestChangedEvent::EVENT_NAME,
+                array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
+            );
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+            
+            $this->setVersion('0.9.0');
         }
     }
 
