@@ -41,7 +41,8 @@ class TestCenter extends ProctoringModule
     {
         $testCenters = TestCenterHelper::getTestCenters();
         $data = array(
-            'list' => $testCenters
+            'list' => $testCenters,
+            'administrator' => $this->isAdmin() //check if the current user is a test site administrator or not
         );
 
         if (\tao_helpers_Request::isAjax()) {

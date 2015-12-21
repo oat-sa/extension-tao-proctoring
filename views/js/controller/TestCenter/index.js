@@ -24,8 +24,9 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/listbox',
-    'taoProctoring/component/breadcrumbs'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory) {
+    'taoProctoring/component/breadcrumbs',
+    'tpl!taoProctoring/templates/testSiteAdmin/adminLink'
+], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory, adminLinkTpl) {
     'use strict';
 
     /**
@@ -54,6 +55,7 @@ define([
          */
         start : function start() {
             var $container = $(cssScope);
+            var admin = $container.data('administrator');
             var boxes = $container.data('list');
             var crumbs = $container.data('breadcrumbs');
             var list = listBox({
@@ -66,8 +68,9 @@ define([
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
+            var adminUrl = helpers._url('index', 'ProctorManager', 'taoProctoring');
             var pollTo = null;
-
+            
             // update the index from a JSON array
             var update = function(boxes) {
                 if (pollTo) {
@@ -104,6 +107,13 @@ define([
                 refresh();
             } else {
                 update(boxes);
+            }
+            
+            if(admin){
+                //add test center admin link
+                $container.find('.header').append(adminLinkTpl({
+                    href : adminUrl
+                }));
             }
         }
     };

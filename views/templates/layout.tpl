@@ -27,7 +27,7 @@ use oat\tao\model\theme\Theme;
                     <div class="settings-menu">
                         <ul class="clearfix plain">
                             <li data-control="home">
-                                <a id="home" href="<?= _url('testCenters', 'TestCenter', 'taoProctoring') ?>">
+                                <a id="home" href="<?= _url('index', 'TestCenter', 'taoProctoring') ?>">
                                     <span class="icon-home"></span>
                                 </a>
                             </li>

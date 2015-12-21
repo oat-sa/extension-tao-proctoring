@@ -28,9 +28,9 @@ define([
     'ui/feedback',
     'ui/dialog',
     'ui/bulkActionPopup',
+    'ui/cascadingComboBox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'ui/cascadingComboBox',
     'tpl!taoProctoring/templates/delivery/itemProgress',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'ui/datatable'
@@ -44,9 +44,9 @@ define([
     feedback,
     dialog,
     bulkActionPopup,
+    cascadingComboBox,
     breadcrumbsFactory,
     _status,
-    cascadingComboBox,
     itemProgressTpl,
     deliveryLinkTpl
 ) {
@@ -215,7 +215,7 @@ define([
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
-                
+
                 _.each(_selection, function(uri){
                     var testTaker = getExecutionData(uri);
                     var checkedTestTaker;
@@ -233,10 +233,9 @@ define([
                     actionName : actionTitle,
                     reason : askForReason,
                     resourceType : 'test taker',
+                    categoriesSelector: cascadingComboBox(categories[actionName]),
                     allowedResources : allowedTestTakers,
-                    deniedResources : forbiddenTestTakers,
-
-                    categoriesSelector: cascadingComboBox(categories[actionName])
+                    deniedResources : forbiddenTestTakers
                 };
                 
                 bulkActionPopup(config).on('ok', function(reason){
