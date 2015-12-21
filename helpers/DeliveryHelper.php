@@ -29,6 +29,7 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -472,16 +473,23 @@ class DeliveryHelper
             /********/
 
             $executions = array();
+            
+            
+            $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
             foreach($deliveryExecutions as $deliveryExecution) {
-
+                $cachedData = current($deliveryMonitoringService->find([
+                    [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]
+                ], ['asArray' => true], true));
+                
                 $userId = $deliveryExecution->getUserIdentifier();
                 $state = array(
                     'status' => $deliveryService->getState($deliveryExecution),
+                    'description' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS]
                 );
                 $testTaker = array();
 
                 /**** to be replaced by real stuff ****/
-                $state = array_merge($state, WebServiceMock::random($mocks));
+                // $state = array_merge($state, WebServiceMock::random($mocks));
                 /********/
 
                 $user = UserHelper::getUser($userId);
