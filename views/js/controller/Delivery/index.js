@@ -28,11 +28,12 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/bulkActionPopup',
+    'ui/cascadingComboBox',
     'taoProctoring/helper/status',
     'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
-], function (_, $, __, helpers, loadingBar, listBox, encode, feedback, bulkActionPopup, _status, breadcrumbsFactory, actionsTpl, statsTpl) {
+], function (_, $, __, helpers, loadingBar, listBox, encode, feedback, bulkActionPopup, cascadingComboBox, _status, breadcrumbsFactory, actionsTpl, statsTpl) {
     'use strict';
 
     /**
@@ -167,8 +168,10 @@ define([
                     reason : true,
                     resourceType : 'test taker',
                     allowedResources : allowed,
-                    categoriesDefinitions : categories.pause.categoriesDefinitions,
-                    categories : categories.pause.categories
+                    categoriesSelector: cascadingComboBox({
+                        categoriesDefinitions : categories.pause.categoriesDefinitions,
+                        categories : categories.pause.categories
+                    })
                 }).on('ok', function(reason){
                     //execute callback
                     $.ajax({
