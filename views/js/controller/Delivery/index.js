@@ -167,11 +167,11 @@ define([
                     actionName : __('Pause Session'),
                     reason : true,
                     resourceType : 'test taker',
-                    allowedResources : allowed,
                     categoriesSelector: cascadingComboBox({
-                        categoriesDefinitions : categories.pause.categoriesDefinitions,
-                        categories : categories.pause.categories
-                    })
+                        categoriesDefinitions: categories.pause.categoriesDefinitions,
+                        categories: categories.pause.categories
+                    }),
+                    allowedResources : allowed
                 }).on('ok', function(reason){
                     //execute callback
                     $.ajax({
