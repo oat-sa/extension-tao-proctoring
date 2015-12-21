@@ -474,8 +474,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
                 "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
                 "FROM " . self::TABLE_NAME . PHP_EOL .
                 "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
-        $isNewRecord = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
 
-        return $isNewRecord === 0;
+        return !((boolean) $exists);
     }
 }
