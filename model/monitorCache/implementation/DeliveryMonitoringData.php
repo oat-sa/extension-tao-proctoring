@@ -46,7 +46,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
     private $requiredFields = [
         DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
-        DeliveryMonitoringService::COLUMN_TEST_TAKER,
         DeliveryMonitoringService::COLUMN_STATUS,
     ];
 

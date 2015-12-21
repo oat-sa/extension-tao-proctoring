@@ -230,12 +230,13 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
-        $id = $this->persistence->lastInsertId(self::TABLE_NAME);
+        if ($result) {
+            $id = $this->persistence->lastInsertId(self::TABLE_NAME);
 
-        $data[self::COLUMN_ID] = $id;
-        $deliveryMonitoring->set($data);
-
-        $this->saveKvData($deliveryMonitoring);
+            $data[self::COLUMN_ID] = $id;
+            $deliveryMonitoring->set($data);
+            $this->saveKvData($deliveryMonitoring);
+        }
 
         return $result;
     }
