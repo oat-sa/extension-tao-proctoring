@@ -190,14 +190,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
 
         $result = $this->service->find([
-            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
             ['error_code' => '1'],
         ]);
         $this->assertEquals(count($result), 0);
 
 
         $result = $this->service->find([
-            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
             'AND',
             [['error_code' => '0'], 'OR', ['error_code' => '1']],
         ]);
@@ -205,7 +205,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
 
         $result = $this->service->find([
-            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
             ['error_code' => '0'],
         ]);
         $this->assertEquals(count($result), 1);
@@ -213,7 +213,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
 
         $result = $this->service->find([
-            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
             ['error_code' => '0'],
         ], [], true);
         $this->assertEquals(count($result), 1);
@@ -222,7 +222,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
 
         $result = $this->service->find([
-            [DeliveryMonitoringService::COLUMN_STATUS => 'finished'],
+            [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
         ], [], true);
         $this->assertEquals(count($result), 2);
 
@@ -240,28 +240,28 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             [
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_1',
-                DeliveryMonitoringService::COLUMN_STATUS => 'active',
+                DeliveryMonitoringService::COLUMN_STATUS => 'active_test',
                 'error_code' => 1,
                 'session_id' => 'i1450191587554175',
             ],
             [
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_2',
-                DeliveryMonitoringService::COLUMN_STATUS => 'paused',
+                DeliveryMonitoringService::COLUMN_STATUS => 'paused_test',
                 'error_code' => 2,
                 'session_id' => 'i1450191587554176',
             ],
             [
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_3',
-                DeliveryMonitoringService::COLUMN_STATUS => 'finished',
+                DeliveryMonitoringService::COLUMN_STATUS => 'finished_test',
                 'error_code' => 3,
                 'session_id' => 'i1450191587554177',
             ],
             [
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_4',
-                DeliveryMonitoringService::COLUMN_STATUS => 'finished',
+                DeliveryMonitoringService::COLUMN_STATUS => 'finished_test',
                 'error_code' => 0,
                 'session_id' => 'i1450191587554178',
             ],
