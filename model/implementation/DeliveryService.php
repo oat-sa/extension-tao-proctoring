@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
@@ -92,8 +93,9 @@ class DeliveryService extends ConfigurableService
         $testCenters = $testCenterService->getTestCentersByProctor($proctor);
 
         $deliveries = [];
+        $eligibilityService = EligibilityService::singleton();
         foreach ($testCenters as $testCenter) {
-            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
+            $deliveries = array_merge($deliveries, $eligibilityService->getEligibleDeliveries($testCenter));
         }
 
         return $deliveries;
@@ -103,25 +105,13 @@ class DeliveryService extends ConfigurableService
      * Gets all deliveries available for a test center
      * @param string|core_kernel_classes_Resource $testCenterId
      * @return \taoDelivery_models_classes_DeliveryRdf[]
+     * @deprecated
      */
     public function getTestCenterDeliveries($testCenterId)
     {
-        if (is_string($testCenterId)) {
-            $testCenter = new \core_kernel_classes_Resource($testCenterId);
-        } else {
-            $testCenter = $testCenterId;
-        }
-
-        $deliveryProp = new \core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI);
-
-        $deliveries = array();
-        foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $delivery = new \taoDelivery_models_classes_DeliveryRdf($delResource);
-            if ($delivery->exists()) {
-                $deliveries[] = $delivery;
-            }
-        }
-        return $deliveries;
+        \common_Logger::w('Use of deprecated method: DeliveryService::getTestCenterDeliveries()');
+        $testCenter = new \core_kernel_classes_Resource($testCenterId);
+        return EligibilityService::singleton()->getEligibleDeliveries($testCenter);
     }
 
     /**
