@@ -56,6 +56,61 @@ class TestCenterService extends tao_models_classes_ClassService
     {
         return new core_kernel_classes_Class(self::CLASS_URI);
     }
+    
+    /**
+     * (non-PHPdoc)
+     * @see tao_models_classes_ClassService::deleteResource()
+     */
+    public function deleteResource(core_kernel_classes_Resource $resource)
+    {
+        $success = parent::deleteResource($resource);
+        if ($success) {
+            $userClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
+            // cleanup proctors
+            $users = $userClass->searchInstances(array(
+                ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI => $resource->getUri()
+            ), array(
+                'recursive' => true, 'like' => false
+            ));
+            foreach ($users as $user) {
+                $user->removePropertyValue(new core_kernel_classes_Property(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI), $resource);
+            }
+            // cleanup admins
+            $users = $userClass->searchInstances(array(
+                ProctorManagementService::PROPERTY_ADMINISTRATOR_URI => $resource->getUri()
+            ), array(
+                'recursive' => true, 'like' => false
+            ));
+            foreach ($users as $user) {
+                $user->removePropertyValue(new core_kernel_classes_Property(ProctorManagementService::PROPERTY_ADMINISTRATOR_URI), $resource);
+            }
+            // @todo cleanup eligibilities
+        }
+        
+        return $success;
+    }
+
+    /**
+     * Merge several list of resources URIs into one array
+     * @param array $uris
+     * @param array ...
+     * @return array
+     */
+    protected function mergeActualResources($uris) {
+        $resources = array();
+        foreach (func_get_args() as $uris) {
+            if (!is_array($uris)) {
+                $uris = [$uris];
+            }
+            foreach ($uris as $uri) {
+                $resource = new core_kernel_classes_Resource($uri);
+                if ($resource->exists()) {
+                    $resources[$uri] = $resource;
+                }
+            }
+        }
+        return $resources;
+    }
 
     /**
      * Get test centers administered by a proctor
@@ -65,14 +120,10 @@ class TestCenterService extends tao_models_classes_ClassService
      * @throws \common_exception_Error
      */
     public function getTestCentersByProctor(User $user) {
-        $testCenters = array();
-        foreach ($user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTOR_URI) as $testCenterUri) {
-            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
-        }
-        foreach ($user->getPropertyValues(self::PROPERTY_ADMINISTRATOR_URI) as $testCenterUri) {
-            $testCenters[$testCenterUri] = new core_kernel_classes_Resource($testCenterUri);
-        }
-        return $testCenters;
+        return $this->mergeActualResources(
+            $user->getPropertyValues(self::PROPERTY_AUTHORIZED_PROCTOR_URI),
+            $user->getPropertyValues(self::PROPERTY_ADMINISTRATOR_URI)
+        );
     }
 
     /**
@@ -84,12 +135,9 @@ class TestCenterService extends tao_models_classes_ClassService
      */
     public function getTestCentersByTestTaker(User $user)
     {
-        $testCenters = $user->getPropertyValues(self::PROPERTY_MEMBERS_URI);
-        array_walk($testCenters, function (&$testCenter) {
-            $testCenter = new core_kernel_classes_Resource($testCenter);
-        });
-
-        return $testCenters;
+        return $this->mergeActualResources(
+            $user->getPropertyValues(self::PROPERTY_MEMBERS_URI)
+        );
     }
 
     /**
