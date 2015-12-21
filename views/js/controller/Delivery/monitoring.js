@@ -215,7 +215,7 @@ define([
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
-                console.log(actionName, askForReason, categories[actionName]);
+
                 _.each(_selection, function(uri){
                     var testTaker = getExecutionData(uri);
                     var checkedTestTaker;
