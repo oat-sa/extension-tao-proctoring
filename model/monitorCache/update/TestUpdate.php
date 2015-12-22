@@ -21,12 +21,12 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * class DeliveryMonitoringData
@@ -81,17 +81,19 @@ class TestUpdate implements DeliveryMonitoringDataInterface
     public static function testStateChange(TestChangedEvent $event)
     {
         //$update = new self($event->getServiceCallId(), $event->getNewStateDescription());
-        
-        $update = new DeliveryMonitoringData($event->getServiceCallId());
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
+
+        $update = $service->getData($event->getServiceCallId());
         $dataArray = $update->get();
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
         if (!isset($dataArray[DeliveryMonitoringService::COLUMN_TEST_TAKER])) {
             \common_Logger::i('Retrieving test-taker id for monitoring');
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
             $update->add(DeliveryMonitoringService::COLUMN_TEST_TAKER, $deliveryExecution->getUserIdentifier());
         }
-        $update->add(DeliveryMonitoringService::COLUMN_STATUS, $event->getNewStateDescription(), true);
-        
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
+        $update->add(DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription(), true);
+        $update->add(DeliveryMonitoringService::COLUMN_STATUS, $deliveryService->getState($deliveryExecution), true);
+
         $success = $service->save($update);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');

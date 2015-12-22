@@ -22,30 +22,41 @@
 namespace oat\taoProctoring\model\monitorCache;
 
 /**
- * Interface DeliveryMonitoringService
+ * Interface DeliveryMonitoringData
+ *
+ * Represents data model of delivery execution.
  *
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryMonitoringServiceInterface
+interface DeliveryMonitoringData
 {
-
-    const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
-
     /**
-     * @return DeliveryMonitoringDataInterface[]
-     */
-    public function find();
-
-    /**
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * Save delivery execution data
+     * @param array $data data to be saved (key => value).
      * @return mixed
      */
-    public function save(DeliveryMonitoringDataInterface $deliveryMonitoring);
+    public function set(array $data);
 
     /**
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * Add value.
+     * @param $key
+     * @param $value
+     * @param bool $overwrite
      * @return mixed
      */
-    public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring);
+    public function add($key, $value, $overwrite = false);
+
+    /**
+     * Get delivery execution data
+     * @return array
+     */
+    public function get();
+
+
+    /**
+     * Validate data
+     * @return boolean
+     */
+    public function validate();
 }

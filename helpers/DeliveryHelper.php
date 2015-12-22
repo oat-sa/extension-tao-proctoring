@@ -484,12 +484,11 @@ class DeliveryHelper
                 $userId = $deliveryExecution->getUserIdentifier();
                 $state = array(
                     'status' => $deliveryService->getState($deliveryExecution),
-                    'description' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS]
                 );
                 $testTaker = array();
 
                 /**** to be replaced by real stuff ****/
-                // $state = array_merge($state, WebServiceMock::random($mocks));
+                $state = array_merge($state, WebServiceMock::random($mocks));
                 /********/
 
                 $user = UserHelper::getUser($userId);
@@ -510,6 +509,7 @@ class DeliveryHelper
                     'date' => DateHelper::displayeDate($deliveryExecution->getStartTime()),
                     'testTaker' => $testTaker,
                     'state' => $state,
+                    'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM],
                 );
             }
 

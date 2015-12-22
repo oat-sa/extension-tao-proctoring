@@ -446,7 +446,7 @@ define([
                 id: 'progress',
                 label: __('Progress'),
                 transform: function(value, row) {
-                	return row.state.description;
+                	return row.progress;
                 	/*
                     var state = row && row.state;
                     var item = state && state.item;
