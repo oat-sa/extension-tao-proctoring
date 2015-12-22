@@ -27,11 +27,13 @@ use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoFrontOffice\model\interfaces\DeliveryExecution as DeliveryExecutionInt;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInt;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoDelivery\model\AssignmentService;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\TestCenterService;
 
@@ -297,8 +299,7 @@ class DeliveryService extends ConfigurableService
      */
     public function getDeliveryTestTakers($deliveryId, $options = array())
     {
-        $delivery = new \core_kernel_classes_Resource($deliveryId);
-        $userIds = \taoDelivery_models_classes_AssignmentService::singleton()->getAssignedUsers($delivery);
+        $userIds = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getAssignedUsers($deliveryId);
         $users = array();
         foreach ($userIds as $id) {
             // assume Tao Users
@@ -620,7 +621,7 @@ class DeliveryService extends ConfigurableService
     public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
     {
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = \taoDelivery_models_classes_DeliveryAssemblyService::singleton()->getRuntime($compiledDelivery);
+        $runtime = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery->getUri());
         $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
         return $inputParameters;

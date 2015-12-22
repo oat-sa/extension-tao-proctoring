@@ -24,13 +24,14 @@ use oat\taoProctoring\model\implementation\DeliveryService;
 use PHPSession;
 use common_Logger;
 use common_session_SessionManager;
+use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
 
 /**
  * Override the default DeliveryServer Controller
  *
  * @package taoProctoring
  */
-class DeliveryServer extends \taoDelivery_actions_DeliveryServer
+class DeliveryServer extends DefaultDeliveryServer
 {
     /**
      * The name of the secure key used to grant proctor authorisation.
@@ -62,8 +63,7 @@ class DeliveryServer extends \taoDelivery_actions_DeliveryServer
     public function index()
     {
         parent::index();
-        $this->setData('content-extension', 'taoProctoring');
-        
+
         // if the test taker passes by this page, he/she cannot access to any delivery without proctor authorization,
         // whatever the delivery execution status is.
         $this->revokeAuthorization();

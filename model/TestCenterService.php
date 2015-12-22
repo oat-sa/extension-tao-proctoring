@@ -26,7 +26,6 @@ use core_kernel_classes_Resource;
 use core_kernel_classes_Class;
 use core_kernel_classes_Property;
 use tao_models_classes_ClassService;
-use taoDelivery_models_classes_DeliveryRdf;
 
 /**
  * TestCenter Service for proctoring
@@ -169,7 +168,7 @@ class TestCenterService extends tao_models_classes_ClassService
     /**
      *
      * @param string $testCenterUri
-     * @return \taoDelivery_models_classes_DeliveryRdf[]
+     * @return \core_kernel_classes_Resource[]
      */
     public function getDeliveries($testCenterUri)
     {
@@ -178,7 +177,7 @@ class TestCenterService extends tao_models_classes_ClassService
 
         $deliveries = array();
         foreach ($testCenter->getPropertyValues($deliveryProp) as $deliveryUri) {
-            $delivery = new taoDelivery_models_classes_DeliveryRdf($deliveryUri);
+            $delivery = new \core_kernel_classes_Resource($deliveryUri);
             if ($delivery->exists()) {
                 $deliveries[] = $delivery;
             }

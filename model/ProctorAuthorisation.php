@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
-use taoDelivery_models_classes_execution_DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 /**
  * Interface for the proctor authorisation
  * 
@@ -32,7 +32,7 @@ interface ProctorAuthorisation extends ProctorMonitor
     /**
      * 
      * @param string $deliveryId
-     * @return taoDelivery_models_classes_execution_DeliveryExecution[]
+     * @return DeliveryExecution[]
      */
     public function getPendingDeliveryExecutions($deliveryId);
     

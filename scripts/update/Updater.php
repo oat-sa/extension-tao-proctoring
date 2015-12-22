@@ -155,6 +155,11 @@ class Updater extends common_ext_ExtensionUpdater {
             
             $this->setVersion('0.9.0');
         }
+
+        // nothign to do
+        if ($this->isVersion('0.9.0')) {
+            $this->setVersion('1.0.0');
+        }
     }
 
 }

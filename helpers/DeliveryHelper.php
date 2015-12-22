@@ -68,7 +68,6 @@ class DeliveryHelper
         );
 
         foreach ($deliveries as $delivery) {
-            /* @var $delivery \taoDelivery_models_classes_DeliveryRdf */
             $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri());
             $inprogress = 0;
             $paused = 0;
