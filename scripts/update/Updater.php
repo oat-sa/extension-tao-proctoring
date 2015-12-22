@@ -28,6 +28,9 @@ use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\oatbox\event\EventManager;
+use oat\taoTests\models\event\TestChangedEvent;
 
 /**
  * 
@@ -113,16 +116,50 @@ class Updater extends common_ext_ExtensionUpdater {
             }
             $currentVersion = '0.6';
         }
-        
-        // save progess so far
+
         $this->setVersion($currentVersion);
-        
-        // nothign to do
+
         if ($this->isVersion('0.6')) {
-            $this->setVersion('0.7.0');
+
+            OntologyUpdater::syncModels();
+            //grant access to test site admin role
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole');
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
+
+            $this->setVersion('0.7');
         }
 
-        return null;
+        if ($this->isVersion('0.7')) {
+            try {
+                $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $service);
+            }
+
+            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryMonitoringTables.php');
+
+            $this->setVersion('0.8.0');
+        }
+        
+        if ($this->isVersion('0.8.0')) {
+
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach(TestChangedEvent::EVENT_NAME,
+                array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
+            );
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+            
+            $this->setVersion('0.9.0');
+        }
+
+        // nothign to do
+        if ($this->isVersion('0.9.0')) {
+            $this->setVersion('1.0.0');
+        }
     }
 
 }

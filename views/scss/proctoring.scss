@@ -97,6 +97,25 @@
         }
     }
     
+    .testcenters-index {
+        .header{
+            position:relative
+        }
+        .admin-link{
+            position: absolute;
+            right: 26px;
+            top: 5px;
+            color: white;
+            opacity : .9;
+            span{
+                margin-right:8px;
+            }
+            &:hover{
+                opacity : 1;
+            }
+        }
+    }
+    
     .delivery-index{
         .list-box {
             .dark {
@@ -178,5 +197,39 @@
                 margin: 0 10px;
             }
         } 
+    }
+
+    .proctorManager-index {
+        .panel {
+            padding: 10px 20px 10px 0;
+        }
+
+        .proctor-form{
+            h2{
+                margin : 0 0 35px;
+            }
+        }
+
+        .proctor-default {
+            display: table;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            //background: $canvas;
+
+            .message {
+                color: whiten($textColor, .5);
+                @include font-size(20);
+                display: table-cell;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    .icon-authorize:before {
+        @include icon-result-ok();
+    }
+    .icon-revoke:before {
+        @include icon-result-nok();
     }
 }

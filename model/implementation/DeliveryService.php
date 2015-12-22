@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
@@ -94,8 +95,9 @@ class DeliveryService extends ConfigurableService
         $testCenters = $testCenterService->getTestCentersByProctor($proctor);
 
         $deliveries = [];
+        $eligibilityService = EligibilityService::singleton();
         foreach ($testCenters as $testCenter) {
-            $deliveries = array_merge($deliveries, $this->getTestCenterDeliveries($testCenter));
+            $deliveries = array_merge($deliveries, $eligibilityService->getEligibleDeliveries($testCenter));
         }
 
         return $deliveries;
@@ -104,23 +106,14 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets all deliveries available for a test center
      * @param string|core_kernel_classes_Resource $testCenterId
-     * @return \core_kernel_classes_Resource[]
+     * @return \taoDelivery_models_classes_DeliveryRdf[]
+     * @deprecated
      */
     public function getTestCenterDeliveries($testCenterId)
     {
-        if (is_string($testCenterId)) {
-            $testCenter = new \core_kernel_classes_Resource($testCenterId);
-        } else {
-            $testCenter = $testCenterId;
-        }
-
-        $deliveryProp = new \core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI);
-
-        $deliveries = array();
-        foreach ($testCenter->getPropertyValues($deliveryProp) as $delResource) {
-            $deliveries[] = new \core_kernel_classes_Resource($delResource);
-        }
-        return $deliveries;
+        \common_Logger::w('Use of deprecated method: DeliveryService::getTestCenterDeliveries()');
+        $testCenter = new \core_kernel_classes_Resource($testCenterId);
+        return EligibilityService::singleton()->getEligibleDeliveries($testCenter);
     }
 
     /**
@@ -261,11 +254,11 @@ class DeliveryService extends ConfigurableService
     /**
      *
      * @param string $deliveryId
-     * @return \core_kernel_classes_Resource
+     * @return \taoDelivery_models_classes_DeliveryRdf
      */
     public function getDelivery($deliveryId)
     {
-        return new \core_kernel_classes_Resource($deliveryId);
+        return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
     }
 
     /**
@@ -593,9 +586,8 @@ class DeliveryService extends ConfigurableService
     /**
      * Returns a group assinged to the delivery
      *
-     * @param unknown $deliveryId
+     * @param string $deliveryId
      * @return string
-     * @throws \common_Exception
      */
     private function findGroup($deliveryId)
     {
@@ -605,7 +597,11 @@ class DeliveryService extends ConfigurableService
             'recursive' => true, 'like' => false
         ));
         if (empty($groups)) {
-            throw new \common_Exception('No system group exists for delivery '.$deliveryId);
+            \common_Logger::w('No system group exists for delivery '.$deliveryId.'. creating one');
+            $delivery = new \core_kernel_classes_Resource($deliveryId);
+            $newGroup = GroupsService::singleton()->getRootClass()->createInstance('test takers for delivery '.$delivery->getLabel());
+            $newGroup->setPropertyValue(new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY), $deliveryId);
+            return $newGroup;
         }
         return reset($groups);
     }
