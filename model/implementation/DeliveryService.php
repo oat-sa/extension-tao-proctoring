@@ -22,7 +22,6 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
-use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
@@ -35,7 +34,6 @@ use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\TestCenterService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 
 /**
  * Sample Delivery Service for proctoring
@@ -179,7 +177,7 @@ class DeliveryService extends ConfigurableService
     {
         $executionStatus = $deliveryExecution->getState()->getUri();
         $proctoringState = $this->getProctoringState($deliveryExecution);
-        $status = isset($proctoringState['status']) ? $proctoringState['status'] : null;
+        $status = $proctoringState['status'];
 
         if (DeliveryExecutionInt::STATE_FINISHIED == $executionStatus) {
             if (self::STATE_TERMINATED != $status) {
@@ -207,17 +205,17 @@ class DeliveryService extends ConfigurableService
     public function setProctoringState($executionId, $state, $reason = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
+        $stateService = $this->getExtendedStateService();
+        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+
         $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
-        $data = $service->getData($deliveryExecution->getIdentifier());
 
-        $data->add(DeliveryMonitoringServiceInterface::STATUS, $state, true);
-        $data->add('reason', $reason, true);
+        $proctoringState['status'] = $state;
+        $proctoringState['reason'] = $reason;
         if ($currentUser !== null && $state === self::STATE_AUTHORIZED) {
-            $data->add(DeliveryMonitoringServiceInterface::AUTHORIZED_BY, $currentUser->getUri(), true);
+            $proctoringState['authorized_by'] = $currentUser->getUri();
         }
-
-        return $service->save($data);
+        $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
     }
 
     /**
@@ -228,9 +226,18 @@ class DeliveryService extends ConfigurableService
     public function getProctoringState($executionId)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
-        $data = $service->getData($deliveryExecution->getIdentifier());
-        return $data->get();
+        $stateService = $this->getExtendedStateService();
+        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+
+        if (!isset($proctoringState['status'])) {
+            $proctoringState['status'] = null;
+        }
+
+        if (!isset($proctoringState['reason'])) {
+            $proctoringState['reason'] = null;
+        }
+
+        return $proctoringState;
     }
 
     /**
@@ -684,13 +691,13 @@ class DeliveryService extends ConfigurableService
      * temporary helper until proper servicemanager integration
      * @return ExtendedStateService
      */
-    /*private function getExtendedStateService()
+    private function getExtendedStateService()
     {
         if (!isset($this->extendedStateService)) {
             $this->extendedStateService = new ExtendedStateService();
         }
         return $this->extendedStateService;
-    }*/
+    }
 
     /**
      * Encodes a test variable

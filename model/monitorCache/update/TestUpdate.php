@@ -59,6 +59,15 @@ class TestUpdate implements DeliveryMonitoringDataInterface
 
     /**
      * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::set()
+     */
+    public function add($key, $value, $overwrite = false)
+    {
+        throw new \common_exception_NotImplemented(__CLASS__.'::'.__FUNCTION__);
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::get()
      */
     public function get()
