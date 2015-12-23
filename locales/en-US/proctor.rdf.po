@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint12\n"
-"PO-Revision-Date: 2015-11-26T14:58:48\n"
+"Project-Id-Version: TAO 3.1.0-sprint15\n"
+"PO-Revision-Date: 2015-12-23T13:55:28\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -18,6 +18,16 @@ msgstr ""
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
+msgstr ""
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Test Center Administrator Role"
+msgstr ""
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Test Center Administrator Role"
 msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
