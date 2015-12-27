@@ -78,7 +78,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
-        $dataModel = new DeliveryMonitoringData($this->deliveryExecutionId);
+        $dataModel = $this->service->getData($this->deliveryExecutionId);
 
         //data is not valid
         $this->assertFalse($this->service->save($dataModel));
@@ -153,7 +153,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
-        $dataModel = new DeliveryMonitoringData($this->deliveryExecutionId);
+        $dataModel = $this->service->getData($this->deliveryExecutionId);
 
         foreach ($data as $key => $val) {
             $dataModel->add($key, $val);
@@ -268,7 +268,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ];
 
         foreach ($data as $item) {
-            $dataModel = new DeliveryMonitoringData($item[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
+            $dataModel = $this->service->getData($item[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
             $dataModel->set($item);
             $this->service->save($dataModel);
         }

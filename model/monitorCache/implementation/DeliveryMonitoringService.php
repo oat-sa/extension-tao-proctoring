@@ -21,8 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringServiceInterface;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
 
 /**
@@ -63,14 +63,15 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const OPTION_PERSISTENCE = 'persistence';
 
     const TABLE_NAME = 'delivery_monitoring';
-    const COLUMN_ID = 'id';
-    const COLUMN_DELIVERY_EXECUTION_ID = 'delivery_execution_id';
-    const COLUMN_STATUS = 'status';
-    const COLUMN_CURRENT_ASSESSMENT_ITEM = 'current_assessment_item';
-    const COLUMN_TEST_TAKER = 'test_taker';
-    const COLUMN_AUTHORIZED_BY = 'authorized_by';
-    const COLUMN_START_TIME = 'start_time';
-    const COLUMN_END_TIME = 'end_time';
+
+    const COLUMN_ID = DeliveryMonitoringServiceInterface::ID;
+    const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
+    const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
+    const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
+    const COLUMN_TEST_TAKER = DeliveryMonitoringServiceInterface::TEST_TAKER;
+    const COLUMN_AUTHORIZED_BY = DeliveryMonitoringServiceInterface::AUTHORIZED_BY;
+    const COLUMN_START_TIME = DeliveryMonitoringServiceInterface::START_TIME;
+    const COLUMN_END_TIME = DeliveryMonitoringServiceInterface::END_TIME;
 
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';
@@ -83,6 +84,15 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @var array
      */
     private $primaryTableColumns;
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return DeliveryMonitoringDataInterface
+     */
+    public function getData($deliveryExecutionId)
+    {
+        return new DeliveryMonitoringData($deliveryExecutionId);
+    }
 
     /**
      * Find delivery monitoring data.
@@ -465,12 +475,18 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     private function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $deliveryExecutionId = $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID];
-        $sql = "SELECT EXISTS( " . PHP_EOL .
-                "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-                "FROM " . self::TABLE_NAME . PHP_EOL .
-                "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
-        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+        $data = $deliveryMonitoring->get();
+        $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+
+        if (isset($data[self::COLUMN_ID])) {
+            $exists = true;
+        } else {
+            $sql = "SELECT EXISTS( " . PHP_EOL .
+                    "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+                    "FROM " . self::TABLE_NAME . PHP_EOL .
+                    "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+            $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+        }
 
         return !((boolean) $exists);
     }

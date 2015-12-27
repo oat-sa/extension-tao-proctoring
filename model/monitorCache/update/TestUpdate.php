@@ -21,12 +21,12 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * class DeliveryMonitoringData
@@ -59,6 +59,15 @@ class TestUpdate implements DeliveryMonitoringDataInterface
 
     /**
      * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::set()
+     */
+    public function add($key, $value, $overwrite = false)
+    {
+        throw new \common_exception_NotImplemented(__CLASS__.'::'.__FUNCTION__);
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::get()
      */
     public function get()
@@ -81,8 +90,9 @@ class TestUpdate implements DeliveryMonitoringDataInterface
     public static function testStateChange(TestChangedEvent $event)
     {
         //$update = new self($event->getServiceCallId(), $event->getNewStateDescription());
-        
-        $update = new DeliveryMonitoringData($event->getServiceCallId());
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
+        $update = $service->getData($event->getServiceCallId());
+
         $dataArray = $update->get();
         if (!isset($dataArray[DeliveryMonitoringService::COLUMN_TEST_TAKER])) {
             \common_Logger::i('Retrieving test-taker id for monitoring');
@@ -90,7 +100,7 @@ class TestUpdate implements DeliveryMonitoringDataInterface
             $update->add(DeliveryMonitoringService::COLUMN_TEST_TAKER, $deliveryExecution->getUserIdentifier());
         }
         $update->add(DeliveryMonitoringService::COLUMN_STATUS, $event->getNewStateDescription(), true);
-        
+
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
         $success = $service->save($update);
         if (!$success) {
