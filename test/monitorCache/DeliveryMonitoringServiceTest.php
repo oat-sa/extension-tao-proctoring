@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\test\monitorCache;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\taoProctoring\test\monitorCache\mock\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 
 /**
@@ -78,7 +78,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
-        $dataModel = $this->service->getData($this->deliveryExecutionId);
+        $deliveryExecution = $this->getDeliveryExecution();
+        $dataModel = new DeliveryMonitoringData($deliveryExecution);
 
         //data is not valid
         $this->assertFalse($this->service->save($dataModel));
@@ -86,11 +87,11 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertNotEmpty($dataModel->getErrors());
 
         foreach ($data as $key => $val) {
-            $dataModel->add($key, $val);
+            $dataModel->addValue($key, $val);
         }
 
         foreach ($secondaryData as $secKey => $secVal) {
-            $dataModel->add($secKey, $secVal);
+            $dataModel->addValue($secKey, $secVal);
         }
 
         $this->assertTrue($this->service->save($dataModel));
@@ -122,25 +123,12 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         }
 
 
-        $dataModel->add(DeliveryMonitoringService::COLUMN_STATUS, 'finished', true);
+        $dataModel->addValue(DeliveryMonitoringService::COLUMN_STATUS, 'finished', true);
         $this->assertTrue($this->service->save($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         //new row has not been inserted
         $this->assertEquals(count($insertedData), 1);
         $this->assertEquals($insertedData[0][DeliveryMonitoringService::COLUMN_STATUS], 'finished');
-
-        $data = $dataModel->get();
-        unset($data['secondary_data_key']);
-        $dataModel->set($data);
-
-        $this->assertTrue($this->service->save($dataModel));
-        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0]['id']);
-        foreach ($insertedKvData as $kvData) {
-            $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
-            //key has been removed
-            $this->assertTrue($key !== 'secondary_data_key');
-        }
     }
 
 
@@ -153,10 +141,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
-        $dataModel = $this->service->getData($this->deliveryExecutionId);
+        $dataModel = new DeliveryMonitoringData($this->getDeliveryExecution());
 
         foreach ($data as $key => $val) {
-            $dataModel->add($key, $val);
+            $dataModel->addValue($key, $val);
         }
 
         $this->assertTrue($this->service->save($dataModel));
@@ -268,8 +256,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ];
 
         foreach ($data as $item) {
-            $dataModel = $this->service->getData($item[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
-            $dataModel->set($item);
+            $dataModel = new DeliveryMonitoringData($this->getDeliveryExecution($item[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]));
+            foreach ($item as $key => $val) {
+                $dataModel->addValue($key, $val);
+            }
             $this->service->save($dataModel);
         }
 
@@ -292,5 +282,16 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ' WHERE ' . DeliveryMonitoringService::KV_COLUMN_PARENT_ID . '=?';
 
         return $this->persistence->query($sql, [$parentId])->fetchAll();
+    }
+
+    private function getDeliveryExecution($id = null)
+    {
+        if ($id === null) {
+            $id = $this->deliveryExecutionId;
+        }
+        $prophet = new \Prophecy\Prophet();
+        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        return $deliveryExecutionProphecy->reveal();
     }
 }

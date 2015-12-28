@@ -24,6 +24,9 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * Class DeliveryMonitoringService
@@ -34,12 +37,8 @@ use oat\oatbox\service\ConfigurableService;
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecutionId);
- * $data->setData([
- *  'test_taker' => 'http://sample/first.rdf#i1450190828500474',
- *  'status' => 'ACTIVE',
- *  'current_assessment_item' => 'http://sample/first.rdf#i145018936535755'
- * ]);
+ * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data->addValue('new_key', 'new_value');
  * $deliveryMonitoringService->save($data);
  * ```
  *
@@ -86,12 +85,12 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     private $primaryTableColumns;
 
     /**
-     * @param string $deliveryExecutionId
+     * @param DeliveryExecution $deliveryExecution
      * @return DeliveryMonitoringDataInterface
      */
-    public function getData($deliveryExecutionId)
+    public function getData(DeliveryExecution $deliveryExecution)
     {
-        return new DeliveryMonitoringData($deliveryExecutionId);
+        return new DeliveryMonitoringData($deliveryExecution);
     }
 
     /**
@@ -197,9 +196,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if ($options['asArray']) {
             $result = $data;
         } else {
+            $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
             foreach($data as $row) {
-                $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData->set($row);
+                $monitoringData = new DeliveryMonitoringData($deliveryService->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]), false);
                 $result[] = $monitoringData;
             }
         }
@@ -243,7 +242,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
 
             $data[self::COLUMN_ID] = $id;
-            $deliveryMonitoring->set($data);
+            $deliveryMonitoring->addValue(self::COLUMN_ID, $id);
             $this->saveKvData($deliveryMonitoring);
         }
 
@@ -287,11 +286,11 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $data = $deliveryMonitoring->get();
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
+        $kvTableData = $this->extractKvData($data);
 
-        if (!$isNewRecord) {
+        if (!$isNewRecord && !empty($kvTableData)) {
             $this->deleteKvData($deliveryMonitoring);
             $id = $data[self::COLUMN_ID];
-            $kvTableData = $this->extractKvData($data);
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
                     self::KV_TABLE_NAME,

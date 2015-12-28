@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
+use oat\taoDelivery\model\execution\DeliveryExecution;
+
 /**
  * Interface DeliveryMonitoringService
  *
@@ -41,10 +43,10 @@ interface DeliveryMonitoringService
     const END_TIME = 'end_time';
 
     /**
-     * @param string $deliveryExecutionId
+     * @param DeliveryExecution $deliveryExecution
      * @return DeliveryMonitoringData
      */
-    public function getData($deliveryExecutionId);
+    public function getData(DeliveryExecution $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]

@@ -21,88 +21,25 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
-use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\oatbox\service\ServiceManager;
 
 /**
- * class DeliveryMonitoringData
- *
- * Represents data model of delivery execution.
  *
  * @package oat\taoProctoring
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class TestUpdate implements DeliveryMonitoringDataInterface
+class TestUpdate
 {
-    private $serviceCallId;
-    
-    private $description;
-
-    public function __construct($serviceCallId, $description)
-    {
-        $this->serviceCallId = $serviceCallId;
-        $this->description = $description;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::set()
-     */
-    public function set(array $data)
-    {
-        throw new \common_exception_NotImplemented(__CLASS__.'::'.__FUNCTION__);
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::set()
-     */
-    public function add($key, $value, $overwrite = false)
-    {
-        throw new \common_exception_NotImplemented(__CLASS__.'::'.__FUNCTION__);
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::get()
-     */
-    public function get()
-    {
-        return array(
-            DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $this->serviceCallId,
-            DeliveryMonitoringService::COLUMN_STATUS => $this->description
-        );
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringDataInterface::validate()
-     */
-    public function validate()
-    {
-        return true;
-    }
 
     public static function testStateChange(TestChangedEvent $event)
     {
-        //$update = new self($event->getServiceCallId(), $event->getNewStateDescription());
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
-        $update = $service->getData($event->getServiceCallId());
-
-        $dataArray = $update->get();
-        if (!isset($dataArray[DeliveryMonitoringService::COLUMN_TEST_TAKER])) {
-            \common_Logger::i('Retrieving test-taker id for monitoring');
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-            $update->add(DeliveryMonitoringService::COLUMN_TEST_TAKER, $deliveryExecution->getUserIdentifier());
-        }
-        $update->add(DeliveryMonitoringService::COLUMN_STATUS, $event->getNewStateDescription(), true);
-
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringServiceInterface::CONFIG_ID);
-        $success = $service->save($update);
+        /** @var DeliveryMonitoringService $service */
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $service->getData($deliveryExecution);
+        $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }
