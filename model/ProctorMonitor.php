@@ -21,8 +21,7 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
-use oat\taoFrontOffice\model\Delivery;
-use taoDelivery_models_classes_execution_DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * Interface for the proctoringservice
@@ -43,7 +42,7 @@ interface ProctorMonitor
      * Gets the executions of a delivery
      *
      * @param $deliveryId
-     * @return taoDelivery_models_classes_execution_DeliveryExecution[]
+     * @return DeliveryExecution[]
      */
     public function getDeliveryExecutions($deliveryId);
     

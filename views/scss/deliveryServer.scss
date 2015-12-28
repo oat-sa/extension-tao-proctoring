@@ -1,0 +1,24 @@
+@import "inc/bootstrap";
+
+.dark-bar .infoControl[data-control="logout"]{
+    display : none;
+}
+
+.awaiting-authorization {
+    padding-top:40px;
+    &.authorization-in-progress .listbox .list-box {
+        .text-link, .title{
+            color: #999;
+        }
+    }
+    .listbox {
+        width : 500px;
+        .list-box .entry {
+            margin-left : 0;
+        }
+    }
+    .success-message .icon-result-ok{
+        margin-left: 6px;
+        color : $success;
+    }
+}

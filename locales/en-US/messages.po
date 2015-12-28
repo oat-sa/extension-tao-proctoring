@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint02\n"
-"PO-Revision-Date: 2015-07-13T16:13:46\n"
+"Project-Id-Version: TAO 3.1.0-sprint15\n"
+"PO-Revision-Date: 2015-12-23T13:55:28\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -13,14 +13,762 @@ msgstr ""
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
 
-msgid "Hello World"
+msgid "%d min"
+msgstr ""
+
+msgid "ACT"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add Eligibility"
+msgstr ""
+
+msgid "Add Test Takers"
+msgstr ""
+
+msgid "Add test takers"
+msgstr ""
+
+msgid "Administer deliveries"
+msgstr ""
+
+msgid "All Sessions"
+msgstr ""
+
+msgid "already authorized"
+msgstr ""
+
+msgid "Assessment Activity Reporting"
+msgstr ""
+
+msgid "Assessment Activity Reporting for test site %s"
+msgstr ""
+
+msgid "Assign administrator"
+msgstr ""
+
+msgid "Assign more test takers to this session"
+msgstr ""
+
+msgid "Assign proctors"
+msgstr ""
+
+msgid "Assign the selected test takers"
+msgstr ""
+
+msgid "Assign the selected test takers to the session"
+msgstr ""
+
+msgid "Assign the test taker to the session"
+msgstr ""
+
+msgid "Assigned proctors"
+msgstr ""
+
+msgid "Assigned test takers"
+msgstr ""
+
+msgid "At least one delivery need to be selected to create"
+msgstr ""
+
+msgid "Attempts"
+msgstr ""
+
+msgid "Authorise"
+msgstr ""
+
+msgid "Authorize"
+msgstr ""
+
+msgid "Authorize session"
+msgstr ""
+
+msgid "Authorize Session"
+msgstr ""
+
+msgid "Authorize sessions"
+msgstr ""
+
+msgid "Authorize the proctor"
+msgstr ""
+
+msgid "Authorize the selected proctors"
+msgstr ""
+
+msgid "Authorized"
+msgstr ""
+
+msgid "Authorized but not started"
+msgstr ""
+
+msgid "Authorized proctors"
+msgstr ""
+
+msgid "Authorized, you may proceed"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Available reports"
+msgstr ""
+
+msgid "Available test takers"
+msgstr ""
+
+msgid "Awaiting"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Bandwidth"
+msgstr ""
+
+msgid "Behaviour"
+msgstr ""
+
+msgid "Browser"
+msgstr ""
+
+msgid "cancel"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "cancel the action"
+msgstr ""
+
+msgid "Check the compatibility of the current workstation and see the results"
+msgstr ""
+
+msgid "Comfort"
+msgstr ""
+
+msgid "Complaint"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Compliance"
+msgstr ""
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr ""
+
+msgid "Create Proctor"
+msgstr ""
+
+msgid "Creates and authorizes proctor"
+msgstr ""
+
+msgid "Current sessions"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Define sub-centers"
 msgstr ""
 
 #, tao-public
-msgid "Proctoring"
+msgid "Delete"
+msgstr ""
+
+msgid "Delivery"
+msgstr ""
+
+msgid "Disturbance"
+msgstr ""
+
+msgid "Download CSV"
+msgstr ""
+
+msgid "Download the selected reports to a CSV file"
 msgstr ""
 
 #, tao-public
-msgid "Template"
+msgid "Duplicate"
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit eligibile test takers"
+msgstr ""
+
+msgid "Edit Eligibility"
+msgstr ""
+
+msgid "Edit test center"
+msgstr ""
+
+msgid "Elapsed time"
+msgstr ""
+
+msgid "Eligible Deliveries"
+msgstr ""
+
+msgid "Eligible delivery removed"
+msgstr ""
+
+msgid "Eligible Test Takers"
+msgstr ""
+
+msgid "Eligible test takers updated"
+msgstr ""
+
+msgid "End"
+msgstr ""
+
+msgid "Environment"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Examinee"
+msgstr ""
+
+#, tao-public
+msgid "Filter"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+msgid "for"
+msgstr ""
+
+msgid "Freezing"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "Generate and review test histories"
+msgstr ""
+
+msgid "Go"
+msgstr ""
+
+msgid "Go to"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "ID/Authorization"
+msgstr ""
+
+msgid "Identifier"
+msgstr ""
+
+msgid "Illness"
+msgstr ""
+
+msgid "In Progress"
+msgstr ""
+
+msgid "Init"
+msgstr ""
+
+msgid "Irregularities"
+msgstr ""
+
+msgid "Irregularity"
+msgstr ""
+
+msgid "is already paused"
+msgstr ""
+
+msgid "is completed"
+msgstr ""
+
+msgid "is paused"
+msgstr ""
+
+msgid "is terminated"
+msgstr ""
+
+msgid "Issue Category"
+msgstr ""
+
+msgid "item"
+msgstr ""
+
+msgid "Item Variables"
+msgstr ""
+
+msgid "Label"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Late"
+msgstr ""
+
+msgid "Launch another readiness check"
+msgstr ""
+
+msgid "Launch readiness check"
+msgstr ""
+
+msgid "Launching"
+msgstr ""
+
+msgid "Loading"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Manage"
+msgstr ""
+
+msgid "Manage Proctors"
+msgstr ""
+
+msgid "Manage sessions"
+msgstr ""
+
+#, tao-public
+msgid "Manage Test Center"
+msgstr ""
+
+msgid "Manage Test Takers"
+msgstr ""
+
+msgid "Monitor"
+msgstr ""
+
+msgid "Monitor and manage sessions for the test site"
+msgstr ""
+
+msgid "Monitoring"
+msgstr ""
+
+#, tao-public
+msgid "Move"
+msgstr ""
+
+msgid "My Test sites"
+msgstr ""
+
+msgid "Navigation"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+#, tao-public
+msgid "New class"
+msgstr ""
+
+msgid "New eligible delivery added"
+msgstr ""
+
+#, tao-public
+msgid "New Test Center"
+msgstr ""
+
+msgid "No assigned proctors"
+msgstr ""
+
+msgid "No assigned test takers"
+msgstr ""
+
+msgid "No available test takers to assign"
+msgstr ""
+
+msgid "No Eligible Delivery yet"
+msgstr ""
+
+msgid "No readiness checks have been done!"
+msgstr ""
+
+msgid "No reports to display!"
+msgstr ""
+
+msgid "No sessions"
+msgstr ""
+
+msgid "No sessions available"
+msgstr ""
+
+msgid "No Show"
+msgstr ""
+
+msgid "No test site available"
+msgstr ""
+
+msgid "Noise"
+msgstr ""
+
+msgid "not awaiting"
+msgstr ""
+
+msgid "not in progress"
+msgstr ""
+
+msgid "not started"
+msgstr ""
+
+msgid "Not yet implemented!"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "OS"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Outcome"
+msgstr ""
+
+msgid "Partially authorized"
+msgstr ""
+
+msgid "Partially authorized proctors"
+msgstr ""
+
+msgid "Pause"
+msgstr ""
+
+msgid "Pause #"
+msgstr ""
+
+msgid "Pause Session"
+msgstr ""
+
+msgid "Pause session"
+msgstr ""
+
+msgid "Pause sessions"
+msgstr ""
+
+msgid "Paused"
+msgstr ""
+
+msgid "Performance"
+msgstr ""
+
+msgid "Please select one or more test site to manage proctors"
+msgstr ""
+
+msgid "Please wait, authorization in process ..."
+msgstr ""
+
+msgid "Power Outage"
+msgstr ""
+
+msgid "Print results"
+msgstr ""
+
+msgid "Print rubric block with item tagged with tao-print tag"
+msgstr ""
+
+msgid "Print Score Report"
+msgstr ""
+
+msgid "Print the assessment results"
+msgstr ""
+
+msgid "Printing"
+msgstr ""
+
+msgid "Proceed"
+msgstr ""
+
+msgid "Proctor"
+msgstr ""
+
+msgid "Proctor created"
+msgstr ""
+
+msgid "Proctor/Staff"
+msgstr ""
+
+msgid "Proctored Delivery Server"
+msgstr ""
+
+msgid "Proctored Test-Takers"
+msgstr ""
+
+msgid "Proctoring interface"
+msgstr ""
+
+msgid "Proctors"
+msgstr ""
+
+msgid "Proctors authorized"
+msgstr ""
+
+msgid "Proctors revoked"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+#, tao-public
+msgid "Properties"
+msgstr ""
+
+msgid "Readiness check"
+msgstr ""
+
+msgid "Readiness Check"
+msgstr ""
+
+msgid "Readiness Check for test site %s"
+msgstr ""
+
+msgid "Readiness checks already done"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Refresh the page"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Remove eligibility"
+msgstr ""
+
+msgid "Remove the readiness check result?"
+msgstr ""
+
+msgid "Remove the selected readiness check results"
+msgstr ""
+
+msgid "Remove the selected test takers from the session"
+msgstr ""
+
+msgid "Remove the test taker from the session"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Report irregularities"
+msgstr ""
+
+msgid "Report irregularity"
+msgstr ""
+
+msgid "Report Irregularity"
+msgstr ""
+
+msgid "results"
+msgstr ""
+
+msgid "Resume"
+msgstr ""
+
+msgid "Resume #"
+msgstr ""
+
+msgid "Resume Test"
+msgstr ""
+
+msgid "Return to the session manager"
+msgstr ""
+
+msgid "Return to the session monitoring"
+msgstr ""
+
+msgid "Revoke"
+msgstr ""
+
+msgid "Revoke authorization for the selected proctors"
+msgstr ""
+
+msgid "Revoke the proctor"
+msgstr ""
+
+msgid "Score"
+msgstr ""
+
+msgid "Score Report"
+msgstr ""
+
+#, tao-public
+msgid "Search"
+msgstr ""
+
+msgid "section"
+msgstr ""
+
+msgid "Session"
+msgstr ""
+
+msgid "Sessions"
+msgstr ""
+
+msgid "Sessions authorized"
+msgstr ""
+
+msgid "Sessions paused"
+msgstr ""
+
+msgid "Sessions reported"
+msgstr ""
+
+msgid "Sessions terminated"
+msgstr ""
+
+msgid "Something went wrong ..."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start Test"
+msgstr ""
+
+msgid "Started at"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Subcategory"
+msgstr ""
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr ""
+
+msgid "Technical"
+msgstr ""
+
+msgid "Terminate"
+msgstr ""
+
+msgid "Terminate Session"
+msgstr ""
+
+msgid "Terminate session"
+msgstr ""
+
+msgid "Terminate sessions"
+msgstr ""
+
+msgid "Terminated"
+msgstr ""
+
+msgid "Test"
+msgstr ""
+
+#, tao-public
+msgid "Test center contains test taker and groups and are administer by a proctor"
+msgstr ""
+
+#, tao-public
+msgid "Test Center List"
+msgstr ""
+
+msgid "Test center saved"
+msgstr ""
+
+#, tao-public
+msgid "Test Centers"
+msgstr ""
+
+msgid "Test site"
+msgstr ""
+
+msgid "Test site %s"
+msgstr ""
+
+msgid "Test sites"
+msgstr ""
+
+msgid "Test taker"
+msgstr ""
+
+msgid "Test Taker"
+msgstr ""
+
+msgid "Test takers have been added"
+msgstr ""
+
+msgid "Test takers have been removed"
+msgstr ""
+
+msgid "Test Variables"
+msgstr ""
+
+msgid "Testing Workstation"
+msgstr ""
+
+msgid "The following delivery(ies) are already eligible : "
+msgstr ""
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr ""
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr ""
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr ""
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr ""
+
+msgid "The readiness check result have been removed"
+msgstr ""
+
+msgid "The readiness check result will be removed. Continue ?"
+msgstr ""
+
+msgid "The selected readiness check results will be removed. Continue ?"
+msgstr ""
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr ""
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr ""
+
+msgid "There is no delivery in progress"
+msgstr ""
+
+msgid "This test has been suspended"
+msgstr ""
+
+msgid "This test has been terminated"
+msgstr ""
+
+msgid "to"
+msgstr ""
+
+msgid "Total time"
+msgstr ""
+
+msgid "Weather"
+msgstr ""
+
+msgid "Workstation"
+msgstr ""
+
+msgid "You must select at least one test center!"
 msgstr ""
 

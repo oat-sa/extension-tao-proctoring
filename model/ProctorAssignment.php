@@ -21,7 +21,6 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
-use oat\taoFrontOffice\model\Delivery;
 /**
  * Interface to assign test-takers to a delivery
  * 
