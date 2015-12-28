@@ -26,8 +26,7 @@ use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInt;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
@@ -181,14 +180,14 @@ class DeliveryService extends ConfigurableService
         $proctoringState = $this->getProctoringState($deliveryExecution);
         $status = $proctoringState['status'];
 
-        if (DeliveryExecutionInt::STATE_FINISHIED == $executionStatus) {
+        if (DeliveryExecution::STATE_FINISHIED == $executionStatus) {
             if (self::STATE_TERMINATED != $status) {
                 $status = self::STATE_COMPLETED;
             }
         } else if (!$status) {
-            if (DeliveryExecutionInt::STATE_ACTIVE == $executionStatus) {
+            if (DeliveryExecution::STATE_ACTIVE == $executionStatus) {
                 $status = self::STATE_INIT;
-            } else if (DeliveryExecutionInt::STATE_PAUSED == $executionStatus) {
+            } else if (DeliveryExecution::STATE_PAUSED == $executionStatus) {
                 $status = self::STATE_PAUSED;
             } else {
                 throw new \common_Exception('Unknown state for delivery execution ' . $deliveryExecution->getIdentifier());
@@ -487,7 +486,7 @@ class DeliveryService extends ConfigurableService
                 $this->finishSession($session);
             }
 
-            $deliveryExecution->setState(DeliveryExecutionInt::STATE_FINISHIED);
+            $deliveryExecution->setState(DeliveryExecution::STATE_FINISHIED);
             $this->setProctoringState($deliveryExecution, self::STATE_TERMINATED, $reason);
 
             $result = true;
