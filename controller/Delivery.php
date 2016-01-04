@@ -402,6 +402,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
+        $testCenter = $this->getRequestParameter('testCenter');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -409,7 +410,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason);
+            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
 
             $this->returnJson(array(
