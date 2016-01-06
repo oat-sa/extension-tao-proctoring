@@ -31,6 +31,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoProctoring\model\DeliveryAuthorizationService;
 
 /**
  * 
@@ -159,6 +160,20 @@ class Updater extends common_ext_ExtensionUpdater {
         // nothign to do
         if ($this->isVersion('0.9.0')) {
             $this->setVersion('1.0.0');
+        }
+
+        if ($this->isVersion('1.0.0')) {
+
+            try {
+                $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryAuthorizationService();
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryAuthorizationService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('1.0.1');
         }
     }
 
