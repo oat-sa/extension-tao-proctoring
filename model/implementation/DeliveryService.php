@@ -197,13 +197,26 @@ class DeliveryService extends ConfigurableService
         return $status;
     }
 
+    public function getHasBeenPaused($deliveryExecution){
+        $proctoringState = $this->getProctoringState($deliveryExecution);
+        $status = $proctoringState['hasBeenPaused'];
+        $this->setHasBeenPaused($deliveryExecution, false);
+        return $status;
+    }
+
+    public function setHasBeenPaused($deliveryExecution, $paused){
+        $proctoringState = $this->getProctoringState($deliveryExecution);
+        $this->setProctoringState($deliveryExecution, $proctoringState['status'], $proctoringState['reason'], $paused);
+    }
+
     /**
      * Sets a proctoring state on a delivery execution. Use the test state storage.
      * @param string|DeliveryExecution $executionId
      * @param string $state
      * @param array $reason
+     * @param boolean $paused
      */
-    public function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null, $paused = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -211,6 +224,9 @@ class DeliveryService extends ConfigurableService
 
         $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
 
+        if(!is_null($paused)){
+            $proctoringState['hasBeenPaused'] = $paused;
+        }
         $proctoringState['status'] = $state;
         $proctoringState['reason'] = $reason;
         if ($currentUser !== null && $state === self::STATE_AUTHORIZED) {
@@ -234,10 +250,13 @@ class DeliveryService extends ConfigurableService
             $proctoringState['status'] = null;
         }
 
+        if (!isset($proctoringState['hasBeenPaused'])) {
+            $proctoringState['hasBeenPaused'] = false;
+        }
+
         if (!isset($proctoringState['reason'])) {
             $proctoringState['reason'] = null;
         }
-
         return $proctoringState;
     }
 
