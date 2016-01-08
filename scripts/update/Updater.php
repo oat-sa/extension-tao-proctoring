@@ -32,6 +32,7 @@ use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringServic
 use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\DeliveryAuthorizationService;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
 
 /**
  * 
@@ -174,6 +175,20 @@ class Updater extends common_ext_ExtensionUpdater {
             }
 
             $this->setVersion('1.0.1');
+        }
+
+        if ($this->isVersion('1.0.1')) {
+
+            try {
+                $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryExecutionStateService();
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('1.0.2');
         }
     }
 
