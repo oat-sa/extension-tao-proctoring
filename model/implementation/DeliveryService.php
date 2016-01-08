@@ -31,10 +31,11 @@ use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoDelivery\model\AssignmentService;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\TestCenterService;
+use \core_kernel_classes_Resource as Resource;
+use \core_kernel_classes_Property as Property;
 
 /**
  * Sample Delivery Service for proctoring
@@ -65,6 +66,8 @@ class DeliveryService extends ConfigurableService
     const STATE_PAUSED = 'PAUSED';
     const STATE_COMPLETED = 'COMPLETED';
     const STATE_TERMINATED = 'TERMINATED';
+
+    const GROUP_CLASS_NAME = 'groups for proctoring';
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
     const PROPERTY_GROUP_TEST_CENTERS = 'http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters';
@@ -105,14 +108,14 @@ class DeliveryService extends ConfigurableService
 
     /**
      * Gets all deliveries available for a test center
-     * @param string|core_kernel_classes_Resource $testCenterId
+     * @param string|Resource $testCenterId
      * @return \taoDelivery_models_classes_DeliveryRdf[]
      * @deprecated
      */
     public function getTestCenterDeliveries($testCenterId)
     {
         \common_Logger::w('Use of deprecated method: DeliveryService::getTestCenterDeliveries()');
-        $testCenter = new \core_kernel_classes_Resource($testCenterId);
+        $testCenter = new Resource($testCenterId);
         return EligibilityService::singleton()->getEligibleDeliveries($testCenter);
     }
 
@@ -125,7 +128,7 @@ class DeliveryService extends ConfigurableService
      */
     public function getDeliveryExecutions($deliveryId, $options = array())
     {
-        $resource = new \core_kernel_classes_Resource($deliveryId);
+        $resource = new Resource($deliveryId);
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getExecutionsByDelivery($resource);
     }
 
@@ -270,13 +273,13 @@ class DeliveryService extends ConfigurableService
     public function getDeliveryProperties($delivery)
     {
         if (is_string($delivery)) {
-            $delivery = new \core_kernel_classes_Resource($delivery);
+            $delivery = new Resource($delivery);
         }
 
         $deliveryProps = $delivery->getPropertiesValues(array(
-            new \core_kernel_classes_Property(TAO_DELIVERY_MAXEXEC_PROP),
-            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
-            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
+            new Property(TAO_DELIVERY_MAXEXEC_PROP),
+            new Property(TAO_DELIVERY_START_PROP),
+            new Property(TAO_DELIVERY_END_PROP),
         ));
 
         $propMaxExec = current($deliveryProps[TAO_DELIVERY_MAXEXEC_PROP]);
@@ -303,7 +306,7 @@ class DeliveryService extends ConfigurableService
         $users = array();
         foreach ($userIds as $id) {
             // assume Tao Users
-            $users[] = new core_kernel_users_GenerisUser(new \core_kernel_classes_Resource($id));
+            $users[] = new core_kernel_users_GenerisUser(new Resource($id));
         }
         return $users;
     }
@@ -364,7 +367,7 @@ class DeliveryService extends ConfigurableService
      */
     public function assignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId, $testCenterId));
+        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->addUser($testTakerId, $deliveryGroup);
     }
 
@@ -380,7 +383,7 @@ class DeliveryService extends ConfigurableService
      */
     public function unassignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId, $testCenterId));
+        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->removeUser($testTakerId, $deliveryGroup);
     }
 
@@ -602,12 +605,29 @@ class DeliveryService extends ConfigurableService
         ));
         if (empty($groups)) {
             \common_Logger::w('No system group exists for delivery '.$deliveryId.' and test center '.$testCenterId.'. creating one');
-            $delivery = new \core_kernel_classes_Resource($deliveryId);
-            $testCenter = new \core_kernel_classes_Resource($testCenterId);
+            $delivery = new Resource($deliveryId);
+            $testCenter = new Resource($testCenterId);
             $instanceName = 'test takers for delivery '.$delivery->getLabel().' and Test center '.$testCenter->getLabel();
-            $newGroup = GroupsService::singleton()->getRootClass()->createInstance($instanceName);
-            $newGroup->setPropertyValue(new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY), $deliveryId);
-            $newGroup->setPropertyValue(new \core_kernel_classes_Property(self::PROPERTY_GROUP_TEST_CENTERS), $testCenterId);
+            $subClasses = GroupsService::singleton()->getRootClass()->getSubClasses();
+
+            $groupClass = null;
+            foreach($subClasses as $subClass){
+                if($subClass->getLabel() === self::GROUP_CLASS_NAME){
+                    $groupClass = $subClass;
+                    continue;
+                }
+            }
+            if(is_null($groupClass)){
+                $groupClass = GroupsService::singleton()->getRootClass()->createSubClass(self::GROUP_CLASS_NAME);
+            }
+
+            $newGroup = $groupClass->createInstanceWithProperties(
+                array(
+                    RDFS_LABEL => $instanceName,
+                    PROPERTY_GROUP_DELVIERY => $deliveryId,
+                    self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
+                )
+            );
             return $newGroup;
         }
         return reset($groups);
@@ -650,7 +670,7 @@ class DeliveryService extends ConfigurableService
         $inputParameters = $this->getRuntimeInputParameters($deliveryExecution);
 
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
-        $testResource = new \core_kernel_classes_Resource($inputParameters['QtiTestDefinition']);
+        $testResource = new Resource($inputParameters['QtiTestDefinition']);
 
         $sessionManager = new \taoQtiTest_helpers_SessionManager($resultServer, $testResource);
 
@@ -665,7 +685,7 @@ class DeliveryService extends ConfigurableService
         if ($qtiStorage->exists($sessionId)) {
             $session = $qtiStorage->retrieve($testDefinition, $sessionId);
 
-            $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
+            $resultServerUri = $compiledDelivery->getOnePropertyValue(new Property(TAO_DELIVERY_RESULTSERVER_PROP));
             $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());
             $resultServer->setValue('resultServerUri', $resultServerUri->getUri());
             $resultServer->setValue('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
