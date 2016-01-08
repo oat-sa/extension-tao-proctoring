@@ -160,6 +160,11 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('0.9.0')) {
             $this->setVersion('1.0.0');
         }
+
+        if ($this->isVersion('1.0.0')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('1.0.1');
+        }
     }
 
 }
