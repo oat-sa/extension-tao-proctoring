@@ -338,6 +338,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryId = $this->getRequestParameter('delivery');
         $testTakers = $this->getRequestParameter('testtaker');
+        $testCenterId = $this->getRequestParameter('testCenter');
 
         if (!is_array($testTakers)) {
             $testTakers = array($testTakers);
@@ -345,7 +346,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $added = DeliveryHelper::assignTestTakers($testTakers, $deliveryId);
+            $added = DeliveryHelper::assignTestTakers($testTakers, $deliveryId, $testCenterId);
             $notAdded = array_diff($testTakers, $added);
 
             $this->returnJson(array(
@@ -370,6 +371,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryId = $this->getRequestParameter('delivery');
         $testTakers = $this->getRequestParameter('testtaker');
+        $testCenterId = $this->getRequestParameter('testCenter');
 
         if (!is_array($testTakers)) {
             $testTakers = array($testTakers);
@@ -377,7 +379,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $removed = DeliveryHelper::unassignTestTakers($testTakers, $deliveryId);
+            $removed = DeliveryHelper::unassignTestTakers($testTakers, $deliveryId, $testCenterId);
             $notRemoved = array_diff($testTakers, $removed);
 
             $this->returnJson(array(

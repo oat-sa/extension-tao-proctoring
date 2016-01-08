@@ -267,16 +267,17 @@ class DeliveryHelper
      *
      * @param array $testTakers
      * @param string $deliveryId
+     * @param string $testCenterId
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function assignTestTakers($testTakers, $deliveryId)
+    public static function assignTestTakers($testTakers, $deliveryId, $testCenterId)
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($testTakers as $testTaker) {
-            if ($deliveryService->assignTestTaker($testTaker, $deliveryId)) {
+            if ($deliveryService->assignTestTaker($testTaker, $deliveryId, $testCenterId)) {
                 $result[] = $testTaker;
             }
         }
@@ -290,16 +291,17 @@ class DeliveryHelper
      *
      * @param array $testTakers
      * @param string $deliveryId
+     * @param string $testCenterId
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function unassignTestTakers($testTakers, $deliveryId)
+    public static function unassignTestTakers($testTakers, $deliveryId, $testCenterId)
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($testTakers as $testTaker) {
-            if ($deliveryService->unassignTestTaker($testTaker, $deliveryId)) {
+            if ($deliveryService->unassignTestTaker($testTaker, $deliveryId, $testCenterId)) {
                 $result[] = $testTaker;
             }
         }

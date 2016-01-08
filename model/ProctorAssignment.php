@@ -48,21 +48,23 @@ interface ProctorAssignment extends ProctorMonitor
     public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array());
 
     /**
-     * Assign a test taker to a delivery
+     * Assign a test taker to a delivery in the context of a test center
      *
      * @param string $testTakerId
      * @param string $deliveryId
+     * @param string $testCenterId
      * @return bool
      */
-    public function assignTestTaker($testTakerId, $deliveryId);
+    public function assignTestTaker($testTakerId, $deliveryId, $testCenterId);
 
     /**
-     * Unassign (remove) a test taker to a delivery
+     * Unassign (remove) a test taker to a delivery in the context of a test center
      *
      * @param string $testTakerId
      * @param string $deliveryId
+     * * @param string $testCenterId
      * @return bool
      */
-    public function unassignTestTaker($testTakerId, $deliveryId);
+    public function unassignTestTaker($testTakerId, $deliveryId, $testCenterId);
 
 }

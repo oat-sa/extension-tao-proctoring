@@ -67,6 +67,7 @@ class DeliveryService extends ConfigurableService
     const STATE_TERMINATED = 'TERMINATED';
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
+    const PROPERTY_GROUP_TEST_CENTERS = 'http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters';
 
     /**
      * Ordered list of allowed states
@@ -352,7 +353,7 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Assign a test taker to a delivery
+     * Assign a test taker to a delivery in the contexte of a test center
      *
      * Assumes:
      * Deliveries are assigned via groups
@@ -361,14 +362,14 @@ class DeliveryService extends ConfigurableService
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorAssignment::assignTestTaker()
      */
-    public function assignTestTaker($testTakerId, $deliveryId)
+    public function assignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId));
+        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->addUser($testTakerId, $deliveryGroup);
     }
 
     /**
-     * Unassign (remove) a test taker to a delivery
+     * Unassign (remove) a test taker to a delivery in the context of a test center
      *
      * Assumes:
      * Deliveries are assigned via groups
@@ -377,9 +378,9 @@ class DeliveryService extends ConfigurableService
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorAssignment::unassignTestTaker()
      */
-    public function unassignTestTaker($testTakerId, $deliveryId)
+    public function unassignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId));
+        $deliveryGroup = new \core_kernel_classes_Resource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->removeUser($testTakerId, $deliveryGroup);
     }
 
@@ -583,23 +584,30 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
-     * Returns a group assinged to the delivery
+     * Returns a group assigned to the delivery
      *
      * @param string $deliveryId
+     * @param string $testCenterId
      * @return string
      */
-    private function findGroup($deliveryId)
+    private function findGroup($deliveryId, $testCenterId)
     {
-        $groups = GroupsService::singleton()->getRootClass()->searchInstances(array(
-            PROPERTY_GROUP_DELVIERY => $deliveryId
-        ), array(
+        $groups = GroupsService::singleton()->getRootClass()->searchInstances(
+            array(
+                PROPERTY_GROUP_DELVIERY => $deliveryId,
+                self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
+            ),
+            array(
             'recursive' => true, 'like' => false
         ));
         if (empty($groups)) {
-            \common_Logger::w('No system group exists for delivery '.$deliveryId.'. creating one');
+            \common_Logger::w('No system group exists for delivery '.$deliveryId.' and test center '.$testCenterId.'. creating one');
             $delivery = new \core_kernel_classes_Resource($deliveryId);
-            $newGroup = GroupsService::singleton()->getRootClass()->createInstance('test takers for delivery '.$delivery->getLabel());
+            $testCenter = new \core_kernel_classes_Resource($testCenterId);
+            $instanceName = 'test takers for delivery '.$delivery->getLabel().' and Test center '.$testCenter->getLabel();
+            $newGroup = GroupsService::singleton()->getRootClass()->createInstance($instanceName);
             $newGroup->setPropertyValue(new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY), $deliveryId);
+            $newGroup->setPropertyValue(new \core_kernel_classes_Property(self::PROPERTY_GROUP_TEST_CENTERS), $testCenterId);
             return $newGroup;
         }
         return reset($groups);
