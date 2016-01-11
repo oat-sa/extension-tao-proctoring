@@ -27,7 +27,6 @@ use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
@@ -52,7 +51,6 @@ class DeliveryHelper
     public static function getDeliveries(core_kernel_classes_Resource $testCenter)
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
         $entries = array();
@@ -76,15 +74,15 @@ class DeliveryHelper
             $awaiting = 0;
             foreach($executions as $execution) {
                 /* @var $execution DeliveryExecution */
-                $executionState = $deliveryExecutionStateService->getState($execution);
+                $executionState = $deliveryService->getState($execution);
                 switch($executionState){
-                    case DeliveryExecutionStateService::STATE_AWAITING:
+                    case DeliveryService::STATE_AWAITING:
                         $awaiting++;
                         break;
-                    case DeliveryExecutionStateService::STATE_INPROGRESS:
+                    case DeliveryService::STATE_INPROGRESS:
                         $inprogress++;
                         break;
-                    case DeliveryExecutionStateService::STATE_PAUSED:
+                    case DeliveryService::STATE_PAUSED:
                         $paused++;
                         break;
                     default:
@@ -314,16 +312,17 @@ class DeliveryHelper
      *
      * @param array $deliveryExecutions
      * @param array $reason
+     * @param string $testCenter Test center uri
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function authoriseExecutions($deliveryExecutions, $reason = null)
+    public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason)) {
+            if ($deliveryService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -341,11 +340,11 @@ class DeliveryHelper
      */
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
+            if ($deliveryService->terminateExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -363,11 +362,11 @@ class DeliveryHelper
      */
     public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason)) {
+            if ($deliveryService->pauseExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -385,11 +384,11 @@ class DeliveryHelper
      */
     public static function reportExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryExecutionStateService->reportExecution($deliveryExecution, $reason)) {
+            if ($deliveryService->reportExecution($deliveryExecution, $reason)) {
                 $result[] = $deliveryExecution;
             }
         }
@@ -413,7 +412,7 @@ class DeliveryHelper
 
         // paginate, then format the data
         return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
-            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
 
             /**** to be replaced by real stuff ****/
             // Seeds the random number generator with a fixed value to avoid changes on refresh
@@ -484,7 +483,7 @@ class DeliveryHelper
                 
                 $userId = $deliveryExecution->getUserIdentifier();
                 $state = array(
-                    'status' => $deliveryExecutionStateService->getState($deliveryExecution),
+                    'status' => $deliveryService->getState($deliveryExecution),
                     'description' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS]
                 );
                 $testTaker = array();

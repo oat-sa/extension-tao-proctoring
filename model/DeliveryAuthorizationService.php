@@ -21,92 +21,30 @@
 
 namespace oat\taoProctoring\model;
 
-use oat\oatbox\service\ConfigurableService;
-use common_Logger;
-use PHPSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
-class DeliveryAuthorizationService extends ConfigurableService
+interface DeliveryAuthorizationService
 {
     const SERVICE_ID = 'taoProctoring/DeliveryAuthorization';
 
     /**
-     * The name of the secure key used to grant proctor authorisation.
-     * If the secure key is not set, or its value is not the same with the access key,
-     * the test taker must wait for proctor authorization
-     */
-    const SECURE_KEY_NAME = 'proctor_secure_key';
-
-    /**
-     * The name of the access key used to grant proctor authorisation.
-     * If the access key is not set, or its value is not the same with the secure key,
-     * the test taker must wait for proctor authorization
-     */
-    const ACCESS_KEY_NAME = 'proctor_access_key';
-
-    /**
-     * Grants the proctor authorization: sets the current security key into the access key.
+     * Grants the proctor authorization
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function grantAuthorization(DeliveryExecution $deliveryExecution)
-    {
-        $securityKey = $this->getSecurityKey($deliveryExecution);
-        common_Logger::i('Grant the proctor authorization, with security key: ' . $securityKey);
-        PHPSession::singleton()->setAttribute(self::ACCESS_KEY_NAME, $securityKey);
-
-        return true;
-    }
+    public function grantAuthorization(DeliveryExecution $deliveryExecution);
 
     /**
-     * Revokes the proctor authorization: generates a new security key.
+     * Revokes the proctor authorization
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function revokeAuthorization(DeliveryExecution $deliveryExecution)
-    {
-        $session = PHPSession::singleton();
-        $securityKey = uniqid();
-        common_Logger::i('Reset the proctor security key with value: ' . $securityKey);
-        $session->setAttribute(self::SECURE_KEY_NAME, $securityKey);
-        $session->setAttribute(self::ACCESS_KEY_NAME, null);
-
-        return true;
-    }
+    public function revokeAuthorization(DeliveryExecution $deliveryExecution);
 
     /**
-     * Checks the proctor authorization: checks if the value of the access key is the same as the security key.
+     * Checks the proctor authorization
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function checkAuthorization(DeliveryExecution $deliveryExecution)
-    {
-        $session = PHPSession::singleton();
-        return $session->hasAttribute(self::ACCESS_KEY_NAME) &&
-        $session->getAttribute(self::ACCESS_KEY_NAME) == $this->getSecurityKey($deliveryExecution);
-    }
-
-    /**
-     * Checks if a security key has been set.
-     * @param DeliveryExecution $deliveryExecution
-     * @return bool
-     */
-    protected function hasSecurityKey(DeliveryExecution $deliveryExecution)
-    {
-        return PHPSession::singleton()->hasAttribute(self::SECURE_KEY_NAME);
-    }
-
-    /**
-     * Gets the current security key.
-     * Generates a new one if needed.
-     * @param DeliveryExecution $deliveryExecution
-     * @return string
-     */
-    protected function getSecurityKey(DeliveryExecution $deliveryExecution)
-    {
-        if (!$this->hasSecurityKey($deliveryExecution)) {
-            $this->revokeAuthorization($deliveryExecution);
-        }
-        return PHPSession::singleton()->getAttribute(self::SECURE_KEY_NAME);
-    }
+    public function isAuthorized(DeliveryExecution $deliveryExecution);
 }

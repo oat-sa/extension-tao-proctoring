@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\test;
 
-use oat\taoProctoring\model\DeliveryAuthorizationService;
+use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\tao\test\TaoPhpUnitTestRunner;
 
 class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner
@@ -45,27 +45,27 @@ class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner
     public function testGrantAuthorization()
     {
         $deliveryExecution = $this->getDEMock();
-        $this->assertFalse($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertFalse($this->authorizationService->isAuthorized($deliveryExecution));
         $this->assertTrue($this->authorizationService->grantAuthorization($deliveryExecution));
-        $this->assertTrue($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertTrue($this->authorizationService->isAuthorized($deliveryExecution));
     }
 
     public function testRevokeAuthorization()
     {
         $deliveryExecution = $this->getDEMock();
         $this->authorizationService->grantAuthorization($deliveryExecution);
-        $this->assertTrue($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertTrue($this->authorizationService->isAuthorized($deliveryExecution));
         $this->assertTrue($this->authorizationService->revokeAuthorization($deliveryExecution));
-        $this->assertFalse($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertFalse($this->authorizationService->isAuthorized($deliveryExecution));
     }
 
-    public function testCheckAuthorization()
+    public function testIsAuthorized()
     {
         $deliveryExecution = $this->getDEMock();
         $this->authorizationService->grantAuthorization($deliveryExecution);
-        $this->assertTrue($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertTrue($this->authorizationService->isAuthorized($deliveryExecution));
         $this->authorizationService->revokeAuthorization($deliveryExecution);
-        $this->assertFalse($this->authorizationService->checkAuthorization($deliveryExecution));
+        $this->assertFalse($this->authorizationService->isAuthorized($deliveryExecution));
     }
 
     private function getDEMock()
