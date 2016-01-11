@@ -76,6 +76,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $secondaryData = [
             'secondary_data_key' => 'secondary_data_val',
             'secondary_data_key_2' => 'secondary_data_val_2',
+            'array' => [
+                'key_1' => 'val_1',
+                'key_2' => 'val_2',
+            ],
         ];
 
         $dataModel = $this->service->getData($this->deliveryExecutionId);
@@ -118,6 +122,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
             $val = $kvData[DeliveryMonitoringService::KV_COLUMN_VALUE];
             $this->assertTrue(isset($secondaryData[$key]));
+            if (is_array($secondaryData[$key])) {
+                $val = json_decode($val, true);
+                $this->assertEquals(json_last_error(), JSON_ERROR_NONE);
+            }
             $this->assertEquals($secondaryData[$key], $val);
         }
 

@@ -89,6 +89,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     public function set(array $data)
     {
+        foreach($data as $key => $val) {
+            if ($this->isJson($val)) {
+                $data[$key] = json_decode($val, true);
+            }
+        }
         $this->data = $data;
     }
 
@@ -127,5 +132,18 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function get()
     {
         return $this->data;
+    }
+
+    /**
+     * Check whether string is json
+     * @param string $val
+     * @return bool
+     */
+    private function isJson($val) {
+        if (!is_string($val)) {
+            return false;
+        }
+        json_decode($val);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 }
