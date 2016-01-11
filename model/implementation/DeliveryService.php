@@ -435,9 +435,10 @@ class DeliveryService extends ConfigurableService
      *
      * @param string $executionId
      * @param array $reason
+     * @param string $testCenter test center uri
      * @return bool
      */
-    public function authoriseExecution($executionId, $reason = null)
+    public function authoriseExecution($executionId, $reason = null, $testCenter = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $executionState = $this->getState($deliveryExecution);
@@ -448,6 +449,13 @@ class DeliveryService extends ConfigurableService
             if ($session) {
                 $this->setTestVariable($session, 'TEST_AUTHORISE', $reason);
                 $this->getStorage()->persist($session);
+            }
+
+            if ($testCenter !== null) {
+                $stateService = $this->getExtendedStateService();
+                $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+                $proctoringState['test_center'] = $testCenter;
+                $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
             }
 
             $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);

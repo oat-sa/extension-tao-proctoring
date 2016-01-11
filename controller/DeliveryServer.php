@@ -189,7 +189,7 @@ class DeliveryServer extends DefaultDeliveryServer
         switch ($executionState) {
             case DeliveryService::STATE_AUTHORIZED:
                 $this->getAuthorizationService()->grantAuthorization($deliveryExecution);
-                $authorized = true;
+                    $authorized = true;
                 break;
             
             case DeliveryService::STATE_TERMINATED:

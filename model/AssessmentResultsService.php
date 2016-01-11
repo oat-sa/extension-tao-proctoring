@@ -24,6 +24,7 @@ namespace oat\taoProctoring\model;
 use \oat\taoOutcomeUi\model\ResultsService;
 use \oat\oatbox\service\ConfigurableService;
 use qtism\data\View;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
 
 /**
  * Class AssessmentResultsService
@@ -122,14 +123,15 @@ class AssessmentResultsService extends ConfigurableService
      * (@see )
      *
      * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @return string
      */
     public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
         /** @var DeliveryService $deliveryService */
-        $deliveryService = $this->getServiceManager()->get('taoProctoring/delivery');
-        $session = $deliveryService->getTestSession($deliveryExecution);
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $session = $deliveryExecutionStateService->getTestSession($deliveryExecution);
 
-        $inputParameters = $deliveryService->getRuntimeInputParameters($deliveryExecution);
+        $inputParameters = $deliveryExecutionStateService->getRuntimeInputParameters($deliveryExecution);
         $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
         $sections = $testDefinition->getComponentsByClassName('assessmentSection');
 
