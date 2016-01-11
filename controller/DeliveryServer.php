@@ -212,16 +212,6 @@ class DeliveryServer extends DefaultDeliveryServer
     }
 
     /**
-     * Checks if a security key has been set.
-     * Left for backward capability.
-     * @return bool
-     */
-    protected function hasSecurityKey()
-    {
-        return PHPSession::singleton()->hasAttribute(DeliveryAuthorizationService::SECURE_KEY_NAME);
-    }
-
-    /**
      * Ensures the result server object is properly set
      * 
      * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
