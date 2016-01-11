@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\test;
 
-use oat\taoProctoring\model\DeliveryAuthorizationService;
+use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\tao\test\TaoPhpUnitTestRunner;
 
 class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner

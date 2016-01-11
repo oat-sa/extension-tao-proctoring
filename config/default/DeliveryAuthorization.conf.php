@@ -1,5 +1,5 @@
 <?php
-use oat\taoProctoring\model\DeliveryAuthorizationService;
+use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 /**
  * Default authorization service
  */
