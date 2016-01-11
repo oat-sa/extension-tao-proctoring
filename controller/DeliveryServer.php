@@ -25,6 +25,7 @@ use PHPSession;
 use common_Logger;
 use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
+use oat\taoProctoring\model\DeliveryAuthorizationService;
 
 /**
  * Override the default DeliveryServer Controller
@@ -33,19 +34,9 @@ use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
  */
 class DeliveryServer extends DefaultDeliveryServer
 {
-    /**
-     * The name of the secure key used to grant proctor authorisation.
-     * If the secure key is not set, or its value is not the same with the access key, 
-     * the test taker must wait for proctor authorization
-     */
-    const SECURE_KEY_NAME = 'proctor_secure_key';
-    
-    /**
-     * The name of the access key used to grant proctor authorisation.
-     * If the access key is not set, or its value is not the same with the secure key, 
-     * the test taker must wait for proctor authorization
-     */
-    const ACCESS_KEY_NAME = 'proctor_access_key';
+
+    /** @var DeliveryAuthorizationService */
+    public $authorizationService;
 
     /**
      * constructor: initialize the service and the default data
@@ -66,7 +57,15 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // if the test taker passes by this page, he/she cannot access to any delivery without proctor authorization,
         // whatever the delivery execution status is.
-        $this->revokeAuthorization();
+        $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        $userUri = common_session_SessionManager::getSession()->getUserUri();
+        $startedExecutions = array_merge(
+            $deliveryExecutionService->getActiveDeliveryExecutions($userUri),
+            $deliveryExecutionService->getPausedDeliveryExecutions($userUri)
+        );
+        foreach($startedExecutions as $startedExecution) {
+            $this->getAuthorizationService()->revokeAuthorization($startedExecution);
+        }
     }
 
     /**
@@ -85,9 +84,9 @@ class DeliveryServer extends DefaultDeliveryServer
     public function initDeliveryExecution() 
     {
         // from this page the test taker can only goes to the awaiting page, so always revoke authorization
-        $this->revokeAuthorization();
-        
         $deliveryExecution = $this->_initDeliveryExecution();
+
+        $this->getAuthorizationService()->revokeAuthorization($deliveryExecution);
 	    $this->redirect(_url('awaitingAuthorization', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
 	}
 
@@ -102,7 +101,7 @@ class DeliveryServer extends DefaultDeliveryServer
         $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $executionState = $deliveryService->getState($deliveryExecution);
         
-        if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->checkAuthorization()) {
+        if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
             $deliveryService->resumeExecution($deliveryExecution);
@@ -110,7 +109,7 @@ class DeliveryServer extends DefaultDeliveryServer
         }
 
         if (DeliveryService::STATE_INPROGRESS != $executionState ||
-            (DeliveryService::STATE_INPROGRESS == $executionState && !$this->checkAuthorization())) {
+            (DeliveryService::STATE_INPROGRESS == $executionState && !$this->getAuthorizationService()->isAuthorized($deliveryExecution))) {
             // the test taker is not allowed to run the delivery
             // so we redirect him/her to the awaiting page
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
@@ -134,15 +133,13 @@ class DeliveryServer extends DefaultDeliveryServer
         $executionState = $deliveryService->getState($deliveryExecution);
 
         // if the test taker is already authorized, straight forward to the execution
-        // note: the authorized state is valid only if the security key has been set,
-        // if the test taker tries to directly access this page, the security key may not be initialized (i.e. just logged in)
-        if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->hasSecurityKey()) {
-            $this->grantAuthorization();
+        if (DeliveryService::STATE_AUTHORIZED == $executionState) {
+            $this->getAuthorizationService()->grantAuthorization($deliveryExecution);
             return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
         // from this page the test taker must wait for proctor authorization
-        $this->revokeAuthorization();
+        $this->getAuthorizationService()->revokeAuthorization($deliveryExecution);
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryService::STATE_INPROGRESS == $executionState) {
@@ -191,12 +188,8 @@ class DeliveryServer extends DefaultDeliveryServer
         // reacts to a few particular states
         switch ($executionState) {
             case DeliveryService::STATE_AUTHORIZED:
-                // note: the authorized state is valid only if the security key has been set,
-                // if the test taker tries to directly access this page, the security key may not be initialized (i.e. just logged in)
-                if ($this->hasSecurityKey()) {
-                    $this->grantAuthorization();
-                    $authorized = true;
-                }
+                $this->getAuthorizationService()->grantAuthorization($deliveryExecution);
+                $authorized = true;
                 break;
             
             case DeliveryService::STATE_TERMINATED:
@@ -219,61 +212,6 @@ class DeliveryServer extends DefaultDeliveryServer
     }
 
     /**
-     * Checks if a security key has been set.
-     * @return bool
-     */
-    protected function hasSecurityKey()
-    {
-        return PHPSession::singleton()->hasAttribute(self::SECURE_KEY_NAME);
-    }
-    
-    /**
-     * Gets the current security key.
-     * Generates a new one if needed.
-     * @return string
-     */
-    protected function getSecurityKey()
-    {
-        if (!$this->hasSecurityKey()) {
-            $this->revokeAuthorization();
-        }
-        return PHPSession::singleton()->getAttribute(self::SECURE_KEY_NAME);
-    }
-
-    /**
-     * Grants the proctor authorization: sets the current security key into the access key.
-     */
-    protected function grantAuthorization()
-    {
-        $securityKey = $this->getSecurityKey();
-        common_Logger::i('Grant the proctor authorization, with security key: ' . $securityKey);
-        PHPSession::singleton()->setAttribute(self::ACCESS_KEY_NAME, $securityKey);
-    }
-
-    /**
-     * Revokes the proctor authorization: generates a new security key.
-     */
-    protected function revokeAuthorization()
-    {
-        $session = PHPSession::singleton();
-        $securityKey = uniqid();
-        common_Logger::i('Reset the proctor security key with value: ' . $securityKey);
-        $session->setAttribute(self::SECURE_KEY_NAME, $securityKey);
-        $session->setAttribute(self::ACCESS_KEY_NAME, null);
-    }
-
-    /**
-     * Checks the proctor authorization: checks if the value of the access key is the same as the security key.
-     * @return bool
-     */
-    protected function checkAuthorization()
-    {
-        $session = PHPSession::singleton();
-        return $session->hasAttribute(self::ACCESS_KEY_NAME) && 
-               $session->getAttribute(self::ACCESS_KEY_NAME) == $this->getSecurityKey();
-    }
-
-    /**
      * Ensures the result server object is properly set
      * 
      * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
@@ -289,5 +227,16 @@ class DeliveryServer extends DefaultDeliveryServer
             $session->setAttribute('resultServerUri', $resultServerUri->getUri());
             $session->setAttribute('resultServerObject', array($resultServerUri->getUri() => $resultServerObject));
         }
+    }
+
+    /**
+     * @return DeliveryAuthorizationService
+     */
+    protected function getAuthorizationService()
+    {
+        if ($this->authorizationService === null) {
+            $this->authorizationService = $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
+        }
+        return $this->authorizationService;
     }
 }
