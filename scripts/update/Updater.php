@@ -173,7 +173,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(DeliveryAuthorizationService::SERVICE_ID, $service);
             }
 
-            $this->setVersion('1.1.1');
+            $this->setVersion('1.1.0');
         }
     }
 

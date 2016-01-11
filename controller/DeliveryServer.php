@@ -101,7 +101,7 @@ class DeliveryServer extends DefaultDeliveryServer
         $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $executionState = $deliveryService->getState($deliveryExecution);
         
-        if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->checkAuthorization($deliveryExecution)) {
+        if (DeliveryService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
             $deliveryService->resumeExecution($deliveryExecution);
@@ -109,7 +109,7 @@ class DeliveryServer extends DefaultDeliveryServer
         }
 
         if (DeliveryService::STATE_INPROGRESS != $executionState ||
-            (DeliveryService::STATE_INPROGRESS == $executionState && !$this->getAuthorizationService()->checkAuthorization($deliveryExecution))) {
+            (DeliveryService::STATE_INPROGRESS == $executionState && !$this->getAuthorizationService()->isAuthorized($deliveryExecution))) {
             // the test taker is not allowed to run the delivery
             // so we redirect him/her to the awaiting page
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);

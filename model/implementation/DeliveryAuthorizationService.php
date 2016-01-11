@@ -78,7 +78,7 @@ class DeliveryAuthorizationService extends ConfigurableService implements Delive
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function checkAuthorization(DeliveryExecution $deliveryExecution)
+    public function isAuthorized(DeliveryExecution $deliveryExecution)
     {
         $session = PHPSession::singleton();
         return $session->hasAttribute(self::ACCESS_KEY_NAME) &&

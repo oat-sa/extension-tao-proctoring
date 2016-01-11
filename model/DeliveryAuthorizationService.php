@@ -46,5 +46,5 @@ interface DeliveryAuthorizationService
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function checkAuthorization(DeliveryExecution $deliveryExecution);
+    public function isAuthorized(DeliveryExecution $deliveryExecution);
 }
