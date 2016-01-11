@@ -233,7 +233,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     private function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $data = $deliveryMonitoring->get();
+        $data = $this->prepareData($deliveryMonitoring->get());
 
         $primaryTableData = $this->extractPrimaryData($data);
 
@@ -260,7 +260,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $setClause = '';
         $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
 
-        $data = $deliveryMonitoring->get();
+        $data = $this->prepareData($deliveryMonitoring->get());
         $primaryTableData = $this->extractPrimaryData($data);
 
         unset($primaryTableData['delivery_execution_id']);
@@ -285,7 +285,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     private function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $data = $deliveryMonitoring->get();
+        $data = $this->prepareData($deliveryMonitoring->get());
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
@@ -489,5 +489,22 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         }
 
         return !((boolean) $exists);
+    }
+
+    /**
+     * Prepare data for saving
+     * @param array $data
+     * @return array
+     */
+    private function prepareData($data)
+    {
+        $data = array_map(function($val){
+            if (is_array($val)) {
+                return json_encode($val);
+            }
+            return $val;
+        }, $data);
+
+        return $data;
     }
 }

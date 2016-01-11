@@ -56,6 +56,31 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
         $this->persistence->exec($sql);
     }
 
+    public function testGet()
+    {
+        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
+
+        $columns = [
+            'string' => 'string value',
+            'array' => [
+                'key_1' => 'val_1',
+                'key_2' => 'val_2',
+            ],
+        ];
+
+        $columns['array'] = json_encode($columns['array']);
+
+        $this->assertTrue(is_string($columns['array']));
+
+        $data = new DeliveryMonitoringData($deliveryExecutionId);
+        foreach ($columns as $columnKey => $columnVal) {
+            $data->add($columnKey, $columnVal);
+        }
+
+        $this->assertTrue(is_array($data->get()['array']));
+        $this->assertEquals($data->get()['array'], json_decode($columns['array'], true));
+    }
+
     public function testConstruct()
     {
         $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
