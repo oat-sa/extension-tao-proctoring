@@ -314,16 +314,17 @@ class DeliveryHelper
      *
      * @param array $deliveryExecutions
      * @param array $reason
+     * @param string $testCenter Test center uri
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function authoriseExecutions($deliveryExecutions, $reason = null)
+    public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
-            if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason)) {
+            if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
                 $result[] = $deliveryExecution;
             }
         }
