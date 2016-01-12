@@ -32,7 +32,7 @@ use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringServic
 use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 
 /**
  * 
