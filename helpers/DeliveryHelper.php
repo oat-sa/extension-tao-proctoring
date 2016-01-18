@@ -181,16 +181,17 @@ class DeliveryHelper
      * Gets the list of test takers assigned to a delivery
      *
      * @param string $deliveryId
+     * @param string $testCenterId
      * @param array [$options]
      * @return array
      * @throws \Exception
      * @throws \common_exception_Error
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getDeliveryTestTakers($deliveryId, $options = array())
+    public static function getDeliveryTestTakers($deliveryId, $testCenterId, $options = array())
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $users = $deliveryService->getDeliveryTestTakers($deliveryId, $options);
+        $users = $deliveryService->getDeliveryTestTakers($deliveryId, $testCenterId, $options);
         $delivery = self::getDelivery($deliveryId);
 
         return DataTableHelper::paginate($users, $options, function($users) use ($delivery) {
@@ -227,6 +228,7 @@ class DeliveryHelper
      * @param core_kernel_classes_Resource $delivery
      * @param core_kernel_classes_Resource $testCenter
      * @param array [$options]
+     * @param string [$testCenterId]
      * @return array
      * @throws \Exception
      * @throws \common_exception_Error
@@ -236,7 +238,7 @@ class DeliveryHelper
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
         $users = EligibilityService::singleton()->getEligibleTestTakers($testCenter, $delivery);
-        $assignedUsers = $deliveryService->getDeliveryTestTakers($delivery->getUri(), $options);
+        $assignedUsers = $deliveryService->getDeliveryTestTakers($delivery->getUri(), $testCenter->getUri(), $options);
         array_walk($assignedUsers, function(&$value){
             $value = $value->getIdentifier();
         });

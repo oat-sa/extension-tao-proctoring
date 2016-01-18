@@ -20,22 +20,22 @@
  */
 namespace oat\taoProctoring\model\implementation;
 
-use oat\oatbox\user\User;
+use core_kernel_classes_Property as Property;
+use core_kernel_classes_Resource as Resource;
+use core_kernel_users_GenerisUser;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\user\User;
+use oat\taoDelivery\model\AssignmentService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoGroups\models\GroupsService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
-use core_kernel_users_GenerisUser;
-use oat\taoGroups\models\GroupsService;
-use oat\taoDelivery\model\execution\DeliveryExecution;
-use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
+use oat\taoProctoring\model\TestCenterService;
 use oat\taoQtiTest\models\TestSessionMetaData;
+use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\storage\common\AbstractStorage;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoDelivery\model\AssignmentService;
 use tao_helpers_Date as DateHelper;
-use oat\taoProctoring\model\TestCenterService;
-use \core_kernel_classes_Resource as Resource;
-use \core_kernel_classes_Property as Property;
 
 /**
  * Sample Delivery Service for proctoring
@@ -58,6 +58,8 @@ class DeliveryService extends ConfigurableService
      * @var ExtendedStateService
      */
     private $extendedStateService;
+
+    private $groupClass = null;
 
     const STATE_INIT = 'INIT';
     const STATE_AWAITING = 'AWAITING';
@@ -317,11 +319,25 @@ class DeliveryService extends ConfigurableService
      *
      * @param $deliveryId
      * @param array $options
+     * @param string $testCenterId
      * @return User[]
      */
-    public function getDeliveryTestTakers($deliveryId, $options = array())
+    public function getDeliveryTestTakers($deliveryId, $testCenterId, $options = array())
     {
-        $userIds = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getAssignedUsers($deliveryId);
+        $groups = $this->getGroupClass()->searchInstances(array(
+            PROPERTY_GROUP_DELVIERY => $deliveryId,
+            self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
+        ), array('recursive' => true, 'like' => false));
+
+        $userIds = array();
+        foreach ($groups as $group) {
+            foreach (GroupsService::singleton()->getUsers($group) as $user) {
+                $userIds[] = $user->getUri();
+            }
+        }
+
+        $userIds = array_unique($userIds);
+
         $users = array();
         foreach ($userIds as $id) {
             // assume Tao Users
@@ -622,7 +638,7 @@ class DeliveryService extends ConfigurableService
      */
     private function findGroup($deliveryId, $testCenterId)
     {
-        $groups = GroupsService::singleton()->getRootClass()->searchInstances(
+        $groups = $this->getGroupClass()->searchInstances(
             array(
                 PROPERTY_GROUP_DELVIERY => $deliveryId,
                 self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
@@ -635,20 +651,9 @@ class DeliveryService extends ConfigurableService
             $delivery = new Resource($deliveryId);
             $testCenter = new Resource($testCenterId);
             $instanceName = 'test takers for delivery '.$delivery->getLabel().' and Test center '.$testCenter->getLabel();
-            $subClasses = GroupsService::singleton()->getRootClass()->getSubClasses();
 
-            $groupClass = null;
-            foreach($subClasses as $subClass){
-                if($subClass->getLabel() === self::GROUP_CLASS_NAME){
-                    $groupClass = $subClass;
-                    continue;
-                }
-            }
-            if(is_null($groupClass)){
-                $groupClass = GroupsService::singleton()->getRootClass()->createSubClass(self::GROUP_CLASS_NAME);
-            }
 
-            $newGroup = $groupClass->createInstanceWithProperties(
+            $newGroup = $this->getGroupClass()->createInstanceWithProperties(
                 array(
                     RDFS_LABEL => $instanceName,
                     PROPERTY_GROUP_DELVIERY => $deliveryId,
@@ -798,5 +803,28 @@ class DeliveryService extends ConfigurableService
                 $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
             )
         ));
+    }
+
+    /**
+     * Get the group class where the group are stored
+     * @return \core_kernel_classes_Class|null
+     */
+    private function getGroupClass()
+    {
+        if(is_null($this->groupClass)){
+            $subClasses = GroupsService::singleton()->getRootClass()->getSubClasses();
+            foreach($subClasses as $subClass){
+                if($subClass->getLabel() === self::GROUP_CLASS_NAME){
+                    $this->groupClass = $subClass;
+                    continue;
+                }
+            }
+            if(is_null($this->groupClass)){
+                $this->groupClass = GroupsService::singleton()->getRootClass()->createSubClass(self::GROUP_CLASS_NAME);
+            }
+
+        }
+        return $this->groupClass;
+
     }
 }

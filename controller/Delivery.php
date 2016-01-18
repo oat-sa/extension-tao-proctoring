@@ -149,7 +149,7 @@ class Delivery extends ProctoringModule
                 array(
                     'delivery' => $delivery->getUri(),
                     'testCenter' => $testCenter->getUri(),
-                    'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions),
+                    'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $testCenter->getUri(), $requestOptions),
                 ),array(
                     BreadcrumbsHelper::testCenters(),
                     BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
@@ -293,9 +293,10 @@ class Delivery extends ProctoringModule
         try {
 
             $delivery      = $this->getCurrentDelivery();
+            $testCenter      = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions();
 
-            $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions));
+            $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $testCenter->getUri(), $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
