@@ -248,14 +248,19 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      * @param string|DeliveryExecution $executionId
      * @param string $state
      * @param array $reason
+     * @param boolean $paused
      */
-    public function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null, $paused = null )
     {
         $deliveryExecution = $this->getExecutionService()->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
         $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
 
         $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
+
+        if(!is_null($paused)){
+            $proctoringState['hasBeenPaused'] = $paused;
+        }
 
         $proctoringState['status'] = $state;
         $proctoringState['reason'] = $reason;
@@ -284,6 +289,10 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
         if (!isset($proctoringState['reason'])) {
             $proctoringState['reason'] = null;
+        }
+
+        if (!isset($proctoringState['hasBeenPaused'])) {
+            $proctoringState['hasBeenPaused'] = false;
         }
 
         return $proctoringState;

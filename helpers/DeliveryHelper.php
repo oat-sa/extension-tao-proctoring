@@ -534,4 +534,28 @@ class DeliveryHelper
             return $executions;
         });
     }
+
+    /**
+     * @param $deliveryExecution
+     * @return mixed
+     */
+    public static function getHasBeenPaused($deliveryExecution)
+    {
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
+        $status = $proctoringState['hasBeenPaused'];
+        self::setHasBeenPaused($deliveryExecution, false);
+        return $status;
+    }
+
+    /**
+     * @param $deliveryExecution
+     * @param boolean $paused
+     */
+    public static function setHasBeenPaused($deliveryExecution, $paused)
+    {
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
+        $deliveryExecutionStateService->setProctoringState($deliveryExecution, $proctoringState['status'], $proctoringState['reason'], $paused);
+    }
 }
