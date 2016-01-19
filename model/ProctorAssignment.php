@@ -43,10 +43,11 @@ interface ProctorAssignment extends ProctorMonitor
      *
      * @param User $proctor
      * @param string $deliveryId
+     * @param string $testCenterId
      * @param array $options
      * @return User[]
      */
-    public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array());
+    public function getAvailableTestTakers(User $proctor, $deliveryId, $testCenterId, $options = array());
 
     /**
      * Assign a test taker to a delivery in the context of a test center

@@ -163,14 +163,30 @@ class DeliveryService extends ConfigurableService
      * Gets the active or paused executions of a delivery
      *
      * @param $deliveryId
+     * @param $testCenterId
      * @param array $options
      * @return DeliveryExecution[]
      */
-    public function getCurrentDeliveryExecutions($deliveryId, $options = array())
+    public function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array())
     {
         $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
-        usort($deliveryExecutions, array($this, 'cmpDeliveryExecution'));
-        return $deliveryExecutions;
+        $returnedDeliveryExecutions = array();
+
+        foreach($deliveryExecutions as $deliveryExecution){
+            $group = $this->findGroup($deliveryId, $testCenterId);
+            $userId = $deliveryExecution->getUserIdentifier();
+            $userIds = array();
+            foreach (GroupsService::singleton()->getUsers($group) as $user) {
+                $userIds[] = $user->getUri();
+            }
+
+            if(in_array($userId, $userIds)){
+                $returnedDeliveryExecutions[] = $deliveryExecution;
+            }
+
+        }
+        usort($returnedDeliveryExecutions, array($this, 'cmpDeliveryExecution'));
+        return $returnedDeliveryExecutions;
     }
 
     /**
@@ -351,16 +367,17 @@ class DeliveryService extends ConfigurableService
      *
      * @param User $proctor
      * @param string $deliveryId
+     * @param string $testCenterId
      * @param array $options
      * @return User[]
     */
-    public function getAvailableTestTakers(User $proctor, $deliveryId, $options = array())
+    public function getAvailableTestTakers(User $proctor, $deliveryId, $testCenterId, $options = array())
     {
         $testCenterService = TestCenterService::singleton();
 
         // test takers already assigned are excluded
         $excludeIds = array();
-        foreach ($this->getDeliveryTestTakers($deliveryId) as $user) {
+        foreach ($this->getDeliveryTestTakers($deliveryId, $testCenterId) as $user) {
             $excludeIds[$user->getIdentifier()] = true;
         }
 
@@ -634,7 +651,7 @@ class DeliveryService extends ConfigurableService
      *
      * @param string $deliveryId
      * @param string $testCenterId
-     * @return string
+     * @return Resource
      */
     private function findGroup($deliveryId, $testCenterId)
     {

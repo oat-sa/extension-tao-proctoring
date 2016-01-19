@@ -68,7 +68,7 @@ class DeliveryHelper
         );
 
         foreach ($deliveries as $delivery) {
-            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri());
+            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
             $inprogress = 0;
             $paused = 0;
             $awaiting = 0;
@@ -148,9 +148,9 @@ class DeliveryHelper
      * @throws \Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getCurrentDeliveryExecutions($deliveryId, $options = array()) {
+    public static function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array()) {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($deliveryId, $options), $options);
+        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options), $options);
     }
 
     /**
@@ -170,7 +170,7 @@ class DeliveryHelper
         $all = array();
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {
-                $all = array_merge($all, $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $options));
+                $all = array_merge($all, $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri(), $options));
             }
         }
 
