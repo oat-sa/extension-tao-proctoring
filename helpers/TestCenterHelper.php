@@ -25,14 +25,13 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
-use core_kernel_users_GenerisUser;
 use DateTime;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
-use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\TestSessionService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -227,8 +226,8 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $session = $deliveryExecutionStateService->getTestSession($deliveryExecution);
+        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+        $session = $testSessionService->getTestSession($deliveryExecution);
         
         $actions = array(
             'pause' => 0,

@@ -51,93 +51,54 @@ interface DeliveryExecutionStateService
     /**
      * Sets a delivery execution in the awaiting state
      *
-     * @param string $executionId
+     * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function waitExecution($executionId);
+    public function waitExecution(DeliveryExecution $deliveryExecution);
 
     /**
      * Sets a delivery execution in the inprogress state
      *
-     * @param string $executionId
+     * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
-    public function resumeExecution($executionId);
+    public function resumeExecution(DeliveryExecution $deliveryExecution);
 
     /**
      * Authorises a delivery execution
      *
-     * @param string $executionId
+     * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @param string $testCenter test center uri
      * @return bool
      */
-    public function authoriseExecution($executionId, $reason = null, $testCenter = null);
+    public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null);
 
     /**
      * Terminates a delivery execution
      *
-     * @param string $executionId
+     * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
      */
-    public function terminateExecution($executionId, $reason = null);
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null);
 
     /**
      * Pauses a delivery execution
      *
-     * @param string $executionId
+     * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
      */
-    public function pauseExecution($executionId, $reason = null);
+    public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null);
 
     /**
      * Report irregularity to a delivery execution
      *
-     * @param string $executionId
+     * @todo remove this method to separate service
+     * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
      */
-    public function reportExecution($executionId, $reason);
-
-    /**
-     * Sets a proctoring state on a delivery execution. Use the test state storage.
-     * @param string|DeliveryExecution $executionId
-     * @param string $state
-     * @param array $reason
-     */
-    public function setProctoringState($executionId, $state, $reason = null);
-
-    /**
-     * Gets a proctoring state from a delivery execution. Use the test state storage.
-     * @param string|DeliveryExecution $executionId
-     * @return array
-     */
-    public function getProctoringState($executionId);
-
-    /**
-     * Gets the test session for a particular deliveryExecution
-     *
-     * @todo move this method to separate service.
-     * @param DeliveryExecution $deliveryExecution
-     * @return \qtism\runtime\tests\AssessmentTestSession
-     * @throws \common_exception_Error
-     * @throws \common_exception_MissingParameter
-     */
-    public function getTestSession(DeliveryExecution $deliveryExecution);
-
-    /**
-     * @todo move this method to separate service.
-     * @param DeliveryExecution $deliveryExecution
-     * @return array
-     * Example:
-     * <pre>
-     * array(
-     *   'QtiTestCompilation' => 'http://sample/first.rdf#i14369768868163155-|http://sample/first.rdf#i1436976886612156+',
-     *   'QtiTestDefinition' => 'http://sample/first.rdf#i14369752345581135'
-     * )
-     * </pre>
-     */
-    public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution);
+    public function reportExecution(DeliveryExecution $deliveryExecution, $reason);
 }

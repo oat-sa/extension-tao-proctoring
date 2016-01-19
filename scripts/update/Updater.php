@@ -33,6 +33,7 @@ use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * 
@@ -186,6 +187,16 @@ class Updater extends common_ext_ExtensionUpdater {
                 $service->setServiceManager($this->getServiceManager());
 
                 $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            }
+
+
+            try {
+                $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $testSessionService = new TestSessionService();
+                $testSessionService->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $testSessionService);
             }
 
             $this->setVersion('1.2.0');

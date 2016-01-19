@@ -24,7 +24,6 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoProctoring\model\EligibilityService;
-use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
@@ -324,8 +323,11 @@ class DeliveryHelper
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
             if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
-                $result[] = $deliveryExecution;
+                $result[] = $deliveryExecution->getIdentifier();
             }
         }
 
@@ -346,8 +348,11 @@ class DeliveryHelper
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
             if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution;
+                $result[] = $deliveryExecution->getIdentifier();
             }
         }
 
@@ -368,8 +373,11 @@ class DeliveryHelper
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
             if ($deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution;
+                $result[] = $deliveryExecution->getIdentifier();
             }
         }
 
@@ -390,12 +398,20 @@ class DeliveryHelper
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
             if ($deliveryExecutionStateService->reportExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution;
+                $result[] = $deliveryExecution->getIdentifier();
             }
         }
 
         return $result;
+    }
+
+    public static function getDeliveryExecutionById($deliveryExecutionId)
+    {
+        return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
     }
 
     /**

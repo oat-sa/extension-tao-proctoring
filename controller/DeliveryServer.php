@@ -104,7 +104,7 @@ class DeliveryServer extends DefaultDeliveryServer
         if (DeliveryExecutionStateService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
-            $deliveryExecutionStateService->resumeExecution($deliveryExecution->getIdentifier());
+            $deliveryExecutionStateService->resumeExecution($deliveryExecution);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
         }
 
@@ -143,12 +143,12 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionStateService::STATE_INPROGRESS == $executionState) {
-            $deliveryExecutionStateService->pauseExecution($deliveryExecution->getIdentifier());
+            $deliveryExecutionStateService->pauseExecution($deliveryExecution);
         }
 
         // we need to change the state of the delivery execution
         if (DeliveryExecutionStateService::STATE_TERMINATED != $executionState && DeliveryExecutionStateService::STATE_COMPLETED != $executionState) {
-            $deliveryExecutionStateService->waitExecution($deliveryExecution->getIdentifier());
+            $deliveryExecutionStateService->waitExecution($deliveryExecution);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
         }
 
