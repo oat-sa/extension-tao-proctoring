@@ -667,7 +667,7 @@ class DeliveryService extends ConfigurableService
             \common_Logger::w('No system group exists for delivery '.$deliveryId.' and test center '.$testCenterId.'. creating one');
             $delivery = new Resource($deliveryId);
             $testCenter = new Resource($testCenterId);
-            $instanceName = 'test takers for delivery '.$delivery->getLabel().' and Test center '.$testCenter->getLabel();
+            $instanceName = 'test takers for delivery '.$delivery->getLabel().' and test center '.$testCenter->getLabel();
 
 
             $newGroup = $this->getGroupClass()->createInstanceWithProperties(
