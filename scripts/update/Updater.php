@@ -179,6 +179,11 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         if ($this->isVersion('1.1.0')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('1.2.0');
+        }
+
+        if ($this->isVersion('1.2.0')) {
 
             try {
                 $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -199,7 +204,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $testSessionService);
             }
 
-            $this->setVersion('1.2.0');
+            $this->setVersion('1.3.0');
         }
     }
 
