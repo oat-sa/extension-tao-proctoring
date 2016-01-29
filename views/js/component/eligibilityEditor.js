@@ -97,8 +97,6 @@ define([
             }
         });
 
-        instance.eligibility.deliveries = _.uniq(tree.getChecked());
-
         return tree;
     }
 
