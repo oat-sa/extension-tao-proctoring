@@ -11,6 +11,7 @@ module.exports = function(grunt) {
     
     var paths = {
         'taoProctoring' : root + '/taoProctoring/views/js',
+        'taoProctoringCss' :  root + '/taoProctoring/views/css',
         'taoQtiTest' : root + '/taoQtiTest/views/js'
     };
     

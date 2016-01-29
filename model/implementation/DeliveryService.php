@@ -197,13 +197,26 @@ class DeliveryService extends ConfigurableService
         return $status;
     }
 
+    public function getHasBeenPaused($deliveryExecution){
+        $proctoringState = $this->getProctoringState($deliveryExecution);
+        $status = $proctoringState['hasBeenPaused'];
+        $this->setHasBeenPaused($deliveryExecution, false);
+        return $status;
+    }
+
+    public function setHasBeenPaused($deliveryExecution, $paused){
+        $proctoringState = $this->getProctoringState($deliveryExecution);
+        $this->setProctoringState($deliveryExecution, $proctoringState['status'], $proctoringState['reason'], $paused);
+    }
+
     /**
      * Sets a proctoring state on a delivery execution. Use the test state storage.
      * @param string|DeliveryExecution $executionId
      * @param string $state
      * @param array $reason
+     * @param boolean $paused
      */
-    public function setProctoringState($executionId, $state, $reason = null)
+    public function setProctoringState($executionId, $state, $reason = null, $paused = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $stateService = $this->getExtendedStateService();
@@ -211,6 +224,9 @@ class DeliveryService extends ConfigurableService
 
         $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
 
+        if(!is_null($paused)){
+            $proctoringState['hasBeenPaused'] = $paused;
+        }
         $proctoringState['status'] = $state;
         $proctoringState['reason'] = $reason;
         if ($currentUser !== null && $state === self::STATE_AUTHORIZED) {
@@ -234,10 +250,13 @@ class DeliveryService extends ConfigurableService
             $proctoringState['status'] = null;
         }
 
+        if (!isset($proctoringState['hasBeenPaused'])) {
+            $proctoringState['hasBeenPaused'] = false;
+        }
+
         if (!isset($proctoringState['reason'])) {
             $proctoringState['reason'] = null;
         }
-
         return $proctoringState;
     }
 
@@ -435,9 +454,10 @@ class DeliveryService extends ConfigurableService
      *
      * @param string $executionId
      * @param array $reason
+     * @param string $testCenter test center uri
      * @return bool
      */
-    public function authoriseExecution($executionId, $reason = null)
+    public function authoriseExecution($executionId, $reason = null, $testCenter = null)
     {
         $deliveryExecution = $this->getDeliveryExecution($executionId);
         $executionState = $this->getState($deliveryExecution);
@@ -448,6 +468,13 @@ class DeliveryService extends ConfigurableService
             if ($session) {
                 $this->setTestVariable($session, 'TEST_AUTHORISE', $reason);
                 $this->getStorage()->persist($session);
+            }
+
+            if ($testCenter !== null) {
+                $stateService = $this->getExtendedStateService();
+                $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
+                $proctoringState['test_center'] = $testCenter;
+                $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
             }
 
             $this->setProctoringState($deliveryExecution, self::STATE_AUTHORIZED, $reason);
