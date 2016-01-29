@@ -79,7 +79,7 @@ class Delivery extends ProctoringModule
             array(
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
-                'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions),
+                'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions),
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
@@ -149,7 +149,7 @@ class Delivery extends ProctoringModule
                 array(
                     'delivery' => $delivery->getUri(),
                     'testCenter' => $testCenter->getUri(),
-                    'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions),
+                    'set' => DeliveryHelper::getDeliveryTestTakers($delivery, $testCenter->getUri(), $requestOptions),
                 ),array(
                     BreadcrumbsHelper::testCenters(),
                     BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
@@ -249,9 +249,10 @@ class Delivery extends ProctoringModule
         try {
 
             $delivery      = $this->getCurrentDelivery();
+            $testCenter      = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions();
 
-            $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $requestOptions));
+            $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -293,9 +294,10 @@ class Delivery extends ProctoringModule
         try {
 
             $delivery      = $this->getCurrentDelivery();
+            $testCenter      = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions();
 
-            $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $requestOptions));
+            $this->returnJson(DeliveryHelper::getDeliveryTestTakers($delivery, $testCenter->getUri(), $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -338,6 +340,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryId = $this->getRequestParameter('delivery');
         $testTakers = $this->getRequestParameter('testtaker');
+        $testCenterId = $this->getRequestParameter('testCenter');
 
         if (!is_array($testTakers)) {
             $testTakers = array($testTakers);
@@ -345,7 +348,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $added = DeliveryHelper::assignTestTakers($testTakers, $deliveryId);
+            $added = DeliveryHelper::assignTestTakers($testTakers, $deliveryId, $testCenterId);
             $notAdded = array_diff($testTakers, $added);
 
             $this->returnJson(array(
@@ -370,6 +373,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryId = $this->getRequestParameter('delivery');
         $testTakers = $this->getRequestParameter('testtaker');
+        $testCenterId = $this->getRequestParameter('testCenter');
 
         if (!is_array($testTakers)) {
             $testTakers = array($testTakers);
@@ -377,7 +381,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $removed = DeliveryHelper::unassignTestTakers($testTakers, $deliveryId);
+            $removed = DeliveryHelper::unassignTestTakers($testTakers, $deliveryId, $testCenterId);
             $notRemoved = array_diff($testTakers, $removed);
 
             $this->returnJson(array(
@@ -402,6 +406,7 @@ class Delivery extends ProctoringModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
+        $testCenter = $this->getRequestParameter('testCenter');
 
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
@@ -409,7 +414,7 @@ class Delivery extends ProctoringModule
 
         try {
 
-            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason);
+            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
 
             $this->returnJson(array(
