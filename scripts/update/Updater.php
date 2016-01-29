@@ -204,6 +204,13 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $testSessionService);
             }
 
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach(
+                'oat\\taoTests\\models\\event\\TestChangedEvent',
+                array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+            );
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
             $this->setVersion('1.3.0');
         }
     }
