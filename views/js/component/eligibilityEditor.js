@@ -39,7 +39,7 @@ define([
     /**
      * Builds group tree inside target container
      * 
-     * @param {Object} the eligibility editor instance
+     * @param {Object} instance - the eligibility editor instance
      * @param {String} selector - the selector for the tree (generis tree works with selector only)
      * @param {Array} [testTakers] - array of selected test takers
      */
@@ -64,13 +64,15 @@ define([
             }
         });
 
+        instance.eligibility.testTakers = _.uniq(tree.getChecked());
+
         return tree;
     }
 
     /**
      * Builds delivery tree inside target container
      * 
-     * @param {Object} the eligibility editor instance
+     * @param {Object} instance - the eligibility editor instance
      * @param {String} selector - the selector for the tree (generis tree works with selector only)
      * @param {Array} [deliveries] - array of selected deliveries
      */
@@ -94,6 +96,8 @@ define([
                 }, 100);
             }
         });
+
+        instance.eligibility.deliveries = _.uniq(tree.getChecked());
 
         return tree;
     }
