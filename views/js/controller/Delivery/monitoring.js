@@ -95,6 +95,7 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
+            var extraFields = $container.data('extrafields');
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
@@ -110,7 +111,7 @@ define([
             var model = [];
             var actionButtons;
             var bc = breadcrumbsFactory($container, crumbs);
-
+            
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
                 if (selection && selection.length) {
@@ -410,16 +411,18 @@ define([
 
                 }
             });
-
-            // column: test taker identifier
-            model.push({
-                id: 'identifier',
-                label: __('Identifier'),
-                transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.id || '';
-                }
+            
+            //extra fields
+            _.each(extraFields, function(extraField){
+                model.push({
+                    id : extraField.id,
+                    label: extraField.label,
+                    transform: function(value, row) {
+                        return row && row.extraFields && row.extraFields[extraField.id] || '';
+                    }
+                });
             });
-
+            
             // column: start time
             model.push({
                 id: 'date',

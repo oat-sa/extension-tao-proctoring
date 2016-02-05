@@ -80,6 +80,7 @@ class Delivery extends ProctoringModule
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
                 'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions),
+                'extrafields' => DeliveryHelper::getExtraFields(),
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
@@ -111,6 +112,7 @@ class Delivery extends ProctoringModule
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions),
+                'extrafields' => DeliveryHelper::getExtraFields(),
                 'categories' => $this->getAllReasonsCategories()
             ),
             array(
