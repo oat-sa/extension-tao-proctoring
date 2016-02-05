@@ -548,12 +548,14 @@ class DeliveryHelper
     public static function testStateChanged(QtiTestChangeEvent $event)
     {
         /** @var \taoQtiTest_helpers_TestSession $session */
-        $session = $event->getSession();
-
-        $state = $session->getState();
-
-        if ($state === AssessmentTestSessionState::SUSPENDED) {
-            self::setHasBeenPaused($session->getSessionId(), true);
+        if (method_exists($event, 'getSession')) {
+            $session = $event->getSession();
+    
+            $state = $session->getState();
+    
+            if ($state === AssessmentTestSessionState::SUSPENDED) {
+                self::setHasBeenPaused($session->getSessionId(), true);
+            }
         }
     }
 

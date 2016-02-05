@@ -32,6 +32,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\helpers\DeliveryHelper;
 
 /**
  * Sample Delivery Service for proctoring
@@ -340,5 +341,19 @@ class DeliveryService extends ConfigurableService
         }
         return $this->groupClass;
 
+    }
+    
+    /**
+     * @deprecated please use DeliveryHelper
+     */
+    public function getHasBeenPaused($deliveryExecution){
+        return DeliveryHelper::getHasBeenPaused($deliveryExecution);
+    }
+    
+    /**
+     * @deprecated please use DeliveryHelper
+     */
+    public function setHasBeenPaused($deliveryExecution){
+        return DeliveryHelper::setHasBeenPaused($deliveryExecution);
     }
 }
