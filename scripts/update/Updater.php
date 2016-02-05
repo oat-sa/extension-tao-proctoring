@@ -180,6 +180,12 @@ class Updater extends common_ext_ExtensionUpdater {
             OntologyUpdater::syncModels();
             $this->setVersion('1.2.0');
         }
+
+        if ($this->isVersion('1.2.0')) {
+            $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
+            $proctoringExtension->setConfig('monitoringUserExtraFields', array());
+            $this->setVersion('1.3.0');
+        }
     }
 
 }
