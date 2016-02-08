@@ -175,7 +175,8 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                     'SECTION' => array('SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT),
                 ));
                 $this->getTestSessionService()->setTestVariable($session, 'TEST_TERMINATE', $reason);
-
+                $this->getTestSessionService()->setTestVariable($session, 'TEST_EXIT_CODE', TestSessionMetaData::TEST_CODE_TERMINATED);
+                
                 $session->endTestSession();
                 $this->getTestSessionService()->persist($session);
             }
