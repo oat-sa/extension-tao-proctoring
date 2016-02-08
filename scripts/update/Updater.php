@@ -194,16 +194,6 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
             }
 
-
-            try {
-                $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
-            } catch (ServiceNotFoundException $e) {
-                $testSessionService = new TestSessionService();
-                $testSessionService->setServiceManager($this->getServiceManager());
-
-                $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $testSessionService);
-            }
-
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $eventManager->attach(
                 'oat\\taoTests\\models\\event\\TestChangedEvent',

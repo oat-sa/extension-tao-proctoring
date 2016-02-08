@@ -20,8 +20,7 @@
 
 namespace oat\taoProctoring\model\implementation;
 
-use oat\oatbox\service\ConfigurableService;
-use oat\taoProctoring\model\TestSessionService as TestSessionServiceInterface;
+use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
@@ -33,7 +32,7 @@ use qtism\runtime\tests\AssessmentTestSession;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class TestSessionService extends ConfigurableService implements TestSessionServiceInterface
+class TestSessionService extends \tao_models_classes_Service
 {
     /** @var array cache to store session instances */
     private $cache = [];
@@ -102,7 +101,7 @@ class TestSessionService extends ConfigurableService implements TestSessionServi
     public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
     {
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = $this->getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery->getUri());
+        $runtime = ServiceManager::getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery->getUri());
         $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
         return $inputParameters;

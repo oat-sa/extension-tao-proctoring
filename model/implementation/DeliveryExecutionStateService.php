@@ -21,10 +21,8 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\oatbox\service\ServiceManager;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoProctoring\model\TestSessionService;
 
 /**
  * Class DeliveryExecutionStateService
@@ -303,7 +301,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private function getTestSessionService()
     {
         if ($this->testSessionService === null) {
-            $this->testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $this->testSessionService = TestSessionService::singleton();
         }
         return $this->testSessionService;
     }
