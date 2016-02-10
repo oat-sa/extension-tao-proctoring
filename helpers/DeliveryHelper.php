@@ -24,6 +24,7 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
@@ -511,7 +512,8 @@ class DeliveryHelper
                     'description' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS]
                 );
                 $testTaker = array();
-
+                $extraFields = array();
+                
                 /**** to be replaced by real stuff ****/
                 // $state = array_merge($state, WebServiceMock::random($mocks));
                 /********/
@@ -522,6 +524,14 @@ class DeliveryHelper
                     $testTaker['id'] = $user->getIdentifier();
                     $testTaker['lastName'] = UserHelper::getUserLastName($user);
                     $testTaker['firstName'] = UserHelper::getUserFirstName($user, empty($testTaker['lastName']));
+                    
+                    $userExtraFields = self::_getUserExtraFields();
+                    foreach($userExtraFields as $field){
+                        $values = $user->getPropertyValues($field['property']);
+                        if(!empty($values) && is_array($values)){
+                            $extraFields[$field['id']] = (string) $values[0];
+                        }
+                    }
                 }
 
                 $delivery = $deliveryExecution->getDelivery();
@@ -533,6 +543,7 @@ class DeliveryHelper
                     ),
                     'date' => DateHelper::displayeDate($deliveryExecution->getStartTime()),
                     'testTaker' => $testTaker,
+                    'extraFields' => $extraFields,
                     'state' => $state,
                 );
             }
@@ -540,8 +551,44 @@ class DeliveryHelper
             return $executions;
         });
     }
+    
+    /**
+     * Get array of user specific extra fields to be displayed in the monitoring data table
+     * 
+     * @return array
+     */
+    private static function _getUserExtraFields(){
+        $returnValue = array();
+        $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
+        $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
+        if(!empty($userExtraFields) && is_array($userExtraFields)){
+            foreach($userExtraFields as $name => $uri){
+                $property = new \core_kernel_classes_Property($uri);
+                $returnValue[] = array(
+                    'id' => $name,
+                    'property' => $property,
+                    'label' => $property->getLabel()
+                );
+            }
+        }
+        return $returnValue;
+    }
 
     /**
+     * Return array of extra fields to be displayed in the monitoring data table
+     * 
+     * @return array
+     */
+    public static function getExtraFields(){
+        return array_map(function($field){
+            return array(
+                'id' => $field['id'],
+                'label' => $field['label']
+            );
+        }, self::_getUserExtraFields());
+    }
+
+     /**
      * Catch changing of session state
      * @param QtiTestChangeEvent $event
      */
