@@ -209,6 +209,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $proctoringExtension->setConfig('monitoringUserExtraFields', array());
             $this->setVersion('1.4.0');
         }
+        
+        $this->skip('1.4.0', '1.5.0');
     }
 
 }
