@@ -29,4 +29,11 @@ $eventManager->attach(TestChangedEvent::EVENT_NAME,
     array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
 );
 
+$eventManager->attach(
+    'oat\\taoTests\\models\\event\\TestChangedEvent',
+    array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+);
+
 $serviceManager->register(EventManager::CONFIG_ID, $eventManager);
+
+
