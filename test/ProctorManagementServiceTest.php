@@ -221,6 +221,37 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
         $testCenterAdmin->delete(true);
     }
 
+    public function testGetAssignedProctorsWithTestCenters(){
+
+        $testCenters = array(
+            'http://myTest.case#TestCenter1',
+            'http://myTest.case#TestCenter2',
+            'http://myTest.case#TestCenter3',
+            'http://myTest.case#TestCenter4'
+        );
+        $testCenterAdmin = $this->proctorManagementService->getRootClass()->createInstance('test Center', '', 'http://myTest.case#testCenterAdmin');
+        $testCenterAdmin->setPropertiesValues(array(ProctorManagementService::PROPERTY_ADMINISTRATOR_URI => $testCenters));
+
+        $proctorClass = $this->proctorManagementService->getRootClass();
+        $propertiesValues = array(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI => $testCenters);
+        $proctor1 = $proctorClass->createInstance('proctor1', '', 'http://myTest.case#proctor1');
+        $proctor1->setPropertiesValues($propertiesValues);
+        $propertiesValues = array(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI => array('http://myTest.case#TestCenter2'));
+        $proctor2 = $proctorClass->createInstance('proctor2', '', 'http://myTest.case#proctor2');
+        $proctor2->setPropertiesValues($propertiesValues);
+
+        $assignedProctor = $this->proctorManagementService->getAssignedProctors($testCenterAdmin->getUri(), $testCenters);
+        $this->assertCount(2, $assignedProctor);
+        $this->assertArrayHasKey($proctor1->getUri(), $assignedProctor);
+        $this->assertArrayHasKey($proctor2->getUri(), $assignedProctor);
+        $assignedProctor = $this->proctorManagementService->getAssignedProctors($testCenterAdmin->getUri(), array('http://myTest.case#TestCenter1'));
+        $this->assertCount(1, $assignedProctor);
+        $this->assertArrayHasKey($proctor1->getUri(), $assignedProctor);
+        $proctor1->delete(true);
+        $proctor2->delete(true);
+        $testCenterAdmin->delete(true);
+    }
+
     public function testGetProctorsAuthorization(){
 
         $testCenters = array(
