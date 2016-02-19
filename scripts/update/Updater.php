@@ -211,6 +211,8 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.4.0', '1.4.1');
+
+        $this->skip('1.4.1', '1.5.0');
     }
 
 }
