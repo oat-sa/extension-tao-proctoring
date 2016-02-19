@@ -24,7 +24,7 @@ namespace oat\taoProctoring\model;
 use \oat\taoOutcomeUi\model\ResultsService;
 use \oat\oatbox\service\ConfigurableService;
 use qtism\data\View;
-use oat\taoProctoring\model\TestSessionService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * Class AssessmentResultsService
@@ -40,6 +40,24 @@ class AssessmentResultsService extends ConfigurableService
 
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
+
+    /**
+     * @var TestSessionService
+     */
+    private $testSessionService;
+
+    /**
+     * Gets test session service
+     *
+     * @return TestSessionService
+     */
+    private function getTestSessionService()
+    {
+        if ($this->testSessionService === null) {
+            $this->testSessionService = TestSessionService::singleton();
+        }
+        return $this->testSessionService;
+    }
 
     /**
      * Get test taker data as associative array
@@ -127,8 +145,7 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
-        /** @var TestSessionService $deliveryService */
-        $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+        $testSessionService = $this->getTestSessionService();
         $session = $testSessionService->getTestSession($deliveryExecution);
 
         $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
