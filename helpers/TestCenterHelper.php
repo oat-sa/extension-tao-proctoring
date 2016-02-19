@@ -31,7 +31,7 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\TestSessionService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -226,7 +226,7 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+        $testSessionService = TestSessionService::singleton();
         $session = $testSessionService->getTestSession($deliveryExecution);
         
         $actions = array(
