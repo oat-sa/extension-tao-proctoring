@@ -42,24 +42,6 @@ class AssessmentResultsService extends ConfigurableService
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
 
     /**
-     * @var TestSessionService
-     */
-    private $testSessionService;
-
-    /**
-     * Gets test session service
-     *
-     * @return TestSessionService
-     */
-    private function getTestSessionService()
-    {
-        if ($this->testSessionService === null) {
-            $this->testSessionService = TestSessionService::singleton();
-        }
-        return $this->testSessionService;
-    }
-
-    /**
      * Get test taker data as associative array
      * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
      * @return array
@@ -145,7 +127,7 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
-        $testSessionService = $this->getTestSessionService();
+        $testSessionService = TestSessionService::singleton();
         $session = $testSessionService->getTestSession($deliveryExecution);
 
         $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
