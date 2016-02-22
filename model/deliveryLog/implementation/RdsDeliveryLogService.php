@@ -33,9 +33,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 {
     const OPTION_PERSISTENCE = 'persistence';
     const TABLE_NAME = 'delivery_log';
+    const ID = 'id';
 
     /**
-     * Log data
+     * Log delivery execution data.
+     * Notice that `$data` parameter will be encoded to JSON before saving
      *
      * @param string $deliveryExecutionId
      * @param string $eventId
@@ -44,9 +46,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function log($deliveryExecutionId, $eventId, $data)
     {
-        if (!is_string($data) || !$this->isJson($data)) {
-            $data = json_encode($data);
-        }
+        $data = json_encode($data);
 
         $currentUser = \common_session_SessionManager::getSession()->getUser();
 
@@ -74,15 +74,13 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     public function get($deliveryExecutionId, $eventId = null)
     {
         $sql = "SELECT * FROM " . self::TABLE_NAME . " t " . PHP_EOL;
-        $sql .= "WHERE " . self::DELIVERY_EXECUTION_ID . "=:delivery_execution_id ";
+        $sql .= "WHERE " . self::DELIVERY_EXECUTION_ID . "=? ";
 
-        $parameters = [
-            ':delivery_execution_id' => $deliveryExecutionId
-        ];
+        $parameters = [$deliveryExecutionId];
 
         if ($eventId !== null) {
-            $sql .= "AND " . self::EVENT_ID . "=:event_id ";
-            $parameters[':event_id'] = $eventId;
+            $sql .= "AND " . self::EVENT_ID . "=? ";
+            $parameters[] = $eventId;
         }
 
         $sql .= "ORDER BY " . self::ID . " ASC";
@@ -90,7 +88,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         $stmt = $this->getPersistence()->query($sql, $parameters);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $result = $this->encodeValues($data);
+        $result = $this->decodeValues($data);
 
         return $result;
     }
@@ -99,11 +97,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      * @param $data
      * @return array
      */
-    private function encodeValues(array $data)
+    private function decodeValues(array $data)
     {
         $result = [];
         foreach ($data as $row) {
-            if (isset($row[self::DATA]) && $this->isJson($row[self::DATA])) {
+            if (isset($row[self::DATA])) {
                 $row[self::DATA] = json_decode($row[self::DATA], true);
             }
             $result[] = $row;
@@ -117,15 +115,5 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     private function getPersistence()
     {
         return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
-    }
-
-    /**
-     * Check whether string is json
-     * @param string $string
-     * @return bool
-     */
-    private function isJson($string) {
-        json_decode($string);
-        return (json_last_error() == JSON_ERROR_NONE);
     }
 }

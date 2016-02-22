@@ -30,7 +30,6 @@ interface DeliveryLog
 {
     const SERVICE_ID = 'taoProctoring/DeliveryLog';
 
-    const ID = 'id';
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
     const EVENT_ID = 'event_id';
     const DATA = 'data';
