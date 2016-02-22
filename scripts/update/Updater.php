@@ -34,6 +34,7 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
 /**
  * 
@@ -213,6 +214,22 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('1.4.0', '1.4.1');
 
         $this->skip('1.4.1', '1.5.0');
+
+        if ($this->isVersion('1.5.0')) {
+            try {
+                $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default'));
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(RdsDeliveryLogService::SERVICE_ID, $service);
+            }
+
+            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryLogTable.php');
+
+            $this->setVersion('1.6.0');
+        }
+
     }
 
 }
