@@ -63,4 +63,32 @@ class Diagnostic extends ProctoringModule
         );
     }
 
+    /**
+     * Display the diagnostic runner
+     */
+    public function diagnostic()
+    {
+        $testCenter = $this->getCurrentTestCenter();
+
+        $this->setData('title', __('Readiness Check for test site %s', $testCenter->getLabel()));
+        $this->composeView(
+            'diagnostic-runner',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'config' => \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag')
+            ),
+            array(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::diagnostics(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::deliveries($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
+                    )
+                )
+            )
+        );
+    }
+
 }

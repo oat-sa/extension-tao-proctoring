@@ -54,7 +54,8 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testCenterId = $container.data('testCenter');
+            var testCenterId = $container.data('testcenter');
+            var diagnosticUrl = helpers._url('diagnostic', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
 
@@ -125,7 +126,7 @@ define([
                         title: __('Launch another readiness check'),
                         label: __('Launch readiness check'),
                         action: function() {
-                            notYet();
+                            location.href = diagnosticUrl;
                         }
                     }, {
                         id: 'remove',

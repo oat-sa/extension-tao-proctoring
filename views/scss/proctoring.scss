@@ -29,7 +29,7 @@
             }
         }
     }
-    
+
     table.datatable {
         [class^="icon-"] {
             padding: 0;
@@ -65,8 +65,29 @@
             width: 500px;
         }
     }
-    
-    .diagnostic-index, .reporting-index, .delivery-testtakers, .delivery-manager {
+
+    .panel {
+        .action-bar {
+            background: whiten($info, .1);
+            padding: 3px;
+            overflow: hidden;
+            color: whiten($info, .9);
+            margin: 40px 0 10px 0;
+
+            .btn-info {
+                overflow: hidden;
+                background: transparent;
+                border: 1px white(.3) solid;
+            }
+        }
+    }
+
+    .diagnostics-main-area {
+        margin-top: 0px;
+        max-width: 800px;
+    }
+
+    .diagnostic-index, .diagnostic-runner, .reporting-index, .delivery-testtakers, .delivery-manager {
         .content {
             width: 800px;
         }
@@ -90,7 +111,7 @@
         background-color: whiten($canvas, .1);
     }
     
-    .diagnostic-index, .reporting-index, .delivery-monitoring {
+    .diagnostic-index, .diagnostic-runner, .reporting-index, .delivery-monitoring {
         .content {
             width: 100%;
             padding: 0 20px;
