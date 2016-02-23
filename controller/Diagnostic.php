@@ -47,7 +47,8 @@ class Diagnostic extends ProctoringModule
             'diagnostic-index',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions)
+                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
+                'config' => \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag')
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -91,4 +92,39 @@ class Diagnostic extends ProctoringModule
         );
     }
 
+    /**
+     * Gets the list of diagnostic results
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function diagnosticData()
+    {
+        try {
+
+            $testCenter = $this->getCurrentTestCenter();
+            $requestOptions = $this->getRequestOptions();
+            $this->returnJson(TestCenterHelper::getDiagnostics($testCenter, $requestOptions));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No diagnostic service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+
+    /**
+     * Removes diagnostic results
+     *
+     * @throws \common_Exception
+     */
+    public function remove()
+    {
+        $testCenter = $this->getCurrentTestCenter();
+
+        $id = $this->getRequestParameter('id');
+
+        $this->returnJson([
+            'success' => TestCenterHelper::removeDiagnostic($testCenter, $id)
+        ]);
+    }
 }

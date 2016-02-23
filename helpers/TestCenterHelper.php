@@ -21,8 +21,9 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoClientDiagnostic\model\storage\Storage;
+use oat\taoClientDiagnostic\model\storage\PaginatedStorage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
@@ -133,8 +134,82 @@ class TestCenterHelper
      */
     public static function getDiagnostics($testCenterId, $options = array())
     {
-        $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-        return DataTableHelper::paginate($diagnostics, $options);
+        /* @var Storage $storageService */
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+
+        if ($storageService instanceof PaginatedStorage) {
+            $optRows = abs(intval(isset($options[DataTableHelper::OPTION_ROWS]) ? $options[DataTableHelper::OPTION_ROWS] : DataTableHelper::DEFAULT_ROWS));
+            $optPage = abs(intval(isset($options[DataTableHelper::OPTION_PAGE]) ? $options[DataTableHelper::OPTION_PAGE] : DataTableHelper::DEFAULT_PAGE));
+
+            $amount = $storageService->count();
+            $rows = max(1, $optRows);
+            $total = ceil($amount / $rows);
+            $page = max(1, min($optPage, $total));
+            $offset = ($page - 1) * $rows;
+
+            $result = array(
+                'offset' => $offset,
+                'amount' => $amount,
+                'total' => $total,
+                'page' => $page,
+                'rows' => $rows
+            );
+
+            $result['data'] = $storageService->findPage($page, $rows);
+            $result['length'] = count($result['data']);
+        } else {
+            $diagnostics = $storageService->findAll();
+            $result = DataTableHelper::paginate($diagnostics, $options);
+        }
+
+        if (isset($result['data'])) {
+            $data = [];
+            foreach($result['data'] as $row) {
+                $rowData = [
+                    'id' => $row['id'],
+                    'workstation' => $row['ip'],
+                    'os' => $row['os'] . ' (' . $row['osVersion'] . ')',
+                    'browser' => $row['browser'] . ' (' . $row['browserVersion'] . ')',
+                    'performance' => $row['performance_average'],
+                    'bandwidth' => $row['bandwidth_max'],
+                ];
+
+
+                if (isset($row['created_at'])) {
+                    $dt = new DateTime($row['created_at']);
+                    $rowData['date'] = DateHelper::displayeDate($dt);
+                }
+
+                $data[] = $rowData;
+            }
+            $result['data'] = $data;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets the list of readiness checks related to a test site
+     *
+     * @param $testCenterId
+     * @param $id
+     * @return bool
+     */
+    public static function removeDiagnostic($testCenterId, $id)
+    {
+        /* @var Storage $storageService */
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+
+        $ids = $id ? $id : [];
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        foreach($ids as $id) {
+            $storageService->delete($id);
+        }
+
+        return true;
     }
 
     /**
