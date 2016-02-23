@@ -177,7 +177,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
-            
+
+            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            if ($session) {
+                $session->endTestSession();
+                $this->getTestSessionService()->persist($session);
+            }
             $result = true;
         }
 
