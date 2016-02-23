@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoQtiTest\models\TestSessionMetaData;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
@@ -136,11 +136,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $result = false;
 
         if (self::STATE_AWAITING == $executionState) {
-            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-            if ($session) {
-                $this->getTestSessionService()->setTestVariable($session, 'TEST_AUTHORISE', $reason);
-                $this->getTestSessionService()->persist($session);
-            }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $reason);
 
             if ($testCenter !== null) {
                 $stateService = $this->getExtendedStateService();
@@ -199,13 +195,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
-                $this->getTestSessionService()->setTestVariable($session, 'TEST_PAUSE', $reason);
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
 
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_PAUSED, $reason);
-
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $reason);
             $result = true;
         }
 
@@ -222,13 +217,16 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function reportExecution(DeliveryExecution $deliveryExecution, $reason)
     {
-        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        //@todo find a way to report it even if the session does not exist
-        if ($session) {
-            $this->getTestSessionService()->setTestVariable($session, 'TEST_IRREGULARITY', $reason);
-            return true;
-        }
-        return false;
+        $deliveryLog = $this->getDeliveryLogService();
+        return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $reason);
+    }
+
+    /**
+     * @return \oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService
+     */
+    private function getDeliveryLogService()
+    {
+        return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
 
     /**
