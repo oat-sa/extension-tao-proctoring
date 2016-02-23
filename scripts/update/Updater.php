@@ -23,6 +23,11 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoClientDiagnostic\model\authorization\Anonymous;
+use oat\taoClientDiagnostic\model\authorization\Authorization;
+use oat\taoClientDiagnostic\model\storage\Sql;
+use oat\taoClientDiagnostic\model\storage\Storage;
+use oat\taoClientDiagnostic\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -213,6 +218,47 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('1.4.0', '1.4.1');
 
         $this->skip('1.4.1', '1.5.0');
+
+        if ($this->isVersion('1.5.0')) {
+
+            //Set diagnostic config
+            $extension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic');
+            $config = $extension->getConfig('clientDiag');
+            $extension->setConfig('clientDiag', array_merge($config, array(
+                'performances' => array(
+                    'samples' => array(
+                        'taoClientDiagnostic/tools/performances/data/sample1/',
+                        'taoClientDiagnostic/tools/performances/data/sample2/',
+                        'taoClientDiagnostic/tools/performances/data/sample3/'
+                    ),
+                    'occurrences' => 10,
+                    'timeout' => 30,
+                    'optimal' => 0.05,
+                    'threshold' => 0.75
+                ),
+                'bandwidth' => array(
+                    'unit' => 0.16,
+                    'ideal' => 45,
+                    'max' => 100,
+                ),
+            )));
+
+            //Set diagnostic authorization
+            $authService = new Anonymous();
+            $authService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(Authorization::SERVICE_ID, $authService);
+
+            //Set diagnostic storage
+            $storageService = new Sql(array(
+                'persistence' => 'default'
+            ));
+            $storageService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(Storage::SERVICE_ID, $storageService);
+            $sqlScript = new createDiagnosticTable();
+            $sqlScript([]);
+
+            $this->setVersion('1.6.0');
+        }
     }
 
 }

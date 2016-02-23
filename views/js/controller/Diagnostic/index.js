@@ -199,7 +199,7 @@ define([
             // column: Performances of the workstation
             model.push({
                 id: 'performance',
-                label: __('Performance'),
+                label: __('Performances'),
                 transform: function(value) {
                     var cursor = performancesRange - value + performancesOptimal;
                     var status = diagnosticStatus.getStatus(cursor / performancesRange * 100, 'performances');
