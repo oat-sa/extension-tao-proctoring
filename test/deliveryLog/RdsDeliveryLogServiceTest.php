@@ -74,10 +74,11 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
      * @param $deliveryExecutionId
      * @param $eventId
      * @param $data
+     * @param string $userId
      */
-    public function testLog($deliveryExecutionId, $eventId, $data)
+    public function testLog($deliveryExecutionId, $eventId, $data, $userId)
     {
-        $result = $this->service->log($deliveryExecutionId, $eventId, $data);
+        $result = $this->service->log($deliveryExecutionId, $eventId, $data, $userId);
         $this->assertTrue($result);
 
         $loggedData = $this->getRecordByDeliveryExecutionId($deliveryExecutionId);
@@ -85,11 +86,15 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
         //get last logged record
         $loggedData = $loggedData[count($loggedData) - 1];
 
-        $this->assertEquals($loggedData[RdsDeliveryLogService::DELIVERY_EXECUTION_ID], $deliveryExecutionId);
-        $this->assertEquals($loggedData[RdsDeliveryLogService::EVENT_ID], $eventId);
+        $this->assertEquals($deliveryExecutionId, $loggedData[RdsDeliveryLogService::DELIVERY_EXECUTION_ID]);
+        $this->assertEquals($eventId, $loggedData[RdsDeliveryLogService::EVENT_ID]);
         $this->assertEquals($data, json_decode($loggedData[RdsDeliveryLogService::DATA], true));
         $this->assertTrue(is_numeric($loggedData[RdsDeliveryLogService::CREATED_AT]));
         $this->assertTrue(!empty($loggedData[RdsDeliveryLogService::CREATED_BY]));
+
+        if ($userId) {
+            $this->assertEquals($userId, $loggedData[RdsDeliveryLogService::CREATED_BY]);
+        }
     }
 
 
@@ -107,15 +112,15 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
         $loggedData = $this->service->get($deliveryExecutionId, $eventId);
         $loggedDataAllEvents = $this->service->get($deliveryExecutionId);
 
-        $this->assertEquals(count($loggedData), 1);
-        $this->assertEquals(count($loggedDataAllEvents), 2);
+        $this->assertEquals(1, count($loggedData));
+        $this->assertEquals(2, count($loggedDataAllEvents));
 
         //get last logged record
         $loggedData = $loggedData[count($loggedData) - 1];
 
-        $this->assertEquals($loggedData[RdsDeliveryLogService::DELIVERY_EXECUTION_ID], $deliveryExecutionId);
-        $this->assertEquals($loggedData[RdsDeliveryLogService::EVENT_ID], $eventId);
-        $this->assertEquals($loggedData[RdsDeliveryLogService::DATA], $data);
+        $this->assertEquals($deliveryExecutionId, $loggedData[RdsDeliveryLogService::DELIVERY_EXECUTION_ID]);
+        $this->assertEquals($eventId, $loggedData[RdsDeliveryLogService::EVENT_ID]);
+        $this->assertEquals($data, $loggedData[RdsDeliveryLogService::DATA]);
         $this->assertTrue(is_numeric($loggedData[RdsDeliveryLogService::CREATED_AT]));
         $this->assertTrue(!empty($loggedData[RdsDeliveryLogService::CREATED_BY]));
     }
@@ -131,6 +136,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
                 $this->deliveryExecutionId,
                 'test_event_1',
                 'string value',
+                'user_id'
             ],
             [
                 $this->deliveryExecutionId,
@@ -139,6 +145,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
                     'key_1' => 'value_1',
                     'key_2' => 'value_2',
                 ],
+                null
             ],
         ];
     }
