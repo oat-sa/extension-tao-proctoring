@@ -28,10 +28,11 @@ define([
     'helpers',
     'layout/loading-bar',
     'ui/actionbar',
+    'ui/feedback',
     'taoProctoring/component/breadcrumbs',
     'taoClientDiagnostic/tools/diagnostic/diagnostic',
-    'ui/feedback'
-], function ($, __, helpers, loadingBar, actionbar, breadcrumbsFactory, diagnosticFactory) {
+    'tpl!taoProctoring/templates/diagnostic/main'
+], function ($, __, helpers, loadingBar, actionbar, feedback, breadcrumbsFactory, diagnosticFactory, diagnosticTpl) {
     'use strict';
 
     /**
@@ -60,8 +61,49 @@ define([
             var config = $container.data('config');
             var testCenterId = $container.data('testcenter');
             var indexUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+            var workstationUrl = helpers._url('workstation', 'DiagnosticChecker', 'taoProctoring', {testCenter : testCenterId});
 
             var bc = breadcrumbsFactory($container, crumbs);
+
+            /**
+             * Installs the diagnostic tool GUI
+             * @param {String} workstation
+             */
+            function installTester(workstation) {
+                diagnosticFactory(config)
+                    .setTemplate(diagnosticTpl)
+                    .on('render', function() {
+                        var self = this;
+
+                        // get access to the input
+                        this.controls.$workstation = this.getElement().find('[data-control="workstation"]')
+                            .on('keypress', function (e) {
+                                if (e.which === 13) {
+                                    e.preventDefault();
+                                    self.run();
+                                }
+                            })
+                            .val(workstation);
+                    })
+                    .on('start', function() {
+                        // append the workstation name to the queries
+                        this.config.storeParams = this.config.storeParams || {};
+                        this.config.storeParams.workstation = this.controls.$workstation.val();
+
+                        // disable the input when running the test
+                        this.controls.$workstation.prop('disabled', true);
+                        loadingBar.start();
+                    })
+                    .on('end', function() {
+                        // enable the input when the test is complete
+                        this.controls.$workstation.removeProp('disabled');
+                        loadingBar.stop();
+                    })
+                    .on('render', function() {
+                        loadingBar.stop();
+                    })
+                    .render($list);
+            }
 
             actionbar({
                 renderTo: $panel,
@@ -76,17 +118,15 @@ define([
                 }]
             });
 
-            diagnosticFactory(config)
-                .on('start', function() {
-                    loadingBar.start();
+            // need to known the workstation name to display it
+            $.get(workstationUrl, 'json')
+                .done(function(data) {
+                    installTester(data && data.workstation);
                 })
-                .on('end', function() {
-                    loadingBar.stop();
-                })
-                .on('render', function() {
-                    loadingBar.stop();
-                })
-                .render($list);
+                .fail(function() {
+                    feedback().error(__('Unable to get the workstation name!'));
+                    installTester();
+                });
         }
     };
 

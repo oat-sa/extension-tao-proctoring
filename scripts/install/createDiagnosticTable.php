@@ -23,7 +23,7 @@ class createDiagnosticTable extends \common_ext_action_InstallAction
             $tableResults = $schema->createtable(DiagnosticStorage::DIAGNOSTIC_TABLE);
             $tableResults->addOption('engine', 'MyISAM');
 
-            $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_ID, 'string', ['length' => 16]);
+            $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_ID, 'string', ['length' => 32]);
             $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER, 'string', ['length' => 255]);
             $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_LOGIN, 'string', ['length' => 32]);
             $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION, 'string', ['length' => 64]);

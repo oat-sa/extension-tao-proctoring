@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoClientDiagnostic\controller\CompatibilityChecker;
+use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\model\DiagnosticStorage;
 
 /**
@@ -48,9 +49,65 @@ class DiagnosticChecker extends CompatibilityChecker
             $data[DiagnosticStorage::DIAGNOSTIC_TEST_CENTER] = $this->getRequestParameter('testCenter');
         }
         if ($this->hasRequestParameter('workstation')) {
-            $data[DiagnosticStorage::DIAGNOSTIC_WORKSTATION] = $this->getRequestParameter('workstation');
+            $data[DiagnosticStorage::DIAGNOSTIC_WORKSTATION] = trim($this->getRequestParameter('workstation'));
         }
 
         return $data;
+    }
+
+    /**
+     * Get cookie id OR create it if doesnt exist
+     * @return string
+     */
+    protected function getId()
+    {
+        $cookieName = 'id';
+
+        if (!isset($_COOKIE[$cookieName])) {
+            $id = uniqid();
+            setcookie($cookieName, $id);
+        } else {
+            $id = $_COOKIE[$cookieName];
+        }
+
+        // the id is related to the test center to avoid overwrites
+        if ($this->hasRequestParameter('testCenter')) {
+            $id = md5($id . $this->getRequestParameter('testCenter') . $id);
+        }
+
+        return $id;
+    }
+
+    /**
+     * Ge
+     * @throws \common_exception_NoImplementation
+     */
+    public function workstation()
+    {
+        $response = [
+            'success' => false
+        ];
+
+        if ($this->hasRequestParameter('testCenter')) {
+            $testCenter = new \core_kernel_classes_Resource($this->getRequestParameter('testCenter'));
+            $id = $this->getId();
+            $response['workstation'] = uniqid('workstation-');
+
+            try {
+                $diagnostic = TestCenterHelper::getDiagnostic($testCenter, $id);
+            } catch (\common_exception_NoImplementation $e) {
+                \common_Logger::i("Unable to get the workstation name for $id ($testCenter)");
+            }
+
+            if (isset($diagnostic)) {
+                $response['success'] = true;
+                $workstation = trim($diagnostic[DiagnosticStorage::DIAGNOSTIC_WORKSTATION]);
+                if ($workstation) {
+                    $response['workstation'] = $workstation;
+                }
+            }
+        }
+
+        $this->returnJson($response);
     }
 }
