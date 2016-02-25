@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model;
 
+use Doctrine\DBAL\Driver\PDOStatement;
 use oat\taoClientDiagnostic\model\storage\Sql;
 use oat\taoClientDiagnostic\exception\StorageException;
 
@@ -31,23 +32,25 @@ use oat\taoClientDiagnostic\exception\StorageException;
 class DiagnosticStorage extends Sql implements PaginatedStorage
 {
     /**
-     * Deletes a row from the storage model based on entity
+     * Additional columns of diagnostic storage
+     */
+    const DIAGNOSTIC_WORKSTATION = 'workstation';
+    const DIAGNOSTIC_TEST_CENTER = 'test_center';
+
+    /**
+     * Gets an existing record in database by id
      * @param $id
-     * @return bool
+     * @return mixed
      * @throws StorageException
      */
-    public function delete($id)
+    public function find($id)
     {
+        if (empty($id)) {
+            throw new StorageException('Invalid id parameter.');
+        }
+
         try {
-            if (empty($id)) {
-                throw new StorageException('Invalid id parameter.');
-            }
-            $persistence = $this->getPersistence();
-
-            $query = 'DELETE FROM ' . self::DIAGNOSTIC_TABLE . ' WHERE ' . self::DIAGNOSTIC_ID . ' = ?';
-            $statement = $persistence->query($query, array($id));
-            return (boolean)$statement->rowCount();
-
+            return $this->select(null, [self::DIAGNOSTIC_ID => $id], 1)->fetch(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             throw new StorageException($e->getMessage());
         }
@@ -57,20 +60,15 @@ class DiagnosticStorage extends Sql implements PaginatedStorage
      * Gets a page from the storage model based on entity
      * @param int $page The page number
      * @param int $size The size of a page (number of rows)
+     * @param array $filter A list of filters (pairs columns => value)
      * @return mixed
      * @throws StorageException
      */
-    public function findPage($page = null, $size = PAGE_SIZE)
+    public function findPage($page = null, $size = PAGE_SIZE, $filter = null)
     {
         try {
-            $persistence = $this->getPersistence();
-
             $offset = ($page - 1) * $size;
-
-            $query = 'SELECT * FROM ' . self::DIAGNOSTIC_TABLE . ' LIMIT ' . $offset . ', ' . $size;
-            $statement = $persistence->query($query);
-            return $statement->fetchAll(\PDO::FETCH_ASSOC);
-
+            return $this->select(null, $filter, $size, $offset)->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             throw new StorageException($e->getMessage());
         }
@@ -78,20 +76,104 @@ class DiagnosticStorage extends Sql implements PaginatedStorage
 
     /**
      * Gets the number of rows from the storage model based on entity
+     * @param array $filter A list of filters (pairs columns => value)
      * @return int
      * @throws StorageException
      */
-    public function count()
+    public function count($filter = null)
     {
         try {
-            $persistence = $this->getPersistence();
-
-            $query = 'SELECT COUNT(*) FROM ' . self::DIAGNOSTIC_TABLE;
-            $statement = $persistence->query($query);
-            return $statement->fetchColumn();
-
+            return $this->select('COUNT(*)', $filter)->fetchColumn();
         } catch (\PDOException $e) {
             throw new StorageException($e->getMessage());
         }
+    }
+
+    /**
+     * Deletes a row from the storage model based on entity
+     * @param $id
+     * @param array $filter A list of filters (pairs columns => value)
+     * @return bool
+     * @throws StorageException
+     */
+    public function delete($id, $filter = null)
+    {
+        if (empty($id)) {
+            throw new StorageException('Invalid id parameter.');
+        }
+
+        if (!$filter) {
+            $filter = [];
+        }
+
+        $filter[self::DIAGNOSTIC_ID] = $id;
+
+        try {
+            \common_Logger::i('Deleting diagnostic result ' . $id);
+            $query = 'DELETE FROM ' . self::DIAGNOSTIC_TABLE;
+            return (boolean)$this->query($query, $filter)->rowCount();
+        } catch (\PDOException $e) {
+            throw new StorageException($e->getMessage());
+        }
+    }
+
+    /**
+     * Builds and runs a select query
+     * @param array $columns
+     * @param array $where
+     * @param int $size
+     * @param int $offset
+     * @return PDOStatement
+     */
+    protected function select($columns = null, $where = null, $size = null, $offset = null)
+    {
+        if (!$columns) {
+            $columns = '*';
+        }
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+
+        $query = 'SELECT ' . implode(',', $columns) . ' FROM ' . self::DIAGNOSTIC_TABLE;
+
+        return $this->query($query, $where, $size, $offset);
+    }
+
+    /**
+     * Builds and runs a query
+     * @param string $query
+     * @param array $where
+     * @param int $size
+     * @param int $offset
+     * @return PDOStatement
+     */
+    protected function query($query, $where = null, $size = null, $offset = null)
+    {
+        $params = [];
+
+        if (is_array($where)) {
+            $conditions = [];
+            foreach($where as $column => $value) {
+                $placeholder = '?';
+                $value = '' . $value;
+
+                $conditions[] = $column . ' = ' . $placeholder;
+                $params[] = $value;
+            }
+            if (count($conditions)) {
+                $query .= ' WHERE ' . implode(' AND ', $conditions);
+            }
+        }
+
+        if (!is_null($size)) {
+            $query .= ' LIMIT ';
+            if (!is_null($offset)) {
+                $query .= $offset . ', ' . $size;
+            } else {
+                $query .= $size;
+            }
+        }
+
+        return $this->getPersistence()->query($query, $params);
     }
 }

@@ -48,6 +48,11 @@ class DataTableHelper
     const OPTION_PAGE = 'page';
 
     /**
+     * The index of the option providing the page filter
+     */
+    const OPTION_FILTER = 'filter';
+
+    /**
      * Paginates a collection to render a subset in a table
      * @param array|PaginatedStorage $collection - The full amount of lines to paginate
      * @param array [$options] - Allow to setup the page. These options are supported:
@@ -60,9 +65,10 @@ class DataTableHelper
     {
         $optRows = abs(intval(isset($options[self::OPTION_ROWS]) ? $options[self::OPTION_ROWS] : self::DEFAULT_ROWS));
         $optPage = abs(intval(isset($options[self::OPTION_PAGE]) ? $options[self::OPTION_PAGE] : self::DEFAULT_PAGE));
+        $optFilter = isset($options[self::OPTION_FILTER]) ? $options[self::OPTION_FILTER] : null;
 
         if ($collection instanceof PaginatedStorage) {
-            $amount = $collection->count();
+            $amount = $collection->count($optFilter);
             $paginatedStorage = true;
         } else {
             $amount = count($collection);
@@ -83,7 +89,7 @@ class DataTableHelper
         );
 
         if ($paginatedStorage) {
-            $result['data'] = $collection->findPage($page, $rows);
+            $result['data'] = $collection->findPage($page, $rows, $optFilter);
         } else {
             $result['data'] = array_slice($collection, $offset, $rows);
         }

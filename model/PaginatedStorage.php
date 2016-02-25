@@ -36,23 +36,33 @@ interface PaginatedStorage extends Storage
     const PAGE_SIZE = 25;
 
     /**
+     * Gets an existing record in database by id
+     * @param $id
+     * @return mixed
+     */
+    public function find($id);
+
+    /**
      * Gets a page from the storage model based on entity
      * @param int $page The page number
      * @param int $size The size of a page (number of rows)
+     * @param array $filter A list of filters (pairs columns => value)
      * @return mixed
      */
-    public function findPage($page = null, $size = PAGE_SIZE);
+    public function findPage($page = null, $size = PAGE_SIZE, $filter = null);
 
     /**
      * Gets the number of rows from the storage model based on entity
+     * @param array $filter A list of filters (pairs columns => value)
      * @return int
      */
-    public function count();
+    public function count($filter = null);
 
     /**
      * Deletes a row from the storage model based on entity
      * @param $id
+     * @param array $filter A list of filters (pairs columns => value)
      * @return mixed
      */
-    public function delete($id);
+    public function delete($id, $filter = null);
 }

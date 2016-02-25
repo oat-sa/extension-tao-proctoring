@@ -26,7 +26,7 @@ use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoClientDiagnostic\model\authorization\Anonymous;
 use oat\taoClientDiagnostic\model\authorization\Authorization;
 use oat\taoClientDiagnostic\model\storage\Storage;
-use oat\taoClientDiagnostic\scripts\install\createDiagnosticTable;
+use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
@@ -38,7 +38,6 @@ use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * 
@@ -256,6 +255,15 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(Storage::SERVICE_ID, $storageService);
             $sqlScript = new createDiagnosticTable();
             $sqlScript([]);
+
+            //Grant access to the overridden controller
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
+
+            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
 
             $this->setVersion('1.6.0');
         }

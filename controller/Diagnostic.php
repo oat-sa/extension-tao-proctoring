@@ -48,7 +48,7 @@ class Diagnostic extends ProctoringModule
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
-                'config' => \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag')
+                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -76,7 +76,7 @@ class Diagnostic extends ProctoringModule
             'diagnostic-runner',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'config' => \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag')
+                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
