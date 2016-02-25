@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -175,8 +175,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getProgress()
     {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $session = $deliveryService->getTestSession($this->deliveryExecution);
+        $testSessionService = TestSessionService::singleton();
+        $session = $testSessionService->getTestSession($this->deliveryExecution);
         $result = null;
         if ($session !== null) {
             $pos = $session->getRoute()->getPosition();
@@ -218,7 +218,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getStartTime()
     {
-        return (string) $this->deliveryExecution->getStartTime();
+        list($usec, $sec) = explode(" ", $this->deliveryExecution->getStartTime());
+        return ((float)$usec + (float)$sec);
     }
 
     /**
@@ -226,7 +227,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getEndTime()
     {
-        return (string) $this->deliveryExecution->getFinishTime();
+        $finishTime = $this->deliveryExecution->getFinishTime();
+        if ($finishTime) {
+            list($usec, $sec) = explode(" ", $this->deliveryExecution->getFinishTime());
+            return ((float)$usec + (float)$sec);
+        }
+        return '';
     }
 
     private function getProctoringData()
