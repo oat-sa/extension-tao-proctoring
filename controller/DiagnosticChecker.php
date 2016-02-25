@@ -61,14 +61,7 @@ class DiagnosticChecker extends CompatibilityChecker
      */
     protected function getId()
     {
-        $cookieName = 'id';
-
-        if (!isset($_COOKIE[$cookieName])) {
-            $id = uniqid();
-            setcookie($cookieName, $id);
-        } else {
-            $id = $_COOKIE[$cookieName];
-        }
+        $id = parent::getId();
 
         // the id is related to the test center to avoid overwrites
         if ($this->hasRequestParameter('testCenter')) {
