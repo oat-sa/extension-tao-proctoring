@@ -34,6 +34,8 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 
 /**
  * 
@@ -213,6 +215,18 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('1.4.0', '1.4.1');
 
         $this->skip('1.4.1', '1.5.0');
+
+        if ($this->isVersion('1.5.0')) {
+            try {
+                $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $action = new RegisterProctoringLog();
+                $action->setServiceLocator($this->getServiceManager());
+                $action->__invoke(array('default'));
+            }
+            $this->setVersion('1.6.0');
+        }
+
     }
 
 }
