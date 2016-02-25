@@ -188,8 +188,8 @@ class TestCenterHelper
                         'bandwidth' => $row[DiagnosticStorage::DIAGNOSTIC_BANDWIDTH_MAX],
                     ];
 
-                    if (isset($row['created_at'])) {
-                        $dt = new DateTime($row['created_at']);
+                    if (isset($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT])) {
+                        $dt = new DateTime($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT]);
                         $rowData['date'] = DateHelper::displayeDate($dt);
                     }
 
