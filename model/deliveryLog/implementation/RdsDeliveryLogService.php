@@ -41,14 +41,17 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      *
      * @param string $deliveryExecutionId
      * @param string $eventId
+     * @param string $user user identifier
      * @param mixed $data
      * @return boolean
      */
-    public function log($deliveryExecutionId, $eventId, $data)
+    public function log($deliveryExecutionId, $eventId, $data, $user = null)
     {
         $data = json_encode($data);
 
-        $currentUser = \common_session_SessionManager::getSession()->getUser();
+        if ($user === null) {
+            $user = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+        }
 
         $result = $this->getPersistence()->insert(
             self::TABLE_NAME,
@@ -57,7 +60,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
                 self::EVENT_ID => $eventId,
                 self::DATA => $data,
                 self::CREATED_AT => time(),
-                self::CREATED_BY => $currentUser->getIdentifier(),
+                self::CREATED_BY => $user,
             )
         );
 
