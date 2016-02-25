@@ -115,7 +115,7 @@ class ProctorManager extends ProctoringModule
     {
         $requestOptions = $this->getRequestOptions();
         $currentUser = SessionManager::getSession()->getUser();
-        $proctors = ProctorManagementService::singleton()->getAssignedProctors($currentUser->getIdentifier());
+        $proctors = ProctorManagementService::singleton()->getAssignedProctors($currentUser->getIdentifier(), $testCenters);
 
         return DataTableHelper::paginate($proctors, $requestOptions, function($proctors) use($testCenters) {
             $testCentersByProctors = ProctorManagementService::singleton()->getProctorsAuthorization($testCenters);

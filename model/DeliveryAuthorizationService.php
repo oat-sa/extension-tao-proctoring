@@ -18,22 +18,33 @@
  *
  *
  */
-use oat\oatbox\service\ServiceManager;
-use oat\oatbox\event\EventManager;
-use oat\taoTests\models\event\TestChangedEvent;
 
-$serviceManager = ServiceManager::getServiceManager();
-$eventManager = $serviceManager->get(EventManager::CONFIG_ID);
+namespace oat\taoProctoring\model;
 
-$eventManager->attach(TestChangedEvent::EVENT_NAME,
-    array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
-);
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
-$eventManager->attach(
-    'oat\\taoTests\\models\\event\\TestChangedEvent',
-    array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
-);
+interface DeliveryAuthorizationService
+{
+    const SERVICE_ID = 'taoProctoring/DeliveryAuthorization';
 
-$serviceManager->register(EventManager::CONFIG_ID, $eventManager);
+    /**
+     * Grants the proctor authorization
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function grantAuthorization(DeliveryExecution $deliveryExecution);
 
+    /**
+     * Revokes the proctor authorization
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function revokeAuthorization(DeliveryExecution $deliveryExecution);
 
+    /**
+     * Checks the proctor authorization
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isAuthorized(DeliveryExecution $deliveryExecution);
+}

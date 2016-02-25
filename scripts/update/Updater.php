@@ -31,6 +31,9 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * 
@@ -160,6 +163,56 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('0.9.0')) {
             $this->setVersion('1.0.0');
         }
+
+        if ($this->isVersion('1.0.0')) {
+
+            try {
+                $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryAuthorizationService();
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryAuthorizationService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('1.1.0');
+        }
+
+        if ($this->isVersion('1.1.0')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('1.2.0');
+        }
+
+        if ($this->isVersion('1.2.0')) {
+
+            try {
+                $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryExecutionStateService();
+                $service->setServiceManager($this->getServiceManager());
+
+                $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            }
+
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach(
+                'oat\\taoTests\\models\\event\\TestChangedEvent',
+                array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+            );
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
+            $this->setVersion('1.3.0');
+        }
+
+        if ($this->isVersion('1.3.0')) {
+            $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
+            $proctoringExtension->setConfig('monitoringUserExtraFields', array());
+            $this->setVersion('1.4.0');
+        }
+
+        $this->skip('1.4.0', '1.4.1');
+
+        $this->skip('1.4.1', '1.5.0');
     }
 
 }

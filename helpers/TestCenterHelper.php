@@ -25,13 +25,13 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
-use core_kernel_users_GenerisUser;
 use DateTime;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
-use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -182,7 +182,9 @@ class TestCenterHelper
             }
         }
 
-        return DataTableHelper::paginate($filteredExecutions, $options, function($deliveryExecutions) use ($deliveryService) {
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+        return DataTableHelper::paginate($filteredExecutions, $options, function($deliveryExecutions) use ($deliveryExecutionStateService) {
             $reports = [];
 
             foreach($deliveryExecutions as $deliveryExecution) {
@@ -193,7 +195,7 @@ class TestCenterHelper
                 $userId = $deliveryExecution->getUserIdentifier();
                 $user = UserHelper::getUser($userId);
 
-                $state = $deliveryService->getProctoringState($deliveryExecution->getUri());
+                $state = $deliveryExecutionStateService->getProctoringState($deliveryExecution->getUri());
                 $proctor = null;
                 if (!empty($state['authorized_by'])) {
                     $proctor = UserHelper::getUser($state['authorized_by']);
@@ -205,7 +207,7 @@ class TestCenterHelper
                     'delivery' => $deliveryExecution->getDelivery()->getLabel(),
                     'testtaker' => $user ? UserHelper::getUserName($user, true) : '',
                     'proctor' => $proctor ? UserHelper::getUserName($proctor, true) : '',
-                    'status' => $deliveryService->getState($deliveryExecution),
+                    'status' => $deliveryExecutionStateService->getState($deliveryExecution),
                     'start' => $startTime ? DateHelper::displayeDate($startTime) : '',
                     'end' => $finishTime ? DateHelper::displayeDate($finishTime) : '',
                     'pause' => $procActions['pause'],
@@ -224,8 +226,8 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $ds = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $session = $ds->getTestSession($deliveryExecution);
+        $testSessionService = TestSessionService::singleton();
+        $session = $testSessionService->getTestSession($deliveryExecution);
         
         $actions = array(
             'pause' => 0,
