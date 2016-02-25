@@ -20,10 +20,16 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceManager;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\tao\model\export\implementation\CsvExporter;
+use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\export\implementation\DeliveryMonitoringExporter;
+use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * Proctoring Delivery controllers
@@ -525,5 +531,22 @@ class Delivery extends ProctoringModule
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
+    }
+    
+    public function export()
+    {
+        $delivery = $this->hasRequestParameter('delivery') ? $this->getCurrentDelivery() : null;
+        
+        $data = (new DeliveryMonitoringExporter(
+            ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID),
+            EligibilityService::singleton(),
+            ResultsService::singleton()
+        ))->getData($this->getCurrentTestCenter(), $delivery);
+
+        // add columnName
+        $data = [array_keys(current($data))] + $data;
+        
+        $csvExporter = new CsvExporter($data);
+        $csvExporter->export(false, true);
     }
 }
