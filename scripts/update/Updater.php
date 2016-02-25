@@ -35,6 +35,7 @@ use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 
 /**
  * 
@@ -219,14 +220,10 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default'));
-                $service->setServiceManager($this->getServiceManager());
-
-                $this->getServiceManager()->register(RdsDeliveryLogService::SERVICE_ID, $service);
+                $action = new RegisterProctoringLog();
+                $action->setServiceLocator($this->getServiceManager());
+                $action->__invoke(array('default'));
             }
-
-            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryLogTable.php');
-
             $this->setVersion('1.6.0');
         }
 
