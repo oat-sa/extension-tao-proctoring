@@ -4,8 +4,8 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\taoClientDiagnostic\model\authorization\Anonymous;
 use oat\taoClientDiagnostic\model\authorization\Authorization;
-use oat\taoClientDiagnostic\model\storage\Sql;
 use oat\taoClientDiagnostic\model\storage\Storage;
+use oat\taoProctoring\model\DiagnosticStorage;
 
 class addDiagnosticSettings extends \common_ext_action_InstallAction
 {
@@ -39,7 +39,7 @@ class addDiagnosticSettings extends \common_ext_action_InstallAction
         $this->getServiceManager()->register(Authorization::SERVICE_ID, $authService);
 
         //Set diagnostic storage
-        $storageService = new Sql(array(
+        $storageService = new DiagnosticStorage(array(
             'persistence' => 'default'
         ));
         $storageService->setServiceManager($this->getServiceManager());

@@ -22,7 +22,6 @@ namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
 use oat\taoClientDiagnostic\model\storage\Storage;
-use oat\taoClientDiagnostic\model\storage\PaginatedStorage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
@@ -33,6 +32,7 @@ use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\PaginatedStorage;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -131,61 +131,35 @@ class TestCenterHelper
      * @param $testCenterId
      * @param array [$options]
      * @return array
+     * @throws \common_exception_NoImplementation
      */
     public static function getDiagnostics($testCenterId, $options = array())
     {
-        /* @var Storage $storageService */
         $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
-
         if ($storageService instanceof PaginatedStorage) {
-            $optRows = abs(intval(isset($options[DataTableHelper::OPTION_ROWS]) ? $options[DataTableHelper::OPTION_ROWS] : DataTableHelper::DEFAULT_ROWS));
-            $optPage = abs(intval(isset($options[DataTableHelper::OPTION_PAGE]) ? $options[DataTableHelper::OPTION_PAGE] : DataTableHelper::DEFAULT_PAGE));
+            return DataTableHelper::paginate($storageService, $options, function($data) {
+                foreach($data as $idx => $row) {
+                    $rowData = [
+                        'id' => $row['id'],
+                        'workstation' => $row['ip'],
+                        'os' => $row['os'] . ' (' . $row['osVersion'] . ')',
+                        'browser' => $row['browser'] . ' (' . $row['browserVersion'] . ')',
+                        'performance' => $row['performance_average'],
+                        'bandwidth' => $row['bandwidth_max'],
+                    ];
 
-            $amount = $storageService->count();
-            $rows = max(1, $optRows);
-            $total = ceil($amount / $rows);
-            $page = max(1, min($optPage, $total));
-            $offset = ($page - 1) * $rows;
+                    if (isset($row['created_at'])) {
+                        $dt = new DateTime($row['created_at']);
+                        $rowData['date'] = DateHelper::displayeDate($dt);
+                    }
 
-            $result = array(
-                'offset' => $offset,
-                'amount' => $amount,
-                'total' => $total,
-                'page' => $page,
-                'rows' => $rows
-            );
-
-            $result['data'] = $storageService->findPage($page, $rows);
-            $result['length'] = count($result['data']);
-        } else {
-            $diagnostics = $storageService->findAll();
-            $result = DataTableHelper::paginate($diagnostics, $options);
-        }
-
-        if (isset($result['data'])) {
-            $data = [];
-            foreach($result['data'] as $row) {
-                $rowData = [
-                    'id' => $row['id'],
-                    'workstation' => $row['ip'],
-                    'os' => $row['os'] . ' (' . $row['osVersion'] . ')',
-                    'browser' => $row['browser'] . ' (' . $row['browserVersion'] . ')',
-                    'performance' => $row['performance_average'],
-                    'bandwidth' => $row['bandwidth_max'],
-                ];
-
-
-                if (isset($row['created_at'])) {
-                    $dt = new DateTime($row['created_at']);
-                    $rowData['date'] = DateHelper::displayeDate($dt);
+                    $data[$idx] = $rowData;
                 }
-
-                $data[] = $rowData;
-            }
-            $result['data'] = $data;
+                return $data;
+            });
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support reads!');
         }
-
-        return $result;
     }
 
     /**
@@ -194,21 +168,23 @@ class TestCenterHelper
      * @param $testCenterId
      * @param $id
      * @return bool
+     * @throws \common_exception_NoImplementation
      */
     public static function removeDiagnostic($testCenterId, $id)
     {
-        /* @var Storage $storageService */
         $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $ids = $id ? $id : [];
+            if (!is_array($ids)) {
+                $ids = [$ids];
+            }
 
-        $ids = $id ? $id : [];
-        if (!is_array($ids)) {
-            $ids = [$ids];
+            foreach($ids as $id) {
+                $storageService->delete($id);
+            }
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support deletions!');
         }
-
-        foreach($ids as $id) {
-            $storageService->delete($id);
-        }
-
         return true;
     }
 

@@ -20,7 +20,7 @@
 
 namespace oat\taoProctoring\helpers;
 
-use oat\oatbox\user\User;
+use oat\taoProctoring\model\PaginatedStorage;
 
 /**
  * Provides common data helper for datatable component.
@@ -49,7 +49,7 @@ class DataTableHelper
 
     /**
      * Paginates a collection to render a subset in a table
-     * @param array $collection - The full amount of lines to paginate
+     * @param array|PaginatedStorage $collection - The full amount of lines to paginate
      * @param array [$options] - Allow to setup the page. These options are supported:
      * - self::OPTION_ROWS : The number of rows per page
      * - self::OPTION_PAGE : The index of the page to get
@@ -61,7 +61,14 @@ class DataTableHelper
         $optRows = abs(intval(isset($options[self::OPTION_ROWS]) ? $options[self::OPTION_ROWS] : self::DEFAULT_ROWS));
         $optPage = abs(intval(isset($options[self::OPTION_PAGE]) ? $options[self::OPTION_PAGE] : self::DEFAULT_PAGE));
 
-        $amount = count($collection);
+        if ($collection instanceof PaginatedStorage) {
+            $amount = $collection->count();
+            $paginatedStorage = true;
+        } else {
+            $amount = count($collection);
+            $paginatedStorage = false;
+        }
+
         $rows = max(1, $optRows);
         $total = ceil($amount / $rows);
         $page = max(1, min($optPage, $total));
@@ -75,10 +82,14 @@ class DataTableHelper
             'rows' => $rows
         );
 
-        if (is_callable($dataRenderer)) {
-            $result['data'] = $dataRenderer(array_slice($collection, $offset, $rows));
+        if ($paginatedStorage) {
+            $result['data'] = $collection->findPage($page, $rows);
         } else {
             $result['data'] = array_slice($collection, $offset, $rows);
+        }
+
+        if (is_callable($dataRenderer)) {
+            $result['data'] = $dataRenderer($result['data']);
         }
         $result['length'] = count($result['data']);
 

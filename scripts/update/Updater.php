@@ -25,9 +25,9 @@ use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\taoClientDiagnostic\model\authorization\Anonymous;
 use oat\taoClientDiagnostic\model\authorization\Authorization;
-use oat\taoClientDiagnostic\model\storage\Sql;
 use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoClientDiagnostic\scripts\install\createDiagnosticTable;
+use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -249,7 +249,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(Authorization::SERVICE_ID, $authService);
 
             //Set diagnostic storage
-            $storageService = new Sql(array(
+            $storageService = new DiagnosticStorage(array(
                 'persistence' => 'default'
             ));
             $storageService->setServiceManager($this->getServiceManager());
