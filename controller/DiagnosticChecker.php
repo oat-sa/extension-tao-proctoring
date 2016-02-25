@@ -79,8 +79,7 @@ class DiagnosticChecker extends CompatibilityChecker
     }
 
     /**
-     * Ge
-     * @throws \common_exception_NoImplementation
+     * Gets the name of the workstation being tested
      */
     public function workstation()
     {
