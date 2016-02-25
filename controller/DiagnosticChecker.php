@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\tao\helpers\UserHelper;
 use oat\taoClientDiagnostic\controller\CompatibilityChecker;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\model\DiagnosticStorage;
@@ -44,6 +45,8 @@ class DiagnosticChecker extends CompatibilityChecker
     protected function getData($check = false)
     {
         $data = parent::getData($check);
+
+        $data['login'] = UserHelper::getUserLogin(\common_session_SessionManager::getSession()->getUser());
 
         if ($this->hasRequestParameter('testCenter')) {
             $data[DiagnosticStorage::DIAGNOSTIC_TEST_CENTER] = $this->getRequestParameter('testCenter');
