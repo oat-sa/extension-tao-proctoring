@@ -42,9 +42,10 @@ interface DeliveryLog
      * @param string $deliveryExecutionId
      * @param string $eventId
      * @param mixed $data
+     * @param string $user user id to be stored as `created_by` value
      * @return boolean
      */
-    public function log($deliveryExecutionId, $eventId, $data);
+    public function log($deliveryExecutionId, $eventId, $data, $user = null);
 
     /**
      * Get logged data by delivery execution id

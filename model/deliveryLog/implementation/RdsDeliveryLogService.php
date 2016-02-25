@@ -41,8 +41,8 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      *
      * @param string $deliveryExecutionId
      * @param string $eventId
-     * @param string $user user identifier
      * @param mixed $data
+     * @param string $user user identifier
      * @return boolean
      */
     public function log($deliveryExecutionId, $eventId, $data, $user = null)
