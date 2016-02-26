@@ -223,6 +223,15 @@ class Updater extends common_ext_ExtensionUpdater {
             $sqlScript = new createDiagnosticTable();
             $sqlScript([]);
 
+            //Grant access to the overridden controller
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
+
+            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
+
             $this->setVersion('1.6.0');
         }
     }

@@ -48,15 +48,6 @@ class addDiagnosticSettings extends \common_ext_action_InstallAction
         $storageService->setServiceManager($serviceManager);
         $serviceManager->register(Storage::SERVICE_ID, $storageService);
 
-        //Grant access to the overridden controller
-        $accessService = \funcAcl_models_classes_AccessService::singleton();
-
-        $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
-        $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
-
-        $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
-        $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
-
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, 'Diagnostic settings added to Proctoring extension');
     }
 }
