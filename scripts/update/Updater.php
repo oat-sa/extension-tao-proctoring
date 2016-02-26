@@ -23,6 +23,8 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoProctoring\scripts\install\addDiagnosticSettings;
+use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -225,6 +227,26 @@ class Updater extends common_ext_ExtensionUpdater {
                 $action->__invoke(array('default'));
             }
             $this->setVersion('1.6.0');
+        }
+
+        if ($this->isVersion('1.6.0')) {
+
+            $settingsScript = new addDiagnosticSettings();
+            $settingsScript([]);
+
+            $sqlScript = new createDiagnosticTable();
+            $sqlScript([]);
+
+            //Grant access to the overridden controller
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
+
+            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
+
+            $this->setVersion('1.7.0');
         }
 
     }
