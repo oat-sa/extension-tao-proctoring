@@ -24,7 +24,7 @@ return array(
 	'label' => 'Proctoring',
 	'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '1.6.0',
+    'version' => '1.7.0',
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
         'tao' => '>=2.19.0',
@@ -32,7 +32,8 @@ return array(
         'taoTestTaker' => '>=2.6.0',
 	    'taoQtiTest' => '>=2.16.0',
 	    'taoOutcomeUi' => '>=2.6.6',
-		'taoClientDiagnostic' => '>=1.6.0',
+	    'generis' => '>=2.15.0',
+	    'taoClientDiagnostic' => '>=1.6.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
@@ -51,7 +52,8 @@ return array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerEntryPoint.php',
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'createDeliveryMonitoringTables.php',
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
-			'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
+            'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
+            'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
 			'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings'
         ),
         'rdf' => array(
