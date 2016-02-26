@@ -31,7 +31,7 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -195,11 +195,8 @@ class TestCenterHelper
                 $userId = $deliveryExecution->getUserIdentifier();
                 $user = UserHelper::getUser($userId);
 
-                $state = $deliveryExecutionStateService->getProctoringState($deliveryExecution->getUri());
-                $proctor = null;
-                if (!empty($state['authorized_by'])) {
-                    $proctor = UserHelper::getUser($state['authorized_by']);
-                }
+                $authorizationData = self::getDeliveryLog()->get($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE');
+                $proctor = empty($authorizationData) ? '' : UserHelper::getUser($authorizationData[0][DeliveryLog::DATA]['proctorUri']);
 
                 $procActions = self::getProctorActions($deliveryExecution);
                 $reports[] = array(
@@ -226,60 +223,50 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $testSessionService = TestSessionService::singleton();
-        $session = $testSessionService->getTestSession($deliveryExecution);
-        
-        $actions = array(
-            'pause' => 0,
-            'resume' => 0,
-            'irregularities' => array()
-        );
+        $actions = [];
 
-        if (!is_null($session)) {
-            $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
-            $vars = $resultServer->getVariables($session->getSessionId());
-            
-            foreach ($vars as $arr) {
-                $var = reset($arr)->variable;
-                if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
-                    $actions['pause']++;
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'pause');
-                } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
-                    $actions['resume']++;
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'resume');
-                } elseif (substr($var->identifier, 0, strlen('TEST_TERMINATE')) == 'TEST_TERMINATE') {
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'terminate');
-                } elseif (substr($var->identifier, 0, strlen('TEST_IRREGULARITY')) == 'TEST_IRREGULARITY') {
-                    $actions['irregularities'][] = self::getProctorIrregularity($var);
-                }
-                
-            }
-        }
+        $irregularityReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY');
+
+        $pausesReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_PAUSE', 'pause');
+        $actions['pause'] = strval(count($pausesReports));
+
+        $authorizeReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', 'resume');
+        $actions['resume'] = strval(count($authorizeReports));
+
+        $terminateReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', 'terminate');
+
+        $actions['irregularities'] = array_merge($irregularityReports, $pausesReports, $authorizeReports, $terminateReports);
         return $actions;
+
     }
 
     /**
-     * @param $var
+     * @param string $deliveryExecutionId
+     * @param string $event
      * @param string $type
      * @return array
      */
-    protected static function getProctorIrregularity($var, $type = 'irregularity')
+    protected static function getActions($deliveryExecutionId, $event, $type = 'irregularity')
     {
-        $trace = json_decode($var->trace, true);
-        $data = array(
-            'timestamp' => DateHelper::displayeDate($trace['timestamp']),
-            'type' => $type
-        );
-
-        if (isset($trace['details'])) {
-            if (!empty($trace['details']['reasons'])) {
-                $data = array_merge($data, $trace['details']['reasons']);
-            }
-            if (!empty($trace['details']['comment'])) {
-                $data['comment'] = $trace['details']['comment'];
-            }
+        $irregularities = self::getDeliveryLog()->get($deliveryExecutionId, $event);
+        $result = [];
+        foreach($irregularities as $irregularityReport) {
+            $data = $irregularityReport[DeliveryLog::DATA];
+            $result[] = [
+                'timestamp' => $irregularityReport[DeliveryLog::CREATED_AT],
+                'type' => $type,
+                'comment' => isset($data['comment']) ? $data['comment'] : '',
+                'reasons' => isset($data['reasons']) ? $data['reasons'] : '',
+            ];
         }
+        return $result;
+    }
 
-        return $data;
+    /**
+     * @return DeliveryLog
+     */
+    protected static function getDeliveryLog()
+    {
+        return ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
     }
 }

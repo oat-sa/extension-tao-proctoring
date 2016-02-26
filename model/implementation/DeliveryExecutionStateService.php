@@ -136,17 +136,17 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $result = false;
 
         if (self::STATE_AWAITING == $executionState) {
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $reason);
-
-            if ($testCenter !== null) {
-                $stateService = $this->getExtendedStateService();
-                $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
-                $proctoringState['test_center'] = $testCenter;
-                $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
+            $logData = [
+                'proctorUri' => \common_session_SessionManager::getSession()->getUser()->getIdentifier()
+            ];
+            if (!empty($reason) && is_array($reason)) {
+                $logData = array_merge($logData, $reason);
             }
-
+            if ($testCenter !== null) {
+                $logData['test_center'] = $testCenter;
+            }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AUTHORIZED, $reason);
-
             $result = true;
         }
 
@@ -173,7 +173,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
-            
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $reason);
             $result = true;
         }
 
