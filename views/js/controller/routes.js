@@ -17,7 +17,8 @@ define({
     },
     'Diagnostic' : {
         'actions' : {
-            'index' : 'controller/Diagnostic/index'
+            'index' : 'controller/Diagnostic/index',
+            'diagnostic' : 'controller/Diagnostic/diagnostic'
         }
     },
     'Reporting' : {

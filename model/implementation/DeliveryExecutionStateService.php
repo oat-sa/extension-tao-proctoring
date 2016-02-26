@@ -173,6 +173,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+
+            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            if ($session) {
+                $session->endTestSession();
+                $this->getTestSessionService()->persist($session);
+            }
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $reason);
             $result = true;
         }
@@ -219,7 +225,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     {
         $deliveryLog = $this->getDeliveryLogService();
         return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $reason);
-    }
+        }
 
     /**
      * @return \oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService

@@ -23,6 +23,8 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoProctoring\scripts\install\addDiagnosticSettings;
+use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -35,6 +37,7 @@ use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 
 /**
  * 
@@ -219,15 +222,31 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default'));
-                $service->setServiceManager($this->getServiceManager());
-
-                $this->getServiceManager()->register(RdsDeliveryLogService::SERVICE_ID, $service);
+                $action = new RegisterProctoringLog();
+                $action->setServiceLocator($this->getServiceManager());
+                $action->__invoke(array('default'));
             }
-
-            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'createDeliveryLogTable.php');
-
             $this->setVersion('1.6.0');
+        }
+
+        if ($this->isVersion('1.6.0')) {
+
+            $settingsScript = new addDiagnosticSettings();
+            $settingsScript([]);
+
+            $sqlScript = new createDiagnosticTable();
+            $sqlScript([]);
+
+            //Grant access to the overridden controller
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
+
+            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
+
+            $this->setVersion('1.7.0');
         }
 
     }

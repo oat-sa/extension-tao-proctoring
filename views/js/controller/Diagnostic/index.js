@@ -27,8 +27,9 @@ define([
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
+    'taoClientDiagnostic/tools/diagnostic/status',
     'ui/datatable'
-], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory) {
+], function ($, __, helpers, loadingBar, encode, feedback, dialog, breadcrumbsFactory, statusFactory) {
     'use strict';
 
     /**
@@ -39,6 +40,18 @@ define([
 
     // the page is always loading data when starting
     loadingBar.start();
+
+    /**
+     * Format a number with decimals
+     * @param {Number} number - The number to format
+     * @param {Number} [digits] - The number of decimals
+     * @returns {Number}
+     */
+    function formatNumber(number, digits) {
+        var nb = undefined === digits ? 2 : Math.max(0, parseInt(digits, 10));
+        var factor = Math.pow(10, nb) || 1;
+        return Math.round(number * factor) / factor;
+    }
 
     /**
      * Controls the taoProctoring readiness check page
@@ -54,21 +67,33 @@ define([
             var $list = $container.find('.list');
             var crumbs = $container.data('breadcrumbs');
             var dataset = $container.data('set');
-            var testCenterId = $container.data('testCenter');
+            var config = $container.data('config') || {};
+            var testCenterId = $container.data('testcenter');
+            var diagnosticUrl = helpers._url('diagnostic', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
-            var serviceUrl = helpers._url('index', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+            var serviceUrl = helpers._url('diagnosticData', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+
+            var performancesConfig = config.performances || {};
+            var performancesOptimal = performancesConfig.optimal;
+            var performancesRange = Math.abs(performancesOptimal - (performancesConfig.threshold));
+
+            var diagnosticStatus = statusFactory();
 
             var bc = breadcrumbsFactory($container, crumbs);
 
+            var tools = [];
+            var actions = [];
+            var model = [];
+
             // request the server with a selection of readiness check results
-            var request = function(url, selection, message) {
+            function request(url, selection, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
                         url: url,
                         data: {
-                            report: selection
+                            id: selection
                         },
                         dataType : 'json',
                         type: 'POST',
@@ -88,22 +113,120 @@ define([
                         }
                     });
                 }
-            };
-
-            var notYet = function() {
-                dialog({
-                    message: __('Not yet implemented!'),
-                    autoRender: true,
-                    autoDestroy: true,
-                    buttons: 'ok'
-                });
-            };
+            }
 
             // request the server to remove the selected diagnostic-index
-            var remove = function(selection) {
-                notYet();
-                //request(removeUrl, selection, __('The readiness check result have been removed'));
-            };
+            function remove(selection) {
+                request(removeUrl, selection, __('The readiness check result have been removed'));
+            }
+
+            // tool: page refresh
+            tools.push({
+                id: 'refresh',
+                icon: 'reset',
+                title: __('Refresh the page'),
+                label: __('Refresh'),
+                action: function() {
+                    $list.datatable('refresh');
+                }
+            });
+
+            // tool: readiness check
+            tools.push({
+                id: 'launch',
+                icon: 'play',
+                title: __('Launch another readiness check'),
+                label: __('Launch readiness check'),
+                action: function() {
+                    location.href = diagnosticUrl;
+                }
+            });
+
+            // tool: remove selected results
+            tools.push({
+                id: 'remove',
+                icon: 'remove',
+                title: __('Remove the selected readiness check results'),
+                label: __('Remove'),
+                massAction: true,
+                action: function(selection) {
+                    dialog({
+                        message: __('The selected readiness check results will be removed. Continue ?'),
+                        autoRender: true,
+                        autoDestroy: true,
+                        onOkBtn: function() {
+                            remove(selection);
+                        }
+                    });
+                }
+            });
+
+            // action: remove the result
+            actions.push({
+                id: 'remove',
+                icon: 'remove',
+                title: __('Remove the readiness check result?'),
+                action: function(id) {
+                    dialog({
+                        autoRender: true,
+                        autoDestroy: true,
+                        message: __('The readiness check result will be removed. Continue ?'),
+                        onOkBtn: function() {
+                            remove([id]);
+                        }
+                    });
+                }
+            });
+
+            // column: Workstation identifier
+            model.push({
+                id: 'workstation',
+                label: __('Workstation')
+            });
+
+            // column: Operating system information
+            model.push({
+                id: 'os',
+                label: __('OS')
+            });
+
+            // column: Browser information
+            model.push({
+                id: 'browser',
+                label: __('Browser')
+            });
+
+            // column: Performances of the workstation
+            model.push({
+                id: 'performance',
+                label: __('Performances'),
+                transform: function(value) {
+                    var cursor = performancesRange - value + performancesOptimal;
+                    var status = diagnosticStatus.getStatus(cursor / performancesRange * 100, 'performances');
+                    return status.feedback.message;
+                }
+            });
+
+            // column: Available bandwidth
+            model.push({
+                id: 'bandwidth',
+                label: __('Bandwidth'),
+                transform: function(value) {
+                    var bandwidth = formatNumber(value);
+
+                    if (value > 100) {
+                        bandwidth = '> 100';
+                    }
+
+                    return bandwidth + ' Mbs';
+                }
+            });
+
+            // column: Date of diagnostic
+            model.push({
+                id: 'date',
+                label: __('Date')
+            });
             
             $list
                 .on('query.datatable', function() {
@@ -119,75 +242,10 @@ define([
                         available: __('Readiness checks already done'),
                         loading: __('Loading')
                     },
-                    tools: [{
-                        id: 'launch',
-                        icon: 'play',
-                        title: __('Launch another readiness check'),
-                        label: __('Launch readiness check'),
-                        action: function() {
-                            notYet();
-                        }
-                    }, {
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the selected readiness check results'),
-                        label: __('Remove'),
-                        massAction: true,
-                        action: function(selection) {
-                            dialog({
-                                message: __('The selected readiness check results will be removed. Continue ?'),
-                                autoRender: true,
-                                autoDestroy: true,
-                                onOkBtn: function() {
-                                    remove(selection);
-                                }
-                            });
-                        }
-                    }],
-                    actions: [{
-                        id: 'remove',
-                        icon: 'remove',
-                        title: __('Remove the readiness check result?'),
-                        action: function(id) {
-                            dialog({
-                                autoRender: true,
-                                autoDestroy: true,
-                                message: __('The readiness check result will be removed. Continue ?'),
-                                onOkBtn: function() {
-                                    remove([id]);
-                                }
-                            });
-                        }
-                    }],
+                    tools: tools,
+                    actions: actions,
                     selectable: true,
-                    model: [{
-                        id: 'workstation',
-                        label: __('Workstation')
-                    }, {
-                        id: 'os',
-                        label: __('OS')
-                    }, {
-                        id: 'browser',
-                        label: __('Browser')
-                    }, {
-                        id: 'performance',
-                        label: __('Performance')
-                    }, {
-                        id: 'bandwidth',
-                        label: __('Bandwidth'),
-                        transform: function(value) {
-                            var bandwidth = value;
-
-                            if (value > 100) {
-                                bandwidth = '> 100';
-                            }
-
-                            return bandwidth + ' Mbs';
-                        }
-                    }, {
-                        id: 'date',
-                        label: __('Date')
-                    }]
+                    model: model
                 }, dataset);
         }
     };
