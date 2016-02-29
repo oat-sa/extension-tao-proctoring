@@ -106,6 +106,8 @@ define([
             var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
+            var exportDeliveryMonitoringUrl = helpers._url('export', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var exportTestCenterMonitoringUrl = helpers._url('export', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];
             var actions = [];
             var model = [];
@@ -267,6 +269,26 @@ define([
                     label: __('Manage'),
                     action: function() {
                         location.href = manageUrl;
+                    }
+                });
+
+                tools.push({
+                    id: 'export-monitoring',
+                    icon: 'export',
+                    title: __('Delivery monitoring exports'),
+                    label: __('Export'),
+                    action: function() {
+                        location.href = exportDeliveryMonitoringUrl;
+                    }
+                });
+            } else {
+                tools.push({
+                    id: 'export-monitoring',
+                    icon: 'export',
+                    title: __('Test Center monitoring exports'),
+                    label: __('Export'),
+                    action: function() {
+                        location.href = exportTestCenterMonitoringUrl;
                     }
                 });
             }
