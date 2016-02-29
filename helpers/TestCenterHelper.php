@@ -323,21 +323,26 @@ class TestCenterHelper
         $actions = [];
 
         $irregularityReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY');
-
         $pausesReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_PAUSE', 'pause');
-        $actions['pause'] = strval(count($pausesReports));
-
         $authorizeReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', 'resume');
-        $actions['resume'] = strval(count($authorizeReports));
-
         $terminateReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', 'terminate');
 
+        $actions['pause'] = strval(count($pausesReports));
+        $actions['resume'] = strval(count($authorizeReports));
         $actions['irregularities'] = array_merge($irregularityReports, $pausesReports, $authorizeReports, $terminateReports);
+        usort($actions['irregularities'], function ($a, $b) {
+            if ($a['timestamp'] == $b['timestamp']) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        });
+
         return $actions;
     }
 
     /**
-     * @param $var
+     * @param string $deliveryExecutionId
+     * @param string $event
      * @param string $type
      * @return array
      */
@@ -353,9 +358,9 @@ class TestCenterHelper
                 'comment' => isset($data['comment']) ? $data['comment'] : '',
                 'reasons' => isset($data['reasons']) ? $data['reasons'] : '',
             ];
-            }
-        return $result;
         }
+        return $result;
+    }
 
     /**
      * @return DeliveryLog
