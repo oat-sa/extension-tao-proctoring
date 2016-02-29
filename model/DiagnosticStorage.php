@@ -166,12 +166,7 @@ class DiagnosticStorage extends Sql implements PaginatedStorage
         }
 
         if (!is_null($size)) {
-            $query .= ' LIMIT ';
-            if (!is_null($offset)) {
-                $query .= $offset . ', ' . $size;
-            } else {
-                $query .= $size;
-            }
+            $query = $this->getPersistence()->getPlatForm()->limitStatement($query, $size, $offset);
         }
 
         return $this->getPersistence()->query($query, $params);
