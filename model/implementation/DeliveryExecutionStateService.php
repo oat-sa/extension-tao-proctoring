@@ -23,6 +23,8 @@ namespace oat\taoProctoring\model\implementation;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoQtiTest\models\TestSessionMetaData;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\oatbox\event\EventManager;
+use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
 /**
  * Class DeliveryExecutionStateService
@@ -168,27 +170,19 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
-            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-            if ($session) {
-                $testSessionMetaData = new TestSessionMetaData($session);
-                $testSessionMetaData->save(array(
-                    'SECTION' => array(
-                        'SECTION_EXIT_CODE' => TestSessionMetaData::SECTION_CODE_FORCE_QUIT
-                    ),
-                    'TEST' => array(
-                        'TEST_EXIT_CODE' => TestSessionMetaData::TEST_CODE_TERMINATED,
-                    ),
-                ));
-                $this->getTestSessionService()->setTestVariable($session, 'TEST_TERMINATE', $reason);
-                $this->getTestSessionService()->setTestVariable($session, 'TEST_EXIT_CODE', TestSessionMetaData::TEST_CODE_TERMINATED);
-
-                $session->endTestSession();
-                $this->getTestSessionService()->persist($session);
-            }
 
             $deliveryExecution->setState(DeliveryExecution::STATE_FINISHIED);
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_TERMINATED, $reason);
 
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $proctor = \common_session_SessionManager::getSession()->getUser();
+            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+
+            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            if ($session) {
+                $session->endTestSession();
+                $this->getTestSessionService()->persist($session);
+            }
             $result = true;
         }
 

@@ -21,8 +21,9 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
@@ -31,7 +32,8 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\TestSessionService;
+use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\PaginatedStorage;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -125,16 +127,109 @@ class TestCenterHelper
     }
 
     /**
+     * Gets the client diagnostic config
+     * @param core_kernel_classes_Resource $testCenter
+     * @return array
+     * @throws \common_ext_ExtensionException
+     */
+    public static function getDiagnosticConfig(core_kernel_classes_Resource $testCenter)
+    {
+        $config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag');
+
+        $config['extension'] = 'taoProctoring';
+        $config['controller'] = 'DiagnosticChecker';
+        $config['storeParams'] = ['testCenter' => $testCenter->getUri()];
+
+        return $config;
+    }
+
+    /**
+     * Gets the results for a particular id
+     * @param core_kernel_classes_Resource $testCenter
+     * @param $id
+     * @return mixed
+     * @throws \common_exception_NoImplementation
+     */
+    public static function getDiagnostic(core_kernel_classes_Resource $testCenter, $id)
+    {
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $diagnostic = $storageService->find($id);
+            if ($testCenter->getUri() == $diagnostic[DiagnosticStorage::DIAGNOSTIC_TEST_CENTER]) {
+                return $diagnostic;
+            }
+            return null;
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support reads!');
+        }
+    }
+
+    /**
      * Gets the list of readiness checks related to a test site
      *
-     * @param $testCenterId
+     * @param core_kernel_classes_Resource $testCenter
      * @param array [$options]
      * @return array
+     * @throws \common_exception_NoImplementation
      */
-    public static function getDiagnostics($testCenterId, $options = array())
+    public static function getDiagnostics(core_kernel_classes_Resource $testCenter, $options = array())
     {
-        $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-        return DataTableHelper::paginate($diagnostics, $options);
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $options[DataTableHelper::OPTION_FILTER] = [DiagnosticStorage::DIAGNOSTIC_TEST_CENTER => $testCenter->getUri()];
+            return DataTableHelper::paginate($storageService, $options, function($data) {
+                foreach($data as $idx => $row) {
+                    $rowData = [
+                        'id' => $row[DiagnosticStorage::DIAGNOSTIC_ID],
+                        'workstation' => $row[DiagnosticStorage::DIAGNOSTIC_WORKSTATION] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_IP] . ')',
+                        'os' => $row[DiagnosticStorage::DIAGNOSTIC_OS] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_OSVERSION] . ')',
+                        'browser' => $row[DiagnosticStorage::DIAGNOSTIC_BROWSER] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_BROWSERVERSION] . ')',
+                        'performance' => $row[DiagnosticStorage::DIAGNOSTIC_PERFORMANCE_AVERAGE],
+                        'bandwidth' => $row[DiagnosticStorage::DIAGNOSTIC_BANDWIDTH_MAX],
+                    ];
+
+                    if (isset($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT])) {
+                        $dt = new DateTime($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT]);
+                        $rowData['date'] = DateHelper::displayeDate($dt);
+                    }
+
+                    $data[$idx] = $rowData;
+                }
+                return $data;
+            });
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support reads!');
+        }
+    }
+
+    /**
+     * Gets the list of readiness checks related to a test site
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param $id
+     * @return bool
+     * @throws \common_exception_NoImplementation
+     */
+    public static function removeDiagnostic(core_kernel_classes_Resource $testCenter, $id)
+    {
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $ids = $id ? $id : [];
+            if (!is_array($ids)) {
+                $ids = [$ids];
+            }
+
+            $filter = [
+                DiagnosticStorage::DIAGNOSTIC_TEST_CENTER => $testCenter->getUri()
+            ];
+
+            foreach($ids as $id) {
+                $storageService->delete($id, $filter);
+            }
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support deletions!');
+        }
+        return true;
     }
 
     /**
@@ -226,7 +321,7 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+        $testSessionService = TestSessionService::singleton();
         $session = $testSessionService->getTestSession($deliveryExecution);
         
         $actions = array(

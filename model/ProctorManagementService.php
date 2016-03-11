@@ -116,16 +116,42 @@ class ProctorManagementService extends tao_models_classes_ClassService
     }
 
     /**
-     * Return all proctor assigned to test centers managed by an admin
+     * Return all proctor assigned to test centers managed by an admin (eventually in the list of test centers)
      * @param string $testCenterAdminUri
+     * @param array $testCenters
      * @return User[]
      */
-    public function getAssignedProctors($testCenterAdminUri){
+    public function getAssignedProctors($testCenterAdminUri, $testCenters = array())
+    {
+        $testCenterService = TestCenterService::singleton();
         $testCenterAdmin = new core_kernel_classes_Resource($testCenterAdminUri);
-        $testCenters = $testCenterAdmin->getPropertyValues(new core_kernel_classes_Property(self::PROPERTY_ADMINISTRATOR_URI));
+        $testCentersAdmin = $testCenterAdmin->getPropertyValues(new core_kernel_classes_Property(self::PROPERTY_ADMINISTRATOR_URI));
+
+        //get all sub test centers
+        foreach($testCentersAdmin as $testCenter){
+            $children = $testCenterService->getSubTestCenters($testCenter);
+            $testCentersAdmin = array_merge($testCentersAdmin, $children);
+        }
+
+        //get test centers in common between administrable test centers and test centers list
+        if(!empty($testCenters)){
+            //get parent testCenter
+            $allTestCenters = $testCenters;
+            foreach($testCenters as $testCenter){
+                $parents = $testCenterService->getRootClass()->searchInstances(
+                    array(
+                        TestCenterService::PROPERTY_CHILDREN_URI => $testCenter
+                    )
+                    ,['recursive' => true]
+                );
+                $parents = array_keys($parents);
+                $allTestCenters = array_merge($allTestCenters, $parents);
+            }
+            $testCentersAdmin = array_intersect($testCentersAdmin, $allTestCenters);
+        }
         $proctorClass = $this->getRootClass();
         $users = array();
-        foreach($testCenters as $testCenterUri){
+        foreach($testCentersAdmin as $testCenterUri){
             $assignedProctors = $proctorClass->searchInstances(array(
                 self::PROPERTY_ASSIGNED_PROCTOR_URI => $testCenterUri
             ), array(
