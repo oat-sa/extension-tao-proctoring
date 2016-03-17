@@ -44,6 +44,10 @@ class DeliveryExecutionTerminated implements Event
      */
     private $reason;
 
+    private $testExitCode;
+
+    private $sectionExitCode;
+
     /**
      * @return string
      */
@@ -53,17 +57,26 @@ class DeliveryExecutionTerminated implements Event
     }
 
     /**
-     * QtiMoveEvent constructor.
-     * @param string $context 'before' or 'after' move
-     * @param AssessmentTestSession $session
-     * @param null|RouteItem $from
-     * @param null|RouteItem $to
+     * DeliveryExecutionTerminated constructor.
+     * @param DeliveryExecution $deliveryExecution
+     * @param User $proctor
+     * @param null $reason
+     * @param null $testExitCode
+     * @param null $sectionExitCode
      */
-    public function __construct(DeliveryExecution $deliveryExecution, User $proctor, $reason = null)
+    public function __construct(
+        DeliveryExecution $deliveryExecution,
+        User $proctor,
+        $reason = null,
+        $testExitCode = null,
+        $sectionExitCode = null
+    )
     {
         $this->deliveryExecution = $deliveryExecution;
         $this->proctor = $proctor;
         $this->reason = $reason;
+        $this->testExitCode = $testExitCode;
+        $this->sectionExitCode = $sectionExitCode;
     }
 
     /**
@@ -94,6 +107,22 @@ class DeliveryExecutionTerminated implements Event
     public function getProctor()
     {
         return $this->proctor;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTestExitCode()
+    {
+        return $this->testExitCode;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getSectionExitCode()
+    {
+        return $this->sectionExitCode;
     }
 
 }

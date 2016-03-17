@@ -20,11 +20,15 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use DateInterval;
+use DateTime;
+use DateTimeImmutable;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoQtiTest\models\TestSessionMetaData;
+use oat\taoAct\model\testSession\TestSessionProcessor;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
+use oat\taoQtiTest\models\TestSessionMetaData;
 
 /**
  * Class DeliveryExecutionStateService
@@ -88,6 +92,32 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
+
+            if ($session = $this->getTestSessionService()->getTestSession($deliveryExecution)) {
+
+                $wasPausedAt = null;
+
+                $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
+                $vars = array_reverse($resultServer->getVariables($session->getSessionId()));
+                foreach ($vars as $arr) {
+                    $var = reset($arr)->variable;
+                    if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
+                        $trace = $trace = json_decode($var->trace, true);
+                        $wasPausedAt = (new DateTimeImmutable())->setTimestamp(\tao_helpers_Date::getTimeStamp($trace['timestamp']));
+                        break;
+                    }
+                }
+
+                if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
+                    $delay = $this->getOption('termination_delay_after_pause');
+                    if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
+                        $this->terminateExecution($deliveryExecution, null, ['test' => TestSessionProcessor::TEST_CODE_INCOMPLETE]);
+
+                        return false;
+                    }
+                }
+            }
+
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AWAITING);
 
             $result = true;
@@ -162,9 +192,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      *
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
+     * @param array $exitCodes
      * @return bool
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     * @throws \qtism\runtime\tests\AssessmentTestSessionException
      */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null, $exitCodes = [])
     {
         $executionState = $this->getState($deliveryExecution);
         $result = false;
@@ -176,7 +210,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+            $eventManager->trigger(new DeliveryExecutionTerminated(
+                $deliveryExecution,
+                $proctor,
+                $reason,
+                isset($exitCodes['test']) ? $exitCodes['test'] : null,
+                isset($exitCodes['section']) ? $exitCodes['section'] : null
+            ));
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
