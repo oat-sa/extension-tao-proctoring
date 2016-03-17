@@ -111,12 +111,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
                     $delay = $this->getOption('termination_delay_after_pause');
                     if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
-                        $metaDataHandler = new TestSessionMetaData($session);
-                        $data['SECTION']['SECTION_EXIT_CODE'] = TestSessionProcessor::SECTION_CODE_FORCE_QUIT;
-                        $data['TEST']['TEST_EXIT_CODE'] = TestSessionProcessor::TEST_CODE_INCOMPLETE;
-                        $metaDataHandler->save($data);
-
-                        //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_TERMINATED);
+                        $this->terminateExecution($deliveryExecution, null, ['test' => TestSessionProcessor::TEST_CODE_INCOMPLETE]);
 
                         return false;
                     }
@@ -197,9 +192,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      *
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
+     * @param array $exitCodes
      * @return bool
+     * @throws \common_Exception
+     * @throws \common_exception_Error
+     * @throws \qtism\runtime\tests\AssessmentTestSessionException
      */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null, $exitCodes = [])
     {
         $executionState = $this->getState($deliveryExecution);
         $result = false;
@@ -211,7 +210,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+            $eventManager->trigger(new DeliveryExecutionTerminated(
+                $deliveryExecution,
+                $proctor,
+                $reason,
+                isset($exitCodes['test']) ? $exitCodes['test'] : null,
+                isset($exitCodes['section']) ? $exitCodes['section'] : null
+            ));
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {

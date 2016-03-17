@@ -35,7 +35,6 @@ use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 
@@ -253,7 +252,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $deliveryExecutionStateService->setOption('termination_delay_after_pause', 'PT1H');
-            $deliveryExecutionStateService->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
             
             $this->setVersion('1.8.0');
         }
