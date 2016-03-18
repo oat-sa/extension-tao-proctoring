@@ -41,7 +41,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private $testSessionService;
 
     /**
-     * temporary variable until proper servicemanager integration
+     * temporary variable until proper service manager integration
      * @var ExtendedStateService
      */
     private $extendedStateService;
@@ -85,19 +85,27 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
         $executionState = $this->getState($deliveryExecution);
-        $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
+            if (TestSessionService::singleton()->isExpired($deliveryExecution)) {
+                $this->terminateExecution(
+                    $deliveryExecution,
+                    ["reasons" => "Paused delivery execution was expired", "comment" => ""]
+                );
+
+                return false;
+            }
+
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AWAITING);
 
-            $result = true;
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
-     * Sets a delivery execution in the inprogress state
+     * Sets a delivery execution in the in progress state
      *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
