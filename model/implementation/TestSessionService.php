@@ -117,7 +117,7 @@ class TestSessionService extends \tao_models_classes_Service
      */
     public function isExpired(DeliveryExecution $deliveryExecution)
     {                                                                    
-        if (!isset($this->cache[$deliveryExecution->getIdentifier()]) || !isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
+        if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
 
             $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
             if (!$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
