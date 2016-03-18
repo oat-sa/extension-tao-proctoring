@@ -312,7 +312,10 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     protected function isExpiredAfterPausing(DeliveryExecution $deliveryExecution)
     {
-        $lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')));
+        if (!$lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
+            return false;
+        }
+
         $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
 
         if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
