@@ -364,14 +364,6 @@ define([
                 id: 'irregularity',
                 icon: 'delivery-small',
                 title: __('Report irregularity'),
-                hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.report !== true;
-                    }
-                    return true;
-                },
                 action: report
             });
 

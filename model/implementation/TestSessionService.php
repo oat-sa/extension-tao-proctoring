@@ -24,7 +24,6 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
-use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**
@@ -108,22 +107,6 @@ class TestSessionService extends \tao_models_classes_Service
     }
 
     /**
-     * Sets a test variable with name automatic suffix
-     * @param AssessmentTestSession $session
-     * @param string $name
-     * @param mixe $value
-     */
-    public function setTestVariable(AssessmentTestSession $session, $name, $value)
-    {
-        $testSessionMetaData = new TestSessionMetaData($session);
-        $testSessionMetaData->save(array(
-            'TEST' => array(
-                $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
-            )
-        ));
-    }
-
-    /**
      * @param AssessmentTestSession $session
      */
     public function persist(AssessmentTestSession $session)
@@ -133,33 +116,4 @@ class TestSessionService extends \tao_models_classes_Service
         $storage->persist($session);
     }
 
-    /**
-     * Build a variable name based on the current position inside the test
-     * @param AssessmentTestSession $session
-     * @param string $name
-     * @return string
-     */
-    private function nameTestVariable(AssessmentTestSession $session, $name)
-    {
-        $varName = array($name);
-        if ($session) {
-            $varName[] = $session->getCurrentAssessmentItemRef();
-            $varName[] = $session->getCurrentAssessmentItemRefOccurence();
-            $varName[] = time();
-        }
-        return implode('.', $varName);
-    }
-
-    /**
-     * Encodes a test variable
-     * @param mixed $value
-     * @return string
-     */
-    private function encodeTestVariable($value)
-    {
-        return json_encode(array(
-            'timestamp' => microtime(),
-            'details' => $value
-        ));
-    }
 }

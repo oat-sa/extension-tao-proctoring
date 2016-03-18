@@ -76,7 +76,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is completed'),
                 pause : __('is completed'),
                 terminate : __('is completed'),
-                report : __('is completed')
+                report : true
             }
         },
         terminated : {
@@ -86,7 +86,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is terminated'),
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
-                report : __('is terminated')
+                report : true
             }
         }
     };
