@@ -249,7 +249,9 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.7.0');
         }
 
-        if ($this->isVersion('1.7.0')) {
+        $this->skip('1.7.0', '1.7.1');
+        
+        if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $deliveryExecutionStateService->setOption('termination_delay_after_pause', 'PT1H');
