@@ -20,13 +20,11 @@
 
 namespace oat\taoProctoring\model\implementation;
 
-use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
+use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
 /**
  * Class DeliveryExecutionStateService
@@ -89,11 +87,10 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
-            if ($this->isExpiredAfterPausing($deliveryExecution)) {
+            if (TestSessionService::singleton()->isExpired($deliveryExecution)) {
                 $this->terminateExecution(
                     $deliveryExecution,
-                    ["reasons" => "Paused delivery execution was expired", "comment" => ""],
-                    "oat\\taoProctoring\\model\\event\\DeliveryExecutionExpired"
+                    ["reasons" => "Paused delivery execution was expired", "comment" => ""]
                 );
 
                 return false;
@@ -169,10 +166,9 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      *
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
-     * @param string $eventClass
      * @return bool
      */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null, $eventClass = "oat\\taoProctoring\\model\\event\\DeliveryExecutionTerminated")
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $this->getState($deliveryExecution);
         $result = false;
@@ -184,7 +180,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
-            $eventManager->trigger(new $eventClass($deliveryExecution, $proctor, $reason));
+            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
@@ -302,30 +298,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         }
 
         return $proctoringState;
-    }
-
-    /**
-     * Checks if delivery execution was expired after pausing
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return bool
-     */
-    protected function isExpiredAfterPausing(DeliveryExecution $deliveryExecution)
-    {
-        if (!$lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
-            return false;
-        }
-
-        $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
-
-        if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
-            $delay = $this->getOption('termination_delay_after_pause');
-            if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

@@ -20,9 +20,12 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use DateInterval;
+use DateTimeImmutable;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -104,6 +107,41 @@ class TestSessionService extends \tao_models_classes_Service
         $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
         return $inputParameters;
+    }
+
+    /**
+     * Checks if delivery execution was expired after pausing
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isExpired(DeliveryExecution $deliveryExecution)
+    {                                                                    
+        if (!isset($this->cache[$deliveryExecution->getIdentifier()]) || !isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
+
+            $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+            if (!$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
+                $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
+
+                return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+            }
+
+            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+            if ($wasPausedAt && $deliveryExecutionStateService->hasOption('termination_delay_after_pause')) {
+                $delay = $deliveryExecutionStateService->getOption('termination_delay_after_pause');
+                if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
+                    $this->cache[$deliveryExecution->getIdentifier()]['expired'] = true;
+
+                    return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+                }
+            }
+
+            $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
+        }
+
+        return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
     }
 
     /**
