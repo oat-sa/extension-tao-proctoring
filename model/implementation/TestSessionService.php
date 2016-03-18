@@ -49,7 +49,7 @@ class TestSessionService extends \tao_models_classes_Service
      */
     public function getTestSession(DeliveryExecution $deliveryExecution)
     {
-        if (!isset($this->cache[$deliveryExecution->getIdentifier()])) {
+        if (!isset($this->cache[$deliveryExecution->getIdentifier()]['session'])) {
             $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
             $compiledDelivery = $deliveryExecution->getDelivery();
