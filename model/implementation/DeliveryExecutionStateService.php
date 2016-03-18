@@ -89,7 +89,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
-            if ($this->isExpired($deliveryExecution)) {
+            if ($this->isExpiredAfterPausing($deliveryExecution)) {
                 $this->terminateExecution(
                     $deliveryExecution,
                     ["reasons" => "Paused delivery execution was expired", "comment" => ""],
@@ -102,26 +102,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AWAITING);
 
             return true;
-        }
-
-        return false;
-    }
-    
-    protected function isExpired(DeliveryExecution $deliveryExecution)
-    {
-        if (!$session = $this->getTestSessionService()->getTestSession($deliveryExecution)) {
-            return false;
-        }
-
-        $lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(),
-            'TEST_PAUSE')));
-        $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
-
-        if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
-            $delay = $this->getOption('termination_delay_after_pause');
-            if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
-                return true;
-            }
         }
 
         return false;
@@ -322,6 +302,32 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         }
 
         return $proctoringState;
+    }
+
+    /**
+     * Checks if delivery execution was expired after pausing
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    protected function isExpiredAfterPausing(DeliveryExecution $deliveryExecution)
+    {
+        if (!$session = $this->getTestSessionService()->getTestSession($deliveryExecution)) {
+            return false;
+        }
+
+        $lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(),
+            'TEST_PAUSE')));
+        $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+
+        if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
+            $delay = $this->getOption('termination_delay_after_pause');
+            if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
