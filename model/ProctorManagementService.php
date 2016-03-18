@@ -142,6 +142,7 @@ class ProctorManagementService extends tao_models_classes_ClassService
                     array(
                         TestCenterService::PROPERTY_CHILDREN_URI => $testCenter
                     )
+                    ,['recursive' => true]
                 );
                 $parents = array_keys($parents);
                 $allTestCenters = array_merge($allTestCenters, $parents);

@@ -270,6 +270,9 @@ class TestCenterHelper
                     if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
                         continue;
                     }
+                    if(!$finishTime && $periodStart && $periodEnd && ( DateHelper::getTimeStamp($startTime) > $periodEnd ||  DateHelper::getTimeStamp($startTime) < $periodStart )) {
+                        continue;
+                    }
                     if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
                         continue;
                     }
