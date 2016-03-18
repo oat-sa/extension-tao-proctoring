@@ -20,11 +20,13 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use DateInterval;
+use DateTime;
+use DateTimeImmutable;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
-use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
 /**
  * Class DeliveryExecutionStateService
@@ -41,7 +43,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private $testSessionService;
 
     /**
-     * temporary variable until proper servicemanager integration
+     * temporary variable until proper service manager integration
      * @var ExtendedStateService
      */
     private $extendedStateService;
@@ -85,19 +87,44 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
         $executionState = $this->getState($deliveryExecution);
-        $result = false;
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
+            if ($this->isExpired($deliveryExecution)) {
+                $this->terminateExecution($deliveryExecution, null, "oat\\taoProctoring\\model\\event\\DeliveryExecutionExpired");
+
+                return false;
+            }
+
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AWAITING);
 
-            $result = true;
+            return true;
         }
 
-        return $result;
+        return false;
+    }
+    
+    protected function isExpired(DeliveryExecution $deliveryExecution)
+    {
+        if (!$session = $this->getTestSessionService()->getTestSession($deliveryExecution)) {
+            return false;
+        }
+
+        $lastPauseEvent = current(array_reverse($this->getDeliveryLogService()->get($deliveryExecution->getIdentifier(),
+            'TEST_PAUSE')));
+        $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+
+        if ($wasPausedAt && $this->hasOption('termination_delay_after_pause')) {
+            $delay = $this->getOption('termination_delay_after_pause');
+            if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTime())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Sets a delivery execution in the inprogress state
+     * Sets a delivery execution in the in progress state
      *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
@@ -158,9 +185,10 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      *
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
+     * @param string $eventClass
      * @return bool
      */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null, $eventClass = "oat\\taoProctoring\\model\\event\\DeliveryExecutionTerminated")
     {
         $executionState = $this->getState($deliveryExecution);
         $result = false;
@@ -172,7 +200,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+            $eventManager->trigger(new $eventClass($deliveryExecution, $proctor, $reason));
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
