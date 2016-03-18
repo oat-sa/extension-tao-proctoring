@@ -145,7 +145,8 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
         if (self::STATE_AWAITING == $executionState) {
             $logData = [
-                'proctorUri' => \common_session_SessionManager::getSession()->getUser()->getIdentifier()
+                'proctorUri' => \common_session_SessionManager::getSession()->getUser()->getIdentifier(),
+                'timestamp' => microtime(true),
             ];
             if (!empty($reason) && is_array($reason)) {
                 $logData = array_merge($logData, $reason);
@@ -153,6 +154,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             if ($testCenter !== null) {
                 $logData['test_center'] = $testCenter;
             }
+            $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AUTHORIZED, $reason);
             $result = true;
@@ -184,10 +186,15 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
+                $data = [
+                    'reason' => $reason,
+                    'timestamp' => microtime(true),
+                    'itemId' => $this->getCurrentItemId($deliveryExecution),
+                ];
+                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $data);
                 $session->endTestSession();
                 $this->getTestSessionService()->persist($session);
             }
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $reason);
             $result = true;
         }
 
@@ -209,12 +216,16 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
+                $data = [
+                    'reason' => $reason,
+                    'timestamp' => microtime(true),
+                    'itemId' => $this->getCurrentItemId($deliveryExecution),
+                ];
+                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
-
             $this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_PAUSED, $reason);
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $reason);
             $result = true;
         }
 
@@ -232,8 +243,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     public function reportExecution(DeliveryExecution $deliveryExecution, $reason)
     {
         $deliveryLog = $this->getDeliveryLogService();
-        return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $reason);
-        }
+        $data = [
+            'reason' => $reason,
+            'timestamp' => microtime(true),
+            'itemId' => $this->getCurrentItemId($deliveryExecution),
+        ];
+        return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
+    }
 
     /**
      * @return \oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService
@@ -336,5 +352,23 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $this->extendedStateService = new ExtendedStateService();
         }
         return $this->extendedStateService;
+    }
+
+    /**
+     * Get identifier of current item.
+     * @param DeliveryExecution $deliveryExecution
+     * @return null|string
+     */
+    public function getCurrentItemId(DeliveryExecution $deliveryExecution)
+    {
+        $result = null;
+        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($session) {
+            $item = $session->getCurrentAssessmentItemRef();
+            if ($item) {
+                $result = $item->getIdentifier();
+            }
+        }
+        return $result;
     }
 }
