@@ -90,7 +90,11 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
         if (self::STATE_TERMINATED != $executionState && self::STATE_COMPLETED != $executionState) {
             if ($this->isExpired($deliveryExecution)) {
-                $this->terminateExecution($deliveryExecution, null, "oat\\taoProctoring\\model\\event\\DeliveryExecutionExpired");
+                $this->terminateExecution(
+                    $deliveryExecution,
+                    ["reasons" => "Paused delivery execution was expired", "comment" => ""],
+                    "oat\\taoProctoring\\model\\event\\DeliveryExecutionExpired"
+                );
 
                 return false;
             }
