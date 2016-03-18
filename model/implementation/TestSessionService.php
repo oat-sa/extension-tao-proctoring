@@ -20,11 +20,13 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use DateInterval;
+use DateTimeImmutable;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
-use oat\taoQtiTest\models\TestSessionMetaData;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**
@@ -47,7 +49,7 @@ class TestSessionService extends \tao_models_classes_Service
      */
     public function getTestSession(DeliveryExecution $deliveryExecution)
     {
-        if (!isset($this->cache[$deliveryExecution->getIdentifier()])) {
+        if (!isset($this->cache[$deliveryExecution->getIdentifier()]['session'])) {
             $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
 
             $compiledDelivery = $deliveryExecution->getDelivery();
@@ -108,19 +110,38 @@ class TestSessionService extends \tao_models_classes_Service
     }
 
     /**
-     * Sets a test variable with name automatic suffix
-     * @param AssessmentTestSession $session
-     * @param string $name
-     * @param mixe $value
+     * Checks if delivery execution was expired after pausing
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
      */
-    public function setTestVariable(AssessmentTestSession $session, $name, $value)
-    {
-        $testSessionMetaData = new TestSessionMetaData($session);
-        $testSessionMetaData->save(array(
-            'TEST' => array(
-                $this->nameTestVariable($session, $name) => $this->encodeTestVariable($value)
-            )
-        ));
+    public function isExpired(DeliveryExecution $deliveryExecution)
+    {                                                                    
+        if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
+
+            $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+            if (!$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
+                $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
+
+                return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+            }
+
+            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+            if ($wasPausedAt && $deliveryExecutionStateService->hasOption('termination_delay_after_pause')) {
+                $delay = $deliveryExecutionStateService->getOption('termination_delay_after_pause');
+                if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
+                    $this->cache[$deliveryExecution->getIdentifier()]['expired'] = true;
+
+                    return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+                }
+            }
+
+            $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
+        }
+
+        return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
     }
 
     /**
@@ -133,33 +154,4 @@ class TestSessionService extends \tao_models_classes_Service
         $storage->persist($session);
     }
 
-    /**
-     * Build a variable name based on the current position inside the test
-     * @param AssessmentTestSession $session
-     * @param string $name
-     * @return string
-     */
-    private function nameTestVariable(AssessmentTestSession $session, $name)
-    {
-        $varName = array($name);
-        if ($session) {
-            $varName[] = $session->getCurrentAssessmentItemRef();
-            $varName[] = $session->getCurrentAssessmentItemRefOccurence();
-            $varName[] = time();
-        }
-        return implode('.', $varName);
-    }
-
-    /**
-     * Encodes a test variable
-     * @param mixed $value
-     * @return string
-     */
-    private function encodeTestVariable($value)
-    {
-        return json_encode(array(
-            'timestamp' => microtime(),
-            'details' => $value
-        ));
-    }
 }
