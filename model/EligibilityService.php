@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 use core_kernel_classes_Resource as Resource;
 use core_kernel_classes_Class;
 use core_kernel_classes_Property as Property;
+use oat\taoProctoring\model\implementation\DeliveryService;
 use tao_models_classes_ClassService;
 
 /**
@@ -101,7 +102,13 @@ class EligibilityService extends tao_models_classes_ClassService
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
         }
-        return $eligibility->delete();
+        $deletion = $eligibility->delete();
+        if($deletion){
+            //unassign all test taker for this delivery in this test center
+            $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+            $deliveryService->removeAvailability($delivery->getUri(), $testCenter->getUri());
+        }
+        return $deletion;
     }
     
     /**
