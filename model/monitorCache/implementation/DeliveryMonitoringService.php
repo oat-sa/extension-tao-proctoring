@@ -176,7 +176,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
+            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
             $whereClause . PHP_EOL .
             "ORDER BY " . $options['order'];
 
@@ -190,7 +190,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if ($together) {
             foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row['id']));
+                $row = array_merge($row, $this->getKvData($row[self::COLUMN_DELIVERY_EXECUTION_ID]));
             }
         }
 
@@ -240,9 +240,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
         if ($result) {
-            $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
-
-            $data[self::COLUMN_ID] = $id;
             $deliveryMonitoring->set($data);
             $this->saveKvData($deliveryMonitoring);
         }
@@ -290,7 +287,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if (!$isNewRecord) {
             $this->deleteKvData($deliveryMonitoring);
-            $id = $data[self::COLUMN_ID];
+            $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
@@ -334,7 +331,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if (!$isNewRecord) {
             $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
                     WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data['id']]);
+            $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
             $result = true;
         }
 

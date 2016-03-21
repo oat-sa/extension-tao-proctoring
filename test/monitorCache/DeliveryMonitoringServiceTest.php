@@ -95,9 +95,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue($this->service->save($dataModel));
         $this->assertEmpty($dataModel->getErrors());
-        //id of new record has been specified
-        $this->assertNotEmpty($dataModel->get()['id']);
-
 
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
@@ -109,7 +106,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertEquals($insertedData[0][$key], $val);
         }
 
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0]['id']);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
 
         $this->assertNotEmpty($insertedKvData);
         $this->assertEquals(count($insertedKvData), count($secondaryData));
@@ -135,7 +132,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue($this->service->save($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0]['id']);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
             //key has been removed

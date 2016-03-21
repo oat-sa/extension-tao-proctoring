@@ -261,6 +261,11 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.8.0', '1.8.1');
+
+        if ($this->isVersion('1.8.1')) {
+            include(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'alterDeliveryMonitoringTables.php');
+            $this->setVersion('1.8.2');
+        }
     }
 
 }
