@@ -25,17 +25,15 @@ use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringServic
 
 $persistence = common_persistence_Manager::getPersistence('default');
 
+
+// Drop foreign key
 /** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
 $schemaManager = $persistence->getDriver()->getSchemaManager();
 $schema = $schemaManager->createSchema();
 $fromSchema = clone $schema;
-
 try {
     $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-
-    $tableData->removeForeignKey(
-        DeliveryMonitoringService::KV_FK_PARENT
-    );
+    $tableData->removeForeignKey(DeliveryMonitoringService::KV_FK_PARENT);
 } catch(SchemaException $e) {
     common_Logger::i('Database Schema already up to date.');
 }
@@ -44,19 +42,35 @@ foreach ($queries as $query) {
     $persistence->exec($query);
 }
 
+//change parent_id column type
+$schemaManager = $persistence->getDriver()->getSchemaManager();
+$schema = $schemaManager->createSchema();
+$fromSchema = clone $schema;
+try {
+    $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
+    $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
+} catch(SchemaException $e) {
+    common_Logger::i('Database Schema already up to date.');
+}
+$queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+foreach ($queries as $query) {
+    $persistence->exec($query);
+}
+
+//update parent_id column values
 $persistence->exec("UPDATE kv_delivery_monitoring SET parent_id=(
 SELECT delivery_monitoring.delivery_execution_id FROM delivery_monitoring
   WHERE delivery_monitoring.id = CAST(kv_delivery_monitoring.parent_id AS INTEGER)
 )");
 
+
+//add foreign key.
 $schemaManager = $persistence->getDriver()->getSchemaManager();
 $schema = $schemaManager->createSchema();
 $fromSchema = clone $schema;
 try {
     $tableLog = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
     $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-
-    $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
 
     $tableData->addForeignKeyConstraint(
         $tableLog,
