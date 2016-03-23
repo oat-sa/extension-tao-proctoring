@@ -24,16 +24,21 @@ namespace oat\taoProctoring\scripts\update;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\oatbox\service\ServiceManager;
 
 class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
 {
+    protected $persistence;
+
     public function __invoke($params)
     {
-        $persistence = \common_persistence_Manager::getPersistence('default');
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+
+        $this->persistence = \common_persistence_Manager::getPersistence($service->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE));
 
         // Drop foreign key
         /** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
-        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schemaManager = $this->persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
         try {
@@ -42,13 +47,13 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
-        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
         foreach ($queries as $query) {
-            $persistence->exec($query);
+            $this->persistence->exec($query);
         }
 
         //change parent_id column type
-        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schemaManager = $this->persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
         try {
@@ -57,16 +62,16 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
-        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
         foreach ($queries as $query) {
-            $persistence->exec($query);
+            $this->persistence->exec($query);
         }
 
         //update parent_id column values
         $this->updateLinks();
 
         //add foreign key.
-        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schemaManager = $this->persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
         try {
@@ -87,9 +92,9 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
-        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
         foreach ($queries as $query) {
-            $persistence->exec($query);
+            $this->persistence->exec($query);
         }
 
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Tables successfully altered'));
@@ -97,12 +102,11 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
 
     protected function updateLinks()
     {
-        $persistence = \common_persistence_Manager::getPersistence('default');
-        $stmt = $persistence->query('SELECT * FROM delivery_monitoring');
+        $stmt = $this->persistence->query('SELECT * FROM delivery_monitoring');
         $parentRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($parentRows as $parentRow) {
-            $persistence->exec("UPDATE kv_delivery_monitoring SET parent_id='{$parentRow['delivery_execution_id']}'
+            $this->persistence->exec("UPDATE kv_delivery_monitoring SET parent_id='{$parentRow['delivery_execution_id']}'
               WHERE parent_id={$parentRow['id']}
             ");
         }
