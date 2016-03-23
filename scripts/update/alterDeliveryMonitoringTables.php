@@ -63,13 +63,7 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         }
 
         //update parent_id column values
-        $intType = $persistence->getDriver() instanceof \common_persistence_sql_pdo_pgsql_Driver ?
-            'INTEGER' : 'UNSIGNED';
-
-        $persistence->exec("UPDATE kv_delivery_monitoring SET parent_id=(
-        SELECT delivery_monitoring.delivery_execution_id FROM delivery_monitoring
-          WHERE delivery_monitoring.id = CAST(kv_delivery_monitoring.parent_id AS {$intType})
-        )");
+        $this->updateLinks();
 
         //add foreign key.
         $schemaManager = $persistence->getDriver()->getSchemaManager();
@@ -99,5 +93,18 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         }
 
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Tables successfully altered'));
+    }
+
+    protected function updateLinks()
+    {
+        $persistence = \common_persistence_Manager::getPersistence('default');
+        $stmt = $persistence->query('SELECT * FROM delivery_monitoring');
+        $parentRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($parentRows as $parentRow) {
+            $persistence->exec("UPDATE kv_delivery_monitoring SET parent_id='{$parentRow['delivery_execution_id']}'
+              WHERE parent_id={$parentRow['id']}
+            ");
+        }
     }
 }
