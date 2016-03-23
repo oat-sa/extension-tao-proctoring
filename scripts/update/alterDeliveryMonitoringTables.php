@@ -19,74 +19,85 @@
  *
  */
 
+namespace oat\taoProctoring\scripts\update;
+
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Types\Type;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 
-$persistence = common_persistence_Manager::getPersistence('default');
+class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
+{
+    public function __invoke($params)
+    {
+        $persistence = \common_persistence_Manager::getPersistence('default');
 
+        // Drop foreign key
+        /** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
+        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schema = $schemaManager->createSchema();
+        $fromSchema = clone $schema;
+        try {
+            $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
+            $tableData->removeForeignKey(DeliveryMonitoringService::KV_FK_PARENT);
+        } catch(SchemaException $e) {
+            \common_Logger::i('Database Schema already up to date.');
+        }
+        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        foreach ($queries as $query) {
+            $persistence->exec($query);
+        }
 
-// Drop foreign key
-/** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
-$schemaManager = $persistence->getDriver()->getSchemaManager();
-$schema = $schemaManager->createSchema();
-$fromSchema = clone $schema;
-try {
-    $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-    $tableData->removeForeignKey(DeliveryMonitoringService::KV_FK_PARENT);
-} catch(SchemaException $e) {
-    common_Logger::i('Database Schema already up to date.');
-}
-$queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
-foreach ($queries as $query) {
-    $persistence->exec($query);
-}
+        //change parent_id column type
+        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schema = $schemaManager->createSchema();
+        $fromSchema = clone $schema;
+        try {
+            $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
+            $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
+        } catch(SchemaException $e) {
+            \common_Logger::i('Database Schema already up to date.');
+        }
+        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        foreach ($queries as $query) {
+            $persistence->exec($query);
+        }
 
-//change parent_id column type
-$schemaManager = $persistence->getDriver()->getSchemaManager();
-$schema = $schemaManager->createSchema();
-$fromSchema = clone $schema;
-try {
-    $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-    $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
-} catch(SchemaException $e) {
-    common_Logger::i('Database Schema already up to date.');
-}
-$queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
-foreach ($queries as $query) {
-    $persistence->exec($query);
-}
+        //update parent_id column values
+        $intType = $persistence->getDriver() instanceof \common_persistence_sql_pdo_pgsql_Driver ?
+            'INTEGER' : 'UNSIGNED';
 
-//update parent_id column values
-$persistence->exec("UPDATE kv_delivery_monitoring SET parent_id=(
-SELECT delivery_monitoring.delivery_execution_id FROM delivery_monitoring
-  WHERE delivery_monitoring.id = CAST(kv_delivery_monitoring.parent_id AS INTEGER)
-)");
+        $persistence->exec("UPDATE kv_delivery_monitoring SET parent_id=(
+        SELECT delivery_monitoring.delivery_execution_id FROM delivery_monitoring
+          WHERE delivery_monitoring.id = CAST(kv_delivery_monitoring.parent_id AS {$intType})
+        )");
 
+        //add foreign key.
+        $schemaManager = $persistence->getDriver()->getSchemaManager();
+        $schema = $schemaManager->createSchema();
+        $fromSchema = clone $schema;
+        try {
+            $tableLog = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
+            $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
 
-//add foreign key.
-$schemaManager = $persistence->getDriver()->getSchemaManager();
-$schema = $schemaManager->createSchema();
-$fromSchema = clone $schema;
-try {
-    $tableLog = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
-    $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
+            $tableData->addForeignKeyConstraint(
+                $tableLog,
+                array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID),
+                array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
+                array(
+                    'onDelete' => 'CASCADE',
+                    'onUpdate' => 'CASCADE',
+                ),
+                DeliveryMonitoringService::KV_FK_PARENT
+            );
 
-    $tableData->addForeignKeyConstraint(
-        $tableLog,
-        array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID),
-        array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
-        array(
-            'onDelete' => 'CASCADE',
-            'onUpdate' => 'CASCADE',
-        ),
-        DeliveryMonitoringService::KV_FK_PARENT
-    );
+        } catch(SchemaException $e) {
+            \common_Logger::i('Database Schema already up to date.');
+        }
+        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+        foreach ($queries as $query) {
+            $persistence->exec($query);
+        }
 
-} catch(SchemaException $e) {
-    common_Logger::i('Database Schema already up to date.');
-}
-$queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
-foreach ($queries as $query) {
-    $persistence->exec($query);
+        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Tables successfully altered'));
+    }
 }
