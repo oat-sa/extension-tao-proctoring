@@ -83,7 +83,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     /**
      * @var array
      */
-    private $primaryTableColumns;
+    protected $primaryTableColumns;
 
     /**
      * @param string $deliveryExecutionId
@@ -176,7 +176,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
             $whereClause . PHP_EOL .
             "ORDER BY " . $options['order'];
 
@@ -190,7 +190,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if ($together) {
             foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row[self::COLUMN_DELIVERY_EXECUTION_ID]));
+                $row = array_merge($row, $this->getKvData($row['id']));
             }
         }
 
@@ -231,7 +231,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
      */
-    private function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
 
@@ -240,6 +240,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
         if ($result) {
+            $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
+
+            $data[self::COLUMN_ID] = $id;
             $deliveryMonitoring->set($data);
             $this->saveKvData($deliveryMonitoring);
         }
@@ -252,7 +255,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
      */
-    private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $setClause = '';
         $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
@@ -280,14 +283,14 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * Delete all related records from secondary table
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      */
-    private function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
             $this->deleteKvData($deliveryMonitoring);
-            $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+            $id = $data[self::COLUMN_ID];
             $kvTableData = $this->extractKvData($data);
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
@@ -322,7 +325,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
-    private function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         $data = $deliveryMonitoring->get();
@@ -331,7 +334,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if (!$isNewRecord) {
             $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
                     WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
+            $this->getPersistence()->exec($sql, [$data['id']]);
             $result = true;
         }
 
@@ -341,7 +344,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     /**
      * @return \common_persistence_SqlPersistence
      */
-    private function getPersistence()
+    protected function getPersistence()
     {
         return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
     }
@@ -350,7 +353,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * Get list of table column names
      * @return array
      */
-    private function getPrimaryColumns()
+    protected function getPrimaryColumns()
     {
         if ($this->primaryTableColumns === null) {
             $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
@@ -364,7 +367,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param array $data
      * @return array
      */
-    private function extractPrimaryData(array $data)
+    protected function extractPrimaryData(array $data)
     {
         $result = [];
         $primaryTableCols = $this->getPrimaryColumns();
@@ -380,7 +383,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param array $data
      * @return array
      */
-    private function extractKvData(array $data)
+    protected function extractKvData(array $data)
     {
         $result = [];
         $primaryTableCols = $this->getPrimaryColumns();
@@ -397,7 +400,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param integer $id
      * @return array
      */
-    private function getKvData($id)
+    protected function getKvData($id)
     {
         $result = [];
         $sql = 'SELECT * FROM ' . self::KV_TABLE_NAME . '
@@ -417,7 +420,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param $selectClause
      * @return string
      */
-    private function prepareCondition($condition, &$parameters, &$selectClause)
+    protected function prepareCondition($condition, &$parameters, &$selectClause)
     {
         $whereClause = '';
 
@@ -470,7 +473,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
-    private function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
         $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
@@ -479,9 +482,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             $exists = true;
         } else {
             $sql = "SELECT EXISTS( " . PHP_EOL .
-                    "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-                    "FROM " . self::TABLE_NAME . PHP_EOL .
-                    "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+                "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+                "FROM " . self::TABLE_NAME . PHP_EOL .
+                "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
             $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
         }
 

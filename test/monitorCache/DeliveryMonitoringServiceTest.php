@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\test\monitorCache;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 
 /**
@@ -45,7 +45,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     public function setUp()
     {
         TaoPhpUnitTestRunner::initTest();
-        $this->service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
+
+        $this->service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $this->persistence = \common_persistence_Manager::getPersistence('default');
     }
 
@@ -68,6 +69,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     public function testSave()
     {
+        $service = $this->service;
         $data = [
             DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_id',
             DeliveryMonitoringService::COLUMN_STATUS => 'active',
@@ -106,7 +108,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertEquals($insertedData[0][$key], $val);
         }
 
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][$service::COLUMN_ID]);
 
         $this->assertNotEmpty($insertedKvData);
         $this->assertEquals(count($insertedKvData), count($secondaryData));
@@ -132,7 +134,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue($this->service->save($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_ID]);
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
             //key has been removed
@@ -277,16 +279,18 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     private function getRecordByDeliveryExecutionId($id)
     {
-        $sql = 'SELECT * FROM ' . DeliveryMonitoringService::TABLE_NAME .
-            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '=?';
+        $service = $this->service;
+        $sql = 'SELECT * FROM ' . $service::TABLE_NAME .
+            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . '=?';
 
         return $this->persistence->query($sql, [$id])->fetchAll();
     }
 
     private function getKvRecordsByParentId($parentId)
     {
-        $sql = 'SELECT * FROM ' . DeliveryMonitoringService::KV_TABLE_NAME .
-            ' WHERE ' . DeliveryMonitoringService::KV_COLUMN_PARENT_ID . '=?';
+        $service = $this->service;
+        $sql = 'SELECT * FROM ' . $service::KV_TABLE_NAME .
+            ' WHERE ' . $service::KV_COLUMN_PARENT_ID . '=?';
 
         return $this->persistence->query($sql, [$parentId])->fetchAll();
     }

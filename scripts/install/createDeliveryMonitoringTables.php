@@ -31,7 +31,6 @@ $fromSchema = clone $schema;
 try {
     $tableLog = $schema->createTable(DeliveryMonitoringService::TABLE_NAME);
     $tableLog->addOption('engine', 'InnoDB');
-    //$tableLog->addColumn(DeliveryMonitoringService::COLUMN_ID, "integer", array("autoincrement" => true));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_STATUS, "string", array("notnull" => true, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
@@ -61,7 +60,6 @@ try {
 
     $tableData = $schema->createTable(DeliveryMonitoringService::KV_TABLE_NAME);
     $tableData->addOption('engine', 'InnoDB');
-    $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_ID, "integer", array("autoincrement" => true));
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_VALUE, "text", array("notnull" => false));
