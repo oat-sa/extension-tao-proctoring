@@ -64,6 +64,8 @@ try {
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_VALUE, "text", array("notnull" => false));
 
+    $tableData->setPrimaryKey(array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, DeliveryMonitoringService::KV_COLUMN_KEY));
+
     $tableData->addForeignKeyConstraint(
         $tableLog,
         array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID),
