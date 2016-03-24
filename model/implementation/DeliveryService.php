@@ -285,6 +285,19 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Remove the group that link test takers to the delivery in a test center
+     * @param string $deliveryId
+     * @param string $testCenterId
+     * @return bool whatever the group has been removed or not
+     */
+    public function removeAvailability($deliveryId, $testCenterId)
+    {
+        // remove group for this delivery and this test center
+        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
+        return $deliveryGroup->delete(true);
+    }
+
+    /**
      * Returns a group assigned to the delivery
      *
      * @param string $deliveryId
