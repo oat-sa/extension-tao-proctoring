@@ -1,8 +1,8 @@
 <?php
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 /**
  * Default monitoring cache service
  */
-return new DeliveryMonitoringService(array(
-    DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'
+return new MonitorCacheService(array(
+    MonitorCacheService::OPTION_PERSISTENCE => 'default'
 ));

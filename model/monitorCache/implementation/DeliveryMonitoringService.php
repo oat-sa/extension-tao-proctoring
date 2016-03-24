@@ -64,7 +64,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     const TABLE_NAME = 'delivery_monitoring';
 
-    const COLUMN_ID = DeliveryMonitoringServiceInterface::ID;
+    const COLUMN_ID = 'id';
     const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
     const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
     const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
@@ -83,7 +83,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     /**
      * @var array
      */
-    private $primaryTableColumns;
+    protected $primaryTableColumns;
 
     /**
      * @param string $deliveryExecutionId
@@ -231,7 +231,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
      */
-    private function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
 
@@ -255,7 +255,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
      */
-    private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $setClause = '';
         $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
@@ -283,7 +283,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * Delete all related records from secondary table
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      */
-    private function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
@@ -325,7 +325,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
-    private function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         $data = $deliveryMonitoring->get();
@@ -344,7 +344,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     /**
      * @return \common_persistence_SqlPersistence
      */
-    private function getPersistence()
+    protected function getPersistence()
     {
         return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
     }
@@ -353,7 +353,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * Get list of table column names
      * @return array
      */
-    private function getPrimaryColumns()
+    protected function getPrimaryColumns()
     {
         if ($this->primaryTableColumns === null) {
             $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
@@ -367,7 +367,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param array $data
      * @return array
      */
-    private function extractPrimaryData(array $data)
+    protected function extractPrimaryData(array $data)
     {
         $result = [];
         $primaryTableCols = $this->getPrimaryColumns();
@@ -383,7 +383,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param array $data
      * @return array
      */
-    private function extractKvData(array $data)
+    protected function extractKvData(array $data)
     {
         $result = [];
         $primaryTableCols = $this->getPrimaryColumns();
@@ -400,7 +400,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param integer $id
      * @return array
      */
-    private function getKvData($id)
+    protected function getKvData($id)
     {
         $result = [];
         $sql = 'SELECT * FROM ' . self::KV_TABLE_NAME . '
@@ -420,7 +420,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param $selectClause
      * @return string
      */
-    private function prepareCondition($condition, &$parameters, &$selectClause)
+    protected function prepareCondition($condition, &$parameters, &$selectClause)
     {
         $whereClause = '';
 
@@ -473,7 +473,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
-    private function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    protected function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
         $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
@@ -482,9 +482,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             $exists = true;
         } else {
             $sql = "SELECT EXISTS( " . PHP_EOL .
-                    "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-                    "FROM " . self::TABLE_NAME . PHP_EOL .
-                    "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+                "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+                "FROM " . self::TABLE_NAME . PHP_EOL .
+                "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
             $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
         }
 

@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\test\monitorCache;
 
+use oat\oatbox\service\ServiceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
@@ -59,7 +60,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testConstruct()
     {
         $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
-        $service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
 
         $columns = [
             DeliveryMonitoringService::COLUMN_TEST_TAKER => 'http://sample/first.rdf#superUser',
