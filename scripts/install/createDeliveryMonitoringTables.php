@@ -39,7 +39,7 @@ try {
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_START_TIME, "integer", array("notnull" => false));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_END_TIME, "integer", array("notnull" => false));
 
-    $tableLog->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_ID));
+    $tableLog->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID));
 
     $tableLog->addIndex(
         array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
@@ -64,7 +64,7 @@ try {
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
     $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_VALUE, "text", array("notnull" => false));
 
-    $tableData->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_ID));
+    $tableData->setPrimaryKey(array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, DeliveryMonitoringService::KV_COLUMN_KEY));
 
     $tableData->addForeignKeyConstraint(
         $tableLog,

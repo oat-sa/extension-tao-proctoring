@@ -134,7 +134,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $this->assertTrue($this->service->save($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_ID]);
+        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID]);
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
             //key has been removed

@@ -64,7 +64,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     const TABLE_NAME = 'delivery_monitoring';
 
-    const COLUMN_ID = DeliveryMonitoringServiceInterface::ID;
     const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
     const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
     const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
