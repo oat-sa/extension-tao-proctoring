@@ -89,6 +89,9 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
                 DeliveryMonitoringService::KV_FK_PARENT
             );
 
+            $tableLog->dropColumn('id');
+            $tableData->dropColumn('id');
+
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
@@ -106,9 +109,9 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         $parentRows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($parentRows as $parentRow) {
-            $this->persistence->exec("UPDATE kv_delivery_monitoring SET parent_id='{$parentRow['delivery_execution_id']}'
-              WHERE parent_id={$parentRow['id']}
-            ");
+            $this->persistence->exec("UPDATE kv_delivery_monitoring SET parent_id=?
+              WHERE parent_id=?
+            ", [$parentRow['delivery_execution_id'], $parentRow['id']]);
         }
     }
 }
