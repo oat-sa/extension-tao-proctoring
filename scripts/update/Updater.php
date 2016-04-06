@@ -38,6 +38,7 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
+use oat\taoProctoring\model\ProctoringAssignmentService;
 
 /**
  * 
@@ -261,6 +262,14 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.8.0', '1.9.0');
+
+        if ($this->isVersion('1.9.0')) {
+            $assignmentService = new ProctoringAssignmentService();
+            $assignmentService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(ProctoringAssignmentService::CONFIG_ID, $assignmentService);
+
+            $this->setVersion('1.9.1');
+        }
     }
 
 }

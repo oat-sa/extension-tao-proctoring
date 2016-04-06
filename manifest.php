@@ -24,7 +24,7 @@ return array(
 	'label' => 'Proctoring',
 	'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '1.9.0',
+    'version' => '1.9.1',
 	'author' => 'Open Assessment Technologies SA',
 	'requires' => array(
         'tao' => '>=2.19.0',
@@ -54,7 +54,8 @@ return array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
             'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
             'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
-			'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings'
+			'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
+			'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',
