@@ -23,6 +23,8 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoProctoring\model\DiagnosticStorage;
+use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -265,6 +267,26 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('1.8.0', '1.9.0');
 
         if ($this->isVersion('1.9.0')) {
+            $persistence = $this->getServiceManager()->get(PaginatedStorage::SERVICE_ID)->getPersistence();
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+
+            /** @var \Doctrine\DBAL\Schema\Table $tableResults */
+            $tableResults = $schema->getTable(DiagnosticStorage::DIAGNOSTIC_TABLE);
+
+            $tableResults->changeColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER, ['notnull' => false]);
+            $tableResults->changeColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION, ['notnull' => false]);
+
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
+            $this->setVersion('1.9.1');
+        }
+
+        if ($this->isVersion('1.9.1')) {
             $assignmentService = new ProctoringAssignmentService();
             $assignmentService->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(ProctoringAssignmentService::CONFIG_ID, $assignmentService);
@@ -277,7 +299,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $deliveryServerService->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
 
-            $this->setVersion('1.9.1');
+            $this->setVersion('1.9.2');
         }
     }
 

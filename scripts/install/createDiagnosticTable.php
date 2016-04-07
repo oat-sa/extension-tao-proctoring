@@ -35,13 +35,13 @@ class createDiagnosticTable extends \common_ext_action_InstallAction
                 $tableResults->changeColumn(DiagnosticStorage::DIAGNOSTIC_ID, ['type' => Type::getType('string'), 'length' => 32]);
             }
             if (!$tableResults->hasColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER)) {
-                $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER, 'string', ['length' => 255]);
+                $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER, 'string', ['length' => 255, 'notnull' => false]);
             }
             if (!$tableResults->hasColumn(DiagnosticStorage::DIAGNOSTIC_LOGIN)) {
                 $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_LOGIN, 'string', ['length' => 32]);
             }
             if (!$tableResults->hasColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION)) {
-                $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION, 'string', ['length' => 64]);
+                $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION, 'string', ['length' => 64, 'notnull' => false]);
             }
             if (!$tableResults->hasColumn(DiagnosticStorage::DIAGNOSTIC_IP)) {
                 $tableResults->addColumn(DiagnosticStorage::DIAGNOSTIC_IP, 'string', ['length' => 32]);
