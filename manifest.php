@@ -56,6 +56,7 @@ return array(
             'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
 			'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
 			'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
+			'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',

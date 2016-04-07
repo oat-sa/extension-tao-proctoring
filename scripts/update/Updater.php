@@ -39,6 +39,7 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\model\ProctoringAssignmentService;
+use oat\taoProctoring\model\DeliveryServerService;
 
 /**
  * 
@@ -267,6 +268,14 @@ class Updater extends common_ext_ExtensionUpdater {
             $assignmentService = new ProctoringAssignmentService();
             $assignmentService->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(ProctoringAssignmentService::CONFIG_ID, $assignmentService);
+
+            $deliveryExt = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $deliveryServerConfig = $deliveryExt->getConfig('deliveryServer');
+            $deliveryServerOptions = $deliveryServerConfig->getOptions();
+
+            $deliveryServerService = new DeliveryServerService($deliveryServerOptions);
+            $deliveryServerService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
 
             $this->setVersion('1.9.1');
         }

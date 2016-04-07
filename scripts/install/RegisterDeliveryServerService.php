@@ -21,15 +21,15 @@
 
 namespace oat\taoProctoring\scripts\install;
 
-use oat\taoProctoring\model\ProctoringAssignmentService;
+use oat\taoProctoring\model\DeliveryServerService;
 use oat\oatbox\service\ServiceManager;
 
 /**
- * Class RegisterAssignmentService
+ * Class RegisterDeliveryServerService
  * @package oat\taoProctoring\scripts\install
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class RegisterAssignmentService extends \common_ext_action_InstallAction
+class RegisterDeliveryServerService extends \common_ext_action_InstallAction
 {
     /**
      * @param $params
@@ -38,9 +38,13 @@ class RegisterAssignmentService extends \common_ext_action_InstallAction
     {
         $serviceManager = ServiceManager::getServiceManager();
 
-        $assignmentService = new ProctoringAssignmentService();
-        $assignmentService->setServiceManager($serviceManager);
-        $serviceManager->register(ProctoringAssignmentService::CONFIG_ID, $assignmentService);
+        $deliveryExt = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+        $deliveryServerConfig = $deliveryExt->getConfig('deliveryServer');
+        $deliveryServerOptions = $deliveryServerConfig->getOptions();
+
+        $deliveryServerService = new DeliveryServerService($deliveryServerOptions);
+        $deliveryServerService->setServiceManager($serviceManager);
+        $serviceManager->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
     }
 }
 

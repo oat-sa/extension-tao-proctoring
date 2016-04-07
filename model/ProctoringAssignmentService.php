@@ -48,6 +48,15 @@ class ProctoringAssignmentService extends GroupAssignment
         return array_unique($deliveryUris);
     }
 
+    public function isDeliveryExecutionAllowed($deliveryIdentifier, User $user)
+    {
+        $delivery = new \core_kernel_classes_Resource($deliveryIdentifier);
+        return $this->verifyUserAssigned($delivery, $user)
+        && $this->verifyTime($delivery)
+        && $this->verifyToken($delivery, $user)
+        && $this->isEligible($delivery, $user);
+    }
+
     /**
      * @param \core_kernel_classes_Resource $delivery
      * @param User $user
@@ -55,22 +64,7 @@ class ProctoringAssignmentService extends GroupAssignment
      */
     protected function isEligible(\core_kernel_classes_Resource $delivery, User $user)
     {
-        $result = false;
-        $class = new \core_kernel_classes_Class(EligibilityService::CLASS_URI);
-        $eligibilities = $class->searchInstances([
-            EligibilityService::PROPERTY_TESTTAKER_URI => $user->getIdentifier(),
-            EligibilityService::PROPERTY_DELIVERY_URI => $delivery->getUri(),
-        ]);
-
-        foreach ($eligibilities as $eligibility) {
-            /* @var \core_kernel_classes_Resource $eligibility*/
-            $testCenter = $eligibility->getOnePropertyValue(new \core_kernel_classes_Property(EligibilityService::PROPERTY_TESTCENTER_URI));
-            if ($testCenter instanceof \core_kernel_classes_Resource && $testCenter->exists()) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
+        $eligibilityService = EligibilityService::singleton();
+        return $eligibilityService->isDeliveryEligible($delivery, $user);
     }
 }
