@@ -37,12 +37,6 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
@@ -83,7 +77,6 @@ define([
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('deliveries', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
-            var pollTo = null;
             
             function format(boxes){
                 
@@ -115,19 +108,8 @@ define([
 
             // update the index from a JSON array
             function update(boxes) {
-                
-                if (pollTo) {
-                    clearTimeout(pollTo);
-                    pollTo = null;
-                }
-
                 list.update(format(boxes));
                 loadingBar.stop();
-
-                // poll the server at regular interval to refresh the index
-                if (refreshPolling) {
-                    pollTo = setTimeout(refresh, refreshPolling);
-                }
             }
 
             // refresh the index
