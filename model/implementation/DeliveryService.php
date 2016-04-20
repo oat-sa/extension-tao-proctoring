@@ -128,17 +128,13 @@ class DeliveryService extends ConfigurableService
             $userIds[] = $user->getUri();
         }
 
-        foreach ($deliveryExecutions as $key => $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (in_array($deliveryExecution->getUserIdentifier(), $userIds)) {
-                $key = DateHelper::getTimeStamp($deliveryExecution->getStartTime()) . $key;
-                $returnedDeliveryExecutions[$key] = $deliveryExecution;
+                $returnedDeliveryExecutions[] = $deliveryExecution;
             }
         }
 
-        // use the key as sort criteria to avoid to call multiple times getStartTime()
-        // getStartTime is not cached, so it request the DB on each call
-        ksort($returnedDeliveryExecutions);
-        return array_values($returnedDeliveryExecutions);
+        return $returnedDeliveryExecutions;
     }
 
     /**
