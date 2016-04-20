@@ -98,6 +98,8 @@ class DeliveryService extends ConfigurableService
     }
 
     /**
+     * Compare two deliveryExecution by their start timestamp.
+     * CAUTION: getStartTime() is not cached at this moment, so it request the DB on each call
      * @param DeliveryExecution $a
      * @param DeliveryExecution $b
      * @return int
@@ -119,21 +121,24 @@ class DeliveryService extends ConfigurableService
         $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
         $returnedDeliveryExecutions = array();
 
-        foreach($deliveryExecutions as $deliveryExecution){
-            $group = $this->findGroup($deliveryId, $testCenterId);
-            $userId = $deliveryExecution->getUserIdentifier();
-            $userIds = array();
-            foreach (GroupsService::singleton()->getUsers($group) as $user) {
-                $userIds[] = $user->getUri();
-            }
-
-            if(in_array($userId, $userIds)){
-                $returnedDeliveryExecutions[] = $deliveryExecution;
-            }
-
+        $group = $this->findGroup($deliveryId, $testCenterId);
+        $users = GroupsService::singleton()->getUsers($group);
+        $userIds = array();
+        foreach ($users as $user) {
+            $userIds[] = $user->getUri();
         }
-        usort($returnedDeliveryExecutions, array($this, 'cmpDeliveryExecution'));
-        return $returnedDeliveryExecutions;
+
+        foreach ($deliveryExecutions as $key => $deliveryExecution) {
+            if (in_array($deliveryExecution->getUserIdentifier(), $userIds)) {
+                $key = DateHelper::getTimeStamp($deliveryExecution->getStartTime()) . $key;
+                $returnedDeliveryExecutions[$key] = $deliveryExecution;
+            }
+        }
+
+        // use the key as sort criteria to avoid to call multiple times getStartTime()
+        // getStartTime is not cached, so it request the DB on each call
+        ksort($returnedDeliveryExecutions);
+        return array_values($returnedDeliveryExecutions);
     }
 
     /**
@@ -232,23 +237,20 @@ class DeliveryService extends ConfigurableService
             $availableIn[$testCenter->getUri()] = true;
         }
 
-        $testCenters = array();
-        foreach ($testCenterService->getTestCentersByProctor($proctor) as $testCenter) {
-            if (array_key_exists($testCenter->getUri(), $availableIn)) {
-                $testCenters[] = $testCenter;
-            }
-        }
-
         // get testtakers from those centers that are not excluded
         $users = array();
-        foreach ($testCenters as $testCenter) {
-            foreach ($testCenterService->getTestTakers($testCenter->getUri()) as $userResource) {
-                $uri = $userResource->getUri();
-                if (!array_key_exists($uri, $excludeIds) && !array_key_exists($uri, $users)) {
-                    $users[$uri] = new \core_kernel_users_GenerisUser($userResource);
+        foreach ($testCenterService->getTestCentersByProctor($proctor) as $testCenter) {
+            $testCenterUri = $testCenter->getUri();
+            if (array_key_exists($testCenterUri, $availableIn)) {
+                foreach ($testCenterService->getTestTakers($testCenterUri) as $userResource) {
+                    $uri = $userResource->getUri();
+                    if (!array_key_exists($uri, $excludeIds) && !array_key_exists($uri, $users)) {
+                        $users[$uri] = new \core_kernel_users_GenerisUser($userResource);
+                    }
                 }
             }
         }
+
         return array_values($users);
     }
 
