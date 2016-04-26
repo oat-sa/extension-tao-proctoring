@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -60,15 +61,19 @@ class TestSessionService extends \tao_models_classes_Service
 
             $sessionManager = new \taoQtiTest_helpers_SessionManager($resultServer, $testResource);
 
+            $userId = $deliveryExecution->getUserIdentifier();
             $qtiStorage = new \taoQtiTest_helpers_TestSessionStorage(
                 $sessionManager,
-                new BinaryAssessmentTestSeeker($testDefinition), $deliveryExecution->getUserIdentifier()
+                new BinaryAssessmentTestSeeker($testDefinition), $userId
             );
 
             $sessionId = $deliveryExecution->getIdentifier();
 
             if ($qtiStorage->exists($sessionId)) {
                 $session = $qtiStorage->retrieve($testDefinition, $sessionId);
+                if ($session instanceof UserUriAware) {
+                    $session->setUserUri($userId);
+                }
 
                 $resultServerUri = $compiledDelivery->getOnePropertyValue(new \core_kernel_classes_Property(TAO_DELIVERY_RESULTSERVER_PROP));
                 $resultServerObject = new \taoResultServer_models_classes_ResultServer($resultServerUri, array());

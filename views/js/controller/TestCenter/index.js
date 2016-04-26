@@ -30,12 +30,6 @@ define([
     'use strict';
 
     /**
-     * The polling delay used to refresh the list
-     * @type {Number}
-     */
-    var refreshPolling = 60 * 1000; // once per minute
-
-    /**
      * The CSS scope
      * @type {String}
      */
@@ -69,22 +63,11 @@ define([
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
             var adminUrl = helpers._url('index', 'ProctorManager', 'taoProctoring');
-            var pollTo = null;
-            
+
             // update the index from a JSON array
             var update = function(boxes) {
-                if (pollTo) {
-                    clearTimeout(pollTo);
-                    pollTo = null;
-                }
-
                 list.update(boxes);
                 loadingBar.stop();
-
-                // poll the server at regular interval to refresh the index
-                if (refreshPolling) {
-                    pollTo = setTimeout(refresh, refreshPolling);
-                }
             };
 
             // refresh the index
