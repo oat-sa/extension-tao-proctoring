@@ -80,6 +80,7 @@ class EligibilityService extends tao_models_classes_ClassService
         $eligibles = $this->getRootClass()->searchInstances(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter
         ), array('recursive' => false, 'like' => false));
+        
         $deliveries = array();
         foreach ($eligibles as $eligible) {
             $delivery = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
@@ -87,6 +88,11 @@ class EligibilityService extends tao_models_classes_ClassService
                 $deliveries[] = $delivery;
             }
         }
+        
+        usort($deliveries, function($a, $b) {
+            return strcmp($a->getLabel(), $b->getLabel());
+        });
+        
         return $deliveries;
     }
     
