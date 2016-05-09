@@ -122,8 +122,13 @@ class DeliveryHelper
             $all['stats']['paused'] += $paused;
         }
 
+        usort($entries, function($a, $b) {
+            return strcmp($a['label'], $b['label']);
+        });
+
         //prepend the all delivery element to the begining of the array
         array_unshift($entries, $all);
+
         return $entries;
     }
 
