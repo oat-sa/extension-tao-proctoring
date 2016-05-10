@@ -23,6 +23,10 @@ namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoProctoring\model\DiagnosticStorage;
+use oat\taoProctoring\model\PaginatedStorage;
+use oat\taoProctoring\scripts\install\addDiagnosticSettings;
+use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -34,6 +38,10 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
+use oat\taoProctoring\model\ProctoringAssignmentService;
+use oat\taoProctoring\model\DeliveryServerService;
 
 /**
  * 
@@ -213,6 +221,87 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('1.4.0', '1.4.1');
 
         $this->skip('1.4.1', '1.5.0');
+
+        if ($this->isVersion('1.5.0')) {
+            try {
+                $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $action = new RegisterProctoringLog();
+                $action->setServiceLocator($this->getServiceManager());
+                $action->__invoke(array('default'));
+            }
+            $this->setVersion('1.6.0');
+        }
+
+        if ($this->isVersion('1.6.0')) {
+
+            $settingsScript = new addDiagnosticSettings();
+            $settingsScript([]);
+
+            $sqlScript = new createDiagnosticTable();
+            $sqlScript([]);
+
+            //Grant access to the overridden controller
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
+
+            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
+
+            $this->setVersion('1.7.0');
+        }
+
+        $this->skip('1.7.0', '1.7.1');
+        
+        if ($this->isVersion('1.7.1')) {
+
+            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService->setOption('termination_delay_after_pause', 'PT1H');
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
+
+            $this->setVersion('1.8.0');
+        }
+
+        $this->skip('1.8.0', '1.9.0');
+
+        if ($this->isVersion('1.9.0')) {
+            $persistence = $this->getServiceManager()->get(PaginatedStorage::SERVICE_ID)->getPersistence();
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+
+            /** @var \Doctrine\DBAL\Schema\Table $tableResults */
+            $tableResults = $schema->getTable(DiagnosticStorage::DIAGNOSTIC_TABLE);
+
+            $tableResults->changeColumn(DiagnosticStorage::DIAGNOSTIC_TEST_CENTER, ['notnull' => false]);
+            $tableResults->changeColumn(DiagnosticStorage::DIAGNOSTIC_WORKSTATION, ['notnull' => false]);
+
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
+            $this->setVersion('1.9.1');
+        }
+
+        if ($this->isVersion('1.9.1')) {
+            $assignmentService = new ProctoringAssignmentService();
+            $assignmentService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(ProctoringAssignmentService::CONFIG_ID, $assignmentService);
+
+            $deliveryExt = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $deliveryServerConfig = $deliveryExt->getConfig('deliveryServer');
+            $deliveryServerOptions = $deliveryServerConfig->getOptions();
+
+            $deliveryServerService = new DeliveryServerService($deliveryServerOptions);
+            $deliveryServerService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
+
+            $this->setVersion('1.9.2');
+        }
+        $this->skip('1.9.2','1.11.0');
     }
 
 }

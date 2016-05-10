@@ -23,7 +23,9 @@ namespace oat\taoProctoring\model;
 use core_kernel_classes_Resource as Resource;
 use core_kernel_classes_Class;
 use core_kernel_classes_Property as Property;
+use oat\taoProctoring\model\implementation\DeliveryService;
 use tao_models_classes_ClassService;
+use oat\oatbox\user\User;
 
 /**
  * Service to manage eligible deliveries
@@ -78,6 +80,7 @@ class EligibilityService extends tao_models_classes_ClassService
         $eligibles = $this->getRootClass()->searchInstances(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter
         ), array('recursive' => false, 'like' => false));
+        
         $deliveries = array();
         foreach ($eligibles as $eligible) {
             $delivery = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
@@ -85,6 +88,11 @@ class EligibilityService extends tao_models_classes_ClassService
                 $deliveries[] = $delivery;
             }
         }
+        
+        usort($deliveries, function($a, $b) {
+            return strcmp($a->getLabel(), $b->getLabel());
+        });
+        
         return $deliveries;
     }
     
@@ -101,7 +109,13 @@ class EligibilityService extends tao_models_classes_ClassService
         if (is_null($eligibility)) {
             throw new IneligibileException('Delivery '.$delivery->getUri().' ineligible to test center '.$testCenter->getUri());
         }
-        return $eligibility->delete();
+        $deletion = $eligibility->delete();
+        if($deletion){
+            //unassign all test taker for this delivery in this test center
+            $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+            $deliveryService->removeAvailability($delivery->getUri(), $testCenter->getUri());
+        }
+        return $deletion;
     }
     
     /**
@@ -160,5 +174,31 @@ class EligibilityService extends tao_models_classes_ClassService
         }
         return reset($eligibles);
     }
-    
+
+    /**
+     * @param \core_kernel_classes_Resource $delivery
+     * @param User $user
+     * @return bool
+     */
+    public function isDeliveryEligible(\core_kernel_classes_Resource $delivery, User $user)
+    {
+        $result = false;
+        $class = new \core_kernel_classes_Class(EligibilityService::CLASS_URI);
+        $eligibilities = $class->searchInstances([
+            EligibilityService::PROPERTY_TESTTAKER_URI => $user->getIdentifier(),
+            EligibilityService::PROPERTY_DELIVERY_URI => $delivery->getUri(),
+        ]);
+
+        foreach ($eligibilities as $eligibility) {
+            /* @var \core_kernel_classes_Resource $eligibility*/
+            $testCenter = $eligibility->getOnePropertyValue(new \core_kernel_classes_Property(EligibilityService::PROPERTY_TESTCENTER_URI));
+            if ($testCenter instanceof \core_kernel_classes_Resource && $testCenter->exists()) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
 }

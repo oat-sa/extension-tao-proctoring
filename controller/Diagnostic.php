@@ -47,7 +47,8 @@ class Diagnostic extends ProctoringModule
             'diagnostic-index',
             array(
                 'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions)
+                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
+                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -63,4 +64,67 @@ class Diagnostic extends ProctoringModule
         );
     }
 
+    /**
+     * Display the diagnostic runner
+     */
+    public function diagnostic()
+    {
+        $testCenter = $this->getCurrentTestCenter();
+
+        $this->setData('title', __('Readiness Check for test site %s', $testCenter->getLabel()));
+        $this->composeView(
+            'diagnostic-runner',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
+            ),
+            array(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::diagnostics(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::deliveries($testCenter),
+                        BreadcrumbsHelper::reporting($testCenter)
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Gets the list of diagnostic results
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function diagnosticData()
+    {
+        try {
+
+            $testCenter = $this->getCurrentTestCenter();
+            $requestOptions = $this->getRequestOptions();
+            $this->returnJson(TestCenterHelper::getDiagnostics($testCenter, $requestOptions));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No diagnostic service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+
+    /**
+     * Removes diagnostic results
+     *
+     * @throws \common_Exception
+     */
+    public function remove()
+    {
+        $testCenter = $this->getCurrentTestCenter();
+
+        $id = $this->getRequestParameter('id');
+
+        $this->returnJson([
+            'success' => TestCenterHelper::removeDiagnostic($testCenter, $id)
+        ]);
+    }
 }

@@ -33,7 +33,6 @@ interface DeliveryMonitoringService
 {
     const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
 
-    const ID = 'id';
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
     const STATUS = 'status';
     const CURRENT_ASSESSMENT_ITEM = 'current_assessment_item';

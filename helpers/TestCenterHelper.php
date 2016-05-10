@@ -21,7 +21,9 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
@@ -32,6 +34,8 @@ use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\PaginatedStorage;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -125,16 +129,109 @@ class TestCenterHelper
     }
 
     /**
+     * Gets the client diagnostic config
+     * @param core_kernel_classes_Resource $testCenter
+     * @return array
+     * @throws \common_ext_ExtensionException
+     */
+    public static function getDiagnosticConfig(core_kernel_classes_Resource $testCenter)
+    {
+        $config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoClientDiagnostic')->getConfig('clientDiag');
+
+        $config['extension'] = 'taoProctoring';
+        $config['controller'] = 'DiagnosticChecker';
+        $config['storeParams'] = ['testCenter' => $testCenter->getUri()];
+
+        return $config;
+    }
+
+    /**
+     * Gets the results for a particular id
+     * @param core_kernel_classes_Resource $testCenter
+     * @param $id
+     * @return mixed
+     * @throws \common_exception_NoImplementation
+     */
+    public static function getDiagnostic(core_kernel_classes_Resource $testCenter, $id)
+    {
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $diagnostic = $storageService->find($id);
+            if ($testCenter->getUri() == $diagnostic[DiagnosticStorage::DIAGNOSTIC_TEST_CENTER]) {
+                return $diagnostic;
+            }
+            return null;
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support reads!');
+        }
+    }
+
+    /**
      * Gets the list of readiness checks related to a test site
      *
-     * @param $testCenterId
+     * @param core_kernel_classes_Resource $testCenter
      * @param array [$options]
      * @return array
+     * @throws \common_exception_NoImplementation
      */
-    public static function getDiagnostics($testCenterId, $options = array())
+    public static function getDiagnostics(core_kernel_classes_Resource $testCenter, $options = array())
     {
-        $diagnostics = WebServiceMock::loadJSON(dirname(__FILE__) . '/../mock/data/diagnostics.json');
-        return DataTableHelper::paginate($diagnostics, $options);
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $options[DataTableHelper::OPTION_FILTER] = [DiagnosticStorage::DIAGNOSTIC_TEST_CENTER => $testCenter->getUri()];
+            return DataTableHelper::paginate($storageService, $options, function($data) {
+                foreach($data as $idx => $row) {
+                    $rowData = [
+                        'id' => $row[DiagnosticStorage::DIAGNOSTIC_ID],
+                        'workstation' => $row[DiagnosticStorage::DIAGNOSTIC_WORKSTATION] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_IP] . ')',
+                        'os' => $row[DiagnosticStorage::DIAGNOSTIC_OS] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_OSVERSION] . ')',
+                        'browser' => $row[DiagnosticStorage::DIAGNOSTIC_BROWSER] . ' (' . $row[DiagnosticStorage::DIAGNOSTIC_BROWSERVERSION] . ')',
+                        'performance' => $row[DiagnosticStorage::DIAGNOSTIC_PERFORMANCE_AVERAGE],
+                        'bandwidth' => $row[DiagnosticStorage::DIAGNOSTIC_BANDWIDTH_MAX],
+                    ];
+
+                    if (isset($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT])) {
+                        $dt = new DateTime($row[DiagnosticStorage::DIAGNOSTIC_CREATED_AT]);
+                        $rowData['date'] = DateHelper::displayeDate($dt);
+                    }
+
+                    $data[$idx] = $rowData;
+                }
+                return $data;
+            });
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support reads!');
+        }
+    }
+
+    /**
+     * Gets the list of readiness checks related to a test site
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param $id
+     * @return bool
+     * @throws \common_exception_NoImplementation
+     */
+    public static function removeDiagnostic(core_kernel_classes_Resource $testCenter, $id)
+    {
+        $storageService = ServiceManager::getServiceManager()->get(Storage::SERVICE_ID);
+        if ($storageService instanceof PaginatedStorage) {
+            $ids = $id ? $id : [];
+            if (!is_array($ids)) {
+                $ids = [$ids];
+            }
+
+            $filter = [
+                DiagnosticStorage::DIAGNOSTIC_TEST_CENTER => $testCenter->getUri()
+            ];
+
+            foreach($ids as $id) {
+                $storageService->delete($id, $filter);
+            }
+        } else {
+            throw new \common_exception_NoImplementation('The storage service provided to store the diagnostic results must be upgraded to support deletions!');
+        }
+        return true;
     }
 
     /**
@@ -173,6 +270,9 @@ class TestCenterHelper
                     if ($finishTime && $periodStart && $periodStart > DateHelper::getTimeStamp($finishTime)) {
                         continue;
                     }
+                    if(!$finishTime && $periodStart && $periodEnd && ( DateHelper::getTimeStamp($startTime) > $periodEnd ||  DateHelper::getTimeStamp($startTime) < $periodStart )) {
+                        continue;
+                    }
                     if ($startTime && $periodEnd && $periodEnd < DateHelper::getTimeStamp($startTime)) {
                         continue;
                     }
@@ -195,11 +295,8 @@ class TestCenterHelper
                 $userId = $deliveryExecution->getUserIdentifier();
                 $user = UserHelper::getUser($userId);
 
-                $state = $deliveryExecutionStateService->getProctoringState($deliveryExecution->getUri());
-                $proctor = null;
-                if (!empty($state['authorized_by'])) {
-                    $proctor = UserHelper::getUser($state['authorized_by']);
-                }
+                $authorizationData = self::getDeliveryLog()->get($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE');
+                $proctor = empty($authorizationData) ? '' : UserHelper::getUser($authorizationData[0][DeliveryLog::DATA]['proctorUri']);
 
                 $procActions = self::getProctorActions($deliveryExecution);
                 $reports[] = array(
@@ -226,60 +323,53 @@ class TestCenterHelper
      */
     protected static function getProctorActions($deliveryExecution)
     {
-        $testSessionService = TestSessionService::singleton();
-        $session = $testSessionService->getTestSession($deliveryExecution);
-        
-        $actions = array(
-            'pause' => 0,
-            'resume' => 0,
-            'irregularities' => array()
-        );
+        $actions = [];
 
-        if (!is_null($session)) {
-            $resultServer = \taoResultServer_models_classes_ResultServerStateFull::singleton();
-            $vars = $resultServer->getVariables($session->getSessionId());
-            
-            foreach ($vars as $arr) {
-                $var = reset($arr)->variable;
-                if (substr($var->identifier, 0, strlen('TEST_PAUSE')) == 'TEST_PAUSE') {
-                    $actions['pause']++;
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'pause');
-                } elseif (substr($var->identifier, 0, strlen('TEST_AUTHORISE')) == 'TEST_AUTHORISE') {
-                    $actions['resume']++;
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'resume');
-                } elseif (substr($var->identifier, 0, strlen('TEST_TERMINATE')) == 'TEST_TERMINATE') {
-                    $actions['irregularities'][] = self::getProctorIrregularity($var, 'terminate');
-                } elseif (substr($var->identifier, 0, strlen('TEST_IRREGULARITY')) == 'TEST_IRREGULARITY') {
-                    $actions['irregularities'][] = self::getProctorIrregularity($var);
-                }
-                
+        $irregularityReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY');
+        $pausesReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_PAUSE', 'pause');
+        $authorizeReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', 'resume');
+        $terminateReports = self::getActions($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', 'terminate');
+
+        $actions['pause'] = strval(count($pausesReports));
+        $actions['resume'] = strval(count($authorizeReports));
+        $actions['irregularities'] = array_merge($irregularityReports, $pausesReports, $authorizeReports, $terminateReports);
+        usort($actions['irregularities'], function ($a, $b) {
+            if ($a['timestamp'] == $b['timestamp']) {
+                return 0;
             }
-        }
+            return ($a < $b) ? -1 : 1;
+        });
+
         return $actions;
     }
 
     /**
-     * @param $var
+     * @param string $deliveryExecutionId
+     * @param string $event
      * @param string $type
      * @return array
      */
-    protected static function getProctorIrregularity($var, $type = 'irregularity')
+    protected static function getActions($deliveryExecutionId, $event, $type = 'irregularity')
     {
-        $trace = json_decode($var->trace, true);
-        $data = array(
-            'timestamp' => DateHelper::displayeDate($trace['timestamp']),
-            'type' => $type
-        );
-
-        if (isset($trace['details'])) {
-            if (!empty($trace['details']['reasons'])) {
-                $data = array_merge($data, $trace['details']['reasons']);
-            }
-            if (!empty($trace['details']['comment'])) {
-                $data['comment'] = $trace['details']['comment'];
-            }
+        $irregularities = self::getDeliveryLog()->get($deliveryExecutionId, $event);
+        $result = [];
+        foreach($irregularities as $irregularityReport) {
+            $data = $irregularityReport[DeliveryLog::DATA];
+            $result[] = [
+                'timestamp' => $irregularityReport[DeliveryLog::CREATED_AT],
+                'type' => $type,
+                'comment' => isset($data['comment']) ? $data['comment'] : '',
+                'reasons' => isset($data['reasons']) ? $data['reasons'] : '',
+            ];
         }
+        return $result;
+    }
 
-        return $data;
+    /**
+     * @return DeliveryLog
+     */
+    protected static function getDeliveryLog()
+    {
+        return ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
     }
 }
