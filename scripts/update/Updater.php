@@ -303,7 +303,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.9.2','1.12.1');
-        
+
         $this->skip('1.12.1','1.12.2');
     }
 
