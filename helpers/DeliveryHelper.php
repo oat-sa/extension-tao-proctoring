@@ -268,6 +268,11 @@ class DeliveryHelper
                     'identifier' => $userId,
                 );
             }
+
+            usort($testTakers, function ($a, $b) {
+                return strcmp($a['lastname'], $b['lastname']);
+            });
+
             return $testTakers;
         });
     }
