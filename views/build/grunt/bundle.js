@@ -36,7 +36,7 @@ module.exports = function(grunt) {
             modules : [{
                 name: 'taoProctoring/controller/routes',
                 include : ext.getExtensionsControllers(['taoProctoring']),
-                exclude : ['mathJax', 'mediaElement'].concat(libs)
+                exclude : ['mathJax'].concat(libs)
             }]
         }
     };
