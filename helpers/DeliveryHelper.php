@@ -248,10 +248,20 @@ class DeliveryHelper
         });
         $users = array_diff($users, $assignedUsers);
 
+        array_walk($users, function(&$user) {
+            $user = new \core_kernel_users_GenerisUser(new \core_kernel_classes_Resource($user));
+        });
+
+        usort($users, function($a, $b) {
+            return strcasecmp(
+                UserHelper::getUserLastName($a),
+                UserHelper::getUserLastName($b)
+            );
+        });
+
         return DataTableHelper::paginate($users, $options, function($users) {
             $testTakers = array();
-            foreach($users as $userId) {
-                $user = new \core_kernel_users_GenerisUser(new core_kernel_classes_Resource($userId));
+            foreach($users as $user) {
                 $userId = $user->getIdentifier();
                 $lastName = UserHelper::getUserLastName($user);
                 $firstName = UserHelper::getUserFirstName($user, empty($lastName));
