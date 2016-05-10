@@ -62,8 +62,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      */
     public function deleteTestData()
     {
-        $sql = 'DELETE FROM ' . DeliveryMonitoringService::TABLE_NAME .
-            ' WHERE ' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
+        $service = $this->service;
+
+        $sql = 'DELETE FROM ' . $service::TABLE_NAME .
+            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
 
         $this->persistence->exec($sql);
     }
@@ -100,6 +102,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertTrue($this->service->save($dataModel));
         $this->assertEmpty($dataModel->getErrors());
 
+
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
         //one row has been inserted
@@ -129,19 +132,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         //new row has not been inserted
         $this->assertEquals(count($insertedData), 1);
         $this->assertEquals($insertedData[0][DeliveryMonitoringService::COLUMN_STATUS], 'finished');
-
-        $data = $dataModel->get();
-        unset($data['secondary_data_key']);
-        $dataModel->set($data);
-
-        $this->assertTrue($this->service->save($dataModel));
-        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][$service::COLUMN_ID]);
-        foreach ($insertedKvData as $kvData) {
-            $key = $kvData[DeliveryMonitoringService::KV_COLUMN_KEY];
-            //key has been removed
-            $this->assertTrue($key !== 'secondary_data_key');
-        }
     }
 
 
@@ -242,6 +232,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_1',
                 DeliveryMonitoringService::COLUMN_STATUS => 'active_test',
+                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
                 'error_code' => 1,
                 'session_id' => 'i1450191587554175',
             ],
@@ -249,6 +240,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_2',
                 DeliveryMonitoringService::COLUMN_STATUS => 'paused_test',
+                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
                 'error_code' => 2,
                 'session_id' => 'i1450191587554176',
             ],
@@ -256,6 +248,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_3',
                 DeliveryMonitoringService::COLUMN_STATUS => 'finished_test',
+                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
                 'error_code' => 3,
                 'session_id' => 'i1450191587554177',
             ],
@@ -263,6 +256,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
                 DeliveryMonitoringService::COLUMN_TEST_TAKER => 'test_taker_4',
                 DeliveryMonitoringService::COLUMN_STATUS => 'finished_test',
+                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
                 'error_code' => 0,
                 'session_id' => 'i1450191587554178',
             ],
