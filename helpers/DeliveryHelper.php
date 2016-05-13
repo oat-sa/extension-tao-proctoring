@@ -33,6 +33,7 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
+use oat\taoAct\model\runner\HeartbeatService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -455,68 +456,11 @@ class DeliveryHelper
         return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-            /**** to be replaced by real stuff ****/
-            // Seeds the random number generator with a fixed value to avoid changes on refresh
-            srand(count($deliveryExecutions));
-            // Sets some mock data for delivery states
-            $mocks = array(
-                array(
-                    //client will infer possible action based on the current status
-                    'section' => array(
-                        'label' => 'section B',
-                        'position' => 2,
-                        'total' => 3
-                    ),
-                    'item' => array(
-                        'label' => 'question X',
-                        'position' => 1,
-                        'total' => 9,
-                        'time' => array(
-                            //time unit in second, does not require microsecond precision for human monitoring
-                            'elapsed' => 340,
-                            'total' => 600
-                        )
-                    )
-                ),
-                array(
-                    'section' => array(
-                        'label' => 'section A',
-                        'position' => 1,
-                        'total' => 3
-                    ),
-                    'item' => array(
-                        'label' => 'question Y',
-                        'position' => 5,
-                        'total' => 8,
-                        'time' => array(
-                            'elapsed' => 60,
-                            'total' => 600
-                        )
-                    )
-                ),
-                array(
-                    'section' => array(
-                        'label' => 'section C',
-                        'position' => 3,
-                        'total' => 3
-                    ),
-                    'item' => array(
-                        'label' => 'question Z',
-                        'position' => 2,
-                        'total' => 4,
-                        'time' => array(
-                            'elapsed' => 540,
-                            'total' => 600
-                        )
-                    )
-                ),
-            );
-            /********/
-
             $executions = array();
             
-            
             $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+            $heartbeatService = ServiceManager::getServiceManager()->get(HeartbeatService::SERVICE_ID);
+
             foreach($deliveryExecutions as $deliveryExecution) {
                 $cachedData = current($deliveryMonitoringService->find([
                     [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]
@@ -530,10 +474,6 @@ class DeliveryHelper
                 $testTaker = array();
                 $extraFields = array();
                 
-                /**** to be replaced by real stuff ****/
-                // $state = array_merge($state, WebServiceMock::random($mocks));
-                /********/
-
                 $user = UserHelper::getUser($userId);
                 if ($user) {
                     /* @var $user User */
@@ -550,6 +490,8 @@ class DeliveryHelper
                     }
                 }
 
+                $online = $heartbeatService->isOnline($deliveryExecution->getIdentifier());
+
                 $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
@@ -561,13 +503,14 @@ class DeliveryHelper
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,
+                    'online' => $online,
                 );
             }
 
             return $executions;
         });
     }
-    
+
     /**
      * Get array of user specific extra fields to be displayed in the monitoring data table
      * 

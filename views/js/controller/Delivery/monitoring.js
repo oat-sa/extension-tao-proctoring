@@ -426,13 +426,20 @@ define([
                 id: 'status',
                 label: __('Status'),
                 transform: function(value, row) {
-                    if(row && row.state && row.state.status){
-                        var status = _status.getStatusByCode(row.state.status);
-                        if(status){
-                            return status.label;
+                    var result = '',
+                        status,
+                        online = row.online ? 'online' : 'offline';
+
+                    if (row && row.state && row.state.status) {
+                        status = _status.getStatusByCode(row.state.status);
+                        if (status) {
+                            result = status.label;
+                            if (row.state.status === 'INPROGRESS') {
+                                result = status.label + ' (' + online + ')';
+                            }
                         }
                     }
-                    return '';
+                    return result;
                 }
             });
 
