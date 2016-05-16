@@ -170,8 +170,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $this->getProgress(), true);
         $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
         $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
-        $this->addValue(DeliveryMonitoringService::START_TIME, intval($this->getStartTime()), true);
-        $this->addValue(DeliveryMonitoringService::END_TIME, intval($this->getEndTime()), true);
+        $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
+        $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
     }
 
     /**

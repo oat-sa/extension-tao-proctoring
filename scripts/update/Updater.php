@@ -301,9 +301,10 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('1.9.2');
         }
-        $this->skip('1.9.2','1.11.0');
 
-        if ($this->isVersion('1.11.0')) {
+        $this->skip('1.9.2','1.12.2');
+
+         if ($this->isVersion('1.12.2')) {
             $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
             $persistence = \common_persistence_Manager::getPersistence($persistenceId);
             $schemaManager = $persistence->getDriver()->getSchemaManager();
@@ -321,7 +322,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 $persistence->exec($query);
             }
 
-            $this->setVersion('1.11.1');
+            $this->setVersion('1.12.3');
         }
     }
 
