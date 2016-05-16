@@ -303,6 +303,27 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.9.2','1.12.2');
+
+         if ($this->isVersion('1.12.2')) {
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+            $persistence = \common_persistence_Manager::getPersistence($persistenceId);
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+            try {
+                $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
+                $tableData->changeColumn(DeliveryMonitoringService::COLUMN_START_TIME, array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255));
+                $tableData->changeColumn(DeliveryMonitoringService::COLUMN_END_TIME, array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255));
+            } catch(SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
+            $this->setVersion('1.12.3');
+        }
     }
 
 }

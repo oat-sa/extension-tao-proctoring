@@ -525,7 +525,7 @@ class DeliveryHelper
                 $userId = $deliveryExecution->getUserIdentifier();
                 $state = array(
                     'status' => $deliveryExecutionStateService->getState($deliveryExecution),
-                    'description' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS]
+                    'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM]
                 );
                 $testTaker = array();
                 $extraFields = array();

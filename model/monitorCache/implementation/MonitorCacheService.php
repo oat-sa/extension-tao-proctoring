@@ -80,8 +80,9 @@ class MonitorCacheService extends DeliveryMonitoringService
             $result = $data;
         } else {
             foreach($data as $row) {
-                $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData->set($row);
+
+                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
                 $result[] = $monitoringData;
             }
         }
@@ -101,7 +102,6 @@ class MonitorCacheService extends DeliveryMonitoringService
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
         if ($result) {
-            $deliveryMonitoring->set($data);
             $this->saveKvData($deliveryMonitoring);
         }
 
