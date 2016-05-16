@@ -25,6 +25,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use qtism\runtime\tests\AssessmentTestSession;
 
 /**
  * class DeliveryMonitoringData
@@ -45,6 +46,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      * @var DeliveryExecution
      */
     private $deliveryExecution;
+
+    /**
+    * @var AssessmentTestSession
+    */
+    private $testSession;
 
     /**
      * @var array
@@ -100,6 +106,15 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function setDeliveryExecution(DeliveryExecution $deliveryExecution)
     {
         $this->deliveryExecution = $deliveryExecution;
+    }
+
+    /**
+     * Set test session
+     * @param AssessmentTestSession $testSession
+     */
+    public function setTestSession(AssessmentTestSession $testSession)
+    {
+        $this->testSession = $testSession;
     }
 
     /**

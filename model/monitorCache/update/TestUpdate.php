@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache\update;
 
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\oatbox\service\ServiceManager;
 
 /**
@@ -33,15 +33,18 @@ use oat\oatbox\service\ServiceManager;
 class TestUpdate
 {
 
-    public static function testStateChange(TestChangedEvent $event)
+    public static function testStateChange(QtiTestChangeEvent $event)
     {
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution);
+        $data = $service->getData($deliveryExecution, false);
+        $data->setTestSession($event->getSession());
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }
     }
+
+
 }

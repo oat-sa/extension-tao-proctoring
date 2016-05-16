@@ -26,6 +26,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\ExtendedStateService;
+use qtism\runtime\tests\AssessmentTestSession;
 
 /**
  * class DeliveryMonitoringData
@@ -48,6 +49,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private $deliveryExecution;
 
     /**
+     * @var AssessmentTestSession
+     */
+    private $testSession;
+
+    /**
      * @var array
      */
     private $errors = [];
@@ -63,6 +69,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     /**
      * DeliveryMonitoringData constructor.
      * @param DeliveryExecution $deliveryExecution
+     * @param boolean $updateData whether instance should be populated by data during instantiation.
      */
     public function __construct(DeliveryExecution $deliveryExecution, $updateData = true)
     {
@@ -105,6 +112,16 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function setDeliveryExecution(DeliveryExecution $deliveryExecution)
     {
         $this->deliveryExecution = $deliveryExecution;
+    }
+
+    /**
+     * Set test session
+     * @param AssessmentTestSession $testSession
+     */
+    public function setTestSession(AssessmentTestSession $testSession)
+    {
+        $this->testSession = $testSession;
+        $this->updateData();
     }
 
     /**
@@ -153,8 +170,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $this->getProgress(), true);
         $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
         $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
-        $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
-        $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
+        $this->addValue(DeliveryMonitoringService::START_TIME, intval($this->getStartTime()), true);
+        $this->addValue(DeliveryMonitoringService::END_TIME, intval($this->getEndTime()), true);
     }
 
     /**
@@ -175,8 +192,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getProgress()
     {
-        $testSessionService = TestSessionService::singleton();
-        $session = $testSessionService->getTestSession($this->deliveryExecution);
+        $session = $this->getTestSession();
         $result = null;
         if ($session !== null) {
             $pos = $session->getRoute()->getPosition();
@@ -190,6 +206,18 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             }
         }
         return $result;
+    }
+
+    /**
+     * return AssessmentTestSession
+     */
+    private function getTestSession()
+    {
+        if ($this->testSession === null) {
+            $testSessionService = TestSessionService::singleton();
+            $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
+        }
+        return $this->testSession;
     }
 
     /**
