@@ -171,14 +171,18 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause = 'WHERE ';
         $parameters = [];
 
+        $options['order'] = $this->prepareOrderStmt($options['order']);
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
             "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
-            $whereClause . PHP_EOL .
-            "ORDER BY " . $options['order'];
+            $whereClause . PHP_EOL;
+
+        if ($options['order']['primary']) {
+            $sql .= "ORDER BY " . $options['order']['primary'];
+        }
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
@@ -192,6 +196,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             foreach ($data as &$row) {
                 $row = array_merge($row, $this->getKvData($row['id']));
             }
+            unset($row);
+            $data = $this->orderResult($data, $options['order']);
         }
 
         if ($options['asArray']) {
@@ -337,6 +343,62 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             $this->getPersistence()->exec($sql, [$data['id']]);
             $result = true;
         }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @param $order
+     * @return array
+     */
+    protected function orderResult(array $data, array $order)
+    {
+        if (empty($order['kv'])) {
+            return $data;
+        }
+        $sortingData = [];
+        foreach ($order['kv'] as $orderRule) {
+            foreach ($data as $key => $row) {
+                $sortingData[$orderRule[0]][$key] = isset($row[$orderRule[0]]) ? $row[$orderRule[0]] : null;
+            }
+        }
+
+        $args = [];
+
+        foreach ($order['kv'] as $orderRule) {
+            $args[] = $sortingData[$orderRule[0]];
+            $args[] = isset($orderRule[1]) && strcasecmp($orderRule[1], 'desc') === 0 ? SORT_DESC : SORT_ASC;
+        }
+
+        $args[] = &$data;
+        call_user_func_array('array_multisort', $args);
+        return array_pop($args);
+    }
+
+    /**
+     * @param $order
+     * @return array
+     */
+    protected function prepareOrderStmt($order)
+    {
+        $order = explode(',', $order);
+        $result = [
+            'primary' => [],
+            'kv' => [],
+        ];
+        $primaryTableColumns = $this->getPrimaryColumns();
+        foreach ($order as $ruleNum => $orderRule) {
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?/i', $orderRule, $ruleParts);
+            if (in_array($ruleParts[1], $primaryTableColumns)) {
+                $result['primary'][] = $orderRule;
+            } else {
+                array_shift($ruleParts);
+                $result['kv'][] = $ruleParts;
+            }
+        }
+
+        $result['primary'] = implode(', ', $result['primary']);
 
         return $result;
     }

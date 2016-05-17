@@ -53,14 +53,18 @@ class MonitorCacheService extends DeliveryMonitoringService
         $whereClause = 'WHERE ';
         $parameters = [];
 
+        $options['order'] = $this->prepareOrderStmt($options['order']);
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
             "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-            $whereClause . PHP_EOL .
-            "ORDER BY " . $options['order'];
+            $whereClause . PHP_EOL;
+
+        if ($options['order']['primary']) {
+            $sql .= "ORDER BY " . $options['order']['primary'];
+        }
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
@@ -74,13 +78,14 @@ class MonitorCacheService extends DeliveryMonitoringService
             foreach ($data as &$row) {
                 $row = array_merge($row, $this->getKvData($row[self::COLUMN_DELIVERY_EXECUTION_ID]));
             }
+            unset($row);
+            $data = $this->orderResult($data, $options['order']);
         }
 
         if ($options['asArray']) {
             $result = $data;
         } else {
             foreach($data as $row) {
-
                 $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
                 $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
                 $result[] = $monitoringData;
