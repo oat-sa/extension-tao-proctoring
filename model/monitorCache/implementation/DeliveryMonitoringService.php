@@ -79,6 +79,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
+    protected $joins = [];
+
     /**
      * @var array
      */
@@ -176,7 +178,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
+            //"LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
+            implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL .
             "ORDER BY " . $options['order'];
 
@@ -457,7 +460,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= " t.$key $op ";
             } else {
-                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
+                $joinNum = count($this->joins);
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL;
                 $parameters[] = trim($key);
             }
 

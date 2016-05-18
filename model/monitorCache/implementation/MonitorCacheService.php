@@ -58,7 +58,8 @@ class MonitorCacheService extends DeliveryMonitoringService
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+            //"LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+            implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL .
             "ORDER BY " . $options['order'];
 
@@ -80,7 +81,6 @@ class MonitorCacheService extends DeliveryMonitoringService
             $result = $data;
         } else {
             foreach($data as $row) {
-
                 $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
                 $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
                 $result[] = $monitoringData;
@@ -131,6 +131,63 @@ class MonitorCacheService extends DeliveryMonitoringService
                 );
             }
         }
+    }
+
+    /**
+     * @param $condition
+     * @param $parameters
+     * @param $selectClause
+     * @return string
+     */
+    protected function prepareCondition($condition, &$parameters, &$selectClause)
+    {
+        $whereClause = '';
+
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition))) {
+            $condition = current($condition);
+        }
+
+        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
+            $whereClause .= " $condition ";
+        } else if (is_array($condition) && count($condition) > 1) {
+            $whereClause .=  '(';
+            $previousCondition = null;
+            foreach ($condition as $subCondition) {
+                if (is_array($subCondition) && is_array($previousCondition)) {
+                    $whereClause .= 'AND';
+                }
+                $whereClause .=  $this->prepareCondition($subCondition, $parameters, $selectClause);
+                $previousCondition = $subCondition;
+            }
+            $whereClause .=  ')';
+        } else if (is_array($condition) && count($condition) === 1) {
+            $primaryColumns = $this->getPrimaryColumns();
+            $key = array_keys($condition)[0];
+            $value = $condition[$key];
+
+            if ($value === null) {
+                $op = 'IS NULL';
+            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
+                $value = $matches[2];
+                $op = $matches[1] ? $matches[1] : "=";
+                $op .= ' ?';
+            }
+
+            if (in_array($key, $primaryColumns)) {
+                $whereClause .= " t.$key $op ";
+            } else {
+                $joinNum = count($this->joins);
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
+                $parameters[] = trim($key);
+            }
+
+            if ($value !== null) {
+                $parameters[] = trim($value);
+            }
+        }
+        return $whereClause;
     }
 
     /**

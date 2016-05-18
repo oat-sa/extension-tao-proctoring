@@ -25,7 +25,7 @@ use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\mock\WebServiceMock;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use tao_helpers_Date as DateHelper;
@@ -80,13 +80,13 @@ class DeliveryHelper
                 /* @var $execution DeliveryExecution */
                 $executionState = $deliveryExecutionStateService->getState($execution);
                 switch($executionState){
-                    case DeliveryExecutionStateService::STATE_AWAITING:
+                    case DeliveryExecution::STATE_AWAITING:
                         $awaiting++;
                         break;
-                    case DeliveryExecutionStateService::STATE_INPROGRESS:
+                    case DeliveryExecution::STATE_ACTIVE:
                         $inprogress++;
                         break;
-                    case DeliveryExecutionStateService::STATE_PAUSED:
+                    case DeliveryExecution::STATE_PAUSED:
                         $paused++;
                         break;
                     default:

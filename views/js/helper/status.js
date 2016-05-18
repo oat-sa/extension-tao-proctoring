@@ -20,7 +20,7 @@ define(['lodash', 'i18n'], function(_, __){
     'use strict';
     var _status = {
         init : {
-            code : 'INIT',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit',
             label : __('Init'),
             can : {
                 authorize : __('not awaiting'),
@@ -30,7 +30,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         awaiting : {
-            code : 'AWAITING',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
             label : __('Awaiting'),
             can : {
                 authorize : true,
@@ -40,7 +40,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         authorized : {
-            code : 'AUTHORIZED',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
             label : __('Authorized but not started'),
             can : {
                 authorize : __('already authorized'),
@@ -50,7 +50,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         inprogress : {
-            code : 'INPROGRESS',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
             label : __('In Progress'),
             can : {
                 authorize : __('already authorized'),
@@ -60,7 +60,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         paused : {
-            code : 'PAUSED',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
             label : __('Paused'),
             can : {
                 authorize : __('is paused'),
@@ -70,7 +70,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         completed : {
-            code : 'COMPLETED',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
             label : __('Completed'),
             can : {
                 authorize : __('is completed'),
@@ -80,7 +80,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         terminated : {
-            code : 'TERMINATED',
+            code : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
             label : __('Terminated'),
             can : {
                 authorize : __('is terminated'),

@@ -324,6 +324,17 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('1.12.3');
         }
+
+        if ($this->isVersion('1.12.3')) {
+            $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $config = $ext->getConfig('execution_service');
+            $config = new \oat\taoProctoring\model\execution\DeliveryExecutionService(['implementation' => $config]);
+            $ext->setConfig('execution_service', $config);
+
+            OntologyUpdater::syncModels();
+
+            $this->setVersion('1.13.0');
+        }
     }
 
 }

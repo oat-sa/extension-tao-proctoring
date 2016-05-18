@@ -26,6 +26,7 @@ use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
 use oat\taoProctoring\model\DeliveryAuthorizationService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Override the default DeliveryServer Controller
@@ -101,20 +102,24 @@ class DeliveryServer extends DefaultDeliveryServer
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
         
-        if (DeliveryExecutionStateService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
+        //if (DeliveryExecutionStateService::STATE_AUTHORIZED == $executionState && $this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
+        if ($this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
             $deliveryExecutionStateService->resumeExecution($deliveryExecution);
-            $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+            //$executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+        } else {
+            common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
+            return $this->redirect(_url('awaitingAuthorization', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
-        if (DeliveryExecutionStateService::STATE_INPROGRESS != $executionState ||
+        /*if (DeliveryExecutionStateService::STATE_INPROGRESS != $executionState ||
             (DeliveryExecutionStateService::STATE_INPROGRESS == $executionState && !$this->getAuthorizationService()->isAuthorized($deliveryExecution))) {
             // the test taker is not allowed to run the delivery
             // so we redirect him/her to the awaiting page
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
             return $this->redirect(_url('awaitingAuthorization', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
-        }
+        }*/
 
         // ensure the result server object is properly set to avoid test runner issue 
         $this->ensureResultServerObject($deliveryExecution);
@@ -133,8 +138,8 @@ class DeliveryServer extends DefaultDeliveryServer
         $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
 
         // if the test taker is already authorized, straight forward to the execution
-        if (DeliveryExecutionStateService::STATE_AUTHORIZED == $executionState) {
-            $this->getAuthorizationService()->grantAuthorization($deliveryExecution);
+        if (DeliveryExecution::STATE_AUTHORIZED === $executionState) {
+            //$this->getAuthorizationService()->grantAuthorization($deliveryExecution);
             return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
@@ -142,17 +147,17 @@ class DeliveryServer extends DefaultDeliveryServer
         $this->getAuthorizationService()->revokeAuthorization($deliveryExecution);
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
-        if (DeliveryExecutionStateService::STATE_INPROGRESS == $executionState) {
+        /*if (DeliveryExecutionStateService::STATE_INPROGRESS == $executionState) {
             $deliveryExecutionStateService->pauseExecution($deliveryExecution);
-        }
+        }*/
 
         // we need to change the state of the delivery execution
-        if (DeliveryExecutionStateService::STATE_TERMINATED != $executionState && DeliveryExecutionStateService::STATE_COMPLETED != $executionState) {
+        if (DeliveryExecution::STATE_TERMINATED !== $executionState && DeliveryExecution::STATE_FINISHED !== $executionState) {
             $deliveryExecutionStateService->waitExecution($deliveryExecution);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
         }
 
-        if (DeliveryExecutionStateService::STATE_AWAITING == $executionState) {
+        if (DeliveryExecution::STATE_AWAITING === $executionState) {
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
             $this->setData('init', !!$this->getRequestParameter('init'));
@@ -187,18 +192,18 @@ class DeliveryServer extends DefaultDeliveryServer
         
         // reacts to a few particular states
         switch ($executionState) {
-            case DeliveryExecutionStateService::STATE_AUTHORIZED:
-                    $this->getAuthorizationService()->grantAuthorization($deliveryExecution);
+            case DeliveryExecution::STATE_AUTHORIZED:
+                    //$this->getAuthorizationService()->grantAuthorization($deliveryExecution);
                     $authorized = true;
                 break;
             
-            case DeliveryExecutionStateService::STATE_TERMINATED:
-            case DeliveryExecutionStateService::STATE_COMPLETED:
+            case DeliveryExecution::STATE_TERMINATED:
+            case DeliveryExecution::STATE_FINISHED:
                 $success = false;
                 $message = __('This test has been terminated');
                 break;
                 
-            case DeliveryExecutionStateService::STATE_PAUSED:
+            case DeliveryExecution::STATE_PAUSED:
                 $success = false;
                 $message = __('This test has been suspended');
                 break;
