@@ -221,6 +221,17 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertTrue(isset($resultRow->get()['error_code']));
             $this->assertTrue(isset($resultRow->get()['session_id']));
         }
+
+
+        $result = $this->service->find([
+            ['error_code' => '>=0'],
+        ], ['order' => 'error_code ASC, session_id'], true);
+
+        $this->assertEquals(count($result), 4);
+
+        foreach ($result as $rowKey => $resultRow) {
+            $this->assertEquals($rowKey, $resultRow->get()['error_code']);
+        }
     }
 
     private function loadFixture()
