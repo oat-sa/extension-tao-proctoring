@@ -628,9 +628,13 @@ class DeliveryHelper
      */
     public static function getHasBeenPaused($deliveryExecution)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
-        $status = $proctoringState['hasBeenPaused'];
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+        }
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
         return $status;
     }
@@ -641,8 +645,13 @@ class DeliveryHelper
      */
     public static function setHasBeenPaused($deliveryExecution, $paused)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
-        $deliveryExecutionStateService->setProctoringState($deliveryExecution, $proctoringState['status'], $proctoringState['reason'], $paused);
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+        }
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data->addValue('hasBeenPaused', $paused);
+        $deliveryMonitoringService->save($data);
     }
 }

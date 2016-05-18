@@ -40,59 +40,6 @@ class MonitorCacheService extends DeliveryMonitoringService
     /**
      * @inheritdoc
      */
-    public function find(array $criteria = [], array $options = [], $together = false)
-    {
-        $result = [];
-        $defaultOptions = [
-            'order' => self::COLUMN_ID." ASC",
-            'offset' => 0,
-            'asArray' => false
-        ];
-        $options = array_merge($defaultOptions, $options);
-
-        $whereClause = 'WHERE ';
-        $parameters = [];
-
-        $selectClause = "SELECT DISTINCT t.* ";
-        $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
-
-        $sql = $selectClause . $fromClause . PHP_EOL .
-            //"LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-            implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL .
-            "ORDER BY " . $options['order'];
-
-        if (isset($options['limit']))  {
-            $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
-        }
-
-        $stmt = $this->getPersistence()->query($sql, $parameters);
-
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if ($together) {
-            foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row[self::COLUMN_DELIVERY_EXECUTION_ID]));
-            }
-        }
-
-        if ($options['asArray']) {
-            $result = $data;
-        } else {
-            foreach($data as $row) {
-                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
-                $result[] = $monitoringData;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
@@ -207,5 +154,25 @@ class MonitorCacheService extends DeliveryMonitoringService
         }
 
         return $result;
+    }
+
+    /**
+     * Check if record for delivery execution already exists in the storage.
+     * @todo add isNewRecord property to DeliveryMonitoringDataInterface to prevent repeated queries to DB.
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean
+     */
+    protected function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $data = $deliveryMonitoring->get();
+        $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+
+        $sql = "SELECT EXISTS( " . PHP_EOL .
+            "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+            "FROM " . self::TABLE_NAME . PHP_EOL .
+            "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+
+        return !((boolean) $exists);
     }
 }

@@ -25,8 +25,9 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\ExtendedStateService;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * class DeliveryMonitoringData
@@ -179,12 +180,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getStatus()
     {
-        $result = null;
-        $proctoringData = $this->getProctoringData();
-        if ($proctoringData !== null && isset($proctoringData['status'])) {
-            $result = $proctoringData['status'];
-        }
-        return $result;
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        return $deliveryExecutionStateService->getState($this->deliveryExecution);
     }
 
     /**
@@ -234,11 +231,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getAuthorizedBy()
     {
         $result = null;
-        $proctoringData = $this->getProctoringData();
-        if ($proctoringData !== null && isset($proctoringData['authorized_by'])) {
-            $result = $proctoringData['authorized_by'];
+        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
+        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
+            $result = $deliveryLog[0]['data']['proctorUri'];
         }
         return $result;
+
     }
 
     /**
@@ -263,10 +261,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         return '';
     }
 
-    private function getProctoringData()
+    /**
+     * @return string
+     */
+    private function getDeliveryLog($eventId = null)
     {
-        $extendedStateService = new ExtendedStateService();
-        $proctoringData = $extendedStateService->getValue($this->deliveryExecution, 'proctoring');
-        return $proctoringData;
+        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
     }
 }

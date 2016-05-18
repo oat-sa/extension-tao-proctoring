@@ -334,31 +334,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     }
 
     /**
-     * Gets delivery execution service
-     *
-     * @return \taoDelivery_models_classes_execution_ServiceProxy
-     */
-    /*private function getExecutionService()
-    {
-        if ($this->executionService === null) {
-            $this->executionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
-        }
-        return $this->executionService;
-    }*/
-
-    /**
-     * temporary helper until proper servicemanager integration
-     * @return ExtendedStateService
-     */
-    /*private function getExtendedStateService()
-    {
-        if (!isset($this->extendedStateService)) {
-            $this->extendedStateService = new ExtendedStateService();
-        }
-        return $this->extendedStateService;
-    }*/
-
-    /**
      * Get identifier of current item.
      * @param DeliveryExecution $deliveryExecution
      * @return null|string
