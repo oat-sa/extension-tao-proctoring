@@ -79,6 +79,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
+    protected $joins = [];
+
     /**
      * @var array
      */
@@ -162,7 +164,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $result = [];
         $defaultOptions = [
-            'order' => self::COLUMN_ID." ASC",
+            'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
             'asArray' => false
         ];
@@ -177,7 +179,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
+            implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL;
 
         if ($options['order']['primary']) {
@@ -194,7 +196,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if ($together) {
             foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row['id']));
+                $row = array_merge($row, $this->getKvData($row[static::COLUMN_ID]));
             }
             unset($row);
             $data = $this->orderResult($data, $options['order']);
@@ -203,9 +205,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if ($options['asArray']) {
             $result = $data;
         } else {
-            $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
             foreach($data as $row) {
-                $monitoringData = new DeliveryMonitoringData($deliveryService->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]), false);
+                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
                 $result[] = $monitoringData;
             }
         }
@@ -248,8 +250,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if ($result) {
             $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
 
-            $data[self::COLUMN_ID] = $id;
-            $deliveryMonitoring->addValue(self::COLUMN_ID, $id);
+            $data[static::COLUMN_ID] = $id;
+            $deliveryMonitoring->addValue(static::COLUMN_ID, $id);
             $this->saveKvData($deliveryMonitoring);
         }
 
@@ -297,7 +299,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if (!$isNewRecord && !empty($kvTableData)) {
             $this->deleteKvData($deliveryMonitoring);
-            $id = $data[self::COLUMN_ID];
+            $id = $data[static::COLUMN_ID];
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
                     self::KV_TABLE_NAME,
@@ -340,7 +342,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if (!$isNewRecord) {
             $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
                     WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data['id']]);
+            $this->getPersistence()->exec($sql, [$data[static::COLUMN_ID]]);
             $result = true;
         }
 
@@ -519,7 +521,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= " t.$key $op ";
             } else {
-                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
+                $joinNum = count($this->joins);
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum. " . self::KV_COLUMN_PARENT_ID . " = t." . static::COLUMN_ID . PHP_EOL;
                 $parameters[] = trim($key);
             }
 
@@ -540,7 +544,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $data = $deliveryMonitoring->get();
         $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
 
-        if (isset($data[self::COLUMN_ID])) {
+        if (isset($data[static::COLUMN_ID])) {
             $exists = true;
         } else {
             $sql = "SELECT EXISTS( " . PHP_EOL .

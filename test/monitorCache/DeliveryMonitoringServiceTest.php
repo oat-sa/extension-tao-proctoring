@@ -179,6 +179,12 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ]);
         $this->assertEquals(count($result), 2);
 
+        $result = $this->service->find([
+            ['error_code' => '1'],
+            'AND',
+            ['session_id' => 'i1450191587554175'],
+        ]);
+        $this->assertEquals(count($result), 1);
 
         $result = $this->service->find([
             [DeliveryMonitoringService::COLUMN_STATUS => 'finished_test'],
