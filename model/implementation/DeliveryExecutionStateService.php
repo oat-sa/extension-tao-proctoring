@@ -33,18 +33,10 @@ use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
  */
 class DeliveryExecutionStateService extends ConfigurableService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
-    //private $executionService;
-
     /**
      * @var TestSessionService
      */
     private $testSessionService;
-
-    /**
-     * temporary variable until proper service manager integration
-     * @var ExtendedStateService
-     */
-    //private $extendedStateService;
 
     /**
      * Computes the state of the delivery and returns one of the extended state code
@@ -55,24 +47,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function getState(DeliveryExecution $deliveryExecution)
     {
-        /*$executionStatus = $deliveryExecution->getState()->getUri();
-        $proctoringState = $this->getProctoringState($deliveryExecution->getIdentifier());
-        $status = $proctoringState['status'];
-
-        if (DeliveryExecution::STATE_FINISHIED == $executionStatus) {
-            if (self::STATE_TERMINATED != $status) {
-                $status = self::STATE_COMPLETED;
-            }
-        } else if (!$status) {
-            if (DeliveryExecution::STATE_ACTIVE == $executionStatus) {
-                $status = self::STATE_INIT;
-            } else if (DeliveryExecution::STATE_PAUSED == $executionStatus) {
-                $status = self::STATE_PAUSED;
-            } else {
-                throw new \common_Exception('Unknown state for delivery execution ' . $deliveryExecution->getIdentifier());
-            }
-        }*/
-
         return $deliveryExecution->getState()->getUri();
     }
 
@@ -92,16 +66,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                     $deliveryExecution,
                     ["reasons" => "Paused delivery execution was expired", "comment" => ""]
                 );
-
                 return false;
             }
 
-            //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AWAITING);
             $deliveryExecution->setState(DeliveryExecution::STATE_AWAITING);
-
             return true;
         }
-
         return false;
     }
 
@@ -122,8 +92,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $session->resume();
                 $this->getTestSessionService()->persist($session);
             }
-
-            //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_INPROGRESS);
             $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
 
             $result = true;
@@ -158,7 +126,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             }
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
-            //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_AUTHORIZED, $reason);
             $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
             $result = true;
         }
@@ -181,7 +148,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         if (DeliveryExecution::STATE_TERMINATED !== $executionState && DeliveryExecution::STATE_FINISHED !== $executionState) {
 
             $deliveryExecution->setState(DeliveryExecution::STATE_FINISHIED);
-            //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_TERMINATED, $reason);
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
@@ -228,7 +194,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
-            //$this->setProctoringState($deliveryExecution->getIdentifier(), self::STATE_PAUSED, $reason);
             $deliveryExecution->setState(DeliveryExecution::STATE_PAUSED);
             $result = true;
         }
@@ -262,63 +227,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     {
         return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
-
-    /**
-     * Sets a proctoring state on a delivery execution. Use the test state storage.
-     *
-     * @todo remove this method to separate service
-     * @param string|DeliveryExecution $executionId
-     * @param string $state
-     * @param array $reason
-     * @param boolean $paused
-     */
-    /*public function setProctoringState($executionId, $state, $reason = null, $paused = null )
-    {
-        $deliveryExecution = $this->getExecutionService()->getDeliveryExecution($executionId);
-        $stateService = $this->getExtendedStateService();
-        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
-
-        $currentUser = \tao_models_classes_UserService::singleton()->getCurrentUser();
-
-        if(!is_null($paused)){
-            $proctoringState['hasBeenPaused'] = $paused;
-        }
-
-        $proctoringState['status'] = $state;
-        $proctoringState['reason'] = $reason;
-        if ($currentUser !== null && $state === self::STATE_AUTHORIZED) {
-            $proctoringState['authorized_by'] = $currentUser->getUri();
-        }
-        $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
-    }*/
-
-    /**
-     * Gets a proctoring state from a delivery execution. Use the test state storage.
-     *
-     * @todo remove this method to separate service
-     * @param string|DeliveryExecution $executionId
-     * @return array
-     */
-    /*public function getProctoringState($executionId)
-    {
-        $deliveryExecution = $this->getExecutionService()->getDeliveryExecution($executionId);
-        $stateService = $this->getExtendedStateService();
-        $proctoringState = $stateService->getValue($deliveryExecution, 'proctoring');
-
-        if (!isset($proctoringState['status'])) {
-            $proctoringState['status'] = null;
-        }
-
-        if (!isset($proctoringState['reason'])) {
-            $proctoringState['reason'] = null;
-        }
-
-        if (!isset($proctoringState['hasBeenPaused'])) {
-            $proctoringState['hasBeenPaused'] = false;
-        }
-
-        return $proctoringState;
-    }*/
 
     /**
      * Gets test session service

@@ -78,9 +78,15 @@ class DeliveryExecutionMock extends \oat\taoProctoring\model\execution\DeliveryE
 {
     private $state;
 
+    public function __construct(\taoDelivery_models_classes_execution_DeliveryExecution $implementation)
+    {
+        parent::__construct($implementation);
+        $this->state = new \core_kernel_classes_Resource('fake_state');
+    }
+
     public function setState($state)
     {
-        $this->state = $state;
+        $this->state = new \core_kernel_classes_Resource($state);
     }
 
     public function getState()
