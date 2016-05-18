@@ -54,19 +54,21 @@ class DeliveryServer extends DefaultDeliveryServer
      */
     public function index()
     {
-        parent::index();
-
         // if the test taker passes by this page, he/she cannot access to any delivery without proctor authorization,
         // whatever the delivery execution status is.
         $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
         $userUri = common_session_SessionManager::getSession()->getUserUri();
         $startedExecutions = array_merge(
             $deliveryExecutionService->getActiveDeliveryExecutions($userUri),
-            $deliveryExecutionService->getPausedDeliveryExecutions($userUri)
+            $deliveryExecutionService->getPausedDeliveryExecutions($userUri),
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AWAITING),
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
         );
         foreach($startedExecutions as $startedExecution) {
             $this->getAuthorizationService()->revokeAuthorization($startedExecution);
         }
+
+        parent::index();
     }
 
     /**

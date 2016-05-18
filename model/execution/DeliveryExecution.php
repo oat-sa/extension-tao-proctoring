@@ -23,7 +23,7 @@ namespace oat\taoProctoring\model\execution;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution as BaseDeliveryExecution;
 
 /**
- * Proctoring for delivery executions
+ * Delivery execution class for proctoring extension
  *
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  * @package taoProctoring
@@ -36,14 +36,7 @@ class DeliveryExecution extends BaseDeliveryExecution
 
     const STATE_AUTHORIZED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized';
 
-    //const STATE_INPROGRESS = 'INPROGRESS';
-    const STATE_ACTIVE = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive';
-
-    //const STATE_COMPLETED = 'COMPLETED';
     const STATE_FINISHED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
-
-    const STATE_PAUSED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused';
-    //const STATE_PAUSED = 'PAUSED';
 
     const STATE_TERMINATED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
 }
