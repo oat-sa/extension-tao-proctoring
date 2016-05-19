@@ -33,7 +33,7 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use oat\taoAct\model\runner\HeartbeatService;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -459,7 +459,7 @@ class DeliveryHelper
             $executions = array();
             
             $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-            $heartbeatService = ServiceManager::getServiceManager()->get(HeartbeatService::SERVICE_ID);
+            $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
             foreach($deliveryExecutions as $deliveryExecution) {
                 $cachedData = current($deliveryMonitoringService->find([
@@ -490,7 +490,7 @@ class DeliveryHelper
                     }
                 }
 
-                $online = $heartbeatService->isOnline($deliveryExecution->getIdentifier());
+                $online = $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
 
                 $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
