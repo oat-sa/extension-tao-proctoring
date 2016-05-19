@@ -42,6 +42,7 @@ use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\model\ProctoringAssignmentService;
 use oat\taoProctoring\model\DeliveryServerService;
+use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
 
 /**
  * 
@@ -323,6 +324,18 @@ class Updater extends common_ext_ExtensionUpdater {
             }
 
             $this->setVersion('1.12.3');
+        }
+
+        if ($this->isVersion('1.12.3')) {
+            try {
+                $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new TestSessionConnectivityStatusService();
+                $service->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->register(TestSessionConnectivityStatusService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('1.13.0');
         }
     }
 
