@@ -24,6 +24,9 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * Class DeliveryMonitoringService
@@ -34,12 +37,8 @@ use oat\oatbox\service\ConfigurableService;
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecutionId);
- * $data->setData([
- *  'test_taker' => 'http://sample/first.rdf#i1450190828500474',
- *  'status' => 'ACTIVE',
- *  'current_assessment_item' => 'http://sample/first.rdf#i145018936535755'
- * ]);
+ * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data->addValue('new_key', 'new_value');
  * $deliveryMonitoringService->save($data);
  * ```
  *
@@ -80,18 +79,21 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
+    protected $joins = [];
+
     /**
      * @var array
      */
     protected $primaryTableColumns;
 
     /**
-     * @param string $deliveryExecutionId
+     * @param DeliveryExecution $deliveryExecution
+     * @param boolean $updateData whether DeliveryMonitoringData instance should be populated by data during instantiation.
      * @return DeliveryMonitoringDataInterface
      */
-    public function getData($deliveryExecutionId)
+    public function getData(DeliveryExecution $deliveryExecution, $updateData = true)
     {
-        return new DeliveryMonitoringData($deliveryExecutionId);
+        return new DeliveryMonitoringData($deliveryExecution, $updateData);
     }
 
     /**
@@ -162,7 +164,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $result = [];
         $defaultOptions = [
-            'order' => self::COLUMN_ID." ASC",
+            'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
             'asArray' => false
         ];
@@ -171,14 +173,18 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $whereClause = 'WHERE ';
         $parameters = [];
 
+        $options['order'] = $this->prepareOrderStmt($options['order']);
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
         $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t. " . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_ID . PHP_EOL .
-            $whereClause . PHP_EOL .
-            "ORDER BY " . $options['order'];
+            implode(PHP_EOL, $this->joins) . PHP_EOL .
+            $whereClause . PHP_EOL;
+
+        if ($options['order']['primary']) {
+            $sql .= "ORDER BY " . $options['order']['primary'];
+        }
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
@@ -190,16 +196,18 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
         if ($together) {
             foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row['id']));
+                $row = array_merge($row, $this->getKvData($row[static::COLUMN_ID]));
             }
+            unset($row);
+            $data = $this->orderResult($data, $options['order']);
         }
 
         if ($options['asArray']) {
             $result = $data;
         } else {
             foreach($data as $row) {
-                $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData->set($row);
+                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
                 $result[] = $monitoringData;
             }
         }
@@ -242,8 +250,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if ($result) {
             $id = $this->getPersistence()->lastInsertId(self::TABLE_NAME);
 
-            $data[self::COLUMN_ID] = $id;
-            $deliveryMonitoring->set($data);
+            $data[static::COLUMN_ID] = $id;
+            $deliveryMonitoring->addValue(static::COLUMN_ID, $id);
             $this->saveKvData($deliveryMonitoring);
         }
 
@@ -287,11 +295,11 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $data = $deliveryMonitoring->get();
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
+        $kvTableData = $this->extractKvData($data);
 
-        if (!$isNewRecord) {
+        if (!$isNewRecord && !empty($kvTableData)) {
             $this->deleteKvData($deliveryMonitoring);
-            $id = $data[self::COLUMN_ID];
-            $kvTableData = $this->extractKvData($data);
+            $id = $data[static::COLUMN_ID];
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->insert(
                     self::KV_TABLE_NAME,
@@ -334,9 +342,65 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if (!$isNewRecord) {
             $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
                     WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data['id']]);
+            $this->getPersistence()->exec($sql, [$data[static::COLUMN_ID]]);
             $result = true;
         }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @param $order
+     * @return array
+     */
+    protected function orderResult(array $data, array $order)
+    {
+        if (empty($order['kv'])) {
+            return $data;
+        }
+        $sortingData = [];
+        foreach ($order['kv'] as $orderRule) {
+            foreach ($data as $key => $row) {
+                $sortingData[$orderRule[0]][$key] = isset($row[$orderRule[0]]) ? $row[$orderRule[0]] : null;
+            }
+        }
+
+        $args = [];
+
+        foreach ($order['kv'] as $orderRule) {
+            $args[] = $sortingData[$orderRule[0]];
+            $args[] = isset($orderRule[1]) && strcasecmp($orderRule[1], 'desc') === 0 ? SORT_DESC : SORT_ASC;
+        }
+
+        $args[] = &$data;
+        call_user_func_array('array_multisort', $args);
+        return array_pop($args);
+    }
+
+    /**
+     * @param $order
+     * @return array
+     */
+    protected function prepareOrderStmt($order)
+    {
+        $order = explode(',', $order);
+        $result = [
+            'primary' => [],
+            'kv' => [],
+        ];
+        $primaryTableColumns = $this->getPrimaryColumns();
+        foreach ($order as $ruleNum => $orderRule) {
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?/i', $orderRule, $ruleParts);
+            if (in_array($ruleParts[1], $primaryTableColumns)) {
+                $result['primary'][] = $orderRule;
+            } else {
+                array_shift($ruleParts);
+                $result['kv'][] = $ruleParts;
+            }
+        }
+
+        $result['primary'] = implode(', ', $result['primary']);
 
         return $result;
     }
@@ -457,7 +521,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= " t.$key $op ";
             } else {
-                $whereClause .= " (kv_t.monitoring_key = ? AND kv_t.monitoring_value $op) ";
+                $joinNum = count($this->joins);
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum. " . self::KV_COLUMN_PARENT_ID . " = t." . static::COLUMN_ID . PHP_EOL;
                 $parameters[] = trim($key);
             }
 
@@ -478,7 +544,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $data = $deliveryMonitoring->get();
         $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
 
-        if (isset($data[self::COLUMN_ID])) {
+        if (isset($data[static::COLUMN_ID])) {
             $exists = true;
         } else {
             $sql = "SELECT EXISTS( " . PHP_EOL .

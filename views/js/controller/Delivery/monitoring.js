@@ -448,18 +448,7 @@ define([
                 id: 'progress',
                 label: __('Progress'),
                 transform: function(value, row) {
-                	return row.state.description;
-                	/*
-                    var state = row && row.state;
-                    var item = state && state.item;
-                    var time = item && item.time;
-                    if (time && time.elapsed) {
-                        time.elapsedStr = _timerFormat(time.elapsed);
-                        time.totalStr = _timerFormat(time.total);
-                        time.display = !!(time.elapsedStr || time.totalStr);
-                    }
-                    return itemProgressTpl(state);
-                    */
+                	return row && row.state && row.state.progress || '' ;
                 }
             });
             

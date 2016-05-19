@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
+use oat\taoDelivery\model\execution\DeliveryExecution;
+
 /**
  * Interface DeliveryMonitoringService
  *
@@ -31,6 +33,7 @@ interface DeliveryMonitoringService
 {
     const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
 
+    const ID = 'id';
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
     const STATUS = 'status';
     const CURRENT_ASSESSMENT_ITEM = 'current_assessment_item';
@@ -40,10 +43,10 @@ interface DeliveryMonitoringService
     const END_TIME = 'end_time';
 
     /**
-     * @param string $deliveryExecutionId
+     * @param DeliveryExecution $deliveryExecution
      * @return DeliveryMonitoringData
      */
-    public function getData($deliveryExecutionId);
+    public function getData(DeliveryExecution $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]

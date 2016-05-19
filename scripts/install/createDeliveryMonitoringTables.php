@@ -36,8 +36,8 @@ try {
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_TEST_TAKER, "string", array("notnull" => false, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_START_TIME, "integer", array("notnull" => false));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_END_TIME, "integer", array("notnull" => false));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
 
     $tableLog->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID));
 

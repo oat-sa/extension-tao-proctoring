@@ -68,69 +68,61 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
             'arbitrary_key' => 'arbitrary_value',
         ];
 
-        $data = new DeliveryMonitoringData($deliveryExecutionId);
+        $deliveryExecution = $this->getDeliveryExecution();
+
+        $data = new DeliveryMonitoringData($deliveryExecution, false);
         foreach ($columns as $columnKey => $columnVal) {
-            $data->add($columnKey, $columnVal);
+            $data->addValue($columnKey, $columnVal);
         }
 
-        $this->assertTrue($service->save($data));
-
-        $createdData = new DeliveryMonitoringData($deliveryExecutionId);
-
         foreach ($columns as $columnKey => $columnVal) {
-            $this->assertNotEmpty($createdData->get()[$columnKey]);
-            $this->assertEquals($createdData->get()[$columnKey], $columnVal);
+            $this->assertNotEmpty($data->get()[$columnKey]);
+            $this->assertEquals($data->get()[$columnKey], $columnVal);
         }
     }
 
-    public function testAdd()
+    public function testAddValue()
     {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
-        $data = new DeliveryMonitoringData($deliveryExecutionId);
+        $deliveryExecution = $this->getDeliveryExecution();
+        $data = new DeliveryMonitoringData($deliveryExecution, false);
 
-        $this->assertEquals($data->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], $deliveryExecutionId);
+        $this->assertEquals($data->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], $deliveryExecution->getIdentifier());
 
-        $data->add('new_value', 'value');
+        $data->addValue('new_value', 'value');
         $this->assertEquals($data->get()['new_value'], 'value');
 
         //should not be overwritten
-        $data->add('new_value', 'value_changed');
+        $data->addValue('new_value', 'value_changed');
         $this->assertEquals($data->get()['new_value'], 'value');
 
         //should be overwritten
-        $data->add('new_value', 'value_changed', true);
+        $data->addValue('new_value', 'value_changed', true);
         $this->assertEquals($data->get()['new_value'], 'value_changed');
-    }
-
-    public function testSet()
-    {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
-
-        $newData = [
-            DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450190828500475_test_record',
-            'new_value' => 'value',
-        ];
-
-        $data = new DeliveryMonitoringData($deliveryExecutionId);
-        $data->set($newData);
-
-        $this->assertEquals($data->get(), $newData);
     }
 
     public function testValidate()
     {
-        $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
-        $data = new DeliveryMonitoringData($deliveryExecutionId);
+        $deliveryExecution = $this->getDeliveryExecution();
+        $data = new DeliveryMonitoringData($deliveryExecution, false);
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();
 
         $this->assertTrue(!empty($errors));
 
-        $data->add(DeliveryMonitoringService::COLUMN_TEST_TAKER, 'test_taker_id');
-        $data->add(DeliveryMonitoringService::COLUMN_STATUS, 'active');
+        $data->addValue(DeliveryMonitoringService::COLUMN_TEST_TAKER, 'test_taker_id');
+        $data->addValue(DeliveryMonitoringService::COLUMN_STATUS, 'active');
 
         $this->assertTrue($data->validate());
         $errors = $data->getErrors();
         $this->assertTrue(empty($errors));
+    }
+
+    private function getDeliveryExecution()
+    {
+        $id = 'http://sample/first.rdf#i1450190828500474_test_record';
+        $prophet = new \Prophecy\Prophet();
+        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        return $deliveryExecutionProphecy->reveal();
     }
 }
