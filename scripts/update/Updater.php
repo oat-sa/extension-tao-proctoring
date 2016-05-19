@@ -336,6 +336,7 @@ class Updater extends common_ext_ExtensionUpdater {
             }
 
             $this->setVersion('1.13.0');
+        }
     }
 
 }
