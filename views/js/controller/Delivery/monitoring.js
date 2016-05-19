@@ -428,7 +428,7 @@ define([
                 transform: function(value, row) {
                     var result = '',
                         status,
-                        online = row.online ? 'online' : 'offline';
+                        online = row.online ? __('online') : __('offline');
 
                     if (row && row.state && row.state.status) {
                         status = _status.getStatusByCode(row.state.status);
