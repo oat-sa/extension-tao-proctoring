@@ -314,7 +314,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 $this->getServiceManager()->register(TestSessionConnectivityStatusService::SERVICE_ID, $service);
             }
 
-            $this->setVersion('1.12.3');
+            $this->setVersion('1.13.0');
         }
     }
 
