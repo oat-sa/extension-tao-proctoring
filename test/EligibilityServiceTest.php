@@ -153,8 +153,13 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $deliveryProphecy3 = $this->prophesize('core_kernel_classes_Resource');
 
         $deliveryProphecy1->exists()->willReturn(true);
+        $deliveryProphecy1->getLabel()->willReturn('1');
+        
         $deliveryProphecy2->exists()->willReturn(true);
+        $deliveryProphecy2->getLabel()->willReturn('2');
+        
         $deliveryProphecy3->exists()->willReturn(true);
+        $deliveryProphecy3->getLabel()->willReturn('3');
 
         $delivery1 = $deliveryProphecy1->reveal();
         $delivery2 = $deliveryProphecy2->reveal();

@@ -47,9 +47,10 @@ use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\model\ProctoringAssignmentService;
 use oat\taoProctoring\model\DeliveryServerService;
+use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
 
 /**
- *
+ * 
  * @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends common_ext_ExtensionUpdater {
@@ -59,10 +60,10 @@ class Updater extends common_ext_ExtensionUpdater {
      * @return string string
      */
     public function update($initialVersion) {
-
+        
         $currentVersion = $initialVersion;
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
-
+        
         if ($currentVersion == '0.1') {
             $service = new DeliveryService();
             $ext->setConfig('delivery', $service);
@@ -160,7 +161,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('0.8.0');
         }
-
+        
         if ($this->isVersion('0.8.0')) {
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
@@ -168,7 +169,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
             );
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
-
+            
             $this->setVersion('0.9.0');
         }
 
@@ -259,7 +260,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.7.0', '1.7.1');
-
+        
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -330,8 +331,20 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.12.3');
         }
 
-
         if ($this->isVersion('1.12.3')) {
+            try {
+                $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new TestSessionConnectivityStatusService();
+                $service->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->register(TestSessionConnectivityStatusService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('1.13.0');
+        }
+
+
+        if ($this->isVersion('1.13.0')) {
 
             $testCenters = TestCenterService::singleton()->getRootClass()->getInstances(true);
             $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -373,7 +386,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
 
-            $this->setVersion('1.13.0');
+            $this->setVersion('1.14.0');
         }
     }
 

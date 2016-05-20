@@ -33,6 +33,7 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -483,6 +484,9 @@ class DeliveryHelper
                     }
                 }
 
+                $online = $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
+
+                $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
                     'id' => $deliveryExecution->getIdentifier(),
                     'delivery' => array(
@@ -493,13 +497,14 @@ class DeliveryHelper
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,
+                    'online' => $online,
                 );
             }
 
             return $executions;
         });
     }
-    
+
     /**
      * Get array of user specific extra fields to be displayed in the monitoring data table
      * 
