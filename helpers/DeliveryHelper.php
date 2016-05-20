@@ -157,15 +157,15 @@ class DeliveryHelper
      * Gets the aggregated data for a filtered set of delivery executions of a given delivery
      * This is performance critical, would need to find a way to optimize to obtain such information
      *
-     * @param $deliveryId
+     * @param core_kernel_classes_Resource $delivery
+     * @param core_kernel_classes_Resource $testCenter
      * @param array $options
      * @return array
-     * @throws \Exception
-     * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array()) {
+    public static function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
+    {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options), $options);
+        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
     }
 
     /**
@@ -178,7 +178,7 @@ class DeliveryHelper
      * @throws \Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
+    public static function getAllCurrentDeliveriesExecutions(core_kernel_classes_Resource $testCenter, array $options = array()){
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
@@ -492,7 +492,7 @@ class DeliveryHelper
                     'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                        'label' => $cachedData[DeliveryMonitoringService::DELIVERY_NAME],
+                        'label' => @$cachedData[DeliveryMonitoringService::DELIVERY_NAME],
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'testTaker' => $testTaker,
