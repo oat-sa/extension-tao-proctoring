@@ -456,6 +456,7 @@ class DeliveryHelper
         // paginate, then format the data
         return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
             $executions = [];
 
