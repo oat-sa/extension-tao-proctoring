@@ -492,7 +492,7 @@ class DeliveryHelper
                     'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                        'label' => @$cachedData[DeliveryMonitoringService::DELIVERY_NAME],
+                        'label' => $cachedData[DeliveryMonitoringService::DELIVERY_NAME],
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'testTaker' => $testTaker,
