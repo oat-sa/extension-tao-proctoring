@@ -601,6 +601,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
             'lastname' => self::TEST_TAKER_LAST_NAME,
             'delivery' => self::DELIVERY_NAME,
             'status' => self::STATUS,
+            'connectivity' => self::CONNECTIVITY,
         ],
             array_combine(array_map(function ($property) {
                 return strtolower($property['id']);

@@ -26,11 +26,13 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\ExtendedStateService;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**
@@ -165,13 +167,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
     private function updateData()
     {
-        $this->addValue(DeliveryMonitoringService::STATUS, $this->getStatus(), true);
         $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $this->getProgress(), true);
         $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
         $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
         $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
         $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $this->getTestCenterUri(), true);
         $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
+
+        $this->updateStatus();
         $this->updateDeliveryLabel();
 
         $this->updateTestTakerData();
@@ -359,5 +362,26 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $this->getTestTakerFistName(), true);
         $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $this->getTestTakerLastName(), true);
         $this->addExtraFieldsValues(true);
+    }
+
+    /**
+     * @param bool|timestamp $lastConnectivity
+     */
+    public function updateStatus($lastConnectivity = false)
+    {
+        $status = $this->getStatus();
+
+        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+
+        if (DeliveryExecutionStateService::STATE_INPROGRESS != $status) {
+            if (!$lastConnectivity) {
+                $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
+            } else {
+                $lastConnectivity = false;
+            }
+        }
+
+        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
+        $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
     }
 }

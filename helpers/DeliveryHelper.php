@@ -485,16 +485,16 @@ class DeliveryHelper
                     }
                 }
 
-                $online = $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
+                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
 
-                $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
-                    'id' => $deliveryExecution->getIdentifier(),
+                    'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
                         'label' => $cachedData[DeliveryMonitoringService::DELIVERY_NAME],
                     ),
-                    'date' => DateHelper::displayeDate($deliveryExecution->getStartTime()),
+                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,

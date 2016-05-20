@@ -434,19 +434,31 @@ define([
 
                 transform: function(value, row) {
                     var result = '',
-                        status,
-                        online = row.online ? __('online') : __('offline');
+                        status;
 
                     if (row && row.state && row.state.status) {
                         status = _status.getStatusByCode(row.state.status);
                         if (status) {
                             result = status.label;
                             if (row.state.status === 'INPROGRESS') {
-                                result = status.label + ' (' + online + ')';
+                                result = status.label;
                             }
                         }
                     }
                     return result;
+                }
+            });
+
+            // column: connectivity status of execution progress
+            model.push({
+                id: 'connectivity',
+                sortable: true,
+                label: __('Connectivity'),
+                transform: function(value, row) {
+                    if (row.state.status === 'INPROGRESS') {
+                        return row.online ? __('online') : __('offline');
+                    }
+                    return '';
                 }
             });
 
