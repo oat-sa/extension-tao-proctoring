@@ -198,9 +198,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getProgress()
     {
-        $testSessionService = TestSessionService::singleton();
-        $session = $testSessionService->getTestSession($this->deliveryExecution);
         $result = null;
+
+        $session = $this->getTestSession();
+
         if ($session !== null) {
             $pos = $session->getRoute()->getPosition();
             $count = $session->getRouteCount();
@@ -344,6 +345,16 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $this->testSession = $testSession;
         $this->updateData();
     }
+
+    private function getTestSession()
+     {
+         if ($this->testSession === null) {
+             $testSessionService = TestSessionService::singleton();
+             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
+         }
+        return $this->testSession;
+     }
+    
 
     /**
      * Refresh delivery information in storage
