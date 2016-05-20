@@ -22,9 +22,15 @@
 namespace oat\taoProctoring\scripts\update;
 
 use \common_ext_ExtensionUpdater;
+use Doctrine\DBAL\Schema\SchemaException;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\tao\model\event\MetadataModified;
 use oat\taoProctoring\model\DiagnosticStorage;
+use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
+use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\PaginatedStorage;
+use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -37,14 +43,13 @@ use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\model\ProctoringAssignmentService;
 use oat\taoProctoring\model\DeliveryServerService;
 
 /**
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends common_ext_ExtensionUpdater {
@@ -54,10 +59,10 @@ class Updater extends common_ext_ExtensionUpdater {
      * @return string string
      */
     public function update($initialVersion) {
-        
+
         $currentVersion = $initialVersion;
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
-        
+
         if ($currentVersion == '0.1') {
             $service = new DeliveryService();
             $ext->setConfig('delivery', $service);
@@ -155,7 +160,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('0.8.0');
         }
-        
+
         if ($this->isVersion('0.8.0')) {
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
@@ -163,7 +168,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
             );
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
-            
+
             $this->setVersion('0.9.0');
         }
 
@@ -254,7 +259,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.7.0', '1.7.1');
-        
+
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -323,6 +328,52 @@ class Updater extends common_ext_ExtensionUpdater {
             }
 
             $this->setVersion('1.12.3');
+        }
+
+
+        if ($this->isVersion('1.12.3')) {
+
+            $testCenters = TestCenterService::singleton()->getRootClass()->getInstances(true);
+            $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+
+            $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+            $eligibilityService = EligibilityService::singleton();
+
+            foreach ($testCenters as $testCenter) {
+                $deliveries = $eligibilityService->getEligibleDeliveries($testCenter, false);
+
+                foreach ($deliveries as $delivery) {
+                    if ($delivery->exists()) {
+                        $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
+                        foreach ($deliveryExecutions as $deliveryExecution) {
+                            $data = $deliveryMonitoringService->getData($deliveryExecution, true);
+                            $deliveryMonitoringService->save($data);
+                        }
+                    }
+                }
+            }
+
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach(DeliveryExecutionStateChanged::EVENT_NAME,
+                ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
+            );
+
+
+            $eventManager->attach(EligiblityChanged::EVENT_NAME,
+                ['oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate', 'eligiblityChange']
+            );
+
+            $eventManager->attach(MetadataModified::class,
+                ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
+            );
+
+            $eventManager->attach(MetadataModified::class,
+                ['oat\\taoProctoring\\model\\monitorCache\\update\\TestTakerUpdate', 'propertyChange']
+            );
+
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
+            $this->setVersion('1.13.0');
         }
     }
 
