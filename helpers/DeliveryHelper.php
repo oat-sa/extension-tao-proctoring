@@ -490,7 +490,8 @@ class DeliveryHelper
                     }
                 }
 
-                $online = $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
+                $online = $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_ACTIVE &&
+                          $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
 
                 $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
