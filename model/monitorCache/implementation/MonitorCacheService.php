@@ -40,58 +40,6 @@ class MonitorCacheService extends DeliveryMonitoringService
     /**
      * @inheritdoc
      */
-    public function find(array $criteria = [], array $options = [], $together = false)
-    {
-        $result = [];
-        $defaultOptions = [
-            'order' => self::COLUMN_ID." ASC",
-            'offset' => 0,
-            'asArray' => false
-        ];
-        $options = array_merge($defaultOptions, $options);
-
-        $whereClause = 'WHERE ';
-        $parameters = [];
-
-        $selectClause = "SELECT DISTINCT t.* ";
-        $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
-
-        $sql = $selectClause . $fromClause . PHP_EOL .
-            "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t ON kv_t." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-            $whereClause . PHP_EOL .
-            "ORDER BY " . $options['order'];
-
-        if (isset($options['limit']))  {
-            $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
-        }
-
-        $stmt = $this->getPersistence()->query($sql, $parameters);
-
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if ($together) {
-            foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row[self::COLUMN_DELIVERY_EXECUTION_ID]));
-            }
-        }
-
-        if ($options['asArray']) {
-            $result = $data;
-        } else {
-            foreach($data as $row) {
-                $monitoringData = new DeliveryMonitoringData($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData->set($row);
-                $result[] = $monitoringData;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
@@ -101,7 +49,6 @@ class MonitorCacheService extends DeliveryMonitoringService
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
 
         if ($result) {
-            $deliveryMonitoring->set($data);
             $this->saveKvData($deliveryMonitoring);
         }
 
@@ -134,6 +81,63 @@ class MonitorCacheService extends DeliveryMonitoringService
     }
 
     /**
+     * @param $condition
+     * @param $parameters
+     * @param $selectClause
+     * @return string
+     */
+    protected function prepareCondition($condition, &$parameters, &$selectClause)
+    {
+        $whereClause = '';
+
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition))) {
+            $condition = current($condition);
+        }
+
+        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
+            $whereClause .= " $condition ";
+        } else if (is_array($condition) && count($condition) > 1) {
+            $whereClause .=  '(';
+            $previousCondition = null;
+            foreach ($condition as $subCondition) {
+                if (is_array($subCondition) && is_array($previousCondition)) {
+                    $whereClause .= 'AND';
+                }
+                $whereClause .=  $this->prepareCondition($subCondition, $parameters, $selectClause);
+                $previousCondition = $subCondition;
+            }
+            $whereClause .=  ')';
+        } else if (is_array($condition) && count($condition) === 1) {
+            $primaryColumns = $this->getPrimaryColumns();
+            $key = array_keys($condition)[0];
+            $value = $condition[$key];
+
+            if ($value === null) {
+                $op = 'IS NULL';
+            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
+                $value = $matches[2];
+                $op = $matches[1] ? $matches[1] : "=";
+                $op .= ' ?';
+            }
+
+            if (in_array($key, $primaryColumns)) {
+                $whereClause .= " t.$key $op ";
+            } else {
+                $joinNum = count($this->joins);
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
+                $parameters[] = trim($key);
+            }
+
+            if ($value !== null) {
+                $parameters[] = trim($value);
+            }
+        }
+        return $whereClause;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
@@ -150,5 +154,25 @@ class MonitorCacheService extends DeliveryMonitoringService
         }
 
         return $result;
+    }
+
+    /**
+     * Check if record for delivery execution already exists in the storage.
+     * @todo add isNewRecord property to DeliveryMonitoringDataInterface to prevent repeated queries to DB.
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean
+     */
+    protected function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $data = $deliveryMonitoring->get();
+        $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+
+        $sql = "SELECT EXISTS( " . PHP_EOL .
+            "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
+            "FROM " . self::TABLE_NAME . PHP_EOL .
+            "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
+        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
+
+        return !((boolean) $exists);
     }
 }
