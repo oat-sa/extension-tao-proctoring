@@ -65,4 +65,22 @@ interface DeliveryMonitoringData
      * @return boolean
      */
     public function validate();
+
+    /**
+     * Refresh delivery information in storage
+     */
+    public function updateDeliveryLabel();
+
+
+    /**
+     * Refresh testtaker information in storage
+     */
+    public function updateTestTakerData();
+
+
+    /**
+     * Refresh test session information in storage
+     */
+    public function updateStatus();
+
 }
