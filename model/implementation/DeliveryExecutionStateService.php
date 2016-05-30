@@ -21,9 +21,11 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
+use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
 /**
@@ -286,6 +288,9 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $proctoringState['authorized_by'] = $currentUser->getUri();
         }
         $stateService->setValue($deliveryExecution, 'proctoring', $proctoringState);
+
+        $eventManager = ServiceManager::getServiceManager()->get(EventManager::CONFIG_ID);
+        $eventManager->trigger(new DeliveryExecutionStateChanged($deliveryExecution));
     }
 
     /**

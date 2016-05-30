@@ -31,7 +31,6 @@ use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoTestTaker\models\TestTakerService;
 use tao_helpers_Date as DateHelper;
-use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 
 /**

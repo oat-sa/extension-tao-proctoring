@@ -138,7 +138,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     /**
      * Get the requested eligibility to be edited
      * 
-     * @return type
+     * @return array
      * @throws \common_Exception
      */
     private function _getRequestEligibility(){
