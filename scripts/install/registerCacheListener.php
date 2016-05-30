@@ -20,6 +20,7 @@
  */
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\event\EventManager;
+use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
 use oat\taoTests\models\event\TestChangedEvent;
 
 $serviceManager = ServiceManager::getServiceManager();
@@ -32,6 +33,23 @@ $eventManager->attach(TestChangedEvent::EVENT_NAME,
 $eventManager->attach(
     'oat\\taoTests\\models\\event\\TestChangedEvent',
     array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+);
+
+$eventManager->attach(DeliveryExecutionStateChanged::EVENT_NAME,
+    ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
+);
+
+
+$eventManager->attach(\oat\taoProctoring\model\event\EligiblityChanged::EVENT_NAME,
+    ['oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate', 'eligiblityChange']
+);
+
+$eventManager->attach(\oat\tao\model\event\MetadataModified::class,
+    ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
+);
+
+$eventManager->attach(\oat\tao\model\event\MetadataModified::class,
+    ['oat\\taoProctoring\\model\\monitorCache\\update\\TestTakerUpdate', 'propertyChange']
 );
 
 $serviceManager->register(EventManager::CONFIG_ID, $eventManager);
