@@ -27,9 +27,10 @@ define([
     'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
+    'core/cachedStore',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, cachedStore, keepAfterResume, authSuccessTpl){
     'use strict';
 
     /**
@@ -114,10 +115,16 @@ define([
              * Function to be called when the delivery execution has been authorized
              */
             function authorized(){
-                loadingBar.stop();
-                //@todo it would be nice to smoothen the transition
-                $container.removeClass('authorization-in-progress');
-                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
+                // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
+                cachedStore('test-states-' + config.deliveryExecution, 'states')
+                    .then(function(states) {
+                        return states.setItem('paused', false);
+                    }).then(function() {
+                        loadingBar.stop();
+                        //@todo it would be nice to smoothen the transition
+                        $container.removeClass('authorization-in-progress');
+                        $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
+                    });
             }
 
             /**
