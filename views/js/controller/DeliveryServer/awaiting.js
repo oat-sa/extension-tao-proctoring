@@ -27,10 +27,10 @@ define([
     'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
-    'core/persistence',
+    'core/cachedStore',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, persistence, keepAfterResume, authSuccessTpl){
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, cachedStore, keepAfterResume, authSuccessTpl){
     'use strict';
 
     /**
@@ -116,7 +116,7 @@ define([
              */
             function authorized(){
                 // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
-                persistence('test-states-' + config.deliveryExecution)
+                cachedStore('test-states-' + config.deliveryExecution, 'states')
                     .then(function(states) {
                         return states.set('paused', false);
                     }).then(function() {
