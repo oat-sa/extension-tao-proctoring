@@ -118,7 +118,7 @@ define([
                 // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
                 cachedStore('test-states-' + config.deliveryExecution, 'states')
                     .then(function(states) {
-                        return states.set('paused', false);
+                        return states.setItem('paused', false);
                     }).then(function() {
                         loadingBar.stop();
                         //@todo it would be nice to smoothen the transition
