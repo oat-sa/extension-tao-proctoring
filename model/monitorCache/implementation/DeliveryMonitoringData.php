@@ -386,6 +386,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         if (DeliveryExecutionStateService::STATE_INPROGRESS == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
+            // to ensure that during sorting by connectivity all similar statuses grouped together
             $lastConnectivity = crc32($status);
         }
 
