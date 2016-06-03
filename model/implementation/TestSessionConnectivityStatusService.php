@@ -34,10 +34,9 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
     /**
      * Whether test session is online
      * @param string $sessionId test session identifier
-     * @param bool $timestamp
      * @return bool
      */
-    public function isOnline($sessionId, $timestamp = false) {
+    public function isOnline($sessionId) {
         \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionId);
         return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_ACTIVE;
@@ -50,7 +49,7 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
     public function getLastOnline($sessionId)
     {
         if ($this->isOnline($sessionId)) {
-            return time();
+            return mktime(true);
         }
         return null;
     }
