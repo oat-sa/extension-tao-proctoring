@@ -376,20 +376,18 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * @param bool|timestamp $lastConnectivity
      */
-    public function updateStatus($lastConnectivity = false)
+    public function updateStatus()
     {
         $status = $this->getStatus();
 
         $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-        if (DeliveryExecutionStateService::STATE_INPROGRESS != $status) {
-            if (!$lastConnectivity) {
-                $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
-            } else {
-                $lastConnectivity = false;
-            }
+        if (DeliveryExecutionStateService::STATE_INPROGRESS == $status) {
+            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
+        }else{
+            // to ensure that during sorting by connectivity all similar statuses grouped together
+            $lastConnectivity = crc32($status);
         }
 
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);

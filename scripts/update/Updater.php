@@ -346,25 +346,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
         if ($this->isVersion('1.13.0')) {
 
-            $testCenters = TestCenterService::singleton()->getRootClass()->getInstances(true);
-            $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-
-            $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
-            $eligibilityService = EligibilityService::singleton();
-
-            foreach ($testCenters as $testCenter) {
-                $deliveries = $eligibilityService->getEligibleDeliveries($testCenter, false);
-
-                foreach ($deliveries as $delivery) {
-                    if ($delivery->exists()) {
-                        $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
-                        foreach ($deliveryExecutions as $deliveryExecution) {
-                            $data = $deliveryMonitoringService->getData($deliveryExecution, true);
-                            $deliveryMonitoringService->save($data);
-                        }
-                    }
-                }
-            }
+            $this->refreshMonitoringData();
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $eventManager->attach(DeliveryExecutionStateChanged::EVENT_NAME,
@@ -390,6 +372,34 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.14.0', '1.14.1');
+
+        if ($this->isVersion('1.14.1')) {
+            $this->refreshMonitoringData();
+            $this->setVersion('1.14.2');
+        }
+    }
+
+    private function refreshMonitoringData()
+    {
+        $testCenters = TestCenterService::singleton()->getRootClass()->getInstances(true);
+        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+
+        $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $eligibilityService = EligibilityService::singleton();
+
+        foreach ($testCenters as $testCenter) {
+            $deliveries = $eligibilityService->getEligibleDeliveries($testCenter, false);
+
+            foreach ($deliveries as $delivery) {
+                if ($delivery->exists()) {
+                    $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
+                    foreach ($deliveryExecutions as $deliveryExecution) {
+                        $data = $deliveryMonitoringService->getData($deliveryExecution, true);
+                        $deliveryMonitoringService->save($data);
+                    }
+                }
+            }
+        }
     }
 
 }
