@@ -49,7 +49,7 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
     public function getLastOnline($sessionId)
     {
         if ($this->isOnline($sessionId)) {
-            return mktime(true);
+            return microtime(true);
         }
         return null;
     }
