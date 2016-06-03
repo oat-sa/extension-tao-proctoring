@@ -83,7 +83,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
 
-    const DEFAULT_SORT_COLUMN =   self::COLUMN_START_TIME;
+    const DEFAULT_SORT_COLUMN = self::COLUMN_START_TIME;
+    const DEFAULT_SORT_ORDER = 'DESC';
 
     protected $joins = [];
 
@@ -576,7 +577,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
 
         $sortBy = $this->getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
-        $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : 'ASC';
+        $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
 
         $result = $this->find([
             [self::TEST_CENTER_ID => $testCenter->getUri()],

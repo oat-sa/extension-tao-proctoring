@@ -72,7 +72,7 @@ class Delivery extends ProctoringModule
 
         $testCenter    = $this->getCurrentTestCenter();
         $delivery      = $this->getCurrentDelivery();
-        $requestOptions = $this->getRequestOptions();
+        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
         $this->composeView(
             'delivery-monitoring',
@@ -105,7 +105,7 @@ class Delivery extends ProctoringModule
     {
 
         $testCenter    = $this->getCurrentTestCenter();
-        $requestOptions = $this->getRequestOptions();
+        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
         $this->composeView(
             'delivery-monitoring',

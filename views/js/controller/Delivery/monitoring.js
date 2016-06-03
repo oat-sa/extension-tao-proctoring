@@ -517,7 +517,9 @@ define([
                     tools: tools,
                     actions: actions,
                     model: model,
-                    selectable: true
+                    selectable: true,
+                    sortorder: 'desc',
+                    sortby : 'date'
                 }, dataset);
                 
         }
