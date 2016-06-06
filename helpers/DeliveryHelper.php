@@ -20,11 +20,11 @@
 
 namespace oat\taoProctoring\helpers;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoProctoring\model\EligibilityService;
-use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
@@ -42,6 +42,11 @@ use oat\taoProctoring\model\TestSessionConnectivityStatusService;
  */
 class DeliveryHelper
 {
+    /**
+     * Cached value for prepopulated fields
+     * @var array
+     */
+    private static $extraFields;
     /**
      * Gets a list of available deliveries for a test site
      *
@@ -152,15 +157,15 @@ class DeliveryHelper
      * Gets the aggregated data for a filtered set of delivery executions of a given delivery
      * This is performance critical, would need to find a way to optimize to obtain such information
      *
-     * @param $deliveryId
+     * @param core_kernel_classes_Resource $delivery
+     * @param core_kernel_classes_Resource $testCenter
      * @param array $options
      * @return array
-     * @throws \Exception
-     * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array()) {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options), $options);
+    public static function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
+    {
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
     }
 
     /**
@@ -173,14 +178,14 @@ class DeliveryHelper
      * @throws \Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function getAllCurrentDeliveriesExecutions($testCenter, $options = array()){
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
+    public static function getAllCurrentDeliveriesExecutions(core_kernel_classes_Resource $testCenter, array $options = array()){
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
         $all = array();
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {
-                $all = array_merge($all, $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri(), $options));
+                $all = array_merge($all, $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options));
             }
         }
 
@@ -447,59 +452,49 @@ class DeliveryHelper
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     private static function adjustDeliveryExecutions($deliveryExecutions, $options) {
-        // sort all executions by reverse date
-        usort($deliveryExecutions, function($a, $b) {
-            return -strcmp(DateHelper::getTimeStamp($a->getStartTime()), DateHelper::getTimeStamp($b->getStartTime()));
-        });
 
         // paginate, then format the data
         return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-
-            $executions = array();
-            
-            $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
             $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-            foreach($deliveryExecutions as $deliveryExecution) {
-                $cachedData = current($deliveryMonitoringService->find([
-                    [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]
-                ], ['asArray' => true], true));
-                
-                $userId = $deliveryExecution->getUserIdentifier();
-                $state = array(
+            $executions = [];
+
+            foreach($deliveryExecutions as $cachedData) {
+
+                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+
+                $state = [
                     'status' => $deliveryExecutionStateService->getState($deliveryExecution),
                     'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM]
-                );
-                $testTaker = array();
-                $extraFields = array();
+                ];
+
+                $testTaker = [];
+                $extraFields = [];
                 
-                $user = UserHelper::getUser($userId);
+                $user = UserHelper::getUser($cachedData[DeliveryMonitoringService::TEST_TAKER]);
                 if ($user) {
                     /* @var $user User */
-                    $testTaker['id'] = $user->getIdentifier();
-                    $testTaker['lastName'] = UserHelper::getUserLastName($user);
-                    $testTaker['firstName'] = UserHelper::getUserFirstName($user, empty($testTaker['lastName']));
-                    
+                    $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
+                    $testTaker['lastName'] = $cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME];
+                    $testTaker['firstName'] = $cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME];
+
                     $userExtraFields = self::_getUserExtraFields();
                     foreach($userExtraFields as $field){
-                        $values = $user->getPropertyValues($field['property']);
-                        if(!empty($values) && is_array($values)){
-                            $extraFields[$field['id']] = (string) $values[0];
-                        }
+                        $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? $cachedData[$field['id']] : '';
                     }
                 }
 
-                $online = $testSessionConnectivityStatusService->isOnline($deliveryExecution->getIdentifier());
+                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
 
-                $delivery = $deliveryExecution->getDelivery();
                 $executions[] = array(
-                    'id' => $deliveryExecution->getIdentifier(),
+                    'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
-                        'uri' => $delivery->getUri(),
-                        'label' => $delivery->getLabel(),
+                        'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
+                        'label' => $cachedData[DeliveryMonitoringService::DELIVERY_NAME],
                     ),
-                    'date' => DateHelper::displayeDate($deliveryExecution->getStartTime()),
+                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,
@@ -517,20 +512,22 @@ class DeliveryHelper
      * @return array
      */
     private static function _getUserExtraFields(){
-        $returnValue = array();
-        $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
-        $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
-        if(!empty($userExtraFields) && is_array($userExtraFields)){
-            foreach($userExtraFields as $name => $uri){
-                $property = new \core_kernel_classes_Property($uri);
-                $returnValue[] = array(
-                    'id' => $name,
-                    'property' => $property,
-                    'label' => $property->getLabel()
-                );
+        if (!self::$extraFields){
+            $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
+            $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
+            if(!empty($userExtraFields) && is_array($userExtraFields)){
+                foreach($userExtraFields as $name => $uri){
+                    $property = new \core_kernel_classes_Property($uri);
+                    self::$extraFields[] = array(
+                        'id' => $name,
+                        'property' => $property,
+                        'label' => $property->getLabel()
+                    );
+                }
             }
         }
-        return $returnValue;
+
+        return self::$extraFields;
     }
 
     /**
@@ -543,6 +540,20 @@ class DeliveryHelper
             return array(
                 'id' => $field['id'],
                 'label' => $field['label']
+            );
+        }, self::_getUserExtraFields());
+    }
+
+    /**
+     * Return array of extra fields to be saved in monitoring storage
+     *
+     * @return array
+     */
+    public static function getExtraFieldsProperties(){
+        return array_map(function($field){
+            return array(
+                'id' => $field['id'],
+                'property' => $field['property']
             );
         }, self::_getUserExtraFields());
     }

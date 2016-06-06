@@ -48,8 +48,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private $deliveryExecution;
 
     /**
-    * @var AssessmentTestSession
-    */
+     * @var AssessmentTestSession
+     */
     private $testSession;
 
     /**
@@ -152,5 +152,31 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function get()
     {
         return $this->data;
+    }
+
+    /**
+     * Refresh delivery information in storage
+     */
+    public function updateDeliveryLabel()
+    {
+
+    }
+
+
+    /**
+     * Refresh testtaker information in storage
+     */
+    public function updateTestTakerData()
+    {
+
+    }
+
+
+    /**
+     * Refresh test session information in storage
+     */
+    public function updateStatus()
+    {
+        
     }
 }
