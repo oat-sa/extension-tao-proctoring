@@ -21,10 +21,17 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\oatbox\user\User;
+use oat\tao\helpers\UserHelper;
+use oat\taoProctoring\helpers\DeliveryHelper;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
@@ -67,10 +74,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         DeliveryMonitoringService::COLUMN_STATUS,
     ];
 
+    /** @var User */
+    private $user;
+
     /**
      * DeliveryMonitoringData constructor.
      * @param DeliveryExecution $deliveryExecution
-     * @param boolean $updateData whether instance should be populated by data during instantiation.
+     * @param bool $updateData
      */
     public function __construct(DeliveryExecution $deliveryExecution, $updateData = true)
     {
@@ -116,16 +126,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * Set test session
-     * @param AssessmentTestSession $testSession
-     */
-    public function setTestSession(AssessmentTestSession $testSession)
-    {
-        $this->testSession = $testSession;
-        $this->updateData();
-    }
-
-    /**
      * Validate data
      * @return bool whether data is valid and can be saved.
      */
@@ -155,6 +155,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
     /**
      * Get delivery execution data
+     * @param bool $refresh
      * @return array
      */
     public function get($refresh = false)
@@ -173,6 +174,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
         $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
         $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
+        $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $this->getTestCenterUri(), true);
+        $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
+
+        $this->updateStatus();
+        $this->updateDeliveryLabel();
+
+        $this->updateTestTakerData();
     }
 
     /**
@@ -189,8 +197,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getProgress()
     {
-        $session = $this->getTestSession();
         $result = null;
+
+        $session = $this->getTestSession();
+
         if ($session !== null) {
             $pos = $session->getRoute()->getPosition();
             $count = $session->getRouteCount();
@@ -206,23 +216,22 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * return AssessmentTestSession
-     */
-    private function getTestSession()
-    {
-        if ($this->testSession === null) {
-            $testSessionService = TestSessionService::singleton();
-            $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
-        }
-        return $this->testSession;
-    }
-
-    /**
      * @return string
      */
     private function getTestTaker()
     {
         return $this->deliveryExecution->getUserIdentifier();
+    }
+
+    /**
+     * @return User
+     */
+    private function getUser()
+    {
+        if (!$this->user){
+             $this->user = UserHelper::getUser($this->getTestTaker());
+        }
+        return $this->user;
     }
 
     /**
@@ -268,5 +277,119 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     {
         $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
         return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
+    }
+
+/**
+     * @return string
+     */
+    private function getTestTakerFistName(){
+        return UserHelper::getUserFirstName($this->getUser());
+    }
+
+    /**
+     * @return string
+     */
+    private function getTestTakerLastName(){
+        return UserHelper::getUserLastName($this->getUser());
+    }
+
+    /**
+     * @param bool $overwrite
+     */
+    private function addExtraFieldsValues($overwrite = false)
+    {
+        $user = $this->getUser();
+        if ($user) {
+            $fields = DeliveryHelper::getExtraFieldsProperties();
+            foreach ($fields as $field) {
+
+                $values = $user->getPropertyValues($field['property']);
+                if (!empty($values) && is_array($values)) {
+                    $this->addValue($field['id'], (string)$values[0], $overwrite);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getTestCenterUri()
+    {
+        $uri = null;
+        $delivery = $this->deliveryExecution->getDelivery();
+        $user = $this->getUser();
+
+        $testCenter = EligibilityService::singleton()->getTestCenter($delivery, $user);
+        if ($testCenter) {
+            $uri = $testCenter->getUri();
+        } else {
+            $deliverLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+            $loggedEvent = $deliverLog->get(
+                $this->deliveryExecution->getIdentifier(),
+                'TEST_AUTHORISE'
+            );
+            $loggedEvent = reset($loggedEvent);
+            $uri = isset($loggedEvent['data']['test_center']) ? $loggedEvent['data']['test_center'] : null;
+        }
+        return $uri;
+    }
+
+    /**
+     * Set test session
+     * @param AssessmentTestSession $testSession
+     */
+    public function setTestSession(AssessmentTestSession $testSession)
+    {
+        $this->testSession = $testSession;
+        $this->updateData();
+    }
+
+    private function getTestSession()
+     {
+         if ($this->testSession === null) {
+             $testSessionService = TestSessionService::singleton();
+             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
+         }
+        return $this->testSession;
+     }
+    
+
+    /**
+     * Refresh delivery information in storage
+     */
+    public function updateDeliveryLabel()
+    {
+        $this->addValue(DeliveryMonitoringService::DELIVERY_NAME, $this->deliveryExecution->getDelivery()->getLabel(), true);
+    }
+
+    /**
+     * Refresh testtaker information in storage
+     */
+    public function updateTestTakerData()
+    {
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $this->getTestTakerFistName(), true);
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $this->getTestTakerLastName(), true);
+        $this->addExtraFieldsValues(true);
+    }
+
+    /**
+     */
+    public function updateStatus()
+    {
+        $status = $this->getStatus();
+
+        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+
+        if (DeliveryExecutionStateService::STATE_INPROGRESS == $status) {
+            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
+        }else{
+            // to ensure that during sorting by connectivity all similar statuses grouped together
+            $lastConnectivity = crc32($status);
+        }
+
+        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
+        $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
     }
 }

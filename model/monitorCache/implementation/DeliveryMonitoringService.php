@@ -21,12 +21,12 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use core_kernel_classes_Resource;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\DeliveryService;
-use oat\oatbox\service\ServiceManager;
 
 /**
  * Class DeliveryMonitoringService
@@ -65,9 +65,12 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     const COLUMN_ID = 'id';
     const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
+    const COLUMN_DELIVERY_TEST_CENTER_ID = DeliveryMonitoringServiceInterface::TEST_CENTER_ID;
     const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
     const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
     const COLUMN_TEST_TAKER = DeliveryMonitoringServiceInterface::TEST_TAKER;
+    const COLUMN_TEST_TAKER_FIRST_NAME = DeliveryMonitoringServiceInterface::TEST_TAKER_FIRST_NAME;
+    const COLUMN_TEST_TAKER_LAST_NAME = DeliveryMonitoringServiceInterface::TEST_TAKER_LAST_NAME;
     const COLUMN_AUTHORIZED_BY = DeliveryMonitoringServiceInterface::AUTHORIZED_BY;
     const COLUMN_START_TIME = DeliveryMonitoringServiceInterface::START_TIME;
     const COLUMN_END_TIME = DeliveryMonitoringServiceInterface::END_TIME;
@@ -78,6 +81,10 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const KV_COLUMN_KEY = 'monitoring_key';
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
+
+
+    const DEFAULT_SORT_COLUMN = self::COLUMN_START_TIME;
+    const DEFAULT_SORT_ORDER = 'DESC';
 
     protected $joins = [];
 
@@ -199,7 +206,10 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
                 $row = array_merge($row, $this->getKvData($row[static::COLUMN_ID]));
             }
             unset($row);
-            $data = $this->orderResult($data, $options['order']);
+
+            if ($data) {
+                $data = $this->orderResult($data, $options['order']);
+            }
         }
 
         if ($options['asArray']) {
@@ -555,5 +565,51 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         }
 
         return !((boolean) $exists);
+    }
+
+    /**
+     * @param core_kernel_classes_Resource $delivery
+     * @param core_kernel_classes_Resource $testCenter
+     * @param array $options
+     * @return DeliveryMonitoringData[]
+     */
+    public function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
+    {
+
+        $sortBy = $this->getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
+        $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
+
+        $result = $this->find([
+            [self::TEST_CENTER_ID => $testCenter->getUri()],
+            'AND',
+            [self::DELIVERY_ID => $delivery->getUri()]
+        ], ['asArray' => true,
+            'order'=> $sortBy.' '. $sortOrder,
+        ],
+            true);
+
+        return $result;
+    }
+
+    /**
+     * @param string $sortBy
+     * @return string
+     */
+    private function getSortByColumn($sortBy)
+    {
+        $map = array_merge([
+            'firstname' => self::COLUMN_TEST_TAKER_FIRST_NAME,
+            'lastname' => self::TEST_TAKER_LAST_NAME,
+            'delivery' => self::DELIVERY_NAME,
+            'status' => self::STATUS,
+            'connectivity' => self::CONNECTIVITY,
+        ],
+            array_combine(array_map(function ($property) {
+                return strtolower($property['id']);
+            }, DeliveryHelper::getExtraFields()), array_map(function ($property) {
+                return $property['id'];
+            }, DeliveryHelper::getExtraFields())));
+
+        return array_key_exists(strtolower($sortBy), $map) ? $map[strtolower($sortBy)] : self::DEFAULT_SORT_COLUMN;
     }
 }

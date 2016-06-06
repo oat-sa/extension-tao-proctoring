@@ -28,7 +28,8 @@ use core_kernel_classes_Property;
 use core_kernel_classes_Resource;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\model\EligibilityService;
-
+use oat\oatbox\event\EventManager;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * Test the Test center service
@@ -153,8 +154,13 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $deliveryProphecy3 = $this->prophesize('core_kernel_classes_Resource');
 
         $deliveryProphecy1->exists()->willReturn(true);
+        $deliveryProphecy1->getLabel()->willReturn('1');
+        
         $deliveryProphecy2->exists()->willReturn(true);
+        $deliveryProphecy2->getLabel()->willReturn('2');
+        
         $deliveryProphecy3->exists()->willReturn(true);
+        $deliveryProphecy3->getLabel()->willReturn('3');
 
         $delivery1 = $deliveryProphecy1->reveal();
         $delivery2 = $deliveryProphecy2->reveal();
@@ -275,12 +281,26 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $testTaker3 = new core_kernel_classes_Resource('TestTaker3');
         $testTakers = array($testTaker1, $testTaker2, $testTaker3);
 
+        //disable event listener
+        $eventManager = ServiceManager::getServiceManager()->get(EventManager::CONFIG_ID);
+        $eventManager->detach(
+            'oat\\taoProctoring\\model\\event\\EligiblityChanged',
+            [
+                'oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate',
+                'eligiblityChange'
+            ]
+        );
+
         $eligibilityProphet = $this->prophesize('core_kernel_classes_Resource');
         $eligibilityProphet
             ->editPropertyValues(
                 new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAOProctor.rdf#EligibileTestTaker'),
                 $testTakers)
             ->willReturn(true);
+
+        $eligibilityProphet
+            ->getPropertyValues(new core_kernel_classes_Property(EligibilityService::PROPERTY_TESTTAKER_URI))
+            ->willReturn([]);
 
         $eligibilityServiceMock = $this->getMockBuilder('oat\taoProctoring\model\EligibilityService')
             ->disableOriginalConstructor()

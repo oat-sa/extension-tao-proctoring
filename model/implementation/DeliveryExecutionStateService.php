@@ -21,9 +21,11 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\oatbox\event\EventManager;
+use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
 /**
