@@ -39,6 +39,8 @@ use DateTime;
  */
 abstract class ProctoringModule extends \tao_actions_CommonModule
 {
+    const DEFAULT_SORT_COLUMN = 'firstname';
+    const DEFAULT_SORT_ORDER = 'asc';
     protected $currentTestCenter = null;
     protected $currentDelivery   = null;
 
@@ -119,18 +121,20 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
     /**
      * Gets the data table request options
      *
+     * @param array $defaults
      * @return array
      */
-    protected function getRequestOptions() {
+    protected function getRequestOptions(array $defaults = []) {
 
-        $today = new DateTime();
-        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : DataTableHelper::DEFAULT_PAGE;
-        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : DataTableHelper::DEFAULT_ROWS;
-        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : 'firstname';
-        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : 'asc';
-        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : null;
-        $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $today->format('Y-m-d');
-        $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $today->format('Y-m-d');
+        $defaults = array_merge($this->getDefaultOptions(), $defaults);
+
+        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : $defaults['page'];
+        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : $defaults['rows'];
+        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : $defaults['sortby'];
+        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : $defaults['sortorder'];
+        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : $defaults['filter'];
+        $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $defaults['periodStart'];
+        $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $defaults['periodEnd'];
 
         return array(
             'page' => $page,
@@ -142,6 +146,23 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'periodEnd' => $periodEnd
         );
 
+    }
+
+    /**
+     * @return array
+     */
+    private function getDefaultOptions()
+    {
+        $today = new DateTime();
+        return [
+            'page' => DataTableHelper::DEFAULT_PAGE,
+            'rows' => DataTableHelper::DEFAULT_ROWS,
+            'sortby' => self::DEFAULT_SORT_COLUMN,
+            'sortorder' => self::DEFAULT_SORT_ORDER,
+            'filter' => null,
+            'periodStart' => $today->format('Y-m-d'),
+            'periodEnd' => $today->format('Y-m-d')
+        ];
     }
 
     /**

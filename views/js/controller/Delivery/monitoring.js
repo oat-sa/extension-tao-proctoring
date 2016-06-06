@@ -372,6 +372,7 @@ define([
                 model.push({
                     id: 'delivery',
                     label: __('Session'),
+                    sortable : true,
                     transform: function(value, row) {
                         var delivery = row && row.delivery;
                         if (delivery) {
@@ -388,6 +389,7 @@ define([
             model.push({
                 id: 'firstname',
                 label: __('First name'),
+                sortable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.firstName || '';
 
@@ -398,6 +400,7 @@ define([
             model.push({
                 id: 'lastname',
                 label: __('Last name'),
+                sortable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.lastName || '';
 
@@ -409,6 +412,7 @@ define([
                 model.push({
                     id : extraField.id,
                     label: extraField.label,
+                    sortable : true,
                     transform: function(value, row) {
                         return row && row.extraFields && row.extraFields[extraField.id] || '';
                     }
@@ -418,6 +422,7 @@ define([
             // column: start time
             model.push({
                 id: 'date',
+                sortable : true,
                 label: __('Started at')
             });
 
@@ -425,21 +430,35 @@ define([
             model.push({
                 id: 'status',
                 label: __('Status'),
+                sortable : true,
+
                 transform: function(value, row) {
                     var result = '',
-                        status,
-                        online = row.online ? __('online') : __('offline');
+                        status;
 
                     if (row && row.state && row.state.status) {
                         status = _status.getStatusByCode(row.state.status);
                         if (status) {
                             result = status.label;
                             if (row.state.status === 'INPROGRESS') {
-                                result = status.label + ' (' + online + ')';
+                                result = status.label;
                             }
                         }
                     }
                     return result;
+                }
+            });
+
+            // column: connectivity status of execution progress
+            model.push({
+                id: 'connectivity',
+                sortable: true,
+                label: __('Connectivity'),
+                transform: function(value, row) {
+                    if (row.state.status === 'INPROGRESS') {
+                        return row.online ? __('online') : __('offline');
+                    }
+                    return '';
                 }
             });
 
@@ -498,7 +517,9 @@ define([
                     tools: tools,
                     actions: actions,
                     model: model,
-                    selectable: true
+                    selectable: true,
+                    sortorder: 'desc',
+                    sortby : 'date'
                 }, dataset);
                 
         }

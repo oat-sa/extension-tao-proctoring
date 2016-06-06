@@ -33,7 +33,13 @@ interface TestSessionConnectivityStatusService
     /**
      * Whether user is online
      * @param string $sessionId session
-     * @return boolean
+     * @return bool
      */
     public function isOnline($sessionId);
+
+    /**
+     * @param $sessionId
+     * @return null|timestamp
+     */
+    public function getLastOnline($sessionId);
 }
