@@ -94,7 +94,8 @@ class Delivery extends ProctoringModule
                     )
                 ),
                 BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
-            )
+            ),
+            'Monitoring/index.tpl'
         );
     }
     
@@ -125,8 +126,9 @@ class Delivery extends ProctoringModule
                         BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
-                BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter))
-            )
+                BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter)),
+            ),
+            'Monitoring/index.tpl'
         );
     }
 

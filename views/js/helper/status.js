@@ -102,7 +102,7 @@ define(['lodash', 'i18n'], function(_, __){
 
     /**
      * Get the status model from its code
-     * @param {string} statusName
+     * @param {string} statusCode
      * @returns {object}
      */
     function getStatusByCode(statusCode){
@@ -130,7 +130,18 @@ define(['lodash', 'i18n'], function(_, __){
         return formatted;
     }
 
+    /**
+     * Get status model mappings formatted
+     * @returns {Array}
+     */
+    function getStatuses() {
+        return _.map(_status, function (el) {
+            return {code: el.code, label: el.label};
+        });
+    }
+
     return {
+        getStatuses : getStatuses,
         getStatus : getStatus,
         getStatusByCode : getStatusByCode,
         verifyTestTaker : verifyTestTaker

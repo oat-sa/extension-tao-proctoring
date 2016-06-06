@@ -579,11 +579,17 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $sortBy = $this->getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
         $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
 
-        $result = $this->find([
+        $criteria = [
             [self::TEST_CENTER_ID => $testCenter->getUri()],
             'AND',
             [self::DELIVERY_ID => $delivery->getUri()]
-        ], ['asArray' => true,
+        ];
+
+        if (isset($options['filter']) && $options['filter']) {
+            $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
+        }
+
+        $result = $this->find($criteria, ['asArray' => true,
             'order'=> $sortBy.' '. $sortOrder,
         ],
             true);

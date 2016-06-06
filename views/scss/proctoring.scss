@@ -247,6 +247,13 @@
         }
     }
 
+    .delivery-monitoring {
+        .filters {
+            margin-top: 30px;
+            float: right;
+        }
+    }
+
     .icon-authorize:before {
         @include icon-result-ok();
     }

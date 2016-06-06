@@ -185,11 +185,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getStatus()
     {
-        $result = null;
-        $proctoringData = $this->getProctoringData();
-        if ($proctoringData !== null && isset($proctoringData['status'])) {
-            $result = $proctoringData['status'];
-        }
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+        $result = $deliveryExecutionStateService->getState($this->deliveryExecution);
+
         return $result;
     }
 

@@ -455,17 +455,14 @@ class DeliveryHelper
 
         // paginate, then format the data
         return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
-            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
             $executions = [];
 
             foreach($deliveryExecutions as $cachedData) {
 
-                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
-
                 $state = [
-                    'status' => $deliveryExecutionStateService->getState($deliveryExecution),
+                    'status' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS],
                     'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM]
                 ];
 

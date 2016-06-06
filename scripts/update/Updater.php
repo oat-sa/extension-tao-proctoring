@@ -373,9 +373,9 @@ class Updater extends common_ext_ExtensionUpdater {
 
         $this->skip('1.14.0', '1.14.1');
 
-        if ($this->isVersion('1.14.1')) {
+        if ($this->isVersion('1.14.1') || $this->isVersion('1.14.2') ) {
             $this->refreshMonitoringData();
-            $this->setVersion('1.14.2');
+            $this->setVersion('1.14.3');
         }
     }
 
