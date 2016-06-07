@@ -396,6 +396,11 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('1.15.0');
         }
+
+        if ($this->isVersion('1.15.0')) {
+            $this->refreshMonitoringData();
+            $this->setVersion('1.15.1');
+        }
     }
 
     private function refreshMonitoringData()

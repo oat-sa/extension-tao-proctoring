@@ -243,7 +243,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             $result = $deliveryLog[0]['data']['proctorUri'];
         }
         return $result;
-
     }
 
     /**

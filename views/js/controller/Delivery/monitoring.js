@@ -31,9 +31,10 @@ define([
     'ui/cascadingComboBox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'tpl!taoProctoring/templates/delivery/itemProgress',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
-    'ui/datatable'
+    'tpl!taoProctoring/templates/delivery/statusFilter',
+    'ui/datatable',
+    'select2'
 ], function (
     $,
     _,
@@ -47,8 +48,8 @@ define([
     cascadingComboBox,
     breadcrumbsFactory,
     _status,
-    itemProgressTpl,
-    deliveryLinkTpl
+    deliveryLinkTpl,
+    statusFilterTpl
 ) {
     'use strict';
 
@@ -61,25 +62,6 @@ define([
     // the page is always loading data when starting
     loadingBar.start();
 
-    /**
-     * Formats a time value to string
-     * @param {Number} time
-     * @returns {String}
-     * @private
-     */
-    var _timerFormat = function(time) {
-        return __('%d min', Math.floor(time / 60));
-    };
-
-    var notYet = function() {
-        dialog({
-            message: __('Not yet implemented!'),
-            autoRender: true,
-            autoDestroy: true,
-            buttons: 'ok'
-        });
-    };
-    
     /**
      * Controls the taoProctoring delivery page
      *
@@ -245,6 +227,32 @@ define([
                         cb(_selection, reason);
                     }
                 });
+            }
+
+
+            /**
+             * @param $container
+             * @param $list
+             */
+            function buildFilters($container, $list){
+
+                $container.find('.filters').append(statusFilterTpl({statuses: _status.getStatuses()}));
+
+                var $statusFilter = $container.find('.filters>select');
+
+                $statusFilter.select2({
+                    dropdownAutoWidth: true,
+                    placeholder: __('Status filter'),
+                    minimumResultsForSearch: Infinity,
+                    allowClear: true
+                })
+                    .on('change', function (e) {
+                        $list
+                            .datatable('options', {
+                                params: {filter: e.val}
+                            })
+                            .datatable('refresh');
+                    });
             }
 
             // tool: page refresh
@@ -521,7 +529,10 @@ define([
                     sortorder: 'desc',
                     sortby : 'date'
                 }, dataset);
-                
+
+
+            buildFilters($container, $list);
+
         }
     };
 
