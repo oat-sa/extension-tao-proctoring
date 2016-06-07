@@ -388,6 +388,8 @@ class Updater extends common_ext_ExtensionUpdater {
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
             );
 
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
             OntologyUpdater::syncModels();
 
             $this->refreshMonitoringData();
