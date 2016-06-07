@@ -80,6 +80,12 @@ define([
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();
 
+            // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
+            cachedStore('test-states-' + config.deliveryExecution, 'states')
+                .then(function(states) {
+                    return states.setItem('paused', false);
+                });
+
             loadingBar.start();
 
             polling({
@@ -115,16 +121,10 @@ define([
              * Function to be called when the delivery execution has been authorized
              */
             function authorized(){
-                // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
-                cachedStore('test-states-' + config.deliveryExecution, 'states')
-                    .then(function(states) {
-                        return states.setItem('paused', false);
-                    }).then(function() {
-                        loadingBar.stop();
-                        //@todo it would be nice to smoothen the transition
-                        $container.removeClass('authorization-in-progress');
-                        $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
-                    });
+                loadingBar.stop();
+                //@todo it would be nice to smoothen the transition
+                $container.removeClass('authorization-in-progress');
+                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
             }
 
             /**
