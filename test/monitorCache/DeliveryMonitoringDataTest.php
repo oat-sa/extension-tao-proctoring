@@ -121,7 +121,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     {
         $id = 'http://sample/first.rdf#i1450190828500474_test_record';
         $prophet = new \Prophecy\Prophet();
-        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoProctoring\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
