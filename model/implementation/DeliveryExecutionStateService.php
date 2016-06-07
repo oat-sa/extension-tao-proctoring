@@ -147,7 +147,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
         if (DeliveryExecution::STATE_TERMINATED !== $executionState && DeliveryExecution::STATE_FINISHED !== $executionState) {
 
-            $deliveryExecution->setState(DeliveryExecution::STATE_FINISHIED);
+            $deliveryExecution->setState(DeliveryExecution::STATE_TERMINATED);
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $proctor = \common_session_SessionManager::getSession()->getUser();
