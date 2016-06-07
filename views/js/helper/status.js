@@ -18,9 +18,17 @@
  */
 define(['lodash', 'i18n'], function(_, __){
     'use strict';
+    var _init = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit',
+        _awaiting = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
+        _authorized = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+        _inprogress = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+        _paused = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
+        _completed = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
+        _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
+
     var _status = {
         init : {
-            code : 'INIT',
+            code : _init,
             label : __('Init'),
             can : {
                 authorize : __('not awaiting'),
@@ -30,7 +38,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         awaiting : {
-            code : 'AWAITING',
+            code : _awaiting,
             label : __('Awaiting'),
             can : {
                 authorize : true,
@@ -40,7 +48,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         authorized : {
-            code : 'AUTHORIZED',
+            code : _authorized,
             label : __('Authorized but not started'),
             can : {
                 authorize : __('already authorized'),
@@ -50,7 +58,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         inprogress : {
-            code : 'INPROGRESS',
+            code : _inprogress,
             label : __('In Progress'),
             can : {
                 authorize : __('already authorized'),
@@ -60,7 +68,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         paused : {
-            code : 'PAUSED',
+            code : _paused,
             label : __('Paused'),
             can : {
                 authorize : __('is paused'),
@@ -70,7 +78,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         completed : {
-            code : 'COMPLETED',
+            code : _completed,
             label : __('Completed'),
             can : {
                 authorize : __('is completed'),
@@ -80,7 +88,7 @@ define(['lodash', 'i18n'], function(_, __){
             }
         },
         terminated : {
-            code : 'TERMINATED',
+            code : _terminated,
             label : __('Terminated'),
             can : {
                 authorize : __('is terminated'),
@@ -144,7 +152,13 @@ define(['lodash', 'i18n'], function(_, __){
         getStatuses : getStatuses,
         getStatus : getStatus,
         getStatusByCode : getStatusByCode,
-        verifyTestTaker : verifyTestTaker
+        verifyTestTaker : verifyTestTaker,
+        STATUS_INIT : _init,
+        STATUS_AUTHORIZED : _authorized,
+        STATUS_INPROGRESS : _inprogress,
+        STATUS_PAUSED : _paused,
+        STATUS_COMPLETED : _completed,
+        STATUS_TERMINATED : _terminated
     };
 });
 

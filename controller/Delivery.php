@@ -251,7 +251,6 @@ class Delivery extends ProctoringModule
     public function deliveryExecutions() {
 
         try {
-
             $delivery      = $this->getCurrentDelivery();
             $testCenter      = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions();

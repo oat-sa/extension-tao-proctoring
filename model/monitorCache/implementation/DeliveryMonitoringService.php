@@ -26,7 +26,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Class DeliveryMonitoringService

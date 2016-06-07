@@ -463,7 +463,7 @@ define([
                 sortable: true,
                 label: __('Connectivity'),
                 transform: function(value, row) {
-                    if (row.state.status === 'INPROGRESS') {
+                    if (row.state.status === _status.STATUS_INPROGRESS) {
                         return row.online ? __('online') : __('offline');
                     }
                     return '';

@@ -154,13 +154,11 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $deliveryProphecy3 = $this->prophesize('core_kernel_classes_Resource');
 
         $deliveryProphecy1->exists()->willReturn(true);
-        $deliveryProphecy1->getLabel()->willReturn('1');
-        
+        $deliveryProphecy1->getLabel()->willReturn('aaa');
         $deliveryProphecy2->exists()->willReturn(true);
-        $deliveryProphecy2->getLabel()->willReturn('2');
-        
+        $deliveryProphecy2->getLabel()->willReturn('ccc');
         $deliveryProphecy3->exists()->willReturn(true);
-        $deliveryProphecy3->getLabel()->willReturn('3');
+        $deliveryProphecy3->getLabel()->willReturn('bbb');
 
         $delivery1 = $deliveryProphecy1->reveal();
         $delivery2 = $deliveryProphecy2->reveal();
@@ -193,10 +191,10 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
 
         $deliveries = $eligibilityServiceMock->getEligibleDeliveries($testCenter);
 
-        $this->assertCount(3,$deliveries);
+        $this->assertCount(3, $deliveries);
         $this->assertEquals($delivery1, $deliveries[0]);
-        $this->assertEquals($delivery2, $deliveries[1]);
-        $this->assertEquals($delivery3, $deliveries[2]);
+        $this->assertEquals($delivery3, $deliveries[1]);
+        $this->assertEquals($delivery2, $deliveries[2]);
     }
 
     /**
