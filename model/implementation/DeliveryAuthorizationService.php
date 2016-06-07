@@ -22,9 +22,7 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
-use common_Logger;
-use PHPSession;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\DeliveryAuthorizationService as DeliveryAuthorizationServiceInterface;
 
 class DeliveryAuthorizationService extends ConfigurableService implements DeliveryAuthorizationServiceInterface
@@ -50,10 +48,7 @@ class DeliveryAuthorizationService extends ConfigurableService implements Delive
      */
     public function grantAuthorization(DeliveryExecution $deliveryExecution)
     {
-        $securityKey = $this->getSecurityKey($deliveryExecution);
-        common_Logger::i('Grant the proctor authorization, with security key: ' . $securityKey);
-        PHPSession::singleton()->setAttribute(self::ACCESS_KEY_NAME, $securityKey);
-
+        $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
         return true;
     }
 
@@ -64,11 +59,7 @@ class DeliveryAuthorizationService extends ConfigurableService implements Delive
      */
     public function revokeAuthorization(DeliveryExecution $deliveryExecution)
     {
-        $session = PHPSession::singleton();
-        $securityKey = uniqid();
-        common_Logger::i('Reset the proctor security key with value: ' . $securityKey);
-        $session->setAttribute(self::SECURE_KEY_NAME, $securityKey);
-        $session->setAttribute(self::ACCESS_KEY_NAME, null);
+        $deliveryExecution->setState(DeliveryExecution::STATE_PAUSED);
 
         return true;
     }
@@ -80,32 +71,6 @@ class DeliveryAuthorizationService extends ConfigurableService implements Delive
      */
     public function isAuthorized(DeliveryExecution $deliveryExecution)
     {
-        $session = PHPSession::singleton();
-        return $session->hasAttribute(self::ACCESS_KEY_NAME) &&
-        $session->getAttribute(self::ACCESS_KEY_NAME) == $this->getSecurityKey($deliveryExecution);
-    }
-
-    /**
-     * Checks if a security key has been set.
-     * @param DeliveryExecution $deliveryExecution
-     * @return bool
-     */
-    protected function hasSecurityKey(DeliveryExecution $deliveryExecution)
-    {
-        return PHPSession::singleton()->hasAttribute(self::SECURE_KEY_NAME);
-    }
-
-    /**
-     * Gets the current security key.
-     * Generates a new one if needed.
-     * @param DeliveryExecution $deliveryExecution
-     * @return string
-     */
-    protected function getSecurityKey(DeliveryExecution $deliveryExecution)
-    {
-        if (!$this->hasSecurityKey($deliveryExecution)) {
-            $this->revokeAuthorization($deliveryExecution);
-        }
-        return PHPSession::singleton()->getAttribute(self::SECURE_KEY_NAME);
+        return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_AUTHORIZED;
     }
 }

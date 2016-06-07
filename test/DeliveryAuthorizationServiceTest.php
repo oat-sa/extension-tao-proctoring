@@ -70,8 +70,27 @@ class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner
 
     private function getDEMock()
     {
-        $deProphecy = $this->prophesize('oat\\taoDelivery\\model\\execution\\DeliveryExecution');
-        $deliveryExecution = $deProphecy->reveal();
-        return $deliveryExecution;
+        return new DeliveryExecutionMock(new \taoDelivery_models_classes_execution_OntologyDeliveryExecution('test_uri'));
+    }
+}
+
+class DeliveryExecutionMock extends \oat\taoProctoring\model\execution\DeliveryExecution
+{
+    private $state;
+
+    public function __construct(\taoDelivery_models_classes_execution_DeliveryExecution $implementation)
+    {
+        parent::__construct($implementation);
+        $this->state = new \core_kernel_classes_Resource('fake_state');
+    }
+
+    public function setState($state)
+    {
+        $this->state = new \core_kernel_classes_Resource($state);
+    }
+
+    public function getState()
+    {
+        return $this->state;
     }
 }

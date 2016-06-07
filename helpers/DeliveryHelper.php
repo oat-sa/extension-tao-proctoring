@@ -25,7 +25,8 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoProctoring\model\EligibilityService;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use tao_helpers_Date as DateHelper;
@@ -86,13 +87,13 @@ class DeliveryHelper
                 /* @var $execution DeliveryExecution */
                 $executionState = $deliveryExecutionStateService->getState($execution);
                 switch($executionState){
-                    case DeliveryExecutionStateService::STATE_AWAITING:
+                    case DeliveryExecution::STATE_AWAITING:
                         $awaiting++;
                         break;
-                    case DeliveryExecutionStateService::STATE_INPROGRESS:
+                    case DeliveryExecution::STATE_ACTIVE:
                         $inprogress++;
                         break;
-                    case DeliveryExecutionStateService::STATE_PAUSED:
+                    case DeliveryExecution::STATE_PAUSED:
                         $paused++;
                         break;
                     default:
@@ -582,9 +583,13 @@ class DeliveryHelper
      */
     public static function getHasBeenPaused($deliveryExecution)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
-        $status = $proctoringState['hasBeenPaused'];
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+        }
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
         return $status;
     }
@@ -595,8 +600,13 @@ class DeliveryHelper
      */
     public static function setHasBeenPaused($deliveryExecution, $paused)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $proctoringState = $deliveryExecutionStateService->getProctoringState($deliveryExecution);
-        $deliveryExecutionStateService->setProctoringState($deliveryExecution, $proctoringState['status'], $proctoringState['reason'], $paused);
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+        }
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data->addValue('hasBeenPaused', $paused);
+        $deliveryMonitoringService->save($data);
     }
 }

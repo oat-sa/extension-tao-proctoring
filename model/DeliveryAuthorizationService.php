@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model;
 
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 interface DeliveryAuthorizationService
 {
