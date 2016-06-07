@@ -31,7 +31,6 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\ExtendedStateService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
 
