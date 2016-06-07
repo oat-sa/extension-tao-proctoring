@@ -46,7 +46,7 @@ class DeliveryHelper
      * Cached value for prepopulated fields
      * @var array
      */
-    private static $extraFields;
+    private static $extraFields = [];
     /**
      * Gets a list of available deliveries for a test site
      *
