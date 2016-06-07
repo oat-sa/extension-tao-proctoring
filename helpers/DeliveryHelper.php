@@ -183,14 +183,36 @@ class DeliveryHelper
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
-        $all = array();
+        $deliveryCriteria = [];
+
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {
-                $all = array_merge($all, $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options));
+                if (!empty($deliveryCriteria)) {
+                    $deliveryCriteria[] = 'OR';
+                }
+                $deliveryCriteria[] = [DeliveryMonitoringService::DELIVERY_ID => $delivery->getUri()];
             }
         }
 
-        return self::adjustDeliveryExecutions($all, $options);
+        $criteria = [
+            [DeliveryMonitoringService::TEST_CENTER_ID => $testCenter->getUri()],
+            'AND',
+            $deliveryCriteria
+        ];
+
+        if (isset($options['filter']) && $options['filter']) {
+            $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
+        }
+
+        $options['asArray'] = true;
+
+        $sortBy = DeliveryMonitoringService::getSortByColumn($options['sortBy']);
+        $sortOrder = isset($options['sortOrder']) ? $options['sortOrder'] : DeliveryMonitoringService::DEFAULT_SORT_ORDER;
+        $options['order'] = "$sortBy $sortOrder";
+
+        $result = $deliveryService->find($criteria, $options, true);
+
+        return self::adjustDeliveryExecutions($result, $options);
     }
 
     /**
