@@ -192,9 +192,9 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $deliveries = $eligibilityServiceMock->getEligibleDeliveries($testCenter);
 
         $this->assertCount(3, $deliveries);
-        $this->assertTrue(in_array($delivery1, $deliveries));
-        $this->assertTrue(in_array($delivery2, $deliveries));
-        $this->assertTrue(in_array($delivery3, $deliveries));
+        $this->assertEquals($delivery1, $deliveries[0]);
+        $this->assertEquals($delivery3, $deliveries[1]);
+        $this->assertEquals($delivery2, $deliveries[2]);
     }
 
     /**
