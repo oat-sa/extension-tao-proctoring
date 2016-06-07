@@ -30,11 +30,9 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * class DeliveryMonitoringData
@@ -382,7 +380,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-        if (DeliveryExecutionStateService::STATE_INPROGRESS == $status) {
+        if (DeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
             // to ensure that during sorting by connectivity all similar statuses grouped together

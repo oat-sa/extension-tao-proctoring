@@ -19,10 +19,9 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
-
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 /**
  *
  * @package oat\taoProctoring
@@ -31,7 +30,7 @@ use oat\oatbox\service\ServiceManager;
 class DeliveryExecutionStateUpdate
 {
 
-    public static function stateChange(DeliveryExecutionStateChanged $event)
+    public static function stateChange(DeliveryExecutionState $event)
     {
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);

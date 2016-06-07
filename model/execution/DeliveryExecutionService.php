@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\execution;
 
 use oat\oatbox\Configurable;
 use oat\taoDelivery\model\execution\DeliveryExecution as InterfaceDeliveryExecution;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution as BaseDeliveryExecution;
 
 /**
  * Service to manage the execution of deliveries
@@ -51,7 +52,7 @@ class DeliveryExecutionService
         $executions = $this->getImplementation()->getExecutionsByDelivery($compiled);
         $result = [];
         foreach ($executions as $execution) {
-            $result[] = new DeliveryExecution($execution);
+            $result[] = $this->createDeliveryExecution($execution);
         }
         return $result;
     }
@@ -65,7 +66,7 @@ class DeliveryExecutionService
         $executions = $this->getImplementation()->getDeliveryExecutionsByStatus($userUri, $status);
         $result = [];
         foreach ($executions as $execution) {
-            $result[] = new DeliveryExecution($execution);
+            $result[] = $this->createDeliveryExecution($execution);
         }
         return $result;
     }
@@ -79,7 +80,7 @@ class DeliveryExecutionService
         $executions = $this->getImplementation()->getUserExecutions($compiled, $userUri);
         $result = [];
         foreach ($executions as $execution) {
-            $result[] = new DeliveryExecution($execution);
+            $result[] = $this->createDeliveryExecution($execution);
         }
         return $result;
     }
@@ -90,7 +91,7 @@ class DeliveryExecutionService
     public function initDeliveryExecution(\core_kernel_classes_Resource $assembly, $userUri)
     {
         $execution = $this->getImplementation()->initDeliveryExecution($assembly, $userUri);
-        return new DeliveryExecution($execution);
+        return $this->createDeliveryExecution($execution);
     }
     
     /**
@@ -98,9 +99,16 @@ class DeliveryExecutionService
      * @see taoDelivery_models_classes_execution_Service::getDeliveryExecution()
      */
     public function getDeliveryExecution($identifier) {
-        return new DeliveryExecution(
-            $this->getImplementation()->getDeliveryExecution($identifier)
-        );
+        return $this->createDeliveryExecution($this->getImplementation()->getDeliveryExecution($identifier));
+    }
+
+    /**
+     * @param BaseDeliveryExecution $deliveryExecution
+     * @return DeliveryExecution
+     */
+    protected function createDeliveryExecution(BaseDeliveryExecution $deliveryExecution)
+    {
+        return new DeliveryExecution($deliveryExecution->getImplementation());
     }
 
 }

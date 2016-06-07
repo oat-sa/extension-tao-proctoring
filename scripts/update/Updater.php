@@ -386,6 +386,8 @@ class Updater extends common_ext_ExtensionUpdater {
 
             OntologyUpdater::syncModels();
 
+            $this->refreshMonitoringData();
+
             $this->setVersion('1.15.0');
         }
     }
