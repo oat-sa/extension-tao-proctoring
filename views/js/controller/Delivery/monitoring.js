@@ -523,7 +523,7 @@ define([
                         loading: __('Loading')
                     },
                     filter: true,
-                    filtercolumns:['status','firstname'],
+                    filtercolumns:['status'],
                     tools: tools,
                     actions: actions,
                     model: model,
@@ -532,8 +532,6 @@ define([
                     sortby : 'date'
                 }, dataset);
 
-
-            // buildFilters($container, $list);
 
         }
     };
