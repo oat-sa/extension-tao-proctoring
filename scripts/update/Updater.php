@@ -377,7 +377,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.14.2');
         }
 
-        if ($this->isVersion('1.14.2')) {
+        if ($this->isVersion('1.14.2') || $this->isVersion('1.14.3')) {
             $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
             $config = $ext->getConfig('execution_service');
             $config = new \oat\taoProctoring\model\execution\DeliveryExecutionService(['implementation' => $config]);
