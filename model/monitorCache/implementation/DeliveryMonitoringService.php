@@ -576,7 +576,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     public function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
     {
 
-        $sortBy = $this->getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
+        $sortBy = self::getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
         $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
 
         $criteria = [
@@ -601,7 +601,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param string $sortBy
      * @return string
      */
-    private function getSortByColumn($sortBy)
+    public static function getSortByColumn($sortBy)
     {
         $map = array_merge([
             'firstname' => self::COLUMN_TEST_TAKER_FIRST_NAME,
