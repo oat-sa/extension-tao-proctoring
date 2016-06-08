@@ -229,30 +229,25 @@ define([
                 });
             }
 
+            /**
+             * Return html for filter
+             * @returns {String}
+             */
+            function buildStatusFilter(){
+                return statusFilterTpl({statuses: _status.getStatuses()});
+            }
 
             /**
-             * @param $container
-             * @param $list
+             * Additional action perfomed with filter element
+             * @param {jQueryElement} $el
              */
-            function buildFilters($container, $list){
-
-                $container.find('.filters').append(statusFilterTpl({statuses: _status.getStatuses()}));
-
-                var $statusFilter = $container.find('.filters>select');
-
-                $statusFilter.select2({
+            function statusFilterHandler($el) {
+                $el.select2({
                     dropdownAutoWidth: true,
-                    placeholder: __('Status filter'),
+                    placeholder: __('Filter'),
                     minimumResultsForSearch: Infinity,
                     allowClear: true
-                })
-                    .on('change', function (e) {
-                        $list
-                            .datatable('options', {
-                                params: {filter: e.val}
-                            })
-                            .datatable('refresh');
-                    });
+                });
             }
 
             // tool: page refresh
@@ -398,6 +393,7 @@ define([
                 id: 'firstname',
                 label: __('First name'),
                 sortable : true,
+                filterable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.firstName || '';
 
@@ -439,6 +435,11 @@ define([
                 id: 'status',
                 label: __('Status'),
                 sortable : true,
+                filterable : true,
+                customFilter : {
+                    template : buildStatusFilter(),
+                    callback : statusFilterHandler
+                },
 
                 transform: function(value, row) {
                     var result = '',
@@ -522,6 +523,8 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filter: true,
+                    filtercolumns:['status','firstname'],
                     tools: tools,
                     actions: actions,
                     model: model,
@@ -531,7 +534,7 @@ define([
                 }, dataset);
 
 
-            buildFilters($container, $list);
+            // buildFilters($container, $list);
 
         }
     };
