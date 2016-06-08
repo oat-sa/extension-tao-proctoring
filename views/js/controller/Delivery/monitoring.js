@@ -393,7 +393,6 @@ define([
                 id: 'firstname',
                 label: __('First name'),
                 sortable : true,
-                filterable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.firstName || '';
 
