@@ -23,6 +23,7 @@ namespace oat\taoProctoring\test;
 
 use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner
 {
@@ -66,6 +67,10 @@ class DeliveryAuthorizationServiceTest extends TaoPhpUnitTestRunner
         $this->assertTrue($this->authorizationService->isAuthorized($deliveryExecution));
         $this->authorizationService->revokeAuthorization($deliveryExecution);
         $this->assertFalse($this->authorizationService->isAuthorized($deliveryExecution));
+
+        //delivery in active state treats as authorized.
+        $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
+        $this->assertTrue($this->authorizationService->isAuthorized($deliveryExecution));
     }
 
     private function getDEMock()
