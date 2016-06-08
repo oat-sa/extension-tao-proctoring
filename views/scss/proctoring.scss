@@ -248,9 +248,8 @@
     }
 
     .delivery-monitoring {
-        .filters {
-            margin-top: 30px;
-            float: right;
+        aside.filter:first-child {
+            display: none;
         }
     }
 

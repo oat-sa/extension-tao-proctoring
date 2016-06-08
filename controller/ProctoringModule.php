@@ -133,6 +133,7 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
         $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : $defaults['sortby'];
         $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : $defaults['sortorder'];
         $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : $defaults['filter'];
+        $filterquery = $this->hasRequestParameter('filterquery') ? $this->getRequestParameter('filterquery') : $defaults['filter'];
         $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $defaults['periodStart'];
         $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $defaults['periodEnd'];
 
@@ -141,7 +142,7 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'rows' => $rows,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
-            'filter' => $filter,
+            'filter' => $filter ? $filter : $filterquery,
             'periodStart' => $periodStart,
             'periodEnd' => $periodEnd
         );
