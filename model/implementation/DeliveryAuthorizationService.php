@@ -71,6 +71,7 @@ class DeliveryAuthorizationService extends ConfigurableService implements Delive
      */
     public function isAuthorized(DeliveryExecution $deliveryExecution)
     {
-        return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_AUTHORIZED;
+        $state = $deliveryExecution->getState()->getUri();
+        return $state === DeliveryExecution::STATE_AUTHORIZED || $state === DeliveryExecution::STATE_ACTIVE;
     }
 }
