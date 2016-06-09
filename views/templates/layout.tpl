@@ -15,10 +15,11 @@ use oat\tao\model\theme\Theme;
         <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
         <link rel="stylesheet" href="<?= Layout::getThemeStylesheet(Theme::CONTEXT_FRONTOFFICE) ?>" />
         <link rel="shortcut icon" href="<?= Template::img('favicon.ico', 'tao') ?>"/>
-        <script src="<?= Template::js('lib/modernizr-2.8/modernizr.js', 'tao') ?>"></script>
         <?= Layout::getAmdLoader() ?>
     </head>
     <body class="proctoring-scope">
+<?php Template::inc('blocks/requirement-check.tpl', 'tao'); ?>
+
         <div class="content-wrap">
             <header class="dark-bar clearfix">
                 <?= Layout::renderThemeTemplate(Theme::CONTEXT_BACKOFFICE, 'header-logo') ?>
