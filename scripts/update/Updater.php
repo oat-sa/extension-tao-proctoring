@@ -401,6 +401,9 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->refreshMonitoringData();
             $this->setVersion('1.15.1');
         }
+
+
+        $this->skip('1.15.1', '1.16.0');
     }
 
     private function refreshMonitoringData()
