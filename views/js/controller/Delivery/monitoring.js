@@ -31,9 +31,10 @@ define([
     'ui/cascadingComboBox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'tpl!taoProctoring/templates/delivery/itemProgress',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
-    'ui/datatable'
+    'tpl!taoProctoring/templates/delivery/statusFilter',
+    'ui/datatable',
+    'select2'
 ], function (
     $,
     _,
@@ -47,8 +48,8 @@ define([
     cascadingComboBox,
     breadcrumbsFactory,
     _status,
-    itemProgressTpl,
-    deliveryLinkTpl
+    deliveryLinkTpl,
+    statusFilterTpl
 ) {
     'use strict';
 
@@ -61,25 +62,6 @@ define([
     // the page is always loading data when starting
     loadingBar.start();
 
-    /**
-     * Formats a time value to string
-     * @param {Number} time
-     * @returns {String}
-     * @private
-     */
-    var _timerFormat = function(time) {
-        return __('%d min', Math.floor(time / 60));
-    };
-
-    var notYet = function() {
-        dialog({
-            message: __('Not yet implemented!'),
-            autoRender: true,
-            autoDestroy: true,
-            buttons: 'ok'
-        });
-    };
-    
     /**
      * Controls the taoProctoring delivery page
      *
@@ -244,6 +226,27 @@ define([
                     if(_.isFunction(cb)){
                         cb(_selection, reason);
                     }
+                });
+            }
+
+            /**
+             * Return html for filter
+             * @returns {String}
+             */
+            function buildStatusFilter(){
+                return statusFilterTpl({statuses: _status.getStatuses()});
+            }
+
+            /**
+             * Additional action perfomed with filter element
+             * @param {jQueryElement} $el
+             */
+            function statusFilterHandler($el) {
+                $el.select2({
+                    dropdownAutoWidth: true,
+                    placeholder: __('Filter'),
+                    minimumResultsForSearch: Infinity,
+                    allowClear: true
                 });
             }
 
@@ -431,6 +434,11 @@ define([
                 id: 'status',
                 label: __('Status'),
                 sortable : true,
+                filterable : true,
+                customFilter : {
+                    template : buildStatusFilter(),
+                    callback : statusFilterHandler
+                },
 
                 transform: function(value, row) {
                     var result = '',
@@ -455,7 +463,7 @@ define([
                 sortable: true,
                 label: __('Connectivity'),
                 transform: function(value, row) {
-                    if (row.state.status === 'INPROGRESS') {
+                    if (row.state.status === _status.STATUS_INPROGRESS) {
                         return row.online ? __('online') : __('offline');
                     }
                     return '';
@@ -514,6 +522,8 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filter: true,
+                    filtercolumns:['status'],
                     tools: tools,
                     actions: actions,
                     model: model,
@@ -521,7 +531,8 @@ define([
                     sortorder: 'desc',
                     sortby : 'date'
                 }, dataset);
-                
+
+
         }
     };
 

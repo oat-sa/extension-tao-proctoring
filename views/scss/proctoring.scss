@@ -247,6 +247,12 @@
         }
     }
 
+    .delivery-monitoring {
+        aside.filter:first-child {
+            display: none;
+        }
+    }
+
     .icon-authorize:before {
         @include icon-result-ok();
     }

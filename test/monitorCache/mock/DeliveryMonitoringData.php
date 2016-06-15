@@ -24,7 +24,7 @@ namespace oat\taoProctoring\test\monitorCache\mock;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**
