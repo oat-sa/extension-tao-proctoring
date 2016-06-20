@@ -26,7 +26,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Class DeliveryMonitoringService
@@ -576,14 +576,20 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     public function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
     {
 
-        $sortBy = $this->getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
+        $sortBy = self::getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
         $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
 
-        $result = $this->find([
+        $criteria = [
             [self::TEST_CENTER_ID => $testCenter->getUri()],
             'AND',
             [self::DELIVERY_ID => $delivery->getUri()]
-        ], ['asArray' => true,
+        ];
+
+        if (isset($options['filter']) && $options['filter']) {
+            $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
+        }
+
+        $result = $this->find($criteria, ['asArray' => true,
             'order'=> $sortBy.' '. $sortOrder,
         ],
             true);
@@ -595,7 +601,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      * @param string $sortBy
      * @return string
      */
-    private function getSortByColumn($sortBy)
+    public static function getSortByColumn($sortBy)
     {
         $map = array_merge([
             'firstname' => self::COLUMN_TEST_TAKER_FIRST_NAME,

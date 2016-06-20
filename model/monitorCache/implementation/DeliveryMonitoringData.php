@@ -30,8 +30,7 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\ExtendedStateService;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -167,7 +166,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
     private function updateData()
     {
+        $this->addValue(DeliveryMonitoringService::STATUS, $this->getStatus(), true);
         $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $this->getProgress(), true);
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
         $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
         $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
         $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
@@ -185,12 +186,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getStatus()
     {
-        $result = null;
-        $proctoringData = $this->getProctoringData();
-        if ($proctoringData !== null && isset($proctoringData['status'])) {
-            $result = $proctoringData['status'];
-        }
-        return $result;
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        return $deliveryExecutionStateService->getState($this->deliveryExecution);
     }
 
     /**
@@ -241,9 +238,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getAuthorizedBy()
     {
         $result = null;
-        $proctoringData = $this->getProctoringData();
-        if ($proctoringData !== null && isset($proctoringData['authorized_by'])) {
-            $result = $proctoringData['authorized_by'];
+        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
+        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
+            $result = $deliveryLog[0]['data']['proctorUri'];
         }
         return $result;
     }
@@ -271,16 +268,15 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * @return mixed|null
+     * @return string
      */
-    private function getProctoringData()
+    private function getDeliveryLog($eventId = null)
     {
-        $extendedStateService = new ExtendedStateService();
-        $proctoringData = $extendedStateService->getValue($this->deliveryExecution, 'proctoring');
-        return $proctoringData;
+        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
     }
 
-    /**
+/**
      * @return string
      */
     private function getTestTakerFistName(){
@@ -383,7 +379,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-        if (DeliveryExecutionStateService::STATE_INPROGRESS == $status) {
+        if (DeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
             // to ensure that during sorting by connectivity all similar statuses grouped together

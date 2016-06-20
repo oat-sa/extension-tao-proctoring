@@ -45,6 +45,10 @@ class RegisterDeliveryServerService extends \common_ext_action_InstallAction
         $deliveryServerService = new DeliveryServerService($deliveryServerOptions);
         $deliveryServerService->setServiceManager($serviceManager);
         $serviceManager->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
+
+        $config = $deliveryExt->getConfig('execution_service');
+        $config = new \oat\taoProctoring\model\execution\DeliveryExecutionService(['implementation' => $config]);
+        $deliveryExt->setConfig('execution_service', $config);
     }
 }
 

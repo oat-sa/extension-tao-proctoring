@@ -27,7 +27,6 @@ use oat\tao\model\entryPoint\EntryPointService;
 use oat\tao\model\event\MetadataModified;
 use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\EligibilityService;
-use oat\taoProctoring\model\event\DeliveryExecutionStateChanged;
 use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\TestCenterService;
@@ -349,7 +348,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->refreshMonitoringData();
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->attach(DeliveryExecutionStateChanged::EVENT_NAME,
+            $eventManager->attach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
             );
 
@@ -377,6 +376,34 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->refreshMonitoringData();
             $this->setVersion('1.14.2');
         }
+
+        if ($this->isVersion('1.14.2') || $this->isVersion('1.14.3')) {
+            $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $config = $ext->getConfig('execution_service');
+            $config = new \oat\taoProctoring\model\execution\DeliveryExecutionService(['implementation' => $config]);
+            $ext->setConfig('execution_service', $config);
+
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
+                ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
+            );
+
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
+            OntologyUpdater::syncModels();
+
+            $this->refreshMonitoringData();
+
+            $this->setVersion('1.15.0');
+        }
+
+        if ($this->isVersion('1.15.0')) {
+            $this->refreshMonitoringData();
+            $this->setVersion('1.15.1');
+        }
+
+
+        $this->skip('1.15.1', '1.16.0');
     }
 
     private function refreshMonitoringData()
@@ -400,6 +427,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 }
             }
         }
+
     }
 
 }

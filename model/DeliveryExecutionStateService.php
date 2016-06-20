@@ -20,7 +20,7 @@
 
 namespace oat\taoProctoring\model;
 
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Interface DeliveryExecutionStateService
@@ -30,14 +30,6 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 interface DeliveryExecutionStateService
 {
     const SERVICE_ID = 'taoProctoring/DeliveryExecutionState';
-
-    const STATE_INIT = 'INIT';
-    const STATE_AWAITING = 'AWAITING';
-    const STATE_AUTHORIZED = 'AUTHORIZED';
-    const STATE_INPROGRESS = 'INPROGRESS';
-    const STATE_PAUSED = 'PAUSED';
-    const STATE_COMPLETED = 'COMPLETED';
-    const STATE_TERMINATED = 'TERMINATED';
 
     /**
      * Computes the state of the delivery and returns one of the extended state code
