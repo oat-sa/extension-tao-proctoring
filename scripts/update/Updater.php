@@ -403,7 +403,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
 
-        $this->skip('1.15.1', '1.16.0');
+        $this->skip('1.15.1', '1.16.1');
     }
 
     private function refreshMonitoringData()
