@@ -65,7 +65,9 @@ class DeliveryServer extends DefaultDeliveryServer
             $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
         );
         foreach($startedExecutions as $startedExecution) {
-            $this->getAuthorizationService()->revokeAuthorization($startedExecution);
+            if($startedExecution->getDelivery()->exists()) {
+                $this->getAuthorizationService()->revokeAuthorization($startedExecution);
+            }
         }
 
         parent::index();
