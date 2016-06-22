@@ -200,12 +200,40 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $session = $this->getTestSession();
 
         if ($session !== null) {
-            $pos = $session->getRoute()->getPosition();
-            $count = $session->getRouteCount();
-
             if ($session->isRunning()) {
-                $section = $session->getCurrentAssessmentSection();
-                $result =  __('%1$s - item %2$s/%3$s', $section->getTitle(), $pos+1, $count);
+                $route = $session->getRoute();
+                $routeItems = $route->getAllRouteItems();
+                $currentPosition = $route->getPosition();
+                $currentSection = $session->getCurrentAssessmentSection();
+                $currentSectionId = $currentSection->getIdentifier();
+
+                $sectionCount = 0;
+                $positionInSection = 0;
+                $offset = 0;
+                $offsetSection = 0;
+                $lastSection = null;
+
+                foreach ($routeItems as $routeItem) {
+                    $sections = $routeItem->getAssessmentSections();
+                    $sectionId = key(current($sections));
+
+                    if ($lastSection != $sectionId) {
+                        $offsetSection = 0;
+                        $lastSection = $sectionId;
+                    }
+
+                    if ($sectionId == $currentSectionId) {
+                        if ($offset == $currentPosition) {
+                            $positionInSection = $offsetSection;
+                        }
+                        $sectionCount ++;
+                    }
+
+                    $offset ++;
+                    $offsetSection ++;
+                }
+
+                $result =  __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection+1, $sectionCount);
             } else {
                 $result = __('finished');
             }
