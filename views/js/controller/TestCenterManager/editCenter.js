@@ -185,6 +185,7 @@ define([
                         })
                         .catch(handleError);
                 })
+                .init({})
                 .render($tableContainer);
         }
     };

@@ -58,9 +58,6 @@ define([
         /**
          * The component.
          *
-         * Already initialized, only render should be called.
-         *
-         *
          * @typedef eligibilityTable
          * @see ui/component
          * @throws eligibilityTable#loading while loading something
@@ -155,8 +152,7 @@ define([
                 if(this.$component){
                     this.$component.datatable('refresh');
                 }
-            })
-            .init({});
+            });
     };
 
     return eligibilityTableFactory;
