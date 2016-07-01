@@ -21,15 +21,16 @@ define([
     'jquery',
     'i18n',
     'helpers',
+    'uri',
     'core/eventifier',
     'generis.tree.select',
     'tpl!taoProctoring/component/eligibilityEditor/layout',
     'ui/feedback',
     'ui/modal',
     'css!taoProctoringCss/eligibilityEditor'
-], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl, feedback){
+], function(_, $, __, helpers, uri, eventifier, GenerisTreeSelectClass, layoutTpl, feedback){
     'use strict';
-    
+
     var _ns = '.eligibility-editor';
 
     var _modalDefaults = {
@@ -38,27 +39,29 @@ define([
 
     /**
      * Builds group tree inside target container
-     * 
+     *
      * @param {Object} instance - the eligibility editor instance
      * @param {String} selector - the selector for the tree (generis tree works with selector only)
      * @param {Array} [testTakers] - array of selected test takers
      */
     function buildTestTakerTree(instance, selector, testTakers){
 
+        var selected = _.pluck(testTakers, 'uri');
         var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
             actionId : 'treeOptions.actionId',
             saveUrl : 'treeOptions.saveUrl',
             saveData : {},
-            checkedNodes : _.pluck(testTakers, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
+            checkedNodes : _.map(selected, uri.encode), //generis tree uses "encoded uri" to check nodes
             serverParameters : {
-                openParentNodes : _.pluck(testTakers, 'uri'), //generis tree uses normal if to open nodes...
+                openParentNodes : selected, //generis tree uses normal if to open nodes...
                 rootNode : 'http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject'
             },
             paginate : 10,
             onChangeCallback : function(){
                 _.delay(function(){
                     //requires a delay to let the node status to be updated
-                    instance.eligibility.testTakers = _.uniq(tree.getChecked());
+                    instance.eligibility.testTakers = _.compact(_.uniq(tree.getChecked()));
+                    instance.eligibility.deliveries = _.pluck(instance.eligibility.deliveries, 'uri');
                     instance.trigger('change', instance.eligibility);
                 }, 100);
             }
@@ -71,27 +74,28 @@ define([
 
     /**
      * Builds delivery tree inside target container
-     * 
+     *
      * @param {Object} instance - the eligibility editor instance
      * @param {String} selector - the selector for the tree (generis tree works with selector only)
      * @param {Array} [deliveries] - array of selected deliveries
      */
     function buildDeliveryTree(instance, selector, deliveries){
 
+        var selected = _.pluck(deliveries, 'uri');
         var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
             actionId : 'treeOptions.actionId',
             saveUrl : 'treeOptions.saveUrl',
             saveData : {},
-            checkedNodes : _.pluck(deliveries, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
+            checkedNodes : _.map(selected, uri.encode), //generis tree uses "encoded uri" to check nodes
             serverParameters : {
-                openParentNodes : _.pluck(deliveries, 'uri'), //generis tree uses normal if to open nodes...
+                openParentNodes : selected, //generis tree uses normal if to open nodes...
                 rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery'
             },
             paginate : 10,
             onChangeCallback : function(){
                 _.delay(function(){
                     //requires a delay to let the node status to be updated
-                    instance.eligibility.deliveries = _.uniq(tree.getChecked());
+                    instance.eligibility.deliveries = _.compact(_.uniq(tree.getChecked()));
                     instance.trigger('change', instance.eligibility);
                 }, 100);
             }
@@ -102,7 +106,7 @@ define([
 
     /**
      * Add the editor into a popup and display it
-     * 
+     *
      * @param {Object} instance - the eligibility editor instance
      * @param {Object} [modalConfig] - any config option available in ui/modal
      */
@@ -118,7 +122,7 @@ define([
             })
             .modal(modalConfig)
             .on('click' + _ns, '.actions .done', function(e){
-                
+
                 if(instance.eligibility && instance.eligibility.deliveries && instance.eligibility.deliveries.length){
                     instance.trigger('ok', instance.eligibility);
                     destroy(instance);
@@ -136,7 +140,7 @@ define([
 
     /**
      * Destroy the eligibility editor
-     * 
+     *
      * @param {object} instance
      * @returns {undefined}
      */
@@ -148,7 +152,7 @@ define([
 
     /**
      * Create an eligibility editor into a $container
-     * 
+     *
      * @param {JQuery} $container
      * @param {Array} eligibilities
      * @param {Object} [delivery]
@@ -166,20 +170,20 @@ define([
         var $deliverySelector;
         var creationMode = true;
         var deliveryName = '';
-        
+
         if(!_.isArray(eligibilities)){
             throw 'the egibility editor requires an array of eligibilities';
         }
 
-        if(delivery && delivery.uri && delivery.label){
-            var eligibility = _.find(eligibilities, {delivery : delivery.uri});
+        if(delivery){
+            var eligibility = _.find( eligibilities, { delivery : delivery.uri});
             if(eligibility){
                 creationMode = false;
                 deliveryName = delivery.label;
-                
+
                 //the format expected for the returned value
                 instance.eligibility = _.defaults(eligibility , {
-                    deliveries : [delivery.uri],
+                    deliveries : [delivery],
                     testTakers : []
                 });
             }else{

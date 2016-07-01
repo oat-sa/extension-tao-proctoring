@@ -19,46 +19,33 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'helpers',
     'layout/loading-bar',
-    'util/encode',
     'ui/feedback',
     'taoProctoring/component/eligibilityEditor',
-    'ui/datatable'
-], function(
-    $,
-    _,
-    __,
-    helpers,
-    loadingBar,
-    encode,
-    feedback,
-    eligibilityEditor
-    ){
-    'use strict';
+    'taoProctoring/component/eligibilityTable',
+    'taoProctoring/provider/eligibility'
+], function( $, _, __, loadingBar, feedback, eligibilityEditor, eligibilityTableFactory, eligibilityProvider ){
+'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-    
+
     /**
      * Format the raw eligibility from the dataset to the expected format for the eligibility editor
-     * 
+     *
      * @param {Object} dataset
      * @returns {Array}
      */
-    function formatEligibilities(dataset){
-        if(dataset.data && _.isArray(dataset.data)){
-            return _.map(dataset.data, function(eligibility){
-                return {
-                    delivery : eligibility.id,
-                    testTakers : eligibility.testTakers
-                };
-            });
-        }
-        return [];
+    function formatEligibilities(eligibilities){
+        return _.map(eligibilities, function(eligibility){
+            return {
+                delivery : eligibility.delivery.uri,
+                testTakers : eligibility.testTakers
+            };
+        });
     }
 
     /**
@@ -72,161 +59,133 @@ define([
          */
         start : function start(){
 
+            var eligibilityTable;
             var $container = $(cssScope);
-            var $list = $container.find('.list');
-            var eligEditor;
-            var $eligibilityEditor = $container.find('.eligibility-editor-container');
-            var deliveries = $container.data('deliveries');
-            var eligibilities = $container.data('eligibilities');
+            var $tableContainer = $('.eligibility-table-container', $container);
+            var $editorContainer = $('.eligibility-editor-container', $container);
+
+            //get the test center id from the DOM
             var testCenterId = $container.data('testcenter');
-            var serviceUrl = helpers._url('getEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var addUrl = helpers._url('addEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var editUrl = helpers._url('editEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var removeUrl = helpers._url('removeEligibilities', 'TestCenterManager', 'taoProctoring', {uri : testCenterId});
-            var tools = [];
-            var actions = [];
-            var model = [];
-            
-            /**
-             * Get the delivery object from its uri
-             * 
-             * @param {String} uri
-             * @returns {Object}
-             */
-            function _getDelivery(uri){
-                return _.find(deliveries, {uri : uri});
-            }
 
             /**
-             * request the server with a selection of test takers
-             * 
-             * @param {String} url
-             * @param {Object} eligibility
-             * @param {String} message
-             * @param {Function} errorCallback
+             * Start the loading bar
              */
-            function _request(url, eligibility, message, errorCallback){
-                if(eligibility){
-                    
-                    loadingBar.start();
-                    
-                    $.ajax({
-                        url : url,
-                        data : {
-                            eligibility : eligibility
-                        },
-                        dataType : 'json',
-                        type : 'POST',
-                        error : function(){
-                            loadingBar.stop();
-                        }
-                    }).done(function(response){
-                        
-                        loadingBar.stop();
+            var loading = function loading(){
+                loadingBar.start();
+            };
 
-                        if(response && response.success){
-                            if(message){
-                                feedback().success(message);
-                            }
-                            $list.datatable('refresh');
-                        }else if(_.isFunction(errorCallback)){
-                            //execute a final callback if needed
-                            errorCallback(response);
-                        }else{
-                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml : false});
-                        }
-                    });
+            /**
+             * Stop the loading bar
+             */
+            var loaded = function loaded(){
+                loadingBar.stop();
+            };
+
+            /**
+             * Handle errors
+             * @param {Error} err - the error to handle
+             */
+            var handleError = function handleError(err){
+                loaded();
+                if(_.isError(err)){
+                    feedback().error(err.message);
+                } else {
+                    feedback().error(err);
                 }
-            }
-            
-            //tool : add new eligibility
-            tools.push({
-                id : 'add',
-                icon : 'add',
-                title : __('Add'),
-                label : __('Add'),
-                action : function(){
-                    //open modal to select delivery + test takers
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities));
-                    eligEditor.on('ok', function(eligibility){
-                        _request(addUrl, eligibility, __('New eligible delivery added'), function(res){
-                            feedback().warning(__('The following delivery(ies) are already eligible : ')+res.failed.join(', '));
-                            $list.datatable('refresh');
+            };
+
+            /**
+             * Handle successful operations
+             * @param {String} message - the message to display
+             */
+            var success = function success(message){
+                loaded();
+                feedback().success(__('Eligible delivery removed'));
+                eligibilityTable.trigger('reload');
+            };
+
+            //setup the eligibility table
+            eligibilityTable =
+              eligibilityTableFactory(testCenterId)
+                .on('loading', loading)
+                .on('loaded', loaded)
+                .on('add', function handleAddAction(eligibilities){
+                    var self = this;
+
+                    //show the editor to select deliveries and test takers
+                    eligibilityEditor
+                        .init($editorContainer, formatEligibilities(eligibilities))
+                        .on('ok', function(eligibility){
+
+                            //then inform the server
+                            loading();
+                            eligibilityProvider(testCenterId)
+                                .addEligibilities(eligibility)
+                                .then(function(response){
+
+                                    loaded();
+                                    if(response.failed && response.failed.length){
+                                        feedback().warning(__('The following delivery(ies) are already eligible : ') + response.failed.join(', '));
+                                    } else {
+                                        feedback().success(__('New eligible delivery added'));
+                                    }
+                                    self.trigger('reload');
+                                })
+                                .catch(handleError);
                         });
-                    });
-                }
-            });
-            
-            //action : edit existing eligibility
-            actions.push({
-                id : 'edit',
-                icon : 'edit',
-                label : __('Edit'),
-                title : __('Edit eligibile test takers'),
-                action : function(uri){
-                    //open modal to select test takers
-                    eligEditor = eligibilityEditor.init($eligibilityEditor, formatEligibilities(eligibilities), _getDelivery(uri));
-                    eligEditor.on('ok', function(eligibility){
-                        _request(editUrl, eligibility, __('Eligible test takers updated'));
-                    });
-                }
-            });
-            
-            //action : remove existing eligibility
-            actions.push({
-                id : 'remove',
-                icon : 'bin',
-                label : __('Remove'),
-                title : __('Remove eligibility'),
-                action : function(uri){
-                    //open modal to select test takers
-                    _request(removeUrl, {deliveries : [uri]}, __('Eligible delivery removed'));
-                }
-            });
-
-
-            // column: delivery
-            model.push({
-                id : 'del',
-                label : __('Delivery'),
-                transform : function(value, row){
-                    return _getDelivery(row.id).label;
-
-                }
-            });
-
-            // column: test taker
-            model.push({
-                id : 'ttakers',
-                label : __('Eligible Test Takers'),
-                transform : function(value, row){
-                    return row.testTakers.length;
-                }
-            });
-
-            // renders the datatable
-            $list
-                .on('query.datatable', function(){
-                    loadingBar.start();
                 })
-                .on('load.datatable', function(e, newDataset){
-                    //update dateset in memory
-                    eligibilities = newDataset;
-                    loadingBar.stop();
-                })
-                .datatable({
-                    url : serviceUrl,
-                    status : {
-                        empty : __('No Eligible Delivery yet'),
-                        available : __('Eligible Deliveries'),
-                        loading : __('Loading')
-                    },
-                    tools : tools,
-                    actions : actions,
-                    model : model,
-                    selectable : false
-                }, eligibilities);
+                .on('edit', function handleEditAction(eligibilityId, eligibilities) {
 
+                    //show the editor to edit  test takers
+                    var eligibility = _.find(eligibilities, { uri : eligibilityId });
+                    eligibilityEditor
+                        .init($editorContainer, formatEligibilities(eligibilities), eligibility.delivery)
+                        .on('ok', function(updated){
+
+                            loading();
+                            eligibilityProvider(testCenterId)
+                                .editEligibility(updated)
+                                .then(function(response){
+                                    success(__('Eligible test takers updated'));
+                                })
+                                .catch(handleError);
+                        });
+                })
+
+                .on('remove', function handleRemoveAction(eligibilityId, eligibilities) {
+                    var eligibility = _.find(eligibilities, { uri : eligibilityId });
+
+                    loading();
+                    eligibilityProvider(testCenterId)
+                        .removeEligibility({
+                            deliveries: [eligibility.delivery.uri]
+                        })
+                        .then(function(){
+                            success(__('Eligible delivery removed'));
+                        })
+                        .catch(handleError);
+                })
+
+                .on('shield', function handleShieldAction(eligibilityId) {
+                    loading();
+                    eligibilityProvider(testCenterId)
+                        .shieldEligibility(eligibilityId)
+                        .then(function(){
+                            success(__('Eligibility needs proctor authorization'));
+                        })
+                        .catch(handleError);
+                })
+
+                .on('unshield', function handleUnshieldAction(eligibilityId) {
+                    loading();
+                    eligibilityProvider(testCenterId)
+                        .unshieldEligibility(eligibilityId)
+                        .then(function(){
+                            success(__('Eligibility don\'t need proctor authorization any more.'));
+                        })
+                        .catch(handleError);
+                })
+                .render($tableContainer);
         }
     };
 
