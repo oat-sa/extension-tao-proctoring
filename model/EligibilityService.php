@@ -42,6 +42,12 @@ class EligibilityService extends tao_models_classes_ClassService
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#EligibileDelivery';
 
+    const PROPERTY_BYPASSPROCTOR_URI = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ByPassProctor"';
+
+    const BOOLEAN_TRUE = 'http://www.tao.lu/Ontologies/generis.rdf#True';
+
+    const BOOLEAN_FALSE = 'http://www.tao.lu/Ontologies/generis.rdf#False';
+
     /**
      * return the test center top level class
      *
@@ -83,10 +89,12 @@ class EligibilityService extends tao_models_classes_ClassService
         $eligibles = $this->getRootClass()->searchInstances(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter
         ), array('recursive' => false, 'like' => false));
+
+        $deliveryProperty = new Property(self::PROPERTY_DELIVERY_URI);
         
         $deliveries = array();
         foreach ($eligibles as $eligible) {
-            $delivery = $eligible->getOnePropertyValue(new Property(self::PROPERTY_DELIVERY_URI));
+            $delivery = $eligible->getOnePropertyValue($deliveryProperty);
             if ($delivery->exists()) {
                 $deliveries[] = $delivery;
             }
@@ -100,7 +108,59 @@ class EligibilityService extends tao_models_classes_ClassService
 
         return $deliveries;
     }
-    
+
+    /**
+     * Get eligibilities of a  test center
+     *
+     * @param Resource $testCenter
+     * @param array options paginantion options
+     * @return array formated eligibilities
+     */
+    public function getEligibilities(Resource $testCenter, $options = []) {
+
+        $eligibilities = [];
+
+        $eligibles = $this->getRootClass()->searchInstances(array(
+            self::PROPERTY_TESTCENTER_URI => $testCenter
+        ), array('recursive' => false, 'like' => false));
+
+        $deliveryProperty  = new Property(self::PROPERTY_DELIVERY_URI);
+        $byPassProperty    = new Property(self::PROPERTY_BYPASSPROCTOR_URI);
+        $testTakerProperty = new Property(self::PROPERTY_TESTTAKER_URI);
+
+        foreach ($eligibles as $eligible) {
+            $values = $eligible->getPropertiesValues([$deliveryProperty, $byPassProperty, $testTakerProperty]);
+
+            $delivery = current($values[self::PROPERTY_DELIVERY_URI]);
+            if ($delivery->exists()) {
+                $byPass = current($values[self::PROPERTY_BYPASSPROCTOR_URI]);
+
+                $eligibilities[] = [
+                    'uri' => $eligible->getUri(),
+                    'delivery' => [
+                        'uri' => $delivery->getUri(),
+                        'label' => $delivery->getLabel()
+                    ],
+                    'byPassProctor' => $byPass instanceof \core_kernel_classes_Resource ? $byPass->getUri() == self::BOOLEAN_TRUE : false,
+                    'testTakers' => array_map(function($testTaker) {
+                        return [
+                            'uri' => $testTaker->getUri(),
+                            'label' => $testTaker->getLabel()
+                        ];
+                    }, $values[self::PROPERTY_TESTTAKER_URI])
+                ];
+            }
+        }
+
+        if ($options['sort'] == true) {
+            usort($eligibilities, function ($comparedA, $comparedB) {
+                return strcmp($comparedA['delivery']['label'], $comparedB['delivery']['label']);
+            });
+        }
+
+        return $eligibilities;
+    }
+
     /**
      * Removes an eligibility
      * 
@@ -238,4 +298,24 @@ class EligibilityService extends tao_models_classes_ClassService
 
     }
 
+    /**
+     * Check whether this Eligibility can by-pass the proctor authorization
+     * @param Resource $eligibility
+     * @return boolean true if the elligility can by-pass the proctor authorization
+     */
+    public function canByPassProctor(Resource $eligibility)
+    {
+        $canByPass = $eligibility->getOnePropertyValue(new Property(self::PROPERTY_BYPASSPROCTOR_URI));
+        return ($canByPass == true);
+    }
+
+    /**
+     * Set whether this Eligibility can by-pass the proctor authorization
+     * @param Resource $eligibility
+     * @param boolean $bypass true if the elligility can by-pass the proctor authorization
+     */
+    public function setByPassProctor(Resource $eligibility, $bypass = false)
+    {
+        $eligibility->editPropertyValues(new Property(self::PROPERTY_BYPASSPROCTOR_URI), new Resource($bypass ? self::BOOLEAN_TRUE : self::BOOLEAN_FALSE));
+    }
 }

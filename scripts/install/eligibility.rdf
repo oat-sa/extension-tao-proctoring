@@ -34,4 +34,10 @@
     <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
     <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOProctor.rdf#DeliveryEligibility"/>
   </rdf:Property>
+  <rdf:Property rdf:about="http://www.tao.lu/Ontologies/TAOProctor.rdf#ByPassProctor">
+    <rdfs:label xml:lang="en-US">By-pass proctor</rdfs:label>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#Boolean"/>
+    <rdfs:comment xml:lang="en-US">The proctor authorization is not required if this property is true</rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOProctor.rdf#DeliveryEligibility"/>
+  </rdf:Property>
 </rdf:RDF>

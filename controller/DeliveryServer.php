@@ -82,8 +82,10 @@ class DeliveryServer extends DefaultDeliveryServer
     }
 
     /**
-     * Overwrites the parent initDeliveryExecution()
-     * Redirects the test taker to the awaitingAuthorization page after delivery initialization
+     * Redirects the test taker to either the awaitingAuthorization page
+     * or run the delivery depending on the authorization.
+     *
+     * @see DefaultDeliveryServer::initDeliveryExecution overrides
      */
     public function initDeliveryExecution()
     {
@@ -91,15 +93,11 @@ class DeliveryServer extends DefaultDeliveryServer
         try {
             //it throws an Unauthorized execption in case of proctored delivery
             $deliveryExecution = $this->_initDeliveryExecution();
-            $executionId = $deliveryExecution->getIdentifier(); 
-
-            \common_Logger::d('Authorized execution, start delivery');
+            $executionId = $deliveryExecution->getIdentifier();
 
             $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $executionId)));
 
         } catch (\common_exception_Unauthorized $e) {
-
-            \common_Logger::d('Unauthorized execution redirect to the awaiting room');
 
             if(isset($executionId)){
 
