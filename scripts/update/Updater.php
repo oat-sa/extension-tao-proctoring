@@ -47,6 +47,8 @@ use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\model\ProctoringAssignmentService;
 use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
+use oat\taoDelivery\model\authorization\AuthorizationService;
+use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
 
 /**
  * 
@@ -402,8 +404,18 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.15.1');
         }
 
-
         $this->skip('1.15.1', '1.16.2');
+
+        if ($this->isVersion('1.16.2')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('1.17.0');
+        }
+
+        if($this->isVersion('1.17.0')){
+
+            $this->getServiceManager()->register(AuthorizationService::CONFIG_ID, new ProctorDeliveryAuthorizationService());
+            $this->setVersion('2.0.0');
+        }
     }
 
     private function refreshMonitoringData()
