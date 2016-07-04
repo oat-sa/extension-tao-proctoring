@@ -81,7 +81,7 @@ define([
              */
             var success = function success(message){
                 loaded();
-                feedback().success(__('Eligible delivery removed'));
+                feedback().success(message);
                 eligibilityTable.trigger('reload');
             };
 
