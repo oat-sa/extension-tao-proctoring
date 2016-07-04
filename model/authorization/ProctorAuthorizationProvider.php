@@ -33,20 +33,6 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
 {
 
     /**
-     * The name of the secure key used to grant proctor authorisation.
-     * If the secure key is not set, or its value is not the same with the access key,
-     * the test taker must wait for proctor authorization
-     */
-    const SECURE_KEY_NAME = 'proctor_secure_key';
-
-    /**
-     * The name of the access key used to grant proctor authorisation.
-     * If the access key is not set, or its value is not the same with the secure key,
-     * the test taker must wait for proctor authorization
-     */
-    const ACCESS_KEY_NAME = 'proctor_access_key';
-
-    /**
      * @var DeliveryExecution the provider keeps the current delieveryExecution
      */
     private $deliveryExecution;
@@ -70,7 +56,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
     public function isAuthorized()
     {
         $state = $this->deliveryExecution->getState()->getUri();
-        return $state === ProctoredDeliveryExecution::STATE_AUTHORIZED || $state === ProctoredDeliveryExecution::STATE_ACTIVE;
+        return $state === ProctoredDeliveryExecution::STATE_AUTHORIZED;
     }
 
     /**
@@ -91,7 +77,9 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function revoke()
     {
-        $this->deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        if($this->deliveryExecution->getState()->getUri() != ProctoredDeliveryExecution::STATE_PAUSED){
+            $this->deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        }
         return true;
     }
 }

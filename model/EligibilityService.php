@@ -235,7 +235,7 @@ class EligibilityService extends tao_models_classes_ClassService
      * @throws \common_exception_InconsistentData
      * @return null|Resource eligibility resource
      */
-    protected function getEligibility(Resource $testCenter, Resource $delivery) {
+    public function getEligibility(Resource $testCenter, Resource $delivery) {
         $eligibles = $this->getRootClass()->searchInstances(array(
             self::PROPERTY_TESTCENTER_URI => $testCenter,
             self::PROPERTY_DELIVERY_URI => $delivery

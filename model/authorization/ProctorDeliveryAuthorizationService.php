@@ -21,6 +21,7 @@ namespace oat\taoProctoring\model\authorization;
 
 use core_kernel_classes_Resource;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\user\User;
 use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
@@ -34,50 +35,29 @@ use oat\taoProctoring\model\EligibilityService;
 class ProctorDeliveryAuthorizationService extends ConfigurableService  implements AuthorizationService
 {
 
-    /**
-     * @var core_kernel_classes_Resource keeps the current test center
-     */
-    private $testCenter;
-
-
-    /**
-     * Get the configured test center
-     * @return core_kernel_classes_Resource
-     */
-    public function getTestCenter()
-    {
-        return $this->testCenter;
-    }
-
-    /**
-     * Set the current test center
-     * @param core_kernel_classes_Resource $testCenter
-     */
-    public function setTestCenter(core_kernel_classes_Resource $testCenter)
-    {
-        $this->testCenter = $testCenter;
-    }
 
     /**
      * Returns the the authorization provider.
      *
      * This implementation selects the provider based on the Eligility's property canByPassProctor.
-     * If the propery is true, then we don't need proctor authorization. All others cases goes into the 
+     * If the propery is true, then we don't need proctor authorization. All others cases goes into the
      * proctoring authoriaztion.
      *
      * @param DeliveryExecution $deliveryExecution the delivery execution to authorize
+     * @param User $user the current user
      * @return AuthorizationProvider a new provider for this execution
      */
-    public function getAuthorizationProvider(DeliveryExecution $deliveryExecution)
+    public function getAuthorizationProvider(DeliveryExecution $deliveryExecution, User $user)
     {
         $eligibilityService = EligibilityService::singleton();
-        if( !is_null($this->getTestCenter()) ){
-            $eligibility = $eligibilityService->getEligibility($this->getTestCenter(), $deliveryExecution);
+        $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
 
-            if($eligibilityService->canByPassProctor($eligibility)){
-                return new DeliveryAuthorizationProvider();
-            }
+        $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
+
+        if($eligibilityService->canByPassProctor($eligibility)){
+            return new DeliveryAuthorizationProvider();
         }
+
         return new ProctorAuthorizationProvider($deliveryExecution);
     }
 }
