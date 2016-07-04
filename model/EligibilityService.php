@@ -306,7 +306,7 @@ class EligibilityService extends tao_models_classes_ClassService
     public function canByPassProctor(Resource $eligibility)
     {
         $canByPass = $eligibility->getOnePropertyValue(new Property(self::PROPERTY_BYPASSPROCTOR_URI));
-        return ($canByPass == true);
+        return ($canByPass->getUri() == self::BOOLEAN_TRUE);
     }
 
     /**
