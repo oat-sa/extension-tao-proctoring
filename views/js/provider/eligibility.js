@@ -127,7 +127,7 @@ define([
                         return reject(new TypeError('Invalid eligibility'));
                     }
 
-                    request('removeEligibility', {
+                    request('removeEligibilities', {
                         uri : testCenterId,
                         eligibility : eligibility
                     })

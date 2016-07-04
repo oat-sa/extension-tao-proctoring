@@ -24,7 +24,7 @@ define([
     'taoProctoring/component/eligibilityEditor',
     'taoProctoring/component/eligibilityTable',
     'taoProctoring/provider/eligibility'
-], function( $, _, __, loadingBar, feedback, eligibilityEditor, eligibilityTableFactory, eligibilityProvider ){
+], function( $, _, __, loadingBar, feedback, eligibilityEditorFactory, eligibilityTableFactory, eligibilityProvider ){
 'use strict';
 
     /**
@@ -32,21 +32,6 @@ define([
      * @type {String}
      */
     var cssScope = '.eligible-deliveries';
-
-    /**
-     * Format the raw eligibility from the dataset to the expected format for the eligibility editor
-     *
-     * @param {Object} dataset
-     * @returns {Array}
-     */
-    function formatEligibilities(eligibilities){
-        return _.map(eligibilities, function(eligibility){
-            return {
-                delivery : eligibility.delivery.uri,
-                testTakers : eligibility.testTakers
-            };
-        });
-    }
 
     /**
      * Controls the test center manager screen
@@ -87,11 +72,7 @@ define([
              */
             var handleError = function handleError(err){
                 loaded();
-                if(_.isError(err)){
-                    feedback().error(err.message);
-                } else {
-                    feedback().error(err);
-                }
+                feedback().error(err.message);
             };
 
             /**
@@ -109,12 +90,12 @@ define([
               eligibilityTableFactory(testCenterId)
                 .on('loading', loading)
                 .on('loaded', loaded)
-                .on('add', function handleAddAction(eligibilities){
+                .on('add', function handleAddAction(){
                     var self = this;
 
                     //show the editor to select deliveries and test takers
-                    eligibilityEditor
-                        .init($editorContainer, formatEligibilities(eligibilities))
+                    eligibilityEditorFactory()
+                        .add($editorContainer)
                         .on('ok', function(eligibility){
 
                             //then inform the server
@@ -138,13 +119,18 @@ define([
 
                     //show the editor to edit  test takers
                     var eligibility = _.find(eligibilities, { uri : eligibilityId });
-                    eligibilityEditor
-                        .init($editorContainer, formatEligibilities(eligibilities), eligibility.delivery)
+                    //eligibilityEditor
+                        //.init($editorContainer, eligibilities, eligibility.delivery)
+                    eligibilityEditorFactory()
+                        .edit($editorContainer, eligibility.delivery.label, eligibility.testTakers)
                         .on('ok', function(updated){
 
                             loading();
                             eligibilityProvider(testCenterId)
-                                .editEligibility(updated)
+                                .editEligibility({
+                                    deliveries : [eligibility.delivery.uri],
+                                    testTakers : updated.testTakers
+                                })
                                 .then(function(response){
                                     success(__('Eligible test takers updated'));
                                 })
