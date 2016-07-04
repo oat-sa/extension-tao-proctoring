@@ -92,7 +92,6 @@ class DeliveryServer extends DefaultDeliveryServer
     {
 
         try {
-            //it throws an Unauthorized execption in case of proctored delivery
             $deliveryExecution = $this->_initDeliveryExecution();
 
             if( ! $this->isDeliveryExecutionAuthorized($deliveryExecution)) {
@@ -118,6 +117,9 @@ class DeliveryServer extends DefaultDeliveryServer
 
     /**
      * Displays the execution screen
+     *
+     * FIXME all state management must be centralized into a service, 
+      * it should'nt be on the controller.
      *
      * @throws common_exception_Error
      */
