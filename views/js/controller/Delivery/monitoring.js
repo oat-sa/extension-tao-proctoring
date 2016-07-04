@@ -215,6 +215,7 @@ define([
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
+                    reasonRequired: true,
                     resourceType : 'test taker',
                     categoriesSelector: cascadingComboBox(categories[actionName]),
                     allowedResources : allowedTestTakers,
