@@ -130,12 +130,17 @@ class DeliveryServer extends DefaultDeliveryServer
         if ($authProvider->isAuthorized()) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
-
             if($authProvider instanceof DeliveryAuthorizationProvider){
+                // if the test is in progress, first pause it to avoid inconsistent storage state
+                if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_ACTIVE) {
+                    $deliveryExecutionStateService->pauseExecution($deliveryExecution);
+                }
+                //\common_Logger::i(' > set state authorized');
                 $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
             }
 
             $deliveryExecutionStateService->resumeExecution($deliveryExecution);
+
         } else {
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
