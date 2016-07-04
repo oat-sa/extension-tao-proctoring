@@ -17,138 +17,33 @@
  *
  */
 define([
-    'lodash',
     'jquery',
+    'lodash',
     'i18n',
     'helpers',
-    'core/eventifier',
+    'uri',
+    'ui/component',
     'generis.tree.select',
     'tpl!taoProctoring/component/eligibilityEditor/layout',
     'ui/feedback',
     'ui/modal',
     'css!taoProctoringCss/eligibilityEditor'
-], function(_, $, __, helpers, eventifier, GenerisTreeSelectClass, layoutTpl, feedback){
+], function($, _, __, helpers, uri, component, GenerisTreeSelectClass, layoutTpl, feedback){
     'use strict';
-    
+
     var _ns = '.eligibility-editor';
 
     var _modalDefaults = {
         width : 600
     };
 
-    /**
-     * Builds group tree inside target container
-     * 
-     * @param {Object} instance - the eligibility editor instance
-     * @param {String} selector - the selector for the tree (generis tree works with selector only)
-     * @param {Array} [testTakers] - array of selected test takers
-     */
-    function buildTestTakerTree(instance, selector, testTakers){
-
-        var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
-            actionId : 'treeOptions.actionId',
-            saveUrl : 'treeOptions.saveUrl',
-            saveData : {},
-            checkedNodes : _.pluck(testTakers, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
-            serverParameters : {
-                openParentNodes : _.pluck(testTakers, 'uri'), //generis tree uses normal if to open nodes...
-                rootNode : 'http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject'
-            },
-            paginate : 10,
-            onChangeCallback : function(){
-                _.delay(function(){
-                    //requires a delay to let the node status to be updated
-                    instance.eligibility.testTakers = _.uniq(tree.getChecked());
-                    instance.trigger('change', instance.eligibility);
-                }, 100);
-            }
-        });
-
-        instance.eligibility.testTakers = _.uniq(tree.getChecked());
-
-        return tree;
-    }
-
-    /**
-     * Builds delivery tree inside target container
-     * 
-     * @param {Object} instance - the eligibility editor instance
-     * @param {String} selector - the selector for the tree (generis tree works with selector only)
-     * @param {Array} [deliveries] - array of selected deliveries
-     */
-    function buildDeliveryTree(instance, selector, deliveries){
-
-        var tree = new GenerisTreeSelectClass(selector, helpers._url('getData', 'GenerisTree', 'tao'), {
-            actionId : 'treeOptions.actionId',
-            saveUrl : 'treeOptions.saveUrl',
-            saveData : {},
-            checkedNodes : _.pluck(deliveries, 'encodedUri'), //generis tree uses "encoded uri" to check nodes
-            serverParameters : {
-                openParentNodes : _.pluck(deliveries, 'uri'), //generis tree uses normal if to open nodes...
-                rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery'
-            },
-            paginate : 10,
-            onChangeCallback : function(){
-                _.delay(function(){
-                    //requires a delay to let the node status to be updated
-                    instance.eligibility.deliveries = _.uniq(tree.getChecked());
-                    instance.trigger('change', instance.eligibility);
-                }, 100);
-            }
-        });
-
-        return tree;
-    }
-
-    /**
-     * Add the editor into a popup and display it
-     * 
-     * @param {Object} instance - the eligibility editor instance
-     * @param {Object} [modalConfig] - any config option available in ui/modal
-     */
-    function initModal(instance, modalConfig){
-
-        modalConfig = _.defaults(modalConfig || {}, _modalDefaults);
-
-        instance.$container.children('.eligibility-editor')
-            .addClass('modal')
-            .on('closed.modal', function(){
-                //one shot only, on close, destroy the widget
-                destroy(instance);
-            })
-            .modal(modalConfig)
-            .on('click' + _ns, '.actions .done', function(e){
-                
-                if(instance.eligibility && instance.eligibility.deliveries && instance.eligibility.deliveries.length){
-                    instance.trigger('ok', instance.eligibility);
-                    destroy(instance);
-                }else{
-                    feedback(instance.$container).warning(__('At least one delivery need to be selected to create'));
-                }
-
-            }).on('click' + _ns, '.actions .cancel', function(e){
-
-                e.preventDefault();
-                instance.trigger('cancel');
-                destroy(instance);
-            });
-    }
-
-    /**
-     * Destroy the eligibility editor
-     * 
-     * @param {object} instance
-     * @returns {undefined}
-     */
-    function destroy(instance){
-        instance.$container.children('.eligibility-editor')
-            .modal('destroy')
-            .remove();
-    }
+    var config = {
+        dataUrl :  helpers._url('getData', 'GenerisTree', 'tao')
+    };
 
     /**
      * Create an eligibility editor into a $container
-     * 
+     *
      * @param {JQuery} $container
      * @param {Array} eligibilities
      * @param {Object} [delivery]
@@ -156,63 +51,197 @@ define([
      * @param {String} [delivery.uri]
      * @returns {Object} the eligibility editor instance
      */
-    function init($container, eligibilities, delivery){
+    var eligibilityEditorFactory = function eligibilityEditorFactory() {
 
-        var instance = eventifier({
-            eligibility : {}
-        });
-        var subjectTreeId = _.uniqueId('eligible-testTaker-tree-');//generating the generis tree id, because it requires one to work
-        var deliveryTreeId = _.uniqueId('eligible-delivery-tree-');//generating the generis tree id, because it requires one to work
-        var $deliverySelector;
-        var creationMode = true;
-        var deliveryName = '';
-        
-        if(!_.isArray(eligibilities)){
-            throw 'the egibility editor requires an array of eligibilities';
-        }
+        var eligibilityEditor;
 
-        if(delivery && delivery.uri && delivery.label){
-            var eligibility = _.find(eligibilities, {delivery : delivery.uri});
-            if(eligibility){
-                creationMode = false;
-                deliveryName = delivery.label;
-                
-                //the format expected for the returned value
-                instance.eligibility = _.defaults(eligibility , {
-                    deliveries : [delivery.uri],
-                    testTakers : []
-                });
-            }else{
-                throw ('given delivery does not exist in the list of eligibilities');
+        var testTakerTreeId = _.uniqueId('eligible-testTaker-tree-');//generating the generis tree id, because it requires one to work
+        var deliveryTreeId  = _.uniqueId('eligible-delivery-tree-');//generating the generis tree id, because it requires one to work
+
+        /**
+         * Builds a tree to select test takers
+         *
+         * @param {String} id - the tree identifier, use to get the DOM node to put the tree
+         * @param {String} url - the tree data url
+         * @param {Array} [testTakers] - array of currently selected test takers
+         * @returns {tree} the created tree
+         */
+        var buildTestTakerTree = function buildTestTakerTree(id, url, testTakers){
+
+            var selected = _.pluck(testTakers, 'uri');
+
+            return new GenerisTreeSelectClass('#' + id, url, {
+                actionId : 'treeOptions.actionId',
+                saveUrl : 'treeOptions.saveUrl',
+                saveData : {},
+                checkedNodes : _.map(selected, uri.encode), //generis tree uses "encoded uri" to check nodes
+                serverParameters : {
+                    openParentNodes : selected, //generis tree uses normal if to open nodes...
+                    rootNode : 'http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject'
+                },
+                paginate : 10
+            });
+        };
+
+        /**
+         * Builds a tree to select deliveries
+         *
+         * @param {String} id - the tree identifier, use to get the DOM node to put the tree
+         * @param {String} url - the tree data url
+         * @param {Array} [deliveries] - array of currently selected deliveris
+         * @returns {tree} the created tree
+         */
+        var buildDeliveryTree = function buildDeliveryTree(id, url, deliveries){
+
+            var selected = _.pluck(deliveries, 'uri');
+            return new GenerisTreeSelectClass('#' + id, url, {
+                actionId : 'treeOptions.actionId',
+                saveUrl : 'treeOptions.saveUrl',
+                saveData : {},
+                checkedNodes : _.map(selected, uri.encode), //generis tree uses "encoded uri" to check nodes
+                serverParameters : {
+                    openParentNodes : selected, //generis tree uses normal if to open nodes...
+                    rootNode : 'http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery'
+                },
+                paginate : 10
+            });
+        };
+
+        /**
+         * Destroy the modal
+         *
+         * @param {object} instance
+         * @returns {undefined}
+         */
+        var destroyModal = function destroyModal(){
+            if(eligibilityEditor && eligibilityEditor.getElement()){
+                eligibilityEditor.getElement()
+                    .modal('destroy')
+                    .remove();
             }
-        }
-        instance.$container = $container;
-        $container.append(layoutTpl({
-            title : creationMode ? __('Add Eligibility') : __('Edit Eligibility'),
-            editingMode : !creationMode,
-            subjectTreeId : subjectTreeId,
-            deliveryTreeId : deliveryTreeId,
-            deliveryName : deliveryName
-        }));
+        };
 
-        if(creationMode){
-            //init delivery selector only when no delivery is selected
-            $deliverySelector = $container.find('.eligible-delivery');
-            buildDeliveryTree(instance, '#' + deliveryTreeId, []);
-        }
+        /**
+         * Add the editor into a popup and display it
+         *
+         * @param {Object} [modalConfig] - any config option available in ui/modal
+         */
+        var initModal = function initModal(modalConfig){
+            modalConfig = _.defaults(modalConfig || {}, _modalDefaults);
 
-        //init test taker selector
-        buildTestTakerTree(instance, '#' + subjectTreeId, instance.eligibility.testTakers || []);
+            if(eligibilityEditor && eligibilityEditor.getElement()){
+                eligibilityEditor.getElement()
+                    .addClass('modal')
+                    .on('closed.modal', destroyModal)
+                    .modal(modalConfig);
+            }
+        };
 
-        //init modal
-        initModal(instance, {
-            width : creationMode ? 650 : 400
-        });
+        /**
+         * The eligibiltiyEditor API
+         */
+        var api = {
 
-        return instance;
-    }
+            /**
+             * Add eligibilities
+             * @param {jQueryElement} $container - where to append the component
+             * @returns {eligibilityEditor} chains the component
+             * @fires eligibilityEditor#ok with the selected eligibities in parameter
+             * @fires eligibilityEditor#cancel
+             */
+            add : function add($container){
+                return this.on('render', function(){
+                    var self = this;
+                    var deliveryTree = buildDeliveryTree(deliveryTreeId, this.config.dataUrl);
+                    var testTakerTree = buildTestTakerTree(testTakerTreeId, this.config.dataUrl);
 
-    return {
-        init : init
+                    initModal({
+                        width : 650
+                    });
+
+                    this.$component
+                        .on('click' + _ns, '.actions .done', function(e){
+
+                            var deliveries = _(deliveryTree.getChecked()).uniq().compact().value();
+                            var testTakers = _(testTakerTree.getChecked()).uniq().compact().value();
+
+                            if( deliveries && deliveries.length){
+                                self.trigger('ok', {
+                                    deliveries: deliveries,
+                                    testTakers: testTakers
+                                });
+                                destroyModal();
+                            } else {
+                                feedback(self.$component).warning(__('At least one delivery need to be selected to create'));
+                            }
+
+                        }).on('click' + _ns, '.actions .cancel', function(e){
+                            e.preventDefault();
+                            destroyModal();
+                            self.trigger('cancel');
+                        });
+                   this.trigger('open');
+                })
+                .init({
+                    title :  __('Add Eligibility'),
+                    editingMode : false,
+                    subjectTreeId : testTakerTreeId,
+                    deliveryTreeId : deliveryTreeId,
+                })
+                .render($container);
+
+            },
+
+            /**
+             * Add eligibilities
+             * @param {jQueryElement} $container - where to append the component
+             * @param {String} deliveryName - the name of the eligibility's deliveryA
+             * @param {Array} testTakers - the test takers already selected
+             * @returns {eligibilityEditor} chains the component
+             * @fires eligibilityEditor#ok with the selected test takers in parameter
+             * @fires eligibilityEditor#cancel
+             */
+            edit : function edit($container, deliveryName, testTakers){
+                return this.on('render', function(){
+                    var self = this;
+
+                    var testTakerTree = buildTestTakerTree(testTakerTreeId, this.config.dataUrl, testTakers);
+
+                    initModal({
+                        width : 400
+                    });
+
+                    this.$component
+                        .on('click' + _ns, '.actions .done', function(e){
+
+                            var testTakers = _(testTakerTree.getChecked()).uniq().compact().value();
+                            self.trigger('ok', {
+                                testTakers : testTakers
+                            });
+                            destroyModal();
+
+                        }).on('click' + _ns, '.actions .cancel', function(e){
+                            e.preventDefault();
+                            destroyModal();
+                            self.trigger('cancel');
+                        });
+                })
+                .init({
+                    title :  __('Edit Eligibility'),
+                    editingMode : true,
+                    subjectTreeId : testTakerTreeId,
+                    deliveryTreeId : deliveryTreeId,
+                    deliveryName : deliveryName
+                })
+                .render($container);
+            }
+        };
+
+        //creates the component here
+        eligibilityEditor = component(api, config).setTemplate(layoutTpl);
+
+        return eligibilityEditor;
     };
+
+    return eligibilityEditorFactory;
 });

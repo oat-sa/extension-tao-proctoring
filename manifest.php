@@ -21,19 +21,20 @@
 
 return array(
     'name' => 'taoProctoring',
-	'label' => 'Proctoring',
-	'description' => 'Proctoring for deliveries',
+    'label' => 'Proctoring',
+    'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '1.16.1',
-	'author' => 'Open Assessment Technologies SA',
-	'requires' => array(
-        'tao' => '>=4.0.0',
+    'version' => '2.0.0',
+    'author' => 'Open Assessment Technologies SA',
+    'requires' => array(
+        'tao' => '>=4.5.0',
+        'taoDelivery' => '>=3.7.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
-	    'taoQtiTest' => '>=2.25.0',
-	    'taoOutcomeUi' => '>=2.6.6',
-	    'generis' => '>=2.15.0',
-	    'taoClientDiagnostic' => '>=1.6.0',
+        'taoQtiTest' => '>=2.25.0',
+        'taoOutcomeUi' => '>=2.6.6',
+        'generis' => '>=2.15.0',
+        'taoClientDiagnostic' => '>=1.6.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
@@ -44,8 +45,8 @@ return array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TestCenter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
-		array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
-		array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
     ),
     'install' => array(
         'php' => array(
@@ -54,9 +55,10 @@ return array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
             'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
             'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
-			'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
-			'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
-			'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
+            'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
+            'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
+            'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
+            'oat\\taoProctoring\\scripts\\install\\RegisterAuthorizationService',
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',

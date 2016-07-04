@@ -1,5 +1,6 @@
 <div class="eligibility-editor{{#if editingMode}} editing{{/if}}">
     <h2 class="title">{{title}}</h2>
+
     <div class="flex-grid ">
         <div class="{{#if editingMode}}flex-col-12{{else}}flex-col-6{{/if}} tree-container eligible-delivery">
             <label>{{__ 'Eligible Deliveries'}}</label>
