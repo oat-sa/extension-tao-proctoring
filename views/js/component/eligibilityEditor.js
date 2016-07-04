@@ -152,7 +152,6 @@ define([
             add : function add($container){
                 return this.on('render', function(){
                     var self = this;
-                    debugger;
                     var deliveryTree = buildDeliveryTree(deliveryTreeId, this.config.dataUrl);
                     var testTakerTree = buildTestTakerTree(testTakerTreeId, this.config.dataUrl);
 
