@@ -90,17 +90,6 @@ class TestCenterManager extends \tao_actions_SaSModule
         $proctorForm->setData('title', __('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
 
-        $deliveryClass = new \core_kernel_classes_Class(TAO_DELIVERY_CLASS);
-        $deliveries = $deliveryClass->getInstances(true);
-        $deliveriesFormated = array_map(function($delivery){
-            return array(
-                'uri' => $delivery->getUri(),
-                'label' => $delivery->getLabel()
-            );
-        }, array_values($deliveries));
-
-        $this->setData('eligibilities', json_encode($this->_getEligibilities()));
-        $this->setData('deliveries', json_encode($deliveriesFormated));
         $this->setData('formTitle', __('Edit test center'));
         $this->setData('testCenter', $testCenter->getUri());
         $this->setData('myForm', $myForm->render());
@@ -108,36 +97,28 @@ class TestCenterManager extends \tao_actions_SaSModule
     }
 
     /**
-     * get eligible deliveries data formated in a way that is compatible with the client ui/datatable component
+     * Get eligiblities formated in a way that is compatible 
+     * with the eligibilityTable component
      *
-     * @return {array}
+     * @return array
      */
     private function _getEligibilities(){
 
         $testCenter = $this->getCurrentInstance();
-        $eligibilityService = $this->eligibilityService;
-        $eligibilities = $eligibilityService->getEligibleDeliveries($testCenter);
 
-        $data = array_map(function($delivery) use ($eligibilityService, $testCenter){
-            return array(
-                'id' => $delivery->getUri(),
-                'testTakers' => array_map(function($testTakerId){
-                    $ttaker = new \core_kernel_classes_Resource($testTakerId);
-                    return array(
-                        'label' => $ttaker->getLabel(),
-                        'uri' => $testTakerId,
-                        'encodedUri' => \tao_helpers_Uri::encode($testTakerId)//jstree use id formated this way...
-                    );
-                }, $eligibilityService->getEligibleTestTakers($testCenter, $delivery))
-            );
-        }, $eligibilities);
+        $data = array_map(function($eligibility) {
+            $eligibility['id'] = $eligibility['uri'];
+            return $eligibility;
+        }, $this->eligibilityService->getEligibilities($testCenter, [ 'sort' => true ]));
 
         return DataTableHelper::paginate($data, $this->getRequestOptions());
     }
 
     /**
-     * Get the requested eligibility to be edited
-     * 
+     * Get the list of eligibilities.
+     *
+     * Reformat them for compat.
+     *
      * @return array
      * @throws \common_Exception
      */
@@ -215,6 +196,10 @@ class TestCenterManager extends \tao_actions_SaSModule
         ));
     }
 
+    /**
+     * Remove the eligibility in parameter
+     * @throws \common_Exception without an eligibility
+     */
     public function removeEligibilities()
     {
         $testCenter = $this->getCurrentInstance();
@@ -224,6 +209,40 @@ class TestCenterManager extends \tao_actions_SaSModule
         }
         return $this->returnJson(array(
             'success' => $success
+        ));
+    }
+
+    /**
+     * Change the eligibility in parameter to use the proctored authorization (shield)
+     * @throws \common_Exception without an eligibility
+     */
+    public function shieldEligibility()
+    {
+        if(!$this->hasRequestParameter('eligibility')){
+            throw new \common_Exception('Please provide the URI of the eligibilty to shield');
+        }
+        $eligibilityUri = $this->getRequestParameter('eligibility');
+
+        $this->eligibilityService->setByPassProctor(new \core_kernel_classes_Resource($eligibilityUri), false);
+        return $this->returnJson(array(
+            'success' => true
+        ));
+    }
+
+    /**
+     * Change the eligibility in parameter to use the default authorization (unshield)
+     * @throws \common_Exception without an eligibility
+     */
+    public function unshieldEligibility()
+    {
+        if(!$this->hasRequestParameter('eligibility')){
+            throw new \common_Exception('Please provide the URI of the eligibilty to unshield');
+        }
+        $eligibilityUri = $this->getRequestParameter('eligibility');
+
+        $this->eligibilityService->setByPassProctor(new \core_kernel_classes_Resource($eligibilityUri), true);
+        return $this->returnJson(array(
+            'success' => true
         ));
     }
 

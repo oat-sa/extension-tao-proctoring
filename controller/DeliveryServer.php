@@ -24,9 +24,12 @@ use PHPSession;
 use common_Logger;
 use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
-use oat\taoProctoring\model\DeliveryAuthorizationService;
+use oat\taoDelivery\model\authorization\AuthorizationService;
+use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
+
+
 
 /**
  * Override the default DeliveryServer Controller
@@ -35,9 +38,6 @@ use oat\taoProctoring\model\execution\DeliveryExecution;
  */
 class DeliveryServer extends DefaultDeliveryServer
 {
-
-    /** @var DeliveryAuthorizationService */
-    public $authorizationService;
 
     /**
      * constructor: initialize the service and the default data
@@ -66,7 +66,7 @@ class DeliveryServer extends DefaultDeliveryServer
         );
         foreach($startedExecutions as $startedExecution) {
             if($startedExecution->getDelivery()->exists()) {
-                $this->getAuthorizationService()->revokeAuthorization($startedExecution);
+                $this->getAuthorizationProvider($startedExecution)->revoke();
             }
         }
 
@@ -81,22 +81,45 @@ class DeliveryServer extends DefaultDeliveryServer
     {
         return _url('index', 'DeliveryServer', 'taoProctoring');
     }
-    
-    /**
-     * Overwrites the parent initDeliveryExecution()
-     * Redirects the test taker to the awaitingAuthorization page after delivery initialization
-     */
-    public function initDeliveryExecution() 
-    {
-        // from this page the test taker can only goes to the awaiting page, so always revoke authorization
-        $deliveryExecution = $this->_initDeliveryExecution();
 
-        $this->getAuthorizationService()->revokeAuthorization($deliveryExecution);
-	    $this->redirect(_url('awaitingAuthorization', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
-	}
+    /**
+     * Redirects the test taker to either the awaitingAuthorization page
+     * or run the delivery depending on the authorization.
+     *
+     * @see DefaultDeliveryServer::initDeliveryExecution overrides
+     */
+    public function initDeliveryExecution()
+    {
+
+        try {
+            $deliveryExecution = $this->_initDeliveryExecution();
+
+            if( ! $this->isDeliveryExecutionAuthorized($deliveryExecution)) {
+                throw new \common_exception_Unauthorized();
+            }
+
+            $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
+
+        } catch (\common_exception_Unauthorized $e) {
+
+
+            if(isset($deliveryExecution) && $deliveryExecution->exists()){
+                // we always revoke authorization for proctored delivery execs
+                $this->getAuthorizationProvider($deliveryExecution)->revoke();
+
+                $this->redirect(_url('awaitingAuthorization', null, null, array('init' => true, 'deliveryExecution' => $deliveryExecution->getIdentifier())));
+
+            } else {
+                return $this->returnError(__('We are unable to retrieve this delivery'), true);
+            }
+        }
+    }
 
     /**
      * Displays the execution screen
+     *
+     * FIXME all state management must be centralized into a service, 
+      * it should'nt be on the controller.
      *
      * @throws common_exception_Error
      */
@@ -104,13 +127,24 @@ class DeliveryServer extends DefaultDeliveryServer
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
-        
-        if ($this->getAuthorizationService()->isAuthorized($deliveryExecution)) {
+        $authProvider = $this->getAuthorizationProvider($deliveryExecution);
+
+        if ($authProvider->isAuthorized()) {
             // the test taker is authorized to run the delivery
             // but a change is needed to make the delivery execution processable
+            if($authProvider instanceof DeliveryAuthorizationProvider){
+                // if the test is in progress, first pause it to avoid inconsistent storage state
+                if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_ACTIVE) {
+                    $deliveryExecutionStateService->pauseExecution($deliveryExecution);
+                }
+                //\common_Logger::i(' > set state authorized');
+                $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
+            }
+
             $deliveryExecutionStateService->resumeExecution($deliveryExecution);
+
         } else {
+            $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
             common_Logger::i(get_called_class() . '::runDeliveryExecution(): try to run delivery without proctor authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
             return $this->redirect(_url('awaitingAuthorization', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
@@ -121,7 +155,7 @@ class DeliveryServer extends DefaultDeliveryServer
         // ok, the delivery execution can be processed
         parent::runDeliveryExecution();
     }
-    
+
     /**
      * The awaiting authorization screen
      */
@@ -137,7 +171,7 @@ class DeliveryServer extends DefaultDeliveryServer
         }
 
         // from this page the test taker must wait for proctor authorization
-        $this->getAuthorizationService()->revokeAuthorization($deliveryExecution);
+        $this->getAuthorizationProvider($deliveryExecution)->revoke();
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecution::STATE_ACTIVE == $executionState) {
@@ -226,14 +260,4 @@ class DeliveryServer extends DefaultDeliveryServer
         }
     }
 
-    /**
-     * @return DeliveryAuthorizationService
-     */
-    protected function getAuthorizationService()
-    {
-        if ($this->authorizationService === null) {
-            $this->authorizationService = $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
-        }
-        return $this->authorizationService;
-    }
 }
