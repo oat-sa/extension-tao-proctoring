@@ -24,7 +24,7 @@ Template::inc('form_context.tpl', 'tao');
 
     <?=get_data('childrenForm')?>
 
-    <div class="eligible-deliveries" data-testcenter="<?=get_data('testCenter')?>">
+    <div class="eligible-deliveries clear" data-testcenter="<?=get_data('testCenter')?>">
         <div class="eligibility-table-container"></div>
         <div class="eligibility-editor-container"></div>
     </div>
