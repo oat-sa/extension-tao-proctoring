@@ -416,7 +416,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(AuthorizationService::CONFIG_ID, new ProctorDeliveryAuthorizationService());
             $this->setVersion('2.0.0');
         }
-        $this->skip('2.0.0','2.0.1');
+        $this->skip('2.0.0','2.1.0');
     }
 
     private function refreshMonitoringData()
