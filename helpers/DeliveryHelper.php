@@ -202,8 +202,6 @@ class DeliveryHelper
             array_merge($criteria, array('AND', $deliveryCriteria));
         }
 
-        \common_Logger::i(print_r($criteria,true));
-
         if (isset($options['filter']) && $options['filter']) {
             $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
         }
