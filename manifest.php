@@ -24,11 +24,11 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '2.0.1',
+    'version' => '2.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=4.5.0',
-        'taoDelivery' => '>=3.7.0',
+        'taoDelivery' => '>=3.8.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=2.25.0',

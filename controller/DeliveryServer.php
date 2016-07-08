@@ -24,7 +24,6 @@ use PHPSession;
 use common_Logger;
 use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
-use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
@@ -98,6 +97,10 @@ class DeliveryServer extends DefaultDeliveryServer
                 throw new \common_exception_Unauthorized();
             }
 
+            if (!$this->isEnvironmentComplies($deliveryExecution)) {
+                $this->redirect(_url('notCompatibleEnvironment'));
+            }
+
             $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
 
         } catch (\common_exception_Unauthorized $e) {
@@ -121,13 +124,17 @@ class DeliveryServer extends DefaultDeliveryServer
      * FIXME all state management must be centralized into a service, 
       * it should'nt be on the controller.
      *
-     * @throws common_exception_Error
+     * @throws \common_exception_Error
      */
     public function runDeliveryExecution() 
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $authProvider = $this->getAuthorizationProvider($deliveryExecution);
+
+        if (!$this->isEnvironmentComplies($deliveryExecution)) {
+            $this->redirect(_url('notCompatibleEnvironment'));
+        }
 
         if ($authProvider->isAuthorized()) {
             // the test taker is authorized to run the delivery
