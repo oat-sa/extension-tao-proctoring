@@ -50,14 +50,18 @@ class ProctorDeliveryAuthorizationService extends ConfigurableService  implement
     public function getAuthorizationProvider(DeliveryExecution $deliveryExecution, User $user)
     {
         $eligibilityService = EligibilityService::singleton();
-        $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
 
-        $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
+        if( $deliveryExecution->exists()){
+            $testCenter = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
 
-        if($eligibilityService->canByPassProctor($eligibility)){
-            return new DeliveryAuthorizationProvider();
+            if(!is_null($testCenter)){
+                $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
+
+                if($eligibilityService->canByPassProctor($eligibility)){
+                    return new DeliveryAuthorizationProvider();
+                }
+            }
         }
-
         return new ProctorAuthorizationProvider($deliveryExecution);
     }
 }
