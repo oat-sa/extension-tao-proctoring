@@ -16,11 +16,11 @@ Template::inc('form_context.tpl', 'tao');
 
 </div>
 <div class="data-container-wrapper flex-container-remainder">
-        <?=get_data('administratorForm')?>
+    <?=get_data('administratorForm')?>
 
-        <?=get_data('proctorForm')?>
+    <?=get_data('proctorForm')?>
 
-        <?=get_data('childrenForm')?>
+    <?=get_data('childrenForm')?>
 </div>
 <div class="grid-row">
     <div class="col-12 eligible-deliveries" data-testcenter="<?=get_data('testCenter')?>">
