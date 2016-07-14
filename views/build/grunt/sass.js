@@ -1,4 +1,5 @@
-module.exports = function(grunt) { 
+module.exports = function(grunt) {
+    'use strict';
 
     var sass    = grunt.config('sass') || {};
     var watch   = grunt.config('watch') || {};
@@ -7,13 +8,14 @@ module.exports = function(grunt) {
 
     sass.taoproctoring = { };
     sass.taoproctoring.files = { };
-    sass.taoproctoring.files[root + 'css/proctoring.css'] = root + 'scss/proctoring.scss';
-    sass.taoproctoring.files[root + 'css/deliveryServer.css'] = root + 'scss/deliveryServer.scss';
+    sass.taoproctoring.files[root + 'css/proctoring.css']        = root + 'scss/proctoring.scss';
+    sass.taoproctoring.files[root + 'css/deliveryServer.css']    = root + 'scss/deliveryServer.scss';
     sass.taoproctoring.files[root + 'css/eligibilityEditor.css'] = root + 'scss/eligibilityEditor.scss';
-    sass.taoproctoring.files[root + 'css/printReport.css'] = root + 'scss/printReport.scss';
+    sass.taoproctoring.files[root + 'css/eligibilityTable.css']  = root + 'scss/eligibilityTable.scss';
+    sass.taoproctoring.files[root + 'css/printReport.css']       = root + 'scss/printReport.scss';
 
     watch.taoproctoringsass = {
-        files : [root + 'views/scss/*.scss', root + 'views/scss/**/*.scss'],
+        files : [root + 'scss/*.scss'],
         tasks : ['sass:taoproctoring', 'notify:taoproctoringsass'],
         options : {
             debounceDelay : 1000
@@ -22,7 +24,7 @@ module.exports = function(grunt) {
 
     notify.taoproctoringsass = {
         options: {
-            title: 'Grunt SASS', 
+            title: 'Grunt SASS',
             message: 'SASS files compiled to CSS'
         }
     };
