@@ -24,7 +24,7 @@ use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\EligibilityService;
 
 /**
@@ -35,6 +35,32 @@ use oat\taoProctoring\model\EligibilityService;
 class ProctorDeliveryAuthorizationService extends ConfigurableService  implements AuthorizationService
 {
 
+    /**
+     * The service used to check wether an execution is proctored
+     * @var EligibilityService
+     */
+    protected $eligibilityService;
+
+    /**
+     * Get (or initialize) the eligibility service
+     * @return EligibilityService
+     */
+    public function getEligibilityService()
+    {
+        if(!isset($this->eligibilityService)){
+            $this->eligibilityService = EligibilityService::singleton();
+        }
+        return $this->eligibilityService;
+    }
+
+    /**
+     * Set  the eligibility service
+     * @param EligibilityService $eligibilityService
+     */
+    public function setEligibilityService(EligibilityService $eligibilityService)
+    {
+        $this->eligibilityService = $eligibilityService;
+    }
 
     /**
      * Returns the the authorization provider.
@@ -49,19 +75,15 @@ class ProctorDeliveryAuthorizationService extends ConfigurableService  implement
      */
     public function getAuthorizationProvider(DeliveryExecution $deliveryExecution, User $user)
     {
-        $eligibilityService = EligibilityService::singleton();
+        $eligibilityService = $this->getEligibilityService();
+        $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
 
-        if( $deliveryExecution->exists()){
-            $testCenter = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
+        $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
 
-            if(!is_null($testCenter)){
-                $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
-
-                if($eligibilityService->canByPassProctor($eligibility)){
-                    return new DeliveryAuthorizationProvider();
-                }
-            }
+        if($eligibilityService->canByPassProctor($eligibility)){
+            return new DeliveryAuthorizationProvider();
         }
+
         return new ProctorAuthorizationProvider($deliveryExecution);
     }
 }
