@@ -123,7 +123,7 @@ define([
             });
     });
 
-    QUnit.asyncTest('Canel Add', function(assert){
+    QUnit.asyncTest('Cancel Add', function(assert){
         QUnit.expect(2);
         var $container = $('#fixture-1');
 
@@ -162,7 +162,6 @@ define([
                     var $testTakers =  $('.eligible-testTaker .node-instance', $editorContainer);
                     assert.equal($testTakers.length, 2, 'The test taker tree contains 2 nodes');
 
-                    console.log('ok');
                     $('a', $testTakers).trigger('click');
 
                     _.delay(function(){
