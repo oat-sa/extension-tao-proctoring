@@ -87,16 +87,14 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (ProctoredDeliveryExecution::STATE_AUTHORIZED === $executionState) {
-            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-            if ($session) {
-                $session->resume();
-                $this->getTestSessionService()->persist($session);
-            }
-            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
-
-            $result = true;
+        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($session) {
+            $session->resume();
+            $this->getTestSessionService()->persist($session);
         }
+        $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
+
+        $result = true;
 
         return $result;
     }
