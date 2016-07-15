@@ -31,6 +31,7 @@ use oat\taoProctoring\model\EligibilityService;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ServiceManager;
 
+
 /**
  * Test the Test center service
  *
@@ -342,5 +343,30 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
         $eligibilityServiceMock->setEligibleTestTakers($testCenter, $delivery, $testTakers);
     }
 
+    /**
+     * Data provider for testByPassProctor
+     * @return array of properyValue/result
+     */
+    public function byPassProctorProvider()
+    {
+        return [
+            [ new core_kernel_classes_Resource(EligibilityService::BOOLEAN_TRUE), true ],
+            [ new core_kernel_classes_Resource(EligibilityService::BOOLEAN_FALSE), false ],
+            [ null, false ]
+        ];
+    }
 
+    /**
+     * Test the method to get the by-pass proctoring status 
+     *
+     * @dataProvider byPassProctorProvider
+     */
+    public function testByPassProctor($property, $result)
+    {
+        $eligibilityProphet = $this->prophesize(core_kernel_classes_Resource::class);
+        $eligibilityProphet->getOnePropertyValue(new core_kernel_classes_Property(EligibilityService::PROPERTY_BYPASSPROCTOR_URI))
+                           ->willReturn($property);
+
+        $this->assertEquals($result, $this->eligilityService->canByPassProctor($eligibilityProphet->reveal()));
+    }
 }

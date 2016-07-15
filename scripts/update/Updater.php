@@ -411,7 +411,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.17.0');
         }
 
-        $this->skip('1.17.0','2.0.2');
+        $this->skip('1.17.0','2.1.0');
     }
 
     private function refreshMonitoringData()
