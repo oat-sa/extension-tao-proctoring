@@ -49,6 +49,9 @@ use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
 use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
+use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
+use oat\taoDelivery\model\authorization\strategy\StateValidation;
+use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 
 /**
  * 
@@ -411,12 +414,19 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.17.0');
         }
 
-        if($this->isVersion('1.17.0')){
-
-            $this->getServiceManager()->register(AuthorizationService::CONFIG_ID, new ProctorDeliveryAuthorizationService());
-            $this->setVersion('2.0.0');
+        $this->skip('1.17.0','2.1.0');
+        
+        if ($this->isVersion('2.1.0')) {
+            $authService = $this->getServiceManager()->get(AuthorizationService::SERVICE_ID);
+            if ($authService instanceof AuthorizationAggregator) {
+                $authService->unregister(StateValidation::class);
+                $authService->addProvider(new ProctorAuthorizationProvider());
+                $this->getServiceManager()->register(AuthorizationService::SERVICE_ID, $authService);
+            } else {
+                throw new \common_exception_Error('Incompatible AuthorizationService "'.get_class($authService).'" found.');
+            }
+            $this->setVersion('3.0.0');
         }
-        $this->skip('2.0.0','2.1.0');
     }
 
     private function refreshMonitoringData()
