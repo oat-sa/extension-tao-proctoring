@@ -425,8 +425,9 @@ class Updater extends common_ext_ExtensionUpdater {
             } else {
                 throw new \common_exception_Error('Incompatible AuthorizationService "'.get_class($authService).'" found.');
             }
-            $this->setVersion('3.0.1');
+            $this->setVersion('3.0.0');
         }
+        $this->skip('3.0.0','3.0.1');
     }
 
     private function refreshMonitoringData()
