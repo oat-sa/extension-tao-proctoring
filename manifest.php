@@ -18,17 +18,18 @@
  *               
  * 
  */               
+use oat\taoProctoring\scripts\install\RegisterAuthProvider;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '2.0.1',
+    'version' => '3.0.2',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=4.5.0',
-        'taoDelivery' => '>=3.7.0',
+        'taoDelivery' => '>=4.0.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=2.25.0',
@@ -58,7 +59,7 @@ return array(
             'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
             'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
-            'oat\\taoProctoring\\scripts\\install\\RegisterAuthorizationService',
+            RegisterAuthProvider::class
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',

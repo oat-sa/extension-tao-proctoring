@@ -195,10 +195,12 @@ class DeliveryHelper
         }
 
         $criteria = [
-            [DeliveryMonitoringService::TEST_CENTER_ID => $testCenter->getUri()],
-            'AND',
-            $deliveryCriteria
+            [DeliveryMonitoringService::TEST_CENTER_ID => $testCenter->getUri()]
         ];
+
+        if (!empty($deliveryCriteria)) {
+            array_merge($criteria, array('AND', $deliveryCriteria));
+        }
 
         if (isset($options['filter']) && $options['filter']) {
             $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);

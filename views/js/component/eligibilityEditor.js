@@ -145,15 +145,22 @@ define([
             /**
              * Add eligibilities
              * @param {jQueryElement} $container - where to append the component
+             * @param {Object} [options]
+             * @param {String} [options.dataUrl] - to define where the tree data are retrieved
              * @returns {eligibilityEditor} chains the component
              * @fires eligibilityEditor#ok with the selected eligibities in parameter
              * @fires eligibilityEditor#cancel
              */
-            add : function add($container){
+            add : function add($container, options){
                 return this.on('render', function(){
                     var self = this;
-                    var deliveryTree = buildDeliveryTree(deliveryTreeId, this.config.dataUrl);
-                    var testTakerTree = buildTestTakerTree(testTakerTreeId, this.config.dataUrl);
+                    var deliveryTree;
+                    var testTakerTree;
+
+                    options = _.defaults(options || {}, this.config);
+
+                    deliveryTree = buildDeliveryTree(deliveryTreeId, options.dataUrl);
+                    testTakerTree = buildTestTakerTree(testTakerTreeId, options.dataUrl);
 
                     initModal({
                         width : 650
@@ -197,15 +204,20 @@ define([
              * @param {jQueryElement} $container - where to append the component
              * @param {String} deliveryName - the name of the eligibility's deliveryA
              * @param {Array} testTakers - the test takers already selected
+             * @param {Object} [options]
+             * @param {String} [options.dataUrl] - to define where the tree data are retrieved
              * @returns {eligibilityEditor} chains the component
              * @fires eligibilityEditor#ok with the selected test takers in parameter
              * @fires eligibilityEditor#cancel
              */
-            edit : function edit($container, deliveryName, testTakers){
+            edit : function edit($container, deliveryName, testTakers, options){
                 return this.on('render', function(){
                     var self = this;
+                    var testTakerTree;
 
-                    var testTakerTree = buildTestTakerTree(testTakerTreeId, this.config.dataUrl, testTakers);
+                    options = _.defaults(options || {}, this.config);
+
+                    testTakerTree = buildTestTakerTree(testTakerTreeId, options.dataUrl, testTakers);
 
                     initModal({
                         width : 400
@@ -225,6 +237,8 @@ define([
                             destroyModal();
                             self.trigger('cancel');
                         });
+
+                   this.trigger('open');
                 })
                 .init({
                     title :  __('Edit Eligibility'),
