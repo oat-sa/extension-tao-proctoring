@@ -22,11 +22,11 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use core_kernel_classes_Resource;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Class DeliveryMonitoringService

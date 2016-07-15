@@ -20,7 +20,8 @@
 
 namespace oat\taoProctoring\model;
 
-use oat\taoProctoring\model\execution\DeliveryExecution;
+
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 
 /**
  * Interface DeliveryExecutionStateService
