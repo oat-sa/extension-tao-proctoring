@@ -20,8 +20,8 @@
  */
 
 namespace oat\taoProctoring\model\monitorCache;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 
-use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Interface DeliveryMonitoringService

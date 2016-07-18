@@ -1,1 +1,31 @@
-{"data":"Test-taker","type":"class","attributes":{"id":"http_2_www_0_tao_0_lu_1_Ontologies_1_TAOSubject_0_rdf_3_Subject","class":"node-class","data-uri":"http:\/\/www.tao.lu\/Ontologies\/TAOSubject.rdf#Subject","data-classUri":null},"state":"open","children":[{"data":"import","type":"class","attributes":{"id":"http_2_bertaoact_1_tao_0_rdf_3_i14673836309164132","class":"node-class","data-uri":"http:\/\/bertaoact\/tao.rdf#i14673836309164132","data-classUri":"http:\/\/www.tao.lu\/Ontologies\/TAOSubject.rdf#Subject"},"state":"closed","count":100},{"data":"Test-taker 1","type":"instance","attributes":{"id":"http_2_bertaoact_1_tao_0_rdf_3_i1467382933708484","class":"node-instance","data-uri":"http:\/\/bertaoact\/tao.rdf#i1467382933708484","data-classUri":"http:\/\/www.tao.lu\/Ontologies\/TAOSubject.rdf#Subject"}}],"count":1}
+{
+  "data": "Foo",
+  "type": "class",
+  "attributes": {
+    "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708480",
+    "class": "node-class",
+    "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480",
+    "data-classUri": null
+  },
+  "state": "open",
+  "children": [{
+    "data": "Bar",
+    "type": "instance",
+    "attributes": {
+      "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708484",
+      "class": "node-instance",
+      "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708484",
+      "data-classUri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480"
+    }
+  }, {
+    "data": "Baz",
+    "type": "instance",
+    "attributes": {
+      "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708485",
+      "class": "node-instance",
+      "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708485",
+      "data-classUri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480"
+    }
+  }],
+  "count": 2
+}

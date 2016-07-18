@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**

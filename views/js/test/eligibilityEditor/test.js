@@ -62,12 +62,11 @@ define([
 
     QUnit.module('Behavior');
 
-    QUnit.asyncTest('add', function(assert){
-        QUnit.expect(7);
+    QUnit.asyncTest('Check DOM', function(assert){
+        QUnit.expect(6);
         var $container = $('#fixture-1');
 
-        var editor = eligibilityEditorFactory();
-        editor
+        eligibilityEditorFactory()
             .on('open', function(){
 
                 var $editorContainer = $container.children('.eligibility-editor');
@@ -78,10 +77,128 @@ define([
                 assert.equal($editorContainer.find('.eligible-testTaker').length, 1, 'eligibility editor dom ok');
                 assert.ok($editorContainer.find('.eligible-testTaker').is(':visible'), 'test taker selector visible');
 
-                assert.ok(true, 'Button clicked');
                 QUnit.start();
+            })
+            .add($container, {
+                dataUrl : '/taoProctoring/views/js/test/eligibilityEditor/data.json'
             });
-        editor.add($container);
     });
 
+    QUnit.asyncTest('Add eligibility', function(assert){
+        QUnit.expect(6);
+        var $container = $('#fixture-1');
+
+        eligibilityEditorFactory()
+            .on('open', function(){
+
+                var $editorContainer = $container.children('.eligibility-editor');
+                assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
+                _.delay(function(){
+
+                    var $deliveries =  $('.eligible-delivery .node-instance', $editorContainer);
+                    assert.equal($deliveries.length, 2, 'The delivery tree contains 2 nodes');
+
+                    var $testTakers =  $('.eligible-testTaker .node-instance', $editorContainer);
+                    assert.equal($testTakers.length, 2, 'The test taker tree contains 2 nodes');
+
+                    $('a', $deliveries).trigger('click');
+                    $('a', $testTakers).first().trigger('click');
+
+
+                    _.delay(function(){
+                        $('.done', $editorContainer).trigger('click.eligibility-editor');
+                    }, 100);
+                }, 500);
+            })
+            .on('ok', function(data){
+
+
+                assert.equal(typeof data, 'object', 'We\'ve got the data');
+                assert.equal(data.deliveries.length, 2, 'We\'ve got the 2 selected deliveries');
+                assert.equal(data.testTakers.length, 1, 'We\'ve got the only selected test taker');
+                QUnit.start();
+            })
+            .add($container, {
+                dataUrl : '/taoProctoring/views/js/test/eligibilityEditor/data.json'
+            });
+    });
+
+    QUnit.asyncTest('Cancel Add', function(assert){
+        QUnit.expect(2);
+        var $container = $('#fixture-1');
+
+        eligibilityEditorFactory()
+            .on('open', function(){
+
+                var $editorContainer = $container.children('.eligibility-editor');
+                assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
+                _.delay(function(){
+                    $('.cancel', $editorContainer).trigger('click.eligibility-editor');
+                }, 500);
+            })
+            .on('cancel', function(){
+                assert.ok(true, 'Cancelled triggered');
+                QUnit.start();
+            })
+            .add($container, {
+                dataUrl : '/taoProctoring/views/js/test/eligibilityEditor/data.json'
+            });
+    });
+
+    QUnit.asyncTest('Edit eligibility', function(assert){
+        QUnit.expect(5);
+        var $container = $('#fixture-1');
+
+        eligibilityEditorFactory()
+            .on('open', function(){
+
+                var $editorContainer = $container.children('.eligibility-editor');
+                assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
+
+                assert.equal($('.delivery-name', $editorContainer).text(), 'Foolivery', 'The delivery name is updated');
+
+                _.delay(function(){
+
+                    var $testTakers =  $('.eligible-testTaker .node-instance', $editorContainer);
+                    assert.equal($testTakers.length, 2, 'The test taker tree contains 2 nodes');
+
+                    $('a', $testTakers).trigger('click');
+
+                    _.delay(function(){
+                        $('.done', $editorContainer).trigger('click.eligibility-editor');
+                    }, 100);
+                }, 500);
+            })
+            .on('ok', function(data){
+
+                assert.equal(typeof data, 'object', 'We\'ve got the data');
+                assert.equal(data.testTakers.length, 2, 'We\'ve got the 2 selected test takers');
+                QUnit.start();
+            })
+            .edit($container, 'Foolivery', [], {
+                dataUrl : '/taoProctoring/views/js/test/eligibilityEditor/data.json'
+            });
+    });
+
+    QUnit.asyncTest('Canel Edit', function(assert){
+        QUnit.expect(2);
+        var $container = $('#fixture-1');
+
+        eligibilityEditorFactory()
+            .on('open', function(){
+
+                var $editorContainer = $container.children('.eligibility-editor');
+                assert.equal($editorContainer.length, 1, 'eligibility editor dom ok');
+                _.delay(function(){
+                    $('.cancel', $editorContainer).trigger('click.eligibility-editor');
+                }, 500);
+            })
+            .on('cancel', function(){
+                assert.ok(true, 'Cancelled triggered');
+                QUnit.start();
+            })
+            .edit($container, 'Foolivery', [], {
+                dataUrl : '/taoProctoring/views/js/test/eligibilityEditor/data.json'
+            });
+    });
 });

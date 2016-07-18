@@ -21,8 +21,9 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 
@@ -60,8 +61,8 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     {
         $executionState = $this->getState($deliveryExecution);
 
-        if (DeliveryExecution::STATE_TERMINATED != $executionState && DeliveryExecution::STATE_FINISHED != $executionState) {
-            $deliveryExecution->setState(DeliveryExecution::STATE_AWAITING);
+        if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
+            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AWAITING);
             return true;
         }
         return false;
@@ -78,16 +79,14 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (DeliveryExecution::STATE_AUTHORIZED === $executionState) {
-            $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-            if ($session) {
-                $session->resume();
-                $this->getTestSessionService()->persist($session);
-            }
-            $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
-
-            $result = true;
+        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($session) {
+            $session->resume();
+            $this->getTestSessionService()->persist($session);
         }
+        $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
+
+        $result = true;
 
         return $result;
     }
@@ -105,7 +104,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (DeliveryExecution::STATE_AWAITING === $executionState) {
+        if (ProctoredDeliveryExecution::STATE_AWAITING === $executionState) {
             $logData = [
                 'proctorUri' => \common_session_SessionManager::getSession()->getUser()->getIdentifier(),
                 'timestamp' => microtime(true),
@@ -118,7 +117,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             }
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
-            $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
+            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
             $result = true;
         }
 
@@ -137,12 +136,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (DeliveryExecution::STATE_TERMINATED !== $executionState && DeliveryExecution::STATE_FINISHED !== $executionState) {
+        if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
 
-            $deliveryExecution->setState(DeliveryExecution::STATE_TERMINATED);
+            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_TERMINATED);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
@@ -173,7 +172,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
         $result = false;
 
-        if (DeliveryExecution::STATE_TERMINATED !== $executionState && DeliveryExecution::STATE_FINISHED !== $executionState) {
+        if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
                 $data = [
@@ -185,7 +184,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
-            $deliveryExecution->setState(DeliveryExecution::STATE_PAUSED);
+            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
             $result = true;
         }
 

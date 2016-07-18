@@ -21,8 +21,11 @@ namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
+use oat\taoProctoring\model\EligibilityService;
+use oat\taoDelivery\model\authorization\UnAuthorizedException;
+use oat\oatbox\user\User;
 
 /**
  * Manage the Delivery authorization.
@@ -31,55 +34,32 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
  */
 class ProctorAuthorizationProvider extends ConfigurableService implements AuthorizationProvider
 {
-
     /**
-     * @var DeliveryExecution the provider keeps the current delieveryExecution
+     * (non-PHPdoc)
+     * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
      */
-    private $deliveryExecution;
-
-    /**
-     * The execution is only set from the constructor. 
-     * Providers should stay immutable and a new instance has to be created for each execution.
-     *
-     * @param DeliveryExecution $deliveryExecution
-     */
-    public function __construct(DeliveryExecution $deliveryExecution)
+    public function verifyStartAuthorization($deliveryId, User $user)
     {
-        $this->deliveryExecution = $deliveryExecution;
+        // always allow start
     }
 
     /**
-     * Is the current execution authorized ?
-     *
-     * @return boolean true if authorized.
+     * (non-PHPdoc)
+     * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyResumeAuthorization()
      */
-    public function isAuthorized()
+    public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
-        $state = $this->deliveryExecution->getState()->getUri();
-        return $state === ProctoredDeliveryExecution::STATE_AUTHORIZED;
-    }
+        $eligibilityService = EligibilityService::singleton();
+        $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
+        $eligibility = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
 
-    /**
-     * Grant the current execution, so it will be then authorized.
-     *
-     * @return boolean true if everything went ok.
-     */
-    public function grant()
-    {
-        $this->deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
-        return true;
-    }
-
-    /**
-     * Revoke the current resource, so it won't be then authorized.
-     *
-     * @return boolean true if everything went ok.
-     */
-    public function revoke()
-    {
-        if($this->deliveryExecution->getState()->getUri() != ProctoredDeliveryExecution::STATE_PAUSED){
-            $this->deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        if (!$eligibilityService->canByPassProctor($eligibility)) {
+            // proctoring is required
+            $state = $deliveryExecution->getState()->getUri();
+            if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+                $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+                throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
+            }
         }
-        return true;
     }
 }
