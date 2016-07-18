@@ -415,7 +415,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.17.0','2.1.0');
-        
+
         if ($this->isVersion('2.1.0')) {
             $authService = $this->getServiceManager()->get(AuthorizationService::SERVICE_ID);
             if ($authService instanceof AuthorizationAggregator) {
@@ -428,6 +428,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.0.0');
         }
         $this->skip('3.0.0','3.0.2');
+
+        $this->skip('3.0.2','3.0.3');
     }
 
     private function refreshMonitoringData()
