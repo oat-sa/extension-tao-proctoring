@@ -90,6 +90,11 @@ class MonitorCacheService extends DeliveryMonitoringService
     {
         $whereClause = '';
 
+        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
+             $condition = current($condition);
+        }
+
         if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
             $whereClause .= " $condition ";
         } else if (is_array($condition) && count($condition) > 1) {
