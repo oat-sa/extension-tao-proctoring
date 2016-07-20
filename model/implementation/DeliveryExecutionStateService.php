@@ -84,9 +84,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
     {
-        $executionState = $this->getState($deliveryExecution);
-        $result = false;
-
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         if ($session) {
             $session->resume();
