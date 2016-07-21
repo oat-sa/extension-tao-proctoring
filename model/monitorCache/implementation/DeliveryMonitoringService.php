@@ -144,6 +144,15 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      *    [['error_code' => '0'], 'OR', ['error_code' => '1']],
      * ]);
      * ```
+     * supports also the following syntax
+     * ```php
+     * $deliveryMonitoringService->find([
+     *    ['status' => 'finished'],
+     *    'AND',
+     *    [['error_code' => ['0', '1']],
+     * ]);
+     * ```
+     * 
      * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
@@ -498,7 +507,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $whereClause = '';
 
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition))) {
+        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
             $condition = current($condition);
         }
 
@@ -522,6 +532,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
             if ($value === null) {
                 $op = 'IS NULL';
+            } else if(is_array($value)){
+                $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
             } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
                 $value = $matches[2];
                 $op = $matches[1] ? $matches[1] : "=";
@@ -537,7 +549,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
                 $parameters[] = trim($key);
             }
 
-            if ($value !== null) {
+            if(is_array($value)){
+               $parameters = array_merge($parameters, $value);
+            } else if ($value !== null) {
                 $parameters[] = trim($value);
             }
         }

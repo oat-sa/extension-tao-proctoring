@@ -430,6 +430,8 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('3.0.0','3.0.2');
 
         $this->skip('3.0.2','3.0.3');
+
+        $this->skip('3.0.3','3.0.4');
     }
 
     private function refreshMonitoringData()
