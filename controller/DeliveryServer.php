@@ -185,7 +185,7 @@ class DeliveryServer extends DefaultDeliveryServer
                 $deliveryExecution,
                 [
                     'reasons' => ['category' => 'focus-loss'],
-                    'comment' => __('Assessment has been paused due to your attempt to another window/tab'),
+                    'comment' => __('Assessment has been paused due to attempt to switch to another window/tab.'),
                 ]
             );
         }
