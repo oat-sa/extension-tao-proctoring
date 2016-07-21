@@ -227,7 +227,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertTrue(isset($resultRow->get()['session_id']));
         }
 
-
         $result = $this->service->find([
             ['error_code' => '>=0'],
         ], ['order' => 'error_code ASC, session_id'], true);
@@ -237,6 +236,19 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         foreach ($result as $rowKey => $resultRow) {
             $this->assertEquals($rowKey, $resultRow->get()['error_code']);
         }
+
+
+        $result = $this->service->find([
+            [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => [
+                'http://sample/first.rdf#i1450191587554175_test_record',
+                'http://sample/first.rdf#i1450191587554176_test_record',
+                'http://sample/first.rdf#i1450191587554177_test_record'
+            ]],
+        ], ['order' => 'session_id'], true);
+        $this->assertEquals(count($result), 3);
+        $this->assertEquals($result[0]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
+        $this->assertEquals($result[1]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554176_test_record');
+        $this->assertEquals($result[2]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
     }
 
     private function loadFixture()

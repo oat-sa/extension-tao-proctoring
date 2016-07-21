@@ -90,8 +90,9 @@ class MonitorCacheService extends DeliveryMonitoringService
     {
         $whereClause = '';
 
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition))) {
-            $condition = current($condition);
+        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
+             $condition = current($condition);
         }
 
         if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
@@ -114,6 +115,8 @@ class MonitorCacheService extends DeliveryMonitoringService
 
             if ($value === null) {
                 $op = 'IS NULL';
+            } else if(is_array($value)){
+                $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
             } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
                 $value = $matches[2];
                 $op = $matches[1] ? $matches[1] : "=";
@@ -130,7 +133,9 @@ class MonitorCacheService extends DeliveryMonitoringService
                 $parameters[] = trim($key);
             }
 
-            if ($value !== null) {
+            if(is_array($value)){
+               $parameters = array_merge($parameters, $value);
+            } else if ($value !== null) {
                 $parameters[] = trim($value);
             }
         }
