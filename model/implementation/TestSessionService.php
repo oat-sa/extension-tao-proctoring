@@ -23,12 +23,12 @@ namespace oat\taoProctoring\model\implementation;
 use DateInterval;
 use DateTimeImmutable;
 use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Interface TestSessionService
@@ -121,14 +121,17 @@ class TestSessionService extends \tao_models_classes_Service
      * @return bool
      */
     public function isExpired(DeliveryExecution $deliveryExecution)
-    {                                                                    
+    {
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
-
+            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
             $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-            if (!$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE')))) {
-                $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
 
-                return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+            if (
+                DeliveryExecution::STATE_PAUSED !== $executionState
+                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
+            ) {
+                return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);

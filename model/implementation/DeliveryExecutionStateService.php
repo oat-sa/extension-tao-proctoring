@@ -62,14 +62,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
-            if (TestSessionService::singleton()->isExpired($deliveryExecution)) {
-                $this->terminateExecution(
-                    $deliveryExecution,
-                    ["reasons" => "Paused delivery execution was expired", "comment" => ""]
-                );
-                return false;
-            }
-
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AWAITING);
             return true;
         }
