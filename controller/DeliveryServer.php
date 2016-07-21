@@ -20,15 +20,12 @@
  */
 namespace oat\taoProctoring\controller;
 
-use PHPSession;
 use common_Logger;
 use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
-use oat\taoDelivery\model\authorization\AuthorizationService;
 use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
-use oat\taoDelivery\model\authorization\UnAuthorizedException;
 
 /**
  * Override the default DeliveryServer Controller
@@ -182,7 +179,15 @@ class DeliveryServer extends DefaultDeliveryServer
     protected function revoke(DeliveryExecution $deliveryExecution)
     {
         if($deliveryExecution->getState()->getUri() != DeliveryExecution::STATE_PAUSED){
-            $deliveryExecution->setState(DeliveryExecution::STATE_PAUSED);
+            /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService->pauseExecution(
+                $deliveryExecution,
+                [
+                    'reasons' => ['category' => 'focus-loss'],
+                    'comment' => __('Assessment has been paused due to attempt to switch to another window/tab.'),
+                ]
+            );
         }
     }
 
