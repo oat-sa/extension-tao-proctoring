@@ -44,7 +44,7 @@ define([
                 e.stopPropagation();
                 e.preventDefault();
                 loadingBar.start();
-                loadingBar.stop();
+
                 var self = $(this),
                     uri = $('[name="uri"]', self).val(),
                     from = $('[name="from"]', self).val(),
@@ -52,7 +52,6 @@ define([
                     params = {'uri': uri, 'from': from, 'to': to},
                     exportUrl = helpers._url('exportIrregularities', 'Irregularity', 'taoProctoring', params);
 
-                console.log(exportUrl);
                 $.fileDownload(exportUrl, {
                     successCallback : function () {
                         loadingBar.stop();
