@@ -57,4 +57,15 @@
             </section>
         </sections>
     </structure>
+    <structure id="results" name="Results" level="5" group="main">
+        <sections>
+            <section id="manage_results" name="Manage Results" url="/taoOutcomeUi/Results/index">
+                <actions>
+                    <action id="irregularity-export" name="Export Irregularities" url="/taoProctoring/Irregularity/index" group="tree" context="instance">
+                        <icon id="icon-export"/>
+                    </action>
+                </actions>
+            </section>
+        </sections>
+    </structure>
 </structures>

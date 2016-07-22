@@ -429,6 +429,14 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('3.0.0','3.0.6');
+
+        if($this->isVersion('3.0.6')){
+            //grant access to test taker
+            $globalManagerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_GLOBALMANAGER);
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $accessService->grantModuleAccess($globalManagerRole, 'taoProctoring', 'Irregularity');
+            $this->setVersion('3.1.0');
+        }
     }
 
     private function refreshMonitoringData()
