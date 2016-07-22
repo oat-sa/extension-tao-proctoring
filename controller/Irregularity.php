@@ -75,6 +75,7 @@ class Irregularity extends \tao_actions_CommonModule
 
             return;
         }
+        setcookie('fileDownload', 'true', 0, '/');
         $exporter = new CsvExporter($export);
         $exporter->export(false, true);
     }
@@ -102,7 +103,7 @@ class Irregularity extends \tao_actions_CommonModule
             );
             foreach($logs as $data){
                 $exportable = array();
-                if(($from === '' || $data['created_at'] > $from) && ($to === '' || $data['created_at'] < $to)){
+                if((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)){
 
                     $testTaker = new \core_kernel_classes_Resource($res['testTakerIdentifier']);
                     $author = new \core_kernel_classes_Resource($data['created_by']);
