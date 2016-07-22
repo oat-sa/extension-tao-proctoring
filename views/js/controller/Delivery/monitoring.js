@@ -67,7 +67,7 @@ define([
      *
      * @type {Object}
      */
-    var proctorDeliveryIndexCtlr = {
+    return {
         /**
          * Entry point of the page
          */
@@ -92,8 +92,7 @@ define([
             var actions = [];
             var model = [];
             var actionButtons;
-            var bc = breadcrumbsFactory($container, crumbs);
-            
+
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
                 if (selection && selection.length) {
@@ -127,32 +126,37 @@ define([
 
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
-                execBulkAction('authorize', __('Authorize Session'), selection, function(selection, reason){
-                    request(authoriseUrl, selection, reason, __('Sessions authorized'));
+                execBulkAction('authorize', __('Authorize Session'), selection, function(sel, reason){
+                    request(authoriseUrl, sel, reason, __('Sessions authorized'));
                 });
             }
 
             // request the server to pause the selected delivery executions
             function pause(selection) {
-                execBulkAction('pause', __('Pause Session'), selection, function(selection, reason){
-                    request(pauseUrl, selection, reason, __('Sessions paused'));
+                execBulkAction('pause', __('Pause Session'), selection, function(sel, reason){
+                    request(pauseUrl, sel, reason, __('Sessions paused'));
                 });
             }
 
             // request the server to terminate the selected delivery executions
             function terminate(selection) {
-                execBulkAction('terminate', __('Terminate Session'), selection, function(selection, reason){
-                    request(terminateUrl, selection, reason, __('Sessions terminated'));
+                execBulkAction('terminate', __('Terminate Session'), selection, function(sel, reason){
+                    request(terminateUrl, sel, reason, __('Sessions terminated'));
                 });
             }
-            
+
             // report irregularities on the selected delivery executions
             function report(selection) {
-                execBulkAction( 'report', __('Report Irregularity'), selection, function(selection, reason){
-                    request(reportUrl, selection, reason, __('Sessions reported'));
+                execBulkAction( 'report', __('Report Irregularity'), selection, function(sel, reason){
+                    request(reportUrl, sel, reason, __('Sessions reported'));
                 });
             }
-            
+
+            // display the session history
+            function showHistory(selection) {
+                location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', {testCenter : testCenterId, session: selection});
+            }
+
             /**
              * Verify and reformat test taker data for the execBulkAction's need
              * @param {Object} testTakerData
@@ -173,19 +177,19 @@ define([
                 }
                 return formatted;
             }
-            
+
             /**
              * Find the execution row data from its uri
-             * 
+             *
              * @param {String} uri
              * @returns {Object}
              */
             function getExecutionData(uri){
                 return _.find(dataset.data, {id : uri});
             }
-            
+
             /**
-             * Exec 
+             * Exec
              * @param {String} actionName
              * @param {String} actionTitle
              * @param {Array|String} selection
@@ -198,6 +202,7 @@ define([
                 var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
+                var config;
 
                 _.each(_selection, function(uri){
                     var testTaker = getExecutionData(uri);
@@ -211,7 +216,7 @@ define([
                         }
                     }
                 });
-                var config = {
+                config = {
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
@@ -221,7 +226,7 @@ define([
                     allowedResources : allowedTestTakers,
                     deniedResources : forbiddenTestTakers
                 };
-                
+
                 bulkActionPopup(config).on('ok', function(reason){
                     //execute callback
                     if(_.isFunction(cb)){
@@ -250,6 +255,8 @@ define([
                     allowClear: true
                 });
             }
+
+            breadcrumbsFactory($container, crumbs);
 
             // tool: page refresh
             tools.push({
@@ -315,6 +322,16 @@ define([
                 action: report
             });
 
+            // tool: display sessions history
+            tools.push({
+                id: 'history',
+                icon: 'history',
+                title: __('Show the detailed session history'),
+                label: __('History'),
+                massAction: true,
+                action: showHistory
+            });
+
             // action: authorise the execution
             actions.push({
                 id: 'authorise',
@@ -371,6 +388,14 @@ define([
                 action: report
             });
 
+            // action: display session history
+            actions.push({
+                id: 'history',
+                icon: 'history',
+                title: __('Show the detailed session history'),
+                action: showHistory
+            });
+
             // column: delivery (only for all deliveries view)
             if (!deliveryId) {
                 model.push({
@@ -410,7 +435,7 @@ define([
 
                 }
             });
-            
+
             //extra fields
             _.each(extraFields, function(extraField){
                 model.push({
@@ -422,7 +447,7 @@ define([
                     }
                 });
             });
-            
+
             // column: start time
             model.push({
                 id: 'date',
@@ -476,10 +501,10 @@ define([
                 id: 'progress',
                 label: __('Progress'),
                 transform: function(value, row) {
-                	return row && row.state && row.state.progress || '' ;
+                    return row && row.state && row.state.progress || '' ;
                 }
             });
-            
+
             // renders the datatable
             $list
                 .on('query.datatable', function() {
@@ -488,7 +513,7 @@ define([
                 .on('load.datatable', function(e, newDataset) {
                     //update dateset in memory
                     dataset = newDataset;
-                    
+
                     //udate the buttons, which have been reconstructed
                     actionButtons = _({
                         authorize : $list.find('.action-bar').children('.tool-authorise'),
@@ -496,10 +521,10 @@ define([
                         terminate : $list.find('.action-bar').children('.tool-terminate'),
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
-                    
+
                     loadingBar.stop();
                 })
-                .on('select.datatable', function(e, newDataset) {
+                .on('select.datatable', function() {
                     //hide all controls then display each required one individually
                     actionButtons.each(function($btn){
                         $btn.hide();
@@ -536,6 +561,4 @@ define([
 
         }
     };
-
-    return proctorDeliveryIndexCtlr;
 });

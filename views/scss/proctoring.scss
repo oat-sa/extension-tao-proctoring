@@ -259,4 +259,7 @@
     .icon-revoke:before {
         @include icon-result-nok();
     }
+    .icon-history:before {
+        @include icon-screen();
+    }
 }

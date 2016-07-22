@@ -281,8 +281,7 @@ define([
                 renderTo: $container.find('.panel')
             }).on('change submit', function() {
                 $list.datatable('options', {
-                    params:
-                    {
+                    params: {
                         periodStart : this.getStart(),
                         periodEnd : this.getEnd()
                     }
