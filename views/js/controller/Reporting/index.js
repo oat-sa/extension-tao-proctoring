@@ -26,16 +26,14 @@ define([
     'layout/loading-bar',
     'util/encode',
     'moment',
-    'tpl!taoProctoring/templates/reporting/datepicker',
+    'taoProctoring/component/dateRange',
     'tpl!taoProctoring/templates/reporting/irregularities',
     'ui/feedback',
     'ui/dialog',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'ui/datatable',
-    'jqueryui',
-    'jquery.timePicker'
-], function ($, _, __, helpers, loadingBar, encode, moment, datepickerTpl, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
+    'ui/datatable'
+], function ($, _, __, helpers, loadingBar, encode, moment, dateRangeFactory, irregularitiesTpl, feedback, dialog, breadcrumbsFactory, _status) {
     'use strict';
 
     /**
@@ -275,68 +273,23 @@ define([
                         periodEnd : today
                     }
                 }, dataset);
-            
+
             //init date range picker
-            dateRangePicker(today, $container, $list);
+            dateRangeFactory({
+                start : today,
+                end : today,
+                renderTo: $container.find('.panel')
+            }).on('change submit', function() {
+                $list.datatable('options', {
+                    params:
+                    {
+                        periodStart : this.getStart(),
+                        periodEnd : this.getEnd()
+                    }
+                }).datatable('refresh');
+            });
         }
     };
-    
-    /**
-     * Create a data range picker for reporting index
-     * 
-     * @param {JQuery} $container
-     * @param {JQuery} $list
-     */
-    function dateRangePicker(date, $container, $list){
-        
-        var $panel = $container.find('.panel');
-        var periodStart = date;
-        var periodEnd = date;
-        $panel.append(datepickerTpl({
-            start : periodStart,
-            end : periodEnd
-        }));
-        
-        var $periodStart = $panel.find('input[name=periodStart]');
-        var $periodEnd = $panel.find('input[name=periodEnd]');
-        var $filterBtn = $panel.find('[data-control="filter"]');
-        $periodStart.datepicker({
-            dateFormat: 'yy-mm-dd',
-            autoSize: true
-        }).change(function(){
-            periodStart = $periodStart.val();
-            $periodEnd.datepicker('option', 'minDate', periodStart);
-            refresh();
-        });
-        $periodEnd.datepicker({
-            dateFormat: 'yy-mm-dd',
-            autoSize: true
-        }).change(function(){
-            periodEnd = $periodEnd.val();
-            $periodStart.datepicker('option', 'maxDate', periodEnd);
-            refresh();
-        });
-        $filterBtn.on('click', function(event) {
-            event.preventDefault();
-            periodStart = $periodStart.val();
-            periodEnd = $periodEnd.val();
-            refresh();
-        });
-        
-        /**
-         * Refresh the data table with new date range 
-         * @returns {undefined}
-         */
-        function refresh(){
-            $list.datatable('options', {
-                params:
-                    {
-                        periodStart : periodStart,
-                        periodEnd : periodEnd
-                    }
-            }).datatable('refresh');
-        }
-    }
-    
+
     return taoProctoringReportCtlr;
 });

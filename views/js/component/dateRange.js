@@ -41,9 +41,11 @@ define([
      * Creates a dates range with date pickers
      *
      * @param {Object} config
-     * @param {String} [config.start]
-     * @param {String} [config.end]
-     * @param {String} [config.dateFormat]
+     * @param {String} [config.start] - The initial start date (default: now)
+     * @param {String} [config.end] - The initial end date (default: now)
+     * @param {String} [config.dateFormat] - The date picker format (default: 'yy-mm-dd')
+     * @fires change when any date is changed
+     * @fires submit when the submit button is clicked
      */
     function dateRangeFactory(config){
         var initConfig = _.defaults(config || {}, _defaults);
@@ -88,6 +90,11 @@ define([
                     periodStart = $periodStart.val();
                     $periodEnd.datepicker('option', 'minDate', periodStart);
 
+                    /**
+                     * @event change
+                     * @param {String} property
+                     * @param {String} value
+                     */
                     self.trigger('change', 'start', periodStart);
                 });
 
@@ -98,6 +105,11 @@ define([
                     periodEnd = $periodEnd.val();
                     $periodStart.datepicker('option', 'maxDate', periodEnd);
 
+                    /**
+                     * @event change
+                     * @param {String} property
+                     * @param {String} value
+                     */
                     self.trigger('change', 'end', periodEnd);
                 });
 
@@ -107,6 +119,9 @@ define([
                     periodStart = $periodStart.val();
                     periodEnd = $periodEnd.val();
 
+                    /**
+                     * @event submit
+                     */
                     self.trigger('submit');
                 });
             })
