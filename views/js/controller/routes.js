@@ -26,6 +26,11 @@ define({
             'index' : 'controller/Reporting/index'
         }
     },
+    'Irregularity' : {
+        'actions' : {
+            'index' : 'controller/Irregularity/index'
+        }
+    },
     'Delivery' : {
         'actions' : {
             'index' : 'controller/Delivery/index',
