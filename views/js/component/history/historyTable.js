@@ -68,6 +68,7 @@ define([
      * @param {Object} config
      * @param {String} config.service - The URL of the service providing the data
      * @param {Object} [config.params] - A list of additional parameters to provide to the service
+     * @param {Array} [config.tools] - A list of optional tools, using the datable format
      * @param {Object} [data] - The first data set
      * @returns {*}
      */
@@ -111,6 +112,13 @@ define([
                     .datatable({
                         url: initConfig.service,
                         params: initConfig.params,
+                        status: {
+                            empty: __('No history to display!'),
+                            available: __('Available history'),
+                            loading: __('Loading')
+                        },
+                        selectable: !!(initConfig.tools && initConfig.tools.length),
+                        tools: initConfig.tools,
                         model: [{
                             id: 'timestamp',
                             label: __('Timestamp'),
