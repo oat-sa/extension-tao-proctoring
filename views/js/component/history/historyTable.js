@@ -112,12 +112,12 @@ define([
                             label: __('Test'),
                             sortable: true
                         }, {
-                            id: 'actor',
-                            label: __('Actor'),
+                            id: 'role',
+                            label: __('Role'),
                             sortable: true
                         }, {
-                            id: 'user',
-                            label: __('User'),
+                            id: 'actor',
+                            label: __('Actor'),
                             sortable: true
                         }, {
                             id: 'event',
