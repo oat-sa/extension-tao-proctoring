@@ -81,6 +81,7 @@ define([
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
+            var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -162,6 +163,16 @@ define([
                     urlParams.delivery = deliveryId;
                 }
                 location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
+            }
+
+            // print the score reports
+            function printReport(selection) {
+                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : selection}), 'printReport' + JSON.stringify(selection));
+            }
+
+            // print the results of the session
+            function printResults(selection) {
+                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : selection}), 'printRubric' + JSON.stringify(selection));
             }
 
             /**
@@ -339,6 +350,28 @@ define([
                 action: showHistory
             });
 
+            // tools: print score report
+            tools.push({
+                id : 'printRubric',
+                title : __('Print the score report'),
+                icon : 'print',
+                label : __('Print Score'),
+                massAction: true,
+                action : printResults
+            });
+
+            // tools: print results
+            if (printReportButton) {
+                tools.push({
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'result',
+                    label : __('Print Results'),
+                    massAction: true,
+                    action : printReport
+                });
+            }
+
             // action: authorise the execution
             actions.push({
                 id: 'authorise',
@@ -402,6 +435,24 @@ define([
                 title: __('Show the detailed session history'),
                 action: showHistory
             });
+
+            // action: print score report
+            actions.push({
+                id : 'printRubric',
+                title : __('Print the Score Report'),
+                icon : 'print',
+                action : printResults
+            });
+
+            // action: print results
+            if (printReportButton) {
+                actions.push({
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'result',
+                    action : printReport
+                });
+            }
 
             // column: delivery (only for all deliveries view)
             if (!deliveryId) {

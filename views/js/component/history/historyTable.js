@@ -101,7 +101,7 @@ define([
                             available: __('Available history'),
                             loading: __('Loading')
                         },
-                        selectable: !!(initConfig.tools && initConfig.tools.length),
+                        selectable: !!(initConfig.tools && _.find(initConfig.tools, {massAction: true})),
                         tools: initConfig.tools,
                         model: [{
                             id: 'timestamp',
