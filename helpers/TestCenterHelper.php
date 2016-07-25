@@ -235,6 +235,19 @@ class TestCenterHelper
     }
 
     /**
+     * Gets the list of session history
+     *
+     * @param $testCenter
+     * @param $sessions
+     * @param array [$options]
+     * @return array
+     */
+    public static function getSessionHistory($testCenter, $sessions, $options = array())
+    {
+        return [];
+    }
+
+    /**
      * Gets the list of assessment reports related to a test site
      *
      * @param $testCenter

@@ -20,11 +20,11 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\helpers\ReportingService;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -70,6 +70,57 @@ class Reporting extends ProctoringModule
                 )
             )
         );
+    }
+
+    /**
+     * Display the session history of the current test center
+     */
+    public function sessionHistory()
+    {
+
+        $testCenter     = $this->getCurrentTestCenter();
+        $requestOptions = $this->getRequestOptions();
+        $sessions       = $this->getRequestParameter('session');
+
+        $this->setData('title', __('Detailed Session History'));
+
+        $this->composeView(
+            'session-history',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions),
+                'sessions' => $sessions
+            ),
+            array(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::reporting(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::diagnostics($testCenter),
+                        BreadcrumbsHelper::deliveries($testCenter),
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Display the activity reporting of the current test center
+     */
+    public function history()
+    {
+        try {
+
+            $testCenter = $this->getCurrentTestCenter();
+            $requestOptions = $this->getRequestOptions();
+            $sessions       = $this->getRequestParameter('session');
+            $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No history service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
     }
 
     /**
