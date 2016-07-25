@@ -244,7 +244,173 @@ class TestCenterHelper
      */
     public static function getSessionHistory($testCenter, $sessions, $options = array())
     {
-        return [];
+        $periodStart = null;
+        $periodEnd = null;
+
+        if (isset($options['periodStart'])) {
+            $periodStart = new DateTime($options['periodStart']);
+            $periodStart->setTime(0, 0, 0);
+            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
+        }
+        if (isset($options['periodEnd'])) {
+            $periodEnd = new DateTime($options['periodEnd']);
+            $periodEnd->setTime(23, 59, 59);
+            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+        }
+
+        if (!is_array($sessions)) {
+            $sessions = $sessions ? [$sessions] : [];
+        }
+
+        $history = [];
+        foreach ($sessions as $sessionUri) {
+            $startTime = time() - rand(10000, 20000);
+            $history[] = [
+                'timestamp' => $startTime,
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'launch',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + 1,
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'awaiting',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(1, 10),
+                'session' => $sessionUri,
+                'actor' => 'Proctor',
+                'user' => 'Proctor 1',
+                'event' => 'authorize',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(10, 20),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'start item',
+                'details' => '',
+                'context' => 'Section 1 - item 1/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(20, 30),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'end item',
+                'details' => '',
+                'context' => 'Section 1 - item 1/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(30, 40),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'start item',
+                'details' => '',
+                'context' => 'Section 1 - item 2/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(40, 50),
+                'session' => $sessionUri,
+                'actor' => 'Proctor',
+                'user' => 'Proctor 1',
+                'event' => 'pause',
+                'details' => ['Fire emergency'],
+                'context' => 'Section 1 - item 2/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(1000, 2000),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'launch',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(1000, 2000),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'awaiting',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(1000, 2000),
+                'session' => $sessionUri,
+                'actor' => 'Proctor',
+                'user' => 'Proctor 1',
+                'event' => 'authorize',
+                'details' => '',
+                'context' => ''
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(2010, 2020),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'start item',
+                'details' => '',
+                'context' => 'Section 1 - item 2/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(2010, 2020),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'prohibited',
+                'details' => 'shortcut: Cmd+c',
+                'context' => 'Section 1 - item 2/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(2020, 2030),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'end item',
+                'details' => '',
+                'context' => 'Section 1 - item 2/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(2010, 2020),
+                'session' => $sessionUri,
+                'actor' => 'Test Taker',
+                'user' => 'Billy LaPorte',
+                'event' => 'start item',
+                'details' => '',
+                'context' => 'Section 1 - item 3/3'
+            ];
+            $history[] = [
+                'timestamp' => $startTime + rand(2040, 2050),
+                'session' => $sessionUri,
+                'actor' => 'Proctor',
+                'user' => 'Proctor 1',
+                'event' => 'terminate',
+                'details' => ['Fire emergency', 'Exit code: T'],
+                'context' => 'Section 1 - item 3/3'
+            ];
+        }
+
+        usort($history, function($a, $b) {
+           return $a['timestamp'] - $b['timestamp'];
+        });
+        return DataTableHelper::paginate($history, $options, function($history) {
+            foreach($history as &$line) {
+                $line['timestamp'] = DateHelper::displayeDate($line['timestamp']);
+            }
+            return $history;
+        });
     }
 
     /**

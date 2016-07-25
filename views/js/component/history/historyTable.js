@@ -24,10 +24,8 @@ define([
     'i18n',
     'layout/loading-bar',
     'ui/component',
-    'tpl!taoProctoring/component/history/details',
-    'tpl!taoProctoring/component/history/context',
     'ui/datatable'
-], function ($, _, __, loadingBar, component, detailsTpl, contextTpl) {
+], function ($, _, __, loadingBar, component) {
     'use strict';
 
     /**
@@ -39,28 +37,14 @@ define([
 
     /**
      * Renders the event details
-     * @param {Object} details
-     * @param {Object} row
+     * @param {String|Array} details
      * @returns {String}
      */
-    function renderDetails(details, row) {
-        return detailsTpl({
-            value: details,
-            row: row
-        });
-    }
-
-    /**
-     * Renders the event context
-     * @param {Object} context
-     * @param {Object} row
-     * @returns {String}
-     */
-    function renderContext(context, row) {
-        return contextTpl({
-            value: context,
-            row: row
-        });
+    function renderDetails(details) {
+        if (_.isArray(details)) {
+            details = details.join('<br />');
+        }
+        return details;
     }
 
     /**
@@ -132,6 +116,10 @@ define([
                             label: __('Actor'),
                             sortable: true
                         }, {
+                            id: 'user',
+                            label: __('User'),
+                            sortable: true
+                        }, {
                             id: 'event',
                             label: __('Event'),
                             sortable: true
@@ -142,7 +130,7 @@ define([
                         }, {
                             id: 'context',
                             label: __('Context'),
-                            transform: renderContext
+                            transform: renderDetails
                         }]
                     }, data);
             })
