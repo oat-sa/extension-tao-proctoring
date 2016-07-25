@@ -154,7 +154,14 @@ define([
 
             // display the session history
             function showHistory(selection) {
-                location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', {testCenter : testCenterId, session: selection});
+                var urlParams = {
+                    testCenter : testCenterId,
+                    session: selection
+                };
+                if (deliveryId) {
+                    urlParams.delivery = deliveryId;
+                }
+                location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
             }
 
             /**

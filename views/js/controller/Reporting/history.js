@@ -54,10 +54,22 @@ define([
             var $container = $(cssScope);
             var dataset = $container.data('set');
             var testCenterId = $container.data('testcenter');
+            var deliveryId = $container.data('delivery');
             var sessions = $container.data('sessions');
-            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, session: sessions});
+            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, delivery : deliveryId, session: sessions});
+            var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {testCenter: testCenterId, delivery : deliveryId});
+            var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
 
             var historyTable = historyTableFactory({
+                tools: [{
+                    id: 'back',
+                    icon: 'preview',
+                    title: __('Return to the session monitoring'),
+                    label: __('Monitoring'),
+                    action: function() {
+                        location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
+                    }
+                }],
                 service: serviceUrl,
                 renderTo: $container.find('.list')
             }, dataset);

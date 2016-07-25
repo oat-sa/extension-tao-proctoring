@@ -116,7 +116,7 @@ class BreadcrumbsHelper
 
         return $breadcrumbs;
     }
-    
+
     /**
      * Create breadcrumb for Delivery::monitoring
      *
@@ -129,7 +129,7 @@ class BreadcrumbsHelper
         //list also other available deliveries
         $breadcrumbs =  array(
             'id' => 'deliveryMonitoring',
-            'url' => _url('monitoring', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
+            'url' => _url('monitoringAll', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
             'label' =>  __('All Sessions')
         );
 
@@ -220,6 +220,33 @@ class BreadcrumbsHelper
         if(count($alternativeRoutes)){
             $breadcrumbs['entries'] = $alternativeRoutes;
         }
+        return $breadcrumbs;
+    }
+
+    /**
+     * Create breadcrumb for Reporting::sessionHistory
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @param core_kernel_classes_Resource $delivery
+     * @param array $sessions
+     * @return array
+     */
+    public static function sessionHistory(core_kernel_classes_Resource $testCenter, $delivery, $sessions)
+    {
+        $urlContext = [
+            'testCenter' => $testCenter->getUri(),
+            'sessions' => is_array($sessions) ? implode(',', $sessions) : $sessions
+        ];
+        if ($delivery) {
+            $urlContext['delivery'] = $delivery->getUri();
+        }
+
+        $breadcrumbs = array(
+            'id' => 'history',
+            'url' => _url('sessionHistory', 'Reporting', null, $urlContext),
+            'label' => __('Session history')
+        );
+
         return $breadcrumbs;
     }
 

@@ -22,6 +22,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\helpers\ReportingService;
 use oat\oatbox\service\ServiceManager;
@@ -77,32 +78,48 @@ class Reporting extends ProctoringModule
      */
     public function sessionHistory()
     {
-
         $testCenter     = $this->getCurrentTestCenter();
-        $requestOptions = $this->getRequestOptions();
+        $delivery       = $this->getCurrentDelivery(false);
+        $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
         $sessions       = $this->getRequestParameter('session');
 
-        $this->setData('title', __('Detailed Session History'));
+        if (!is_array($sessions)) {
+            $sessions = $sessions ? explode(',', $sessions) : [];
+        }
 
-        $this->composeView(
-            'session-history',
-            array(
-                'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions),
-                'sessions' => $sessions
-            ),
-            array(
-                BreadcrumbsHelper::testCenters(),
-                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                BreadcrumbsHelper::reporting(
-                    $testCenter,
-                    array(
-                        BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::deliveries($testCenter),
-                    )
-                )
-            )
-        );
+        $breadcrumbs = [
+            BreadcrumbsHelper::testCenters(),
+            BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+            BreadcrumbsHelper::deliveries($testCenter, [
+                    BreadcrumbsHelper::diagnostics($testCenter),
+                    BreadcrumbsHelper::reporting($testCenter)
+            ])
+        ];
+
+        $viewData = [
+            'testCenter' => $testCenter->getUri(),
+            'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions),
+            'sessions' => $sessions
+        ];
+
+        if ($delivery) {
+            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter));
+            $viewData['delivery'] = $delivery->getUri();
+        } else {
+            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter));
+        }
+
+        $breadcrumbs[] = BreadcrumbsHelper::sessionHistory($testCenter, $delivery, $sessions);
+
+        if (count($sessions) > 1) {
+            $title = __('Detailed Session History of a selection');
+        } else {
+            $session = new \core_kernel_classes_Resource($sessions[0]);
+            $title = __('Detailed Session History of %s', $session->getLabel());
+        }
+
+        $this->setData('title', $title);
+        $this->composeView('session-history', $viewData, $breadcrumbs);
     }
 
     /**
@@ -113,7 +130,7 @@ class Reporting extends ProctoringModule
         try {
 
             $testCenter = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
             $sessions       = $this->getRequestParameter('session');
             $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions));
 
