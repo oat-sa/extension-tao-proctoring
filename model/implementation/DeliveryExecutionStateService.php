@@ -26,6 +26,7 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
+use oat\taoTests\models\event\TestExecutionPausedEvent;
 
 /**
  * Class DeliveryExecutionStateService
@@ -181,7 +182,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
-            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
             $result = true;
         }
 
@@ -244,5 +244,15 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             }
         }
         return $result;
+    }
+
+    /**
+     * Pause delivery execution if test session was paused.
+     * @param TestExecutionPausedEvent $event
+     */
+    public static function catchSessionPause(TestExecutionPausedEvent $event)
+    {
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
+        $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
     }
 }
