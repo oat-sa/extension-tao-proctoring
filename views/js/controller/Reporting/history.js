@@ -25,12 +25,11 @@ define([
     'helpers',
     'layout/loading-bar',
     'util/encode',
-    'moment',
     'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
     'taoProctoring/component/breadcrumbs',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, moment, dateRangeFactory, historyTableFactory, breadcrumbsFactory) {
+], function ($, _, __, helpers, loadingBar, encode, dateRangeFactory, historyTableFactory, breadcrumbsFactory) {
     'use strict';
 
     /**
@@ -57,22 +56,15 @@ define([
             var testCenterId = $container.data('testcenter');
             var sessions = $container.data('sessions');
             var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, session: sessions});
-            var today = moment().format('YYYY-MM-DD');
 
             var historyTable = historyTableFactory({
                 service: serviceUrl,
-                params: {
-                    periodStart : today,
-                    periodEnd : today
-                },
                 renderTo: $container.find('.list')
             }, dataset);
 
             breadcrumbsFactory($container, $container.data('breadcrumbs'));
 
             dateRangeFactory({
-                start : today,
-                end : today,
                 renderTo: $container.find('.panel')
             }).on('change submit', function() {
                 historyTable.refresh({

@@ -21,11 +21,10 @@
 define([
     'jquery',
     'lodash',
-    'moment',
     'ui/component',
     'tpl!taoProctoring/component/dateRange/form',
     'jquery.timePicker'
-], function ($, _, moment, component, formTpl) {
+], function ($, _, component, formTpl) {
     'use strict';
 
     /**
@@ -41,17 +40,16 @@ define([
      * Creates a dates range with date pickers
      *
      * @param {Object} config
-     * @param {String} [config.start] - The initial start date (default: now)
-     * @param {String} [config.end] - The initial end date (default: now)
+     * @param {String} [config.start] - The initial start date (default: none)
+     * @param {String} [config.end] - The initial end date (default: none)
      * @param {String} [config.dateFormat] - The date picker format (default: 'yy-mm-dd')
      * @fires change when any date is changed
      * @fires submit when the submit button is clicked
      */
     function dateRangeFactory(config){
         var initConfig = _.defaults(config || {}, _defaults);
-        var today = moment().format('YYYY-MM-DD');
-        var periodStart = initConfig.start || today;
-        var periodEnd = initConfig.end || today;
+        var periodStart = initConfig.start || '';
+        var periodEnd = initConfig.end || '';
 
         var dateRange = {
             /**
