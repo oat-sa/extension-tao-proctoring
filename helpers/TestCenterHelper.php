@@ -244,20 +244,6 @@ class TestCenterHelper
      */
     public static function getSessionHistory($testCenter, $sessions, $options = array())
     {
-        $periodStart = null;
-        $periodEnd = null;
-
-        if (isset($options['periodStart'])) {
-            $periodStart = new DateTime($options['periodStart']);
-            $periodStart->setTime(0, 0, 0);
-            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
-        }
-        if (isset($options['periodEnd'])) {
-            $periodEnd = new DateTime($options['periodEnd']);
-            $periodEnd->setTime(23, 59, 59);
-            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
-        }
-
         if (!is_array($sessions)) {
             $sessions = $sessions ? [$sessions] : [];
         }
@@ -402,14 +388,48 @@ class TestCenterHelper
             ];
         }
 
-        usort($history, function($a, $b) {
-           return $a['timestamp'] - $b['timestamp'];
-        });
-        return DataTableHelper::paginate($history, $options, function($history) {
-            foreach($history as &$line) {
-                $line['timestamp'] = DateHelper::displayeDate($line['timestamp']);
+        $sortBy = isset($options['sortBy']) ? $options['sortBy'] : 'timestamp';
+        $sortOrder = isset($options['sortOrder']) ? $options['sortOrder'] : 'desc';
+        if ($sortOrder == 'asc') {
+            $sortOrder = 1;
+        } else {
+            $sortOrder = -1;
+        }
+        if ($sortBy == 'timestamp' || $sortBy == 'id') {
+            usort($history, function($a, $b) use($sortOrder) {
+                return $sortOrder * ($a['timestamp'] - $b['timestamp']);
+            });
+        } else {
+            usort($history, function($a, $b) use($sortBy, $sortOrder) {
+                return $sortOrder * strnatcasecmp($a[$sortBy], $b[$sortBy]);
+            });
+        }
+
+        return DataTableHelper::paginate($history, $options, function($history) use($options) {
+            $periodStart = null;
+            $periodEnd = null;
+
+            if (isset($options['periodStart'])) {
+                $periodStart = new DateTime($options['periodStart']);
+                $periodStart->setTime(0, 0, 0);
+                $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
             }
-            return $history;
+            if (isset($options['periodEnd'])) {
+                $periodEnd = new DateTime($options['periodEnd']);
+                $periodEnd->setTime(23, 59, 59);
+                $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+            }
+
+            $page = [];
+            foreach($history as $line) {
+                if (($periodStart && $line['timestamp'] < $periodStart) || ($periodEnd && $line['timestamp'] > $periodEnd)) {
+                    continue;
+                }
+
+                $line['timestamp'] = DateHelper::displayeDate($line['timestamp']);
+                $page[] = $line;
+            }
+            return $page;
         });
     }
 
