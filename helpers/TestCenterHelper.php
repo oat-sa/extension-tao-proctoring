@@ -28,6 +28,9 @@ use oat\taoProctoring\model\mock\WebServiceMock;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
+use qtism\data\AssessmentTest;
+use qtism\data\storage\xml\XmlDocument;
+use qtism\runtime\tests\AssessmentTestSession;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -242,150 +245,69 @@ class TestCenterHelper
      * @param array [$options]
      * @return array
      */
-    public static function getSessionHistory($testCenter, $sessions, $options = array())
+    public static function getSessionHistory($sessions, $options = array())
     {
+        $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+
+        $periodStart = null;
+        $periodEnd = null;
+//
+//        if (isset($options['periodStart'])) {
+//            $periodStart = new DateTime($options['periodStart']);
+//            $periodStart->setTime(0, 0, 0);
+//            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
+//        }
+//        if (isset($options['periodEnd'])) {
+//            $periodEnd = new DateTime($options['periodEnd']);
+//            $periodEnd->setTime(23, 59, 59);
+//            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+//        }
+
         if (!is_array($sessions)) {
             $sessions = $sessions ? [$sessions] : [];
         }
 
         $history = [];
+        $userService = \tao_models_classes_UserService::singleton();
+
         foreach ($sessions as $sessionUri) {
-            $startTime = time() - rand(10000, 20000);
-            $history[] = [
-                'timestamp' => $startTime,
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'launch',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + 1,
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'awaiting',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1, 10),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'authorize',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(10, 20),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 1/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(20, 30),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'end item',
-                'details' => '',
-                'context' => 'Section 1 - item 1/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(30, 40),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(40, 50),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'pause',
-                'details' => ['Fire emergency'],
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'launch',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'awaiting',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'authorize',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'prohibited',
-                'details' => 'shortcut: Cmd+c',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2020, 2030),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'end item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 3/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2040, 2050),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'terminate',
-                'details' => ['Fire emergency', 'Exit code: T'],
-                'context' => 'Section 1 - item 3/3'
-            ];
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
+            $delivery = $deliveryExecution->getDelivery();
+            $compilation = new \core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDeliveryCompilationDirectory');
+            $directories = $delivery->getPropertyValues($compilation);
+            foreach($directories as $directory){
+                $dir = \tao_models_classes_service_FileStorage::singleton()->getDirectoryById($directory);
+                foreach($dir->getIterator() as $file){
+                    \common_Logger::d($file);
+                    if(strpos($file, 'testdefinition') !== FALSE){
+                        $stream = $dir->readStream($file);
+                        $xml = new XmlDocument();
+                        $xml->loadFromString($stream->getContents());
+                        \common_Logger::d(print_r($xml->getDocumentComponent(),true));
+
+                        break 2;
+                    }
+                }
+            }
+            $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
+
+            $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
+            $exportable = array();
+            foreach($logs as $data){
+                if($data['event_id'] !== 'HEARTBEAT' && strpos($data['event_id'], 'latency') === FALSE){
+                    $author = new \core_kernel_classes_Resource($data['created_by']);
+                    $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+                    $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
+
+                    if(is_string($data['data'])){
+                        $data['data'] = json_decode($data['data'], true);
+                    }
+                    if(isset($data['data']['type'])) {
+                        $event_id = $data['data']['type'];
+                        $context = json_encode($data['data']['context']);
+                    } else {
+                        $event_id = $data['event_id'];
+                        $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
         }
 
         $sortBy = isset($options['sortBy']) ? $options['sortBy'] : 'timestamp';
