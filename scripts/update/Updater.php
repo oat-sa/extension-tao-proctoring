@@ -437,6 +437,16 @@ class Updater extends common_ext_ExtensionUpdater {
             $accessService->grantModuleAccess($globalManagerRole, 'taoProctoring', 'Irregularity');
             $this->setVersion('3.1.0');
         }
+
+        if($this->isVersion('3.1.0')){
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach('oat\\taoTests\\models\\event\\TestExecutionPausedEvent',
+                ['oat\\taoProctoring\\model\\implementation\\DeliveryExecutionStateService', 'catchSessionPause']
+            );
+
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+            $this->setVersion('3.1.1');
+        }
     }
 
     private function refreshMonitoringData()
