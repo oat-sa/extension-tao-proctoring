@@ -111,6 +111,8 @@ define([
                             loadingBar.stop();
                         }
                     }).done(function(response) {
+                        var messageContext, unprocessed;
+
                         loadingBar.stop();
 
                         if (response && response.success) {
@@ -119,7 +121,24 @@ define([
                             }
                             $list.datatable('refresh');
                         } else {
-                            feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
+                            messageContext = '';
+                            if (response) {
+                                unprocessed = _.map(response.unprocessed, function (id) {
+                                    var execution = getExecutionData(id);
+                                    if (execution) {
+                                        return __('Session %s - %s has not been processed', execution.delivery, execution.date);
+                                    }
+                                });
+
+                                if (unprocessed.length) {
+                                    messageContext += '<br>' + unprocessed.join('<br>');
+                                }
+                                if (response.error) {
+                                    messageContext += '<br>' + encode.html(response.error);
+                                }
+                            }
+
+                            feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
                         }
                     });
                 }
