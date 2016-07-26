@@ -98,7 +98,7 @@ class Delivery extends ProctoringModule
             'Monitoring/index.tpl'
         );
     }
-    
+
     /**
      * Displays all delivery executions of ALL deliveries in the test center
      */
@@ -187,7 +187,7 @@ class Delivery extends ProctoringModule
 
         $delivery = $this->getCurrentDelivery();
         $testCenter = $this->getCurrentTestCenter();
-        
+
         try {
 
             $requestOptions = $this->getRequestOptions();
@@ -253,7 +253,7 @@ class Delivery extends ProctoringModule
         try {
             $delivery      = $this->getCurrentDelivery();
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions));
 
@@ -275,7 +275,7 @@ class Delivery extends ProctoringModule
         try {
 
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions));
 
