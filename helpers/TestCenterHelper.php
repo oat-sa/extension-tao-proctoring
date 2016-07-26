@@ -102,15 +102,8 @@ class TestCenterHelper
 
         $actionDiagnostics = BreadcrumbsHelper::diagnostics($testCenter);
         $actionDeliveries = BreadcrumbsHelper::deliveries($testCenter);
-        $actionReporting = BreadcrumbsHelper::reporting($testCenter);
 
         $actions = array(
-            array(
-                'url' => $actionDiagnostics['url'],
-                'label' => __('Readiness Check'),
-                'content' => __('Check the compatibility of the current workstation and see the results'),
-                'text' => __('Go')
-            ),
             array(
                 'url' => $actionDeliveries['url'],
                 'label' => __('Sessions'),
@@ -118,9 +111,9 @@ class TestCenterHelper
                 'text' => __('Go')
             ),
             array(
-                'url' => $actionReporting['url'],
-                'label' => __('Assessment Activity Reporting'),
-                'content' => __('Generate and review test histories'),
+                'url' => $actionDiagnostics['url'],
+                'label' => __('Readiness Check'),
+                'content' => __('Check the compatibility of the current workstation and see the results'),
                 'text' => __('Go')
             ),
         );

@@ -59,7 +59,7 @@ define([
                 textLoading: __("Loading"),
                 renderTo: $container.find('.content'),
                 replace: true,
-                width: 4
+                width: 12
             });
             var bc = breadcrumbsFactory($container, crumbs);
             var serviceUrl = helpers._url('testCenter', 'TestCenter', 'taoProctoring');

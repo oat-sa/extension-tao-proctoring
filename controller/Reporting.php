@@ -24,7 +24,6 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
-use oat\taoProctoring\helpers\ReportingService;
 use oat\oatbox\service\ServiceManager;
 
 /**
@@ -37,42 +36,6 @@ use oat\oatbox\service\ServiceManager;
  */
 class Reporting extends ProctoringModule
 {
-    /**
-     * Display the activity reporting of the current test center
-     */
-    public function index()
-    {
-
-        $testCenter     = $this->getCurrentTestCenter();
-        $requestOptions = $this->getRequestOptions();
-
-        $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
-
-        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
-
-        $this->composeView(
-            'reporting-index',
-            array(
-                'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
-                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
-                'categories' => $this->getAllReasonsCategories(),
-            ),
-            array(
-                BreadcrumbsHelper::testCenters(),
-                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                BreadcrumbsHelper::reporting(
-                    $testCenter,
-                    array(
-                        BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::deliveries($testCenter),
-                    )
-                )
-            )
-        );
-    }
-
     /**
      * Display the session history of the current test center
      */
@@ -92,7 +55,6 @@ class Reporting extends ProctoringModule
             BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
             BreadcrumbsHelper::deliveries($testCenter, [
                     BreadcrumbsHelper::diagnostics($testCenter),
-                    BreadcrumbsHelper::reporting($testCenter)
             ])
         ];
 

@@ -23,7 +23,6 @@ define({
     },
     'Reporting' : {
         'actions' : {
-            'index' : 'controller/Reporting/index',
             'sessionHistory' : 'controller/Reporting/history'
         }
     },

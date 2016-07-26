@@ -572,7 +572,7 @@ define([
                     //update dateset in memory
                     dataset = newDataset;
 
-                    //udate the buttons, which have been reconstructed
+                    //update the buttons, which have been reconstructed
                     actionButtons = _({
                         authorize : $list.find('.action-bar').children('.tool-authorise'),
                         pause : $list.find('.action-bar').children('.tool-pause'),

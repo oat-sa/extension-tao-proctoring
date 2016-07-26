@@ -58,7 +58,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
         ));
@@ -94,7 +93,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
                 BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
@@ -131,7 +129,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
                 BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter)),
@@ -169,7 +166,6 @@ class Delivery extends ProctoringModule
                         $testCenter,
                         array(
                             BreadcrumbsHelper::diagnostics($testCenter),
-                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
                     BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
@@ -214,7 +210,6 @@ class Delivery extends ProctoringModule
                         $testCenter,
                         array(
                             BreadcrumbsHelper::diagnostics($testCenter),
-                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
                     BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
