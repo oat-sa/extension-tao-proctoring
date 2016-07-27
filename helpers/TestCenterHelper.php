@@ -24,19 +24,15 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\DiagnosticStorage;
-use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
-use qtism\data\AssessmentTest;
-use qtism\data\storage\xml\XmlDocument;
-use qtism\runtime\tests\AssessmentTestSession;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
@@ -242,54 +238,40 @@ class TestCenterHelper
      *
      * @param $testCenter
      * @param $sessions
+     * @param bool $logHistory
      * @param array [$options]
      * @return array
      */
-    public static function getSessionHistory($sessions, $options = array())
+    public static function getSessionHistory($testCenter, $sessions, $logHistory = false, $options = array())
     {
         $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
         $periodStart = null;
         $periodEnd = null;
-//
-//        if (isset($options['periodStart'])) {
-//            $periodStart = new DateTime($options['periodStart']);
-//            $periodStart->setTime(0, 0, 0);
-//            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
-//        }
-//        if (isset($options['periodEnd'])) {
-//            $periodEnd = new DateTime($options['periodEnd']);
-//            $periodEnd->setTime(23, 59, 59);
-//            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
-//        }
-
-        if (!is_array($sessions)) {
-            $sessions = $sessions ? [$sessions] : [];
-        }
 
         $history = [];
         $userService = \tao_models_classes_UserService::singleton();
+        $proctor = $userService->getCurrentUser();
 
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         foreach ($sessions as $sessionUri) {
+            $valid = false;
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
             $delivery = $deliveryExecution->getDelivery();
-            $compilation = new \core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDeliveryCompilationDirectory');
-            $directories = $delivery->getPropertyValues($compilation);
-            foreach($directories as $directory){
-                $dir = \tao_models_classes_service_FileStorage::singleton()->getDirectoryById($directory);
-                foreach($dir->getIterator() as $file){
-                    \common_Logger::d($file);
-                    if(strpos($file, 'testdefinition') !== FALSE){
-                        $stream = $dir->readStream($file);
-                        $xml = new XmlDocument();
-                        $xml->loadFromString($stream->getContents());
-                        \common_Logger::d(print_r($xml->getDocumentComponent(),true));
-
-                        break 2;
-                    }
+            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options);
+            foreach($executions as $execution){
+                if($execution['delivery_execution_id'] === $sessionUri && $execution['authorized_by'] === $proctor->getUri()){
+                    $valid = true;
+                    continue;
                 }
             }
-            $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
+            if(!$valid){
+                continue;
+            }
+
+            if($logHistory){
+                $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
+            }
 
             $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
             $exportable = array();
@@ -304,10 +286,28 @@ class TestCenterHelper
                     }
                     if(isset($data['data']['type'])) {
                         $event_id = $data['data']['type'];
-                        $context = json_encode($data['data']['context']);
+
+                        $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
+                        $details = (isset($data['data']['context']['shortcut']))?$data['data']['context']['shortcut']: '';
                     } else {
+                        $details = (isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
+                        if(isset($data['data']['exitCode'])){
+                            $details = $data['data']['exitCode'];
+                        }
                         $event_id = $data['event_id'];
                         $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
+                    }
+
+                    $exportable['timestamp'] = $data['created_at'];
+                    $exportable['session'] = $deliveryExecution->getIdentifier();
+                    $exportable['role'] = $role;
+                    $exportable['actor'] = $author->getLabel();
+                    $exportable['event'] = $event_id;
+                    $exportable['details'] = $details;
+                    $exportable['context'] = $context;
+                    $history[] = $exportable;
+                }
+            }
         }
 
         $sortBy = isset($options['sortBy']) ? $options['sortBy'] : 'timestamp';
