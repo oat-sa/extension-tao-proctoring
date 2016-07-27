@@ -328,7 +328,7 @@ class TestCenterHelper
                         $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
                     }
 
-                    $exportable['timestamp'] = $data['created_at'];
+                    $exportable['timestamp'] = (isset($data['data']['timestamp']))?$data['data']['timestamp']:$data['created_at'];
                     $exportable['session'] = $deliveryExecution->getIdentifier();
                     $exportable['role'] = $role;
                     $exportable['actor'] = $author->getLabel();
