@@ -52,6 +52,7 @@ use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
 use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
+use oat\oatbox\task\Queue;
 
 /**
  *
@@ -449,6 +450,12 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('3.1.1','3.1.2');
+
+        if($this->isVersion('3.1.2')){
+            $queue = $this->getServiceManager()->get(Queue::CONFIG_ID);
+            $queue->createTask(new \oat\taoProctoring\scripts\TerminatePausedAssessment(), ['--create-recurrence'], true);
+            $this->setVersion('3.1.3');
+        }
     }
 
     private function refreshMonitoringData()
