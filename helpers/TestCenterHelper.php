@@ -263,9 +263,10 @@ class TestCenterHelper
             foreach($executions as $execution){
                 if($execution['delivery_execution_id'] === $sessionUri && $execution['authorized_by'] === $proctor->getUri()){
                     $valid = true;
-                    continue;
+                    break;
                 }
             }
+            
             if(!$valid){
                 continue;
             }
