@@ -24,7 +24,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\DiagnosticStorage;
-use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
@@ -33,7 +33,6 @@ use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
@@ -232,153 +231,106 @@ class TestCenterHelper
      *
      * @param $testCenter
      * @param $sessions
+     * @param bool $logHistory
      * @param array [$options]
      * @return array
      */
-    public static function getSessionHistory($testCenter, $sessions, $options = array())
+    public static function getSessionHistory($testCenter, $sessions, $logHistory = false, $options = array())
     {
         if (!is_array($sessions)) {
             $sessions = $sessions ? [$sessions] : [];
         }
+        
+        $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
         $history = [];
+        $userService = \tao_models_classes_UserService::singleton();
+        $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         foreach ($sessions as $sessionUri) {
-            $startTime = time() - rand(10000, 20000);
-            $history[] = [
-                'timestamp' => $startTime,
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'launch',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + 1,
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'awaiting',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1, 10),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'authorize',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(10, 20),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 1/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(20, 30),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'end item',
-                'details' => '',
-                'context' => 'Section 1 - item 1/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(30, 40),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(40, 50),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'pause',
-                'details' => ['Fire emergency'],
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'launch',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'awaiting',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(1000, 2000),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'authorize',
-                'details' => '',
-                'context' => ''
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'prohibited',
-                'details' => 'shortcut: Cmd+c',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2020, 2030),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'end item',
-                'details' => '',
-                'context' => 'Section 1 - item 2/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2010, 2020),
-                'session' => $sessionUri,
-                'role' => 'Test Taker',
-                'actor' => 'Billy LaPorte',
-                'event' => 'start item',
-                'details' => '',
-                'context' => 'Section 1 - item 3/3'
-            ];
-            $history[] = [
-                'timestamp' => $startTime + rand(2040, 2050),
-                'session' => $sessionUri,
-                'role' => 'Proctor',
-                'actor' => 'Proctor 1',
-                'event' => 'terminate',
-                'details' => ['Fire emergency', 'Exit code: T'],
-                'context' => 'Section 1 - item 3/3'
-            ];
+            $valid = false;
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
+            $delivery = $deliveryExecution->getDelivery();
+            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options);
+
+            foreach($executions as $execution){
+                if($execution['delivery_execution_id'] === $sessionUri){
+                    $valid = true;
+                    break;
+                }
+            }
+
+            if(!$valid){
+                continue;
+            }
+
+            $author = new \core_kernel_classes_Resource($deliveryExecution->getUserIdentifier());
+            $startTest = array(
+                'timestamp' => DateHelper::getTimeStamp($deliveryExecution->getStartTime()),
+                'session'   => $sessionUri,
+                'role'      => __('Test-Taker'),
+                'actor'     => $author->getLabel(),
+                'event'     => __('Test start time'),
+                'details'   => '',
+                'context'   => '',
+            );
+            $history[] = $startTest;
+
+            if(!is_null($finishdate = $deliveryExecution->getFinishTime())){
+                $endTest = array(
+                    'timestamp' => DateHelper::getTimeStamp($finishdate),
+                    'session'   => $sessionUri,
+                    'role'      => __('Test-Taker'),
+                    'actor'     => $author->getLabel(),
+                    'event'     => __('Test end time'),
+                    'details'   => '',
+                    'context'   => '',
+                );
+                $history[] = $endTest;
+
+            }
+
+            if($logHistory){
+                $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
+            }
+
+            $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
+            $exportable = array();
+            foreach($logs as $data){
+                if($data['event_id'] !== 'HEARTBEAT'){
+                    $author = new \core_kernel_classes_Resource($data['created_by']);
+                    $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
+
+                    //prohibited behavior
+                    if(isset($data['data']['type'])) {
+                        $event_id = $data['data']['type'];
+
+                        $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
+                        $details = (isset($data['data']['context']['shortcut']))?$data['data']['context']['shortcut']: '';
+                    } else {
+                        $details = (isset($data['data']['reason']) && isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
+                        if(isset($data['data']['exitCode'])){
+                            $details = $data['data']['exitCode'];
+                        }
+
+                        if(is_string($data['data'])){
+                            $details = $data['data'];
+                        }
+                        $event_id = $data['event_id'];
+                        $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
+                    }
+
+                    $exportable['timestamp'] = (isset($data['data']['timestamp']))?$data['data']['timestamp']:$data['created_at'];
+                    $exportable['session'] = $deliveryExecution->getIdentifier();
+                    $exportable['role'] = $role;
+                    $exportable['actor'] = $author->getLabel();
+                    $exportable['event'] = $event_id;
+                    $exportable['details'] = $details;
+                    $exportable['context'] = $context;
+                    $history[] = $exportable;
+                }
+            }
         }
 
         $sortBy = isset($options['sortBy']) ? $options['sortBy'] : 'timestamp';
