@@ -250,9 +250,6 @@ class TestCenterHelper
         
         $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
-        $periodStart = null;
-        $periodEnd = null;
-
         $history = [];
         $userService = \tao_models_classes_UserService::singleton();
         $proctor = $userService->getCurrentUser();
