@@ -43,8 +43,13 @@ class Reporting extends ProctoringModule
     {
         $testCenter     = $this->getCurrentTestCenter();
         $delivery       = $this->getCurrentDelivery(false);
-        $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
         $sessions       = $this->getRequestParameter('session');
+        $requestOptions = $this->getRequestOptions([
+            'sortby'      => 'timestamp',
+            'sortorder'   => 'desc',
+            'periodStart' => '',
+            'periodEnd' => '',
+        ]);
 
         if (!is_array($sessions)) {
             $sessions = $sessions ? explode(',', $sessions) : [];
@@ -91,9 +96,14 @@ class Reporting extends ProctoringModule
     {
         try {
 
-            $testCenter = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
+            $testCenter     = $this->getCurrentTestCenter();
             $sessions       = $this->getRequestParameter('session');
+            $requestOptions = $this->getRequestOptions([
+                'sortby'      => 'timestamp',
+                'sortorder'   => 'desc',
+                'periodStart' => '',
+                'periodEnd' => '',
+            ]);
 
             if (!is_array($sessions)) {
                 $sessions = $sessions ? explode(',', $sessions) : [];
