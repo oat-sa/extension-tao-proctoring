@@ -244,6 +244,10 @@ class TestCenterHelper
      */
     public static function getSessionHistory($testCenter, $sessions, $logHistory = false, $options = array())
     {
+        if (!is_array($sessions)) {
+            $sessions = $sessions ? [$sessions] : [];
+        }
+        
         $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
         $periodStart = null;

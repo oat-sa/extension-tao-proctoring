@@ -132,6 +132,10 @@ class Reporting extends ProctoringModule
             $testCenter = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
             $sessions       = $this->getRequestParameter('session');
+
+            if (!is_array($sessions)) {
+                $sessions = $sessions ? explode(',', $sessions) : [];
+            }
             $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, false, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
