@@ -316,7 +316,7 @@ class TestCenterHelper
                         $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
                         $details = (isset($data['data']['context']['shortcut']))?$data['data']['context']['shortcut']: '';
                     } else {
-                        $details = (isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
+                        $details = (isset($data['data']['reason']) && isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
                         if(isset($data['data']['exitCode'])){
                             $details = $data['data']['exitCode'];
                         }
