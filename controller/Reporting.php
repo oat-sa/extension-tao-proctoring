@@ -98,7 +98,7 @@ class Reporting extends ProctoringModule
 
         $viewData = [
             'testCenter' => $testCenter->getUri(),
-            'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions),
+            'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, true, $requestOptions),
             'sessions' => $sessions
         ];
 
@@ -132,7 +132,7 @@ class Reporting extends ProctoringModule
             $testCenter = $this->getCurrentTestCenter();
             $requestOptions = $this->getRequestOptions(['sortby' => 'timestamp', 'sortorder' => 'desc']);
             $sessions       = $this->getRequestParameter('session');
-            $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, $requestOptions));
+            $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, false, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No history service defined for proctoring');
