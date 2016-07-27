@@ -253,6 +253,7 @@ class TestCenterHelper
         $history = [];
         $userService = \tao_models_classes_UserService::singleton();
         $proctor = $userService->getCurrentUser();
+        $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         foreach ($sessions as $sessionUri) {
@@ -266,7 +267,7 @@ class TestCenterHelper
                     break;
                 }
             }
-            
+
             if(!$valid){
                 continue;
             }
@@ -280,7 +281,6 @@ class TestCenterHelper
             foreach($logs as $data){
                 if($data['event_id'] !== 'HEARTBEAT' && strpos($data['event_id'], 'latency') === FALSE){
                     $author = new \core_kernel_classes_Resource($data['created_by']);
-                    $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
                     $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
 
                     if(is_string($data['data'])){
