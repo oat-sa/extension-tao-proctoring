@@ -252,7 +252,6 @@ class TestCenterHelper
 
         $history = [];
         $userService = \tao_models_classes_UserService::singleton();
-        $proctor = $userService->getCurrentUser();
         $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -261,8 +260,9 @@ class TestCenterHelper
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
             $delivery = $deliveryExecution->getDelivery();
             $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options);
+
             foreach($executions as $execution){
-                if($execution['delivery_execution_id'] === $sessionUri && $execution['authorized_by'] === $proctor->getUri()){
+                if($execution['delivery_execution_id'] === $sessionUri){
                     $valid = true;
                     break;
                 }
@@ -272,6 +272,32 @@ class TestCenterHelper
                 continue;
             }
 
+            $author = new \core_kernel_classes_Resource($deliveryExecution->getUserIdentifier());
+            $startTest = array(
+                'timestamp' => DateHelper::getTimeStamp($deliveryExecution->getStartTime()),
+                'session'   => $sessionUri,
+                'role'      => __('Test-Taker'),
+                'actor'     => $author->getLabel(),
+                'event'     => __('Test start time'),
+                'details'   => '',
+                'context'   => '',
+            );
+            $history[] = $startTest;
+
+            if(!is_null($finishdate = $deliveryExecution->getFinishTime())){
+                $endTest = array(
+                    'timestamp' => DateHelper::getTimeStamp($finishdate),
+                    'session'   => $sessionUri,
+                    'role'      => __('Test-Taker'),
+                    'actor'     => $author->getLabel(),
+                    'event'     => __('Test end time'),
+                    'details'   => '',
+                    'context'   => '',
+                );
+                $history[] = $endTest;
+
+            }
+
             if($logHistory){
                 $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
             }
@@ -279,13 +305,11 @@ class TestCenterHelper
             $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
             $exportable = array();
             foreach($logs as $data){
-                if($data['event_id'] !== 'HEARTBEAT' && strpos($data['event_id'], 'latency') === FALSE){
+                if($data['event_id'] !== 'HEARTBEAT'){
                     $author = new \core_kernel_classes_Resource($data['created_by']);
                     $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
 
-                    if(is_string($data['data'])){
-                        $data['data'] = json_decode($data['data'], true);
-                    }
+                    //prohibited behavior
                     if(isset($data['data']['type'])) {
                         $event_id = $data['data']['type'];
 
@@ -295,6 +319,10 @@ class TestCenterHelper
                         $details = (isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
                         if(isset($data['data']['exitCode'])){
                             $details = $data['data']['exitCode'];
+                        }
+
+                        if(is_string($data['data'])){
+                            $details = $data['data'];
                         }
                         $event_id = $data['event_id'];
                         $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
