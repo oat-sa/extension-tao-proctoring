@@ -86,6 +86,16 @@ define([
 
         return component(historyTable)
             .on('render', function() {
+                var self = this;
+                var tools = [{
+                    id: 'refresh',
+                    icon: 'reset',
+                    title: __('Refresh the page'),
+                    label: __('Refresh'),
+                    action: function() {
+                        self.refresh();
+                    }
+                }];
                 this.getElement()
                     .on('query.datatable', function() {
                         loadingBar.start();
@@ -102,7 +112,7 @@ define([
                             loading: __('Loading')
                         },
                         selectable: !!(initConfig.tools && _.find(initConfig.tools, {massAction: true})),
-                        tools: initConfig.tools,
+                        tools: tools.concat(initConfig.tools || []),
                         model: [{
                             id: 'timestamp',
                             label: __('Timestamp'),
