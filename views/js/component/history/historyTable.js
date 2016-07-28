@@ -114,8 +114,8 @@ define([
                         selectable: !!(initConfig.tools && _.find(initConfig.tools, {massAction: true})),
                         tools: tools.concat(initConfig.tools || []),
                         model: [{
-                            id: 'timestamp',
-                            label: __('Timestamp'),
+                            id: 'date',
+                            label: __('Date'),
                             sortable: true
                         }, {
                             id: 'session',

@@ -240,7 +240,21 @@ class TestCenterHelper
         if (!is_array($sessions)) {
             $sessions = $sessions ? [$sessions] : [];
         }
-        
+
+        $periodStart = null;
+        $periodEnd = null;
+
+        if (!empty($options['periodStart'])) {
+            $periodStart = new DateTime($options['periodStart']);
+            $periodStart->setTime(0, 0, 0);
+            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
+        }
+        if (!empty($options['periodEnd'])) {
+            $periodEnd = new DateTime($options['periodEnd']);
+            $periodEnd->setTime(23, 59, 59);
+            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
+        }
+
         $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
         $history = [];
@@ -275,6 +289,7 @@ class TestCenterHelper
                 'details'   => '',
                 'context'   => '',
             );
+            $startTest['date'] = DateHelper::displayeDate($startTest['timestamp']);
             $history[] = $startTest;
 
             if(!is_null($finishdate = $deliveryExecution->getFinishTime())){
@@ -287,6 +302,7 @@ class TestCenterHelper
                     'details'   => '',
                     'context'   => '',
                 );
+                $endTest['date'] = DateHelper::displayeDate($endTest['timestamp']);
                 $history[] = $endTest;
 
             }
@@ -322,6 +338,10 @@ class TestCenterHelper
                     }
 
                     $exportable['timestamp'] = (isset($data['data']['timestamp']))?$data['data']['timestamp']:$data['created_at'];
+                    if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
+                        continue;
+                    }
+                    $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
                     $exportable['session'] = $deliveryExecution->getIdentifier();
                     $exportable['role'] = $role;
                     $exportable['actor'] = $author->getLabel();
@@ -350,32 +370,7 @@ class TestCenterHelper
             });
         }
 
-        return DataTableHelper::paginate($history, $options, function($history) use($options) {
-            $periodStart = null;
-            $periodEnd = null;
-
-            if (isset($options['periodStart'])) {
-                $periodStart = new DateTime($options['periodStart']);
-                $periodStart->setTime(0, 0, 0);
-                $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
-            }
-            if (isset($options['periodEnd'])) {
-                $periodEnd = new DateTime($options['periodEnd']);
-                $periodEnd->setTime(23, 59, 59);
-                $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
-            }
-
-            $page = [];
-            foreach($history as $line) {
-                if (($periodStart && $line['timestamp'] < $periodStart) || ($periodEnd && $line['timestamp'] > $periodEnd)) {
-                    continue;
-                }
-
-                $line['timestamp'] = DateHelper::displayeDate($line['timestamp']);
-                $page[] = $line;
-            }
-            return $page;
-        });
+        return DataTableHelper::paginate($history, $options);
     }
 
     /**
