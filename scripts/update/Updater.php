@@ -54,7 +54,7 @@ use oat\taoDelivery\model\authorization\strategy\StateValidation;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 
 /**
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends common_ext_ExtensionUpdater {
@@ -64,10 +64,10 @@ class Updater extends common_ext_ExtensionUpdater {
      * @return string string
      */
     public function update($initialVersion) {
-        
+
         $currentVersion = $initialVersion;
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
-        
+
         if ($currentVersion == '0.1') {
             $service = new DeliveryService();
             $ext->setConfig('delivery', $service);
@@ -165,7 +165,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('0.8.0');
         }
-        
+
         if ($this->isVersion('0.8.0')) {
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
@@ -173,7 +173,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
             );
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
-            
+
             $this->setVersion('0.9.0');
         }
 
@@ -264,7 +264,7 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('1.7.0', '1.7.1');
-        
+
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -447,6 +447,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
             $this->setVersion('3.1.1');
         }
+
+        $this->skip('3.1.1','3.1.2');
     }
 
     private function refreshMonitoringData()
