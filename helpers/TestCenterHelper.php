@@ -280,31 +280,36 @@ class TestCenterHelper
             }
 
             $author = new \core_kernel_classes_Resource($deliveryExecution->getUserIdentifier());
-            $startTest = array(
-                'timestamp' => DateHelper::getTimeStamp($deliveryExecution->getStartTime()),
-                'session'   => $sessionUri,
-                'role'      => __('Test-Taker'),
-                'actor'     => $author->getLabel(),
-                'event'     => __('Test start time'),
-                'details'   => '',
-                'context'   => '',
-            );
-            $startTest['date'] = DateHelper::displayeDate($startTest['timestamp']);
-            $history[] = $startTest;
-
-            if(!is_null($finishdate = $deliveryExecution->getFinishTime())){
-                $endTest = array(
-                    'timestamp' => DateHelper::getTimeStamp($finishdate),
+            $startTime = DateHelper::getTimeStamp($deliveryExecution->getStartTime());
+            if (($periodStart && $startTime >= $periodStart) || ($periodEnd && $startTime <= $periodEnd)) {
+                $startTest = array(
+                    'timestamp' => $startTime,
                     'session'   => $sessionUri,
                     'role'      => __('Test-Taker'),
                     'actor'     => $author->getLabel(),
-                    'event'     => __('Test end time'),
+                    'event'     => __('Test start time'),
                     'details'   => '',
                     'context'   => '',
                 );
-                $endTest['date'] = DateHelper::displayeDate($endTest['timestamp']);
-                $history[] = $endTest;
+                $startTest['date'] = DateHelper::displayeDate($startTest['timestamp']);
+                $history[] = $startTest;
+            }
 
+            if(!is_null($finishDate = $deliveryExecution->getFinishTime())){
+                $finishTime = DateHelper::getTimeStamp($finishDate);
+                if (($periodStart && $finishTime >= $periodStart) || ($periodEnd && $finishTime <= $periodEnd)) {
+                    $endTest = array(
+                        'timestamp' => $finishTime,
+                        'session' => $sessionUri,
+                        'role' => __('Test-Taker'),
+                        'actor' => $author->getLabel(),
+                        'event' => __('Test end time'),
+                        'details' => '',
+                        'context' => '',
+                    );
+                    $endTest['date'] = DateHelper::displayeDate($endTest['timestamp']);
+                    $history[] = $endTest;
+                }
             }
 
             if($logHistory){
