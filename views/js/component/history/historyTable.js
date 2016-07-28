@@ -33,7 +33,10 @@ define([
      * @type {Object}
      * @private
      */
-    var _defaults = {};
+    var _defaults = {
+        sortBy: 'timestamp',
+        sortOrder: 'desc'
+    };
 
     /**
      * Renders the event details
@@ -52,6 +55,8 @@ define([
      * @param {Object} config
      * @param {String} config.service - The URL of the service providing the data
      * @param {Object} [config.params] - A list of additional parameters to provide to the service
+     * @param {String} [config.sortBy] - The default sorted column
+     * @param {String} [config.sortOrder] - The default sort direction
      * @param {Array} [config.tools] - A list of optional tools, using the datable format
      * @param {Object} [data] - The first data set
      * @returns {*}
@@ -59,7 +64,7 @@ define([
     function historyTableFactory(config, data) {
         var initConfig = _.defaults(config || {}, _defaults);
 
-        //
+        // define some additional behavior
         var historyTable = {
             /**
              * Refresh the table
@@ -106,6 +111,8 @@ define([
                     .datatable({
                         url: initConfig.service,
                         params: initConfig.params,
+                        sortby: initConfig.sortBy,
+                        sortorder: initConfig.sortOrder,
                         status: {
                             empty: __('No history to display!'),
                             available: __('Available history'),

@@ -56,6 +56,10 @@ define([
             var testCenterId = $container.data('testcenter');
             var deliveryId = $container.data('delivery');
             var sessions = $container.data('sessions');
+            var sortBy = $container.data('sortBy');
+            var sortOrder = $container.data('sortorder');
+            var periodStart = $container.data('periodstart');
+            var periodEnd = $container.data('periodEnd');
             var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, delivery : deliveryId, session: sessions});
             var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {testCenter: testCenterId, delivery : deliveryId});
             var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
@@ -71,12 +75,16 @@ define([
                     }
                 }],
                 service: serviceUrl,
+                sortBy: sortBy,
+                sortOrder: sortOrder,
                 renderTo: $container.find('.list')
             }, dataset);
 
             breadcrumbsFactory($container, $container.data('breadcrumbs'));
 
             dateRangeFactory({
+                start : periodStart,
+                end : periodEnd,
                 renderTo: $container.find('.panel')
             }).on('change submit', function() {
                 historyTable.refresh({

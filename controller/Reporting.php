@@ -64,9 +64,13 @@ class Reporting extends ProctoringModule
         ];
 
         $viewData = [
-            'testCenter' => $testCenter->getUri(),
-            'set' => TestCenterHelper::getSessionHistory($testCenter, $sessions, true, $requestOptions),
-            'sessions' => $sessions
+            'testCenter'  => $testCenter->getUri(),
+            'set'         => TestCenterHelper::getSessionHistory($testCenter, $sessions, true, $requestOptions),
+            'sessions'    => $sessions,
+            'sortBy'      => $requestOptions['sortBy'],
+            'sortOrder'   => $requestOptions['sortOrder'],
+            'periodStart' => $requestOptions['periodStart'],
+            'periodEnd'   => $requestOptions['periodEnd'],
         ];
 
         if ($delivery) {
