@@ -22,10 +22,9 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'layout/loading-bar',
     'ui/component',
     'ui/datatable'
-], function ($, _, __, loadingBar, component) {
+], function ($, _, __, component) {
     'use strict';
 
     /**
@@ -103,10 +102,10 @@ define([
                 }];
                 this.getElement()
                     .on('query.datatable', function() {
-                        loadingBar.start();
+                        self.trigger('loading');
                     })
                     .on('load.datatable', function() {
-                        loadingBar.stop();
+                        self.trigger('loaded');
                     })
                     .datatable({
                         url: initConfig.service,

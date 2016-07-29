@@ -38,9 +38,6 @@ define([
      */
     var cssScope = '.session-history';
 
-    // the page is always loading data when starting
-    loadingBar.start();
-
     /**
      * Controls the taoProctoring session history page
      *
@@ -65,20 +62,26 @@ define([
             var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
 
             var historyTable = historyTableFactory({
-                tools: [{
-                    id: 'back',
-                    icon: 'preview',
-                    title: __('Return to the session monitoring'),
-                    label: __('Monitoring'),
-                    action: function() {
-                        window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
-                    }
-                }],
-                service: serviceUrl,
-                sortBy: sortBy,
-                sortOrder: sortOrder,
-                renderTo: $container.find('.list')
-            }, dataset);
+                    tools: [{
+                        id: 'back',
+                        icon: 'preview',
+                        title: __('Return to the session monitoring'),
+                        label: __('Monitoring'),
+                        action: function() {
+                            window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
+                        }
+                    }],
+                    service: serviceUrl,
+                    sortBy: sortBy,
+                    sortOrder: sortOrder
+                }, dataset)
+                .on('loading', function() {
+                    loadingBar.start();
+                })
+                .on('loaded', function() {
+                    loadingBar.stop();
+                })
+                .render($container.find('.list'));
 
             breadcrumbsFactory($container, $container.data('breadcrumbs'));
 
@@ -94,6 +97,9 @@ define([
             });
         }
     };
+
+    // the page is always loading data when starting
+    loadingBar.start();
 
     return taoProctoringReportCtlr;
 });
