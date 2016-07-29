@@ -113,7 +113,7 @@ define([
                     title: __('Return to the list'),
                     label: __('List of readiness checks'),
                     action: function() {
-                        location.href = indexUrl;
+                        window.location.href = indexUrl;
                     }
                 }]
             });

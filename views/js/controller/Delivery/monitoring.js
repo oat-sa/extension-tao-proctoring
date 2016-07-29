@@ -181,7 +181,7 @@ define([
                 if (deliveryId) {
                     urlParams.delivery = deliveryId;
                 }
-                location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
+                window.location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
             }
 
             // print the score reports
@@ -314,7 +314,7 @@ define([
                     title: __('Manage sessions'),
                     label: __('Manage'),
                     action: function() {
-                        location.href = manageUrl;
+                        window.location.href = manageUrl;
                     }
                 });
             }

@@ -116,7 +116,7 @@ define([
                 interval : refreshPolling,
                 autoStart : true
             });
-            
+
             /**
              * Function to be called when the delivery execution has been authorized
              */
@@ -131,7 +131,7 @@ define([
              * Goes back to the delivery index
              */
             function exit() {
-                location.href = config.returnUrl;
+                window.location.href = config.returnUrl;
             }
         }
     };

@@ -71,7 +71,7 @@ define([
                     title: __('Return to the session monitoring'),
                     label: __('Monitoring'),
                     action: function() {
-                        location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
+                        window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
                     }
                 }],
                 service: serviceUrl,
