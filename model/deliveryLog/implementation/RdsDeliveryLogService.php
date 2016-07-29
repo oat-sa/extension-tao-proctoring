@@ -53,6 +53,10 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             $user = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
         }
 
+        if (empty($user) && PHP_SAPI == 'cli') {
+            $user = 'cli';
+        }
+
         $result = $this->getPersistence()->insert(
             self::TABLE_NAME,
             array(

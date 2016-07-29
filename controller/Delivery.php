@@ -58,7 +58,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
         ));
@@ -74,6 +73,9 @@ class Delivery extends ProctoringModule
         $delivery      = $this->getCurrentDelivery();
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
         $this->composeView(
             'delivery-monitoring',
             array(
@@ -81,7 +83,8 @@ class Delivery extends ProctoringModule
                 'testCenter' => $testCenter->getUri(),
                 'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions),
                 'extrafields' => DeliveryHelper::getExtraFields(),
-                'categories' => $this->getAllReasonsCategories()
+                'categories' => $this->getAllReasonsCategories(),
+                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -90,7 +93,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
                 BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter))
@@ -98,7 +100,7 @@ class Delivery extends ProctoringModule
             'Monitoring/index.tpl'
         );
     }
-    
+
     /**
      * Displays all delivery executions of ALL deliveries in the test center
      */
@@ -108,13 +110,17 @@ class Delivery extends ProctoringModule
         $testCenter    = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
         $this->composeView(
             'delivery-monitoring',
             array(
                 'testCenter' => $testCenter->getUri(),
                 'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions),
                 'extrafields' => DeliveryHelper::getExtraFields(),
-                'categories' => $this->getAllReasonsCategories()
+                'categories' => $this->getAllReasonsCategories(),
+                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -123,7 +129,6 @@ class Delivery extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 ),
                 BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter)),
@@ -161,7 +166,6 @@ class Delivery extends ProctoringModule
                         $testCenter,
                         array(
                             BreadcrumbsHelper::diagnostics($testCenter),
-                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
                     BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
@@ -187,7 +191,7 @@ class Delivery extends ProctoringModule
 
         $delivery = $this->getCurrentDelivery();
         $testCenter = $this->getCurrentTestCenter();
-        
+
         try {
 
             $requestOptions = $this->getRequestOptions();
@@ -206,7 +210,6 @@ class Delivery extends ProctoringModule
                         $testCenter,
                         array(
                             BreadcrumbsHelper::diagnostics($testCenter),
-                            BreadcrumbsHelper::reporting($testCenter)
                         )
                     ),
                     BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter)),
@@ -253,7 +256,7 @@ class Delivery extends ProctoringModule
         try {
             $delivery      = $this->getCurrentDelivery();
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions));
 
@@ -275,7 +278,7 @@ class Delivery extends ProctoringModule
         try {
 
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions));
 

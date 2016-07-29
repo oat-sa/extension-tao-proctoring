@@ -81,7 +81,7 @@ define([
 
                         if (response && response.success) {
                             feedback().success(__('Test takers have been added'));
-                            location.href = managerUrl;
+                            window.location.href = managerUrl;
                         } else {
                             feedback().error(__('Something went wrong ...') + '<br>' + encode.html(response.error), {encodeHtml: false});
                         }
@@ -109,7 +109,7 @@ define([
                         title: __('Return to the session manager'),
                         label: __('Back'),
                         action: function() {
-                            location.href = managerUrl;
+                            window.location.href = managerUrl;
                         }
                     }, {
                         id: 'refresh',

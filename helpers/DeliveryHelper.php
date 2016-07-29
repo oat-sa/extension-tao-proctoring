@@ -185,12 +185,13 @@ class DeliveryHelper
 
         $deliveryCriteria = [];
 
+
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {
-                if (!empty($deliveryCriteria)) {
-                    $deliveryCriteria[] = 'OR';
+                if(!isset($deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID])){
+                    $deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID] = [];
                 }
-                $deliveryCriteria[] = [DeliveryMonitoringService::DELIVERY_ID => $delivery->getUri()];
+                array_push($deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID], $delivery->getUri());
             }
         }
 
@@ -199,7 +200,7 @@ class DeliveryHelper
         ];
 
         if (!empty($deliveryCriteria)) {
-            array_merge($criteria, array('AND', $deliveryCriteria));
+            array_push($criteria, 'AND', $deliveryCriteria);
         }
 
         if (isset($options['filter']) && $options['filter']) {

@@ -26,6 +26,7 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
+use oat\taoTests\models\event\TestExecutionPausedEvent;
 
 /**
  * Class DeliveryExecutionStateService
@@ -62,14 +63,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $executionState = $this->getState($deliveryExecution);
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
-            if (TestSessionService::singleton()->isExpired($deliveryExecution)) {
-                $this->terminateExecution(
-                    $deliveryExecution,
-                    ["reasons" => "Paused delivery execution was expired", "comment" => ""]
-                );
-                return false;
-            }
-
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AWAITING);
             return true;
         }
@@ -84,9 +77,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
     {
-        $executionState = $this->getState($deliveryExecution);
-        $result = false;
-
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         if ($session) {
             $session->resume();
@@ -124,6 +114,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $logData['test_center'] = $testCenter;
             }
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
+            $logData['context'] = $this->getProgress($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
             $result = true;
@@ -157,6 +148,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                     'reason' => $reason,
                     'timestamp' => microtime(true),
                     'itemId' => $this->getCurrentItemId($deliveryExecution),
+                    'context' => $this->getProgress($deliveryExecution)
                 ];
                 $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $data);
                 $session->endTestSession();
@@ -187,12 +179,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                     'reason' => $reason,
                     'timestamp' => microtime(true),
                     'itemId' => $this->getCurrentItemId($deliveryExecution),
+                    'context' => $this->getProgress($deliveryExecution)
                 ];
                 $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
             }
-            $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
             $result = true;
         }
 
@@ -214,6 +206,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             'reason' => $reason,
             'timestamp' => microtime(true),
             'itemId' => $this->getCurrentItemId($deliveryExecution),
+            'context' => $this->getProgress($deliveryExecution)
         ];
         return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
     }
@@ -252,6 +245,38 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $item = $session->getCurrentAssessmentItemRef();
             if ($item) {
                 $result = $item->getIdentifier();
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Pause delivery execution if test session was paused.
+     * @param TestExecutionPausedEvent $event
+     */
+    public static function catchSessionPause(TestExecutionPausedEvent $event)
+    {
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
+        $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+    }
+
+    protected function getProgress(DeliveryExecution $deliveryExecution)
+    {
+        $result = null;
+
+        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+
+        if ($session !== null) {
+            if ($session->isRunning()) {
+                $route = $session->getRoute();
+                $currentSection = $session->getCurrentAssessmentSection();
+                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
+                $currentItem = $route->current();
+                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
+
+                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
+            } else {
+                $result = __('finished');
             }
         }
         return $result;

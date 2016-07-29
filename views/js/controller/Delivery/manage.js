@@ -126,7 +126,7 @@ define([
                         title: __('Return to the session monitoring'),
                         label: __('Monitoring'),
                         action: function() {
-                            location.href = monitoringUrl;
+                            window.location.href = monitoringUrl;
                         }
                     }, {
                         id: 'assign',
@@ -134,7 +134,7 @@ define([
                         title: __('Assign more test takers to this session'),
                         label: __('Add test takers'),
                         action: function() {
-                            location.href = assignUrl;
+                            window.location.href = assignUrl;
                         }
                     }, {
                         id: 'remove',

@@ -57,7 +57,6 @@ class Diagnostic extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::deliveries($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
             )
@@ -85,7 +84,6 @@ class Diagnostic extends ProctoringModule
                     $testCenter,
                     array(
                         BreadcrumbsHelper::deliveries($testCenter),
-                        BreadcrumbsHelper::reporting($testCenter)
                     )
                 )
             )
