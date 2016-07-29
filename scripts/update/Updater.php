@@ -449,6 +449,14 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('3.1.1','3.2.0');
+
+        if($this->isVersion('3.2.0')){
+            $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $config = $ext->getConfig('execution_service');
+            $implementation = $config->getImplementation();
+            $ext->setConfig('execution_service', $implementation);
+            $this->setVersion('3.3.0');
+        }
     }
 
     private function refreshMonitoringData()
