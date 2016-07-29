@@ -28,7 +28,8 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 
 /**
  * Interface TestSessionService
@@ -128,7 +129,7 @@ class TestSessionService extends \tao_models_classes_Service
             $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
             if (
-                DeliveryExecution::STATE_PAUSED !== $executionState
+                DeliveryExecutionInterface::STATE_PAUSED !== $executionState
                 || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
             ) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;

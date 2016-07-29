@@ -176,7 +176,7 @@ class DeliveryServer extends DefaultDeliveryServer
     }
     
 
-    protected function revoke(DeliveryExecution $deliveryExecution)
+    protected function revoke(\oat\taoDelivery\models\classes\execution\DeliveryExecution $deliveryExecution)
     {
         if($deliveryExecution->getState()->getUri() != DeliveryExecution::STATE_PAUSED){
             /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
