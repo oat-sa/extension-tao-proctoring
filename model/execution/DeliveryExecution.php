@@ -20,15 +20,13 @@
 
 namespace oat\taoProctoring\model\execution;
 
-use oat\taoDelivery\models\classes\execution\DeliveryExecution as BaseDeliveryExecution;
-
 /**
- * Delivery execution class for proctoring extension
+ * Delivery execution interface for proctoring extension
  *
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  * @package taoProctoring
  */
-class DeliveryExecution extends BaseDeliveryExecution
+interface DeliveryExecution
 {
     const STATE_INIT = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit';
 
