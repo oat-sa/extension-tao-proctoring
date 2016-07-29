@@ -60,6 +60,7 @@ return array(
             'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
             'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
+            'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
             RegisterAuthProvider::class
         ),
         'rdf' => array(

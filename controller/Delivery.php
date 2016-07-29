@@ -256,7 +256,7 @@ class Delivery extends ProctoringModule
         try {
             $delivery      = $this->getCurrentDelivery();
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions));
 
@@ -278,7 +278,7 @@ class Delivery extends ProctoringModule
         try {
 
             $testCenter      = $this->getCurrentTestCenter();
-            $requestOptions = $this->getRequestOptions();
+            $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
             $this->returnJson(DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions));
 

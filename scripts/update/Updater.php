@@ -438,7 +438,17 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.1.0');
         }
 
-        $this->skip('3.1.0','3.2.0');
+        if($this->isVersion('3.1.0')){
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->attach('oat\\taoTests\\models\\event\\TestExecutionPausedEvent',
+                ['oat\\taoProctoring\\model\\implementation\\DeliveryExecutionStateService', 'catchSessionPause']
+            );
+
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+            $this->setVersion('3.1.1');
+        }
+
+        $this->skip('3.1.1','3.2.0');
     }
 
     private function refreshMonitoringData()
