@@ -48,7 +48,7 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getTestTakerData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
-        $data = $this->getResultService($deliveryExecution->getDelivery())->getTestTakerData($deliveryExecution);
+        $data = $this->getResultService($deliveryExecution->getDelivery())->getTestTakerData($deliveryExecution->getIdentifier());
         $result = $this->propertiesToArray($data);
         return $result;
     }
@@ -61,14 +61,14 @@ class AssessmentResultsService extends ConfigurableService
     public function getTestData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
-        $testUri = $resultService->getTestsFromDeliveryResult($deliveryExecution);
+        $testUri = $resultService->getTestsFromDeliveryResult($deliveryExecution->getIdentifier());
         $testResource = new \core_kernel_classes_Resource($testUri[0]);
         $propValues = $testResource->getPropertiesValues(array(
             RDFS_LABEL,
         ));
         $result = $this->propertiesToArray($propValues);
 
-        $deliveryVariables = $resultService->getVariableDataFromDeliveryResult($deliveryExecution);
+        $deliveryVariables = $resultService->getVariableDataFromDeliveryResult($deliveryExecution->getIdentifier());
         $result = array_merge($result, $this->variablesToArray($deliveryVariables));
 
         return $result;
@@ -84,7 +84,7 @@ class AssessmentResultsService extends ConfigurableService
         $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
 
-        $itemsData = $resultService->getItemVariableDataFromDeliveryResult($deliveryExecution, 'lastSubmitted');
+        $itemsData = $resultService->getItemVariableDataFromDeliveryResult($deliveryExecution->getIdentifier(), 'lastSubmitted');
 
         foreach ($itemsData as $itemData) {
             $rawResult = [];
