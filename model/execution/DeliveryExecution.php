@@ -26,7 +26,7 @@ namespace oat\taoProctoring\model\execution;
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  * @package taoProctoring
  */
-interface DeliveryExecution
+interface DeliveryExecution extends \oat\taoDelivery\model\execution\DeliveryExecution
 {
     const STATE_INIT = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit';
 
