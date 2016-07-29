@@ -29,20 +29,21 @@ use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\TestCenterService;
 use oat\taoTestTaker\models\TestTakerService;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 
 /**
  * Sample Delivery Service for proctoring
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  */
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
     const CONFIG_ID = 'taoProctoring/delivery';
-    
+
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
 
     const PROPERTY_GROUP_TEST_CENTERS = 'http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters';
@@ -190,18 +191,18 @@ class DeliveryService extends ConfigurableService
             PROPERTY_GROUP_DELVIERY => $deliveryId,
             self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
         ), array('recursive' => true, 'like' => false));
-        
+
         if ($groups) {
             $subjectClass = TestTakerService::singleton()->getRootClass();
             $usersResources = $subjectClass->searchInstances(array(
                 GroupsService::PROPERTY_MEMBERS_URI => $groups
             ), array(
-                'recursive' => true, 
+                'recursive' => true,
                 'like' => false,
                 'order' => PROPERTY_USER_LASTNAME,
                 'chaining' => 'or'
             ));
-            
+
             if ($usersResources){
                 foreach ($usersResources as $user) {
                     // assume Tao Users
@@ -209,7 +210,7 @@ class DeliveryService extends ConfigurableService
                 }
             }
         }
-        
+
         return $users;
     }
 
@@ -358,14 +359,14 @@ class DeliveryService extends ConfigurableService
         return $this->groupClass;
 
     }
-    
+
     /**
      * @deprecated please use DeliveryHelper
      */
     public function getHasBeenPaused($deliveryExecution){
         return DeliveryHelper::getHasBeenPaused($deliveryExecution);
     }
-    
+
     /**
      * @deprecated please use DeliveryHelper
      */

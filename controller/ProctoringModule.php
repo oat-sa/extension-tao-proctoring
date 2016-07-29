@@ -72,18 +72,19 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
      * Get the requested delivery resource
      * Use this to identify which delivery is currently being selected buy the proctor
      *
+     * @param bool $mandatory Throws an exception if the delivery is not provided
      * @return core_kernel_classes_Resource
      * @throws \common_Exception
      */
-    protected function getCurrentDelivery()
+    protected function getCurrentDelivery($mandatory = true)
     {
         if (is_null($this->currentDelivery)) {
-            if($this->hasRequestParameter('delivery')){
+            if ($this->hasRequestParameter('delivery')) {
 
                 //get test center resource from its uri
                 $deliveryUri           = $this->getRequestParameter('delivery');
                 $this->currentDelivery = DeliveryHelper::getDelivery($deliveryUri);
-            }else{
+            } else if ($mandatory) {
                 //@todo use a better exception
                 throw new \common_Exception('no current delivery');
             }

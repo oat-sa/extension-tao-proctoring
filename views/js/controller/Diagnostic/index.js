@@ -138,7 +138,7 @@ define([
                 title: __('Launch another readiness check'),
                 label: __('Launch readiness check'),
                 action: function() {
-                    location.href = diagnosticUrl;
+                    window.location.href = diagnosticUrl;
                 }
             });
 
@@ -227,7 +227,7 @@ define([
                 id: 'date',
                 label: __('Date')
             });
-            
+
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();

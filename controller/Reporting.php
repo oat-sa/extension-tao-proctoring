@@ -20,11 +20,11 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
-use oat\taoProctoring\helpers\ReportingService;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\implementation\DeliveryService;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -37,39 +37,87 @@ use oat\taoProctoring\model\implementation\DeliveryService;
 class Reporting extends ProctoringModule
 {
     /**
+     * Display the session history of the current test center
+     */
+    public function sessionHistory()
+    {
+        $testCenter     = $this->getCurrentTestCenter();
+        $delivery       = $this->getCurrentDelivery(false);
+        $sessions       = $this->getRequestParameter('session');
+        $requestOptions = $this->getRequestOptions([
+            'sortby'      => 'timestamp',
+            'sortorder'   => 'desc',
+            'periodStart' => '',
+            'periodEnd' => '',
+        ]);
+
+        if (!is_array($sessions)) {
+            $sessions = $sessions ? explode(',', $sessions) : [];
+        }
+
+        $breadcrumbs = [
+            BreadcrumbsHelper::testCenters(),
+            BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+            BreadcrumbsHelper::deliveries($testCenter, [
+                    BreadcrumbsHelper::diagnostics($testCenter),
+            ])
+        ];
+
+        $viewData = [
+            'testCenter'  => $testCenter->getUri(),
+            'set'         => TestCenterHelper::getSessionHistory($testCenter, $sessions, true, $requestOptions),
+            'sessions'    => $sessions,
+            'sortBy'      => $requestOptions['sortBy'],
+            'sortOrder'   => $requestOptions['sortOrder'],
+            'periodStart' => $requestOptions['periodStart'],
+            'periodEnd'   => $requestOptions['periodEnd'],
+        ];
+
+        if ($delivery) {
+            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter));
+            $viewData['delivery'] = $delivery->getUri();
+        } else {
+            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter));
+        }
+
+        $breadcrumbs[] = BreadcrumbsHelper::sessionHistory($testCenter, $delivery, $sessions);
+
+        if (count($sessions) > 1) {
+            $title = __('Detailed Session History of a selection');
+        } else {
+            $session = new \core_kernel_classes_Resource($sessions[0]);
+            $title = __('Detailed Session History of %s', $session->getLabel());
+        }
+
+        $this->setData('title', $title);
+        $this->composeView('session-history', $viewData, $breadcrumbs);
+    }
+
+    /**
      * Display the activity reporting of the current test center
      */
-    public function index()
+    public function history()
     {
+        try {
 
-        $testCenter     = $this->getCurrentTestCenter();
-        $requestOptions = $this->getRequestOptions();
+            $testCenter     = $this->getCurrentTestCenter();
+            $sessions       = $this->getRequestParameter('session');
+            $requestOptions = $this->getRequestOptions([
+                'sortby'      => 'timestamp',
+                'sortorder'   => 'desc',
+                'periodStart' => '',
+                'periodEnd' => '',
+            ]);
 
-        $this->setData('title', __('Assessment Activity Reporting for test site %s', $testCenter->getLabel()));
+            if (!is_array($sessions)) {
+                $sessions = $sessions ? explode(',', $sessions) : [];
+            }
+            $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, false, $requestOptions));
 
-        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
-
-        $this->composeView(
-            'reporting-index',
-            array(
-                'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getReports($testCenter, $requestOptions),
-                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
-                'categories' => $this->getAllReasonsCategories(),
-            ),
-            array(
-                BreadcrumbsHelper::testCenters(),
-                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                BreadcrumbsHelper::reporting(
-                    $testCenter,
-                    array(
-                        BreadcrumbsHelper::diagnostics($testCenter),
-                        BreadcrumbsHelper::deliveries($testCenter),
-                    )
-                )
-            )
-        );
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No history service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
     }
 
     /**

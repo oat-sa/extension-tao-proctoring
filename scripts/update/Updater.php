@@ -448,7 +448,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.1.1');
         }
 
-        $this->skip('3.1.1','3.1.2');
+        $this->skip('3.1.1','3.2.0');
     }
 
     private function refreshMonitoringData()
