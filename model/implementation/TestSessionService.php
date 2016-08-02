@@ -129,7 +129,7 @@ class TestSessionService extends \tao_models_classes_Service
 
             if (
                 DeliveryExecution::STATE_PAUSED !== $executionState
-                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
+                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'HEARTBEAT')))
             ) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
