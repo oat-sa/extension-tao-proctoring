@@ -21,6 +21,7 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
  * Service to manage the execution of deliveries
@@ -39,10 +40,13 @@ class DeliveryServerService extends \taoDelivery_models_classes_DeliveryServerSe
     public function getResumableDeliveries(User $user)
     {
         $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
-            $started = array_merge(
-                $deliveryExecutionService->getActiveDeliveryExecutions($user->getIdentifier()),
-                $deliveryExecutionService->getPausedDeliveryExecutions($user->getIdentifier())
-            );
+        $userUri = $user->getIdentifier();
+        $started = array_merge(
+            $deliveryExecutionService->getActiveDeliveryExecutions($userUri),
+            $deliveryExecutionService->getPausedDeliveryExecutions($userUri),
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AWAITING),
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
+        );
         $eligibilityService = EligibilityService::singleton();
         $resumable = array();
         foreach ($started as $deliveryExecution) {
