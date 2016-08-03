@@ -114,9 +114,13 @@ define([
              * Function to be called when the delivery execution has been authorized
              */
             function authorized(){
+                var box = list.getElement().find('.list');
                 loadingBar.stop();
-                //@todo it would be nice to smoothen the transition
-                $container.removeClass('authorization-in-progress');
+
+                box.fadeOut(250, function() {
+                    $container.removeClass('authorization-in-progress');
+                    box.fadeIn(250);
+                });
                 $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
             }
 
