@@ -133,18 +133,14 @@ class TestSessionService extends ConfigurableService
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
-            $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-
-            if (
-                DeliveryExecution::STATE_PAUSED !== $executionState
-                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
-            ) {
+            $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
+            if (DeliveryExecution::STATE_PAUSED !== $executionState || !$lastTestTakersEvent) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
             if ($wasPausedAt && $deliveryExecutionStateService->hasOption('termination_delay_after_pause')) {
                 $delay = $deliveryExecutionStateService->getOption('termination_delay_after_pause');
                 if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
@@ -168,6 +164,23 @@ class TestSessionService extends ConfigurableService
         $sessionId = $session->getSessionId();
         $storage = $this->cache[$sessionId]['storage'];
         $storage->persist($session);
+    }
+
+    /**
+     * Get last test takers event from delivery log
+     * @param DeliveryExecution $deliveryExecution
+     * @return array|null
+     */
+    protected function getLastTestTakersEvent(DeliveryExecution $deliveryExecution)
+    {
+        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        $testTakerIdentifier = $deliveryExecution->getUserIdentifier();
+        $events = $deliveryLogService->get($deliveryExecution->getIdentifier());
+        $testTakersEvents = array_filter($events, function ($event) use ($testTakerIdentifier) {
+            return $event[DeliveryLog::CREATED_BY] === $testTakerIdentifier;
+        });
+
+        return current(array_reverse($testTakersEvents));
     }
 
 }
