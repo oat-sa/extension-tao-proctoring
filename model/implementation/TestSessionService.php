@@ -29,16 +29,24 @@ use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoProctoring\model\execution\DeliveryExecution;
+use \oat\oatbox\service\ConfigurableService;
 
 /**
  * Interface TestSessionService
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class TestSessionService extends \tao_models_classes_Service
+class TestSessionService extends ConfigurableService
 {
+    const SERVICE_ID = 'taoProctoring/TestSessionService';
+
     /** @var array cache to store session instances */
-    private $cache = [];
+    protected $cache = [];
+
+    public static function singleton()
+    {
+        return ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+    }
 
     /**
      * Gets the test session for a particular deliveryExecution
@@ -129,7 +137,7 @@ class TestSessionService extends \tao_models_classes_Service
 
             if (
                 DeliveryExecution::STATE_PAUSED !== $executionState
-                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'HEARTBEAT')))
+                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
             ) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }

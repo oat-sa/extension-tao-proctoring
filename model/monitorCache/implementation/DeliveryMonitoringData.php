@@ -348,7 +348,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getTestSession()
      {
          if ($this->testSession === null) {
-             $testSessionService = TestSessionService::singleton();
+             $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
              $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
          }
         return $this->testSession;

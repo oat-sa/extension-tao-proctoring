@@ -52,6 +52,7 @@ use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
 use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
+use oat\taoProctoring\model\implementation\TestSessionService;
 
 /**
  *
@@ -452,7 +453,18 @@ class Updater extends common_ext_ExtensionUpdater {
 
         $this->skip('3.3.0','3.3.1');
 
-        $this->skip('3.3.1','3.3.2');
+        if ($this->isVersion('3.3.1')) {
+            try {
+                $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new TestSessionService();
+                $service->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $service);
+            }
+            $this->setVersion('3.3.2');
+        }
+
+
     }
 
     private function refreshMonitoringData()
