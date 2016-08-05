@@ -85,8 +85,8 @@ class Reporting extends ProctoringModule
         if (count($sessions) > 1) {
             $title = __('Detailed Session History of a selection');
         } else {
-            $session = new \core_kernel_classes_Resource($sessions[0]);
-            $title = __('Detailed Session History of %s', $session->getLabel());
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
+            $title = __('Detailed Session History of %s', $deliveryExecution->getLabel());
         }
 
         $this->setData('title', $title);
