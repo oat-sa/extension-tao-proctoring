@@ -133,8 +133,7 @@ class TestSessionService extends ConfigurableService
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
-            $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
-            if (DeliveryExecution::STATE_PAUSED !== $executionState || !$lastTestTakersEvent) {
+            if (DeliveryExecution::STATE_PAUSED !== $executionState || !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
