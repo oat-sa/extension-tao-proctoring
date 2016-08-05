@@ -152,7 +152,9 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                     'context' => $this->getProgress($deliveryExecution)
                 ];
                 $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $data);
-                $session->endTestSession();
+                if ($session->isRunning()) {
+                    $session->endTestSession();
+                }
                 $this->getTestSessionService()->persist($session);
             }
             $result = true;
