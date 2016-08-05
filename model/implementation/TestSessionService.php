@@ -174,12 +174,17 @@ class TestSessionService extends ConfigurableService
     {
         $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
         $testTakerIdentifier = $deliveryExecution->getUserIdentifier();
-        $events = $deliveryLogService->get($deliveryExecution->getIdentifier());
-        $testTakersEvents = array_filter($events, function ($event) use ($testTakerIdentifier) {
-            return $event[DeliveryLog::CREATED_BY] === $testTakerIdentifier;
-        });
+        $events = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier()));
 
-        return current(array_reverse($testTakersEvents));
+        $lastTestTakersEvent = null;
+        foreach ($events as $event) {
+            if ($event[DeliveryLog::CREATED_BY] === $testTakerIdentifier) {
+                $lastTestTakersEvent = $event;
+                break;
+            }
+        }
+
+        return $lastTestTakersEvent;
     }
 
 }
