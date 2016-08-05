@@ -28,7 +28,8 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use \oat\oatbox\service\ConfigurableService;
 
 /**

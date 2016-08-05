@@ -60,8 +60,7 @@ class DeliveryHelper
      */
     public static function getDeliveries(core_kernel_classes_Resource $testCenter)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
 
         $entries = array();
@@ -78,14 +77,19 @@ class DeliveryHelper
             )
         );
 
+        $deliveryProps = array(
+            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
+            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
+        );
+
+        /** @var core_kernel_classes_Resource $delivery */
         foreach ($deliveries as $delivery) {
-            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
             $inprogress = 0;
             $paused = 0;
             $awaiting = 0;
-            foreach($executions as $execution) {
-                /* @var $execution DeliveryExecution */
-                $executionState = $deliveryExecutionStateService->getState($execution);
+            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter);
+            foreach($executions as $executionData) {
+                $executionState = $executionData[DeliveryMonitoringService::STATUS];
                 switch($executionState){
                     case DeliveryExecution::STATE_AWAITING:
                         $awaiting++;
@@ -101,14 +105,17 @@ class DeliveryHelper
                 }
             }
 
-            $deliveryProperties = $deliveryService->getDeliveryProperties($delivery);
-            $properties = array();
 
-            if (!empty($deliveryProperties[TAO_DELIVERY_START_PROP])) {
-                $properties['periodStart'] = DateHelper::displayeDate($deliveryProperties[TAO_DELIVERY_START_PROP]);
+            $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
+            $propStartExec = current($deliveryProperties[TAO_DELIVERY_START_PROP]);
+            $propEndExec = current($deliveryProperties[TAO_DELIVERY_END_PROP]);
+
+            $properties = array();
+            if (!is_null($propStartExec) && !empty((string)$propStartExec)) {
+                $properties['periodStart'] = DateHelper::displayeDate((string)$propStartExec);
             }
-            if (!empty($deliveryProperties[TAO_DELIVERY_END_PROP])) {
-                $properties['periodEnd'] = DateHelper::displayeDate($deliveryProperties[TAO_DELIVERY_END_PROP]);
+            if (!is_null($propStartExec) && !empty((string)$propEndExec)) {
+                $properties['periodEnd'] = DateHelper::displayeDate((string)$propEndExec);
             }
 
             $entries[] = array(

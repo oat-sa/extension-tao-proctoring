@@ -449,11 +449,17 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.1.1');
         }
 
-        $this->skip('3.1.1','3.3.0');
+        $this->skip('3.1.1','3.3.1');
 
-        $this->skip('3.3.0','3.3.1');
+        if($this->isVersion('3.3.1')){
+            $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+            $config = $ext->getConfig('execution_service');
+            $implementation = $config->getImplementation();
+            $ext->setConfig('execution_service', $implementation);
+            $this->setVersion('3.4.0');
+        }
 
-        if ($this->isVersion('3.3.1')) {
+        if ($this->isVersion('3.4.0')) {
             try {
                 $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {
@@ -461,10 +467,8 @@ class Updater extends common_ext_ExtensionUpdater {
                 $service->setServiceManager($this->getServiceManager());
                 $this->getServiceManager()->register(TestSessionService::SERVICE_ID, $service);
             }
-            $this->setVersion('3.3.2');
+            $this->setVersion('3.4.1');
         }
-
-
     }
 
     private function refreshMonitoringData()
