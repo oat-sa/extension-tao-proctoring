@@ -27,10 +27,9 @@ define([
     'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
-    'core/cachedStore',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, cachedStore, keepAfterResume, authSuccessTpl){
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
     'use strict';
 
     /**
@@ -60,12 +59,12 @@ define([
             var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
             var runDeliveryUrl = helpers._url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
             var boxes = [{
-                    id : 'goToDelivery',
-                    label : config.deliveryLabel,
-                    url : runDeliveryUrl,
-                    content : __('Please wait, authorization in process ...'),
-                    text : __('Proceed')
-                }];
+                id : 'goToDelivery',
+                label : config.deliveryLabel,
+                url : runDeliveryUrl,
+                content : __('Please wait, authorization in process ...'),
+                text : __('Proceed')
+            }];
             var list = listBox({
                 title : config.deliveryInit ? __('Start Test') : __('Resume Test'),
                 textEmpty : '',
@@ -79,12 +78,6 @@ define([
 
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();
-
-            // reset the paused state from the test persistence in order to avoid the session being rejected by the runner
-            cachedStore('test-states-' + config.deliveryExecution, 'states')
-                .then(function(states) {
-                    return states.setItem('paused', false);
-                });
 
             loadingBar.start();
 
@@ -122,8 +115,7 @@ define([
              */
             function authorized(){
                 loadingBar.stop();
-                //@todo it would be nice to smoothen the transition
-                $container.removeClass('authorization-in-progress');
+                $container.addClass('authorization-granted').removeClass('authorization-in-progress');
                 $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
             }
 
