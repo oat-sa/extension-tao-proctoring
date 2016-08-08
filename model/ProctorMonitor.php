@@ -43,6 +43,7 @@ interface ProctorMonitor
      *
      * @param $deliveryId
      * @return DeliveryExecution[]
+     * @deprecated
      */
     public function getDeliveryExecutions($deliveryId);
     

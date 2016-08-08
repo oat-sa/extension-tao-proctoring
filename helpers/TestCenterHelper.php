@@ -323,6 +323,7 @@ class TestCenterHelper
                     $author = new \core_kernel_classes_Resource($data['created_by']);
                     $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
 
+                    $details = '';
                     //prohibited behavior
                     if(isset($data['data']['type'])) {
                         $event_id = $data['data']['type'];
@@ -330,7 +331,11 @@ class TestCenterHelper
                         $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
                         $details = (isset($data['data']['context']['shortcut']))?$data['data']['context']['shortcut']: '';
                     } else {
-                        $details = (isset($data['data']['reason']) && isset($data['data']['reason']['reasons']) && !is_null($data['data']['reason']['reasons']))?array_merge(array_values($data['data']['reason']['reasons']), array($data['data']['reason']['comment'])) : '';
+                        if (isset($data['data']['reason']) && isset($data['data']['reason']['reasons'])) {
+                            $details = is_array($data['data']['reason']['reasons']) ?
+                                array_merge(array_values($data['data']['reason']['reasons']), [$data['data']['reason']['comment']])
+                                : array_merge([$data['data']['reason']['reasons']], [$data['data']['reason']['comment']]);
+                        }
                         if(isset($data['data']['exitCode'])){
                             $details = $data['data']['exitCode'];
                         }

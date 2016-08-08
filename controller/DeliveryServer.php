@@ -25,7 +25,8 @@ use common_session_SessionManager;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
 use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * Override the default DeliveryServer Controller
@@ -57,8 +58,8 @@ class DeliveryServer extends DefaultDeliveryServer
         $startedExecutions = array_merge(
             $deliveryExecutionService->getActiveDeliveryExecutions($userUri),
             $deliveryExecutionService->getPausedDeliveryExecutions($userUri),
-            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AWAITING),
-            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecutionState::STATE_AWAITING),
+            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecutionState::STATE_AUTHORIZED)
         );
         foreach($startedExecutions as $startedExecution) {
             if($startedExecution->getDelivery()->exists()) {
@@ -106,17 +107,17 @@ class DeliveryServer extends DefaultDeliveryServer
         $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
 
         // if the test taker is already authorized, straight forward to the execution
-        if (DeliveryExecution::STATE_AUTHORIZED === $executionState) {
+        if (DeliveryExecutionState::STATE_AUTHORIZED === $executionState) {
             return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
         }
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
-        if (DeliveryExecution::STATE_ACTIVE == $executionState) {
+        if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
             $deliveryExecutionStateService->pauseExecution($deliveryExecution);
         }
 
         // we need to change the state of the delivery execution
-        if (!in_array($executionState , array(DeliveryExecution::STATE_FINISHED, DeliveryExecution::STATE_TERMINATED))) {
+        if (!in_array($executionState , array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
             $deliveryExecutionStateService->waitExecution($deliveryExecution);
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
@@ -152,17 +153,17 @@ class DeliveryServer extends DefaultDeliveryServer
         
         // reacts to a few particular states
         switch ($executionState) {
-            case DeliveryExecution::STATE_AUTHORIZED:
+            case DeliveryExecutionState::STATE_AUTHORIZED:
                     $authorized = true;
                 break;
             
-            case DeliveryExecution::STATE_TERMINATED:
-            case DeliveryExecution::STATE_FINISHED:
+            case DeliveryExecutionState::STATE_TERMINATED:
+            case DeliveryExecutionState::STATE_FINISHED:
                 $success = false;
                 $message = __('This test has been terminated');
                 break;
                 
-            case DeliveryExecution::STATE_PAUSED:
+            case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
                 $message = __('This test has been suspended');
                 break;
@@ -178,7 +179,7 @@ class DeliveryServer extends DefaultDeliveryServer
 
     protected function revoke(DeliveryExecution $deliveryExecution)
     {
-        if($deliveryExecution->getState()->getUri() != DeliveryExecution::STATE_PAUSED){
+        if($deliveryExecution->getState()->getUri() != DeliveryExecutionState::STATE_PAUSED){
             /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $deliveryExecutionStateService->pauseExecution(
