@@ -105,7 +105,10 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $deliveryExecutionStateService->terminateExecution(
             $deliveryExecution,
-            ['reasons' => 'Paused delivery execution was expired', 'comment' => '']
+            [
+                'reasons' => ['category' => 'system'],
+                'comment' => __('Terminated by the system due to timeout.'),
+            ]
         );
         $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getUri()} has been terminated.");
     }
