@@ -11,6 +11,14 @@
             color: #999;
         }
     }
+    @include keyframes(authorized) {
+        0%   { opacity:1; }
+        50%  { opacity:0; }
+        100% { opacity:1; }
+    }
+    &.authorization-granted .listbox .list-box {
+        @include animation(authorized .5s linear 1);
+    }
     .listbox {
         width : 500px;
         .list-box .entry {

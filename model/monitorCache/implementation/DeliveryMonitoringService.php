@@ -179,6 +179,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     public function find(array $criteria = [], array $options = [], $together = false)
     {
         $result = [];
+        $this->joins = [];
         $defaultOptions = [
             'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
