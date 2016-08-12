@@ -54,10 +54,17 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
         
         if (!empty($testCenter)) {
             $eligibility        = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
-    
+            $state = $deliveryExecution->getState()->getUri();
+
+            if (in_array($state, [ProctoredDeliveryExecution::STATE_FINISHED, ProctoredDeliveryExecution::STATE_TERMINATED])) {
+                throw new UnAuthorizedException(
+                    _url('index', 'DeliveryServer', 'taoProctoring'),
+                    'Terminated/Finished delivery cannot be resumed'
+                );
+            }
+
             if (!$eligibilityService->canByPassProctor($eligibility)) {
                 // proctoring is required
-                $state = $deliveryExecution->getState()->getUri();
                 if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
                     $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
                     throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');

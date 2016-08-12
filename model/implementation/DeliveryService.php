@@ -90,6 +90,7 @@ class DeliveryService extends ConfigurableService
      * @param $deliveryId
      * @param array $options
      * @return DeliveryExecution[]
+     * @deprecated
      */
     public function getDeliveryExecutions($deliveryId, $options = array())
     {
@@ -115,6 +116,7 @@ class DeliveryService extends ConfigurableService
      * @param $testCenterId
      * @param array $options
      * @return DeliveryExecution[]
+     * @deprecated
      */
     public function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array())
     {

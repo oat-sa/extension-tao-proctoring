@@ -28,17 +28,26 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoQtiTest\models\runner\session\UserUriAware;
 use qtism\runtime\storage\binary\BinaryAssessmentTestSeeker;
 use qtism\runtime\tests\AssessmentTestSession;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use \oat\oatbox\service\ConfigurableService;
 
 /**
  * Interface TestSessionService
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class TestSessionService extends \tao_models_classes_Service
+class TestSessionService extends ConfigurableService
 {
+    const SERVICE_ID = 'taoProctoring/TestSessionService';
+
     /** @var array cache to store session instances */
-    private $cache = [];
+    protected $cache = [];
+
+    public static function singleton()
+    {
+        return ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+    }
 
     /**
      * Gets the test session for a particular deliveryExecution
@@ -125,18 +134,13 @@ class TestSessionService extends \tao_models_classes_Service
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
-            $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-
-            if (
-                DeliveryExecution::STATE_PAUSED !== $executionState
-                || !$lastPauseEvent = current(array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier())))
-            ) {
+            if (DeliveryExecution::STATE_PAUSED !== $executionState || !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastPauseEvent['created_at']);
+            $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
             if ($wasPausedAt && $deliveryExecutionStateService->hasOption('termination_delay_after_pause')) {
                 $delay = $deliveryExecutionStateService->getOption('termination_delay_after_pause');
                 if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
@@ -160,6 +164,28 @@ class TestSessionService extends \tao_models_classes_Service
         $sessionId = $session->getSessionId();
         $storage = $this->cache[$sessionId]['storage'];
         $storage->persist($session);
+    }
+
+    /**
+     * Get last test takers event from delivery log
+     * @param DeliveryExecution $deliveryExecution
+     * @return array|null
+     */
+    protected function getLastTestTakersEvent(DeliveryExecution $deliveryExecution)
+    {
+        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        $testTakerIdentifier = $deliveryExecution->getUserIdentifier();
+        $events = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier()));
+
+        $lastTestTakersEvent = null;
+        foreach ($events as $event) {
+            if ($event[DeliveryLog::CREATED_BY] === $testTakerIdentifier) {
+                $lastTestTakersEvent = $event;
+                break;
+            }
+        }
+
+        return $lastTestTakersEvent;
     }
 
 }

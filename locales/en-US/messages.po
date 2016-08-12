@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint15\n"
-"PO-Revision-Date: 2015-12-23T13:55:28\n"
+"Project-Id-Version: TAO 3.1.0-sprint32\n"
+"PO-Revision-Date: 2016-08-12T11:46:59\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -13,10 +13,22 @@ msgstr ""
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
 
-msgid "%d min"
+msgid "%1$s - item %2$s/%3$s"
+msgstr ""
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr ""
+
+msgid "A session of the delivery %s have not been paused"
 msgstr ""
 
 msgid "ACT"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Actor"
 msgstr ""
 
 msgid "Add"
@@ -25,10 +37,10 @@ msgstr ""
 msgid "Add Eligibility"
 msgstr ""
 
-msgid "Add Test Takers"
+msgid "Add test takers"
 msgstr ""
 
-msgid "Add test takers"
+msgid "Add Test Takers"
 msgstr ""
 
 msgid "Administer deliveries"
@@ -43,7 +55,7 @@ msgstr ""
 msgid "Assessment Activity Reporting"
 msgstr ""
 
-msgid "Assessment Activity Reporting for test site %s"
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
 msgstr ""
 
 msgid "Assign administrator"
@@ -76,16 +88,19 @@ msgstr ""
 msgid "Attempts"
 msgstr ""
 
+msgid "author"
+msgstr ""
+
 msgid "Authorise"
 msgstr ""
 
 msgid "Authorize"
 msgstr ""
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr ""
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr ""
 
 msgid "Authorize sessions"
@@ -112,7 +127,7 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
-msgid "Available reports"
+msgid "Available history"
 msgstr ""
 
 msgid "Available test takers"
@@ -133,19 +148,25 @@ msgstr ""
 msgid "Browser"
 msgstr ""
 
-msgid "cancel"
-msgstr ""
-
 msgid "Cancel"
 msgstr ""
 
+msgid "cancel"
+msgstr ""
+
 msgid "cancel the action"
+msgstr ""
+
+msgid "category"
 msgstr ""
 
 msgid "Check the compatibility of the current workstation and see the results"
 msgstr ""
 
 msgid "Comfort"
+msgstr ""
+
+msgid "comment"
 msgstr ""
 
 msgid "Complaint"
@@ -155,6 +176,12 @@ msgid "Completed"
 msgstr ""
 
 msgid "Compliance"
+msgstr ""
+
+msgid "Connectivity"
+msgstr ""
+
+msgid "Context"
 msgstr ""
 
 msgid "Create and authorize a proctor to the selected test sites"
@@ -172,6 +199,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
+msgid "date"
+msgstr ""
+
 msgid "Define sub-centers"
 msgstr ""
 
@@ -182,13 +212,16 @@ msgstr ""
 msgid "Delivery"
 msgstr ""
 
+msgid "Detailed Session History of %s"
+msgstr ""
+
+msgid "Detailed Session History of a selection"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
 msgid "Disturbance"
-msgstr ""
-
-msgid "Download CSV"
-msgstr ""
-
-msgid "Download the selected reports to a CSV file"
 msgstr ""
 
 #, tao-public
@@ -213,6 +246,12 @@ msgstr ""
 msgid "Elapsed time"
 msgstr ""
 
+msgid "Eligibility don\'t need proctor authorization any more."
+msgstr ""
+
+msgid "Eligibility needs proctor authorization"
+msgstr ""
+
 msgid "Eligible Deliveries"
 msgstr ""
 
@@ -225,7 +264,13 @@ msgstr ""
 msgid "Eligible test takers updated"
 msgstr ""
 
+msgid "Enable proctor authorization"
+msgstr ""
+
 msgid "End"
+msgstr ""
+
+msgid "End date of the export"
 msgstr ""
 
 msgid "Environment"
@@ -234,11 +279,24 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
+msgid "Event"
+msgstr ""
+
 msgid "Examinee"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+#, tao-public
+msgid "Export Irregularities"
 msgstr ""
 
 #, tao-public
 msgid "Filter"
+msgstr ""
+
+msgid "finished"
 msgstr ""
 
 msgid "First name"
@@ -253,13 +311,13 @@ msgstr ""
 msgid "From"
 msgstr ""
 
-msgid "Generate and review test histories"
-msgstr ""
-
 msgid "Go"
 msgstr ""
 
 msgid "Go to"
+msgstr ""
+
+msgid "History"
 msgstr ""
 
 msgid "Home"
@@ -278,12 +336,6 @@ msgid "In Progress"
 msgstr ""
 
 msgid "Init"
-msgstr ""
-
-msgid "Irregularities"
-msgstr ""
-
-msgid "Irregularity"
 msgstr ""
 
 msgid "is already paused"
@@ -325,6 +377,9 @@ msgstr ""
 msgid "Launching"
 msgstr ""
 
+msgid "List of readiness checks"
+msgstr ""
+
 msgid "Loading"
 msgstr ""
 
@@ -338,6 +393,10 @@ msgid "Manage"
 msgstr ""
 
 msgid "Manage Proctors"
+msgstr ""
+
+#, tao-public
+msgid "Manage Results"
 msgstr ""
 
 msgid "Manage sessions"
@@ -395,10 +454,10 @@ msgstr ""
 msgid "No Eligible Delivery yet"
 msgstr ""
 
-msgid "No readiness checks have been done!"
+msgid "No history to display!"
 msgstr ""
 
-msgid "No reports to display!"
+msgid "No readiness checks have been done!"
 msgstr ""
 
 msgid "No sessions"
@@ -425,10 +484,13 @@ msgstr ""
 msgid "not started"
 msgstr ""
 
-msgid "Not yet implemented!"
+msgid "offline"
 msgstr ""
 
 msgid "OK"
+msgstr ""
+
+msgid "online"
 msgstr ""
 
 msgid "OS"
@@ -449,9 +511,6 @@ msgstr ""
 msgid "Pause"
 msgstr ""
 
-msgid "Pause #"
-msgstr ""
-
 msgid "Pause Session"
 msgstr ""
 
@@ -464,7 +523,7 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-msgid "Performance"
+msgid "Performances"
 msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
@@ -476,16 +535,19 @@ msgstr ""
 msgid "Power Outage"
 msgstr ""
 
-msgid "Print results"
+msgid "Print Results"
 msgstr ""
 
-msgid "Print rubric block with item tagged with tao-print tag"
-msgstr ""
-
-msgid "Print Score Report"
+msgid "Print Score"
 msgstr ""
 
 msgid "Print the assessment results"
+msgstr ""
+
+msgid "Print the Score Report"
+msgstr ""
+
+msgid "Print the score report"
 msgstr ""
 
 msgid "Printing"
@@ -552,6 +614,9 @@ msgstr ""
 msgid "Remove eligibility"
 msgstr ""
 
+msgid "Remove proctor authorization"
+msgstr ""
+
 msgid "Remove the readiness check result?"
 msgstr ""
 
@@ -579,13 +644,14 @@ msgstr ""
 msgid "results"
 msgstr ""
 
-msgid "Resume"
-msgstr ""
-
-msgid "Resume #"
+#, tao-public
+msgid "Results"
 msgstr ""
 
 msgid "Resume Test"
+msgstr ""
+
+msgid "Return to the list"
 msgstr ""
 
 msgid "Return to the session manager"
@@ -601,6 +667,9 @@ msgid "Revoke authorization for the selected proctors"
 msgstr ""
 
 msgid "Revoke the proctor"
+msgstr ""
+
+msgid "Role"
 msgstr ""
 
 msgid "Score"
@@ -619,6 +688,12 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
+msgid "Session %s - %s has not been processed"
+msgstr ""
+
+msgid "Session history"
+msgstr ""
+
 msgid "Sessions"
 msgstr ""
 
@@ -634,10 +709,19 @@ msgstr ""
 msgid "Sessions terminated"
 msgstr ""
 
+msgid "Show the detailed session history"
+msgstr ""
+
 msgid "Something went wrong ..."
 msgstr ""
 
+msgid "Something went wrong during the export"
+msgstr ""
+
 msgid "Start"
+msgstr ""
+
+msgid "Start date of the export"
 msgstr ""
 
 msgid "Start Test"
@@ -647,6 +731,9 @@ msgid "Started at"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "subcategory"
 msgstr ""
 
 msgid "Subcategory"
@@ -661,10 +748,10 @@ msgstr ""
 msgid "Terminate"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
 msgid "Terminate sessions"
@@ -691,6 +778,9 @@ msgstr ""
 msgid "Test Centers"
 msgstr ""
 
+msgid "Test end time"
+msgstr ""
+
 msgid "Test site"
 msgstr ""
 
@@ -700,10 +790,13 @@ msgstr ""
 msgid "Test sites"
 msgstr ""
 
-msgid "Test taker"
+msgid "Test start time"
 msgstr ""
 
-msgid "Test Taker"
+msgid "test taker"
+msgstr ""
+
+msgid "Test taker"
 msgstr ""
 
 msgid "Test takers have been added"
@@ -713,6 +806,9 @@ msgid "Test takers have been removed"
 msgstr ""
 
 msgid "Test Variables"
+msgstr ""
+
+msgid "Test-Taker"
 msgstr ""
 
 msgid "Testing Workstation"
@@ -751,6 +847,12 @@ msgstr ""
 msgid "There is no delivery in progress"
 msgstr ""
 
+msgid "This delivery can be launched without authorization"
+msgstr ""
+
+msgid "This delivery needs proctor authorization"
+msgstr ""
+
 msgid "This test has been suspended"
 msgstr ""
 
@@ -763,10 +865,25 @@ msgstr ""
 msgid "Total time"
 msgstr ""
 
+msgid "Un-Proctor"
+msgstr ""
+
+msgid "Unable to get the workstation name!"
+msgstr ""
+
 msgid "Weather"
 msgstr ""
 
 msgid "Workstation"
+msgstr ""
+
+msgid "Workstation name"
+msgstr ""
+
+msgid "Workstation:"
+msgstr ""
+
+msgid "You must select a delivery in order to export its irregularities"
 msgstr ""
 
 msgid "You must select at least one test center!"

@@ -71,11 +71,12 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryClass = new \core_kernel_classes_Class(CLASS_COMPILEDDELIVERY);
         $deliveries = $deliveryClass->getInstances(true);
         $count = 0;
+        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         foreach ($deliveries as $delivery) {
             if ($delivery->exists()) {
                 $deliveryExecutions = $deliveryExecutionService->getExecutionsByDelivery($delivery);
                 foreach ($deliveryExecutions as $deliveryExecution) {
-                    if (TestSessionService::singleton()->isExpired($deliveryExecution)) {
+                    if ($testSessionService->isExpired($deliveryExecution)) {
                         try {
                             $this->terminateExecution($deliveryExecution);
                             $count++;
@@ -104,7 +105,10 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $deliveryExecutionStateService->terminateExecution(
             $deliveryExecution,
-            ['reasons' => 'Paused delivery execution was expired', 'comment' => '']
+            [
+                'reasons' => ['category' => 'system'],
+                'comment' => __('Terminated by the system due to timeout.'),
+            ]
         );
         $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getUri()} has been terminated.");
     }

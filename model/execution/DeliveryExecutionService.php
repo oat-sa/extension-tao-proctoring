@@ -30,6 +30,7 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution as BaseDeliveryEx
  * @access public
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  * @package taoProctoring
+ * @deprecated
  */
 class DeliveryExecutionService
     extends Configurable
@@ -49,10 +50,12 @@ class DeliveryExecutionService
      */
     public function getExecutionsByDelivery(\core_kernel_classes_Resource $compiled)
     {
-        $executions = $this->getImplementation()->getExecutionsByDelivery($compiled);
         $result = [];
-        foreach ($executions as $execution) {
-            $result[] = $this->createDeliveryExecution($execution);
+        if($this->getImplementation() instanceof \taoDelivery_models_classes_execution_Monitoring){
+            $executions = $this->getImplementation()->getExecutionsByDelivery($compiled);
+            foreach ($executions as $execution) {
+                $result[] = $this->createDeliveryExecution($execution);
+            }
         }
         return $result;
     }
@@ -108,7 +111,7 @@ class DeliveryExecutionService
      */
     protected function createDeliveryExecution(BaseDeliveryExecution $deliveryExecution)
     {
-        return new DeliveryExecution($deliveryExecution->getImplementation());
+        return $deliveryExecution;
     }
 
 }

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 use \oat\taoOutcomeUi\model\ResultsService;
 use \oat\oatbox\service\ConfigurableService;
+use \oat\oatbox\service\ServiceManager;
 use qtism\data\View;
 use oat\taoProctoring\model\implementation\TestSessionService;
 
@@ -127,7 +128,7 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
     {
-        $testSessionService = TestSessionService::singleton();
+        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         $session = $testSessionService->getTestSession($deliveryExecution);
 
         $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
