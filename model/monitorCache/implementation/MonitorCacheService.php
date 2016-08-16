@@ -80,6 +80,7 @@ class MonitorCacheService extends DeliveryMonitoringService
                 if (!empty($existent) &&
                     isset($existent[self::KV_COLUMN_VALUE]) &&
                     $existent[self::KV_COLUMN_VALUE] === $kvDataValue) {
+                    $this->getPersistence()->exec('COMMIT;');
                     continue;
                 } else if (!empty($existent)) {
                     $this->getPersistence()->exec(
@@ -100,7 +101,6 @@ class MonitorCacheService extends DeliveryMonitoringService
                         )
                     );
                 }
-
                 $this->getPersistence()->exec('COMMIT;');
             }
         }
