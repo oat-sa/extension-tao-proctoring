@@ -64,18 +64,39 @@ class MonitorCacheService extends DeliveryMonitoringService
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
-            $this->deleteKvData($deliveryMonitoring);
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                $this->getPersistence()->insert(
-                    self::KV_TABLE_NAME,
-                    array(
-                        self::KV_COLUMN_PARENT_ID => $id,
-                        self::KV_COLUMN_KEY => $kvDataKey,
-                        self::KV_COLUMN_VALUE => $kvDataValue,
-                    )
+                $this->getPersistence()->exec('BEGIN;');
+
+                $exists = $this->getPersistence()->exec(
+                    'SELECT ' . self::KV_COLUMN_PARENT_ID . ', ' . self::KV_COLUMN_KEY . '
+                    FROM ' . self::KV_TABLE_NAME . '
+                    WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ? AND ' . self::KV_COLUMN_KEY . ' = ? FOR UPDATE;',
+                    [$id, $kvDataKey]
                 );
+
+                if ($exists) {
+                    $this->getPersistence()->exec(
+                        'UPDATE ' . self::KV_TABLE_NAME . '
+                          SET '  . self::KV_COLUMN_VALUE . ' = ?
+                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
+                          AND ' . self::KV_COLUMN_KEY . ' = ?
+                          AND ' . self::KV_COLUMN_VALUE . ' = ?;',
+                        [$kvDataValue, $id, $kvDataKey, $kvDataValue]
+                    );
+                } else {
+                    $this->getPersistence()->insert(
+                        self::KV_TABLE_NAME,
+                        array(
+                            self::KV_COLUMN_PARENT_ID => $id,
+                            self::KV_COLUMN_KEY => $kvDataKey,
+                            self::KV_COLUMN_VALUE => $kvDataValue,
+                        )
+                    );
+                }
+
+                $this->getPersistence()->exec('COMMIT;');
             }
         }
     }

@@ -39,9 +39,9 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     /**
      * @var DeliveryMonitoringService
      */
-    private $service;
-    private $persistence;
-    private $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
+    protected $service;
+    protected $persistence;
+    protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
 
     public function setUp()
     {
@@ -251,7 +251,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals($result[2]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
     }
 
-    private function loadFixture()
+    protected function loadFixture()
     {
         $this->setUp();
 
@@ -303,7 +303,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ];
     }
 
-    private function getRecordByDeliveryExecutionId($id)
+    protected function getRecordByDeliveryExecutionId($id)
     {
         $service = $this->service;
         $sql = 'SELECT * FROM ' . $service::TABLE_NAME .
@@ -312,7 +312,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         return $this->persistence->query($sql, [$id])->fetchAll();
     }
 
-    private function getKvRecordsByParentId($parentId)
+    protected function getKvRecordsByParentId($parentId)
     {
         $service = $this->service;
         $sql = 'SELECT * FROM ' . $service::KV_TABLE_NAME .
@@ -321,13 +321,13 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         return $this->persistence->query($sql, [$parentId])->fetchAll();
     }
 
-    private function getDeliveryExecution($id = null)
+    protected function getDeliveryExecution($id = null)
     {
         if ($id === null) {
             $id = $this->deliveryExecutionId;
         }
         $prophet = new \Prophecy\Prophet();
-        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoProctoring\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\models\classes\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
