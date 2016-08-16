@@ -45,6 +45,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     public function setUp()
     {
+        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+
         TaoPhpUnitTestRunner::initTest();
 
         $this->service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);

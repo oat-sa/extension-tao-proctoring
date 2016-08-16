@@ -69,14 +69,19 @@ class MonitorCacheService extends DeliveryMonitoringService
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 $this->getPersistence()->exec('BEGIN;');
 
-                $exists = $this->getPersistence()->exec(
-                    'SELECT ' . self::KV_COLUMN_PARENT_ID . ', ' . self::KV_COLUMN_KEY . '
+                $stmt = $this->getPersistence()->query(
+                    'SELECT ' . self::KV_COLUMN_VALUE . '
                     FROM ' . self::KV_TABLE_NAME . '
                     WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ? AND ' . self::KV_COLUMN_KEY . ' = ? FOR UPDATE;',
                     [$id, $kvDataKey]
                 );
+                $existent = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-                if ($exists) {
+                if (!empty($existent) &&
+                    isset($existent[self::KV_COLUMN_VALUE]) &&
+                    $existent[self::KV_COLUMN_VALUE] === $kvDataValue) {
+                    continue;
+                } else if (!empty($existent)) {
                     $this->getPersistence()->exec(
                         'UPDATE ' . self::KV_TABLE_NAME . '
                           SET '  . self::KV_COLUMN_VALUE . ' = ?
