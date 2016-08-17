@@ -23,7 +23,6 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\oatbox\user\User;
 use oat\tao\helpers\UserHelper;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\EligibilityService;
@@ -34,6 +33,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * class DeliveryMonitoringData

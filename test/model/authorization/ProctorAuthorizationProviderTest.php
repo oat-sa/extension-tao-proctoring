@@ -26,6 +26,9 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\taoDelivery\model\authorization\UnAuthorizedException;
+use oat\oatbox\user\User;
+use oat\taoProctoring\model\EligibilityService;
 
 /**
  * Test the ProctorAuthorizationProvider
@@ -35,23 +38,42 @@ use oat\tao\test\TaoPhpUnitTestRunner;
 class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
 {
 
+    protected function getProvider($canByPassProctor = false)
+    {
+        $noopResource = new \core_kernel_classes_Resource('foo');
+    
+        //$prophecy = $this->prophesize(EligibilityService::class);
+        $prophet = new Prophet();
+        $prophecy = $prophet->prophesize();
+        $prophecy->willExtend(EligibilityService::class);
+        
+        $prophecy->getTestCenter(Argument::any(), Argument::any())->willReturn($noopResource);
+        $prophecy->getEligibility(Argument::any(), Argument::any())->willReturn($noopResource);
+        $prophecy->canByPassProctor(Argument::any())->willReturn($canByPassProctor);
+    
+        $provider = new ProctorAuthorizationProvider();
+        $provider->eligibilityService = $prophecy->reveal();
+        return $provider;
+    }
+    
     /**
-     * Get the mocked provider
+     * Get the mocked delivery execution
      *
      * @param string $executionStateUri the state of the delivery execution
-     * @return ProctorAuthorizationProvider the mocked provider
+     * @return DeliveryExecution the mocked delivery execution
      */
-    protected function getProvider($executionStateUri = ProctoredDeliveryExecution::STATE_AUTHORIZED)
+    protected function getDeliveryExecution($executionStateUri = ProctoredDeliveryExecution::STATE_AUTHORIZED)
     {
         $prophet = new Prophet();
         $prophecy = $prophet->prophesize();
         $prophecy->willImplement(DeliveryExecution::class);
+        $prophecy->getDelivery()->willReturn(new \core_kernel_classes_Resource('fakeDelivery'));
         $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($executionStateUri));
+        $prophecy->getIdentifier()->willReturn('fakeDeliveryExecution');
         $prophecy->setState(Argument::any())->will(function($args) use ($prophecy){
             $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($args[0]));
         });
-
-        return  new ProctorAuthorizationProvider($prophecy->reveal());
+        return $prophecy->reveal();
     }
 
     /**
@@ -68,32 +90,32 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     public function testIsAuthorized()
     {
-        $authorizationProvider = $this->getProvider(ProctoredDeliveryExecution::STATE_AUTHORIZED);
-        $this->assertTrue($authorizationProvider->isAuthorized());
-
-        $authorizationProvider = $this->getProvider(ProctoredDeliveryExecution::STATE_PAUSED);
-        $this->assertFalse($authorizationProvider->isAuthorized());
+        $authorizationProvider = $this->getProvider();
+        $user = $this->prophesize(User::class)->reveal();
+        
+        $authorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_AUTHORIZED);
+        $authorizationProvider->verifyResumeAuthorization($authorized, $user);
     }
-
+    
     /**
-     * Test the ProctorAuthorizationProvider#grant method
+     * @expectedException oat\taoDelivery\model\authorization\UnAuthorizedException
      */
-    public function testGrant()
-    {
-        $authorizationProvider = $this->getProvider(ProctoredDeliveryExecution::STATE_PAUSED);
-        $this->assertFalse($authorizationProvider->isAuthorized());
-        $this->assertTrue($authorizationProvider->grant());
-        $this->assertTrue($authorizationProvider->isAuthorized());
-    }
-
-    /**
-     * Test the ProctorAuthorizationProvider#revoke method
-     */
-    public function testRevoke()
+    public function testIsUnauthorized()
     {
         $authorizationProvider = $this->getProvider();
-        $this->assertTrue($authorizationProvider->isAuthorized());
-        $this->assertTrue($authorizationProvider->revoke());
-        $this->assertFalse($authorizationProvider->isAuthorized());
+        $user = $this->prophesize(User::class)->reveal();
+        $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
+        $authorizationProvider->verifyResumeAuthorization($unauthorized,$user);
+    }
+    
+    /**
+     * Test bypass flag
+     */
+    public function testBypass()
+    {
+        $authorizationProvider = $this->getProvider(true);
+        $user = $this->prophesize(User::class)->reveal();
+        $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
+        $authorizationProvider->verifyResumeAuthorization($unauthorized,$user);
     }
 }

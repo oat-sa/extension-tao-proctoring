@@ -34,6 +34,8 @@ use oat\oatbox\user\User;
  */
 class ProctorAuthorizationProvider extends ConfigurableService implements AuthorizationProvider
 {
+    public $eligibilityService;
+    
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
@@ -49,7 +51,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
-        $eligibilityService = EligibilityService::singleton();
+        $eligibilityService = $this->getEligibilityService();
         $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
         
         if (!empty($testCenter)) {
@@ -71,5 +73,13 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
                 }
             }
         }
+    }
+    
+    private function getEligibilityService()
+    {
+        if (is_null($this->eligibilityService)) {
+            $this->eligibilityService = EligibilityService::singleton(); 
+        }
+        return $this->eligibilityService;
     }
 }

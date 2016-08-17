@@ -64,18 +64,50 @@ class MonitorCacheService extends DeliveryMonitoringService
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
-            $this->deleteKvData($deliveryMonitoring);
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
+
+            if (empty($kvTableData)) {
+                return;
+            }
+
+            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
+            FROM ' . self::KV_TABLE_NAME . '
+            WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
+            $keys = array_fill(0, count($kvTableData), '?');
+            $query .= implode(',', $keys);
+            $query .= ')';
+
+            $params = array_merge([$id], array_keys($kvTableData));
+
+            $stmt = $this->getPersistence()->query($query, $params);
+            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
+
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                $this->getPersistence()->insert(
-                    self::KV_TABLE_NAME,
-                    array(
-                        self::KV_COLUMN_PARENT_ID => $id,
-                        self::KV_COLUMN_KEY => $kvDataKey,
-                        self::KV_COLUMN_VALUE => $kvDataValue,
-                    )
-                );
+                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] === $kvDataValue) {
+                    continue;
+                }
+
+                if (isset($existent[$kvDataKey])) {
+                    $this->getPersistence()->exec(
+                        'UPDATE ' . self::KV_TABLE_NAME . '
+                          SET '  . self::KV_COLUMN_VALUE . ' = ?
+                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
+                          AND ' . self::KV_COLUMN_KEY . ' = ?
+                          AND ' . self::KV_COLUMN_VALUE . ' = ?;',
+                        [$kvDataValue, $id, $kvDataKey, $kvDataValue]
+                    );
+                } else {
+                    $this->getPersistence()->insert(
+                        self::KV_TABLE_NAME,
+                        array(
+                            self::KV_COLUMN_PARENT_ID => $id,
+                            self::KV_COLUMN_KEY => $kvDataKey,
+                            self::KV_COLUMN_VALUE => $kvDataValue,
+                        )
+                    );
+                }
             }
         }
     }
