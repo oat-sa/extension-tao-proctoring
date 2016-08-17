@@ -90,7 +90,7 @@ class MonitorCacheServiceThread extends \Thread
             'q' => '16',
             'r' => '17',
             's' => '18',
-            't' => '19',
+            't' => null,
         ];
         $dataModel = new DeliveryMonitoringData($deliveryExecution);
         foreach ($data as $key => $val) {

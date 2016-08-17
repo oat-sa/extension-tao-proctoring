@@ -89,7 +89,7 @@ class MonitorCacheService extends DeliveryMonitoringService
                     continue;
                 }
 
-                if (isset($existent[$kvDataKey])) {
+                if (array_key_exists($kvDataKey, $existent)) {
                     $this->getPersistence()->exec(
                         'UPDATE ' . self::KV_TABLE_NAME . '
                           SET '  . self::KV_COLUMN_VALUE . ' = ?
