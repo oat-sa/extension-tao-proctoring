@@ -21,8 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use qtism\runtime\tests\AssessmentTestSession;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * Interface DeliveryMonitoringData
