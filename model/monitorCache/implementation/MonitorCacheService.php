@@ -66,23 +66,30 @@ class MonitorCacheService extends DeliveryMonitoringService
         if (!$isNewRecord) {
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
+
+            if (empty($kvTableData)) {
+                return;
+            }
+
+            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
+            FROM ' . self::KV_TABLE_NAME . '
+            WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
+            $keys = array_fill(0, count($kvTableData), '?');
+            $query .= implode(',', $keys);
+            $query .= ')';
+
+            $params = array_merge([$id], array_keys($kvTableData));
+
+            $stmt = $this->getPersistence()->query($query, $params);
+            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
+
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                $this->getPersistence()->exec('BEGIN;');
-
-                $stmt = $this->getPersistence()->query(
-                    'SELECT ' . self::KV_COLUMN_VALUE . '
-                    FROM ' . self::KV_TABLE_NAME . '
-                    WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ? AND ' . self::KV_COLUMN_KEY . ' = ? FOR UPDATE;',
-                    [$id, $kvDataKey]
-                );
-                $existent = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-                if (!empty($existent) &&
-                    isset($existent[self::KV_COLUMN_VALUE]) &&
-                    $existent[self::KV_COLUMN_VALUE] === $kvDataValue) {
-                    $this->getPersistence()->exec('COMMIT;');
+                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] === $kvDataValue) {
                     continue;
-                } else if (!empty($existent)) {
+                }
+
+                if (isset($existent[$kvDataKey])) {
                     $this->getPersistence()->exec(
                         'UPDATE ' . self::KV_TABLE_NAME . '
                           SET '  . self::KV_COLUMN_VALUE . ' = ?
@@ -101,7 +108,6 @@ class MonitorCacheService extends DeliveryMonitoringService
                         )
                     );
                 }
-                $this->getPersistence()->exec('COMMIT;');
             }
         }
     }

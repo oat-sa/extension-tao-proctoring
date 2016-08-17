@@ -60,7 +60,7 @@ class MonitorCacheServiceTest extends DeliveryMonitoringServiceTest
     {
         $fails = 0;
         $service = $this->service;
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $workers[$i]= new MonitorCacheServiceThread($service);
             $workers[$i]->start(0);
         }

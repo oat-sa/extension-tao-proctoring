@@ -105,7 +105,11 @@ class MonitorCacheServiceThread extends \Thread
 
         try {
             $this->service->save($dataModel);
+            $dataModel->addValue('u', '20');
+            $dataModel->addValue('a', '21', true);
+            $this->service->save($dataModel);
         } catch (\Exception $e) {
+            var_dump($e->getMessage());
             $this->failed = true;
         };
     }
