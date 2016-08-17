@@ -50,7 +50,7 @@ class EligibilityServiceTest extends TaoPhpUnitTestRunner
      */
     public function setUp()
     {
-        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoTestTaker');
+        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDeliveryRdf');
         TaoPhpUnitTestRunner::initTest();
         $this->eligilityService = EligibilityService::singleton();
     }

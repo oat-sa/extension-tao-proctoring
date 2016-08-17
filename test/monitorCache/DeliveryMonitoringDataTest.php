@@ -25,6 +25,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * class DeliveryMonitoringData
@@ -121,7 +122,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     {
         $id = 'http://sample/first.rdf#i1450190828500474_test_record';
         $prophet = new \Prophecy\Prophet();
-        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoProctoring\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy = $prophet->prophesize(DeliveryExecution::class);
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
