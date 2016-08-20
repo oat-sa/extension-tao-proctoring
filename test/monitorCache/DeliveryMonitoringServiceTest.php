@@ -134,6 +134,18 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         //new row has not been inserted
         $this->assertEquals(count($insertedData), 1);
         $this->assertEquals($insertedData[0][DeliveryMonitoringService::COLUMN_STATUS], 'finished');
+
+        //update record in kv table
+        $dataModel->addValue('secondary_data_key', 'new value', true);
+        $this->assertTrue($this->service->save($dataModel));
+        $insertedData = $this->getKvRecordsByParentId($this->deliveryExecutionId);
+        $this->assertTrue(
+            in_array([
+                DeliveryMonitoringService::KV_COLUMN_PARENT_ID => $this->deliveryExecutionId,
+                DeliveryMonitoringService::KV_COLUMN_KEY => 'secondary_data_key',
+                DeliveryMonitoringService::KV_COLUMN_VALUE => 'new value'
+            ], $insertedData)
+        );
     }
 
 
@@ -320,7 +332,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $sql = 'SELECT * FROM ' . $service::KV_TABLE_NAME .
             ' WHERE ' . $service::KV_COLUMN_PARENT_ID . '=?';
 
-        return $this->persistence->query($sql, [$parentId])->fetchAll();
+        return $this->persistence->query($sql, [$parentId])->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     protected function getDeliveryExecution($id = null)
