@@ -94,9 +94,8 @@ class MonitorCacheService extends DeliveryMonitoringService
                         'UPDATE ' . self::KV_TABLE_NAME . '
                           SET '  . self::KV_COLUMN_VALUE . ' = ?
                         WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
-                          AND ' . self::KV_COLUMN_KEY . ' = ?
-                          AND ' . self::KV_COLUMN_VALUE . ' = ?;',
-                        [$kvDataValue, $id, $kvDataKey, $kvDataValue]
+                          AND ' . self::KV_COLUMN_KEY . ' = ?;',
+                        [$kvDataValue, $id, $kvDataKey]
                     );
                 } else {
                     $this->getPersistence()->insert(
