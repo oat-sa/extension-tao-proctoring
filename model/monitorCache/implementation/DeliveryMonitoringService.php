@@ -440,9 +440,16 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     protected function getPrimaryColumns()
     {
         if ($this->primaryTableColumns === null) {
-            $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
-            $schema = $schemaManager->createSchema();
-            $this->primaryTableColumns = array_keys($schema->getTable(self::TABLE_NAME)->getColumns());
+            $stmt = $this->getPersistence()->query('select * from ' . self::TABLE_NAME . ' limit 1');
+            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            if (empty($data)) {//table is empty yet, fallback to use db schema
+                $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
+                $schema = $schemaManager->createSchema();
+                $this->primaryTableColumns = array_keys($schema->getTable(self::TABLE_NAME)->getColumns());
+            } else {
+                $this->primaryTableColumns = array_keys($data[0]);
+            }
+
         }
         return $this->primaryTableColumns;
     }
