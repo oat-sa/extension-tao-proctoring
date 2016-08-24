@@ -61,6 +61,8 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 {
     const OPTION_PERSISTENCE = 'persistence';
 
+    const OPTION_PRIMARY_COLUMNS = 'primary_columns';
+
     const TABLE_NAME = 'delivery_monitoring';
 
     const COLUMN_ID = 'id';
@@ -87,11 +89,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const DEFAULT_SORT_ORDER = 'DESC';
 
     protected $joins = [];
-
-    /**
-     * @var array
-     */
-    protected $primaryTableColumns;
 
     /**
      * @param DeliveryExecution $deliveryExecution
@@ -439,19 +436,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     protected function getPrimaryColumns()
     {
-        if ($this->primaryTableColumns === null) {
-            $stmt = $this->getPersistence()->query('select * from ' . self::TABLE_NAME . ' limit 1');
-            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            if (empty($data)) {//table is empty yet, fallback to use db schema
-                $schemaManager = $this->getPersistence()->getDriver()->getSchemaManager();
-                $schema = $schemaManager->createSchema();
-                $this->primaryTableColumns = array_keys($schema->getTable(self::TABLE_NAME)->getColumns());
-            } else {
-                $this->primaryTableColumns = array_keys($data[0]);
-            }
-
-        }
-        return $this->primaryTableColumns;
+        return $this->getOption(self::OPTION_PRIMARY_COLUMNS);
     }
 
     /**
