@@ -1,5 +1,6 @@
 <?php
 use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 /**
  * Default monitoring cache service
  */
