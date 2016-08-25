@@ -74,7 +74,7 @@ class DeliveryService extends ConfigurableService
     /**
      * Gets all deliveries available for a test center
      * @param string|Resource $testCenterId
-     * @return \taoDelivery_models_classes_DeliveryRdf[]
+     * @return array
      * @deprecated
      */
     public function getTestCenterDeliveries($testCenterId)
@@ -142,11 +142,11 @@ class DeliveryService extends ConfigurableService
     /**
      *
      * @param string $deliveryId
-     * @return \taoDelivery_models_classes_DeliveryRdf
+     * @return \core_kernel_classes_Resource
      */
     public function getDelivery($deliveryId)
     {
-        return new \taoDelivery_models_classes_DeliveryRdf($deliveryId);
+        return new \core_kernel_classes_Resource($deliveryId);
     }
 
     /**
