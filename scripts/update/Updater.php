@@ -471,6 +471,24 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         $this->skip('3.4.1','3.6.3');
+
+        if ($this->isVersion('3.6.3')) {
+            $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+            $deliveryMonitoringService->setOption(
+                DeliveryMonitoringService::OPTION_PRIMARY_COLUMNS,
+                [
+                    DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
+                    DeliveryMonitoringService::COLUMN_STATUS,
+                    DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM,
+                    DeliveryMonitoringService::COLUMN_TEST_TAKER,
+                    DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
+                    DeliveryMonitoringService::COLUMN_START_TIME,
+                    DeliveryMonitoringService::COLUMN_END_TIME,
+                ]
+            );
+            $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
+            $this->setVersion('3.6.4');
+        }
     }
 
     private function refreshMonitoringData()
