@@ -487,7 +487,7 @@ class Updater extends common_ext_ExtensionUpdater {
                 ]
             );
             $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
-            $this->setVersion('3.6.4');
+            $this->setVersion('3.6.5');
         }
     }
 
