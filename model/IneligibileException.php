@@ -20,14 +20,6 @@
  */
 namespace oat\taoProctoring\model;
 
-use oat\oatbox\user\User;
-use oat\taoTestTaker\models\TestTakerService;
-use core_kernel_classes_Resource as Resource;
-use core_kernel_classes_Class;
-use core_kernel_classes_Property as Property;
-use tao_models_classes_ClassService;
-use taoDelivery_models_classes_DeliveryRdf;
-
 /**
  * Service to manage eligible deliveries
  */
