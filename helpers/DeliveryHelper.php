@@ -596,7 +596,7 @@ class DeliveryHelper
     {
         $session = $event->getSession();
         $state = $session->getState();
-        if ($state === AssessmentTestSessionState::SUSPENDED) {
+        if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL && $state === AssessmentTestSessionState::SUSPENDED) {
             self::setHasBeenPaused($session->getSessionId(), true);
         }
     }
