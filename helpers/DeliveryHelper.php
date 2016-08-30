@@ -32,7 +32,7 @@ use oat\taoProctoring\model\DeliveryExecutionStateService;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
-use oat\taoQtiTest\models\event\QtiTestChangeEvent;
+use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 
@@ -590,19 +590,14 @@ class DeliveryHelper
 
      /**
      * Catch changing of session state
-     * @param QtiTestChangeEvent $event
+     * @param QtiTestStateChangeEvent $event
      */
-    public static function testStateChanged(QtiTestChangeEvent $event)
+    public static function testStateChanged(QtiTestStateChangeEvent $event)
     {
-        /** @var \taoQtiTest_helpers_TestSession $session */
-        if (method_exists($event, 'getSession')) {
-            $session = $event->getSession();
-    
-            $state = $session->getState();
-    
-            if ($state === AssessmentTestSessionState::SUSPENDED) {
-                self::setHasBeenPaused($session->getSessionId(), true);
-            }
+        $session = $event->getSession();
+        $state = $session->getState();
+        if ($state === AssessmentTestSessionState::SUSPENDED) {
+            self::setHasBeenPaused($session->getSessionId(), true);
         }
     }
 

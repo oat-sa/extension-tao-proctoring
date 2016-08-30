@@ -30,7 +30,7 @@ $eventManager->attach(TestChangedEvent::EVENT_NAME,
 );
 
 $eventManager->attach(
-    'oat\\taoTests\\models\\event\\TestChangedEvent',
+    'oat\\taoQtiTest\\models\\event\\QtiTestStateChangeEvent',
     array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
 );
 
