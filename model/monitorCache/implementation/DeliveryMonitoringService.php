@@ -91,13 +91,25 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     protected $joins = [];
 
     /**
+     * @var DeliveryMonitoringData[]
+     */
+    protected $data = [];
+
+    /**
      * @param DeliveryExecution $deliveryExecution
      * @param boolean $updateData whether DeliveryMonitoringData instance should be populated by data during instantiation.
      * @return DeliveryMonitoringDataInterface
      */
     public function getData(DeliveryExecution $deliveryExecution, $updateData = true)
     {
-        return new DeliveryMonitoringData($deliveryExecution, $updateData);
+        $id = $deliveryExecution->getIdentifier();
+        if (!isset($this->data[$id])) {
+            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution, false);
+        }
+        if ($updateData) {
+            $this->data[$id]->updateData();
+        }
+        return $this->data[$id];
     }
 
     /**

@@ -35,6 +35,15 @@ class DeliveryExecutionStateUpdate
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = $event->getDeliveryExecution();
+
+        /**
+         * status
+         * current_assessment_item
+         * end_time
+         * hasBeenPaused
+         * last_connect
+         */
+        
         $data = $service->getData($deliveryExecution, true);
         $success = $service->save($data);
         if (!$success) {

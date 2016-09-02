@@ -165,36 +165,86 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         return $this->data;
     }
 
-    private function updateData()
+    /**
+     * Set test session
+     * @param AssessmentTestSession $testSession
+     */
+    public function setTestSession(AssessmentTestSession $testSession)
     {
-        $this->addValue(DeliveryMonitoringService::STATUS, $this->getStatus(), true);
-        $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $this->getProgress(), true);
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
-        $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $this->getAuthorizedBy(), true);
-        $this->addValue(DeliveryMonitoringService::START_TIME, $this->getStartTime(), true);
-        $this->addValue(DeliveryMonitoringService::END_TIME, $this->getEndTime(), true);
-        $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $this->getTestCenterUri(), true);
-        $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
-
-        $this->updateStatus();
-        $this->updateDeliveryLabel();
-
-        $this->updateTestTakerData();
+        $this->testSession = $testSession;
+        $this->updateData();
     }
 
     /**
-     * @return string
+     * @param array $keys
      */
-    private function getStatus()
+    public function updateData(array $keys = null)
+    {
+        if ($keys === null) {
+            $keys = [
+                DeliveryMonitoringService::STATUS,
+                DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
+                DeliveryMonitoringService::TEST_TAKER,
+                DeliveryMonitoringService::TEST_TAKER_FIRST_NAME,
+                DeliveryMonitoringService::TEST_TAKER_LAST_NAME,
+                DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
+                DeliveryMonitoringService::START_TIME,
+                DeliveryMonitoringService::END_TIME,
+                DeliveryMonitoringService::TEST_CENTER_ID,
+                DeliveryMonitoringService::DELIVERY_ID,
+                DeliveryMonitoringService::DELIVERY_NAME,
+            ];
+        }
+        foreach ($keys as $key) {
+            $methodName = 'update' . str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            if (method_exists($this, $methodName)) {
+                $this->{$methodName}();
+            }
+        }
+    }
+
+    /**
+     * Update test session state
+     */
+    private function updateStatus()
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        return $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
     }
 
     /**
-     * @return string
+     * Update connectivity status (online|offline)
      */
-    private function getProgress()
+    private function updateConnectivity()
+    {
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+
+        if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
+            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
+        }else{
+            // to ensure that during sorting by connectivity all similar statuses grouped together
+            $lastConnectivity = crc32($status);
+        }
+
+        $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
+    }
+
+    /**
+     * Update test-taker uri
+     */
+    private function updateTestTaker()
+    {
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->deliveryExecution->getUserIdentifier(), true);
+        $this->addExtraFieldsValues(true);
+    }
+
+    /**
+     * Update progress (current test-takers position)
+     */
+    private function updateCurrentAssessmentItem()
     {
         $result = null;
 
@@ -213,15 +263,101 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
                 $result = __('finished');
             }
         }
-        return $result;
+        $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $result, true);
     }
 
     /**
-     * @return string
+     * Update uri of proctor authorized the delivery
      */
-    private function getTestTaker()
+    private function updateAuthorizedBy()
     {
-        return $this->deliveryExecution->getUserIdentifier();
+        $authorizedBy = null;
+        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
+        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
+            $authorizedBy = $deliveryLog[0]['data']['proctorUri'];
+        }
+        $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $authorizedBy, true);
+    }
+
+    /**
+     * Update start time of delivery execution
+     */
+    private function updateStartTime()
+    {
+        list($usec, $sec) = explode(" ", $this->deliveryExecution->getStartTime());
+        $startTime = ((float)$usec + (float)$sec);
+        $this->addValue(DeliveryMonitoringService::START_TIME, $startTime, true);
+    }
+
+    /**
+     * Update end time of delivery execution
+     */
+    private function updateEndTime()
+    {
+        $finishTime = $this->deliveryExecution->getFinishTime();
+        if ($finishTime) {
+            list($usec, $sec) = explode(" ", $this->deliveryExecution->getFinishTime());
+            $finishTime = ((float)$usec + (float)$sec);
+        } else {
+            $finishTime = '';
+        }
+        $this->addValue(DeliveryMonitoringService::END_TIME, $finishTime, true);
+    }
+
+    /**
+     * Update test center uri
+     */
+    private function updateTestCenterId()
+    {
+        $uri = null;
+        $delivery = $this->deliveryExecution->getDelivery();
+        $user = $this->getUser();
+
+        $testCenter = EligibilityService::singleton()->getTestCenter($delivery, $user);
+        if ($testCenter) {
+            $uri = $testCenter->getUri();
+        } else {
+            $deliverLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+            $loggedEvent = $deliverLog->get(
+                $this->deliveryExecution->getIdentifier(),
+                'TEST_AUTHORISE'
+            );
+            $loggedEvent = reset($loggedEvent);
+            $uri = isset($loggedEvent['data']['test_center']) ? $loggedEvent['data']['test_center'] : null;
+        }
+        $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $uri, true);
+    }
+
+    /**
+     * Update delivery uri
+     */
+    private function updateDeliveryId()
+    {
+        $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
+    }
+
+    /**
+     * Update test-taker's first name
+     */
+    private function updateTestTakerFirstName(){
+        $result = UserHelper::getUserFirstName($this->getUser());
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $result, true);
+    }
+
+    /**
+     * Update test-taker's last name
+     */
+    private function updateTestTakerLastName(){
+        $result = UserHelper::getUserLastName($this->getUser());
+        $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $result, true);
+    }
+
+    /**
+     * Update deliver label
+     */
+    private function updateDeliveryName()
+    {
+        $this->addValue(DeliveryMonitoringService::DELIVERY_NAME, $this->deliveryExecution->getDelivery()->getLabel(), true);
     }
 
     /**
@@ -230,44 +366,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getUser()
     {
         if (!$this->user){
-             $this->user = UserHelper::getUser($this->getTestTaker());
+             $this->user = UserHelper::getUser($this->deliveryExecution->getUserIdentifier());
         }
         return $this->user;
-    }
-
-    /**
-     * @return null|string
-     */
-    private function getAuthorizedBy()
-    {
-        $result = null;
-        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
-        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
-            $result = $deliveryLog[0]['data']['proctorUri'];
-        }
-        return $result;
-    }
-
-    /**
-     * @return string
-     */
-    private function getStartTime()
-    {
-        list($usec, $sec) = explode(" ", $this->deliveryExecution->getStartTime());
-        return ((float)$usec + (float)$sec);
-    }
-
-    /**
-     * @return string
-     */
-    private function getEndTime()
-    {
-        $finishTime = $this->deliveryExecution->getFinishTime();
-        if ($finishTime) {
-            list($usec, $sec) = explode(" ", $this->deliveryExecution->getFinishTime());
-            return ((float)$usec + (float)$sec);
-        }
-        return '';
     }
 
     /**
@@ -277,20 +378,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     {
         $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
         return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
-    }
-
-/**
-     * @return string
-     */
-    private function getTestTakerFistName(){
-        return UserHelper::getUserFirstName($this->getUser());
-    }
-
-    /**
-     * @return string
-     */
-    private function getTestTakerLastName(){
-        return UserHelper::getUserLastName($this->getUser());
     }
 
     /**
@@ -312,84 +399,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * @return string
+     * @return AssessmentTestSession
      */
-    private function getTestCenterUri()
-    {
-        $uri = null;
-        $delivery = $this->deliveryExecution->getDelivery();
-        $user = $this->getUser();
-
-        $testCenter = EligibilityService::singleton()->getTestCenter($delivery, $user);
-        if ($testCenter) {
-            $uri = $testCenter->getUri();
-        } else {
-            $deliverLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-            $loggedEvent = $deliverLog->get(
-                $this->deliveryExecution->getIdentifier(),
-                'TEST_AUTHORISE'
-            );
-            $loggedEvent = reset($loggedEvent);
-            $uri = isset($loggedEvent['data']['test_center']) ? $loggedEvent['data']['test_center'] : null;
-        }
-        return $uri;
-    }
-
-    /**
-     * Set test session
-     * @param AssessmentTestSession $testSession
-     */
-    public function setTestSession(AssessmentTestSession $testSession)
-    {
-        $this->testSession = $testSession;
-        $this->updateData();
-    }
-
     private function getTestSession()
-     {
-         if ($this->testSession === null) {
-             $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
-             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
-         }
-        return $this->testSession;
-     }
-    
-
-    /**
-     * Refresh delivery information in storage
-     */
-    public function updateDeliveryLabel()
     {
-        $this->addValue(DeliveryMonitoringService::DELIVERY_NAME, $this->deliveryExecution->getDelivery()->getLabel(), true);
-    }
-
-    /**
-     * Refresh testtaker information in storage
-     */
-    public function updateTestTakerData()
-    {
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->getTestTaker(), true);
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $this->getTestTakerFistName(), true);
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $this->getTestTakerLastName(), true);
-        $this->addExtraFieldsValues(true);
-    }
-
-    /**
-     */
-    public function updateStatus()
-    {
-        $status = $this->getStatus();
-
-        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
-
-        if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
-            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
-        }else{
-            // to ensure that during sorting by connectivity all similar statuses grouped together
-            $lastConnectivity = crc32($status);
+        if ($this->testSession === null) {
+            $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
         }
-
-        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
-        $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
+        return $this->testSession;
     }
 }

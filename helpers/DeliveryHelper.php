@@ -617,7 +617,7 @@ class DeliveryHelper
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data = $deliveryMonitoringService->getData($deliveryExecution, false);
         $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
         return $status;
@@ -634,8 +634,8 @@ class DeliveryHelper
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
-        $data->addValue('hasBeenPaused', $paused);
+        $data = $deliveryMonitoringService->getData($deliveryExecution, false);
+        $data->addValue('hasBeenPaused', $paused, true);
         $deliveryMonitoringService->save($data);
     }
 }
