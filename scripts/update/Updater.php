@@ -489,7 +489,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
             $this->setVersion('3.6.5');
         }
-        $this->skip('3.6.4','3.6.5');
+        $this->skip('3.6.4','3.6.6');
     }
 
     private function refreshMonitoringData()
