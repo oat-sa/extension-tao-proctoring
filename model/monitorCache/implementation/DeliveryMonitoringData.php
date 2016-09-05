@@ -172,7 +172,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function setTestSession(AssessmentTestSession $testSession)
     {
         $this->testSession = $testSession;
-        $this->updateData();
     }
 
     /**

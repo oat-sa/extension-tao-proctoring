@@ -40,6 +40,12 @@ class TestUpdate
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
         $data = $service->getData($deliveryExecution, false);
         $data->setTestSession($event->getSession());
+        $data->updateData([
+            DeliveryMonitoringService::STATUS,
+            DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
+            DeliveryMonitoringService::START_TIME,
+            DeliveryMonitoringService::END_TIME,
+        ]);
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
