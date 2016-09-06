@@ -106,8 +106,8 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryExecutionStateService->terminateExecution(
             $deliveryExecution,
             [
-                'reasons' => ['category' => 'system'],
-                'comment' => __('Terminated by the system due to timeout.'),
+                'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
+                'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
             ]
         );
         $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getUri()} has been terminated.");
