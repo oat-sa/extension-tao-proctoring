@@ -489,7 +489,25 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
             $this->setVersion('3.6.5');
         }
-        $this->skip('3.6.4','3.6.6');
+        $this->skip('3.6.4','3.6.5');
+
+        if ($this->isVersion('3.6.5')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->detach(
+                'oat\\taoTests\\models\\event\\TestChangedEvent',
+                array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+            );
+            $eventManager->attach(
+                'oat\\taoQtiTest\\models\\event\\QtiTestStateChangeEvent',
+                array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
+            );
+            $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
+
+            $this->setVersion('3.6.6');
+        }
+
+        $this->skip('3.6.6','3.6.8');
+
     }
 
     private function refreshMonitoringData()
