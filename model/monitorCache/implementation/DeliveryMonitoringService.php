@@ -103,12 +103,17 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     public function getData(DeliveryExecution $deliveryExecution, $updateData = true)
     {
         $id = $deliveryExecution->getIdentifier();
+
         if (!isset($this->data[$id])) {
             $this->data[$id] = new DeliveryMonitoringData($deliveryExecution, false);
+        } else {
+            $this->data[$id]->setDeliveryExecution($deliveryExecution);
         }
+
         if ($updateData) {
             $this->data[$id]->updateData();
         }
+        
         return $this->data[$id];
     }
 

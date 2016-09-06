@@ -36,15 +36,13 @@ class DeliveryExecutionStateUpdate
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = $event->getDeliveryExecution();
 
-        /**
-         * status
-         * current_assessment_item
-         * end_time
-         * hasBeenPaused
-         * last_connect
-         */
-        
-        $data = $service->getData($deliveryExecution, true);
+        $data = $service->getData($deliveryExecution, false);
+        $data->updateData([
+            DeliveryMonitoringService::STATUS,
+            DeliveryMonitoringService::CONNECTIVITY,
+            DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
+            DeliveryMonitoringService::END_TIME,
+        ]);
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
