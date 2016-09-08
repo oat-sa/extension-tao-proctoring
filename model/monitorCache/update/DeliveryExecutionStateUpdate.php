@@ -35,7 +35,9 @@ class DeliveryExecutionStateUpdate
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = $event->getDeliveryExecution();
+
         $data = $service->getData($deliveryExecution, true);
+        
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');

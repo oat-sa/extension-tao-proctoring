@@ -596,6 +596,17 @@ class DeliveryHelper
     {
         $session = $event->getSession();
         $state = $session->getState();
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryExecution = self::getDeliveryExecutionById($session->getSessionId());
+        $data = $deliveryMonitoringService->getData($deliveryExecution, false);
+        $data->setTestSession($session);
+        $data->updateData([
+            DeliveryMonitoringService::STATUS,
+            DeliveryMonitoringService::CONNECTIVITY,
+            DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
+            DeliveryMonitoringService::END_TIME,
+        ]);
+        $deliveryMonitoringService->save($data);
         if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL && $state === AssessmentTestSessionState::SUSPENDED) {
             self::setHasBeenPaused($session->getSessionId(), true);
         }
@@ -612,7 +623,7 @@ class DeliveryHelper
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data = $deliveryMonitoringService->getData($deliveryExecution, false);
         $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
         return $status;
@@ -629,8 +640,8 @@ class DeliveryHelper
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
-        $data->addValue('hasBeenPaused', $paused);
+        $data = $deliveryMonitoringService->getData($deliveryExecution, false);
+        $data->addValue('hasBeenPaused', $paused, true);
         $deliveryMonitoringService->save($data);
     }
 }

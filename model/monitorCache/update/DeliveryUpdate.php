@@ -45,7 +45,7 @@ class DeliveryUpdate
             ], []);
 
             foreach ($deliveryExecutionsData as $data) {
-                $data->updateDeliveryLabel();
+                $data->updateData([DeliveryMonitoringService::DELIVERY_NAME]);
                 $success = $service->save($data);
                 if (!$success) {
                     \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
