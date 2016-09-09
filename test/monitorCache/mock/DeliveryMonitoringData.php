@@ -155,28 +155,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * Refresh delivery information in storage
+     * @param array|null $keys
      */
-    public function updateDeliveryLabel()
+    public function updateData(array $keys = null)
     {
-
+        // TODO: Implement updateData() method.
     }
 
-
-    /**
-     * Refresh testtaker information in storage
-     */
-    public function updateTestTakerData()
-    {
-
-    }
-
-
-    /**
-     * Refresh test session information in storage
-     */
-    public function updateStatus()
-    {
-        
-    }
 }

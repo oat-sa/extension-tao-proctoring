@@ -67,20 +67,9 @@ interface DeliveryMonitoringData
     public function validate();
 
     /**
-     * Refresh delivery information in storage
+     * Refresh all the delivery information
+     * @param array|null $keys list of fields to update
      */
-    public function updateDeliveryLabel();
-
-
-    /**
-     * Refresh testtaker information in storage
-     */
-    public function updateTestTakerData();
-
-
-    /**
-     * Refresh test session information in storage
-     */
-    public function updateStatus();
+    public function updateData(array $keys = null);
 
 }

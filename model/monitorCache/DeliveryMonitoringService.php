@@ -52,9 +52,10 @@ interface DeliveryMonitoringService
 
     /**
      * @param DeliveryExecution $deliveryExecution
+     * @param boolean $updateData
      * @return DeliveryMonitoringData
      */
-    public function getData(DeliveryExecution $deliveryExecution);
+    public function getData(DeliveryExecution $deliveryExecution, $updateData = true);
 
     /**
      * @return DeliveryMonitoringData[]
