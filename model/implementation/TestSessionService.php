@@ -134,7 +134,7 @@ class TestSessionService extends ConfigurableService
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
-            if (!in_array($executionState, [DeliveryExecutionState::STATE_PAUSED, DeliveryExecutionState::STATE_ACTIVE]) ||
+            if (!in_array($executionState, $this->getExpirableStates()) ||
                 !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
@@ -187,6 +187,14 @@ class TestSessionService extends ConfigurableService
         }
 
         return $lastTestTakersEvent;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExpirableStates()
+    {
+        return [DeliveryExecutionState::STATE_PAUSED, DeliveryExecutionState::STATE_ACTIVE];
     }
 
 }

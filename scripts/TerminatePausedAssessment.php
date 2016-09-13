@@ -25,6 +25,7 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\oatbox\action\Action;
+use oat\taoTestTaker\models\TestTakerService;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use common_Logger;
@@ -68,13 +69,13 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
 
         $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
 
-        $deliveryClass = new \core_kernel_classes_Class(CLASS_COMPILEDDELIVERY);
-        $deliveries = $deliveryClass->getInstances(true);
         $count = 0;
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
-        foreach ($deliveries as $delivery) {
-            if ($delivery->exists()) {
-                $deliveryExecutions = $deliveryExecutionService->getExecutionsByDelivery($delivery);
+        $testTakers = TestTakerService::singleton()->getRootClass()->getInstances(true);
+        foreach ($testTakers as $testTaker) {
+            foreach ($testSessionService->getExpirableStates() as $state) {
+                $deliveryExecutions = $deliveryExecutionService->getDeliveryExecutionsByStatus($testTaker->getUri(),
+                    $state);
                 foreach ($deliveryExecutions as $deliveryExecution) {
                     if ($testSessionService->isExpired($deliveryExecution)) {
                         try {
@@ -85,7 +86,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
                         }
                     }
                 }
-                common_Logger::d('Checked ' . $delivery->getLabel() . ' with ' . count($deliveryExecutions) . ' corresponding executions');
+                common_Logger::d('Checked testtaker ' . $testTaker->getUri() . ' with ' . count($deliveryExecutions) . '  executions');
             }
         }
 
@@ -110,7 +111,8 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
                 'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
             ]
         );
-        $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getUri()} has been terminated.");
+        $this->addReport(Report::TYPE_INFO,
+            "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated.");
     }
 
     /**
