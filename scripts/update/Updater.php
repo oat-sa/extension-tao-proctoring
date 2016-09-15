@@ -507,6 +507,19 @@ class Updater extends common_ext_ExtensionUpdater {
         }
         $this->skip('3.6.6', '3.6.9');
 
+        if ($this->isVersion('3.6.8')) {
+            $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
+
+            $i = $ext->getConfig(\taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY);
+            if ($i instanceof \taoDelivery_models_classes_execution_KeyValueService) {
+                $i->setOption(\taoDelivery_models_classes_execution_KeyValueService::OPTION_EXECUTION_STATE_INTERFACE,
+                    \oat\taoProctoring\model\execution\DeliveryExecution::class);
+
+                $ext->setConfig(\taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY, $i);
+            }
+
+            $this->setVersion('3.6.9');
+        }
     }
 
     private function refreshMonitoringData()

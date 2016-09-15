@@ -29,7 +29,7 @@ return array(
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=4.5.0',
-        'taoDelivery' => '>=4.0.0',
+        'taoDelivery' => '>=4.4.1',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=5.10.1',
@@ -61,6 +61,7 @@ return array(
             'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
             'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
+            'oat\\taoProctoring\\scripts\\install\\AdjustKVExecutionPersistenceService',
             RegisterAuthProvider::class
         ),
         'rdf' => array(
