@@ -506,12 +506,12 @@ class DeliveryHelper
                 if ($user) {
                     /* @var $user User */
                     $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                    $testTaker['lastName'] = $cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME];
-                    $testTaker['firstName'] = $cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME];
+                    $testTaker['lastName'] = _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]);
+                    $testTaker['firstName'] = _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]);
 
                     $userExtraFields = self::_getUserExtraFields();
                     foreach($userExtraFields as $field){
-                        $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? $cachedData[$field['id']] : '';
+                        $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
                     }
                 }
 
@@ -522,7 +522,7 @@ class DeliveryHelper
                     'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                        'label' => $cachedData[DeliveryMonitoringService::DELIVERY_NAME],
+                        'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'testTaker' => $testTaker,
