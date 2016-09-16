@@ -24,6 +24,7 @@ namespace oat\taoProctoring\scripts;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\action\Action;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -68,24 +69,29 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
 
         $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
 
-        $deliveryClass = new \core_kernel_classes_Class(CLASS_COMPILEDDELIVERY);
-        $deliveries = $deliveryClass->getInstances(true);
         $count = 0;
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
-        foreach ($deliveries as $delivery) {
-            if ($delivery->exists()) {
-                $deliveryExecutions = $deliveryExecutionService->getExecutionsByDelivery($delivery);
-                foreach ($deliveryExecutions as $deliveryExecution) {
-                    if ($testSessionService->isExpired($deliveryExecution)) {
-                        try {
-                            $this->terminateExecution($deliveryExecution);
-                            $count++;
-                        } catch (\Exception $e) {
-                            $this->addReport(Report::TYPE_ERROR,$e->getMessage());
-                        }
-                    }
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryExecutionsData = $deliveryMonitoringService->find([
+            DeliveryMonitoringService::STATUS => [
+                DeliveryExecution::STATE_ACTIVE,
+                DeliveryExecution::STATE_PAUSED
+            ]
+        ]);
+
+        foreach ($deliveryExecutionsData as $deliveryExecutionData) {
+            $data = $deliveryExecutionData->get();
+            $deliveryExecution = $deliveryExecutionService->getDeliveryExecution(
+                $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+            );
+            if ($testSessionService->isExpired($deliveryExecution)) {
+                try {
+                    $this->terminateExecution($deliveryExecution);
+                    $count++;
+                } catch (\Exception $e) {
+                    $this->addReport(Report::TYPE_ERROR,$e->getMessage());
                 }
-                common_Logger::d('Checked ' . $delivery->getLabel() . ' with ' . count($deliveryExecutions) . ' corresponding executions');
             }
         }
 
@@ -110,7 +116,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
                 'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
             ]
         );
-        $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getUri()} has been terminated.");
+        $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated.");
     }
 
     /**

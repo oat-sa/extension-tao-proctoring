@@ -42,7 +42,7 @@ class Diagnostic extends ProctoringModule
         $testCenter = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
 
-        $this->setData('title', __('Readiness Check for test site %s', $testCenter->getLabel()));
+        $this->setData('title', __('Readiness Check for test site %s', _dh($testCenter->getLabel())));
         $this->composeView(
             'diagnostic-index',
             array(
