@@ -24,11 +24,16 @@ namespace oat\taoProctoring\scripts\update;
 use common_ext_ExtensionsManager;
 use common_report_Report;
 use oat\oatbox\service\ServiceManager;
-use taoDelivery_models_classes_execution_AdvancedKeyValueService;
+use oat\taoDelivery\model\execution\KeyValueService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use taoDelivery_models_classes_execution_ServiceProxy;
 
-class setAdvancedKVExecutionPersistenceService extends \common_ext_action_InstallAction
+/**
+ * This one required in order to move from deprecated implementation
+ * Class setKVExecutionPersistenceService
+ * @package oat\taoProctoring\scripts\update
+ */
+class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
 {
     /**
      * @param $params
@@ -39,8 +44,8 @@ class setAdvancedKVExecutionPersistenceService extends \common_ext_action_Instal
         $ext = common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
         $oldService = $ext->getConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY);
         $persistenceOption = $oldService->getOption($oldService::OPTION_PERSISTENCE);
-        $newService = new taoDelivery_models_classes_execution_AdvancedKeyValueService([
-            taoDelivery_models_classes_execution_AdvancedKeyValueService::OPTION_PERSISTENCE => $persistenceOption,
+        $newService = new KeyValueService([
+            KeyValueService::OPTION_PERSISTENCE => $persistenceOption,
         ]);
 
         $ext->setConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY, $newService);
@@ -68,7 +73,7 @@ class setAdvancedKVExecutionPersistenceService extends \common_ext_action_Instal
         }
 
         return new common_report_Report(common_report_Report::TYPE_SUCCESS,
-            'Execution KV storage updated to taoDelivery_models_classes_execution_AdvancedKVDeliveryExecution');
+            'Execution KV storage updated to oat\taoDelivery\model\execution\KeyValueService');
 
     }
 }
