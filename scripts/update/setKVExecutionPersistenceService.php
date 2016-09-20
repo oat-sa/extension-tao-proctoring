@@ -48,7 +48,6 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
             KeyValueService::OPTION_PERSISTENCE => $persistenceOption,
         ]);
 
-        $ext->setConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY, $newService);
 
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -71,6 +70,8 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
                 $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
 
         }
+
+        $ext->setConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY, $newService);
 
         return new common_report_Report(common_report_Report::TYPE_SUCCESS,
             'Execution KV storage updated to oat\taoDelivery\model\execution\KeyValueService');
