@@ -21,6 +21,7 @@
 namespace oat\taoProctoring\helpers;
 
 use oat\oatbox\service\ServiceManager;
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\DiagnosticStorage;
@@ -286,7 +287,7 @@ class TestCenterHelper
                     'timestamp' => $startTime,
                     'session'   => $sessionUri,
                     'role'      => __('Test-Taker'),
-                    'actor'     => $author->getLabel(),
+                    'actor' => _dh($author->getLabel()),
                     'event'     => __('Test start time'),
                     'details'   => '',
                     'context'   => '',
@@ -302,7 +303,7 @@ class TestCenterHelper
                         'timestamp' => $finishTime,
                         'session' => $sessionUri,
                         'role' => __('Test-Taker'),
-                        'actor' => $author->getLabel(),
+                        'actor' => _dh($author->getLabel()),
                         'event' => __('Test end time'),
                         'details' => '',
                         'context' => '',
@@ -354,7 +355,7 @@ class TestCenterHelper
                     $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
                     $exportable['session'] = $deliveryExecution->getIdentifier();
                     $exportable['role'] = $role;
-                    $exportable['actor'] = $author->getLabel();
+                    $exportable['actor'] = _dh($author->getLabel());
                     $exportable['event'] = $event_id;
                     $exportable['details'] = $details;
                     $exportable['context'] = $context;

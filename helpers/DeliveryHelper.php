@@ -260,8 +260,8 @@ class DeliveryHelper
 
                 $testTakers[] = array(
                     'id' => $userId,
-                    'firstname' => $firstName,
-                    'lastname' => $lastName,
+                    'firstname' => _dh($firstName),
+                    'lastname' => _dh($lastName),
                     'identifier' => $userId,
                     'status' => implode(', ', array_unique($status)),
                 );
@@ -312,8 +312,8 @@ class DeliveryHelper
 
                 $testTakers[] = array(
                     'id' => $userId,
-                    'firstname' => $firstName,
-                    'lastname' => $lastName,
+                    'firstname' => _dh($firstName),
+                    'lastname' => _dh($lastName),
                     'identifier' => $userId,
                 );
             }
