@@ -24,6 +24,7 @@ use core_kernel_classes_Property as Property;
 use core_kernel_classes_Resource as Resource;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
@@ -188,7 +189,6 @@ class DeliveryService extends ConfigurableService
      */
     public function getDeliveryTestTakers($deliveryId, $testCenterId, $options = array())
     {
-        $users = array();
         $groups = $this->getGroupClass()->searchInstances(array(
             PROPERTY_GROUP_DELVIERY => $deliveryId,
             self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
@@ -207,6 +207,14 @@ class DeliveryService extends ConfigurableService
             // assume Tao Users
             $users[] = new core_kernel_users_GenerisUser(new Resource($id));
         }
+
+        usort($users, function ($a, $b) {
+            return strcasecmp(
+                UserHelper::getUserLastName($a),
+                UserHelper::getUserLastName($b)
+            );
+        });
+
 
         return $users;
     }
