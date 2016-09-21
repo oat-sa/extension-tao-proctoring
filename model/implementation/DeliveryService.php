@@ -194,23 +194,18 @@ class DeliveryService extends ConfigurableService
             self::PROPERTY_GROUP_TEST_CENTERS => $testCenterId
         ), array('recursive' => true, 'like' => false));
 
-        if ($groups) {
-            $subjectClass = TestTakerService::singleton()->getRootClass();
-            $usersResources = $subjectClass->searchInstances(array(
-                GroupsService::PROPERTY_MEMBERS_URI => $groups
-            ), array(
-                'recursive' => true,
-                'like' => false,
-                'order' => PROPERTY_USER_LASTNAME,
-                'chaining' => 'or'
-            ));
-
-            if ($usersResources){
-                foreach ($usersResources as $user) {
-                    // assume Tao Users
-                    $users[] = new core_kernel_users_GenerisUser(new Resource($user->getUri()));
-                }
+        $userIds = array();
+        foreach ($groups as $group) {
+            foreach (GroupsService::singleton()->getUsers($group) as $user) {
+                $userIds[] = $user->getUri();
             }
+        }
+
+        $userIds = array_unique($userIds);
+        $users = array();
+        foreach ($userIds as $id) {
+            // assume Tao Users
+            $users[] = new core_kernel_users_GenerisUser(new Resource($id));
         }
 
         return $users;
