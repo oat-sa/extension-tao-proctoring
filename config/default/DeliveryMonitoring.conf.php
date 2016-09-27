@@ -8,6 +8,8 @@ return new MonitorCacheService(array(
     MonitorCacheService::OPTION_PERSISTENCE => 'default',
     MonitorCacheService::OPTION_PRIMARY_COLUMNS => [
         DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
+        DeliveryMonitoringService::COLUMN_DELIVERY_ID,
+        DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID,
         DeliveryMonitoringService::COLUMN_STATUS,
         DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM,
         DeliveryMonitoringService::COLUMN_TEST_TAKER,

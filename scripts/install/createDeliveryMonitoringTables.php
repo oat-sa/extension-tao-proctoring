@@ -32,6 +32,8 @@ try {
     $tableLog = $schema->createTable(DeliveryMonitoringService::TABLE_NAME);
     $tableLog->addOption('engine', 'InnoDB');
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_ID, "string", array("notnull" => true, "length" => 255));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID, "string", array("notnull" => true, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_STATUS, "string", array("notnull" => true, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_TEST_TAKER, "string", array("notnull" => false, "length" => 255));
