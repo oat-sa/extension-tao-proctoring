@@ -528,47 +528,6 @@ class Updater extends common_ext_ExtensionUpdater {
                 \common_Logger::i('Database Schema already up to date.');
             }
 
-            // get data from kv and fill new column
-            $sql = 'SELECT ' . DeliveryMonitoringService::KV_COLUMN_VALUE . ', ' . DeliveryMonitoringService::KV_COLUMN_PARENT_ID . '
-                FROM ' . DeliveryMonitoringService::KV_TABLE_NAME . '
-                WHERE ' . DeliveryMonitoringService::KV_COLUMN_KEY . '=?';
-
-            foreach($persistence->query($sql, [DeliveryMonitoringService::COLUMN_DELIVERY_ID]) as $row){
-                $update = "UPDATE " . DeliveryMonitoringService::TABLE_NAME . " SET " . DeliveryMonitoringService::COLUMN_DELIVERY_ID . " =:value
-                        WHERE " . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
-                $persistence->exec($update, [':value'=>$row[DeliveryMonitoringService::KV_COLUMN_VALUE],':delivery_execution_id'=>$row[DeliveryMonitoringService::KV_COLUMN_PARENT_ID]]);
-            }
-
-            foreach($persistence->query($sql, [DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID]) as $row){
-                $update = "UPDATE " . DeliveryMonitoringService::TABLE_NAME . " SET " . DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID . " =:value
-                        WHERE " . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
-                $persistence->exec($update, [':value'=>$row[DeliveryMonitoringService::KV_COLUMN_VALUE],':delivery_execution_id'=>$row[DeliveryMonitoringService::KV_COLUMN_PARENT_ID]]);
-            }
-
-            //remove data
-            $delete = 'DELETE FROM ' . DeliveryMonitoringService::KV_TABLE_NAME . '
-                WHERE ' . DeliveryMonitoringService::KV_COLUMN_KEY . '=?';
-            $persistence->exec($delete, [DeliveryMonitoringService::COLUMN_DELIVERY_ID]);
-            $persistence->exec($delete, [DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID]);
-
-            // use these newly created column
-            $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-            $deliveryMonitoringService->setOption(
-                DeliveryMonitoringService::OPTION_PRIMARY_COLUMNS,
-                [
-                    DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
-                    DeliveryMonitoringService::COLUMN_DELIVERY_ID,
-                    DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID,
-                    DeliveryMonitoringService::COLUMN_STATUS,
-                    DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM,
-                    DeliveryMonitoringService::COLUMN_TEST_TAKER,
-                    DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
-                    DeliveryMonitoringService::COLUMN_START_TIME,
-                    DeliveryMonitoringService::COLUMN_END_TIME,
-                ]
-            );
-
-            $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
             $this->setVersion('3.7.0');
         }
 
