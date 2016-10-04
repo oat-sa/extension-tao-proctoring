@@ -51,6 +51,15 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoTestTaker');
         TaoPhpUnitTestRunner::initTest();
         $this->proctorManagementService = ProctorManagementService::singleton();
+
+        //clean test resources
+        $proctor1 = new \core_kernel_classes_Resource('http://myTest.case#proctor1');
+        $proctor2 = new \core_kernel_classes_Resource('http://myTest.case#proctor2');
+        $proctor3 = new \core_kernel_classes_Resource('http://myTest.case#proctor3');
+
+        $proctor1->delete(true);
+        $proctor2->delete(true);
+        $proctor3->delete(true);
     }
 
     public function testProctorRoot()
