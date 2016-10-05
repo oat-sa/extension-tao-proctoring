@@ -51,6 +51,15 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoTestTaker');
         TaoPhpUnitTestRunner::initTest();
         $this->proctorManagementService = ProctorManagementService::singleton();
+
+        //clean test resources
+        $proctor1 = new \core_kernel_classes_Resource('http://myTest.case#proctor1');
+        $proctor2 = new \core_kernel_classes_Resource('http://myTest.case#proctor2');
+        $proctor3 = new \core_kernel_classes_Resource('http://myTest.case#proctor3');
+
+        $proctor1->delete(true);
+        $proctor2->delete(true);
+        $proctor3->delete(true);
     }
 
     public function testProctorRoot()
@@ -258,7 +267,8 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
             'http://myTest.case#TestCenter1',
             'http://myTest.case#TestCenter2',
             'http://myTest.case#TestCenter3',
-            'http://myTest.case#TestCenter4'
+            'http://myTest.case#TestCenter4',
+            'http://myTest.case#TestCenter5'
         );
         $testCenters1 = array(
             'http://myTest.case#TestCenter1',
@@ -287,7 +297,7 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
         $proctor3->setPropertiesValues($propertiesValues);
 
         $authorization = $this->proctorManagementService->getProctorsAuthorization($testCenters);
-        $this->assertCount(3, $authorization);
+        $this->assertCount(4, $authorization);
         $this->assertArrayHasKey($proctor1->getUri(), $authorization);
         $this->assertArrayHasKey($proctor2->getUri(), $authorization);
         $this->assertArrayHasKey($proctor3->getUri(), $authorization);
