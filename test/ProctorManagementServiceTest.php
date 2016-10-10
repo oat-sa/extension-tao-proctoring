@@ -297,7 +297,7 @@ class ProctorManagementServiceTest extends TaoPhpUnitTestRunner
         $proctor3->setPropertiesValues($propertiesValues);
 
         $authorization = $this->proctorManagementService->getProctorsAuthorization($testCenters);
-        $this->assertCount(4, $authorization);
+        $this->assertCount(3, $authorization);
         $this->assertArrayHasKey($proctor1->getUri(), $authorization);
         $this->assertArrayHasKey($proctor2->getUri(), $authorization);
         $this->assertArrayHasKey($proctor3->getUri(), $authorization);
