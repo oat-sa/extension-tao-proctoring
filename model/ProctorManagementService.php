@@ -178,7 +178,6 @@ class ProctorManagementService extends tao_models_classes_ClassService
         ), array(
             'recursive' => true,
             'like' => false,
-            'chaining' => 'or'
         ));
 
         /** @var core_kernel_classes_Resource $proctor */
