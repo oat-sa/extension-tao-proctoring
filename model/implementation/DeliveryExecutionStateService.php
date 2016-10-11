@@ -177,16 +177,19 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            $data = [
+                'reason' => $reason,
+                'timestamp' => microtime(true),
+            ];
             if ($session) {
-                $data = [
-                    'reason' => $reason,
-                    'timestamp' => microtime(true),
-                    'itemId' => $this->getCurrentItemId($deliveryExecution),
-                    'context' => $this->getProgress($deliveryExecution)
-                ];
+                $data['itemId'] = $this->getCurrentItemId($deliveryExecution);
+                $data['context'] = $this->getProgress($deliveryExecution);
                 $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
                 $session->suspend();
                 $this->getTestSessionService()->persist($session);
+            } else {
+                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
+                $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_PAUSED);
             }
             $result = true;
         }
