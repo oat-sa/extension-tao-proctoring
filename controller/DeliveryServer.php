@@ -186,4 +186,13 @@ class DeliveryServer extends DefaultDeliveryServer
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function _initDeliveryExecution()
+    {
+        $deliveryExecution = parent::_initDeliveryExecution();
+        $deliveryExecution->setState(DeliveryExecutionState::STATE_PAUSED);
+        return $deliveryExecution;
+    }
 }
