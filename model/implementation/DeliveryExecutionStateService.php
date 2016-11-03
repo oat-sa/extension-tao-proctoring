@@ -28,6 +28,9 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
+use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
+use oat\taoClientDiagnostic\model\browserDetector\OSService;
+
 
 /**
  * Class DeliveryExecutionStateService
@@ -79,9 +82,20 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     public function resumeExecution(DeliveryExecution $deliveryExecution)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        $logData = [
+            'web_browser_name' => WebBrowserService::singleton()->getClientName(),
+            'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
+            'os_name' => OSService::singleton()->getClientName(),
+            'os_version' => OSService::singleton()->getClientVersion(),
+            'timestamp' => microtime(true),
+        ];
+
         if ($session) {
             $session->resume();
             $this->getTestSessionService()->persist($session);
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RESUME', $logData);
+        } else {
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RUN', $logData);
         }
         $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
 
