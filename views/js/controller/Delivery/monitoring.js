@@ -33,6 +33,7 @@ define([
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
+    'tpl!taoProctoring/templates/delivery/actionBtn',
     'ui/datatable',
     'select2'
 ], function (
@@ -49,7 +50,8 @@ define([
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
-    statusFilterTpl
+    statusFilterTpl,
+    actionBtnTpl
 ) {
     'use strict';
 
@@ -391,38 +393,6 @@ define([
                 });
             }
 
-            // action: authorise the execution
-            actions.push({
-                id: 'authorise',
-                icon: 'play',
-                title: __('Authorize session'),
-                hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.authorize !== true;
-                    }
-                    return true;
-                },
-                action: authorise
-            });
-
-            // action: pause the execution
-            actions.push({
-                id: 'pause',
-                icon: 'pause',
-                title: __('Pause session'),
-                hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.pause !== true;
-                    }
-                    return true;
-                },
-                action: pause
-            });
-
             // action: terminate the execution
             actions.push({
                 id: 'terminate',
@@ -498,7 +468,6 @@ define([
                 sortable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.firstName || '';
-
                 }
             });
 
@@ -509,7 +478,6 @@ define([
                 sortable : true,
                 transform: function(value, row) {
                     return row && row.testTaker && row.testTaker.lastName || '';
-
                 }
             });
 
@@ -560,6 +528,50 @@ define([
                 }
             });
 
+            // column: pause
+            model.push({
+                id: 'pause',
+                label: __('Pause'),
+                transform: function(value, row) {
+                    var status;
+                    var inactive = true;
+
+                    if (row.state && row.state.status) {
+                        status = _status.getStatusByCode(row.state.status);
+                        inactive = !status || status.can.pause !== true;
+                    }
+
+                    return actionBtnTpl({
+                        icon: 'pause',
+                        type: 'pause',
+                        title: __('Pause session'),
+                        disabled: inactive ? 'disabled' : ''
+                    });
+                }
+            });
+
+            // column: pause
+            model.push({
+                id: 'authorize',
+                label: __('Authorize'),
+                transform: function(value, row) {
+                    var status;
+                    var inactive = true;
+
+                    if (row.state && row.state.status){
+                        status = _status.getStatusByCode(row.state.status);
+                        inactive = !status || status.can.authorize !== true;
+                    }
+
+                    return actionBtnTpl({
+                        icon: 'play',
+                        type: 'authorize',
+                        title: __('Authorize session'),
+                        disabled: inactive ? 'disabled' : ''
+                    });
+                }
+            });
+
             // column: connectivity status of execution progress
             model.push({
                 id: 'connectivity',
@@ -597,6 +609,14 @@ define([
                         pause : $list.find('.action-bar').children('.tool-pause'),
                         terminate : $list.find('.action-bar').children('.tool-terminate'),
                         report : $list.find('.action-bar').children('.tool-irregularity')
+                    });
+
+                    $('.btn-action-pause', $list).off('click').on('click', function() {
+                        pause($(this).parents('tr').data('item-identifier'));
+                    });
+
+                    $('.btn-action-authorize', $list).off('click').on('click', function() {
+                        authorise($(this).parents('tr').data('item-identifier'));
                     });
 
                     loadingBar.stop();
