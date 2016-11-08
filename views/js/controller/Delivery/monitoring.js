@@ -599,6 +599,9 @@ define([
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
 
+                    // rewrite column name
+                    $('th.actions', $list).text(__('Administration'));
+
                     loadingBar.stop();
                 })
                 .on('select.datatable', function() {
