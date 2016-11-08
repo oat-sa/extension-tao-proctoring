@@ -104,7 +104,7 @@ define([
         eligibilityTable
             .on('loaded', function () {
                 var $add;
-                var $component = $('.component', $fixtureContainer);
+                var $component = $('.component:eq(0)', $fixtureContainer);
 
                 assert.equal($component.length, 1, 'The component has been appended to the container');
                 assert.equal($('.action-bar', $component).length, 1, 'The action bar exists');
@@ -133,7 +133,7 @@ define([
         eligibilityTable
             .on('loaded', function () {
                 var $rm;
-                var $component = $('.component', $fixtureContainer);
+                var $component = $('.component:eq(0)', $fixtureContainer);
 
                 assert.equal($component.length, 1, 'The component has been appended to the container');
 
@@ -143,7 +143,7 @@ define([
                 $rm.first().trigger('click');
             })
             .on('remove', function(id, data){
-                 var $component = $('.component', $fixtureContainer);
+                 var $component = $('.component:eq(0)', $fixtureContainer);
                  assert.equal(typeof id, 'string', 'The id is given');
                  assert.equal(id, $('.datatable-container tbody tr', $component).first().data('item-identifier'), 'The given identifier matches the row');
                  assert.equal(data.length, 2, 'The table data contains 2 entries');
