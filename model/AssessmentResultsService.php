@@ -41,6 +41,7 @@ class AssessmentResultsService extends ConfigurableService
 
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
+    const OPTION_TIME_HANDLING = 'time_handling';
 
     /**
      * Get test taker data as associative array

@@ -507,6 +507,24 @@ class Updater extends common_ext_ExtensionUpdater {
         }
         $this->skip('3.6.6', '3.6.16');
 
+        if ($this->isVersion('3.6.16')) {
+            try {
+                $service = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new AssessmentResultsService([
+                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
+                    AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
+                    AssessmentResultsService::OPTION_TIME_HANDLING => false,
+                ]);
+            }
+            
+            $service->setOption(AssessmentResultsService::OPTION_TIME_HANDLING, false);
+
+            $service->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
+            
+            $this->setVersion('3.7.0');
+        }
     }
 
     private function refreshMonitoringData()

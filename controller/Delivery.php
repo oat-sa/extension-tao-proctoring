@@ -85,6 +85,7 @@ class Delivery extends ProctoringModule
                 'extrafields' => DeliveryHelper::getExtraFields(),
                 'categories' => $this->getAllReasonsCategories(),
                 'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+                'timeHandling' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_TIME_HANDLING)),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),

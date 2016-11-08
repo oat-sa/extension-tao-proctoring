@@ -81,6 +81,7 @@ define([
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
             var testCenterId = $container.data('testcenter');
+            var timeHandlingButton = $container.data('timehandling');
             var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -192,6 +193,10 @@ define([
             // print the results of the session
             function printResults(selection) {
                 window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : selection}), 'printRubric' + JSON.stringify(selection));
+            }
+
+            function timeHandling(selection) {
+                console.log('timeHandling', selection);
             }
 
             /**
@@ -391,6 +396,18 @@ define([
                 });
             }
 
+            // tools: handles the session time
+            if (timeHandlingButton) {
+                tools.push({
+                    id : 'timeHandling',
+                    title : __('Session time handling'),
+                    icon : 'time',
+                    label : __('Time'),
+                    massAction: true,
+                    action : timeHandling
+                });
+            }
+
             // action: authorise the execution
             actions.push({
                 id: 'authorise',
@@ -470,6 +487,16 @@ define([
                     title : __('Print the assessment results'),
                     icon : 'result',
                     action : printReport
+                });
+            }
+
+            // action: handles the session time
+            if (timeHandlingButton) {
+                actions.push({
+                    id : 'timeHandling',
+                    title : __('Session time handling'),
+                    icon : 'time',
+                    action : timeHandling
                 });
             }
 

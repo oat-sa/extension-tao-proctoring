@@ -24,4 +24,5 @@ use oat\taoProctoring\model\AssessmentResultsService;
 return new AssessmentResultsService([
     AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
     AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
+    AssessmentResultsService::OPTION_TIME_HANDLING => false,
 ]);
