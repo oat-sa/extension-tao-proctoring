@@ -43,6 +43,12 @@
             padding: 0;
         }
 
+        tr {
+            &.highlight-row {
+                background-color: #b0b3d6;
+            }
+        }
+
         td {
             font-size: 90%;
             font-weight: normal;

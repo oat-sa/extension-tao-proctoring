@@ -33,6 +33,7 @@ define([
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
+    'tpl!taoProctoring/templates/delivery/highlightedStatus',
     'ui/datatable',
     'select2'
 ], function (
@@ -49,7 +50,8 @@ define([
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
-    statusFilterTpl
+    statusFilterTpl,
+    highlightedStatusTpl
 ) {
     'use strict';
 
@@ -554,6 +556,10 @@ define([
                             if (row.state.status === 'INPROGRESS') {
                                 result = status.label;
                             }
+                            if (result === 'Awaiting') {
+                                // highlight row
+                                result = highlightedStatusTpl({status: result});
+                            }
                         }
                     }
                     return result;
@@ -598,6 +604,8 @@ define([
                         terminate : $list.find('.action-bar').children('.tool-terminate'),
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
+
+                    $('.highlighted-status', $list).parents('tr').addClass('highlight-row');
 
                     loadingBar.stop();
                 })
