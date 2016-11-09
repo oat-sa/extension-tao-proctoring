@@ -189,6 +189,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
                 DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
                 DeliveryMonitoringService::START_TIME,
                 DeliveryMonitoringService::END_TIME,
+                DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::TEST_CENTER_ID,
                 DeliveryMonitoringService::DELIVERY_ID,
                 DeliveryMonitoringService::DELIVERY_NAME,
@@ -301,6 +302,39 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             $finishTime = '';
         }
         $this->addValue(DeliveryMonitoringService::END_TIME, $finishTime, true);
+    }
+
+    /**
+     * Update remaining time of delivery execution
+     */
+    private function updateRemainingTime()
+    {
+        $result = null;
+        $remaining = 0;
+        $hasTimer = false;
+
+        $session = $this->getTestSession();
+
+        if ($session !== null && $session->isRunning()) {
+            $remaining = PHP_INT_MAX;
+            foreach ($session->getTimeConstraints() as $tc) {
+                // Only consider time constraints in force.
+                if ($tc->getMaximumRemainingTime() !== false) {
+                    $hasTimer = true;
+                    $remaining = min($remaining, $tc->getMaximumRemainingTime()->getSeconds(true));
+                }
+            }
+        }
+
+        if ($hasTimer) {
+            if ($remaining) {
+                $result = $remaining . 's';
+            } else {
+                $result = __('none');
+            }
+        }
+
+        $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
     }
 
     /**

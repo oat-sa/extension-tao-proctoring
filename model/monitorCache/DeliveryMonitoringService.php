@@ -41,6 +41,7 @@ interface DeliveryMonitoringService
     const AUTHORIZED_BY = 'authorized_by';
     const START_TIME = 'start_time';
     const END_TIME = 'end_time';
+    const REMAINING_TIME = 'remaining_time';
 
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';

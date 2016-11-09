@@ -45,6 +45,7 @@ class TestUpdate
             DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
             DeliveryMonitoringService::START_TIME,
             DeliveryMonitoringService::END_TIME,
+            DeliveryMonitoringService::REMAINING_TIME,
         ]);
         $success = $service->save($data);
         if (!$success) {

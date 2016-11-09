@@ -508,6 +508,7 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('3.6.6', '3.6.16');
 
         if ($this->isVersion('3.6.16')) {
+            // register tomeHandling option
             try {
                 $service = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
@@ -522,6 +523,25 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $service->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
+
+            // extend the data table
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+            $persistence = \common_persistence_Manager::getPersistence($persistenceId);
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+            try {
+                $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+            } catch(SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
+            $this->refreshMonitoringData();
             
             $this->setVersion('3.7.0');
         }

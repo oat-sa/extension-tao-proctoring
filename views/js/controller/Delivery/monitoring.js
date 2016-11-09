@@ -24,6 +24,7 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
+    'core/encoder/time',
     'util/encode',
     'ui/feedback',
     'ui/dialog',
@@ -41,6 +42,7 @@ define([
     __,
     helpers,
     loadingBar,
+    timeEncoder,
     encode,
     feedback,
     dialog,
@@ -584,6 +586,20 @@ define([
                         }
                     }
                     return result;
+                }
+            });
+
+            // column: remaining time
+            model.push({
+                id: 'remaining',
+                sortable : true,
+                label: __('Remaining'),
+                transform: function(value) {
+                    var remaining = parseInt(value, 10) || 0;
+                    if( remaining) {
+                        return timeEncoder.encode(remaining);
+                    }
+                    return value;
                 }
             });
 

@@ -525,6 +525,7 @@ class DeliveryHelper
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
+                    'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,

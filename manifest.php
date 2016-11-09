@@ -32,7 +32,7 @@ return array(
         'taoDelivery' => '>=4.4.1',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
-        'taoQtiTest' => '>=5.10.1',
+        'taoQtiTest' => '>=5.35.0',
         'taoOutcomeUi' => '>=2.6.6',
         'generis' => '>=2.15.0',
         'taoClientDiagnostic' => '>=1.6.0',
