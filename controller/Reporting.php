@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\controller;
 
+use InvalidArgumentException;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
@@ -151,11 +152,15 @@ class Reporting extends ProctoringModule
                 \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
                 continue;
             }
+            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+            if (!$deliveryData['end']) {
+                continue;
+            }
             $result[] = [
                 'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
                 'testData' => $assessmentResultsService->getTestData($deliveryExecution),
                 'resultsData' => $assessmentResultsService->getResultsData($deliveryExecution),
-                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+                'deliveryData' => $deliveryData,
             ];
         }
 
@@ -187,11 +192,15 @@ class Reporting extends ProctoringModule
 
         foreach ($idList as $deliveryExecutionId) {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+            if (!$deliveryData['end']) {
+                continue;
+            }
             $result[] = [
                 'testData' => $assessmentResultsService->getTestData($deliveryExecution),
                 'rubricContent' => $assessmentResultsService->getPrintableRubric($deliveryExecution),
                 'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
-                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+                'deliveryData' => $deliveryData,
             ];
         }
 
@@ -207,5 +216,48 @@ class Reporting extends ProctoringModule
         $testCenter     = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
         $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
+    }
+
+    /**
+     * Checks that delivery is finished and can be generated report
+     */
+    public function hasReport()
+    {
+
+        if ($this->hasRequestParameter("id")) {
+            $id = $this->getRequestParameter('id');
+        } else {
+            throw new \common_exception_MissingParameter('id', __METHOD__);
+        }
+
+        $idList = $id;
+        if (!is_array($idList)) {
+            $idList = [$idList];
+        }
+
+        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+
+        $excepted = [];
+        foreach ($idList as $deliveryExecutionId) {
+            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+            if (!$deliveryData['end']) {
+                $deliveryData['date'] = \tao_helpers_Date::displayeDate($deliveryData['start']);
+                $excepted[] = $deliveryData;
+            }
+        }
+
+        if (count($idList) == 1 && count($excepted) == count($idList)) {
+            throw new InvalidArgumentException(__('Selected delivery doesn\'t have an available report') );
+        }
+
+        $this->returnJson([
+            'data' => [
+                'excepted' => $excepted,
+                'allExcepted' => count($excepted) == count($idList)
+            ],
+            'success' => true
+        ]);
     }
 }

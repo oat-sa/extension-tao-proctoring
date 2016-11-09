@@ -31,8 +31,10 @@ define([
     'ui/cascadingComboBox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
+    'taoProctoring/provider/reporting',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
+    'tpl!taoProctoring/templates/delivery/reportExceptedDeliveries',
     'ui/datatable',
     'select2'
 ], function (
@@ -48,8 +50,10 @@ define([
     cascadingComboBox,
     breadcrumbsFactory,
     _status,
+    reportingProvider,
     deliveryLinkTpl,
-    statusFilterTpl
+    statusFilterTpl,
+    reportExceptedDeliveriesTpl
 ) {
     'use strict';
 
@@ -184,14 +188,48 @@ define([
                 window.location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
             }
 
+            function openPrintWindow(type, selection) {
+                window.open(helpers._url(type,  'Reporting', 'taoProctoring', {'id' : selection}), 'printReport' + JSON.stringify(selection));
+            }
+
+            function printReporting(type, selection) {
+                reportingProvider
+                    .hasReport(selection)
+                    .then(function (data) {
+                        var dlg;
+
+                        if (data.excepted.length) {
+
+                            if (data.allExcepted === true) {
+                                feedback().warning(__('No report available for these test sessions'));
+                            } else {
+
+                                dlg = dialog({
+                                    content: reportExceptedDeliveriesTpl(data),
+                                    autoRender: true,
+                                    autoDestroy: true,
+                                    onOkBtn: function () {
+                                        openPrintWindow(type, selection);
+                                    }
+                                });
+                            }
+                        } else {
+                            openPrintWindow(type, selection);
+                        }
+                    })
+                    .catch(function () {
+                        feedback().warning(__('No report available for this test session'));
+                    });
+            }
+
             // print the score reports
             function printReport(selection) {
-                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : selection}), 'printReport' + JSON.stringify(selection));
+                printReporting('printReport', selection);
             }
 
             // print the results of the session
             function printResults(selection) {
-                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : selection}), 'printRubric' + JSON.stringify(selection));
+                printReporting('printRubric', selection);
             }
 
             /**
