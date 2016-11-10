@@ -507,6 +507,30 @@ class Updater extends common_ext_ExtensionUpdater {
         }
         $this->skip('3.6.6', '3.6.17');
 
+        if ($this->isVersion('3.6.13')) {
+
+            // create new column for test center and delivery
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+            $persistence = \common_persistence_Manager::getPersistence($persistenceId);
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+            try {
+                $tableLog = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
+                $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_ID, "string", array("notnull" => true, "length" => 255));
+                $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_TEST_CENTER_ID, "string", array("notnull" => true, "length" => 255));
+
+                $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+                foreach ($queries as $query) {
+                    $persistence->exec($query);
+                }
+            } catch(SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+
+            $this->setVersion('3.7.0');
+        }
+
     }
 
     private function refreshMonitoringData()
