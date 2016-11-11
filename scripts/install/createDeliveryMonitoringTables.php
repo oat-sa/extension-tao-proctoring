@@ -39,6 +39,8 @@ try {
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
     $tableLog->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
 
     $tableLog->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID));
 

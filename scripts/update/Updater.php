@@ -533,6 +533,8 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
                 $tableData->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
             } catch(SchemaException $e) {
                 \common_Logger::i('Database Schema already up to date.');
             }

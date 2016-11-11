@@ -532,4 +532,35 @@ class Delivery extends ProctoringModule
             $this->returnError('Proctoring interface not available');
         }
     }
+
+    /**
+     * Extra Time handling: add or remove time on delivery executions
+     * 
+     * @throws \common_Exception
+     */
+    public function extraTime()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $extraTime = floatval($this->getRequestParameter('time'));
+
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+
+        try {
+
+            $reported = DeliveryHelper::setExtraTime($deliveryExecution, $extraTime);
+            $notReported = array_diff($deliveryExecution, $reported);
+
+            $this->returnJson(array(
+                'success' => !count($notReported),
+                'processed' => $reported,
+                'unprocessed' => $notReported
+            ));
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
 }
