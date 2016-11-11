@@ -34,7 +34,7 @@ define([
     'taoProctoring/provider/reporting',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
-    'tpl!taoProctoring/templates/delivery/reportExceptedDeliveries',
+    'tpl!taoProctoring/templates/delivery/reportExcludedDeliveries',
     'ui/datatable',
     'select2'
 ], function (
@@ -53,7 +53,7 @@ define([
     reportingProvider,
     deliveryLinkTpl,
     statusFilterTpl,
-    reportExceptedDeliveriesTpl
+    reportExcludedDeliveriesTpl
 ) {
     'use strict';
 
@@ -198,14 +198,14 @@ define([
                     .then(function (data) {
                         var dlg;
 
-                        if (data.excepted.length) {
+                        if (data.excluded.length) {
 
                             if (data.allExcepted === true) {
                                 feedback().warning(__('No report available for these test sessions'));
                             } else {
 
                                 dlg = dialog({
-                                    content: reportExceptedDeliveriesTpl(data),
+                                    content: reportExcludedDeliveriesTpl(data),
                                     autoRender: true,
                                     autoDestroy: true,
                                     onOkBtn: function () {

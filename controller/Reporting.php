@@ -238,24 +238,24 @@ class Reporting extends ProctoringModule
         /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
         $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
 
-        $excepted = [];
+        $excludedDeliveries = [];
         foreach ($idList as $deliveryExecutionId) {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
             $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
             if (!$deliveryData['end']) {
                 $deliveryData['date'] = \tao_helpers_Date::displayeDate($deliveryData['start']);
-                $excepted[] = $deliveryData;
+                $excludedDeliveries[] = $deliveryData;
             }
         }
 
-        if (count($idList) == 1 && count($excepted) == count($idList)) {
+        if (count($idList) == 1 && count($excludedDeliveries) == count($idList)) {
             throw new InvalidArgumentException(__('Selected delivery doesn\'t have an available report') );
         }
 
         $this->returnJson([
             'data' => [
-                'excepted' => $excepted,
-                'allExcepted' => count($excepted) == count($idList)
+                'excluded' => $excludedDeliveries,
+                'allDeliveriesExcluded' => count($excludedDeliveries) == count($idList)
             ],
             'success' => true
         ]);
