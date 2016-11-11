@@ -93,6 +93,7 @@ define([
             var actions = [];
             var model = [];
             var actionButtons;
+            var actionList;
 
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
@@ -396,7 +397,7 @@ define([
                 id: 'authorise',
                 icon: 'play',
                 title: __('Authorize session'),
-                hidden: function() {
+                disabled: function() {
                     var status;
                     if(this.state && this.state.status){
                         status = _status.getStatusByCode(this.state.status);
@@ -412,7 +413,7 @@ define([
                 id: 'pause',
                 icon: 'pause',
                 title: __('Pause session'),
-                hidden: function() {
+                disabled: function() {
                     var status;
                     if(this.state && this.state.status){
                         status = _status.getStatusByCode(this.state.status);
@@ -560,6 +561,20 @@ define([
                 }
             });
 
+            model.push({
+                id: 'authorizeCl',
+                label: __('Authorize'),
+                type: 'actions',
+                actions: [{id: 'authorise'}]
+            });
+
+            model.push({
+                id: 'pauseCl',
+                label: __('Pause'),
+                type: 'actions',
+                actions: [{id: 'pause'}]
+            });
+
             // column: connectivity status of execution progress
             model.push({
                 id: 'connectivity',
@@ -581,6 +596,20 @@ define([
                     return row && row.state && row.state.progress || '' ;
                 }
             });
+
+            // column: proctoring actions
+            actionList = [{id: 'history'}, {id: 'printRubric'}];
+            if (printReportButton) {
+                actionList.push({id: 'printReport'});
+            }
+
+            model.push({
+                id: 'administrationCl',
+                label: __('Administration'),
+                type: 'actions',
+                actions: actionList
+            });
+
 
             // renders the datatable
             $list
@@ -620,6 +649,7 @@ define([
                 })
                 .datatable({
                     url: deliveryId ? serviceUrl : serviceAllUrl,
+                    showActions: false,
                     status: {
                         empty: __('No sessions'),
                         available: __('Current sessions'),
