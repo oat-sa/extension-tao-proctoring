@@ -200,7 +200,7 @@ define([
 
                         if (data.excluded.length) {
 
-                            if (data.allExcepted === true) {
+                            if (data.allDeliveriesExcluded === true) {
                                 feedback().warning(__('No report available for these test sessions'));
                             } else {
 
