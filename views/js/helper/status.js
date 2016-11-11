@@ -34,7 +34,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('not awaiting'),
                 pause : __('not in progress'),
                 terminate : true,
-                report : true
+                report : true,
+                time : true
             }
         },
         awaiting : {
@@ -44,7 +45,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : true,
                 pause : __('not in progress'),
                 terminate : true,
-                report : true
+                report : true,
+                time : true
             }
         },
         authorized : {
@@ -54,7 +56,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('already authorized'),
                 pause : __('not started'), //not in progress
                 terminate : true,
-                report : true
+                report : true,
+                time : true
             }
         },
         inprogress : {
@@ -64,7 +67,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('already authorized'),
                 pause : true,
                 terminate : true,
-                report : true
+                report : true,
+                time : true
             }
         },
         paused : {
@@ -74,7 +78,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is paused'),
                 pause : __('is already paused'),
                 terminate : true,
-                report : true
+                report : true,
+                time : true
             }
         },
         completed : {
@@ -84,7 +89,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is completed'),
                 pause : __('is completed'),
                 terminate : __('is completed'),
-                report : true
+                report : true,
+                time : __('is completed')
             }
         },
         terminated : {
@@ -94,7 +100,8 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('is terminated'),
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
-                report : true
+                report : true,
+                time : __('is terminated')
             }
         }
     };

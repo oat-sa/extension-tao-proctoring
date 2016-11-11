@@ -589,8 +589,8 @@ class DeliveryHelper
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
                     'timer' => [
                         'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
-                        'extraTime' => $cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME],
-                        'consumedExtraTime' => $cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME],
+                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME]),
+                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME]),
                     ],
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,

@@ -30,6 +30,7 @@ define([
     'ui/dialog',
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
+    'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
@@ -48,6 +49,7 @@ define([
     dialog,
     bulkActionPopup,
     cascadingComboBox,
+    extraTimePopup,
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
@@ -89,6 +91,7 @@ define([
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
@@ -98,16 +101,15 @@ define([
             var actionButtons;
 
             // request the server with a selection of test takers
-            function request(url, selection, reason, message) {
+            function request(url, selection, data, message) {
                 if (selection && selection.length) {
                     loadingBar.start();
 
                     $.ajax({
                         url: url,
-                        data: {
-                            execution: selection,
-                            reason: reason
-                        },
+                        data: _.merge({
+                            execution: selection
+                        }, data),
                         dataType : 'json',
                         type: 'POST',
                         error: function() {
@@ -150,28 +152,28 @@ define([
             // request the server to authorise the selected delivery executions
             function authorise(selection) {
                 execBulkAction('authorize', __('Authorize Session'), selection, function(sel, reason){
-                    request(authoriseUrl, sel, reason, __('Sessions authorized'));
+                    request(authoriseUrl, sel, {reason: reason}, __('Sessions authorized'));
                 });
             }
 
             // request the server to pause the selected delivery executions
             function pause(selection) {
                 execBulkAction('pause', __('Pause Session'), selection, function(sel, reason){
-                    request(pauseUrl, sel, reason, __('Sessions paused'));
+                    request(pauseUrl, sel, {reason: reason}, __('Sessions paused'));
                 });
             }
 
             // request the server to terminate the selected delivery executions
             function terminate(selection) {
                 execBulkAction('terminate', __('Terminate Session'), selection, function(sel, reason){
-                    request(terminateUrl, sel, reason, __('Sessions terminated'));
+                    request(terminateUrl, sel, {reason: reason}, __('Sessions terminated'));
                 });
             }
 
             // report irregularities on the selected delivery executions
             function report(selection) {
                 execBulkAction( 'report', __('Report Irregularity'), selection, function(sel, reason){
-                    request(reportUrl, sel, reason, __('Sessions reported'));
+                    request(reportUrl, sel, {reason: reason}, __('Sessions reported'));
                 });
             }
 
@@ -197,8 +199,32 @@ define([
                 window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : selection}), 'printRubric' + JSON.stringify(selection));
             }
 
+            // display the time handling popup
             function timeHandling(selection) {
-                console.log('timeHandling', selection);
+                var _selection = _.isArray(selection) ? selection : [selection];
+                var config = _.merge(listTestTakers('time', _selection), {
+                    renderTo : $content,
+                    actionName : __('Grant Extra Time')
+                });
+
+                extraTimePopup(config).on('ok', function(time){
+                    request(extraTimeUrl, _selection, {time: time}, __('Extra time granted'));
+                });
+            }
+
+            /**
+             * Check if an action is available with respect to the provided state
+             * @param {String} what
+             * @param {Object} state
+             * @returns {Boolean}
+             */
+            function canDo(what, state) {
+                var status;
+                if(state && state.status){
+                    status = _status.getStatusByCode(state.status);
+                    return status && status.can[what] === true;
+                }
+                return false;
             }
 
             /**
@@ -213,10 +239,20 @@ define([
                     label : testTakerData.firstname+' '+testTakerData.lastname
                 };
                 var status = _status.getStatusByCode(testTakerData.state.status);
+                var remaining;
                 if(status){
                     formatted.allowed = (status.can[actionName] === true);
                     if(!formatted.allowed){
                         formatted.reason = status.can[actionName];
+                    }
+                }
+                if (testTakerData.timer) {
+                    formatted.extraTime = testTakerData.timer.extraTime;
+                    formatted.consumedTime = testTakerData.timer.consumedExtraTime;
+                    formatted.remaining = testTakerData.timer.remaining;
+                    remaining = parseInt(formatted.remaining, 10) || 0;
+                    if (remaining) {
+                        formatted.remaining = timeEncoder.encode(remaining);
                     }
                 }
                 return formatted;
@@ -233,6 +269,36 @@ define([
             }
 
             /**
+             * Gets the list of allowed and forbidden test takers from the provided selection
+             * @param {String} actionName
+             * @param {Array} selection
+             * @returns {Object} Returns the config object that contains the lists of allowed and forbidden test takers
+             */
+            function listTestTakers(actionName, selection) {
+                var allowedTestTakers = [];
+                var forbiddenTestTakers = [];
+
+                _.each(selection, function (uri) {
+                    var testTaker = getExecutionData(uri);
+                    var checkedTestTaker;
+                    if (testTaker) {
+                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
+                        if (checkedTestTaker.allowed) {
+                            allowedTestTakers.push(checkedTestTaker);
+                        } else {
+                            forbiddenTestTakers.push(checkedTestTaker);
+                        }
+                    }
+                });
+
+                return {
+                    resourceType: 'test taker',
+                    allowedResources: allowedTestTakers,
+                    deniedResources: forbiddenTestTakers
+                };
+            }
+
+            /**
              * Exec
              * @param {String} actionName
              * @param {String} actionTitle
@@ -241,35 +307,17 @@ define([
              * @returns {undefined}
              */
             function execBulkAction(actionName, actionTitle, selection, cb){
-
-                var allowedTestTakers = [];
-                var forbiddenTestTakers = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 var config;
 
-                _.each(_selection, function(uri){
-                    var testTaker = getExecutionData(uri);
-                    var checkedTestTaker;
-                    if(testTaker){
-                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
-                        if(checkedTestTaker.allowed){
-                            allowedTestTakers.push(checkedTestTaker);
-                        }else{
-                            forbiddenTestTakers.push(checkedTestTaker);
-                        }
-                    }
-                });
-                config = {
+                config = _.merge(listTestTakers(actionName, _selection), {
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
                     reasonRequired: true,
-                    resourceType : 'test taker',
-                    categoriesSelector: cascadingComboBox(categories[actionName]),
-                    allowedResources : allowedTestTakers,
-                    deniedResources : forbiddenTestTakers
-                };
+                    categoriesSelector: cascadingComboBox(categories[actionName] || {})
+                });
 
                 bulkActionPopup(config).on('ok', function(reason){
                     //execute callback
@@ -416,12 +464,7 @@ define([
                 icon: 'play',
                 title: __('Authorize session'),
                 hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.authorize !== true;
-                    }
-                    return true;
+                    return !canDo('authorize', this.state);
                 },
                 action: authorise
             });
@@ -432,12 +475,7 @@ define([
                 icon: 'pause',
                 title: __('Pause session'),
                 hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.pause !== true;
-                    }
-                    return true;
+                    return !canDo('pause', this.state);
                 },
                 action: pause
             });
@@ -448,12 +486,7 @@ define([
                 icon: 'stop',
                 title: __('Terminate session'),
                 hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.terminate !== true;
-                    }
-                    return true;
+                    return !canDo('terminate', this.state);
                 },
                 action: terminate
             });
@@ -498,7 +531,10 @@ define([
                     id : 'timeHandling',
                     title : __('Session time handling'),
                     icon : 'time',
-                    action : timeHandling
+                    action : timeHandling,
+                    hidden: function() {
+                        return !canDo('time', this.state);
+                    }
                 });
             }
 
@@ -594,12 +630,16 @@ define([
                 id: 'remaining',
                 sortable : true,
                 label: __('Remaining'),
-                transform: function(value) {
-                    var remaining = parseInt(value, 10) || 0;
+                transform: function(value, row) {
+                    var timer = _.isObject(row.timer) ? row.timer : {};
+                    var refinedValue = timer.remaining;
+                    var remaining = parseInt(refinedValue, 10) || 0;
+
                     if( remaining) {
-                        return timeEncoder.encode(remaining);
+                        refinedValue = timeEncoder.encode(remaining);
                     }
-                    return value;
+
+                    return refinedValue;
                 }
             });
 
