@@ -506,9 +506,9 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('3.6.6');
         }
-        $this->skip('3.6.6', '3.6.17');
+        $this->skip('3.6.6', '3.6.18');
 
-        if ($this->isVersion('3.6.17')) {
+        if ($this->isVersion('3.6.18')) {
             try {
                 $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {

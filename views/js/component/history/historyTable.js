@@ -124,10 +124,6 @@ define([
                             label: __('Date'),
                             sortable: true
                         }, {
-                            id: 'session',
-                            label: __('Test'),
-                            sortable: true
-                        }, {
                             id: 'role',
                             label: __('Role'),
                             sortable: true

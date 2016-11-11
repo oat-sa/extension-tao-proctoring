@@ -130,7 +130,6 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                     continue;
                 }
                 $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
-                $exportable['session'] = $deliveryExecution->getIdentifier();
                 $exportable['role'] = $role;
                 $exportable['actor'] = _dh($author->getLabel());
                 $exportable['event'] = $eventId;
