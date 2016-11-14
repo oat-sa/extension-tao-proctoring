@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+	xml:base="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#"
+	xmlns:ns11="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#"
+	xmlns:generis="http://www.tao.lu/Ontologies/generis.rdf#" 
+	xmlns:ns3="http://www.tao.lu/datatypes/WidgetDefinitions.rdf#"
+	xmlns:tao="http://www.tao.lu/Ontologies/TAO.rdf#">
+
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter">
+    <rdfs:label xml:lang="en-US"><![CDATA[Test Center]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Test Center]]></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#TAOObject"/>
+  </rdf:Description>
+
+  <!-- A test taker is a member of a test center (part of)-->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#member">
+  	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Test Center]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Member of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOSubject.rdf#Subject"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+
+  <!-- A user can be part of a test center-->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor">
+  	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Proctor]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Proctor of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#User"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  
+  <!-- A user can be a manager of a test center -->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administrator">
+  	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Administrator]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[the administrator of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#User"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  
+  <!-- A user can administer a test center-->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor">
+  	<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Authorized Proctor]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Authorized Proctor of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#User"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+
+  <!-- A user can be assigned to a test center-->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#assignedProctor">
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Assigned Proctor]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Assigned Proctor of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAO.rdf#User"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+
+  <!-- A test center contains different groups -->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers">
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Content]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[test center administers delivery]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  
+  <!-- A test center may contain children test center -->
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#children">
+    <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#member"/>
+    <rdfs:label xml:lang="en-US"><![CDATA[Children Test Center]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[children test center of the test center]]></rdfs:comment>
+    <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+    <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#True" />
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters">
+      <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+      <rdfs:label xml:lang="en-US"><![CDATA[Test Centers]]></rdfs:label>
+      <rdfs:comment xml:lang="en-US"><![CDATA[Test Centers of the group]]></rdfs:comment>
+      <rdfs:domain rdf:resource="http://www.tao.lu/Ontologies/TAOGroup.rdf#Group"/>
+      <rdfs:range rdf:resource="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"/>
+      <generis:Multiple rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#False" />
+      <tao:TAOGUIOrder><![CDATA[20]]></tao:TAOGUIOrder>
+    </rdf:Description>
+</rdf:RDF>

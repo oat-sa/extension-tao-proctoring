@@ -1,0 +1,31 @@
+{
+  "data": "Foo",
+  "type": "class",
+  "attributes": {
+    "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708480",
+    "class": "node-class",
+    "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480",
+    "data-classUri": null
+  },
+  "state": "open",
+  "children": [{
+    "data": "Bar",
+    "type": "instance",
+    "attributes": {
+      "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708484",
+      "class": "node-instance",
+      "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708484",
+      "data-classUri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480"
+    }
+  }, {
+    "data": "Baz",
+    "type": "instance",
+    "attributes": {
+      "id": "http_2_bertaoact_1_tao_0_rdf_3_i1467382933708485",
+      "class": "node-instance",
+      "data-uri": "http:\/\/bertaoact\/tao.rdf#i1467382933708485",
+      "data-classUri": "http:\/\/bertaoact\/tao.rdf#i1467382933708480"
+    }
+  }],
+  "count": 2
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<rdf:RDF 
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+	xml:base="http://www.tao.lu/Ontologies/TAODelivery.rdf#"
+>
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit">
+    <rdfs:label xml:lang="en-US"><![CDATA[Initial]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Initial status of a delivery execution]]></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting">
+    <rdfs:label xml:lang="en-US"><![CDATA[Awaiting]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Awaiting of authorization status of a delivery execution]]></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized">
+    <rdfs:label xml:lang="en-US"><![CDATA[Authorized]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Authorized status of a delivery execution]]></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
+  </rdf:Description>
+
+  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated">
+    <rdfs:label xml:lang="en-US"><![CDATA[Terminated]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Terminated status of a delivery execution]]></rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
+  </rdf:Description>
+</rdf:RDF>

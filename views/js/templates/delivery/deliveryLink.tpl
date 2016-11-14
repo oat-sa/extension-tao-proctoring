@@ -1,0 +1,1 @@
+<a class="elipsis" href="{{url}}" title="{{{label}}}">{{{label}}}</a>

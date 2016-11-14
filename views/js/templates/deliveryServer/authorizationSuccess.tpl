@@ -1,0 +1,1 @@
+<span class="success-message">{{message}}<span class="icon-result-ok"></span></span>
