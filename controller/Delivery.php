@@ -24,6 +24,8 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 
 /**
  * Proctoring Delivery controllers
@@ -74,7 +76,10 @@ class Delivery extends ProctoringModule
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
         /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+        $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
+        
+        /** @var $deliveryExecutionStateService \oat\taoProctoring\model\implementation\DeliveryExecutionStateService */
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $this->composeView(
             'delivery-monitoring',
@@ -84,8 +89,8 @@ class Delivery extends ProctoringModule
                 'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions),
                 'extrafields' => DeliveryHelper::getExtraFields(),
                 'categories' => $this->getAllReasonsCategories(),
-                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
-                'timeHandling' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_TIME_HANDLING)),
+                'printReportButton' => json_encode($assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+                'timeHandling' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING)),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
@@ -112,7 +117,10 @@ class Delivery extends ProctoringModule
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
 
         /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+        $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
+
+        /** @var $deliveryExecutionStateService \oat\taoProctoring\model\implementation\DeliveryExecutionStateService */
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $this->composeView(
             'delivery-monitoring',
@@ -121,8 +129,8 @@ class Delivery extends ProctoringModule
                 'set' => DeliveryHelper::getAllCurrentDeliveriesExecutions($testCenter, $requestOptions),
                 'extrafields' => DeliveryHelper::getExtraFields(),
                 'categories' => $this->getAllReasonsCategories(),
-                'printReportButton' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
-                'timeHandling' => json_encode($assessmentResultsService->getOption($assessmentResultsService::OPTION_TIME_HANDLING)),
+                'printReportButton' => json_encode($assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+                'timeHandling' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING)),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),

@@ -269,7 +269,7 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $deliveryExecutionStateService->setOption('termination_delay_after_pause', 'PT1H');
+            $deliveryExecutionStateService->setOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE, 'PT1H');
             $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
 
             $this->setVersion('1.8.0');
@@ -508,21 +508,20 @@ class Updater extends common_ext_ExtensionUpdater {
         $this->skip('3.6.6', '3.6.16');
 
         if ($this->isVersion('3.6.16')) {
-            // register tomeHandling option
+            // register timeHandling option
             try {
-                $service = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
+                $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new AssessmentResultsService([
-                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
-                    AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
-                    AssessmentResultsService::OPTION_TIME_HANDLING => false,
+                $service = new DeliveryExecutionStateService([
+                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
+                    DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
                 ]);
             }
             
-            $service->setOption(AssessmentResultsService::OPTION_TIME_HANDLING, false);
+            $service->setOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING, false);
 
             $service->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
 
             // extend the data table
             $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
