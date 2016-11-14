@@ -86,6 +86,7 @@ class ProctorManagementService extends tao_models_classes_ClassService
             $proctor = new core_kernel_classes_Resource($proctorUri);
             foreach($testCenters as $testCenter){
                 $return &= $proctor->removePropertyValue(new core_kernel_classes_Property(self::PROPERTY_AUTHORIZED_PROCTOR_URI), $testCenter);
+
             }
         }
 

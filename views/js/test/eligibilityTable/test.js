@@ -104,11 +104,7 @@ define([
         eligibilityTable
             .on('loaded', function () {
                 var $add;
-<<<<<<< HEAD
-                var $component = $('.component', $fixtureContainer);
-=======
                 var $component = $('.component:eq(0)', $fixtureContainer);
->>>>>>> f827d8d4fa1d2ab8b4af982dae6e047849e94f06
 
                 assert.equal($component.length, 1, 'The component has been appended to the container');
                 assert.equal($('.action-bar', $component).length, 1, 'The action bar exists');
@@ -137,11 +133,7 @@ define([
         eligibilityTable
             .on('loaded', function () {
                 var $rm;
-<<<<<<< HEAD
-                var $component = $('.component', $fixtureContainer);
-=======
                 var $component = $('.component:eq(0)', $fixtureContainer);
->>>>>>> f827d8d4fa1d2ab8b4af982dae6e047849e94f06
 
                 assert.equal($component.length, 1, 'The component has been appended to the container');
 
@@ -151,11 +143,7 @@ define([
                 $rm.first().trigger('click');
             })
             .on('remove', function(id, data){
-<<<<<<< HEAD
-                 var $component = $('.component', $fixtureContainer);
-=======
                  var $component = $('.component:eq(0)', $fixtureContainer);
->>>>>>> f827d8d4fa1d2ab8b4af982dae6e047849e94f06
                  assert.equal(typeof id, 'string', 'The id is given');
                  assert.equal(id, $('.datatable-container tbody tr', $component).first().data('item-identifier'), 'The given identifier matches the row');
                  assert.equal(data.length, 2, 'The table data contains 2 entries');
