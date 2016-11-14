@@ -33,7 +33,6 @@ define([
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
-    'tpl!taoProctoring/templates/delivery/highlightedStatus',
     'ui/datatable',
     'select2'
 ], function (
@@ -50,8 +49,7 @@ define([
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
-    statusFilterTpl,
-    highlightedStatusTpl
+    statusFilterTpl
 ) {
     'use strict';
 
@@ -95,6 +93,7 @@ define([
             var actions = [];
             var model = [];
             var actionButtons;
+            var highlightRows = [];
 
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
@@ -557,8 +556,7 @@ define([
                                 result = status.label;
                             }
                             if (result === 'Awaiting') {
-                                // highlight row
-                                result = highlightedStatusTpl({status: result});
+                                highlightRows.push(row.id);
                             }
                         }
                     }
@@ -605,7 +603,11 @@ define([
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
 
-                    $('.highlighted-status', $list).parents('tr').addClass('highlight-row');
+                    if (highlightRows.length) {
+                        _.forEach(highlightRows, function (v) {
+                            $list.datatable('highlightRow', v);
+                        });
+                    }
 
                     loadingBar.stop();
                 })
@@ -642,8 +644,6 @@ define([
                     sortorder: 'desc',
                     sortby : 'date'
                 }, dataset);
-
-
         }
     };
 });
