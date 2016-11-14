@@ -20,7 +20,6 @@
 
 namespace oat\taoProctoring\controller;
 
-use InvalidArgumentException;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
@@ -216,48 +215,5 @@ class Reporting extends ProctoringModule
         $testCenter     = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
         $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
-    }
-
-    /**
-     * Checks that delivery is finished and can be generated report
-     */
-    public function hasReport()
-    {
-
-        if ($this->hasRequestParameter("id")) {
-            $id = $this->getRequestParameter('id');
-        } else {
-            throw new \common_exception_MissingParameter('id', __METHOD__);
-        }
-
-        $idList = $id;
-        if (!is_array($idList)) {
-            $idList = [$idList];
-        }
-
-        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
-
-        $excludedDeliveries = [];
-        foreach ($idList as $deliveryExecutionId) {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
-            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
-            if (!$deliveryData['end']) {
-                $deliveryData['date'] = \tao_helpers_Date::displayeDate($deliveryData['start']);
-                $excludedDeliveries[] = $deliveryData;
-            }
-        }
-
-        if (count($idList) == 1 && count($excludedDeliveries) == count($idList)) {
-            throw new InvalidArgumentException(__('Selected delivery doesn\'t have an available report') );
-        }
-
-        $this->returnJson([
-            'data' => [
-                'excluded' => $excludedDeliveries,
-                'allDeliveriesExcluded' => count($excludedDeliveries) == count($idList)
-            ],
-            'success' => true
-        ]);
     }
 }

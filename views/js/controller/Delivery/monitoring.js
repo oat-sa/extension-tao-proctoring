@@ -31,10 +31,8 @@ define([
     'ui/cascadingComboBox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
-    'taoProctoring/provider/reporting',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
-    'tpl!taoProctoring/templates/delivery/reportExcludedDeliveries',
     'ui/datatable',
     'select2'
 ], function (
@@ -50,10 +48,8 @@ define([
     cascadingComboBox,
     breadcrumbsFactory,
     _status,
-    reportingProvider,
     deliveryLinkTpl,
-    statusFilterTpl,
-    reportExcludedDeliveriesTpl
+    statusFilterTpl
 ) {
     'use strict';
 
@@ -176,6 +172,12 @@ define([
                 });
             }
 
+            function print(selection, type) {
+                execBulkAction('print', __('Print Score'), selection, function(sel){
+                    window.open(helpers._url(type,  'Reporting', 'taoProctoring', {'id' : sel}), 'printReport' + JSON.stringify(sel));
+                });
+            }
+
             // display the session history
             function showHistory(selection) {
                 var urlParams = {
@@ -188,48 +190,14 @@ define([
                 window.location.href = helpers._url('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
             }
 
-            function openPrintWindow(type, selection) {
-                window.open(helpers._url(type,  'Reporting', 'taoProctoring', {'id' : selection}), 'printReport' + JSON.stringify(selection));
-            }
-
-            function printReporting(type, selection) {
-                reportingProvider
-                    .hasReport(selection)
-                    .then(function (data) {
-                        var dlg;
-
-                        if (data.excluded.length) {
-
-                            if (data.allDeliveriesExcluded === true) {
-                                feedback().warning(__('No report available for these test sessions'));
-                            } else {
-
-                                dlg = dialog({
-                                    content: reportExcludedDeliveriesTpl(data),
-                                    autoRender: true,
-                                    autoDestroy: true,
-                                    onOkBtn: function () {
-                                        openPrintWindow(type, selection);
-                                    }
-                                });
-                            }
-                        } else {
-                            openPrintWindow(type, selection);
-                        }
-                    })
-                    .catch(function () {
-                        feedback().warning(__('No report available for this test session'));
-                    });
-            }
-
             // print the score reports
             function printReport(selection) {
-                printReporting('printReport', selection);
+                print(selection, 'printReport');
             }
 
             // print the results of the session
             function printResults(selection) {
-                printReporting('printRubric', selection);
+                print(selection, 'printRubric');
             }
 
             /**
@@ -238,10 +206,11 @@ define([
              * @param {String} actionName
              * @returns {Object}
              */
-            function verifyTestTaker(testTakerData, actionName){
+            function verifyDelivery(testTakerData, actionName){
+                var deliveryName = $(testTakerData.delivery).text();
                 var formatted = {
                     id : testTakerData.id,
-                    label : testTakerData.firstname+' '+testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.date + ']'
                 };
                 var status = _status.getStatusByCode(testTakerData.state.status);
                 if(status){
@@ -273,33 +242,34 @@ define([
              */
             function execBulkAction(actionName, actionTitle, selection, cb){
 
-                var allowedTestTakers = [];
-                var forbiddenTestTakers = [];
+                var allowedDeliveries = [];
+                var forbiddenDeliveries = [];
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 var config;
 
                 _.each(_selection, function(uri){
-                    var testTaker = getExecutionData(uri);
-                    var checkedTestTaker;
-                    if(testTaker){
-                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
-                        if(checkedTestTaker.allowed){
-                            allowedTestTakers.push(checkedTestTaker);
+                    var testTakerData = getExecutionData(uri);
+                    var checkedDelivery;
+                    if(testTakerData){
+                        checkedDelivery = verifyDelivery(testTakerData, actionName);
+                        if(checkedDelivery.allowed){
+                            allowedDeliveries.push(checkedDelivery);
                         }else{
-                            forbiddenTestTakers.push(checkedTestTaker);
+                            forbiddenDeliveries.push(checkedDelivery);
                         }
                     }
                 });
+
                 config = {
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
                     reasonRequired: true,
-                    resourceType : 'test taker',
+                    resourceType : 'session',
                     categoriesSelector: cascadingComboBox(categories[actionName]),
-                    allowedResources : allowedTestTakers,
-                    deniedResources : forbiddenTestTakers
+                    allowedResources : allowedDeliveries,
+                    deniedResources : forbiddenDeliveries
                 };
 
                 bulkActionPopup(config).on('ok', function(reason){
