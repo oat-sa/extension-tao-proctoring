@@ -8,8 +8,8 @@
             {{#each allowedResources}}
             <li data-resource="{{id}}">
                 <span class="resource-label">{{label}}</span>
-                {{#if remaining}}<span class="remaining">{{remaining}}</span>{{/if}}
-                {{#if extraTime}}<span class="time">({{consumedTime}}/{{extraTime}} {{__ "minutes more"}})</span>{{/if}}
+                {{#if remainingStr}}<span class="remaining">{{remainingStr}}</span>{{/if}}
+                {{#if extraTimeStr}}<span class="time">({{extraTimeStr}})</span>{{/if}}
             </li>
             {{/each}}
         </ul>

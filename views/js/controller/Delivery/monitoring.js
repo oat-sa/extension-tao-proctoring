@@ -31,6 +31,7 @@ define([
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
     'taoProctoring/component/extraTime/extraTime',
+    'taoProctoring/component/extraTime/encoder',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
@@ -50,6 +51,7 @@ define([
     bulkActionPopup,
     cascadingComboBox,
     extraTimePopup,
+    encodeExtraTime,
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
@@ -62,6 +64,12 @@ define([
      * @type {String}
      */
     var cssScope = '.delivery-monitoring';
+
+    /**
+     * The extra time unit: by default in minutes
+     * @type {Number}
+     */
+    var extraTimeUnit = 60;
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -204,7 +212,8 @@ define([
                 var _selection = _.isArray(selection) ? selection : [selection];
                 var config = _.merge(listTestTakers('time', _selection), {
                     renderTo : $content,
-                    actionName : __('Grant Extra Time')
+                    actionName : __('Grant Extra Time'),
+                    unit: extraTimeUnit // input extra time in minutes
                 });
 
                 extraTimePopup(config).on('ok', function(time){
@@ -239,7 +248,6 @@ define([
                     label : testTakerData.firstname+' '+testTakerData.lastname
                 };
                 var status = _status.getStatusByCode(testTakerData.state.status);
-                var remaining;
                 if(status){
                     formatted.allowed = (status.can[actionName] === true);
                     if(!formatted.allowed){
@@ -250,10 +258,6 @@ define([
                     formatted.extraTime = testTakerData.timer.extraTime;
                     formatted.consumedTime = testTakerData.timer.consumedExtraTime;
                     formatted.remaining = testTakerData.timer.remaining;
-                    remaining = parseInt(formatted.remaining, 10) || 0;
-                    if (remaining) {
-                        formatted.remaining = timeEncoder.encode(remaining);
-                    }
                 }
                 return formatted;
             }
@@ -635,8 +639,13 @@ define([
                     var refinedValue = timer.remaining;
                     var remaining = parseInt(refinedValue, 10) || 0;
 
-                    if( remaining) {
-                        refinedValue = timeEncoder.encode(remaining);
+                    if (remaining || _.isFinite(refinedValue) ) {
+                        if (remaining) {
+                            refinedValue = timeEncoder.encode(remaining);
+                        } else {
+                            refinedValue = '';
+                        }
+                        refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s mn'), extraTimeUnit);
                     }
 
                     return refinedValue;

@@ -19,12 +19,16 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
+    'jquery',
     'lodash',
+    'i18n',
+    'core/encoder/time',
     'ui/component',
     'ui/hider',
+    'taoProctoring/component/extraTime/encoder',
     'tpl!taoProctoring/component/extraTime/extraTime',
     'ui/modal'
-], function (_, component, hider, extraTimeTpl) {
+], function ($, _, __, timeEncoder, component, hider, encodeExtraTime, extraTimeTpl) {
     'use strict';
 
     /**
@@ -33,6 +37,7 @@ define([
      * @private
      */
     var _defaults = {
+        unit: 60,           // default time unit is minutes
         deniedResources: []
     };
 
@@ -43,11 +48,25 @@ define([
      * @param {String} config.actionName - the action name (use in the title text)
      * @param {Array} config.allowedResources - list of allowed resources to be displayed
      * @param {Array} [config.deniedResources] - list of denied resources to be displayed
+     * @param {Number} [config.unit] - the time is stored in seconds, but can be handled in other time units, by default this is minutes (60)
      * @fires cancel when the component is closed without validation
      * @fires ok when the ok button is clicked
      */
     function extraTimeFactory(config) {
         var initConfig = _.defaults(config || {}, _defaults);
+        var timeUnit = initConfig.unit || _defaults.unit;
+
+        _.forEach(initConfig.allowedResources, function(resource) {
+            var remaining = parseFloat(resource.remaining) || 0;
+            var extraTime = parseFloat(resource.extraTime);
+            var consumedTime = parseFloat(resource.consumedTime);
+
+            if (remaining) {
+                resource.remainingStr = timeEncoder.encode(remaining);
+            }
+
+            resource.extraTimeStr = encodeExtraTime(extraTime, consumedTime, __('%s minutes more'), timeUnit);
+        });
 
         return component()
             .setTemplate(extraTimeTpl)
@@ -93,7 +112,7 @@ define([
                          * @event ok
                          * @param {Number} time
                          */
-                        self.trigger('ok', parseFloat($time.val()));
+                        self.trigger('ok', parseFloat($time.val()) * timeUnit);
                         $cmp.modal('close');
                     }
                 }
@@ -120,7 +139,7 @@ define([
                 // we need to find the common extra time for all selected test takers
                 $time.val(_.reduce(initConfig.allowedResources, function(time, testTaker) {
                     return Math.max(time, testTaker && testTaker.extraTime || 0);
-                }, 0));
+                }, 0) / timeUnit);
 
                 $cmp
                     .addClass('modal')
