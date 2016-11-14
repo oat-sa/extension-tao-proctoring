@@ -21,7 +21,6 @@ namespace oat\taoProctoring\controller;
 
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\helpers\DataTableHelper;
-use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 use \tao_helpers_Uri;
 use \tao_helpers_Request;
 use common_session_SessionManager as SessionManager;
@@ -29,6 +28,7 @@ use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\controller\form\AddProctor;
 use oat\taoProctoring\model\ProctorManagementService;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 
 /**
  * Proctor manager controller
@@ -64,7 +64,7 @@ class ProctorManager extends ProctoringModule
     {
         $testCenters = TestCenterHelper::getTestCenters();
         $data = array(
-            'list' => $testCenters,
+            'list' => $testCenters
         );
 
         if (tao_helpers_Request::isAjax()) {

@@ -8,7 +8,7 @@
     </button>
 {{else}}
     <button class="btn-info small edit" title="{{__ 'Remove proctor authorization'}}" data-action="unshield">
-        <span class="icon-unshield"></span> <?= get_data('unproctor-action'); ?>{{__ 'Un-Proctor'}}
+        <span class="icon-unshield"></span> {{__ 'Un-Proctor'}}
     </button>
 {{/if}}
 

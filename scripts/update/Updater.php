@@ -146,7 +146,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
             OntologyUpdater::syncModels();
             //grant access to test site admin role
-            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole');
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole');
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
 
@@ -506,7 +506,8 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('3.6.6');
         }
-        $this->skip('3.6.6', '3.6.16');
+        
+        $this->skip('3.6.6', '3.6.18');
 
         if ($this->isVersion('3.6.16')) {
 
