@@ -56,7 +56,8 @@ class ProctoringTextConverter extends TextConverterService
             'Revoke the proctor' => __('Revoke the proctor'),
             'Proctors authorized' => __('Proctors authorized'),
             'Proctors revoked' => __('Proctors revoked'),
-            'Proctor created' => __('Proctor created')
+            'Proctor created' => __('Proctor created'),
+            'No proctors in request param' => __('No proctors in request param')
         );
     }
 
