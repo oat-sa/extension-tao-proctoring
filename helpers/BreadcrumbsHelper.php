@@ -22,12 +22,20 @@
 namespace oat\taoProctoring\helpers;
 
 use \core_kernel_classes_Resource;
+use oat\oatbox\service\ServiceManager;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 
 /**
  * Allow creating breakcrumbs easily
  */
 class BreadcrumbsHelper
 {
+    /**
+     * Tool to change text denomination
+     *
+     * @var ProctoringTextConverter
+     */
+    static protected $textConverterService;
 
     /**
      * Create breadcrumb for TestCenter::index
@@ -259,7 +267,21 @@ class BreadcrumbsHelper
         return array(
             'id' => 'proctorManager',
             'url' => _url('index', 'ProctorManager'),
-            'label' => __('Manage Proctors')
+            'label' => self::convert('Manage Proctors')
         );
+    }
+
+    /**
+     * Convert a text $key by TextConverterService content
+     *
+     * @param $key
+     * @return mixed
+     */
+    static protected function convert($key)
+    {
+        if (! self::$textConverterService) {
+            self::$textConverterService = ServiceManager::getServiceManager()->get(ProctoringTextConverter::SERVICE_ID);
+        }
+        return self::$textConverterService->get($key);
     }
 }
