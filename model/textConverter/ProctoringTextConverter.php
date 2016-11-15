@@ -25,34 +25,4 @@ use oat\tao\model\textConverter\NullTextConverter;
 class ProctoringTextConverter extends NullTextConverter
 {
     const SERVICE_ID = 'taoProctoring/textConverter';
-
-    public function getTextRegistry()
-    {
-        return [
-            'Assign administrator' => __('Proctors'),
-            'Assign proctors' => __('Instructors'),
-            'Please select one or more test site to manage proctors' => __('Please select one or more test site to manage instructors'),
-            'Create Proctor' => __('Create Instructor'),
-            'Create and authorize a proctor to the selected test sites' => __('Create and authorize an instructor to the selected test sites'),
-            'Manage Proctors' => __('Manage Instructors'),
-            'Define sub-centers' => __('Define class rooms'),
-            'The proctors will be authorized. Continue ?' => __('The instructors will be authorized. Continue ?'),
-            'The proctors will be revoked. Continue ?' => __('The instructors will be revoked. Continue ?'),
-            'The proctor will be authorized. Continue ?' => __('The instructor will be authorized. Continue ?'),
-            'The proctor will be revoked. Continue ?' => __('The instructor will be revoked. Continue ?'),
-            'Authorized proctors' => __('Authorized instructors'),
-            'Partially authorized proctors' => __('Partially authorized instructors'),
-            'No assigned proctors' => __('No assigned instructors'),
-            'Assigned proctors' => __('Assigned instructors'),
-            'Creates and authorizes proctor' => __('Creates and authorizes instructor'),
-            'Authorize the selected proctors' => __('Authorize the selected instructors'),
-            'Authorize the proctor' => __('Authorize the instructor'),
-            'Revoke authorization for the selected proctors' => __('Revoke authorization for the selected instructors'),
-            'Revoke the proctor' => __('Revoke the instructor'),
-            'Proctors authorized' => __('Instructors authorized'),
-            'Proctors revoked' => __('Instructors revoked'),
-            'Proctor created' => __('Instructor created')
-        ];
-    }
-
 }

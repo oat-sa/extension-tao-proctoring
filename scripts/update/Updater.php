@@ -509,16 +509,15 @@ class Updater extends common_ext_ExtensionUpdater {
         
         $this->skip('3.6.6', '3.6.18');
 
-        if ($this->isVersion('3.6.16')) {
+        if ($this->isVersion('3.6.18')) {
 
-            $this->getServiceManager()->register(ProctoringTextConverter::SERVICE_ID, new ProctoringTextConverter([]));
+            $this->getServiceManager()->register(ProctoringTextConverter::SERVICE_ID, new ProctoringTextConverter());
 
             $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'TextConverter');
 
-
-//            $this->setVersion('3.7.0');
+            $this->setVersion('3.7.0');
         }
 
     }
