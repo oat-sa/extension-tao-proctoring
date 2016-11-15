@@ -175,7 +175,7 @@ define([
 
             function terminateAndIrregularity(selection) {
                 var dlg = dialog({
-                    message: __('Select an option'),
+                    message: __('Please, make your selection'),
                     autoRender: true,
                     autoDestroy: true,
                     buttons: [{
