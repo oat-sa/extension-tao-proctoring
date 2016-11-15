@@ -57,7 +57,10 @@ class ProctoringTextConverter extends TextConverterService
             'Proctors authorized' => __('Proctors authorized'),
             'Proctors revoked' => __('Proctors revoked'),
             'Proctor created' => __('Proctor created'),
-            'No proctors in request param' => __('No proctors in request param')
+            'No proctors in request param' => __('No proctors in request param'),
+            'Test site %s' =>__('Test site %s'),
+            'Test center saved' => __('Test center saved'),
+            'Edit test center' => __('Edit test center')
         );
     }
 
