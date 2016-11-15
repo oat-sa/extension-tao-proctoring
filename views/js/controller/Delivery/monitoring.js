@@ -93,6 +93,7 @@ define([
             var actions = [];
             var model = [];
             var actionButtons;
+            var highlightRows = [];
 
             // request the server with a selection of test takers
             function request(url, selection, reason, message) {
@@ -566,6 +567,9 @@ define([
                             if (row.state.status === 'INPROGRESS') {
                                 result = status.label;
                             }
+                            if (result === 'Awaiting') {
+                                highlightRows.push(row.id);
+                            }
                         }
                     }
                     return result;
@@ -611,6 +615,12 @@ define([
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
 
+                    if (highlightRows.length) {
+                        _.forEach(highlightRows, function (v) {
+                            $list.datatable('highlightRow', v);
+                        });
+                    }
+
                     loadingBar.stop();
                 })
                 .on('select.datatable', function() {
@@ -646,8 +656,6 @@ define([
                     sortorder: 'desc',
                     sortby : 'date'
                 }, dataset);
-
-
         }
     };
 });
