@@ -20,9 +20,45 @@
 
 namespace oat\taoProctoring\model\textConverter;
 
-use oat\tao\model\textConverter\NullTextConverter;
+use oat\tao\model\textConverter\TextConverterService;
 
-class ProctoringTextConverter extends NullTextConverter
+class ProctoringTextConverter extends TextConverterService
 {
     const SERVICE_ID = 'taoProctoring/textConverter';
+
+    /**
+     * Return the translation of key
+     *
+     * @return array
+     */
+    public function getTextRegistry()
+    {
+        return array(
+            'Assign administrator' => __('Assign administrator'),
+            'Assign proctors' => __('Assign proctors'),
+            'Please select one or more test site to manage proctors' => __('Please select one or more test site to manage proctors'),
+            'Create Proctor' => __('Create Proctor'),
+            'Create and authorize a proctor to the selected test sites' => __('Create and authorize a proctor to the selected test sites'),
+            'Manage Proctors' => __('Manage Proctors'),
+            'Define sub-centers' => __('Define sub-centers'),
+            'The proctors will be authorized. Continue ?' => __('The proctors will be authorized. Continue ?'),
+            'The proctors will be revoked. Continue ?' => __('The proctors will be revoked. Continue ?'),
+            'The proctor will be authorized. Continue ?' => __('The proctor will be authorized. Continue ?'),
+            'The proctor will be revoked. Continue ?' => __('The proctor will be revoked. Continue ?'),
+            'Authorized proctors' => __('Authorized proctors'),
+            'Partially authorized proctors' => __('Partially authorized proctors'),
+            'No assigned proctors' => __('No assigned proctors'),
+            'Assigned proctors' => __('Assigned proctors'),
+            'Creates and authorizes proctor' => __('Creates and authorizes proctor'),
+            'Authorize the selected proctors' => __('Authorize the selected proctors'),
+            'Authorize the proctor' => __('Authorize the proctor'),
+            'Revoke authorization for the selected proctors' => __('Revoke authorization for the selected proctor'),
+            'Revoke the proctor' => __('Revoke the proctor'),
+            'Proctors authorized' => __('Proctors authorized'),
+            'Proctors revoked' => __('Proctors revoked'),
+            'Proctor created' => __('Proctor created')
+        );
+    }
+
+
 }
