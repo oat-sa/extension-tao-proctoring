@@ -272,12 +272,16 @@ define([
                     deniedResources : forbiddenDeliveries
                 };
 
-                bulkActionPopup(config).on('ok', function(reason){
-                    //execute callback
-                    if(_.isFunction(cb)){
-                        cb(_selection, reason);
-                    }
-                });
+                if (!allowedDeliveries.length) {
+                    feedback().warning(__('No report available for these test sessions'));
+                } else {
+                    bulkActionPopup(config).on('ok', function(reason){
+                        //execute callback
+                        if(_.isFunction(cb)){
+                            cb(_selection, reason);
+                        }
+                    });
+                }
             }
 
             /**
