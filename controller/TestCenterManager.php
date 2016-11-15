@@ -25,6 +25,7 @@ use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\model\ProctorManagementService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\helpers\DataTableHelper;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -36,6 +37,10 @@ use oat\taoProctoring\helpers\DataTableHelper;
  */
 class TestCenterManager extends \tao_actions_SaSModule
 {
+    use ProctoringTextConverterTrait;
+
+    protected $eligibilityService;
+
     /**
      * Initialize the service and the default data
      */
@@ -69,7 +74,7 @@ class TestCenterManager extends \tao_actions_SaSModule
                 $testCenter = $binder->bind($myForm->getValues());
 
                 $this->setData("selectNode", \tao_helpers_Uri::encode($testCenter->getUri()));
-                $this->setData('message', __('Test center saved'));
+                $this->setData('message', $this->convert('Test center saved'));
                 $this->setData('reload', true);
             }
         }
@@ -77,20 +82,20 @@ class TestCenterManager extends \tao_actions_SaSModule
         $childrenProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_CHILDREN_URI);
         $childrenForm = \tao_helpers_form_GenerisTreeForm::buildTree($testCenter, $childrenProperty);
         $childrenForm->setHiddenNodes(array($testCenter->getUri()));
-        $childrenForm->setTitle(__('Define sub-centers'));
+        $childrenForm->setTitle($this->convert('Define sub-centers'));
         $this->setData('childrenForm', $childrenForm->render());
 
         $administratorProperty = new \core_kernel_classes_Property(TestCenterService::PROPERTY_ADMINISTRATOR_URI);
         $administratorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $administratorProperty);
-        $administratorForm->setData('title', __('Assign administrator'));
+        $administratorForm->setData('title', $this->convert('Assign administrator'));
         $this->setData('administratorForm', $administratorForm->render());
 
         $proctorProperty = new \core_kernel_classes_Property(ProctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI);
         $proctorForm = \tao_helpers_form_GenerisTreeForm::buildReverseTree($testCenter, $proctorProperty);
-        $proctorForm->setData('title', __('Assign proctors'));
+        $proctorForm->setData('title', $this->convert('Assign proctors'));
         $this->setData('proctorForm', $proctorForm->render());
 
-        $this->setData('formTitle', __('Edit test center'));
+        $this->setData('formTitle', $this->convert('Edit test center'));
         $this->setData('testCenter', $testCenter->getUri());
         $this->setData('myForm', $myForm->render());
         $this->setView('form_test_center.tpl');
