@@ -173,6 +173,29 @@ define([
                 });
             }
 
+            function terminateAndIrregularity(selection) {
+                var dlg = dialog({
+                    message: __('Select an option'),
+                    autoRender: true,
+                    autoDestroy: true,
+                    buttons: [{
+                        id: 'terminate',
+                        type: 'error',
+                        label: __('Terminate session'),
+                        icon: 'stop',
+                        close: true,
+                        action: function() {terminate(selection);}
+                    },{
+                        id: 'irregularity',
+                        type: 'info',
+                        label: __('Report irregularity'),
+                        icon: 'delivery-small',
+                        close: true,
+                        action: function(){report(selection);}
+                    }]
+                });
+            }
+
             // display the session history
             function showHistory(selection) {
                 var urlParams = {
@@ -448,6 +471,13 @@ define([
                 action: report
             });
 
+            actions.push({
+                id: 'terminateAndIrregularity',
+                icon: 'delivery-small',
+                title: __('Terminate and irregularity'),
+                action: terminateAndIrregularity
+            });
+
             // action: display session history
             actions.push({
                 id: 'history',
@@ -487,7 +517,6 @@ define([
                             value = deliveryLinkTpl(delivery);
                         }
                         return value;
-
                     }
                 });
             }
@@ -598,7 +627,7 @@ define([
             });
 
             // column: proctoring actions
-            actionList = [{id: 'history'}, {id: 'printRubric'}];
+            actionList = [{id: 'terminateAndIrregularity'}, {id: 'history'}, {id: 'printRubric'}];
             if (printReportButton) {
                 actionList.push({id: 'printReport'});
             }
