@@ -177,7 +177,8 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'authorize' => array(),
             'pause' => ReasonCategoryHelper::irregularity(),
             'terminate' => ReasonCategoryHelper::irregularity(),
-            'report' => ReasonCategoryHelper::irregularity()
+            'report' => ReasonCategoryHelper::irregularity(),
+            'print' => [],
         );
     }
 

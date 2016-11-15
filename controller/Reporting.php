@@ -151,11 +151,15 @@ class Reporting extends ProctoringModule
                 \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
                 continue;
             }
+            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+            if (!$deliveryData['end']) {
+                continue;
+            }
             $result[] = [
                 'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
                 'testData' => $assessmentResultsService->getTestData($deliveryExecution),
                 'resultsData' => $assessmentResultsService->getResultsData($deliveryExecution),
-                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+                'deliveryData' => $deliveryData,
             ];
         }
 
@@ -187,11 +191,15 @@ class Reporting extends ProctoringModule
 
         foreach ($idList as $deliveryExecutionId) {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+            if (!$deliveryData['end']) {
+                continue;
+            }
             $result[] = [
                 'testData' => $assessmentResultsService->getTestData($deliveryExecution),
                 'rubricContent' => $assessmentResultsService->getPrintableRubric($deliveryExecution),
                 'testTakerData' => $assessmentResultsService->getTestTakerData($deliveryExecution),
-                'deliveryData' => $assessmentResultsService->getDeliveryData($deliveryExecution),
+                'deliveryData' => $deliveryData,
             ];
         }
 
