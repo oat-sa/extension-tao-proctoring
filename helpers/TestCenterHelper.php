@@ -285,7 +285,6 @@ class TestCenterHelper
             if (($periodStart && $startTime >= $periodStart) || ($periodEnd && $startTime <= $periodEnd)) {
                 $startTest = array(
                     'timestamp' => $startTime,
-                    'session'   => $sessionUri,
                     'role'      => __('Test-Taker'),
                     'actor' => _dh($author->getLabel()),
                     'event'     => __('Test start time'),
@@ -301,7 +300,6 @@ class TestCenterHelper
                 if (($periodStart && $finishTime >= $periodStart) || ($periodEnd && $finishTime <= $periodEnd)) {
                     $endTest = array(
                         'timestamp' => $finishTime,
-                        'session' => $sessionUri,
                         'role' => __('Test-Taker'),
                         'actor' => _dh($author->getLabel()),
                         'event' => __('Test end time'),
@@ -353,7 +351,6 @@ class TestCenterHelper
                         continue;
                     }
                     $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
-                    $exportable['session'] = $deliveryExecution->getIdentifier();
                     $exportable['role'] = $role;
                     $exportable['actor'] = _dh($author->getLabel());
                     $exportable['event'] = $event_id;

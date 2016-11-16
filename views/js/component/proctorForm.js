@@ -26,8 +26,9 @@ define([
     'users',
     'ui/feedback',
     'ui/component',
+    'taoProctoring/helper/textConverter',
     'tpl!taoProctoring/component/proctorForm/form'
-], function(_, $, __, helpers, users, feedback, component, formTpl){
+], function(_, $, __, helpers, users, feedback, component, textConverter, formTpl){
     'use strict';
 
     var _ns = '.proctor-form';
@@ -71,37 +72,41 @@ define([
                 var self = this;
                 var $element = this.getElement();
 
-                $.get(proctorFormUrl, function(formData){
+                textConverter().then(function(labels) {
+                    $.get(proctorFormUrl, function(formData){
 
-                    renderFormFromData($element, formData);
+                        renderFormFromData($element, formData);
 
-                    $element.on('submit' + _ns, 'form', function(e){
+                        $element.on('submit' + _ns, 'form', function(e){
 
-                        var $form = $(this);
-                        var fields = $form.serializeArray();
-                        var list = self.config.testCenterList;
-                        var data = {
-                            testCenters : list && list.getSelection()
-                        };
-                        _.each(fields, function(field){
-                            data[field.name] = field.value;
+                            var $form = $(this);
+                            var fields = $form.serializeArray();
+                            var list = self.config.testCenterList;
+                            var data = {
+                                testCenters : list && list.getSelection()
+                            };
+                            _.each(fields, function(field){
+                                data[field.name] = field.value;
+                            });
+
+                            $.post(proctorFormUrl, data, function(res){
+                                if(res.created){
+                                    feedback().success(labels.get('Proctor created'));
+                                    self.destroy();
+                                }else{
+                                    renderFormFromData($element, res);
+                                }
+                            });
+
+                            e.preventDefault();
+                        }).on('click', 'button.btn-diasble', function() {
+                            self.destroy();
                         });
-
-                        $.post(proctorFormUrl, data, function(res){
-                            if(res.created){
-                                feedback().success(__('Proctor created'));
-                                self.destroy();
-                            }else{
-                                renderFormFromData($element, res);
-                            }
-                        });
-
-                        e.preventDefault();
-                        
-                    }).on('click', 'button.btn-diasble', function() {
-                        self.destroy();
                     });
+                }).catch(function(err) {
+                   console.log(err);
                 });
+
             })
             .init(config);
     };

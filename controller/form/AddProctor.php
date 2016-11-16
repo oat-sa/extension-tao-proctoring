@@ -19,11 +19,13 @@
  */
 namespace oat\taoProctoring\controller\form;
 
+use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 use \tao_actions_form_Users;
 use \tao_helpers_form_FormFactory;
 
 class AddProctor extends tao_actions_form_Users
 {
+    use ProctoringTextConverterTrait;
 
     public function __construct()
     {
@@ -45,7 +47,7 @@ class AddProctor extends tao_actions_form_Users
 
         $buttonSave = tao_helpers_form_FormFactory::getElement('Save', 'Button');
         $buttonSave->setIcon('icon-add');
-        $buttonSave->setValue(__('Create Proctor'));
+        $buttonSave->setValue($this->convert('Create Proctor'));
         $buttonSave->setType('submit');
         $buttonSave->addClass('form-submitter btn-success small');
         $value .= $buttonSave->render();
@@ -66,7 +68,7 @@ class AddProctor extends tao_actions_form_Users
     protected function initElements()
     {
         $title = tao_helpers_form_FormFactory::getElement('title', 'Free');
-        $title->setValue('<h2>'.__('Create and authorize a proctor to the selected test sites').'</h2>');
+        $title->setValue('<h2>' . $this->convert('Create and authorize a proctor to the selected test sites') . '</h2>');
         $this->form->addElement($title);
         parent::initElements();
         $this->form->removeElement(\tao_helpers_Uri::encode(PROPERTY_USER_ROLES));

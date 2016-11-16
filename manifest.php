@@ -25,7 +25,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '3.7.0',
+    'version' => '3.10.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.23.0',
@@ -46,6 +46,7 @@ return array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Diagnostic')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TestCenter')),
+        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
