@@ -20,8 +20,12 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\ltiDeliveryProvider\model\LTIDeliveryTool;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\model\implementation\DeliveryService;
+
+require_once __DIR__.'/../../tao/lib/oauth/OAuth.php';
 
 /**
  * Proctoring Diagnostic controller for the readiness check screen
@@ -41,6 +45,63 @@ class Diagnostic extends ProctoringModule
 
         $testCenter = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
+
+        if(\common_ext_ExtensionsManager::singleton()->isInstalled('ltiDeliveryProvider')){
+            /** @var DeliveryService $service */
+            $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+            $deliveries = $service->getAccessibleDeliveries();
+
+
+            if(!empty($deliveries)){
+                $deliveryData = array();
+
+                $ltiConsumer = \taoLti_models_classes_ConsumerService::singleton()->getRootClass()->getInstances(false, array('limit' => 1));
+                $ltiConsumer = reset($ltiConsumer);
+
+                $credentials = new \tao_models_classes_oauth_Credentials($ltiConsumer);
+                $session = \common_session_SessionManager::getSession();
+
+                $ltiData = array(
+                    'lti_message_type' => 'basic-lti-launch-request',
+                    'lti_version' => 'LTI-1p0',
+
+                    'resource_link_id' => rand(0, 9999999),
+                    'resource_link_title' => 'Launch Title',
+                    'resource_link_label' => 'Launch label',
+
+                    'context_title' => 'Launch Title',
+                    'context_label' => 'Launch label',
+
+                    'user_id' => $session->getUserUri(),
+                    'roles' => 'Learner',
+                    'lis_person_name_full' => $session->getUserLabel(),
+
+                    'tool_consumer_info_product_family_code' => PRODUCT_NAME,
+                    'tool_consumer_info_version' => TAO_VERSION,
+
+                    'launch_presentation_return_url' => _url(null,null,null,array('testCenter' => $testCenter->getUri())),
+                    'cookie' => $this->getCookie(GENERIS_SESSION_NAME),
+                );
+
+
+
+                $hmac_method = new \OAuthSignatureMethod_HMAC_SHA1();
+                $test_consumer = new \OAuthConsumer('aaa', 'bbb');
+                $test_token = new \OAuthToken($test_consumer, '');
+
+
+                foreach($deliveries as $delivery){
+                    $launchUrl =  LTIDeliveryTool::singleton()->getLaunchUrl(array('delivery' => $delivery->getUri()));
+                    $acc_req = \OAuthRequest::from_consumer_and_token($test_consumer, $test_token, 'GET', $launchUrl, $ltiData);
+                    $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
+
+                    $deliveryData[] = array('name' => $delivery->getLabel(), 'url' => $acc_req->to_url());
+                }
+                $this->setData('deliveries', $deliveryData);
+            }
+
+        }
+
 
         $this->setData('title', __('Readiness Check for test site %s', _dh($testCenter->getLabel())));
         $this->composeView(
