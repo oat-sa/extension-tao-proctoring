@@ -30,6 +30,7 @@ use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -519,7 +520,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.7.0');
         }
 
-        $this->skip('3.7.0', '3.9.0');
+        $this->skip('3.7.0', '3.9.1');
 
     }
 
