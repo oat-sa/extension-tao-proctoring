@@ -55,10 +55,21 @@ class Diagnostic extends ProctoringModule
             if(!empty($deliveries)){
                 $deliveryData = array();
 
-                $ltiConsumer = \taoLti_models_classes_ConsumerService::singleton()->getRootClass()->getInstances(false, array('limit' => 1));
-                $ltiConsumer = reset($ltiConsumer);
+                try{
+                    $dataStore = new \tao_models_classes_oauth_DataStore();
+                    $test_consumer = $dataStore->lookup_consumer('proctoring_key');
+                } catch(\tao_models_classes_oauth_Exception $e){
+                    $secret = uniqid('proctoring_');
+                    \taoLti_models_classes_ConsumerService::singleton()->getRootClass()->createInstanceWithProperties(
+                        array(
+                            RDFS_LABEL => 'proctoring',
+                            PROPERTY_OAUTH_KEY => 'proctoring_key',
+                            PROPERTY_OAUTH_SECRET => $secret
+                        )
+                    );
 
-                $credentials = new \tao_models_classes_oauth_Credentials($ltiConsumer);
+                    $test_consumer = new \OAuthConsumer('proctoring_key', $secret);
+                }
                 $session = \common_session_SessionManager::getSession();
 
                 $ltiData = array(
@@ -86,7 +97,7 @@ class Diagnostic extends ProctoringModule
 
 
                 $hmac_method = new \OAuthSignatureMethod_HMAC_SHA1();
-                $test_consumer = new \OAuthConsumer('aaa', 'bbb');
+
                 $test_token = new \OAuthToken($test_consumer, '');
 
 
