@@ -7,9 +7,9 @@
         <h1><?= get_data('title'); ?></h1>
 <?php endif; ?>
 <?php if(has_data('deliveries')): ?>
-        <? foreach(get_data('deliveries') as $delivery):?>
+        <?php foreach(get_data('deliveries') as $delivery):?>
             <a href="<?=$delivery['url']?>" target="_blank"><?=$delivery['name']?></a>
-        <?endforeach;?>
+        <?php endforeach;?>
 <?php endif; ?>
         <div class="panel"></div>
         <div class="list"></div>
