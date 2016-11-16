@@ -415,95 +415,6 @@ define([
                 });
             }
 
-            // action: authorise the execution
-            actions.push({
-                id: 'authorise',
-                icon: 'play',
-                title: __('Authorize session'),
-                disabled: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.authorize !== true;
-                    }
-                    return true;
-                },
-                action: authorise
-            });
-
-            // action: pause the execution
-            actions.push({
-                id: 'pause',
-                icon: 'pause',
-                title: __('Pause session'),
-                disabled: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.pause !== true;
-                    }
-                    return true;
-                },
-                action: pause
-            });
-
-            // action: terminate the execution
-            actions.push({
-                id: 'terminate',
-                icon: 'stop',
-                title: __('Terminate session'),
-                hidden: function() {
-                    var status;
-                    if(this.state && this.state.status){
-                        status = _status.getStatusByCode(this.state.status);
-                        return !status || status.can.terminate !== true;
-                    }
-                    return true;
-                },
-                action: terminate
-            });
-
-            // action: report irregularities
-            actions.push({
-                id: 'irregularity',
-                icon: 'delivery-small',
-                title: __('Report irregularity'),
-                action: report
-            });
-
-            actions.push({
-                id: 'terminateAndIrregularity',
-                icon: 'delivery-small',
-                title: __('Terminate and irregularity'),
-                action: terminateAndIrregularity
-            });
-
-            // action: display session history
-            actions.push({
-                id: 'history',
-                icon: 'history',
-                title: __('Show the detailed session history'),
-                action: showHistory
-            });
-
-            // action: print score report
-            actions.push({
-                id : 'printRubric',
-                title : __('Print the Score Report'),
-                icon : 'print',
-                action : printResults
-            });
-
-            // action: print results
-            if (printReportButton) {
-                actions.push({
-                    id : 'printReport',
-                    title : __('Print the assessment results'),
-                    icon : 'result',
-                    action : printReport
-                });
-            }
-
             // column: delivery (only for all deliveries view)
             if (!deliveryId) {
                 model.push({
@@ -590,18 +501,46 @@ define([
                 }
             });
 
+            // action: authorise the execution
             model.push({
                 id: 'authorizeCl',
                 label: __('Authorize'),
                 type: 'actions',
-                actions: [{id: 'authorise'}]
+                actions: [{
+                    id: 'authorise',
+                    icon: 'play',
+                    title: __('Authorize session'),
+                    disabled: function() {
+                        var status;
+                        if(this.state && this.state.status){
+                            status = _status.getStatusByCode(this.state.status);
+                            return !status || status.can.authorize !== true;
+                        }
+                        return true;
+                    },
+                    action: authorise
+                }]
             });
 
+            // action: pause the execution
             model.push({
                 id: 'pauseCl',
                 label: __('Pause'),
                 type: 'actions',
-                actions: [{id: 'pause'}]
+                actions: [{
+                    id: 'pause',
+                    icon: 'pause',
+                    title: __('Pause session'),
+                    disabled: function() {
+                        var status;
+                        if(this.state && this.state.status){
+                            status = _status.getStatusByCode(this.state.status);
+                            return !status || status.can.pause !== true;
+                        }
+                        return true;
+                    },
+                    action: pause
+                }]
             });
 
             // column: connectivity status of execution progress
@@ -627,9 +566,29 @@ define([
             });
 
             // column: proctoring actions
-            actionList = [{id: 'terminateAndIrregularity'}, {id: 'history'}, {id: 'printRubric'}];
+            actionList = [{
+                id: 'terminateAndIrregularity',
+                icon: 'delivery-small',
+                title: __('Terminate and irregularity'),
+                action: terminateAndIrregularity
+            }, {
+                id: 'history',
+                icon: 'history',
+                title: __('Show the detailed session history'),
+                action: showHistory
+            }, {
+                id : 'printRubric',
+                title : __('Print the Score Report'),
+                icon : 'print',
+                action : printResults
+            }];
             if (printReportButton) {
-                actionList.push({id: 'printReport'});
+                actionList.push({
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'result',
+                    action : printReport
+                });
             }
 
             model.push({
@@ -638,7 +597,6 @@ define([
                 type: 'actions',
                 actions: actionList
             });
-
 
             // renders the datatable
             $list
@@ -678,7 +636,6 @@ define([
                 })
                 .datatable({
                     url: deliveryId ? serviceUrl : serviceAllUrl,
-                    showActions: false,
                     status: {
                         empty: __('No sessions'),
                         available: __('Current sessions'),
@@ -687,7 +644,6 @@ define([
                     filter: true,
                     filtercolumns:['status'],
                     tools: tools,
-                    actions: actions,
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
