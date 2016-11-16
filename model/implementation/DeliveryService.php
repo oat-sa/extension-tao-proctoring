@@ -25,6 +25,7 @@ use core_kernel_classes_Resource as Resource;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\tao\helpers\UserHelper;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
@@ -48,6 +49,10 @@ class DeliveryService extends ConfigurableService
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
 
     const PROPERTY_GROUP_TEST_CENTERS = 'http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters';
+
+    const PROPERTY_PROCTOR_ACCESSIBLE = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
+
+    const CHECK_MODE_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
 
     const GROUP_CLASS_NAME = 'groups for proctoring';
 
@@ -148,6 +153,21 @@ class DeliveryService extends ConfigurableService
     public function getDelivery($deliveryId)
     {
         return new \core_kernel_classes_Resource($deliveryId);
+    }
+
+
+    public function getAccessibleDeliveries()
+    {
+        $deliveries = DeliveryAssemblyService::singleton()->getRootClass()->searchInstances(
+            array(
+                self::PROPERTY_PROCTOR_ACCESSIBLE => self::CHECK_MODE_ENABLED
+            ),
+            array(
+                'recursive' => true
+            )
+        );
+
+        return $deliveries;
     }
 
     /**
