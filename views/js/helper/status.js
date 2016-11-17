@@ -90,7 +90,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is completed'),
                 terminate : __('is completed'),
                 report : true,
-                time : __('is completed')
+                time : true
             }
         },
         terminated : {
@@ -101,7 +101,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
                 report : true,
-                time : __('is terminated')
+                time : true
             }
         }
     };

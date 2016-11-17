@@ -24,6 +24,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
+use oat\taoDelivery\helper\Delivery;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
@@ -32,6 +33,7 @@ use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use qtism\common\datatypes\QtiDuration;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
@@ -519,6 +521,39 @@ class DeliveryHelper
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
+
+            // reopen the execution if already closed
+            if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHIED) {
+                $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
+                $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+
+                /* @var TestSession $testSession */
+                $testSession = $testSessionService->getTestSession($deliveryExecution);
+                if ($testSession) {
+                    $testSession->getRoute()->setPosition(0);
+                    
+                    $testSession->setState(AssessmentTestSessionState::INTERACTING);
+
+                    // The duration store contains durations (time spent) on test, testPart(s) and assessmentSection(s).
+                    $durationStore = $testSession->getDurationStore();
+
+                    $offsetDuration = new QtiDuration("PT${extraTime}S");
+                    $testDefinition = $testSession->getAssessmentTest();
+                    $currentDuration = $durationStore[$testDefinition->getIdentifier()];
+
+                    $offsetSeconds = $offsetDuration->getSeconds(true);
+                    $currentSeconds = $currentDuration->getSeconds(true);
+                    $newSeconds = $currentSeconds - $offsetSeconds;
+                    if ($newSeconds < 0) {
+                        $newSeconds = 0;
+                    }
+
+                    // Replace test duration with new duration.
+                    $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
+
+                    $testSessionService->persist($testSession);
+                }
             }
             
             $timer = self::getDeliveryTimer($deliveryExecution);
