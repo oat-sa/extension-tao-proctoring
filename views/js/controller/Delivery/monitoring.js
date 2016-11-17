@@ -637,9 +637,9 @@ define([
                 transform: function(value, row) {
                     var timer = _.isObject(row.timer) ? row.timer : {};
                     var refinedValue = timer.remaining;
-                    var remaining = parseInt(refinedValue, 10) || 0;
+                    var remaining = parseInt(refinedValue, 10);
 
-                    if (remaining || _.isFinite(refinedValue) ) {
+                    if (remaining || _.isFinite(remaining) ) {
                         if (remaining) {
                             refinedValue = timeEncoder.encode(remaining);
                         } else {

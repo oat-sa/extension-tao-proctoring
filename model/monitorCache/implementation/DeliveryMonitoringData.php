@@ -321,7 +321,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         if ($session !== null && $session->isRunning()) {
             $remaining = PHP_INT_MAX;
-            foreach ($session->getTimeConstraints() as $tc) {
+            foreach ($session->getRegularTimeConstraints() as $tc) {
                 // Only consider time constraints in force.
                 if ($tc->getMaximumRemainingTime() !== false) {
                     $hasTimer = true;
