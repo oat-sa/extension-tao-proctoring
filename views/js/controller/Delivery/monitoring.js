@@ -104,9 +104,10 @@ define([
             var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];
-            var actions = [];
             var model = [];
             var actionButtons;
+            var highlightRows = [];
+            var actionList;
 
             // request the server with a selection of test takers
             function request(url, selection, data, message) {
@@ -185,6 +186,35 @@ define([
                 });
             }
 
+            function print(selection, type) {
+                execBulkAction('print', __('Print Score'), selection, function(sel){
+                    window.open(helpers._url(type,  'Reporting', 'taoProctoring', {'id' : sel}), 'printReport' + JSON.stringify(sel));
+                });
+            }
+
+            function terminateAndIrregularity(selection) {
+                dialog({
+                    message: __('Please, make your selection'),
+                    autoRender: true,
+                    autoDestroy: true,
+                    buttons: [{
+                        id: 'terminate',
+                        type: 'error',
+                        label: __('Terminate session'),
+                        icon: 'stop',
+                        close: true,
+                        action: function() {terminate(selection);}
+                    },{
+                        id: 'irregularity',
+                        type: 'info',
+                        label: __('Report irregularity'),
+                        icon: 'delivery-small',
+                        close: true,
+                        action: function(){report(selection);}
+                    }]
+                });
+            }
+
             // display the session history
             function showHistory(selection) {
                 var urlParams = {
@@ -199,18 +229,18 @@ define([
 
             // print the score reports
             function printReport(selection) {
-                window.open(helpers._url('printReport',  'Reporting', 'taoProctoring', {'id' : selection}), 'printReport' + JSON.stringify(selection));
+                print(selection, 'printReport');
             }
 
             // print the results of the session
             function printResults(selection) {
-                window.open(helpers._url('printRubric',  'Reporting', 'taoProctoring', {'id' : selection}), 'printRubric' + JSON.stringify(selection));
+                print(selection, 'printRubric');
             }
 
             // display the time handling popup
             function timeHandling(selection) {
                 var _selection = _.isArray(selection) ? selection : [selection];
-                var config = _.merge(listTestTakers('time', _selection), {
+                var config = _.merge(listSessions('time', _selection), {
                     renderTo : $content,
                     actionName : __('Grant Extra Time'),
                     unit: extraTimeUnit // input extra time in minutes
@@ -229,7 +259,7 @@ define([
              */
             function canDo(what, state) {
                 var status;
-                if(state && state.status){
+                if (state && state.status) {
                     status = _status.getStatusByCode(state.status);
                     return status && status.can[what] === true;
                 }
@@ -242,10 +272,11 @@ define([
              * @param {String} actionName
              * @returns {Object}
              */
-            function verifyTestTaker(testTakerData, actionName){
+            function verifyDelivery(testTakerData, actionName){
+                var deliveryName = $(testTakerData.delivery).text();
                 var formatted = {
                     id : testTakerData.id,
-                    label : testTakerData.firstname+' '+testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.date + ']'
                 };
                 var status = _status.getStatusByCode(testTakerData.state.status);
                 if(status){
@@ -273,32 +304,32 @@ define([
             }
 
             /**
-             * Gets the list of allowed and forbidden test takers from the provided selection
+             * Gets the list of allowed and forbidden test sessions from the provided selection
              * @param {String} actionName
              * @param {Array} selection
-             * @returns {Object} Returns the config object that contains the lists of allowed and forbidden test takers
+             * @returns {Object} Returns the config object that contains the lists of allowed and forbidden test sessions
              */
-            function listTestTakers(actionName, selection) {
-                var allowedTestTakers = [];
-                var forbiddenTestTakers = [];
+            function listSessions(actionName, selection) {
+                var allowedDeliveries = [];
+                var forbiddenDeliveries = [];
 
                 _.each(selection, function (uri) {
-                    var testTaker = getExecutionData(uri);
-                    var checkedTestTaker;
-                    if (testTaker) {
-                        checkedTestTaker = verifyTestTaker(testTaker, actionName);
-                        if (checkedTestTaker.allowed) {
-                            allowedTestTakers.push(checkedTestTaker);
-                        } else {
-                            forbiddenTestTakers.push(checkedTestTaker);
+                    var testTakerData = getExecutionData(uri);
+                    var checkedDelivery;
+                    if(testTakerData){
+                        checkedDelivery = verifyDelivery(testTakerData, actionName);
+                        if(checkedDelivery.allowed){
+                            allowedDeliveries.push(checkedDelivery);
+                        }else{
+                            forbiddenDeliveries.push(checkedDelivery);
                         }
                     }
                 });
 
                 return {
-                    resourceType: 'test taker',
-                    allowedResources: allowedTestTakers,
-                    deniedResources: forbiddenTestTakers
+                    resourceType : 'session',
+                    allowedResources: allowedDeliveries,
+                    deniedResources: forbiddenDeliveries
                 };
             }
 
@@ -315,7 +346,8 @@ define([
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 var config;
 
-                config = _.merge(listTestTakers(actionName, _selection), {
+
+                config = _.merge(listSessions(actionName, _selection), {
                     renderTo : $content,
                     actionName : actionTitle,
                     reason : askForReason,
@@ -323,12 +355,16 @@ define([
                     categoriesSelector: cascadingComboBox(categories[actionName] || {})
                 });
 
-                bulkActionPopup(config).on('ok', function(reason){
-                    //execute callback
-                    if(_.isFunction(cb)){
-                        cb(_selection, reason);
-                    }
-                });
+                if (!config.allowedResources.length) {
+                    feedback().warning(__('No report available for these test sessions'));
+                } else {
+                    bulkActionPopup(config).on('ok', function(reason){
+                        //execute callback
+                        if(_.isFunction(cb)){
+                            cb(_selection, reason);
+                        }
+                    });
+                }
             }
 
             /**
@@ -462,86 +498,6 @@ define([
                 });
             }
 
-            // action: authorise the execution
-            actions.push({
-                id: 'authorise',
-                icon: 'play',
-                title: __('Authorize session'),
-                hidden: function() {
-                    return !canDo('authorize', this.state);
-                },
-                action: authorise
-            });
-
-            // action: pause the execution
-            actions.push({
-                id: 'pause',
-                icon: 'pause',
-                title: __('Pause session'),
-                hidden: function() {
-                    return !canDo('pause', this.state);
-                },
-                action: pause
-            });
-
-            // action: terminate the execution
-            actions.push({
-                id: 'terminate',
-                icon: 'stop',
-                title: __('Terminate session'),
-                hidden: function() {
-                    return !canDo('terminate', this.state);
-                },
-                action: terminate
-            });
-
-            // action: report irregularities
-            actions.push({
-                id: 'irregularity',
-                icon: 'delivery-small',
-                title: __('Report irregularity'),
-                action: report
-            });
-
-            // action: display session history
-            actions.push({
-                id: 'history',
-                icon: 'history',
-                title: __('Show the detailed session history'),
-                action: showHistory
-            });
-
-            // action: print score report
-            actions.push({
-                id : 'printRubric',
-                title : __('Print the Score Report'),
-                icon : 'print',
-                action : printResults
-            });
-
-            // action: print results
-            if (printReportButton) {
-                actions.push({
-                    id : 'printReport',
-                    title : __('Print the assessment results'),
-                    icon : 'result',
-                    action : printReport
-                });
-            }
-
-            // action: handles the session time
-            if (timeHandlingButton) {
-                actions.push({
-                    id : 'timeHandling',
-                    title : __('Session time handling'),
-                    icon : 'time',
-                    action : timeHandling,
-                    hidden: function() {
-                        return !canDo('time', this.state);
-                    }
-                });
-            }
-
             // column: delivery (only for all deliveries view)
             if (!deliveryId) {
                 model.push({
@@ -555,7 +511,6 @@ define([
                             value = deliveryLinkTpl(delivery);
                         }
                         return value;
-
                     }
                 });
             }
@@ -623,6 +578,9 @@ define([
                             if (row.state.status === 'INPROGRESS') {
                                 result = status.label;
                             }
+                            if (result === 'Awaiting') {
+                                highlightRows.push(row.id);
+                            }
                         }
                     }
                     return result;
@@ -651,6 +609,54 @@ define([
                     return refinedValue;
                 }
             });
+            if (timeHandlingButton) {
+                model.push({
+                    id: 'extraTime',
+                    label: __('Extra Time'),
+                    type: 'actions',
+                    actions: [{
+                        id : 'timeHandling',
+                        title : __('Session time handling'),
+                        icon : 'time',
+                        action : timeHandling,
+                        hidden: function() {
+                            return !canDo('time', this.state);
+                        }
+                    }]
+                });
+            }
+
+            // action: authorise the execution
+            model.push({
+                id: 'authorizeCl',
+                label: __('Authorize'),
+                type: 'actions',
+                actions: [{
+                    id: 'authorise',
+                    icon: 'play',
+                    title: __('Authorize session'),
+                    disabled: function() {
+                        return !canDo('authorize', this.state);
+                    },
+                    action: authorise
+                }]
+            });
+
+            // action: pause the execution
+            model.push({
+                id: 'pauseCl',
+                label: __('Pause'),
+                type: 'actions',
+                actions: [{
+                    id: 'pause',
+                    icon: 'pause',
+                    title: __('Pause session'),
+                    disabled: function() {
+                        return !canDo('pause', this.state);
+                    },
+                    action: pause
+                }]
+            });
 
             // column: connectivity status of execution progress
             model.push({
@@ -674,10 +680,44 @@ define([
                 }
             });
 
+            // column: proctoring actions
+            actionList = [{
+                id: 'terminateAndIrregularity',
+                icon: 'delivery-small',
+                title: __('Terminate and irregularity'),
+                action: terminateAndIrregularity
+            }, {
+                id: 'history',
+                icon: 'history',
+                title: __('Show the detailed session history'),
+                action: showHistory
+            }, {
+                id : 'printRubric',
+                title : __('Print the Score Report'),
+                icon : 'print',
+                action : printResults
+            }];
+            if (printReportButton) {
+                actionList.push({
+                    id : 'printReport',
+                    title : __('Print the assessment results'),
+                    icon : 'result',
+                    action : printReport
+                });
+            }
+
+            model.push({
+                id: 'administrationCl',
+                label: __('Administration'),
+                type: 'actions',
+                actions: actionList
+            });
+
             // renders the datatable
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
+                    highlightRows = [];
                 })
                 .on('load.datatable', function(e, newDataset) {
                     //update dateset in memory
@@ -690,6 +730,13 @@ define([
                         terminate : $list.find('.action-bar').children('.tool-terminate'),
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
+
+                    // highlight rows
+                    if (highlightRows.length) {
+                        _.forEach(highlightRows, function (v) {
+                            $list.datatable('highlightRow', v);
+                        });
+                    }
 
                     loadingBar.stop();
                 })
@@ -720,14 +767,11 @@ define([
                     filter: true,
                     filtercolumns:['status'],
                     tools: tools,
-                    actions: actions,
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
                     sortby : 'date'
                 }, dataset);
-
-
         }
     };
 });

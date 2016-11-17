@@ -35,6 +35,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not in progress'),
                 terminate : true,
                 report : true,
+                print : __('not finished'),
                 time : true
             }
         },
@@ -46,6 +47,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not in progress'),
                 terminate : true,
                 report : true,
+                print : __('not finished'),
                 time : true
             }
         },
@@ -54,9 +56,10 @@ define(['lodash', 'i18n'], function(_, __){
             label : __('Authorized but not started'),
             can : {
                 authorize : __('already authorized'),
-                pause : __('not started'), //not in progress
                 terminate : true,
                 report : true,
+                pause : __('not started'), //not in progress
+                print : __('not finished'),
                 time : true
             }
         },
@@ -68,6 +71,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : true,
                 terminate : true,
                 report : true,
+                print : __('not finished'),
                 time : true
             }
         },
@@ -79,6 +83,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is already paused'),
                 terminate : true,
                 report : true,
+                print : __('not finished'),
                 time : true
             }
         },
@@ -90,6 +95,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is completed'),
                 terminate : __('is completed'),
                 report : true,
+                print: true,
                 time : true
             }
         },
@@ -101,6 +107,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
                 report : true,
+                print: true,
                 time : true
             }
         }

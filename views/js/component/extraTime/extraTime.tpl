@@ -3,7 +3,7 @@
 
     {{#if allowedResources.length}}
     <div class="multiple">
-        <p>{{__ "The action will be applied to the following test takers"}}:</p>
+        <p>{{__ "The action will be applied to the following session"}}:</p>
         <ul class="plain applicables">
             {{#each allowedResources}}
             <li data-resource="{{id}}">
@@ -16,7 +16,7 @@
     </div>
 
     {{#if deniedResources.length}}
-    <p>{{__ "However, the action will not be applied to the following test takers"}}:</p>
+    <p>{{__ "However, the action will not be applied to the following sessions"}}:</p>
     <ul class="plain no-applicables">
         {{#each deniedResources}}
         <li data-resource="{{id}}">
@@ -28,7 +28,7 @@
     {{/if}}
 
     {{else}}
-    <p>{{__ "The action cannot be applied, no eligible test takers found"}}</p>
+    <p>{{__ "The action cannot be applied, no eligible sessions found"}}</p>
     {{/if}}
 
     <div class="form">

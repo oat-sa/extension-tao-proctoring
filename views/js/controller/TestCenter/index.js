@@ -25,8 +25,9 @@ define([
     'layout/loading-bar',
     'ui/listbox',
     'taoProctoring/component/breadcrumbs',
+    'taoProctoring/helper/textConverter',
     'tpl!taoProctoring/templates/testSiteAdmin/adminLink'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory, adminLinkTpl) {
+], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory, textConverter, adminLinkTpl) {
     'use strict';
 
     /**
@@ -48,56 +49,63 @@ define([
          * Entry point of the page
          */
         start : function start() {
-            var $container = $(cssScope);
-            var admin = $container.data('administrator');
-            var boxes = $container.data('list');
-            var crumbs = $container.data('breadcrumbs');
-            var list = listBox({
-                title: __("My Test sites"),
-                textEmpty: __("No test site available"),
-                textNumber: __("Available"),
-                textLoading: __("Loading"),
-                renderTo: $container.find('.content'),
-                replace: true
-            });
-            var bc = breadcrumbsFactory($container, crumbs);
-            var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
-            var adminUrl = helpers._url('index', 'ProctorManager', 'taoProctoring');
 
-            // update the index from a JSON array
-            var update = function(boxes) {
-                list.update(boxes);
-                loadingBar.stop();
-            };
+            textConverter().then(function(labels) {
 
-            // refresh the index
-            var refresh = function() {
-                loadingBar.start();
-                list.setLoading(true);
-
-                $.ajax({
-                    url: serviceUrl,
-                    cache: false,
-                    dataType : 'json',
-                    type: 'GET'
-                }).done(function(response) {
-                    boxes = response && response.list;
-                    update(boxes);
+                var $container = $(cssScope);
+                var admin = $container.data('administrator');
+                var boxes = $container.data('list');
+                var crumbs = $container.data('breadcrumbs');
+                var list = listBox({
+                    title: __("My Test sites"),
+                    textEmpty: __("No test site available"),
+                    textNumber: __("Available"),
+                    textLoading: __("Loading"),
+                    renderTo: $container.find('.content'),
+                    replace: true
                 });
-            };
+                var bc = breadcrumbsFactory($container, crumbs);
+                var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
+                var adminUrl = helpers._url('index', 'ProctorManager', 'taoProctoring');
 
-            if (!boxes) {
-                refresh();
-            } else {
-                update(boxes);
-            }
-            
-            if(admin){
-                //add test center admin link
-                $container.find('.header').append(adminLinkTpl({
-                    href : adminUrl
-                }));
-            }
+                // update the index from a JSON array
+                var update = function(boxes) {
+                    list.update(boxes);
+                    loadingBar.stop();
+                };
+
+                // refresh the index
+                var refresh = function() {
+                    loadingBar.start();
+                    list.setLoading(true);
+
+                    $.ajax({
+                        url: serviceUrl,
+                        cache: false,
+                        dataType : 'json',
+                        type: 'GET'
+                    }).done(function(response) {
+                        boxes = response && response.list;
+                        update(boxes);
+                    });
+                };
+
+                if (!boxes) {
+                    refresh();
+                } else {
+                    update(boxes);
+                }
+
+                if(admin){
+                    //add test center admin link
+                    $container.find('.header').append(adminLinkTpl({
+                        href : adminUrl,
+                        manageProctorMenu : labels.get('Manage Proctors')
+                    }));
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         }
     };
 
