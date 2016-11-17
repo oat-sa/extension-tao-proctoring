@@ -645,7 +645,7 @@ define([
                         } else {
                             refinedValue = '';
                         }
-                        refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s mn'), extraTimeUnit);
+                        refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
                     }
 
                     return refinedValue;
