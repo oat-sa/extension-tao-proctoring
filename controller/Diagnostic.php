@@ -71,7 +71,6 @@ class Diagnostic extends ProctoringModule
     {
         $deliveryData = array();
         if(\common_ext_ExtensionsManager::singleton()->isInstalled('ltiDeliveryProvider')){
-            $testCenter = $this->getCurrentTestCenter();
             /** @var DeliveryService $service */
             $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
             $deliveries = $service->getAccessibleDeliveries();
@@ -113,6 +112,9 @@ class Diagnostic extends ProctoringModule
 
                     'tool_consumer_info_product_family_code' => PRODUCT_NAME,
                     'tool_consumer_info_version' => TAO_VERSION,
+
+                    'custom_skip_thankyou' => 'true',
+                    'launch_presentation_return_url' => _url('logout', 'Main', 'tao')
                 );
 
 
@@ -143,21 +145,32 @@ class Diagnostic extends ProctoringModule
         if (\tao_helpers_Request::isAjax()) {
             $this->returnJson(array('list' => $deliveryData));
         } else {
-            $this->composeView(
-                'diagnostic-deliveries',
-                array('list' => $deliveryData),
-                array(
-                    BreadcrumbsHelper::testCenters(),
-                    BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                    BreadcrumbsHelper::diagnostics(
-                        $testCenter,
-                        array(
-                            BreadcrumbsHelper::deliveries($testCenter),
-                        )
-                    ),
-                    BreadcrumbsHelper::deliveriesByProctor($testCenter)
-                )
-            );
+            try{
+                $testCenter = $this->getCurrentTestCenter();
+                $this->composeView(
+                    'diagnostic-deliveries',
+                    array('list' => $deliveryData),
+                    array(
+                        BreadcrumbsHelper::testCenters(),
+                        BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                        BreadcrumbsHelper::diagnostics(
+                            $testCenter,
+                            array(
+                                BreadcrumbsHelper::deliveries($testCenter),
+                            )
+                        ),
+                        BreadcrumbsHelper::deliveriesByProctor($testCenter)
+                    )
+                );
+            } catch(\common_Exception $e){
+                $this->composeView(
+                    'diagnostic-deliveries',
+                    array('list' => $deliveryData),
+                    array(
+                        BreadcrumbsHelper::testCenters(),
+                    )
+                );
+            }
         }
     }
     /**
