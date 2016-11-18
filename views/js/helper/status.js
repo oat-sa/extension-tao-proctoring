@@ -35,7 +35,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not in progress'),
                 terminate : true,
                 report : true,
-                print : __('not finished')
+                print : __('not finished'),
+                time : true
             }
         },
         awaiting : {
@@ -46,7 +47,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not in progress'),
                 terminate : true,
                 report : true,
-                print : __('not finished')
+                print : __('not finished'),
+                time : true
             }
         },
         authorized : {
@@ -57,7 +59,8 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : true,
                 report : true,
                 pause : __('not started'), //not in progress
-                print : __('not finished')
+                print : __('not finished'),
+                time : true
             }
         },
         inprogress : {
@@ -68,7 +71,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : true,
                 terminate : true,
                 report : true,
-                print : __('not finished')
+                print : __('not finished'),
+                time : true
             }
         },
         paused : {
@@ -79,7 +83,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is already paused'),
                 terminate : true,
                 report : true,
-                print : __('not finished')
+                print : __('not finished'),
+                time : true
             }
         },
         completed : {
@@ -90,7 +95,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is completed'),
                 terminate : __('is completed'),
                 report : true,
-                print: true
+                print: true,
+                time : true
             }
         },
         terminated : {
@@ -101,7 +107,8 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('is terminated'),
                 terminate : __('is terminated'),
                 report : true,
-                print: true
+                print: true,
+                time : true
             }
         }
     };

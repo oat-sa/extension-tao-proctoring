@@ -39,6 +39,9 @@ use oat\taoClientDiagnostic\model\browserDetector\OSService;
  */
 class DeliveryExecutionStateService extends ConfigurableService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
+    const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
+    const OPTION_TIME_HANDLING = 'time_handling';
+    
     /**
      * @var TestSessionService
      */
