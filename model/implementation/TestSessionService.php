@@ -142,8 +142,8 @@ class TestSessionService extends ConfigurableService
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
             $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
-            if ($wasPausedAt && $deliveryExecutionStateService->hasOption('termination_delay_after_pause')) {
-                $delay = $deliveryExecutionStateService->getOption('termination_delay_after_pause');
+            if ($wasPausedAt && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
+                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
                 if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
                     $this->cache[$deliveryExecution->getIdentifier()]['expired'] = true;
 

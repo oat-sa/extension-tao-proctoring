@@ -32,6 +32,9 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimer;
+use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
@@ -189,6 +192,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
                 DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
                 DeliveryMonitoringService::START_TIME,
                 DeliveryMonitoringService::END_TIME,
+                DeliveryMonitoringService::REMAINING_TIME,
+                DeliveryMonitoringService::EXTRA_TIME,
                 DeliveryMonitoringService::TEST_CENTER_ID,
                 DeliveryMonitoringService::DELIVERY_ID,
                 DeliveryMonitoringService::DELIVERY_NAME,
@@ -301,6 +306,45 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             $finishTime = '';
         }
         $this->addValue(DeliveryMonitoringService::END_TIME, $finishTime, true);
+    }
+
+    /**
+     * Update remaining time of delivery execution
+     */
+    private function updateRemainingTime()
+    {
+        $result = null;
+        $remaining = 0;
+        $hasTimer = false;
+
+        $session = $this->getTestSession();
+
+        if ($session !== null && $session->isRunning()) {
+            $remaining = PHP_INT_MAX;
+            foreach ($session->getRegularTimeConstraints() as $tc) {
+                // Only consider time constraints in force.
+                if ($tc->getMaximumRemainingTime() !== false) {
+                    $hasTimer = true;
+                    $remaining = min($remaining, $tc->getMaximumRemainingTime()->getSeconds(true));
+                }
+            }
+        }
+
+        if ($hasTimer) {
+            $result = $remaining . 's';
+        }
+
+        $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
+    }
+    
+    /**
+     * Update extra time allowed for the delivery execution
+     */
+    private function updateExtraTime()
+    {
+        $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
+        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
+        $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }
 
     /**
