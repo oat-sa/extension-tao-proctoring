@@ -212,6 +212,23 @@ class BreadcrumbsHelper
     }
 
     /**
+     * Create breadcrumb for Diagnostic::deliveriesByProctor
+     *
+     * @param core_kernel_classes_Resource $testCenter
+     * @return array
+     */
+    public static function deliveriesByProctor(core_kernel_classes_Resource $testCenter)
+    {
+        $breadcrumbs = array(
+            'id' => 'deliveries',
+            'url' => _url('deliveriesByProctor', 'Diagnostic', null, array('testCenter' => $testCenter->getUri())),
+            'label' => __('Deliveries')
+        );
+
+        return $breadcrumbs;
+    }
+
+    /**
      * Create breadcrumb for Reporting::index
      *
      * @param core_kernel_classes_Resource $testCenter

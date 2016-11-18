@@ -42,18 +42,42 @@ class Diagnostic extends ProctoringModule
      * It also allows launching new ones.
      */
     public function index(){
-
         $testCenter = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
 
+        $this->setData('title', __('Readiness Check for test site %s', _dh($testCenter->getLabel())));
+        $this->composeView(
+            'diagnostic-index',
+            array(
+                'testCenter' => $testCenter->getUri(),
+                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
+                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
+            ),
+            array(
+                BreadcrumbsHelper::testCenters(),
+                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                BreadcrumbsHelper::diagnostics(
+                    $testCenter,
+                    array(
+                        BreadcrumbsHelper::deliveries($testCenter),
+                    )
+                )
+            )
+        );
+    }
+
+
+    public function deliveriesByProctor()
+    {
+        $deliveryData = array();
         if(\common_ext_ExtensionsManager::singleton()->isInstalled('ltiDeliveryProvider')){
+            $testCenter = $this->getCurrentTestCenter();
             /** @var DeliveryService $service */
             $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
             $deliveries = $service->getAccessibleDeliveries();
 
 
             if(!empty($deliveries)){
-                $deliveryData = array();
 
                 try{
                     $dataStore = new \tao_models_classes_oauth_DataStore();
@@ -103,35 +127,39 @@ class Diagnostic extends ProctoringModule
                     $acc_req = \OAuthRequest::from_consumer_and_token($test_consumer, $test_token, 'GET', $launchUrl, $ltiData);
                     $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
 
-                    $deliveryData[] = array('name' => $delivery->getLabel(), 'url' => $acc_req->to_url());
+                    $deliveryData[] = array(
+                        'id' => $delivery->getUri(),
+                        'label' => $delivery->getLabel(),
+                        'url' => $acc_req->to_url(),
+                        'text' => __('Test')
+                    );
                 }
-                $this->setData('deliveries', $deliveryData);
             }
 
         }
 
+        $this->setData('title', __('Available Deliveries'));
 
-        $this->setData('title', __('Readiness Check for test site %s', _dh($testCenter->getLabel())));
-        $this->composeView(
-            'diagnostic-index',
-            array(
-                'testCenter' => $testCenter->getUri(),
-                'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
-                'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
-            ),
-            array(
-                BreadcrumbsHelper::testCenters(),
-                BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
-                BreadcrumbsHelper::diagnostics(
-                    $testCenter,
-                    array(
-                        BreadcrumbsHelper::deliveries($testCenter),
-                    )
+        if (\tao_helpers_Request::isAjax()) {
+            $this->returnJson(array('list' => $deliveryData));
+        } else {
+            $this->composeView(
+                'diagnostic-deliveries',
+                array('list' => $deliveryData),
+                array(
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                    BreadcrumbsHelper::diagnostics(
+                        $testCenter,
+                        array(
+                            BreadcrumbsHelper::deliveries($testCenter),
+                        )
+                    ),
+                    BreadcrumbsHelper::deliveriesByProctor($testCenter)
                 )
-            )
-        );
+            );
+        }
     }
-
     /**
      * Display the diagnostic runner
      */
