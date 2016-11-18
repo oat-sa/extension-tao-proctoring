@@ -491,9 +491,8 @@ class DeliveryHelper
 
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
 
-        /* @var TestSession $testSession */
         $testSession = $testSessionService->getTestSession($deliveryExecution);
-        if ($testSession) {
+        if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer(); 
         } else {
             $timer = new QtiTimer();
