@@ -7,6 +7,6 @@
         <h1><?= get_data('title'); ?></h1>
 <?php endif; ?>
         <div class="panel"></div>
-        <div class="list"></div>
+        <div class="list clearfix"></div>
     </div>
 </div>
