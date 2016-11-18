@@ -49,6 +49,7 @@ class Reporting extends ProctoringModule
             'sortorder'   => 'desc',
             'periodStart' => '',
             'periodEnd' => '',
+            'detailed' => false
         ]);
 
         if (!is_array($sessions)) {
@@ -65,7 +66,7 @@ class Reporting extends ProctoringModule
 
         $viewData = [
             'testCenter'  => $testCenter->getUri(),
-            'set'         => TestCenterHelper::getSessionHistory($testCenter, $sessions, true, $requestOptions),
+            'set'         => TestCenterHelper::getSessionHistory($sessions, true, $requestOptions),
             'sessions'    => $sessions,
             'sortBy'      => $requestOptions['sortBy'],
             'sortOrder'   => $requestOptions['sortOrder'],
@@ -99,8 +100,6 @@ class Reporting extends ProctoringModule
     public function history()
     {
         try {
-
-            $testCenter     = $this->getCurrentTestCenter();
             $sessions       = $this->getRequestParameter('session');
             $requestOptions = $this->getRequestOptions([
                 'sortby'      => 'timestamp',
@@ -112,7 +111,7 @@ class Reporting extends ProctoringModule
             if (!is_array($sessions)) {
                 $sessions = $sessions ? explode(',', $sessions) : [];
             }
-            $this->returnJson(TestCenterHelper::getSessionHistory($testCenter, $sessions, false, $requestOptions));
+            $this->returnJson(TestCenterHelper::getSessionHistory($sessions, false, $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No history service defined for proctoring');
