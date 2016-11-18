@@ -80,6 +80,12 @@
         }
     }
 
+    .session-history {
+        .tool-show-brief-report, .tool-show-detailed-report {
+            float: right;
+        }
+    }
+
     .diagnostic-index, .diagnostic-runner, .reporting-index, .session-history, .delivery-monitoring {
         .content {
             width: 100%;

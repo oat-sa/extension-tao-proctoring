@@ -137,6 +137,8 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
         $filterquery = $this->hasRequestParameter('filterquery') ? $this->getRequestParameter('filterquery') : $defaults['filter'];
         $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $defaults['periodStart'];
         $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $defaults['periodEnd'];
+        $detailed = $this->hasRequestParameter('detailed') ? $this->getRequestParameter('detailed') : 'false';
+        $detailed = filter_var($detailed, FILTER_VALIDATE_BOOLEAN);
 
         return array(
             'page' => $page,
@@ -145,6 +147,7 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
             'sortOrder' => $sortOrder,
             'filter' => $filter ? $filter : $filterquery,
             'periodStart' => $periodStart,
+            'detailed' => $detailed,
             'periodEnd' => $periodEnd
         );
 
