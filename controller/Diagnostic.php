@@ -20,8 +20,12 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\ltiDeliveryProvider\model\LTIDeliveryTool;
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\model\implementation\DeliveryService;
+
+require_once __DIR__.'/../../tao/lib/oauth/OAuth.php';
 
 /**
  * Proctoring Diagnostic controller for the readiness check screen
@@ -38,7 +42,6 @@ class Diagnostic extends ProctoringModule
      * It also allows launching new ones.
      */
     public function index(){
-
         $testCenter = $this->getCurrentTestCenter();
         $requestOptions = $this->getRequestOptions();
 
@@ -63,6 +66,100 @@ class Diagnostic extends ProctoringModule
         );
     }
 
+
+    public function deliveriesByProctor()
+    {
+        $deliveryData = array();
+        if(\common_ext_ExtensionsManager::singleton()->isInstalled('ltiDeliveryProvider')){
+            $testCenter = $this->getCurrentTestCenter();
+            /** @var DeliveryService $service */
+            $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+            $deliveries = $service->getAccessibleDeliveries();
+
+
+            if(!empty($deliveries)){
+
+                try{
+                    $dataStore = new \tao_models_classes_oauth_DataStore();
+                    $test_consumer = $dataStore->lookup_consumer('proctoring_key');
+                } catch(\tao_models_classes_oauth_Exception $e){
+                    $secret = uniqid('proctoring_');
+                    \taoLti_models_classes_ConsumerService::singleton()->getRootClass()->createInstanceWithProperties(
+                        array(
+                            RDFS_LABEL => 'proctoring',
+                            PROPERTY_OAUTH_KEY => 'proctoring_key',
+                            PROPERTY_OAUTH_SECRET => $secret
+                        )
+                    );
+
+                    $test_consumer = new \OAuthConsumer('proctoring_key', $secret);
+                }
+                $session = \common_session_SessionManager::getSession();
+
+                $ltiData = array(
+                    'lti_message_type' => 'basic-lti-launch-request',
+                    'lti_version' => 'LTI-1p0',
+
+                    'resource_link_id' => rand(0, 9999999),
+                    'resource_link_title' => 'Launch Title',
+                    'resource_link_label' => 'Launch label',
+
+                    'context_title' => 'Launch Title',
+                    'context_label' => 'Launch label',
+
+                    'user_id' => $session->getUserUri(),
+                    'roles' => 'Learner',
+                    'lis_person_name_full' => $session->getUserLabel(),
+
+                    'tool_consumer_info_product_family_code' => PRODUCT_NAME,
+                    'tool_consumer_info_version' => TAO_VERSION,
+                );
+
+
+
+                $hmac_method = new \OAuthSignatureMethod_HMAC_SHA1();
+
+                $test_token = new \OAuthToken($test_consumer, '');
+
+
+                foreach($deliveries as $delivery){
+                    $launchUrl =  LTIDeliveryTool::singleton()->getLaunchUrl(array('delivery' => $delivery->getUri()));
+                    $acc_req = \OAuthRequest::from_consumer_and_token($test_consumer, $test_token, 'GET', $launchUrl, $ltiData);
+                    $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
+
+                    $deliveryData[] = array(
+                        'id' => $delivery->getUri(),
+                        'label' => $delivery->getLabel(),
+                        'url' => $acc_req->to_url(),
+                        'text' => __('Test')
+                    );
+                }
+            }
+
+        }
+
+        $this->setData('title', __('Available Deliveries'));
+
+        if (\tao_helpers_Request::isAjax()) {
+            $this->returnJson(array('list' => $deliveryData));
+        } else {
+            $this->composeView(
+                'diagnostic-deliveries',
+                array('list' => $deliveryData),
+                array(
+                    BreadcrumbsHelper::testCenters(),
+                    BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
+                    BreadcrumbsHelper::diagnostics(
+                        $testCenter,
+                        array(
+                            BreadcrumbsHelper::deliveries($testCenter),
+                        )
+                    ),
+                    BreadcrumbsHelper::deliveriesByProctor($testCenter)
+                )
+            );
+        }
+    }
     /**
      * Display the diagnostic runner
      */

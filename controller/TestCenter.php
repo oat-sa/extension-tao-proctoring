@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 
 /**
  * Proctoring Test Center controllers for test center screens
@@ -34,6 +35,8 @@ use oat\taoProctoring\helpers\TestCenterHelper;
  */
 class TestCenter extends ProctoringModule
 {
+    use ProctoringTextConverterTrait;
+
     /**
      * Displays the index page of the extension: list all available deliveries.
      */
@@ -67,7 +70,7 @@ class TestCenter extends ProctoringModule
         $testCenter  = $this->getCurrentTestCenter();
         $data = array(
             'testCenter' => $testCenter->getUri(),
-            'title' => __('Test site %s', $testCenter->getLabel()),
+            'title' => sprintf($this->convert('Test site %s'), $testCenter->getLabel()),
             'list' => TestCenterHelper::getTestCenterActions($testCenter)
         );
 

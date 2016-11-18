@@ -70,6 +70,7 @@ define([
             var config = $container.data('config') || {};
             var testCenterId = $container.data('testcenter');
             var diagnosticUrl = helpers._url('diagnostic', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
+            var deliveryUrl = helpers._url('deliveriesByProctor', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var removeUrl = helpers._url('remove', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var serviceUrl = helpers._url('diagnosticData', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
 
@@ -139,6 +140,17 @@ define([
                 label: __('Launch readiness check'),
                 action: function() {
                     window.location.href = diagnosticUrl;
+                }
+            });
+
+            // tool: compatibilty via lti
+            tools.push({
+                id: 'lti',
+                icon: 'play',
+                title: __('Try a test delivery'),
+                label: __('Try a test delivery'),
+                action: function() {
+                    window.location.href = deliveryUrl;
                 }
             });
 

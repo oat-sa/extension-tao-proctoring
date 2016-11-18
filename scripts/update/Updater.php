@@ -30,6 +30,7 @@ use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\TestCenterService;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
 use oat\taoProctoring\model\implementation\DeliveryService;
@@ -53,6 +54,7 @@ use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\implementation\TestSessionHistoryService;
 
 /**
  *
@@ -269,7 +271,7 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $deliveryExecutionStateService->setOption('termination_delay_after_pause', 'PT1H');
+            $deliveryExecutionStateService->setOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE, 'PT1H');
             $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
 
             $this->setVersion('1.8.0');
@@ -505,8 +507,79 @@ class Updater extends common_ext_ExtensionUpdater {
 
             $this->setVersion('3.6.6');
         }
-        $this->skip('3.6.6', '3.6.16');
 
+        $this->skip('3.6.6', '3.6.18');
+
+        if ($this->isVersion('3.6.18')) {
+
+            $this->getServiceManager()->register(ProctoringTextConverter::SERVICE_ID, new ProctoringTextConverter());
+
+            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+            $accessService = \funcAcl_models_classes_AccessService::singleton();
+            $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'TextConverter');
+
+            $this->setVersion('3.7.0');
+        }
+
+        $this->skip('3.7.0', '3.10.1');
+
+        if ($this->isVersion('3.10.1')) {
+            try {
+                $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new TestSessionHistoryService();
+                $service->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->register(TestSessionHistoryService::SERVICE_ID, $service);
+            }
+            $this->setVersion('3.11.0');
+        }
+
+        if ($this->isVersion('3.11.0')) {
+            // register timeHandling option
+            try {
+                $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryExecutionStateService([
+                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
+                    DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
+                ]);
+            }
+            
+            $service->setOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING, false);
+
+            $service->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+
+            // extend the data table
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+            $persistence = \common_persistence_Manager::getPersistence($persistenceId);
+            $schemaManager = $persistence->getDriver()->getSchemaManager();
+            $schema = $schemaManager->createSchema();
+            $fromSchema = clone $schema;
+            try {
+                $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+            } catch(SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
+            $this->refreshMonitoringData();
+            
+            $this->setVersion('3.12.0');
+        }
+
+        $this->skip('3.12.0', '3.12.1');
+
+        if ($this->isVersion('3.12.1')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.13.0');
+        }
     }
 
     private function refreshMonitoringData()

@@ -26,15 +26,14 @@ define([
     'ui/listbox',
     'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/textConverter',
-    'tpl!taoProctoring/templates/testSiteAdmin/adminLink'
-], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory, textConverter, adminLinkTpl) {
+], function ($, __, helpers, loadingBar, listBox, breadcrumbsFactory, textConverter) {
     'use strict';
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.testcenters-index';
+    var cssScope = '.diagnostic-deliveries';
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -44,7 +43,7 @@ define([
      *
      * @type {Object}
      */
-    var taoProctoringIndexCtlr = {
+    return {
         /**
          * Entry point of the page
          */
@@ -53,20 +52,18 @@ define([
             textConverter().then(function(labels) {
 
                 var $container = $(cssScope);
-                var admin = $container.data('administrator');
                 var boxes = $container.data('list');
                 var crumbs = $container.data('breadcrumbs');
                 var list = listBox({
-                    title: __("My Test sites"),
-                    textEmpty: __("No test site available"),
+                    title: __('Available Deliveries'),
+                    textEmpty: __("No Deliveries available"),
                     textNumber: __("Available"),
                     textLoading: __("Loading"),
                     renderTo: $container.find('.content'),
                     replace: true
                 });
                 var bc = breadcrumbsFactory($container, crumbs);
-                var serviceUrl = helpers._url('index', 'TestCenter', 'taoProctoring');
-                var adminUrl = helpers._url('index', 'ProctorManager', 'taoProctoring');
+                var serviceUrl = helpers._url('deliveriesByProctor', 'Diagnostic', 'taoProctoring');
 
                 // update the index from a JSON array
                 var update = function(boxes) {
@@ -96,18 +93,10 @@ define([
                     update(boxes);
                 }
 
-                if(admin){
-                    //add test center admin link
-                    $container.find('.header').append(adminLinkTpl({
-                        href : adminUrl,
-                        manageProctorMenu : labels.get('Manage Proctors')
-                    }));
-                }
             }).catch(function (err) {
                 console.log(err);
             });
         }
     };
 
-    return taoProctoringIndexCtlr;
 });
