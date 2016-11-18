@@ -82,13 +82,15 @@ define([
                  * @returns {Boolean}
                  */
                 function checkInputError() {
+                    var value = $time.val().trim();
+
                     // use Number() instead of parseInt/parseFloat to prevent number with text like "10$$" to be
                     // converted to number, as we need to avoid that case
-                    var time = Number($time.val());
+                    var time = Number(value);
 
                     // here we also check with the parseFloat to detect non decimal notation,
                     // otherwise numbers like 0x10 will be accepted, but misunderstood when applied
-                    var error = isNaN(time) || time !== parseFloat($time.val());
+                    var error = isNaN(time) || time !== parseFloat(value);
 
                     if (error) {
                         hider.show($error);

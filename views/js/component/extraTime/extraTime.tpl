@@ -34,7 +34,7 @@
     <div class="form">
         <p>
             <label for="input-extra-time">{{__ "Extra time"}}:</label>
-            <input id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
+            <input type="text" id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
             <label for="input-extra-time">{{__ "minutes"}}</label>
         </p>
     </div>
