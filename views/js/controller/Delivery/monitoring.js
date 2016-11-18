@@ -617,6 +617,7 @@ define([
             $list
                 .on('query.datatable', function() {
                     loadingBar.start();
+                    highlightRows = [];
                 })
                 .on('load.datatable', function(e, newDataset) {
                     //update dateset in memory
@@ -630,6 +631,7 @@ define([
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
 
+                    // highlight rows
                     if (highlightRows.length) {
                         _.forEach(highlightRows, function (v) {
                             $list.datatable('highlightRow', v);
