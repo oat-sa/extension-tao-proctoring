@@ -89,9 +89,6 @@ class Diagnostic extends ProctoringModule
 
                     'tool_consumer_info_product_family_code' => PRODUCT_NAME,
                     'tool_consumer_info_version' => TAO_VERSION,
-
-                    'launch_presentation_return_url' => _url(null,null,null,array('testCenter' => $testCenter->getUri())),
-                    'cookie' => $this->getCookie(GENERIS_SESSION_NAME),
                 );
 
 
