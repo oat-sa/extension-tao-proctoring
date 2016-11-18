@@ -53,8 +53,6 @@ define([
 
                 var $container = $(cssScope);
                 var boxes = $container.data('list');
-                console.log(boxes);
-                console.log($container.data());
                 var crumbs = $container.data('breadcrumbs');
                 var list = listBox({
                     title: __('Available Deliveries'),
