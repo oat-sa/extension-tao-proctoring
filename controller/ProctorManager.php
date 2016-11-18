@@ -28,6 +28,7 @@ use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\controller\form\AddProctor;
 use oat\taoProctoring\model\ProctorManagementService;
+use oat\taoProctoring\model\textConverter\ProctoringTextConverterTrait;
 
 /**
  * Proctor manager controller
@@ -39,6 +40,8 @@ use oat\taoProctoring\model\ProctorManagementService;
  */
 class ProctorManager extends ProctoringModule
 {
+    use ProctoringTextConverterTrait;
+
     /**
      * The proctor is not authorized on the selected test centers
      */
@@ -67,6 +70,7 @@ class ProctorManager extends ProctoringModule
         if (tao_helpers_Request::isAjax()) {
             $this->returnJson($data);
         } else {
+            $this->setData('select-message', $this->convert('Please select one or more test site to manage proctors'));
             $this->composeView(
                 'proctorManager-index',
                 $data,
@@ -101,7 +105,7 @@ class ProctorManager extends ProctoringModule
         if($this->hasRequestParameter('proctors')){
             return $this->getRequestParameter('proctors');
         }else{
-            throw new \common_Exception('no proctors in request param');
+            throw new \common_Exception($this->convert('No proctors in request param'));
         }
     }
 
@@ -253,12 +257,12 @@ class ProctorManager extends ProctoringModule
 
     /**
      * action used to check if a login can be used
-     * @throws Exception
+     * @throws \Exception
      */
     public function checkLogin()
     {
         if (!tao_helpers_Request::isAjax()) {
-            throw new Exception("wrong request mode");
+            throw new \Exception("wrong request mode");
         }
 
         $available = false;

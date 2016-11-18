@@ -12,7 +12,7 @@
                 <div class="proctor-list hidden"></div>
                 <div class="proctor-create hidden"></div>
                 <div class="proctor-default">
-                    <div class="message"><?= __('Please select one or more test site to manage proctors'); ?></div>
+                    <div class="message"><?= get_data('select-message'); ?></div>
                 </div>
             </div>
         </div>
