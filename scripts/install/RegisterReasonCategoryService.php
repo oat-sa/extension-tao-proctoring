@@ -37,7 +37,7 @@ class RegisterReasonCategoryService extends \common_ext_action_InstallAction
      */
     public function __invoke($params)
     {
-        $serviceManager = ServiceManager::getServiceManager();
+        $serviceManager = $this->getServiceManager();
 
         $service = new ReasonCategoryService();
         $service->setServiceManager($serviceManager);
