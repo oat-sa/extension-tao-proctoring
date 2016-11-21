@@ -587,6 +587,38 @@ define([
                 }
             });
 
+            // action: authorise the execution
+            model.push({
+                id: 'authorizeCl',
+                label: __('Authorize'),
+                type: 'actions',
+                actions: [{
+                    id: 'authorise',
+                    icon: 'play',
+                    title: __('Authorize session'),
+                    disabled: function() {
+                        return !canDo('authorize', this.state);
+                    },
+                    action: authorise
+                }]
+            });
+
+            // action: pause the execution
+            model.push({
+                id: 'pauseCl',
+                label: __('Pause'),
+                type: 'actions',
+                actions: [{
+                    id: 'pause',
+                    icon: 'pause',
+                    title: __('Pause session'),
+                    disabled: function() {
+                        return !canDo('pause', this.state);
+                    },
+                    action: pause
+                }]
+            });
+
             // column: remaining time
             model.push({
                 id: 'remaining',
@@ -625,38 +657,6 @@ define([
                     }]
                 });
             }
-
-            // action: authorise the execution
-            model.push({
-                id: 'authorizeCl',
-                label: __('Authorize'),
-                type: 'actions',
-                actions: [{
-                    id: 'authorise',
-                    icon: 'play',
-                    title: __('Authorize session'),
-                    disabled: function() {
-                        return !canDo('authorize', this.state);
-                    },
-                    action: authorise
-                }]
-            });
-
-            // action: pause the execution
-            model.push({
-                id: 'pauseCl',
-                label: __('Pause'),
-                type: 'actions',
-                actions: [{
-                    id: 'pause',
-                    icon: 'pause',
-                    title: __('Pause session'),
-                    disabled: function() {
-                        return !canDo('pause', this.state);
-                    },
-                    action: pause
-                }]
-            });
 
             // column: connectivity status of execution progress
             model.push({
