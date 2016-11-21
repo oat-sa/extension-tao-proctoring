@@ -69,7 +69,6 @@ define([
             var dataset = $container.data('set');
             var config = $container.data('config') || {};
             var installedExtension = $container.data('installedextension') || false;
-            console.log(installedExtension);
             var testCenterId = $container.data('testcenter');
             var diagnosticUrl = helpers._url('diagnostic', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
             var deliveryUrl = helpers._url('deliveriesByProctor', 'Diagnostic', 'taoProctoring', {testCenter : testCenterId});
