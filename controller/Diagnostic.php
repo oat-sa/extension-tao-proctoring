@@ -52,6 +52,7 @@ class Diagnostic extends ProctoringModule
                 'testCenter' => $testCenter->getUri(),
                 'set' => TestCenterHelper::getDiagnostics($testCenter, $requestOptions),
                 'config' => TestCenterHelper::getDiagnosticConfig($testCenter),
+                'installedExtension' => \common_ext_ExtensionsManager::singleton()->isInstalled('ltiDeliveryProvider'),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
