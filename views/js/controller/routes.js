@@ -19,7 +19,7 @@ define({
         'actions' : {
             'index' : 'controller/Diagnostic/index',
             'diagnostic' : 'controller/Diagnostic/diagnostic',
-            'deliveriesByProctor' : 'controller/Diagnostic/deliveriesByproctor'
+            'deliveriesByProctor' : 'controller/Diagnostic/deliveriesByProctor'
         }
     },
     'Reporting' : {
