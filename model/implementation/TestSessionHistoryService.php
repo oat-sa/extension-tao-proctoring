@@ -42,8 +42,6 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
      * List of event ids which should be represented in the brief history report
      */
     protected static $briefEvents = [
-        'item_end_time_server',
-        'item_start_time_server',
         'section_exit_code',
         'test_exit_code',
         'test_pause',
