@@ -580,7 +580,7 @@ class Updater extends common_ext_ExtensionUpdater {
             OntologyUpdater::syncModels();
             $this->setVersion('3.13.0');
         }
-        $this->skip('3.13.0', '3.13.2');
+        $this->skip('3.13.0', '3.13.4');
     }
 
     private function refreshMonitoringData()
