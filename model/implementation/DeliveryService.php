@@ -139,8 +139,11 @@ class DeliveryService extends ConfigurableService
             $returnedDeliveryExecutions[] = ExecutionServiceProxy::singleton()->getUserExecutions($delivery,
                 $user->getUri());
         }
-
-        return call_user_func_array('array_merge', $returnedDeliveryExecutions);
+        
+        if (count($returnedDeliveryExecutions)) {
+            return call_user_func_array('array_merge', $returnedDeliveryExecutions);
+        }
+        return [];
     }
 
     /**
