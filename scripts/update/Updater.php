@@ -568,8 +568,6 @@ class Updater extends common_ext_ExtensionUpdater {
             foreach ($queries as $query) {
                 $persistence->exec($query);
             }
-
-            $this->refreshMonitoringData();
             
             $this->setVersion('3.12.0');
         }
@@ -580,30 +578,12 @@ class Updater extends common_ext_ExtensionUpdater {
             OntologyUpdater::syncModels();
             $this->setVersion('3.13.0');
         }
-        $this->skip('3.13.0', '3.13.4');
+        $this->skip('3.13.0', '3.13.5');
     }
 
     private function refreshMonitoringData()
     {
-        $testCenters = TestCenterService::singleton()->getRootClass()->getInstances(true);
-        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-
-        $deliveryService = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $eligibilityService = EligibilityService::singleton();
-
-        foreach ($testCenters as $testCenter) {
-            $deliveries = $eligibilityService->getEligibleDeliveries($testCenter, false);
-
-            foreach ($deliveries as $delivery) {
-                if ($delivery->exists()) {
-                    $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
-                    foreach ($deliveryExecutions as $deliveryExecution) {
-                        $data = $deliveryMonitoringService->getData($deliveryExecution, true);
-                        $deliveryMonitoringService->save($data);
-                    }
-                }
-            }
-        }
+        \common_Logger::w(__METHOD__ . ' is deprecated! Please use the CLI tool instead! (RefreshMonitoringData)');
 
     }
 
