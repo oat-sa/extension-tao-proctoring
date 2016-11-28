@@ -583,7 +583,7 @@ class Updater extends common_ext_ExtensionUpdater {
 
     private function refreshMonitoringData()
     {
-        \common_Logger::w(__METHOD__ . ' is deprecated! Please the CLI tool instead! (RefreshMonitoringData)');
+        \common_Logger::w(__METHOD__ . ' is deprecated! Please use the CLI tool instead! (RefreshMonitoringData)');
 
     }
 
