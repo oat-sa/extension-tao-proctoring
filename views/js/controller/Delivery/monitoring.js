@@ -356,7 +356,11 @@ define([
                 });
 
                 if (!config.allowedResources.length) {
-                    feedback().warning(__('No report available for these test sessions'));
+                    if (selection.length > 1) {
+                        feedback().warning(__('No report available for these test sessions'));
+                    } else {
+                        feedback().warning(__('No report available for this test session'));
+                    }
                 } else {
                     bulkActionPopup(config).on('ok', function(reason){
                         //execute callback
