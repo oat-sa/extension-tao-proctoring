@@ -356,7 +356,7 @@ define([
                 });
 
                 if (!config.allowedResources.length) {
-                    if (selection.length > 1) {
+                    if (_selection.length > 1) {
                         feedback().warning(__('No report available for these test sessions'));
                     } else {
                         feedback().warning(__('No report available for this test session'));
