@@ -273,12 +273,19 @@ define([
              * @returns {Object}
              */
             function verifyDelivery(testTakerData, actionName){
-                var deliveryName = $(testTakerData.delivery).text();
-                var formatted = {
+                var deliveryName, formatted, status;
+
+                if (_.isObject(testTakerData.delivery)) {
+                    deliveryName = testTakerData.delivery.label;
+                } else {
+                    deliveryName = $(testTakerData.delivery).text();
+                }
+                formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.date + ']'
+                    label: deliveryName + ' [' + testTakerData.date + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
                 };
-                var status = _status.getStatusByCode(testTakerData.state.status);
+                status = _status.getStatusByCode(testTakerData.state.status);
+
                 if(status){
                     formatted.allowed = (status.can[actionName] === true);
                     if(!formatted.allowed){
