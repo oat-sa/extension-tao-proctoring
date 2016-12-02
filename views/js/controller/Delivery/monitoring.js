@@ -273,12 +273,19 @@ define([
              * @returns {Object}
              */
             function verifyDelivery(testTakerData, actionName){
-                var deliveryName = $(testTakerData.delivery).text();
-                var formatted = {
+                var deliveryName, formatted, status;
+
+                if (_.isObject(testTakerData.delivery)) {
+                    deliveryName = testTakerData.delivery.label;
+                } else {
+                    deliveryName = $(testTakerData.delivery).text();
+                }
+                formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.date + ']'
+                    label: deliveryName + ' [' + testTakerData.date + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
                 };
-                var status = _status.getStatusByCode(testTakerData.state.status);
+                status = _status.getStatusByCode(testTakerData.state.status);
+
                 if(status){
                     formatted.allowed = (status.can[actionName] === true);
                     if(!formatted.allowed){
@@ -356,7 +363,11 @@ define([
                 });
 
                 if (!config.allowedResources.length) {
-                    feedback().warning(__('No report available for these test sessions'));
+                    if (_selection.length > 1) {
+                        feedback().warning(__('No report available for these test sessions'));
+                    } else {
+                        feedback().warning(__('No report available for this test session'));
+                    }
                 } else {
                     bulkActionPopup(config).on('ok', function(reason){
                         //execute callback
