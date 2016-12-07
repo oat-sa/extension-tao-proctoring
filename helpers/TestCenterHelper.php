@@ -25,13 +25,13 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoClientDiagnostic\model\storage\Storage;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\model\DiagnosticStorage;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestCenterService;
 use core_kernel_classes_Resource;
 use DateTime;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\implementation\TestSessionHistoryService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\PaginatedStorage;
@@ -230,155 +230,23 @@ class TestCenterHelper
     /**
      * Gets the list of session history
      *
-     * @param $testCenter
      * @param $sessions
      * @param bool $logHistory
      * @param array [$options]
      * @return array
      */
-    public static function getSessionHistory($testCenter, $sessions, $logHistory = false, $options = array())
+    public static function getSessionHistory($sessions, $logHistory = false, $options = array())
     {
-        if (!is_array($sessions)) {
-            $sessions = $sessions ? [$sessions] : [];
-        }
-
-        $periodStart = null;
-        $periodEnd = null;
-
-        if (!empty($options['periodStart'])) {
-            $periodStart = new DateTime($options['periodStart']);
-            $periodStart->setTime(0, 0, 0);
-            $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
-        }
-        if (!empty($options['periodEnd'])) {
-            $periodEnd = new DateTime($options['periodEnd']);
-            $periodEnd->setTime(23, 59, 59);
-            $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
-        }
-
-        $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-
-        $history = [];
-        $userService = \tao_models_classes_UserService::singleton();
-        $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
-
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        foreach ($sessions as $sessionUri) {
-            $valid = false;
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
-            $delivery = $deliveryExecution->getDelivery();
-            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options);
-
-            foreach($executions as $execution){
-                if($execution['delivery_execution_id'] === $sessionUri){
-                    $valid = true;
-                    break;
-                }
-            }
-
-            if(!$valid){
-                continue;
-            }
-
-            $author = new \core_kernel_classes_Resource($deliveryExecution->getUserIdentifier());
-            $startTime = DateHelper::getTimeStamp($deliveryExecution->getStartTime());
-            if (($periodStart && $startTime >= $periodStart) || ($periodEnd && $startTime <= $periodEnd)) {
-                $startTest = array(
-                    'timestamp' => $startTime,
-                    'role'      => __('Test-Taker'),
-                    'actor' => _dh($author->getLabel()),
-                    'event'     => __('Test start time'),
-                    'details'   => '',
-                    'context'   => '',
-                );
-                $startTest['date'] = DateHelper::displayeDate($startTest['timestamp']);
-                $history[] = $startTest;
-            }
-
-            if(!is_null($finishDate = $deliveryExecution->getFinishTime())){
-                $finishTime = DateHelper::getTimeStamp($finishDate);
-                if (($periodStart && $finishTime >= $periodStart) || ($periodEnd && $finishTime <= $periodEnd)) {
-                    $endTest = array(
-                        'timestamp' => $finishTime,
-                        'role' => __('Test-Taker'),
-                        'actor' => _dh($author->getLabel()),
-                        'event' => __('Test end time'),
-                        'details' => '',
-                        'context' => '',
-                    );
-                    $endTest['date'] = DateHelper::displayeDate($endTest['timestamp']);
-                    $history[] = $endTest;
-                }
-            }
-
-            if($logHistory){
-                $deliveryLog->log($deliveryExecution->getIdentifier(), 'HISTORY', array());
-            }
-
-            $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
-            $exportable = array();
-            foreach($logs as $data){
-                if($data['event_id'] !== 'HEARTBEAT'){
-                    $author = new \core_kernel_classes_Resource($data['created_by']);
-                    $role = ($userService->userHasRoles($author, $proctorRole)) ? __('Proctor') : __('Test-Taker');
-
-                    $details = '';
-                    //prohibited behavior
-                    if(isset($data['data']['type'])) {
-                        $event_id = $data['data']['type'];
-
-                        $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
-                        $details = (isset($data['data']['context']['shortcut']))?$data['data']['context']['shortcut']: '';
-                    } else {
-                        if (isset($data['data']['reason']) && isset($data['data']['reason']['reasons'])) {
-                            $details = is_array($data['data']['reason']['reasons']) ?
-                                array_merge(array_values($data['data']['reason']['reasons']), [$data['data']['reason']['comment']])
-                                : array_merge([$data['data']['reason']['reasons']], [$data['data']['reason']['comment']]);
-                        }
-                        if(isset($data['data']['exitCode'])){
-                            $details = $data['data']['exitCode'];
-                        }
-
-                        if(is_string($data['data'])){
-                            $details = $data['data'];
-                        }
-                        $event_id = $data['event_id'];
-                        $context = (isset($data['data']['context']) && !is_null($data['data']['context']))?$data['data']['context'] : '';
-                    }
-
-                    $exportable['timestamp'] = (isset($data['data']['timestamp']))?$data['data']['timestamp']:$data['created_at'];
-                    if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
-                        continue;
-                    }
-                    $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
-                    $exportable['role'] = $role;
-                    $exportable['actor'] = _dh($author->getLabel());
-                    $exportable['event'] = $event_id;
-                    $exportable['details'] = $details;
-                    $exportable['context'] = $context;
-                    $history[] = $exportable;
-                }
+        if ($logHistory) {
+            foreach ($sessions as $sessionUri) {
+                $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+                $deliveryLog->log($sessionUri, 'HISTORY', []);
             }
         }
+        /** @var TestSessionHistoryService $historyService */
+        $historyService = ServiceManager::getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
+        return DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $options), $options);
 
-        $sortBy = isset($options['sortBy']) ? $options['sortBy'] : 'timestamp';
-        $sortOrder = isset($options['sortOrder']) ? $options['sortOrder'] : 'desc';
-        if ($sortOrder == 'asc') {
-            $sortOrder = 1;
-        } else {
-            $sortOrder = -1;
-        }
-        if ($sortBy == 'timestamp' || $sortBy == 'id') {
-            usort($history, function($a, $b) use($sortOrder) {
-                return $sortOrder * ($a['timestamp'] - $b['timestamp']);
-            });
-        } else {
-            usort($history, function($a, $b) use($sortBy, $sortOrder) {
-                return $sortOrder * strnatcasecmp($a[$sortBy], $b[$sortBy]);
-            });
-        }
-
-        return DataTableHelper::paginate($history, $options);
     }
 
     /**

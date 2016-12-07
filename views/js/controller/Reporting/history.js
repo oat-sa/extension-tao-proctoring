@@ -60,6 +60,7 @@ define([
             var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, delivery : deliveryId, session: sessions});
             var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {testCenter: testCenterId, delivery : deliveryId});
             var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
+            var detailedHistory = false;
 
             var historyTable = historyTableFactory({
                     tools: [{
@@ -70,7 +71,20 @@ define([
                         action: function() {
                             window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
                         }
+                    }, {
+                        id: 'show-detailed-report',
+                        icon: 'insert-horizontal-line',
+                        title: __('Show detailed session history messages'),
+                        label: __('Show detailed report'),
+                        action: function() {
+                            var tool = historyTable.config.tools.find(function (val) {return val.id === 'show-detailed-report'});
+
+                            historyTable.config.params.detailed = detailedHistory = !detailedHistory;
+                            tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
+                            historyTable.refresh();
+                        }
                     }],
+                    params: {detailed: detailedHistory},
                     service: serviceUrl,
                     sortBy: sortBy,
                     sortOrder: sortOrder

@@ -24,11 +24,16 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
+use oat\taoDelivery\helper\Delivery;
 use oat\taoProctoring\model\EligibilityService;
-use oat\taoProctoring\model\mock\WebServiceMock;
+use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimer;
+use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use qtism\common\datatypes\QtiDuration;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
@@ -471,6 +476,97 @@ class DeliveryHelper
         return $result;
     }
 
+    /**
+     * Gets the delivery time counter
+     *
+     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @return QtiTimer
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function getDeliveryTimer($deliveryExecution)
+    {
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+        }
+
+        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+
+        $testSession = $testSessionService->getTestSession($deliveryExecution);
+        if ($testSession instanceof TestSession) {
+            $timer = $testSession->getTimer(); 
+        } else {
+            $timer = new QtiTimer();
+            $timer->setStorage(new QtiTimeStorage($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier()));
+            $timer->load();
+        }
+
+        return $timer;
+    }
+    
+    /**
+     * Sets the extra time to a list of delivery executions
+     *
+     * @param array $deliveryExecutions
+     * @param float $extraTime
+     * @return array
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public static function setExtraTime($deliveryExecutions, $extraTime = null)
+    {
+        $serviceManager = ServiceManager::getServiceManager();
+        $deliveryMonitoringService = $serviceManager->get(DeliveryMonitoringService::CONFIG_ID);
+
+        $result = array();
+        foreach($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
+
+            // reopen the execution if already closed
+            if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHIED) {
+                $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
+                $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+
+                /* @var TestSession $testSession */
+                $testSession = $testSessionService->getTestSession($deliveryExecution);
+                if ($testSession) {
+                    $testSession->getRoute()->setPosition(0);
+                    
+                    $testSession->setState(AssessmentTestSessionState::INTERACTING);
+
+                    // The duration store contains durations (time spent) on test, testPart(s) and assessmentSection(s).
+                    $durationStore = $testSession->getDurationStore();
+
+                    $offsetDuration = new QtiDuration("PT${extraTime}S");
+                    $testDefinition = $testSession->getAssessmentTest();
+                    $currentDuration = $durationStore[$testDefinition->getIdentifier()];
+
+                    $offsetSeconds = $offsetDuration->getSeconds(true);
+                    $currentSeconds = $currentDuration->getSeconds(true);
+                    $newSeconds = $currentSeconds - $offsetSeconds;
+                    if ($newSeconds < 0) {
+                        $newSeconds = 0;
+                    }
+
+                    // Replace test duration with new duration.
+                    $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
+
+                    $testSessionService->persist($testSession);
+                }
+            }
+            
+            $timer = self::getDeliveryTimer($deliveryExecution);
+            $timer->setExtraTime($extraTime)->save();
+            
+            $data = $deliveryMonitoringService->getData($deliveryExecution, true);
+            $deliveryMonitoringService->save($data);
+            
+            $result[] = $deliveryExecution->getIdentifier();
+        }
+
+        return $result;
+    }
+
     public static function getDeliveryExecutionById($deliveryExecutionId)
     {
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
@@ -525,6 +621,11 @@ class DeliveryHelper
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
+                    'timer' => [
+                        'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
+                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME]),
+                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME]),
+                    ],
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,

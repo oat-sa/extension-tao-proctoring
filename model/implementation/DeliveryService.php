@@ -21,19 +21,21 @@
 namespace oat\taoProctoring\model\implementation;
 
 use core_kernel_classes_Property as Property;
-use core_kernel_classes_Resource as Resource;
+use core_kernel_classes_Resource;
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\tao\helpers\UserHelper;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ProctorAssignment;
 use core_kernel_users_GenerisUser;
 use oat\taoGroups\models\GroupsService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\TestCenterService;
-use oat\taoTestTaker\models\TestTakerService;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
+use taoDelivery_models_classes_execution_ServiceProxy as ExecutionServiceProxy;
 
 /**
  * Sample Delivery Service for proctoring
@@ -43,11 +45,17 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 class DeliveryService extends ConfigurableService
     implements ProctorAssignment
 {
+    use OntologyAwareTrait;
+
     const CONFIG_ID = 'taoProctoring/delivery';
 
     const PROPERTY_DELIVERY_URI = 'http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers';
 
     const PROPERTY_GROUP_TEST_CENTERS = 'http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters';
+
+    const PROPERTY_PROCTOR_ACCESSIBLE = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
+
+    const CHECK_MODE_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
 
     const GROUP_CLASS_NAME = 'groups for proctoring';
 
@@ -74,14 +82,14 @@ class DeliveryService extends ConfigurableService
 
     /**
      * Gets all deliveries available for a test center
-     * @param string|Resource $testCenterId
+     * @param string|core_kernel_classes_Resource $testCenterId
      * @return array
      * @deprecated
      */
     public function getTestCenterDeliveries($testCenterId)
     {
         \common_Logger::w('Use of deprecated method: DeliveryService::getTestCenterDeliveries()');
-        $testCenter = new Resource($testCenterId);
+        $testCenter = $this->getResource($testCenterId);
         return EligibilityService::singleton()->getEligibleDeliveries($testCenter);
     }
 
@@ -95,8 +103,8 @@ class DeliveryService extends ConfigurableService
      */
     public function getDeliveryExecutions($deliveryId, $options = array())
     {
-        $resource = new Resource($deliveryId);
-        return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getExecutionsByDelivery($resource);
+        $resource = $this->getResource($deliveryId);
+        return ExecutionServiceProxy::singleton()->getExecutionsByDelivery($resource);
     }
 
     /**
@@ -121,23 +129,21 @@ class DeliveryService extends ConfigurableService
      */
     public function getCurrentDeliveryExecutions($deliveryId, $testCenterId, $options = array())
     {
-        $deliveryExecutions = $this->getDeliveryExecutions($deliveryId);
         $returnedDeliveryExecutions = array();
 
         $group = $this->findGroup($deliveryId, $testCenterId);
         $users = GroupsService::singleton()->getUsers($group);
-        $userIds = array();
+        $delivery = $this->getResource($deliveryId);
+
         foreach ($users as $user) {
-            $userIds[] = $user->getUri();
+            $returnedDeliveryExecutions[] = ExecutionServiceProxy::singleton()->getUserExecutions($delivery,
+                $user->getUri());
         }
-
-        foreach ($deliveryExecutions as $deliveryExecution) {
-            if (in_array($deliveryExecution->getUserIdentifier(), $userIds)) {
-                $returnedDeliveryExecutions[] = $deliveryExecution;
-            }
+        
+        if (count($returnedDeliveryExecutions)) {
+            return call_user_func_array('array_merge', $returnedDeliveryExecutions);
         }
-
-        return $returnedDeliveryExecutions;
+        return [];
     }
 
     /**
@@ -147,7 +153,22 @@ class DeliveryService extends ConfigurableService
      */
     public function getDelivery($deliveryId)
     {
-        return new \core_kernel_classes_Resource($deliveryId);
+        return $this->getResource($deliveryId);
+    }
+
+
+    public function getAccessibleDeliveries()
+    {
+        $deliveries = DeliveryAssemblyService::singleton()->getRootClass()->searchInstances(
+            array(
+                self::PROPERTY_PROCTOR_ACCESSIBLE => self::CHECK_MODE_ENABLED
+            ),
+            array(
+                'recursive' => true
+            )
+        );
+
+        return $deliveries;
     }
 
     /**
@@ -159,7 +180,7 @@ class DeliveryService extends ConfigurableService
     public function getDeliveryProperties($delivery)
     {
         if (is_string($delivery)) {
-            $delivery = new Resource($delivery);
+            $delivery = $this->getResource($delivery);
         }
 
         $deliveryProps = $delivery->getPropertiesValues(array(
@@ -205,7 +226,7 @@ class DeliveryService extends ConfigurableService
         $users = array();
         foreach ($userIds as $id) {
             // assume Tao Users
-            $users[] = new core_kernel_users_GenerisUser(new Resource($id));
+            $users[] = new core_kernel_users_GenerisUser($this->getResource($id));
         }
 
         usort($users, function ($a, $b) {
@@ -273,7 +294,7 @@ class DeliveryService extends ConfigurableService
      */
     public function assignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
+        $deliveryGroup = $this->getResource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->addUser($testTakerId, $deliveryGroup);
     }
 
@@ -289,7 +310,7 @@ class DeliveryService extends ConfigurableService
      */
     public function unassignTestTaker($testTakerId, $deliveryId, $testCenterId)
     {
-        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
+        $deliveryGroup = $this->getResource($this->findGroup($deliveryId, $testCenterId));
         return GroupsService::singleton()->removeUser($testTakerId, $deliveryGroup);
     }
 
@@ -302,7 +323,7 @@ class DeliveryService extends ConfigurableService
     public function removeAvailability($deliveryId, $testCenterId)
     {
         // remove group for this delivery and this test center
-        $deliveryGroup = new Resource($this->findGroup($deliveryId, $testCenterId));
+        $deliveryGroup = $this->getResource($this->findGroup($deliveryId, $testCenterId));
         return $deliveryGroup->delete(true);
     }
 
@@ -311,7 +332,7 @@ class DeliveryService extends ConfigurableService
      *
      * @param string $deliveryId
      * @param string $testCenterId
-     * @return Resource
+     * @return core_kernel_classes_Resource
      */
     private function findGroup($deliveryId, $testCenterId)
     {
@@ -325,8 +346,8 @@ class DeliveryService extends ConfigurableService
         ));
         if (empty($groups)) {
             \common_Logger::w('No system group exists for delivery '.$deliveryId.' and test center '.$testCenterId.'. creating one');
-            $delivery = new Resource($deliveryId);
-            $testCenter = new Resource($testCenterId);
+            $delivery = $this->getResource($deliveryId);
+            $testCenter = $this->getResource($testCenterId);
             $instanceName = 'test takers for delivery '.$delivery->getLabel().' and test center '.$testCenter->getLabel();
 
 

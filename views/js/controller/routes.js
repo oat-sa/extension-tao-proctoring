@@ -18,7 +18,8 @@ define({
     'Diagnostic' : {
         'actions' : {
             'index' : 'controller/Diagnostic/index',
-            'diagnostic' : 'controller/Diagnostic/diagnostic'
+            'diagnostic' : 'controller/Diagnostic/diagnostic',
+            'deliveriesByProctor' : 'controller/Diagnostic/deliveriesByProctor'
         }
     },
     'Reporting' : {
