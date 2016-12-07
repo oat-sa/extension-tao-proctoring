@@ -29,6 +29,7 @@ use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\PaginatedStorage;
+use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
@@ -579,6 +580,18 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.13.0');
         }
         $this->skip('3.13.0', '3.13.7');
+
+        if ($this->isVersion('3.13.7')) {
+            try {
+                $this->getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new ReasonCategoryService();
+                $service->setServiceManager($this->getServiceManager());
+                $this->getServiceManager()->register(ReasonCategoryService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('3.14.0');
+        }
     }
 
     private function refreshMonitoringData()
