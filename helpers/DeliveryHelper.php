@@ -192,8 +192,9 @@ class DeliveryHelper
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public static function getAllCurrentDeliveriesExecutions(core_kernel_classes_Resource $testCenter, array $options = array()){
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
+        $serviceManager = ServiceManager::getServiceManager();
+        $deliveryService = $serviceManager->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveries = $serviceManager->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
 
         $deliveryCriteria = [];
 
@@ -289,8 +290,9 @@ class DeliveryHelper
      */
     public static function getAvailableTestTakers($delivery, $testCenter, $options = array())
     {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $users = EligibilityService::singleton()->getEligibleTestTakers($testCenter, $delivery);
+        $serviceManager = ServiceManager::getServiceManager();
+        $deliveryService = $serviceManager->get(DeliveryService::CONFIG_ID);
+        $users = $serviceManager->get(EligibilityService::SERVICE_ID)->getEligibleTestTakers($testCenter, $delivery);
         $assignedUsers = $deliveryService->getDeliveryTestTakers($delivery->getUri(), $testCenter->getUri(), $options);
         array_walk($assignedUsers, function(&$value){
             $value = $value->getIdentifier();
