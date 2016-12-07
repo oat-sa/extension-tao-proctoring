@@ -66,7 +66,7 @@ class DeliveryHelper
     public static function getDeliveries(core_kernel_classes_Resource $testCenter)
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $deliveries = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
+        $deliveries = ServiceManager::getServiceManager()->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
 
         $entries = array();
 

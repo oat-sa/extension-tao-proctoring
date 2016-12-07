@@ -21,41 +21,40 @@
 
 namespace oat\taoProctoring\scripts\update;
 
-use \common_ext_ExtensionUpdater;
+use common_ext_ExtensionUpdater;
 use Doctrine\DBAL\Schema\SchemaException;
+use oat\oatbox\event\EventManager;
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\tao\model\event\MetadataModified;
+use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoDelivery\model\authorization\AuthorizationService;
+use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
+use oat\taoDelivery\model\authorization\strategy\StateValidation;
+use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
+use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\EligibilityService;
+use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\taoProctoring\model\event\EligiblityChanged;
+use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\DeliveryService;
+use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
+use oat\taoProctoring\model\implementation\TestSessionHistoryService;
+use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
-use oat\taoProctoring\model\implementation\DeliveryService;
-use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
-use oat\tao\scripts\update\OntologyUpdater;
-use oat\taoProctoring\model\AssessmentResultsService;
-use oat\oatbox\service\ServiceNotFoundException;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
-use oat\oatbox\event\EventManager;
-use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
-use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
-use oat\taoProctoring\model\ProctoringAssignmentService;
-use oat\taoProctoring\model\DeliveryServerService;
-use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
-use oat\taoDelivery\model\authorization\AuthorizationService;
-use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
-use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
-use oat\taoDelivery\model\authorization\strategy\StateValidation;
-use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
-use oat\taoProctoring\model\implementation\TestSessionService;
-use oat\taoProctoring\model\implementation\TestSessionHistoryService;
+use oat\taoTests\models\event\TestChangedEvent;
 
 /**
  *
@@ -591,6 +590,16 @@ class Updater extends common_ext_ExtensionUpdater {
             }
 
             $this->setVersion('3.14.0');
+        }
+
+        if ($this->isVersion('3.14.0')) {
+            $eligibilityService = new EligibilityService([
+                EligibilityService::OPTION_MANAGEABLE => true
+            ]);
+            $eligibilityService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(EligibilityService::SERVICE_ID, $eligibilityService);
+
+            $this->setVersion('3.15.0');
         }
     }
 
