@@ -19,6 +19,7 @@
  *
  */
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
+use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 
 return array(
     'name' => 'taoProctoring',
@@ -40,7 +41,6 @@ return array(
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager', array('ext' => 'taoProctoring', 'mod'=>'TestCenterManager')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole', array('ext'=>'taoProctoring', 'mod'=>'ProctorManager')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Delivery')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Diagnostic')),
@@ -58,7 +58,7 @@ return array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
             'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
             'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
-            'oat\\taoProctoring\\scripts\\install\\addDiagnosticSettings',
+            addDiagnosticSettings::class,
             'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
             'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
