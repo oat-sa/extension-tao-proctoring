@@ -33,14 +33,12 @@ use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
-use oat\taoProctoring\model\authorization\ProctorDeliveryAuthorizationService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\DiagnosticStorage;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\taoProctoring\model\event\EligiblityChanged;
-use oat\taoProctoring\model\implementation\DeliveryAuthorizationService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService;
@@ -49,7 +47,6 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
 use oat\taoProctoring\model\PaginatedStorage;
 use oat\taoProctoring\model\ReasonCategoryService;
-use oat\taoProctoring\model\TestCenterService;
 use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
@@ -60,13 +57,15 @@ use oat\taoTests\models\event\TestChangedEvent;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class Updater extends common_ext_ExtensionUpdater {
+class Updater extends common_ext_ExtensionUpdater
+{
 
     /**
      * @param string $initialVersion
      * @return string string
      */
-    public function update($initialVersion) {
+    public function update($initialVersion)
+    {
 
         $currentVersion = $initialVersion;
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
@@ -130,10 +129,12 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new AssessmentResultsService([
-                    AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
-                    AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
-                ]);
+                $service = new AssessmentResultsService(
+                    [
+                        AssessmentResultsService::OPTION_PRINTABLE_RUBRIC_TAG => 'x-tao-scorereport',
+                        AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON => false,
+                    ]
+                );
                 $service->setServiceManager($this->getServiceManager());
 
                 $this->getServiceManager()->register(AssessmentResultsService::CONFIG_ID, $service);
@@ -147,7 +148,9 @@ class Updater extends common_ext_ExtensionUpdater {
 
             OntologyUpdater::syncModels();
             //grant access to test site admin role
-            $proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole');
+            $proctorRole = new \core_kernel_classes_Resource(
+                'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole'
+            );
             $accessService = \funcAcl_models_classes_AccessService::singleton();
             $accessService->grantModuleAccess($proctorRole, 'taoProctoring', 'ProctorManager');
 
@@ -158,7 +161,9 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new DeliveryMonitoringService(array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default'));
+                $service = new DeliveryMonitoringService(
+                    array(DeliveryMonitoringService::OPTION_PERSISTENCE => 'default')
+                );
                 $service->setServiceManager($this->getServiceManager());
 
                 $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $service);
@@ -172,7 +177,8 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('0.8.0')) {
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->attach(TestChangedEvent::EVENT_NAME,
+            $eventManager->attach(
+                TestChangedEvent::EVENT_NAME,
                 array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
             );
             $this->getServiceManager()->register(EventManager::CONFIG_ID, $eventManager);
@@ -187,14 +193,14 @@ class Updater extends common_ext_ExtensionUpdater {
 
         if ($this->isVersion('1.0.0')) {
 
-            try {
-                $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
-            } catch (ServiceNotFoundException $e) {
-                $service = new DeliveryAuthorizationService();
-                $service->setServiceManager($this->getServiceManager());
-
-                $this->getServiceManager()->register(DeliveryAuthorizationService::SERVICE_ID, $service);
-            }
+//            try {
+//                $this->getServiceManager()->get(DeliveryAuthorizationService::SERVICE_ID);
+//            } catch (ServiceNotFoundException $e) {
+//                $service = new DeliveryAuthorizationService();
+//                $service->setServiceManager($this->getServiceManager());
+//
+//                $this->getServiceManager()->register(DeliveryAuthorizationService::SERVICE_ID, $service);
+//            }
 
             $this->setVersion('1.1.0');
         }
@@ -257,10 +263,14 @@ class Updater extends common_ext_ExtensionUpdater {
             //Grant access to the overridden controller
             $accessService = \funcAcl_models_classes_AccessService::singleton();
 
-            $taoClientDiagnosticManager = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager');
+            $taoClientDiagnosticManager = new \core_kernel_classes_Resource(
+                'http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager'
+            );
             $accessService->grantModuleAccess($taoClientDiagnosticManager, 'taoProctoring', 'DiagnosticChecker');
 
-            $anonymousRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole');
+            $anonymousRole = new \core_kernel_classes_Resource(
+                'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole'
+            );
             $accessService->grantModuleAccess($anonymousRole, 'taoProctoring', 'DiagnosticChecker');
 
             $this->setVersion('1.7.0');
@@ -271,8 +281,14 @@ class Updater extends common_ext_ExtensionUpdater {
         if ($this->isVersion('1.7.1')) {
 
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $deliveryExecutionStateService->setOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE, 'PT1H');
-            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $deliveryExecutionStateService);
+            $deliveryExecutionStateService->setOption(
+                DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE,
+                'PT1H'
+            );
+            $this->getServiceManager()->register(
+                DeliveryExecutionStateService::SERVICE_ID,
+                $deliveryExecutionStateService
+            );
 
             $this->setVersion('1.8.0');
         }
@@ -315,19 +331,27 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.9.2');
         }
 
-        $this->skip('1.9.2','1.12.2');
+        $this->skip('1.9.2', '1.12.2');
 
-         if ($this->isVersion('1.12.2')) {
-            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+        if ($this->isVersion('1.12.2')) {
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(
+                DeliveryMonitoringService::OPTION_PERSISTENCE
+            );
             $persistence = \common_persistence_Manager::getPersistence($persistenceId);
             $schemaManager = $persistence->getDriver()->getSchemaManager();
             $schema = $schemaManager->createSchema();
             $fromSchema = clone $schema;
             try {
                 $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
-                $tableData->changeColumn(DeliveryMonitoringService::COLUMN_START_TIME, array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255));
-                $tableData->changeColumn(DeliveryMonitoringService::COLUMN_END_TIME, array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255));
-            } catch(SchemaException $e) {
+                $tableData->changeColumn(
+                    DeliveryMonitoringService::COLUMN_START_TIME,
+                    array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255)
+                );
+                $tableData->changeColumn(
+                    DeliveryMonitoringService::COLUMN_END_TIME,
+                    array('type' => \Doctrine\DBAL\Types\Type::getType('string'), 'notnull' => false, 'length' => 255)
+                );
+            } catch (SchemaException $e) {
                 \common_Logger::i('Database Schema already up to date.');
             }
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
@@ -356,20 +380,24 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->refreshMonitoringData();
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->attach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
+            $eventManager->attach(
+                'oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
             );
 
 
-            $eventManager->attach(EligiblityChanged::EVENT_NAME,
+            $eventManager->attach(
+                EligiblityChanged::EVENT_NAME,
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate', 'eligiblityChange']
             );
 
-            $eventManager->attach(MetadataModified::class,
+            $eventManager->attach(
+                MetadataModified::class,
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
             );
 
-            $eventManager->attach(MetadataModified::class,
+            $eventManager->attach(
+                MetadataModified::class,
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\TestTakerUpdate', 'propertyChange']
             );
 
@@ -392,7 +420,8 @@ class Updater extends common_ext_ExtensionUpdater {
             $ext->setConfig('execution_service', $config);
 
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->attach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
+            $eventManager->attach(
+                'oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
             );
 
@@ -417,7 +446,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('1.17.0');
         }
 
-        $this->skip('1.17.0','2.1.0');
+        $this->skip('1.17.0', '2.1.0');
 
         if ($this->isVersion('2.1.0')) {
             $authService = $this->getServiceManager()->get(AuthorizationService::SERVICE_ID);
@@ -426,14 +455,16 @@ class Updater extends common_ext_ExtensionUpdater {
                 $authService->addProvider(new ProctorAuthorizationProvider());
                 $this->getServiceManager()->register(AuthorizationService::SERVICE_ID, $authService);
             } else {
-                throw new \common_exception_Error('Incompatible AuthorizationService "'.get_class($authService).'" found.');
+                throw new \common_exception_Error(
+                    'Incompatible AuthorizationService "' . get_class($authService) . '" found.'
+                );
             }
             $this->setVersion('3.0.0');
         }
 
-        $this->skip('3.0.0','3.0.6');
+        $this->skip('3.0.0', '3.0.6');
 
-        if($this->isVersion('3.0.6')){
+        if ($this->isVersion('3.0.6')) {
             //grant access to test taker
             $globalManagerRole = new \core_kernel_classes_Resource(INSTANCE_ROLE_GLOBALMANAGER);
             $accessService = \funcAcl_models_classes_AccessService::singleton();
@@ -441,9 +472,10 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.1.0');
         }
 
-        if($this->isVersion('3.1.0')){
+        if ($this->isVersion('3.1.0')) {
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->attach('oat\\taoTests\\models\\event\\TestExecutionPausedEvent',
+            $eventManager->attach(
+                'oat\\taoTests\\models\\event\\TestExecutionPausedEvent',
                 ['oat\\taoProctoring\\model\\implementation\\DeliveryExecutionStateService', 'catchSessionPause']
             );
 
@@ -451,9 +483,9 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.1.1');
         }
 
-        $this->skip('3.1.1','3.3.1');
+        $this->skip('3.1.1', '3.3.1');
 
-        if($this->isVersion('3.3.1')){
+        if ($this->isVersion('3.3.1')) {
             $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
             $config = $ext->getConfig('execution_service');
             $implementation = $config->getImplementation();
@@ -472,7 +504,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->setVersion('3.4.1');
         }
 
-        $this->skip('3.4.1','3.6.3');
+        $this->skip('3.4.1', '3.6.3');
 
         if ($this->isVersion('3.6.3')) {
             $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -491,7 +523,7 @@ class Updater extends common_ext_ExtensionUpdater {
             $this->getServiceManager()->register(DeliveryMonitoringService::CONFIG_ID, $deliveryMonitoringService);
             $this->setVersion('3.6.5');
         }
-        $this->skip('3.6.4','3.6.5');
+        $this->skip('3.6.4', '3.6.5');
 
         if ($this->isVersion('3.6.5')) {
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
@@ -539,36 +571,52 @@ class Updater extends common_ext_ExtensionUpdater {
             try {
                 $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             } catch (ServiceNotFoundException $e) {
-                $service = new DeliveryExecutionStateService([
-                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
-                    DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
-                ]);
+                $service = new DeliveryExecutionStateService(
+                    [
+                        DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
+                        DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
+                    ]
+                );
             }
-            
+
             $service->setOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING, false);
 
             $service->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
 
             // extend the data table
-            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE);
+            $persistenceId = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->getOption(
+                DeliveryMonitoringService::OPTION_PERSISTENCE
+            );
             $persistence = \common_persistence_Manager::getPersistence($persistenceId);
             $schemaManager = $persistence->getDriver()->getSchemaManager();
             $schema = $schemaManager->createSchema();
             $fromSchema = clone $schema;
             try {
                 $tableData = $schema->getTable(DeliveryMonitoringService::TABLE_NAME);
-                $tableData->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
-                $tableData->addColumn(DeliveryMonitoringService::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-                $tableData->addColumn(DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-            } catch(SchemaException $e) {
+                $tableData->addColumn(
+                    DeliveryMonitoringService::COLUMN_REMAINING_TIME,
+                    "string",
+                    array("notnull" => false, "length" => 255)
+                );
+                $tableData->addColumn(
+                    DeliveryMonitoringService::COLUMN_EXTRA_TIME,
+                    "string",
+                    array("notnull" => false, "length" => 255)
+                );
+                $tableData->addColumn(
+                    DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME,
+                    "string",
+                    array("notnull" => false, "length" => 255)
+                );
+            } catch (SchemaException $e) {
                 \common_Logger::i('Database Schema already up to date.');
             }
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
             foreach ($queries as $query) {
                 $persistence->exec($query);
             }
-            
+
             $this->setVersion('3.12.0');
         }
 
@@ -593,9 +641,11 @@ class Updater extends common_ext_ExtensionUpdater {
         }
 
         if ($this->isVersion('3.14.0')) {
-            $eligibilityService = new EligibilityService([
-                EligibilityService::OPTION_MANAGEABLE => true
-            ]);
+            $eligibilityService = new EligibilityService(
+                [
+                    EligibilityService::OPTION_MANAGEABLE => true
+                ]
+            );
             $eligibilityService->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(EligibilityService::SERVICE_ID, $eligibilityService);
 
