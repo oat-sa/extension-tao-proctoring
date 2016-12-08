@@ -36,8 +36,9 @@ class EligiblityUpdate
 
     public static function eligiblityChange(EligiblityChanged $event)
     {
+        $serviceManager = ServiceManager::getServiceManager();
         /** @var DeliveryMonitoringService $monitoringService */
-        $monitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $monitoringService = $serviceManager->get(DeliveryMonitoringService::CONFIG_ID);
 
         $eligiblity = $event->getEligiblity();
 
@@ -46,7 +47,7 @@ class EligiblityUpdate
 
         $newTestTakers = array_diff($after, $before);
 
-        $delivery = EligibilityService::singleton()->getDelivery($eligiblity);
+        $delivery = $serviceManager->get(EligibilityService::SERVICE_ID)->getDelivery($eligiblity);
 
         //might be we would like to remove newly uneliglbe executions later
         foreach ($newTestTakers as $testTakerUri) {

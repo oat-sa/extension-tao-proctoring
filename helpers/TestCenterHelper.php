@@ -273,7 +273,7 @@ class TestCenterHelper
         }
 
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $deliveries      = EligibilityService::singleton()->getEligibleDeliveries($testCenter);
+        $deliveries      = ServiceManager::getServiceManager()->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
         $filteredExecutions = array();
         foreach($deliveries as $delivery) {
             if ($delivery->exists()) {

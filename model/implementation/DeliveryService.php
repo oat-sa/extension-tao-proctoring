@@ -72,7 +72,7 @@ class DeliveryService extends ConfigurableService
         $testCenters = $testCenterService->getTestCentersByProctor($proctor);
 
         $deliveries = [];
-        $eligibilityService = EligibilityService::singleton();
+        $eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
         foreach ($testCenters as $testCenter) {
             $deliveries = array_merge($deliveries, $eligibilityService->getEligibleDeliveries($testCenter));
         }
@@ -90,7 +90,7 @@ class DeliveryService extends ConfigurableService
     {
         \common_Logger::w('Use of deprecated method: DeliveryService::getTestCenterDeliveries()');
         $testCenter = $this->getResource($testCenterId);
-        return EligibilityService::singleton()->getEligibleDeliveries($testCenter);
+        return $this->getServiceManager()->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
     }
 
     /**

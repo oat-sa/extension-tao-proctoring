@@ -64,7 +64,7 @@ class ProctoringAssignmentService extends GroupAssignment
      */
     protected function isEligible(\core_kernel_classes_Resource $delivery, User $user)
     {
-        $eligibilityService = EligibilityService::singleton();
+        $eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
         return $eligibilityService->isDeliveryEligible($delivery, $user);
     }
 }

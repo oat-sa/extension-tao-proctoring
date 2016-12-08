@@ -24,6 +24,8 @@ use \core_kernel_classes_Resource as Resource;
 use core_kernel_classes_Class;
 use \core_kernel_classes_Property as Property;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\event\EligiblityChanged;
 use oat\taoProctoring\model\implementation\DeliveryService;
 use tao_models_classes_ClassService;
@@ -32,8 +34,10 @@ use oat\oatbox\user\User;
 /**
  * Service to manage eligible deliveries
  */
-class EligibilityService extends tao_models_classes_ClassService
+class EligibilityService extends ConfigurableService
 {
+    const SERVICE_ID = 'taoProctoring/EligibilityService';
+
     const CLASS_URI = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#DeliveryEligibility';
 
     const PROPERTY_TESTCENTER_URI = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#EligibileTestCenter';
@@ -47,6 +51,8 @@ class EligibilityService extends tao_models_classes_ClassService
     const BOOLEAN_TRUE = 'http://www.tao.lu/Ontologies/generis.rdf#True';
 
     const BOOLEAN_FALSE = 'http://www.tao.lu/Ontologies/generis.rdf#False';
+
+    const OPTION_MANAGEABLE = 'manageable';
 
     /**
      * return the test center top level class
@@ -224,6 +230,11 @@ class EligibilityService extends tao_models_classes_ClassService
         $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
         $eventManager->trigger(new EligiblityChanged($eligibility, $previousTestTakerCollection, $testTakerIds));
 
+        if(!$this->isManageable()){
+            DeliveryHelper::unassignTestTakers($previousTestTakerCollection, $delivery->getUri(), $testCenter->getUri());
+            DeliveryHelper::assignTestTakers($testTakerIds, $delivery->getUri(), $testCenter->getUri());
+        }
+
         return $result;
     }
     
@@ -293,7 +304,7 @@ class EligibilityService extends tao_models_classes_ClassService
     public function getDelivery(Resource $eligibility)
     {
         /* @var \core_kernel_classes_Resource $eligibility */
-        $delivery = $eligibility->getOnePropertyValue(new \core_kernel_classes_Property(EligibilityService::PROPERTY_DELIVERY_URI));
+        $delivery = $eligibility->getOnePropertyValue(new \core_kernel_classes_Property(self::PROPERTY_DELIVERY_URI));
         return $delivery;
 
     }
@@ -317,5 +328,10 @@ class EligibilityService extends tao_models_classes_ClassService
     public function setByPassProctor(Resource $eligibility, $bypass = false)
     {
         $eligibility->editPropertyValues(new Property(self::PROPERTY_BYPASSPROCTOR_URI), new Resource($bypass ? self::BOOLEAN_TRUE : self::BOOLEAN_FALSE));
+    }
+
+    public function isManageable()
+    {
+        return $this->hasOption(self::OPTION_MANAGEABLE) && $this->getOption(self::OPTION_MANAGEABLE) === true;
     }
 }
