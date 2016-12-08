@@ -92,6 +92,7 @@ define([
             var extraFields = $container.data('extrafields');
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
+            var isManageable = $container.data('ismanageable');
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
             var printReportButton = $container.data('printreportbutton');
@@ -413,7 +414,7 @@ define([
             });
 
             // tool: manage test takers (only for unique delivery)
-            if (deliveryId) {
+            if (deliveryId && isManageable) {
                 tools.push({
                     id: 'manage',
                     icon: 'property-advanced',

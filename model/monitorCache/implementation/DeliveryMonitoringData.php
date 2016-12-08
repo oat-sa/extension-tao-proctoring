@@ -90,7 +90,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
 
-        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
+        $data = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
             [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecutionId],
         ], ['asArray' => true], true);
 
@@ -212,7 +212,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function updateStatus()
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
     }
@@ -222,9 +222,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function updateConnectivity()
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $serviceManager = $this->getServiceManager();
+        $deliveryExecutionStateService = $serviceManager->get(DeliveryExecutionStateService::SERVICE_ID);
         $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
-        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $testSessionConnectivityStatusService = $serviceManager->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
@@ -361,11 +362,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $delivery = $this->deliveryExecution->getDelivery();
         $user = $this->getUser();
 
-        $testCenter = EligibilityService::singleton()->getTestCenter($delivery, $user);
+        $serviceManager = $this->getServiceManager();
+
+        $testCenter = $serviceManager->get(EligibilityService::SERVICE_ID)->getTestCenter($delivery, $user);
         if ($testCenter) {
             $uri = $testCenter->getUri();
         } else {
-            $deliverLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+            $deliverLog = $serviceManager->get(DeliveryLog::SERVICE_ID);
             $loggedEvent = $deliverLog->get(
                 $this->deliveryExecution->getIdentifier(),
                 'TEST_AUTHORISE'
@@ -424,7 +427,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getDeliveryLog($eventId = null)
     {
-        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        $deliveryLogService = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
         return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
     }
 
@@ -452,9 +455,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getTestSession()
     {
         if ($this->testSession === null) {
-            $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
         }
         return $this->testSession;
+    }
+
+    private function getServiceManager()
+    {
+        return ServiceManager::getServiceManager();
     }
 }
