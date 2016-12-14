@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\scripts\install;
 
-use oat\oatbox\service\ServiceManager;
+use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
@@ -30,17 +30,13 @@ use oat\taoProctoring\model\ReasonCategoryService;
  * @package oat\taoProctoring\scripts\install
  * @author Gyula Szucs, <gyula@taotesting.com>
  */
-class RegisterReasonCategoryService extends \common_ext_action_InstallAction
+class RegisterReasonCategoryService extends InstallAction
 {
     /**
      * @param $params
      */
     public function __invoke($params)
     {
-        $serviceManager = $this->getServiceManager();
-
-        $service = new ReasonCategoryService();
-        $service->setServiceManager($serviceManager);
-        $serviceManager->register(ReasonCategoryService::SERVICE_ID, $service);
+        $this->registerService(ReasonCategoryService::SERVICE_ID, new ReasonCategoryService());
     }
 }

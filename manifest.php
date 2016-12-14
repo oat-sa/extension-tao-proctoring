@@ -19,8 +19,10 @@
  *
  */
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
-use oat\taoProctoring\scripts\install\RegisterEligibilityService;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
+use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
+use oat\taoProctoring\controller\DeliverySelection;
+use oat\taoProctoring\controller\Monitor;
 
 return array(
     'name' => 'taoProctoring',
@@ -43,6 +45,8 @@ return array(
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole', array('ext'=>'taoProctoring', 'mod'=>'ProctorManager')),
+        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => DeliverySelection::class)),
+        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => Monitor::class)),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Delivery')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Diagnostic')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
@@ -54,24 +58,19 @@ return array(
     ),
     'install' => array(
         'php' => array(
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerEntryPoint.php',
+            RegisterProctoringEntryPoint::class,
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'createDeliveryMonitoringTables.php',
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
             'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
             'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
             addDiagnosticSettings::class,
-            'oat\\taoProctoring\\scripts\\install\\RegisterAssignmentService',
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
             'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
             RegisterAuthProvider::class,
-            'oat\\taoProctoring\\scripts\\install\\RegisterReasonCategoryService',
-            RegisterEligibilityService::class
+            'oat\\taoProctoring\\scripts\\install\\RegisterReasonCategoryService'
         ),
         'rdf' => array(
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'taotestcenter.rdf',
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'eligibility.rdf',
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'taodelivery.rdf',
+            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
         )
     ),
     'uninstall' => array(

@@ -53,6 +53,61 @@ class DeliveryHelper
      * @var array
      */
     private static $extraFields = [];
+    
+    public static function buildDeliveryData($delivery, $executions)
+    {
+        $inprogress = 0;
+        $paused = 0;
+        $awaiting = 0;
+        foreach($executions as $executionData) {
+            $executionState = $executionData[DeliveryMonitoringService::STATUS];
+            switch($executionState){
+                case DeliveryExecution::STATE_AWAITING:
+                    $awaiting++;
+                    break;
+                case DeliveryExecution::STATE_ACTIVE:
+                    $inprogress++;
+                    break;
+                case DeliveryExecution::STATE_PAUSED:
+                    $paused++;
+                    break;
+                default:
+                    continue;
+            }
+        }
+        
+        $deliveryProps = array(
+            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
+            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
+        );
+        $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
+        $propStartExec = current($deliveryProperties[TAO_DELIVERY_START_PROP]);
+        $propEndExec = current($deliveryProperties[TAO_DELIVERY_END_PROP]);
+        
+        $properties = array();
+        if (!is_null($propStartExec) && !empty((string)$propStartExec)) {
+            $properties['periodStart'] = DateHelper::displayeDate((string)$propStartExec);
+        }
+        if (!is_null($propStartExec) && !empty((string)$propEndExec)) {
+            $properties['periodEnd'] = DateHelper::displayeDate((string)$propEndExec);
+        }
+        
+        $entry = array(
+            'id' => $delivery->getUri(),
+            'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri())),
+            'label' => $delivery->getLabel(),
+            'text' => __('Monitor'),
+            'stats' => array(
+                'awaitingApproval' => $awaiting,
+                'inProgress' => $inprogress,
+                'paused' => $paused
+            ),
+            'properties' => $properties
+        );
+        
+        return $entry;
+    }
+    
     /**
      * Gets a list of available deliveries for a test site
      *
@@ -572,6 +627,10 @@ class DeliveryHelper
     public static function getDeliveryExecutionById($deliveryExecutionId)
     {
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+    }
+    
+    public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
+        return self::adjustDeliveryExecutions($deliveryExecutions, $sortOptions);
     }
 
     /**

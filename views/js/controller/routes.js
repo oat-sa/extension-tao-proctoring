@@ -1,10 +1,4 @@
 define({
-    'TestCenter' : {
-        'actions' : {
-            'index' : 'controller/TestCenter/index',
-            'testCenter' : 'controller/TestCenter/testCenter'
-        }
-    },
 	'ProctorManager' : {
         'actions' : {
             'index' : 'controller/ProctorManager/index'
@@ -25,6 +19,16 @@ define({
     'Irregularity' : {
         'actions' : {
             'index' : 'controller/Irregularity/index'
+        }
+    },
+    'DeliverySelection' : {
+        'actions' : {
+            'index' : 'controller/Delivery/index',
+        }
+    },
+    'Monitor' : {
+        'actions' : {
+            'index' : 'controller/Delivery/monitoring',
         }
     },
     'Delivery' : {

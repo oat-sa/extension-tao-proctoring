@@ -23,7 +23,6 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
-use oat\taoProctoring\model\EligibilityService;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 
@@ -34,8 +33,6 @@ use oat\oatbox\user\User;
  */
 class ProctorAuthorizationProvider extends ConfigurableService implements AuthorizationProvider
 {
-    public $eligibilityService;
-    
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
@@ -51,35 +48,17 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
-        $eligibilityService = $this->getEligibilityService();
-        $testCenter         = $eligibilityService->getTestCenter($deliveryExecution->getDelivery(), $user);
-        
-        if (!empty($testCenter)) {
-            $eligibility        = $eligibilityService->getEligibility($testCenter, $deliveryExecution->getDelivery());
-            $state = $deliveryExecution->getState()->getUri();
+        $state = $deliveryExecution->getState()->getUri();
 
-            if (in_array($state, [ProctoredDeliveryExecution::STATE_FINISHED, ProctoredDeliveryExecution::STATE_TERMINATED])) {
-                throw new UnAuthorizedException(
-                    _url('index', 'DeliveryServer', 'taoProctoring'),
-                    'Terminated/Finished delivery cannot be resumed'
-                );
-            }
-
-            if (!$eligibilityService->canByPassProctor($eligibility)) {
-                // proctoring is required
-                if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
-                    $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
-                    throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
-                }
-            }
+        if (in_array($state, [ProctoredDeliveryExecution::STATE_FINISHED, ProctoredDeliveryExecution::STATE_TERMINATED])) {
+            throw new UnAuthorizedException(
+                _url('index', 'DeliveryServer', 'taoProctoring'),
+                'Terminated/Finished delivery cannot be resumed'
+            );
         }
-    }
-    
-    private function getEligibilityService()
-    {
-        if (is_null($this->eligibilityService)) {
-            $this->eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
+        if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+            $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+            throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
         }
-        return $this->eligibilityService;
     }
 }
