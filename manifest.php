@@ -39,7 +39,6 @@ return array(
         'taoQtiTest' => '>=5.38.0',
         'taoOutcomeUi' => '>=2.6.6',
         'generis' => '>=2.15.0',
-        'taoClientDiagnostic' => '>=1.6.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
@@ -48,13 +47,10 @@ return array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => DeliverySelection::class)),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => Monitor::class)),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Delivery')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Diagnostic')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TestCenter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')),
     ),
     'install' => array(
         'php' => array(
@@ -62,8 +58,6 @@ return array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'createDeliveryMonitoringTables.php',
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
             'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
-            'oat\\taoProctoring\\scripts\\install\\createDiagnosticTable',
-            addDiagnosticSettings::class,
             'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
             'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
             RegisterAuthProvider::class,
