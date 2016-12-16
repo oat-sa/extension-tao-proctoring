@@ -25,6 +25,7 @@ use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 
 /**
@@ -84,6 +85,7 @@ class Delivery extends ProctoringModule
         $this->composeView(
             'delivery-monitoring',
             array(
+                'ismanageable' => $this->getServiceManager()->get(EligibilityService::SERVICE_ID)->isManageable(),
                 'delivery' => $delivery->getUri(),
                 'testCenter' => $testCenter->getUri(),
                 'set' => DeliveryHelper::getCurrentDeliveryExecutions($delivery, $testCenter, $requestOptions),

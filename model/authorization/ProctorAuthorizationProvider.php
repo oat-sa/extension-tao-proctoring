@@ -78,7 +78,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
     private function getEligibilityService()
     {
         if (is_null($this->eligibilityService)) {
-            $this->eligibilityService = EligibilityService::singleton(); 
+            $this->eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
         }
         return $this->eligibilityService;
     }

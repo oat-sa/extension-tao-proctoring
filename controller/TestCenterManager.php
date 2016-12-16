@@ -48,7 +48,7 @@ class TestCenterManager extends \tao_actions_SaSModule
     {
         parent::__construct();
         $this->service = $this->getClassService();
-        $this->eligibilityService = EligibilityService::singleton();
+        $this->eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
     }
 
     protected function getClassService()

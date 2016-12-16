@@ -60,7 +60,7 @@ class RefreshMonitoringData implements Action, ServiceLocatorAwareInterface
         $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::CONFIG_ID);
 
         $deliveryService = $this->getServiceLocator()->get(DeliveryService::CONFIG_ID);
-        $eligibilityService = EligibilityService::singleton();
+        $eligibilityService = $this->getServiceLocator()->get(EligibilityService::SERVICE_ID);
 
         foreach ($testCenters as $testCenter) {
             $deliveries = $eligibilityService->getEligibleDeliveries($testCenter, false);

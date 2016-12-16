@@ -28,6 +28,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\taoProctoring\helpers\ReasonCategoryHelper;
 use DateTime;
+use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * Base proctoring interface controller
@@ -176,11 +177,14 @@ abstract class ProctoringModule extends \tao_actions_CommonModule
      * @return array
      */
     protected function getAllReasonsCategories(){
+        /** @var ReasonCategoryService $categoryService */
+        $categoryService = $this->getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
+
         return array(
             'authorize' => array(),
-            'pause' => ReasonCategoryHelper::irregularity(),
-            'terminate' => ReasonCategoryHelper::irregularity(),
-            'report' => ReasonCategoryHelper::irregularity(),
+            'pause' => $categoryService->getIrregularities(),
+            'terminate' => $categoryService->getIrregularities(),
+            'report' => $categoryService->getIrregularities(),
             'print' => [],
         );
     }
