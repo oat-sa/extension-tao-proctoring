@@ -211,9 +211,8 @@ define([
                 var deliveryId = $(this).data('delivery');
                 var pauseUrl = (deliveryId === 'all') ?
                     helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter: testCenterId}) :
-                    helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {
-                        delivery: deliveryId,
-                        testCenter: testCenterId
+                    helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {
+                        delivery: deliveryId
                     });
 
                 //prevent clicking the parent link that goes to the monitoring screen

@@ -102,7 +102,7 @@ define([
             var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];
             var model = [];

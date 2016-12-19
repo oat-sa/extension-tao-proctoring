@@ -65,6 +65,20 @@ class Monitor extends SimplePageModule
     }
     
     /**
+     * Gets the list of current executions for a delivery
+     *
+     * @throws \common_Exception
+     */
+    public function deliveryExecutions()
+    {
+        $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $proctor = \common_session_SessionManager::getSession()->getUser();
+        $delivery = $this->getResource($this->getRequestParameter('delivery'));
+        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
+        $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions));
+    }
+
+    /**
      * Get the list of all available categories, sorted by action names
      *
      * @return array
