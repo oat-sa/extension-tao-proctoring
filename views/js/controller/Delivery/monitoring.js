@@ -97,11 +97,11 @@ define([
             var timeHandlingButton = $container.data('timehandling');
             var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var authoriseUrl = helpers._url('authoriseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var pauseUrl = helpers._url('pauseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var authoriseUrl = helpers._url('authoriseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var reportUrl = helpers._url('reportExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
+            var reportUrl = helpers._url('reportExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
             var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
             var tools = [];

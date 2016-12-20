@@ -95,4 +95,134 @@ class Monitor extends SimplePageModule
             'print' => [],
         );
     }
+    
+    /**
+     * Authorises a delivery execution
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function authoriseExecutions()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
+        $testCenter = $this->getRequestParameter('testCenter');
+    
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+    
+        try {
+    
+            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
+            $notAuthorised = array_diff($deliveryExecution, $authorised);
+    
+            $this->returnJson(array(
+                'success' => !count($notAuthorised),
+                'processed' => $authorised,
+                'unprocessed' => $notAuthorised
+            ));
+    
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+    
+
+    /**
+     * Terminates delivery executions
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function terminateExecutions()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
+    
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+    
+        try {
+    
+            $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
+            $notTerminated = array_diff($deliveryExecution, $terminated);
+    
+            $this->returnJson(array(
+                'success' => !count($notTerminated),
+                'processed' => $terminated,
+                'unprocessed' => $notTerminated
+            ));
+    
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+    
+    /**
+     * Pauses delivery executions
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function pauseExecutions()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
+    
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+    
+        try {
+    
+            $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
+            $notPaused = array_diff($deliveryExecution, $paused);
+    
+            $this->returnJson(array(
+                'success' => !count($notPaused),
+                'processed' => $paused,
+                'unprocessed' => $notPaused
+            ));
+    
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+    
+    /**
+     * Report irregularities in delivery executions
+     *
+     * @throws \common_Exception
+     * @throws \oat\oatbox\service\ServiceNotFoundException
+     */
+    public function reportExecutions()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $reason = $this->getRequestParameter('reason');
+    
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+    
+        try {
+    
+            $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
+            $notReported = array_diff($deliveryExecution, $reported);
+    
+            $this->returnJson(array(
+                'success' => !count($notReported),
+                'processed' => $reported,
+                'unprocessed' => $notReported
+            ));
+    
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
 }

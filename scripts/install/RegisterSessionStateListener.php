@@ -23,27 +23,30 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\extension\InstallAction;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoProctoring\model\monitorCache\update\DeliveryExecutionStateUpdate;
+use oat\taoTests\models\event\TestExecutionPausedEvent;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoProctoring\model\monitorCache\update\TestUpdate;
+use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
  * Class RegisterSessionStateListener
  * @package oat\taoProctoring\scripts\install
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class RegisterSessionStateListener extends \common_ext_action_InstallAction
+class RegisterSessionStateListener extends InstallAction
 {
     /**
      * @param $params
      */
     public function __invoke($params)
     {
-        $serviceManager = ServiceManager::getServiceManager();
-
-        $eventManager = $serviceManager->get(EventManager::CONFIG_ID);
-        $eventManager->attach('oat\\taoTests\\models\\event\\TestExecutionPausedEvent',
-            ['oat\\taoProctoring\\model\\implementation\\DeliveryExecutionStateService', 'catchSessionPause']
-        );
-
-        $serviceManager->register(EventManager::CONFIG_ID, $eventManager);
+        $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
+        $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
     }
 }
 
