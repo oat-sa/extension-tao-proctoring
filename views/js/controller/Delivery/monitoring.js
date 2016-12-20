@@ -384,7 +384,11 @@ define([
              * @returns {String}
              */
             function buildStatusFilter(){
-                return statusFilterTpl({statuses: _status.getStatuses()});
+                var statuses = _status.getStatuses();
+                statuses = _.filter(statuses, function(o) {
+                    return o.code !== _status.STATUS_INIT;
+                });
+                return statusFilterTpl({statuses: statuses});
             }
 
             /**
