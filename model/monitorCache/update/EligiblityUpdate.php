@@ -53,7 +53,7 @@ class EligiblityUpdate
         foreach ($newTestTakers as $testTakerUri) {
             $executions = taoDelivery_models_classes_execution_ServiceProxy::singleton()->getUserExecutions($delivery, $testTakerUri);
             foreach ($executions as $execution) {
-                $deliverMonitoringData = $monitoringService->getData($execution, false);
+                $deliverMonitoringData = $monitoringService->getData($execution);
                 $deliverMonitoringData->updateData([DeliveryMonitoringService::TEST_CENTER_ID]);
                 $monitoringService->save($deliverMonitoringData);
             }

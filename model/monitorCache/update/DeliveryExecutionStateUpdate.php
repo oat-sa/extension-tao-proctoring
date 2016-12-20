@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\monitorCache\update;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 /**
  *
  * @package oat\taoProctoring
@@ -36,13 +37,12 @@ class DeliveryExecutionStateUpdate
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = $service->getData($deliveryExecution, true);
+        $data = $service->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
     }
-
-
 }

@@ -54,11 +54,12 @@ interface DeliveryMonitoringService
     const CONNECTIVITY = 'last_connect';
 
     /**
+     * Retrieve the currently cached delivery data
+     * 
      * @param DeliveryExecution $deliveryExecution
-     * @param boolean $updateData
      * @return DeliveryMonitoringData
      */
-    public function getData(DeliveryExecution $deliveryExecution, $updateData = true);
+    public function getData(DeliveryExecution $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]

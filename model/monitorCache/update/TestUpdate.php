@@ -38,7 +38,7 @@ class TestUpdate
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution, false);
+        $data = $service->getData($deliveryExecution);
         $data->setTestSession($event->getSession());
         $data->updateData([
             DeliveryMonitoringService::STATUS,
