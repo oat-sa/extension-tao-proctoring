@@ -651,6 +651,11 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('3.15.0');
         }
+
+        if ($this->isVersion('3.15.0')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('3.16.0');
+        }
     }
 
     private function refreshMonitoringData()
