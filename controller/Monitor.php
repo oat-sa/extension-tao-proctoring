@@ -38,13 +38,23 @@ class Monitor extends SimplePageModule
     use OntologyAwareTrait;
     
     /**
+     * Returns the currently proctored delivery
+     *
+     * @return core_kernel_classes_Resource
+     */
+    protected function getCurrentDelivery()
+    {
+        return $this->getResource($this->getRequestParameter('delivery'));
+    }
+
+    /**
      * Displays the index page of the deliveries list all available deliveries for the current test center
      */
     public function index()
     {
         $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
-        $delivery = $this->getResource($this->getRequestParameter('delivery'));
+        $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
         $this->composeView(
             'delivery-monitoring',
@@ -72,7 +82,7 @@ class Monitor extends SimplePageModule
     {
         $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
-        $delivery = $this->getResource($this->getRequestParameter('delivery'));
+        $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
         $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions));
     }
