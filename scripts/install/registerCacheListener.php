@@ -34,15 +34,6 @@ $eventManager->attach(
     array('\\oat\\taoProctoring\\helpers\\DeliveryHelper', 'testStateChanged')
 );
 
-$eventManager->attach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
-    ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
-);
-
-
-$eventManager->attach(\oat\taoProctoring\model\event\EligiblityChanged::EVENT_NAME,
-    ['oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate', 'eligiblityChange']
-);
-
 $eventManager->attach(\oat\tao\model\event\MetadataModified::class,
     ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
 );

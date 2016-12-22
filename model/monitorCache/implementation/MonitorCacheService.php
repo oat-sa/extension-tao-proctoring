@@ -21,9 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 
 /**
  * Class MonitorCacheService
@@ -38,17 +37,29 @@ class MonitorCacheService extends MonitoringStorage
 
     public function executionCreated(DeliveryExecutionCreated $event)
     {
-        $service = $this;
         $deliveryExecution = $event->getDeliveryExecution();
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState(), true);
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier(), true);
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri(), true);
+        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel(), true);
         $data->update(DeliveryMonitoringService::START_TIME, $deliveryExecution->getStartTime(), true);
-        $success = $service->save($data);
+        $success = $this->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
     
+    }
+    
+    public function executionStateChanged(DeliveryExecutionState $event)
+    {
+        /** @var DeliveryMonitoringService $service */
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $data = $this->getData($event->getDeliveryExecution());
+        $data->update(DeliveryMonitoringService::STATUS, $event->getState());
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+        }
     }
 }

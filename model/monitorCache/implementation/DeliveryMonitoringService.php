@@ -68,7 +68,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
 
     const COLUMN_ID = 'id';
     const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
-    const COLUMN_DELIVERY_TEST_CENTER_ID = DeliveryMonitoringServiceInterface::TEST_CENTER_ID;
     const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
     const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
     const COLUMN_TEST_TAKER = DeliveryMonitoringServiceInterface::TEST_TAKER;
@@ -107,7 +106,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
-            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution, false);
+            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution);
         } else {
             $this->data[$id]->setDeliveryExecution($deliveryExecution);
         }
@@ -238,7 +237,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         } else {
             foreach($data as $row) {
                 $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
+                $monitoringData = new DeliveryMonitoringData($deliveryExecution);
                 $result[] = $monitoringData;
             }
         }
@@ -586,36 +585,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         }
 
         return !((boolean) $exists);
-    }
-
-    /**
-     * @param core_kernel_classes_Resource $delivery
-     * @param core_kernel_classes_Resource $testCenter
-     * @param array $options
-     * @return DeliveryMonitoringData[]
-     */
-    public function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
-    {
-
-        $sortBy = self::getSortByColumn(array_key_exists('sortBy',$options )?$options['sortBy']:'');
-        $sortOrder = array_key_exists('sortOrder', $options) ? $options['sortOrder'] : self::DEFAULT_SORT_ORDER;
-
-        $criteria = [
-            [self::TEST_CENTER_ID => $testCenter->getUri()],
-            'AND',
-            [self::DELIVERY_ID => $delivery->getUri()]
-        ];
-
-        if (isset($options['filter']) && $options['filter']) {
-            $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
-        }
-
-        $result = $this->find($criteria, ['asArray' => true,
-            'order'=> $sortBy.' '. $sortOrder,
-        ],
-            true);
-
-        return $result;
     }
 
     /**

@@ -25,7 +25,6 @@ use oat\oatbox\user\User;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -82,9 +81,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     /**
      * DeliveryMonitoringData constructor.
      * @param DeliveryExecution $deliveryExecution
-     * @param bool $updateData
      */
-    public function __construct(DeliveryExecution $deliveryExecution, $updateData = true)
+    public function __construct(DeliveryExecution $deliveryExecution)
     {
         $this->deliveryExecution = $deliveryExecution;
 
@@ -98,10 +96,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             $this->addValue('delivery_execution_id', $deliveryExecutionId);
         } else {
             $this->data = $data[0];
-        }
-
-        if ($updateData) {
-            $this->updateData();
         }
     }
 
@@ -203,7 +197,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
                 DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME,
-                DeliveryMonitoringService::TEST_CENTER_ID,
                 DeliveryMonitoringService::DELIVERY_ID,
                 DeliveryMonitoringService::DELIVERY_NAME,
             ];
@@ -360,32 +353,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
-    }
-
-    /**
-     * Update test center uri
-     */
-    private function updateTestCenterId()
-    {
-        $uri = null;
-        $delivery = $this->deliveryExecution->getDelivery();
-        $user = $this->getUser();
-
-        $serviceManager = $this->getServiceManager();
-
-        $testCenter = $serviceManager->get(EligibilityService::SERVICE_ID)->getTestCenter($delivery, $user);
-        if ($testCenter) {
-            $uri = $testCenter->getUri();
-        } else {
-            $deliverLog = $serviceManager->get(DeliveryLog::SERVICE_ID);
-            $loggedEvent = $deliverLog->get(
-                $this->deliveryExecution->getIdentifier(),
-                'TEST_AUTHORISE'
-            );
-            $loggedEvent = reset($loggedEvent);
-            $uri = isset($loggedEvent['data']['test_center']) ? $loggedEvent['data']['test_center'] : null;
-        }
-        $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $uri, true);
     }
 
     /**

@@ -106,7 +106,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
-            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution, false);
+            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution);
         } else {
             $this->data[$id]->setDeliveryExecution($deliveryExecution);
         }
@@ -237,7 +237,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         } else {
             foreach($data as $row) {
                 $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData = new DeliveryMonitoringData($deliveryExecution, false);
+                $monitoringData = new DeliveryMonitoringData($deliveryExecution);
                 $result[] = $monitoringData;
             }
         }

@@ -45,6 +45,7 @@ class RegisterSessionStateListener extends InstallAction
      */
     public function __invoke($params)
     {
+        $this->registerEvent(DeliveryExecutionStateUpdate::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
     }

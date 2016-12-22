@@ -23,7 +23,6 @@ namespace oat\taoProctoring\controller;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\delivery\DeliveryService;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
