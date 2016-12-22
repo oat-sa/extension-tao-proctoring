@@ -35,10 +35,6 @@ $eventManager->attach(
 );
 
 $eventManager->attach(\oat\tao\model\event\MetadataModified::class,
-    ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
-);
-
-$eventManager->attach(\oat\tao\model\event\MetadataModified::class,
     ['oat\\taoProctoring\\model\\monitorCache\\update\\TestTakerUpdate', 'propertyChange']
 );
 

@@ -23,6 +23,9 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\tao\model\event\MetadataModified;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
 
 /**
  * Class MonitorCacheService
@@ -39,11 +42,11 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
         $data = $this->getData($deliveryExecution);
-        $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState(), true);
-        $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier(), true);
-        $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri(), true);
-        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel(), true);
-        $data->update(DeliveryMonitoringService::START_TIME, $deliveryExecution->getStartTime(), true);
+        $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
+        $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
+        $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
+        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
+        $data->update(DeliveryMonitoringService::START_TIME, $deliveryExecution->getStartTime());
         $success = $this->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
@@ -53,13 +56,28 @@ class MonitorCacheService extends MonitoringStorage
     
     public function executionStateChanged(DeliveryExecutionState $event)
     {
-        /** @var DeliveryMonitoringService $service */
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $data = $this->getData($event->getDeliveryExecution());
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $success = $this->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+        }
+    }
+
+    /**
+     * Update the label of the delivery across the entrie cache
+     *
+     * @param MetadataModified $event
+     */
+    public function deliverylabelChange(MetadataModified $event)
+    {
+        $resource = $event->getResource();
+        if ($event->getMetadataUri() === RDFS_LABEL) {
+            $assemblyClass = DeliveryAssemblyService::singleton()->getRootClass();
+            if ($resource->isInstanceOf($assemblyClass)) {
+                $update = new DeliveryUpdater();
+                $update->changeLabel($this, $resource->getUri(), $event->getMetadataValue());
+            }
         }
     }
 }

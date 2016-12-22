@@ -32,6 +32,7 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\tao\model\event\MetadataModified;
 
 /**
  * Class RegisterSessionStateListener
@@ -48,6 +49,9 @@ class RegisterSessionStateListener extends InstallAction
         $this->registerEvent(DeliveryExecutionStateUpdate::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
+        
+        $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::CONFIG_ID, 'deliveryLabelChange']);
+        
     }
 }
 

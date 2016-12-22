@@ -30,26 +30,20 @@ use oat\oatbox\service\ServiceManager;
  * @package oat\taoProctoring
  * @author Mikhail Kamarouski <kamarouski@1pt.com>
  */
-class DeliveryUpdate
+class DeliveryUpdater
 {
 
-    public static function labelChange(MetadataModified $event)
+    public function changeLabel($service, $deliveryUri, $newLabel)
     {
-        $resource = $event->getResource();
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryExecutionsData = $service->find([
+            DeliveryMonitoringService::DELIVERY_ID => $deliveryUri,
+        ], []);
 
-        if ($resource->hasType(new \core_kernel_classes_Class(CLASS_COMPILEDDELIVERY)) && RDFS_LABEL === $event->getMetadataUri()) {
-
-            $deliveryExecutionsData = $service->find([
-                DeliveryMonitoringService::DELIVERY_ID => $resource->getUri(),
-            ], []);
-
-            foreach ($deliveryExecutionsData as $data) {
-                $data->updateData([DeliveryMonitoringService::DELIVERY_NAME]);
-                $success = $service->save($data);
-                if (!$success) {
-                    \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
-                }
+        foreach ($deliveryExecutionsData as $data) {
+            $data->update(DeliveryMonitoringService::DELIVERY_NAME, $newLabel);
+            $success = $service->save($data);
+            if (!$success) {
+                \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
             }
         }
     }
