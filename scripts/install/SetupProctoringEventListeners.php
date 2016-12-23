@@ -33,25 +33,31 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\taoProctoring\helpers\DeliveryHelper;
+use oat\taoProctoring\model\monitorCache\update\TestTakerUpdate;
 
 /**
  * Class RegisterSessionStateListener
  * @package oat\taoProctoring\scripts\install
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class RegisterSessionStateListener extends InstallAction
+class SetupProctoringEventListeners extends InstallAction
 {
     /**
      * @param $params
      */
     public function __invoke($params)
     {
+        // monitoring cache
         $this->registerEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
-        $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
-        
         $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::CONFIG_ID, 'deliveryLabelChange']);
-        
+        $this->registerEvent(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+        $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
+
+        $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
+
+        $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
     }
 }
 

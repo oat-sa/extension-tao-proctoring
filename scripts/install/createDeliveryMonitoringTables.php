@@ -20,7 +20,7 @@
  */
 
 use Doctrine\DBAL\Schema\SchemaException;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 $persistence = common_persistence_Manager::getPersistence('default');
 
@@ -29,55 +29,55 @@ $schema = $schemaManager->createSchema();
 $fromSchema = clone $schema;
 
 try {
-    $tableLog = $schema->createTable(DeliveryMonitoringService::TABLE_NAME);
+    $tableLog = $schema->createTable(MonitoringStorage::TABLE_NAME);
     $tableLog->addOption('engine', 'InnoDB');
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_STATUS, "string", array("notnull" => true, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_TEST_TAKER, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-    $tableLog->addColumn(DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_STATUS, "string", array("notnull" => true, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_AUTHORIZED_BY, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+    $tableLog->addColumn(MonitoringStorage::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
 
-    $tableLog->setPrimaryKey(array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID));
+    $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
 
     $tableLog->addIndex(
-        array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
-        'IDX_' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '_' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID
+        array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
+        'IDX_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID
     );
     $tableLog->addIndex(
-        array(DeliveryMonitoringService::COLUMN_START_TIME),
-        'IDX_' . DeliveryMonitoringService::TABLE_NAME . '_' . DeliveryMonitoringService::COLUMN_START_TIME
+        array(MonitoringStorage::COLUMN_START_TIME),
+        'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_START_TIME
     );
     $tableLog->addIndex(
-        array(DeliveryMonitoringService::COLUMN_END_TIME),
-        'IDX_' . DeliveryMonitoringService::TABLE_NAME . '_' . DeliveryMonitoringService::COLUMN_END_TIME
+        array(MonitoringStorage::COLUMN_END_TIME),
+        'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_END_TIME
     );
     $tableLog->addUniqueIndex(
-        array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
-        'IDX_' . DeliveryMonitoringService::TABLE_NAME . '_' . DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
+        array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
+        'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
     );
 
-    $tableData = $schema->createTable(DeliveryMonitoringService::KV_TABLE_NAME);
+    $tableData = $schema->createTable(MonitoringStorage::KV_TABLE_NAME);
     $tableData->addOption('engine', 'InnoDB');
-    $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
-    $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
-    $tableData->addColumn(DeliveryMonitoringService::KV_COLUMN_VALUE, "text", array("notnull" => false));
+    $tableData->addColumn(MonitoringStorage::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
+    $tableData->addColumn(MonitoringStorage::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
+    $tableData->addColumn(MonitoringStorage::KV_COLUMN_VALUE, "text", array("notnull" => false));
 
-    $tableData->setPrimaryKey(array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, DeliveryMonitoringService::KV_COLUMN_KEY));
+    $tableData->setPrimaryKey(array(MonitoringStorage::KV_COLUMN_PARENT_ID, MonitoringStorage::KV_COLUMN_KEY));
 
     $tableData->addForeignKeyConstraint(
         $tableLog,
-        array(DeliveryMonitoringService::KV_COLUMN_PARENT_ID),
-        array(DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID),
+        array(MonitoringStorage::KV_COLUMN_PARENT_ID),
+        array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
         array(
             'onDelete' => 'CASCADE',
             'onUpdate' => 'CASCADE',
         ),
-        DeliveryMonitoringService::KV_FK_PARENT
+        MonitoringStorage::KV_FK_PARENT
     );
 } catch(SchemaException $e) {
     common_Logger::i('Database Schema already up to date.');

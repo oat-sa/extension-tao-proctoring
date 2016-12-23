@@ -36,7 +36,7 @@ use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\common\datatypes\QtiDuration;
 use tao_helpers_Date as DateHelper;
 use oat\tao\helpers\UserHelper;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
@@ -603,8 +603,8 @@ class DeliveryHelper
             foreach($deliveryExecutions as $cachedData) {
 
                 $state = [
-                    'status' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS],
-                    'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM]
+                    'status' => $cachedData[DeliveryMonitoringService::STATUS],
+                    'progress' => $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]
                 ];
 
                 $testTaker = [];
@@ -632,11 +632,11 @@ class DeliveryHelper
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
-                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
+                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
                     'timer' => [
-                        'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
-                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME]),
-                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME]),
+                        'remaining' => $cachedData[DeliveryMonitoringService::REMAINING_TIME],
+                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]),
+                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]),
                     ],
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,

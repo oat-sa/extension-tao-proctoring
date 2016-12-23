@@ -23,6 +23,10 @@ use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
+use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
+use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
+use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 
 return array(
     'name' => 'taoProctoring',
@@ -43,8 +47,8 @@ return array(
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => DeliverySelection::class)),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => Monitor::class)),
+        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', DeliverySelection::class),
+        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', Monitor::class),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
@@ -53,12 +57,11 @@ return array(
         'php' => array(
             RegisterProctoringEntryPoint::class,
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'createDeliveryMonitoringTables.php',
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerCacheListener.php',
-            'oat\\taoProctoring\\scripts\\install\\RegisterProctoringLog',
-            'oat\\taoProctoring\\scripts\\install\\RegisterDeliveryServerService',
-            'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
+            RegisterProctoringLog::class,
+            RegisterDeliveryServerService::class,
+            SetupProctoringEventListeners::class,
             RegisterAuthProvider::class,
-            'oat\\taoProctoring\\scripts\\install\\RegisterReasonCategoryService'
+            RegisterReasonCategoryService::class
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

@@ -36,6 +36,7 @@ use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
  * class DeliveryMonitoringData
@@ -71,8 +72,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      * @var array
      */
     private $requiredFields = [
-        DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
-        DeliveryMonitoringService::COLUMN_STATUS,
+        DeliveryMonitoringService::DELIVERY_EXECUTION_ID,
+        DeliveryMonitoringService::STATUS,
     ];
 
     /** @var User */
@@ -89,7 +90,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
 
         $data = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
-            [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecutionId],
+            [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecutionId],
         ], ['asArray' => true], true);
 
         if (empty($data)) {
@@ -192,7 +193,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
                 DeliveryMonitoringService::TEST_TAKER,
                 DeliveryMonitoringService::TEST_TAKER_FIRST_NAME,
                 DeliveryMonitoringService::TEST_TAKER_LAST_NAME,
-                DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
+                DeliveryMonitoringService::AUTHORIZED_BY,
                 DeliveryMonitoringService::START_TIME,
                 DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
@@ -280,7 +281,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
             $authorizedBy = $deliveryLog[0]['data']['proctorUri'];
         }
-        $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $authorizedBy, true);
+        $this->addValue(DeliveryMonitoringService::AUTHORIZED_BY, $authorizedBy, true);
     }
 
     /**

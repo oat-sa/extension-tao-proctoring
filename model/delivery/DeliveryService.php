@@ -25,7 +25,6 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService as ServiceImplementation;
 
 /**
  * Sample Delivery Service for proctoring

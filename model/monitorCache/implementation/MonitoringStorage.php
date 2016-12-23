@@ -24,7 +24,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 use core_kernel_classes_Resource;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
 use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
@@ -58,7 +58,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class MonitoringStorage extends ConfigurableService implements DeliveryMonitoringServiceInterface
+class MonitoringStorage extends ConfigurableService implements DeliveryMonitoringService
 {
     const OPTION_PERSISTENCE = 'persistence';
 
@@ -66,19 +66,19 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     const TABLE_NAME = 'delivery_monitoring';
 
-    const COLUMN_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
-    const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
-    const COLUMN_STATUS = DeliveryMonitoringServiceInterface::STATUS;
-    const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringServiceInterface::CURRENT_ASSESSMENT_ITEM;
-    const COLUMN_TEST_TAKER = DeliveryMonitoringServiceInterface::TEST_TAKER;
-    const COLUMN_TEST_TAKER_FIRST_NAME = DeliveryMonitoringServiceInterface::TEST_TAKER_FIRST_NAME;
-    const COLUMN_TEST_TAKER_LAST_NAME = DeliveryMonitoringServiceInterface::TEST_TAKER_LAST_NAME;
-    const COLUMN_AUTHORIZED_BY = DeliveryMonitoringServiceInterface::AUTHORIZED_BY;
-    const COLUMN_START_TIME = DeliveryMonitoringServiceInterface::START_TIME;
-    const COLUMN_END_TIME = DeliveryMonitoringServiceInterface::END_TIME;
-    const COLUMN_REMAINING_TIME = DeliveryMonitoringServiceInterface::REMAINING_TIME;
-    const COLUMN_EXTRA_TIME = DeliveryMonitoringServiceInterface::EXTRA_TIME;
-    const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringServiceInterface::CONSUMED_EXTRA_TIME;
+    const COLUMN_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
+    const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
+    const COLUMN_STATUS = DeliveryMonitoringService::STATUS;
+    const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM;
+    const COLUMN_TEST_TAKER = DeliveryMonitoringService::TEST_TAKER;
+    const COLUMN_TEST_TAKER_FIRST_NAME = DeliveryMonitoringService::TEST_TAKER_FIRST_NAME;
+    const COLUMN_TEST_TAKER_LAST_NAME = DeliveryMonitoringService::TEST_TAKER_LAST_NAME;
+    const COLUMN_AUTHORIZED_BY = DeliveryMonitoringService::AUTHORIZED_BY;
+    const COLUMN_START_TIME = DeliveryMonitoringService::START_TIME;
+    const COLUMN_END_TIME = DeliveryMonitoringService::END_TIME;
+    const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
+    const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
+    const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
     
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';

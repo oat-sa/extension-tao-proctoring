@@ -26,6 +26,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
  * Class MonitorCacheService
@@ -44,6 +45,10 @@ class MonitorCacheService extends MonitoringStorage
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
+        // need to add user to event
+        $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, '');
+        $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, '');
+
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
         $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
         $data->update(DeliveryMonitoringService::START_TIME, $deliveryExecution->getStartTime());
