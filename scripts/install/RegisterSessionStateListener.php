@@ -25,7 +25,6 @@ use oat\oatbox\service\ServiceManager;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
-use oat\taoProctoring\model\monitorCache\update\DeliveryExecutionStateUpdate;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoTests\models\event\TestChangedEvent;
@@ -33,6 +32,7 @@ use oat\taoProctoring\model\monitorCache\update\TestUpdate;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\tao\model\event\MetadataModified;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 
 /**
  * Class RegisterSessionStateListener
@@ -46,7 +46,7 @@ class RegisterSessionStateListener extends InstallAction
      */
     public function __invoke($params)
     {
-        $this->registerEvent(DeliveryExecutionStateUpdate::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
+        $this->registerEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);
         
