@@ -214,8 +214,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function updateStatus()
     {
-        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $status = $this->deliveryExecution->getState()->getUri();
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
     }
 
@@ -224,10 +223,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function updateConnectivity()
     {
-        $serviceManager = $this->getServiceManager();
-        $deliveryExecutionStateService = $serviceManager->get(DeliveryExecutionStateService::SERVICE_ID);
-        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
-        $testSessionConnectivityStatusService = $serviceManager->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $status = $this->deliveryExecution->getState()->getUri();
+        $testSessionConnectivityStatusService = $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());

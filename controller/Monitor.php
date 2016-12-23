@@ -48,7 +48,7 @@ class Monitor extends SimplePageModule
     }
 
     /**
-     * Displays the index page of the deliveries list all available deliveries for the current test center
+     * Monitoring view of a selected delivery
      */
     public function index()
     {

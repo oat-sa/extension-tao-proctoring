@@ -57,7 +57,7 @@ define([
 
             var $container = $(cssScope);
             var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
-            var runDeliveryUrl = helpers._url('runDeliveryExecution', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
+            var runDeliveryUrl = config.runDeliveryUrl;
             var boxes = [{
                 id : 'goToDelivery',
                 label : config.deliveryLabel,

@@ -48,18 +48,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private $testSessionService;
 
     /**
-     * Computes the state of the delivery and returns one of the extended state code
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return null|string
-     * @throws \common_Exception
-     */
-    public function getState(DeliveryExecution $deliveryExecution)
-    {
-        return $deliveryExecution->getState()->getUri();
-    }
-
-    /**
      * Sets a delivery execution in the awaiting state
      *
      * @param DeliveryExecution $deliveryExecution
@@ -67,7 +55,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AWAITING);
@@ -117,7 +105,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_AWAITING === $executionState) {
@@ -150,7 +138,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
@@ -189,7 +177,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {

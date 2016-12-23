@@ -34,7 +34,7 @@ use oat\taoProctoring\model\delivery\DeliveryService;
 class DeliverySelection extends SimplePageModule
 {
     /**
-     * Displays the index page of the deliveries list all available deliveries for the current test center
+     * Lists all available deliveries
      */
     public function index()
     {

@@ -33,15 +33,6 @@ interface DeliveryExecutionStateService
     const SERVICE_ID = 'taoProctoring/DeliveryExecutionState';
 
     /**
-     * Computes the state of the delivery and returns one of the extended state code
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return null|string
-     * @throws \common_Exception
-     */
-    public function getState(DeliveryExecution $deliveryExecution);
-
-    /**
      * Sets a delivery execution in the awaiting state
      *
      * @param DeliveryExecution $deliveryExecution

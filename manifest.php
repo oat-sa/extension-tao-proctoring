@@ -43,7 +43,6 @@ return array(
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole', array('ext'=>'taoProctoring', 'mod'=>'ProctorManager')),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => DeliverySelection::class)),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('controller' => Monitor::class)),
         array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
