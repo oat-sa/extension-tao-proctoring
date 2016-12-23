@@ -1,11 +1,4 @@
 define({
-    'Diagnostic' : {
-        'actions' : {
-            'index' : 'controller/Diagnostic/index',
-            'diagnostic' : 'controller/Diagnostic/diagnostic',
-            'deliveriesByProctor' : 'controller/Diagnostic/deliveriesByProctor'
-        }
-    },
     'Reporting' : {
         'actions' : {
             'sessionHistory' : 'controller/Reporting/history'

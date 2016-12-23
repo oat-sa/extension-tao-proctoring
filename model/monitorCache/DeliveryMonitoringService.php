@@ -48,7 +48,6 @@ interface DeliveryMonitoringService
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
-    const TEST_CENTER_ID = 'test_center_id';
     const DELIVERY_ID = 'delivery_id';
     const DELIVERY_NAME = 'delivery_name';
     const CONNECTIVITY = 'last_connect';

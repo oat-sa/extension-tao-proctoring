@@ -34,7 +34,7 @@ use oat\oatbox\service\ServiceManager;
  * @license GPL-2.0
  *
  */
-class Reporting extends ProctoringModule
+class Reporting extends SimplePageModule
 {
     /**
      * Display the session history of the current test center
@@ -57,8 +57,6 @@ class Reporting extends ProctoringModule
         }
 
         $breadcrumbs = [
-            BreadcrumbsHelper::testCenters(),
-            BreadcrumbsHelper::testCenter($testCenter, TestCenterHelper::getTestCenters()),
             BreadcrumbsHelper::deliveries($testCenter, [
                     BreadcrumbsHelper::diagnostics($testCenter),
             ])

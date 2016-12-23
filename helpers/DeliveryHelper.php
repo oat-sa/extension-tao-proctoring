@@ -237,56 +237,6 @@ class DeliveryHelper
     }
 
     /**
-     * Gets all deliveries executions from the current test center
-     * This is performance critical, would need to find a way to optimize to obtain such information
-     *
-     * @param $testCenter
-     * @param array $options
-     * @return array
-     * @throws \Exception
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public static function getAllCurrentDeliveriesExecutions(core_kernel_classes_Resource $testCenter, array $options = array()){
-        $serviceManager = ServiceManager::getServiceManager();
-        $deliveryService = $serviceManager->get(DeliveryMonitoringService::CONFIG_ID);
-        $deliveries = $serviceManager->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
-
-        $deliveryCriteria = [];
-
-
-        foreach($deliveries as $delivery) {
-            if ($delivery->exists()) {
-                if(!isset($deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID])){
-                    $deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID] = [];
-                }
-                array_push($deliveryCriteria[DeliveryMonitoringService::DELIVERY_ID], $delivery->getUri());
-            }
-        }
-
-        $criteria = [
-            [DeliveryMonitoringService::TEST_CENTER_ID => $testCenter->getUri()]
-        ];
-
-        if (!empty($deliveryCriteria)) {
-            array_push($criteria, 'AND', $deliveryCriteria);
-        }
-
-        if (isset($options['filter']) && $options['filter']) {
-            $criteria = array_merge($criteria, ['AND'], [['status' => $options['filter']]]);
-        }
-
-        $options['asArray'] = true;
-
-        $sortBy = DeliveryMonitoringService::getSortByColumn($options['sortBy']);
-        $sortOrder = isset($options['sortOrder']) ? $options['sortOrder'] : DeliveryMonitoringService::DEFAULT_SORT_ORDER;
-        $options['order'] = "$sortBy $sortOrder";
-
-        $result = $deliveryService->find($criteria, $options, true);
-
-        return self::adjustDeliveryExecutions($result, $options);
-    }
-
-    /**
      * Gets the list of test takers assigned to a delivery
      *
      * @param string $deliveryId
