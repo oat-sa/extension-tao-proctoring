@@ -87,6 +87,15 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringData::update()
+     */
+    public function update($key, $value)
+    {
+        $this->addValue($key, $value, true);
+    }
+
+    /**
      * Add data
      * @param string $key
      * @param string $value
