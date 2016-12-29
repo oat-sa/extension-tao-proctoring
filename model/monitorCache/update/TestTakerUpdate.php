@@ -25,6 +25,7 @@ use oat\tao\model\event\MetadataModified;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
+use oat\tao\helpers\UserHelper;
 
 /**
  *
@@ -49,13 +50,11 @@ class TestTakerUpdate
             $deliveryExecutionsData = $service->find([
                 DeliveryMonitoringService::TEST_TAKER => $resource->getUri(),
             ], []);
+            $user = new \core_kernel_users_GenerisUser($resource);
 
             foreach ($deliveryExecutionsData as $data) {
-                $data->updateData([
-                    DeliveryMonitoringService::TEST_TAKER,
-                    DeliveryMonitoringService::TEST_TAKER_FIRST_NAME,
-                    DeliveryMonitoringService::TEST_TAKER_LAST_NAME,
-                ]);
+                $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, UserHelper::getUserFirstName($user));
+                $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, UserHelper::getUserLastName($user));
                 $success = $service->save($data);
                 if (!$success) {
                     \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. TestTaker data has not been changed');

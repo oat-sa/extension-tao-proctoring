@@ -182,17 +182,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($keys === null) {
             $keys = [
                 DeliveryMonitoringService::STATUS,
-                DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
-                DeliveryMonitoringService::TEST_TAKER,
-                DeliveryMonitoringService::TEST_TAKER_FIRST_NAME,
-                DeliveryMonitoringService::TEST_TAKER_LAST_NAME,
                 DeliveryMonitoringService::AUTHORIZED_BY,
-                DeliveryMonitoringService::START_TIME,
                 DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
-                DeliveryMonitoringService::EXTRA_TIME,
-                DeliveryMonitoringService::DELIVERY_ID,
-                DeliveryMonitoringService::DELIVERY_NAME,
+                DeliveryMonitoringService::EXTRA_TIME
             ];
         }
         foreach ($keys as $key) {
@@ -231,15 +224,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     }
 
     /**
-     * Update test-taker uri
-     */
-    private function updateTestTaker()
-    {
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->deliveryExecution->getUserIdentifier(), true);
-        $this->addExtraFieldsValues(true);
-    }
-
-    /**
      * Update uri of proctor authorized the delivery
      */
     private function updateAuthorizedBy()
@@ -250,16 +234,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $authorizedBy = $deliveryLog[0]['data']['proctorUri'];
         }
         $this->addValue(DeliveryMonitoringService::AUTHORIZED_BY, $authorizedBy, true);
-    }
-
-    /**
-     * Update start time of delivery execution
-     */
-    private function updateStartTime()
-    {
-        list($usec, $sec) = explode(" ", $this->deliveryExecution->getStartTime());
-        $startTime = ((float)$usec + (float)$sec);
-        $this->addValue(DeliveryMonitoringService::START_TIME, $startTime, true);
     }
 
     /**
@@ -319,38 +293,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
-    }
-
-    /**
-     * Update delivery uri
-     */
-    private function updateDeliveryId()
-    {
-        $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
-    }
-
-    /**
-     * Update test-taker's first name
-     */
-    private function updateTestTakerFirstName(){
-        $result = UserHelper::getUserFirstName($this->getUser());
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $result, true);
-    }
-
-    /**
-     * Update test-taker's last name
-     */
-    private function updateTestTakerLastName(){
-        $result = UserHelper::getUserLastName($this->getUser());
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $result, true);
-    }
-
-    /**
-     * Update deliver label
-     */
-    private function updateDeliveryName()
-    {
-        $this->addValue(DeliveryMonitoringService::DELIVERY_NAME, $this->deliveryExecution->getDelivery()->getLabel(), true);
     }
 
     /**
