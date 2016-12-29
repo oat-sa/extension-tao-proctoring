@@ -27,6 +27,7 @@ use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 
 /**
  * Class MonitorCacheService
@@ -65,7 +66,24 @@ class MonitorCacheService extends MonitoringStorage
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $success = $this->save($data);
         if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
+        }
+    }
+
+    public function testStateChanged(QtiTestChangeEvent $event)
+    {
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $this->getData($deliveryExecution);
+        $data->setTestSession($event->getSession());
+        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
+        $data->updateData([
+            DeliveryMonitoringService::END_TIME,
+            DeliveryMonitoringService::REMAINING_TIME,
+            DeliveryMonitoringService::EXTRA_TIME,
+        ]);
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for teststate could not be updated');
         }
     }
 
@@ -74,7 +92,7 @@ class MonitorCacheService extends MonitoringStorage
      *
      * @param MetadataModified $event
      */
-    public function deliverylabelChange(MetadataModified $event)
+    public function deliverylabelChanged(MetadataModified $event)
     {
         $resource = $event->getResource();
         if ($event->getMetadataUri() === RDFS_LABEL) {

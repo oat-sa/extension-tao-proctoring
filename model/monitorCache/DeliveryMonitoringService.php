@@ -20,7 +20,7 @@
  */
 
 namespace oat\taoProctoring\model\monitorCache;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 
 /**

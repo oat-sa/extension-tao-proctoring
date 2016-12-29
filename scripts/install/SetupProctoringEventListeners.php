@@ -51,8 +51,8 @@ class SetupProctoringEventListeners extends InstallAction
         // monitoring cache
         $this->registerEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::CONFIG_ID, 'executionStateChanged']);
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::CONFIG_ID, 'executionCreated']);
-        $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::CONFIG_ID, 'deliveryLabelChange']);
-        $this->registerEvent(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+        $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::CONFIG_ID, 'deliveryLabelChanged']);
+        $this->registerEvent(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::CONFIG_ID, 'testStateChanged']);
         $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
 
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);

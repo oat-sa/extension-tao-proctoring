@@ -40,6 +40,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -486,7 +487,7 @@ class DeliveryHelper
     /**
      * Gets the delivery time counter
      *
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return QtiTimer
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
@@ -712,11 +713,11 @@ class DeliveryHelper
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecution = self::getDeliveryExecutionById($session->getSessionId());
         $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         $data->setTestSession($session);
         $data->updateData([
             DeliveryMonitoringService::STATUS,
             DeliveryMonitoringService::CONNECTIVITY,
-            DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
             DeliveryMonitoringService::END_TIME,
         ]);
         $deliveryMonitoringService->save($data);

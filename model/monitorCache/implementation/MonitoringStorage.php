@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use core_kernel_classes_Resource;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -106,9 +106,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
-            $this->data[$id] = new DeliveryMonitoringData($deliveryExecution);
-        } else {
-            $this->data[$id]->setDeliveryExecution($deliveryExecution);
+            $results = $this->find([
+                [self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()],
+            ], ['asArray' => true], true);
+            $data = empty($results)
+                ? array(self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier())
+                : $results[0];
+            $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
+            $this->getServiceManager()->propagate($dataObject);
+            $this->data[$id] = $dataObject;
         }
         return $this->data[$id];
     }
@@ -237,8 +243,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         } else {
             foreach($data as $row) {
                 $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $monitoringData = new DeliveryMonitoringData($deliveryExecution);
-                $result[] = $monitoringData;
+                $result[] = $this->getData($deliveryExecution);
             }
         }
 

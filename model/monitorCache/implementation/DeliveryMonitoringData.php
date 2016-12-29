@@ -37,6 +37,8 @@ use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 /**
  * class DeliveryMonitoringData
@@ -46,8 +48,10 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  * @package oat\taoProctoring
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
+class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, ServiceLocatorAwareInterface
 {
+    use ServiceLocatorAwareTrait;
+
     /**
      * @var array
      */
@@ -83,21 +87,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      * DeliveryMonitoringData constructor.
      * @param DeliveryExecution $deliveryExecution
      */
-    public function __construct(DeliveryExecution $deliveryExecution)
+    public function __construct(DeliveryExecution $deliveryExecution, $data)
     {
         $this->deliveryExecution = $deliveryExecution;
-
-        $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
-
-        $data = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
-            [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecutionId],
-        ], ['asArray' => true], true);
-
-        if (empty($data)) {
-            $this->addValue('delivery_execution_id', $deliveryExecutionId);
-        } else {
-            $this->data = $data[0];
-        }
+        $this->data = $data;
     }
 
     /**
@@ -225,7 +218,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function updateConnectivity()
     {
         $status = $this->deliveryExecution->getState()->getUri();
-        $testSessionConnectivityStatusService = $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $testSessionConnectivityStatusService = $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
@@ -244,31 +237,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     {
         $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->deliveryExecution->getUserIdentifier(), true);
         $this->addExtraFieldsValues(true);
-    }
-
-    /**
-     * Update progress (current test-takers position)
-     */
-    private function updateCurrentAssessmentItem()
-    {
-        $result = null;
-
-        $session = $this->getTestSession();
-
-        if ($session !== null) {
-            if ($session->isRunning()) {
-                $route = $session->getRoute();
-                $currentSection = $session->getCurrentAssessmentSection();
-                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
-                $currentItem = $route->current();
-                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
-
-                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
-            } else {
-                $result = __('finished');
-            }
-        }
-        $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $result, true);
     }
 
     /**
@@ -401,7 +369,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function getDeliveryLog($eventId = null)
     {
-        $deliveryLogService = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
         return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
     }
 
@@ -429,14 +397,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getTestSession()
     {
         if ($this->testSession === null) {
-            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
         }
         return $this->testSession;
-    }
-
-    private function getServiceManager()
-    {
-        return ServiceManager::getServiceManager();
     }
 }
