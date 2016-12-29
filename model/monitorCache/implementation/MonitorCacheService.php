@@ -28,6 +28,7 @@ use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
+use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
 
 /**
  * Class MonitorCacheService
