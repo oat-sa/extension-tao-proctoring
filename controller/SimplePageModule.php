@@ -22,13 +22,8 @@
 namespace oat\taoProctoring\controller;
 
 use common_session_SessionManager as SessionManager;
-use core_kernel_classes_Resource;
 use oat\taoProctoring\helpers\DataTableHelper;
-use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\helpers\TestCenterHelper;
-use oat\taoProctoring\helpers\ReasonCategoryHelper;
 use DateTime;
-use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * Base proctoring interface controller
@@ -69,9 +64,18 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
         $this->setData('clientConfigUrl', $this->getClientConfigUrl());
         $this->setData('cls', $cssClass);
         $this->setData('data', $data);
-        $this->setData('content-template', empty($template) ? 'pages/index.tpl' : $template);
-        $this->setData('content-extension', empty($extension) ? 'taoProctoring' : $extension);
-        $this->setView('layout.tpl', 'taoProctoring');
+        
+        $template = empty($template) ? 'pages/index.tpl' : $template;
+        $extension = empty($extension) ? 'taoProctoring' : $extension;
+
+        if (\tao_helpers_Request::isAjax()) {
+            $this->setView($template, $extension);
+        } else {
+            $this->setData('content-template', $template);
+            $this->setData('content-extension', $extension);
+            
+            $this->setView('layout.tpl', \Context::getInstance()->getExtensionName());
+        }
     }
 
     /**
