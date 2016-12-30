@@ -11,21 +11,12 @@ define({
     },
     'DeliverySelection' : {
         'actions' : {
-            'index' : 'controller/Delivery/index',
+            'index' : 'controller/Delivery/index'
         }
     },
     'Monitor' : {
         'actions' : {
-            'index' : 'controller/Delivery/monitoring',
-        }
-    },
-    'Delivery' : {
-        'actions' : {
-            'index' : 'controller/Delivery/index',
-            'manage' : 'controller/Delivery/manage',
-            'monitoring' : 'controller/Delivery/monitoring',
-            'monitoringAll' : 'controller/Delivery/monitoring',
-            'testTakers' : 'controller/Delivery/testTakers'
+            'index' : 'controller/Delivery/monitoring'
         }
     }
 });

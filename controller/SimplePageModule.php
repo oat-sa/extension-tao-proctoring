@@ -22,13 +22,8 @@
 namespace oat\taoProctoring\controller;
 
 use common_session_SessionManager as SessionManager;
-use core_kernel_classes_Resource;
 use oat\taoProctoring\helpers\DataTableHelper;
-use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\helpers\TestCenterHelper;
-use oat\taoProctoring\helpers\ReasonCategoryHelper;
 use DateTime;
-use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * Base proctoring interface controller
@@ -40,9 +35,12 @@ use oat\taoProctoring\model\ReasonCategoryService;
  */
 abstract class SimplePageModule extends \tao_actions_CommonModule
 {
-    protected function singlePage($cssClass, $data = array(), $template = 'pages/index.tpl', $extension = 'taoProctoring')
+    protected function singlePage($cssClass, $data = array(), $template = '', $extension = '')
     {
-        $this->setData('content-template', array($template,$extension));
+        $currentExtension = \Context::getInstance()->getExtensionName();
+        $template = empty($template) ? 'pages/index.tpl' : $template;
+        $extension = empty($extension) ? $currentExtension : $extension;
+        $this->setData('content-template', array($template, $extension));
         $this->setView('layout.tpl', 'tao');
     }
     
@@ -53,6 +51,7 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
      * @param array $data
      * @param array $breadcrumbs
      * @param String $template
+     * @param String $extension
      */
     protected function composeView($cssClass, $data = array(), $breadcrumbs = array(), $template = '', $extension = '')
     {
@@ -69,9 +68,18 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
         $this->setData('clientConfigUrl', $this->getClientConfigUrl());
         $this->setData('cls', $cssClass);
         $this->setData('data', $data);
-        $this->setData('content-template', empty($template) ? 'pages/index.tpl' : $template);
-        $this->setData('content-extension', empty($extension) ? 'taoProctoring' : $extension);
-        $this->setView('layout.tpl', 'taoProctoring');
+        
+        $currentExtension = \Context::getInstance()->getExtensionName();
+        $template = empty($template) ? 'pages/index.tpl' : $template;
+        $extension = empty($extension) ? $currentExtension : $extension;
+
+        if (\tao_helpers_Request::isAjax()) {
+            $this->setView($template, $extension);
+        } else {
+            $this->setData('content-template', $template);
+            $this->setData('content-extension', $extension);
+            $this->setView('layout.tpl', $currentExtension);
+        }
     }
 
     /**
