@@ -35,9 +35,12 @@ use DateTime;
  */
 abstract class SimplePageModule extends \tao_actions_CommonModule
 {
-    protected function singlePage($cssClass, $data = array(), $template = 'pages/index.tpl', $extension = 'taoProctoring')
+    protected function singlePage($cssClass, $data = array(), $template = '', $extension = '')
     {
-        $this->setData('content-template', array($template,$extension));
+        $currentExtension = \Context::getInstance()->getExtensionName();
+        $template = empty($template) ? 'pages/index.tpl' : $template;
+        $extension = empty($extension) ? $currentExtension : $extension;
+        $this->setData('content-template', array($template, $extension));
         $this->setView('layout.tpl', 'tao');
     }
     
@@ -48,6 +51,7 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
      * @param array $data
      * @param array $breadcrumbs
      * @param String $template
+     * @param String $extension
      */
     protected function composeView($cssClass, $data = array(), $breadcrumbs = array(), $template = '', $extension = '')
     {
@@ -65,16 +69,16 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
         $this->setData('cls', $cssClass);
         $this->setData('data', $data);
         
+        $currentExtension = \Context::getInstance()->getExtensionName();
         $template = empty($template) ? 'pages/index.tpl' : $template;
-        $extension = empty($extension) ? 'taoProctoring' : $extension;
+        $extension = empty($extension) ? $currentExtension : $extension;
 
         if (\tao_helpers_Request::isAjax()) {
             $this->setView($template, $extension);
         } else {
             $this->setData('content-template', $template);
             $this->setData('content-extension', $extension);
-            
-            $this->setView('layout.tpl', \Context::getInstance()->getExtensionName());
+            $this->setView('layout.tpl', $currentExtension);
         }
     }
 
