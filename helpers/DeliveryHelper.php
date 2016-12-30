@@ -121,7 +121,7 @@ class DeliveryHelper
      */
     public static function getDeliveries(core_kernel_classes_Resource $testCenter)
     {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveries = ServiceManager::getServiceManager()->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
 
         $entries = array();
@@ -233,7 +233,7 @@ class DeliveryHelper
      */
     public static function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
     {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
     }
 
@@ -522,7 +522,7 @@ class DeliveryHelper
     public static function setExtraTime($deliveryExecutions, $extraTime = null)
     {
         $serviceManager = ServiceManager::getServiceManager();
-        $deliveryMonitoringService = $serviceManager->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = $serviceManager->get(DeliveryMonitoringService::SERVICE_ID);
 
         $result = array();
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -710,7 +710,7 @@ class DeliveryHelper
     {
         $session = $event->getSession();
         $state = $session->getState();
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = self::getDeliveryExecutionById($session->getSessionId());
         $data = $deliveryMonitoringService->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
@@ -736,7 +736,7 @@ class DeliveryHelper
             $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $data = $deliveryMonitoringService->getData($deliveryExecution);
         $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
@@ -753,7 +753,7 @@ class DeliveryHelper
             $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $data = $deliveryMonitoringService->getData($deliveryExecution);
         $data->update('hasBeenPaused', $paused);
         $deliveryMonitoringService->save($data);

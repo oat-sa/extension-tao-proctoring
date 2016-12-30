@@ -49,7 +49,7 @@ class DeliveryService extends ConfigurableService
     
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null)
     {
-        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $criteria = [
             [DeliveryMonitoringService::DELIVERY_ID => $delivery->getUri()]
         ];

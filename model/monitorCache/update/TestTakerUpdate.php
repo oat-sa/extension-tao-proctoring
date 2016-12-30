@@ -38,7 +38,7 @@ class TestTakerUpdate
     public static function propertyChange(MetadataModified $event)
     {
         $resource = $event->getResource();
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
         $tracked = array_merge([PROPERTY_USER_FIRSTNAME, PROPERTY_USER_LASTNAME], array_map(function ($field) {
             return $field['property']->getUri();

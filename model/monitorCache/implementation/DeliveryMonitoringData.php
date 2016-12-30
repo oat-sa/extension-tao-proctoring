@@ -182,7 +182,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($keys === null) {
             $keys = [
                 DeliveryMonitoringService::STATUS,
-                DeliveryMonitoringService::AUTHORIZED_BY,
                 DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME
@@ -221,19 +220,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
-    }
-
-    /**
-     * Update uri of proctor authorized the delivery
-     */
-    private function updateAuthorizedBy()
-    {
-        $authorizedBy = null;
-        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
-        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
-            $authorizedBy = $deliveryLog[0]['data']['proctorUri'];
-        }
-        $this->addValue(DeliveryMonitoringService::AUTHORIZED_BY, $authorizedBy, true);
     }
 
     /**
@@ -293,44 +279,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        if (!$this->user){
-             $this->user = UserHelper::getUser($this->deliveryExecution->getUserIdentifier());
-        }
-        return $this->user;
-    }
-
-    /**
-     * @return string
-     */
-    private function getDeliveryLog($eventId = null)
-    {
-        $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
-        return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
-    }
-
-    /**
-     * @param bool $overwrite
-     */
-    private function addExtraFieldsValues($overwrite = false)
-    {
-        $user = $this->getUser();
-        if ($user) {
-            $fields = DeliveryHelper::getExtraFieldsProperties();
-            foreach ($fields as $field) {
-
-                $values = $user->getPropertyValues($field['property']);
-                if (!empty($values) && is_array($values)) {
-                    $this->addValue($field['id'], (string)$values[0], $overwrite);
-                }
-            }
-        }
     }
 
     /**

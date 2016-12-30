@@ -31,7 +31,16 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 interface DeliveryMonitoringService
 {
+    /**
+     * @deprecated
+     */
     const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
+
+    /**
+     * Service Id of the main Monitoring Cache Service
+     * @var string
+     */
+    const SERVICE_ID = 'taoProctoring/DeliveryMonitoring';
 
     const ID = 'id';
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
