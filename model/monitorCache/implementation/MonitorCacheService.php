@@ -48,8 +48,14 @@ class MonitorCacheService extends MonitoringStorage
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
         // need to add user to event
-        $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, '');
-        $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, '');
+        $firstNames = $event->getUser()->getPropertyValues(PROPERTY_USER_FIRSTNAME);
+        if (!empty($firstNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
+        }
+        $lastNames = $event->getUser()->getPropertyValues(PROPERTY_USER_LASTNAME);
+        if (!empty($lastNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
+        }
 
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
         $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
