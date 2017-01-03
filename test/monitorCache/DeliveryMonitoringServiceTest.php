@@ -22,9 +22,11 @@
 namespace oat\taoProctoring\test\monitorCache;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoProctoring\test\monitorCache\mock\DeliveryMonitoringData;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
+use oat\taoProctoring\scripts\install\db\DbSetup;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
  * class DeliveryMonitoringData
@@ -45,11 +47,13 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     public function setUp()
     {
+        parent::setUp();
+        TaoPhpUnitTestRunner::initTest();
+
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
 
-        TaoPhpUnitTestRunner::initTest();
         $this->service = new MonitoringStorage([
-            MonitoringStorage::OPTION_PERSISTENCE => 'default',
+            MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
             MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
                 'delivery_execution_id',
                 'status',
@@ -60,12 +64,22 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 'end_time'
             )
         ]);
-        $this->service->setServiceLocator($this->getServiceManagerProphecy());
         $this->persistence = \common_persistence_Manager::getPersistence('default');
+        $this->service->setServiceLocator($this->getServiceManagerProphecy());
+
+        $pmMock = $this->getSqlMock('test_monitoring');
+        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
+        DbSetup::generateTable($this->persistence);
+
+        $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
+        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
+        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
     }
 
     public function tearDown()
     {
+        parent::tearDown();
         $this->deleteTestData();
     }
 
@@ -79,7 +93,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $sql = 'DELETE FROM ' . $service::TABLE_NAME .
             ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
-
+        
         $this->persistence->exec($sql);
     }
 
@@ -97,7 +111,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ];
 
         $deliveryExecution = $this->getDeliveryExecution();
-        $dataModel = new DeliveryMonitoringData($deliveryExecution);
+        $dataModel = $this->service->getData($deliveryExecution);
 
         //data is not valid
         $this->assertFalse($this->service->save($dataModel));
@@ -119,8 +133,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
         //one row has been inserted
-        $this->assertEquals(count($insertedData), 1);
-        $this->assertEquals($insertedData[0][MonitoringStorage::COLUMN_STATUS], 'active');
+        $this->assertEquals(1, count($insertedData));
+        $this->assertEquals('active', $insertedData[0][MonitoringStorage::COLUMN_STATUS]);
 
         foreach ($data as $key => $val) {
             $this->assertEquals($insertedData[0][$key], $val);
@@ -129,7 +143,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][$service::COLUMN_ID]);
 
         $this->assertNotEmpty($insertedKvData);
-        $this->assertEquals(count($insertedKvData), count($secondaryData));
+        $this->assertEquals(count($secondaryData), count($insertedKvData));
 
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[MonitoringStorage::KV_COLUMN_KEY];
@@ -169,7 +183,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
 
-        $dataModel = new DeliveryMonitoringData($this->getDeliveryExecution());
+        $dataModel = $this->service->getData($this->getDeliveryExecution());
 
         foreach ($data as $key => $val) {
             $dataModel->addValue($key, $val);
@@ -316,7 +330,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         ];
 
         foreach ($data as $item) {
-            $dataModel = new DeliveryMonitoringData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
+            $dataModel = $this->service->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }

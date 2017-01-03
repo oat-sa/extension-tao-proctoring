@@ -49,7 +49,8 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
         $deliveryExecution = $this->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, false);
+        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data->setServiceLocator($this->getServiceManagerProphecy());
         foreach ($columns as $columnKey => $columnVal) {
             $data->addValue($columnKey, $columnVal);
         }
@@ -63,7 +64,8 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testAddValue()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, false);
+        $data = new DeliveryMonitoringData($deliveryExecution,[]);
+        $data->setServiceLocator($this->getServiceManagerProphecy());
 
         $this->assertEquals($data->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $deliveryExecution->getIdentifier());
 
@@ -82,7 +84,8 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testValidate()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, false);
+        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data->setServiceLocator($this->getServiceManagerProphecy());
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();
 
