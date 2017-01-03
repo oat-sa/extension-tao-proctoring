@@ -90,7 +90,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     public function __construct(DeliveryExecution $deliveryExecution, $data)
     {
         $this->deliveryExecution = $deliveryExecution;
-        $this->data = $data;
+        if (is_array($data) && !empty($data)) {
+            $this->data = $data;
+        } else {
+            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
+        }
     }
 
     /**
@@ -159,7 +163,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     public function get($refresh = false)
     {
-        if (empty($this->data) || $refresh) {
+        if ($refresh) {
             $this->updateData();
         }
         return $this->data;
@@ -250,7 +254,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     private function updateExtraTime()
     {
-        $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
+        $testSession = $this->getTestSession();
+        if ($testSession instanceof TestSession) {
+            $timer = $testSession->getTimer();
+        } else {
+            $timer = new QtiTimer();
+            $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
+            $timer->load();
+        }
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }

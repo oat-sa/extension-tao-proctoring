@@ -30,6 +30,8 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 
 /**
  * Class MonitorCacheService
@@ -81,16 +83,44 @@ class MonitorCacheService extends MonitoringStorage
         }
     }
 
-    public function qtiTestStateChanged(QtiTestChangeEvent $event)
+    /**
+     * Something changed in the state of the test execution
+     * (for example: the current item in the test)
+     *
+     * @param TestChangedEvent $event
+     */
+    public function testStateChanged(TestChangedEvent $event)
+    {
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $this->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
+        if ($event instanceof QtiTestChangeEvent) {
+            $data->setTestSession($event->getSession());
+            $data->updateData([
+                DeliveryMonitoringService::REMAINING_TIME,
+                DeliveryMonitoringService::EXTRA_TIME
+            ]);
+        }
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for teststate could not be updated');
+        }
+    }
+
+    /**
+     * The status of the test execution has changed
+     * (for example: from running to paused)
+     *
+     * @param QtiTestStateChangeEvent $event
+     */
+    public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
     {
         // assumes test execution id = delivery execution id
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
         $data = $this->getData($deliveryExecution);
         $data->setTestSession($event->getSession());
-        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         $data->updateData([
-            DeliveryMonitoringService::REMAINING_TIME,
-            DeliveryMonitoringService::EXTRA_TIME
+            DeliveryMonitoringService::CONNECTIVITY
         ]);
         $success = $this->save($data);
         if (!$success) {

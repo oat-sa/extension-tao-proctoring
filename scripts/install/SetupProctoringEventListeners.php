@@ -53,7 +53,7 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']);
         $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
         $this->registerEvent(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
-        $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStateChanged']);
+        $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
         $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
 
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::class, 'catchSessionPause']);

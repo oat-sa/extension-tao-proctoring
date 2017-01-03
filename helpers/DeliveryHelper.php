@@ -708,7 +708,8 @@ class DeliveryHelper
      */
     public static function testStateChanged(QtiTestStateChangeEvent $event)
     {
-        if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL && $state === AssessmentTestSessionState::SUSPENDED) {
+        if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL
+            && $event->getSession()->getState() === AssessmentTestSessionState::SUSPENDED) {
             self::setHasBeenPaused($event->getSession()->getSessionId(), true);
         }
     }

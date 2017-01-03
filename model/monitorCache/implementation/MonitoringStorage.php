@@ -109,9 +109,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $results = $this->find([
                 [self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()],
             ], ['asArray' => true], true);
-            $data = empty($results)
-                ? array(self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier())
-                : $results[0];
+            $data = empty($results) ? [] : $results[0];
             $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
             $this->getServiceManager()->propagate($dataObject);
             $this->data[$id] = $dataObject;
