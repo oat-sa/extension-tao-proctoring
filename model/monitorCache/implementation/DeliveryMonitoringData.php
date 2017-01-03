@@ -181,8 +181,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     {
         if ($keys === null) {
             $keys = [
-                DeliveryMonitoringService::STATUS,
-                DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME
             ];
@@ -193,15 +191,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
                 $this->{$methodName}();
             }
         }
-    }
-
-    /**
-     * Update test session state
-     */
-    private function updateStatus()
-    {
-        $status = $this->deliveryExecution->getState()->getUri();
-        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
     }
 
     /**
@@ -220,21 +209,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
-    }
-
-    /**
-     * Update end time of delivery execution
-     */
-    private function updateEndTime()
-    {
-        $finishTime = $this->deliveryExecution->getFinishTime();
-        if ($finishTime) {
-            list($usec, $sec) = explode(" ", $this->deliveryExecution->getFinishTime());
-            $finishTime = ((float)$usec + (float)$sec);
-        } else {
-            $finishTime = '';
-        }
-        $this->addValue(DeliveryMonitoringService::END_TIME, $finishTime, true);
     }
 
     /**

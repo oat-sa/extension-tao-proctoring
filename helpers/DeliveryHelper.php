@@ -708,21 +708,8 @@ class DeliveryHelper
      */
     public static function testStateChanged(QtiTestStateChangeEvent $event)
     {
-        $session = $event->getSession();
-        $state = $session->getState();
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveryExecution = self::getDeliveryExecutionById($session->getSessionId());
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
-        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
-        $data->setTestSession($session);
-        $data->updateData([
-            DeliveryMonitoringService::STATUS,
-            DeliveryMonitoringService::CONNECTIVITY,
-            DeliveryMonitoringService::END_TIME,
-        ]);
-        $deliveryMonitoringService->save($data);
         if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL && $state === AssessmentTestSessionState::SUSPENDED) {
-            self::setHasBeenPaused($session->getSessionId(), true);
+            self::setHasBeenPaused($event->getSession()->getSessionId(), true);
         }
     }
 

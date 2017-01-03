@@ -75,7 +75,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
 
-        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
+        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID)->find([
             [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecutionId],
         ], ['asArray' => true], true);
 
