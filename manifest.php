@@ -27,6 +27,7 @@ use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
+use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 
 return array(
     'name' => 'taoProctoring',
@@ -56,7 +57,7 @@ return array(
     'install' => array(
         'php' => array(
             RegisterProctoringEntryPoint::class,
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'createDeliveryMonitoringTables.php',
+            SetupDeliveryMonitoring::class,
             RegisterProctoringLog::class,
             RegisterDeliveryServerService::class,
             SetupProctoringEventListeners::class,

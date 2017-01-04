@@ -43,9 +43,6 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::COLUMN_AUTHORIZED_BY, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringStorage::COLUMN_REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringStorage::COLUMN_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringStorage::COLUMN_CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
         
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
         
@@ -92,6 +89,23 @@ class DbSetup {
         foreach ($queries as $query) {
             $persistence->exec($query);
         }
-        
+    }
+
+    /**
+     * Returns a list of columns stored in the primary table
+     *
+     * @return array column identifiers
+     */
+    public static function getPrimaryColumns()
+    {
+        return [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID,
+            MonitoringStorage::COLUMN_STATUS,
+            MonitoringStorage::COLUMN_CURRENT_ASSESSMENT_ITEM,
+            MonitoringStorage::COLUMN_TEST_TAKER,
+            MonitoringStorage::COLUMN_AUTHORIZED_BY,
+            MonitoringStorage::COLUMN_START_TIME,
+            MonitoringStorage::COLUMN_END_TIME
+        ];
     }
 }
