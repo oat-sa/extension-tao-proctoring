@@ -615,8 +615,8 @@ class DeliveryHelper
                 if ($user) {
                     /* @var $user User */
                     $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                    $testTaker['lastName'] = _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]);
-                    $testTaker['firstName'] = _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]);
+                    $testTaker['lastName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
+                    $testTaker['firstName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
                     $userExtraFields = self::_getUserExtraFields();
                     foreach($userExtraFields as $field){
@@ -635,9 +635,9 @@ class DeliveryHelper
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
                     'timer' => [
-                        'remaining' => $cachedData[DeliveryMonitoringService::REMAINING_TIME],
-                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]),
-                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]),
+                        'remaining' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
+                        'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
+                        'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
                     ],
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,

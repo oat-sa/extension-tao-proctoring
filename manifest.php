@@ -43,7 +43,7 @@ return array(
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=5.38.0',
         'taoOutcomeUi' => '>=2.6.6',
-        'generis' => '>=2.15.0',
+        'generis' => '>=3.13.2',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
