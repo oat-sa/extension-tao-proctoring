@@ -18,8 +18,7 @@
  */
 define(['lodash', 'i18n'], function(_, __){
     'use strict';
-    var _init = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit',
-        _awaiting = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
+    var _awaiting = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
         _authorized = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
         _inprogress = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
         _paused = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
@@ -27,18 +26,6 @@ define(['lodash', 'i18n'], function(_, __){
         _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
 
     var _status = {
-        init : {
-            code : _init,
-            label : __('Init'),
-            can : {
-                authorize : __('not awaiting'),
-                pause : __('not in progress'),
-                terminate : true,
-                report : true,
-                print : __('not finished'),
-                time : true
-            }
-        },
         awaiting : {
             code : _awaiting,
             label : __('Awaiting'),
@@ -167,7 +154,6 @@ define(['lodash', 'i18n'], function(_, __){
         getStatus : getStatus,
         getStatusByCode : getStatusByCode,
         verifyTestTaker : verifyTestTaker,
-        STATUS_INIT : _init,
         STATUS_AUTHORIZED : _authorized,
         STATUS_INPROGRESS : _inprogress,
         STATUS_PAUSED : _paused,
