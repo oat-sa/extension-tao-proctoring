@@ -35,7 +35,9 @@ class DeliveryService extends ConfigurableService
 {
     use OntologyAwareTrait;
 
-    const CONFIG_ID = 'taoProctoring/delivery';
+    const SERVICE_ID = 'taoProctoring/delivery';
+    
+    const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
     /**
      * Gets all deliveries available for a proctor

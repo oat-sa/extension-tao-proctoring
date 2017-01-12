@@ -38,7 +38,7 @@ class DeliverySelection extends SimplePageModule
      */
     public function index()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $deliveries = $service->getProctorableDeliveries($proctor);
         $data = array();

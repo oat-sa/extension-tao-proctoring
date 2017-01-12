@@ -52,7 +52,7 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
@@ -80,7 +80,7 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::CONFIG_ID);
+        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
