@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\taoProctoring\model;
+namespace oat\taoProctoring\controller\form;
 
 /**
  *

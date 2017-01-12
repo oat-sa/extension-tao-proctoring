@@ -24,7 +24,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\tao\model\export\implementation\CsvExporter;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\IrregularitiesExportForm;
+use oat\taoProctoring\controller\form\IrregularitiesExportForm;
 
 /**
  * Irregularity controller
