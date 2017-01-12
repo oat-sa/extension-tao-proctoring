@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\delivery\DeliveryService;
+use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoProctoring\model\ReasonCategoryService;
 
@@ -52,7 +52,7 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
+        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
@@ -80,7 +80,7 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
+        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);

@@ -18,7 +18,7 @@
  *
  *
  */
-namespace oat\taoProctoring\model\delivery;
+namespace oat\taoProctoring\model;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\user\User;
@@ -31,11 +31,11 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class DeliveryService extends ConfigurableService
+class ProctorService extends ConfigurableService
 {
     use OntologyAwareTrait;
 
-    const SERVICE_ID = 'taoProctoring/delivery';
+    const SERVICE_ID = 'taoProctoring/ProctorAccess';
     
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 

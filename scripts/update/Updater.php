@@ -33,7 +33,7 @@ use oat\taoProctoring\model\ReasonCategoryService;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
-use oat\taoProctoring\model\delivery\DeliveryService;
+use oat\taoProctoring\model\ProctorService;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\tao\model\event\MetadataModified;
@@ -58,7 +58,7 @@ class Updater extends common_ext_ExtensionUpdater
     public function update($initialVersion)
     {
         if ($this->isBetween('0.0.0', '3.11.0')) {
-            throw new \common_exception_NotImplemented('Please first update to 3.15.0 using taoProctoring 3.15.0');
+            throw new \common_ext_UpdateException('Please first update to 3.15.0 using taoProctoring 3.15.0');
         }
 
         $this->skip('3.12.0', '3.12.1');
@@ -129,18 +129,18 @@ class Updater extends common_ext_ExtensionUpdater
 
             // unregister testcenter services
             $this->getServiceManager()->register(AssignmentService::SERVICE_ID, new GroupAssignment());
-            $this->getServiceManager()->register(DeliveryService::SERVICE_ID, new DeliveryService());
+            $this->getServiceManager()->register(ProctorService::SERVICE_ID, new ProctorService());
 
             // access rights
-            AclProxy::applyRule(new AccessRule('grant', DeliveryService::ROLE_PROCTOR, DeliverySelection::class));
-            AclProxy::applyRule(new AccessRule('grant', DeliveryService::ROLE_PROCTOR, Monitor::class));
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, DeliverySelection::class));
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, Monitor::class));
 
             $old = array(
                 ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',array('ext' => 'taoProctoring', 'mod'=>'TestCenterManager')],
                 ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole',array('ext' => 'taoProctoring', 'mod'=>'ProctorManager')],
-                [DeliveryService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Delivery')],
-                [DeliveryService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Diagnostic')],
-                [DeliveryService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'TestCenter')],
+                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Delivery')],
+                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Diagnostic')],
+                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'TestCenter')],
                 ['http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager',array('ext' => 'taoProctoring', 'mod'=>'DiagnosticChecker')],
                 [TaoRoles::ANONYMOUS, array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')]
             );

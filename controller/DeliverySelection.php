@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\controller;
 
 use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\delivery\DeliveryService;
+use oat\taoProctoring\model\ProctorService;
 
 /**
  * Proctoring Delivery controllers
@@ -38,7 +38,7 @@ class DeliverySelection extends SimplePageModule
      */
     public function index()
     {
-        $service = $this->getServiceManager()->get(DeliveryService::SERVICE_ID);
+        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $deliveries = $service->getProctorableDeliveries($proctor);
         $data = array();

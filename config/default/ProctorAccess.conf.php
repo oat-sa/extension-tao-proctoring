@@ -19,4 +19,4 @@
  * 
  */  
 
-return new oat\taoProctoring\model\delivery\DeliveryService();
+return new oat\taoProctoring\model\ProctorService();

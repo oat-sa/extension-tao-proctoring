@@ -28,6 +28,7 @@ use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
+use oat\taoProctoring\model\ProctorService;
 
 return array(
     'name' => 'taoProctoring',
@@ -48,10 +49,10 @@ return array(
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', DeliverySelection::class),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', Monitor::class),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole', array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
+        array('grant', ProctorService::ROLE_PROCTOR, DeliverySelection::class),
+        array('grant', ProctorService::ROLE_PROCTOR, Monitor::class),
+        array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
+        array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
     ),
     'install' => array(
