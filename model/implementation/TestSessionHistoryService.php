@@ -51,6 +51,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         'test_terminate',
         'test_irregularity',
         'pause',
+        'framed-prohibited',
         'focus-loss-prohibited',
         'leave-fullscreen-prohibited',
         'pause-on-disconnect',
