@@ -182,7 +182,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $result = $this->service->find([
             [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
         ]);
-        $this->assertEquals(count($result), 1);
+        $this->assertEquals(1, count($result));
+
         $this->assertEquals($result[0]->get()[DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
 
         $result = $this->service->find([
@@ -190,6 +191,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'OR',
             ['error_code' => '2'],
         ]);
+
         $this->assertEquals(count($result), 2);
 
         $result = $this->service->find([
@@ -197,6 +199,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             'AND',
             ['session_id' => 'i1450191587554175'],
         ]);
+
         $this->assertEquals(count($result), 1);
 
         $result = $this->service->find([

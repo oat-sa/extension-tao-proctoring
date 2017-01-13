@@ -210,11 +210,13 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
 
+        $where = $this->prepareCondition($criteria, $parameters, $selectClause);
+
         $sql = $selectClause . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL;
 
-        if(($where = $this->prepareCondition($criteria, $parameters, $selectClause)) !== ''){
-            $sql .= 'WHERE '. $where . PHP_EOL;
+        if($where !== ''){
+            $sql .= 'WHERE ' . $where .PHP_EOL;
         }
 
         if ($options['order']['primary']) {
