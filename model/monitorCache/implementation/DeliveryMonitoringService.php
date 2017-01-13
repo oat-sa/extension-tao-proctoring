@@ -204,17 +204,18 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         ];
         $options = array_merge($defaultOptions, $options);
 
-        $whereClause = 'WHERE ';
         $parameters = [];
 
         $options['order'] = $this->prepareOrderStmt($options['order']);
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
 
         $sql = $selectClause . $fromClause . PHP_EOL .
-            implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL;
+            implode(PHP_EOL, $this->joins) . PHP_EOL;
+
+        if(($where = $this->prepareCondition($criteria, $parameters, $selectClause)) !== ''){
+            $sql .= 'WHERE '. $where . PHP_EOL;
+        }
 
         if ($options['order']['primary']) {
             $sql .= "ORDER BY " . $options['order']['primary'];
@@ -356,6 +357,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
+        $this->deleteKvData($deliveryMonitoring);
         $data = $deliveryMonitoring->get();
 
         $sql = 'DELETE FROM ' . self::TABLE_NAME . '
