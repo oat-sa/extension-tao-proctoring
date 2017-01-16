@@ -138,13 +138,13 @@ class Updater extends common_ext_ExtensionUpdater
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, Monitor::class));
 
             $old = array(
-                ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',array('ext' => 'taoProctoring', 'mod'=>'TestCenterManager')],
-                ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole',array('ext' => 'taoProctoring', 'mod'=>'ProctorManager')],
-                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Delivery')],
-                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'Diagnostic')],
-                [ProctorService::ROLE_PROCTOR,array('ext' => 'taoProctoring', 'mod'=>'TestCenter')],
-                ['http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager',array('ext' => 'taoProctoring', 'mod'=>'DiagnosticChecker')],
-                [TaoRoles::ANONYMOUS, array('ext'=>'taoProctoring','mod' => 'DiagnosticChecker')]
+                ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',array('oat\\taoProctoring\\controller\\TestCenterManager')],
+                ['http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole',array('oat\\taoProctoring\\controller\\ProctorManager')],
+                [ProctorService::ROLE_PROCTOR,'oat\\taoProctoring\\controller\\Delivery'],
+                [ProctorService::ROLE_PROCTOR,'oat\\taoProctoring\\controller\\Diagnostic'],
+                [ProctorService::ROLE_PROCTOR,'oat\\taoProctoring\\controller\\TestCenter'],
+                ['http://www.tao.lu/Ontologies/generis.rdf#taoClientDiagnosticManager','oat\\taoProctoring\\controller\\DiagnosticChecker'],
+                [TaoRoles::ANONYMOUS, 'oat\\taoProctoring\\controller\\DiagnosticChecker']
             );
             foreach ($old as $row) {
                 list($role, $acl) = $row;
