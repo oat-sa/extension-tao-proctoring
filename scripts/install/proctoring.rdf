@@ -21,12 +21,6 @@
   </rdf:Description>
   
   <!--  Delivery states -->
-  <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit">
-    <rdfs:label xml:lang="en-US"><![CDATA[Initial]]></rdfs:label>
-    <rdfs:comment xml:lang="en-US"><![CDATA[Initial status of a delivery execution]]></rdfs:comment>
-    <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
-  </rdf:Description>
-
   <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting">
     <rdfs:label xml:lang="en-US"><![CDATA[Awaiting]]></rdfs:label>
     <rdfs:comment xml:lang="en-US"><![CDATA[Awaiting of authorization status of a delivery execution]]></rdfs:comment>

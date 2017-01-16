@@ -28,8 +28,6 @@ namespace oat\taoProctoring\model\execution;
  */
 interface DeliveryExecution extends \oat\taoDelivery\model\execution\DeliveryExecution
 {
-    const STATE_INIT = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusInit';
-
     const STATE_AWAITING = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
 
     const STATE_AUTHORIZED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized';
