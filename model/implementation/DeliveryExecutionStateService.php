@@ -31,6 +31,7 @@ use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
 
 
 /**
@@ -110,9 +111,9 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_AWAITING === $executionState) {
-            $proctorId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+            $proctor = \common_session_SessionManager::getSession()->getUser();
             $logData = [
-                'proctorUri' => $proctorId,
+                'proctorUri' => $proctor->getIdentifier(),
                 'timestamp' => microtime(true),
             ];
             if (!empty($reason) && is_array($reason)) {
@@ -125,12 +126,8 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $logData['context'] = $this->getProgress($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
-            $cache = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
-            $data = $cache->getData($deliveryExecution);
-            $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $proctorId);
-            if (!$cache->save($data)) {
-                \common_Logger::w('monitor cache for teststate could not be updated');
-            }
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->trigger(new AuthorizationGranted($deliveryExecution, $proctor));
             $result = true;
         }
 

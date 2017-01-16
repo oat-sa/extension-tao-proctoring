@@ -43,6 +43,7 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\tao\model\user\TaoRoles;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
 
 /**
  *
@@ -125,6 +126,7 @@ class Updater extends common_ext_ExtensionUpdater
             $eventManager->attach(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
             $eventManager->attach(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
             $eventManager->attach(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
+            $eventManager->attach(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
 
             // unregister testcenter services

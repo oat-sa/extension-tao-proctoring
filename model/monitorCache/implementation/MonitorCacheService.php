@@ -32,6 +32,7 @@ use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
 
 /**
  * Class MonitorCacheService
@@ -142,6 +143,19 @@ class MonitorCacheService extends MonitoringStorage
                 $update = new DeliveryUpdater();
                 $update->changeLabel($this, $resource->getUri(), $event->getMetadataValue());
             }
+        }
+    }
+
+    /**
+     * Sets the protor who authorized this delivery execution
+     * @param AuthorizationGranted $event
+     */
+    public function deliveryAuthorized(AuthorizationGranted $event)
+    {
+        $data = $this->getData($event->getDeliveryExecution());
+        $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
+        if (!$this->save($data)) {
+            \common_Logger::w('monitor cache for authorization could not be updated');
         }
     }
 }
