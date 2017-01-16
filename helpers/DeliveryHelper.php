@@ -25,10 +25,8 @@ use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
 use oat\taoDelivery\helper\Delivery;
-use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\DeliveryService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
@@ -108,119 +106,6 @@ class DeliveryHelper
         
         return $entry;
     }
-    
-    /**
-     * Gets a list of available deliveries for a test site
-     *
-     * @param core_kernel_classes_Resource $testCenter
-     * @param array [$options]
-     * @return array
-     * @throws ServiceNotFoundException
-     * @throws \common_Exception
-     * @throws \common_exception_Error
-     */
-    public static function getDeliveries(core_kernel_classes_Resource $testCenter)
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveries = ServiceManager::getServiceManager()->get(EligibilityService::SERVICE_ID)->getEligibleDeliveries($testCenter);
-
-        $entries = array();
-
-        $all = array(
-            'id' => 'all',
-            'url' => _url('monitoringAll', 'Delivery', null, array('testCenter' => $testCenter->getUri())),
-            'label' => __('All Sessions'),
-            'cls' => 'dark',
-            'stats' => array(
-                'awaitingApproval' => 0,
-                'inProgress' => 0,
-                'paused' => 0
-            )
-        );
-
-        $deliveryProps = array(
-            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
-            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
-        );
-
-        /** @var core_kernel_classes_Resource $delivery */
-        foreach ($deliveries as $delivery) {
-            $inprogress = 0;
-            $paused = 0;
-            $awaiting = 0;
-            $executions = $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter);
-            foreach($executions as $executionData) {
-                $executionState = $executionData[DeliveryMonitoringService::STATUS];
-                switch($executionState){
-                    case DeliveryExecution::STATE_AWAITING:
-                        $awaiting++;
-                        break;
-                    case DeliveryExecution::STATE_ACTIVE:
-                        $inprogress++;
-                        break;
-                    case DeliveryExecution::STATE_PAUSED:
-                        $paused++;
-                        break;
-                    default:
-                        continue;
-                }
-            }
-
-
-            $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
-            $propStartExec = current($deliveryProperties[TAO_DELIVERY_START_PROP]);
-            $propEndExec = current($deliveryProperties[TAO_DELIVERY_END_PROP]);
-
-            $properties = array();
-            if (!is_null($propStartExec) && !empty((string)$propStartExec)) {
-                $properties['periodStart'] = DateHelper::displayeDate((string)$propStartExec);
-            }
-            if (!is_null($propStartExec) && !empty((string)$propEndExec)) {
-                $properties['periodEnd'] = DateHelper::displayeDate((string)$propEndExec);
-            }
-
-            $entries[] = array(
-                'id' => $delivery->getUri(),
-                'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri(), 'testCenter' => $testCenter->getUri())),
-                'label' => $delivery->getLabel(),
-                'text' => __('Monitor'),
-                'stats' => array(
-                    'awaitingApproval' => $awaiting,
-                    'inProgress' => $inprogress,
-                    'paused' => $paused
-                ),
-                'properties' => $properties
-            );
-
-            $all['stats']['awaitingApproval'] += $awaiting;
-            $all['stats']['inProgress'] += $inprogress;
-            $all['stats']['paused'] += $paused;
-        }
-
-        usort($entries, function($a, $b) {
-            return strcmp($a['label'], $b['label']);
-        });
-
-        //prepend the all delivery element to the begining of the array
-        array_unshift($entries, $all);
-
-        return $entries;
-    }
-
-    /**
-     * Gets a delivery
-     *
-     * @param string $deliveryId
-     * @return core_kernel_classes_Resource
-     * @throws ServiceNotFoundException
-     * @throws \common_Exception
-     * @throws \common_exception_Error
-     */
-    public static function getDelivery($deliveryId)
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        return $deliveryService->getDelivery($deliveryId);
-    }
 
     /**
      * Gets the aggregated data for a filtered set of delivery executions of a given delivery
@@ -235,152 +120,6 @@ class DeliveryHelper
     {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
-    }
-
-    /**
-     * Gets the list of test takers assigned to a delivery
-     *
-     * @param string $deliveryId
-     * @param string $testCenterId
-     * @param array [$options]
-     * @return array
-     * @throws \Exception
-     * @throws \common_exception_Error
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public static function getDeliveryTestTakers($deliveryId, $testCenterId, $options = array())
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-        $users = $deliveryService->getDeliveryTestTakers($deliveryId, $testCenterId, $options);
-        $delivery = self::getDelivery($deliveryId);
-
-        return DataTableHelper::paginate($users, $options, function($users) use ($delivery) {
-            $executionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
-
-            $testTakers = array();
-            foreach($users as $user) {
-                /* @var $user User */
-                $userId = $user->getIdentifier();
-                $lastName = UserHelper::getUserLastName($user);
-                $firstName = UserHelper::getUserFirstName($user, empty($lastName));
-
-                $status = array();
-                $executions = $executionService->getUserExecutions($delivery, $userId);
-                foreach ($executions as $execution) {
-                    $status[] = $execution->getState()->getLabel();
-                }
-
-                $testTakers[] = array(
-                    'id' => $userId,
-                    'firstname' => _dh($firstName),
-                    'lastname' => _dh($lastName),
-                    'identifier' => $userId,
-                    'status' => implode(', ', array_unique($status)),
-                );
-            }
-            return $testTakers;
-        });
-    }
-
-    /**
-     * Gets the test takers available for a delivery as a table page
-     *
-     * @param core_kernel_classes_Resource $delivery
-     * @param core_kernel_classes_Resource $testCenter
-     * @param array [$options]
-     * @param string [$testCenterId]
-     * @return array
-     * @throws \Exception
-     * @throws \common_exception_Error
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public static function getAvailableTestTakers($delivery, $testCenter, $options = array())
-    {
-        $serviceManager = ServiceManager::getServiceManager();
-        $deliveryService = $serviceManager->get(DeliveryService::CONFIG_ID);
-        $users = $serviceManager->get(EligibilityService::SERVICE_ID)->getEligibleTestTakers($testCenter, $delivery);
-        $assignedUsers = $deliveryService->getDeliveryTestTakers($delivery->getUri(), $testCenter->getUri(), $options);
-        array_walk($assignedUsers, function(&$value){
-            $value = $value->getIdentifier();
-        });
-        $users = array_diff($users, $assignedUsers);
-
-        array_walk($users, function(&$user) {
-            $user = new \core_kernel_users_GenerisUser(new \core_kernel_classes_Resource($user));
-        });
-
-        usort($users, function($a, $b) {
-            return strcasecmp(
-                UserHelper::getUserLastName($a),
-                UserHelper::getUserLastName($b)
-            );
-        });
-
-        return DataTableHelper::paginate($users, $options, function($users) {
-            $testTakers = array();
-            foreach($users as $user) {
-                $userId = $user->getIdentifier();
-                $lastName = UserHelper::getUserLastName($user);
-                $firstName = UserHelper::getUserFirstName($user, empty($lastName));
-
-                $testTakers[] = array(
-                    'id' => $userId,
-                    'firstname' => _dh($firstName),
-                    'lastname' => _dh($lastName),
-                    'identifier' => $userId,
-                );
-            }
-
-            return $testTakers;
-        });
-    }
-
-    /**
-     * Add a list of test takers to a delivery.
-     * Returns the list of successfully added test takers.
-     *
-     * @param array $testTakers
-     * @param string $deliveryId
-     * @param string $testCenterId
-     * @return array
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public static function assignTestTakers($testTakers, $deliveryId, $testCenterId)
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-
-        $result = array();
-        foreach($testTakers as $testTaker) {
-            if ($deliveryService->assignTestTaker($testTaker, $deliveryId, $testCenterId)) {
-                $result[] = $testTaker;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Removes a list of test takers from a delivery.
-     * Returns the list of successfully removed test takers.
-     *
-     * @param array $testTakers
-     * @param string $deliveryId
-     * @param string $testCenterId
-     * @return array
-     * @throws \oat\oatbox\service\ServiceNotFoundException
-     */
-    public static function unassignTestTakers($testTakers, $deliveryId, $testCenterId)
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryService::CONFIG_ID);
-
-        $result = array();
-        foreach($testTakers as $testTaker) {
-            if ($deliveryService->unassignTestTaker($testTaker, $deliveryId, $testCenterId)) {
-                $result[] = $testTaker;
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -567,7 +306,8 @@ class DeliveryHelper
             $timer->setExtraTime($extraTime)->save();
             
             $data = $deliveryMonitoringService->getData($deliveryExecution);
-            $data->updateData();
+            $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
+            $this->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
             $deliveryMonitoringService->save($data);
             
             $result[] = $deliveryExecution->getIdentifier();
