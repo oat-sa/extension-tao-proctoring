@@ -132,7 +132,7 @@ class TestSessionService extends ConfigurableService
     public function isExpired(DeliveryExecution $deliveryExecution)
     {
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
-            $executionState = $deliveryExecution->getState()->getUr;
+            $executionState = $deliveryExecution->getState()->getUri();
             if (!in_array($executionState, [DeliveryExecutionState::STATE_PAUSED, DeliveryExecutionState::STATE_ACTIVE]) ||
                 !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
