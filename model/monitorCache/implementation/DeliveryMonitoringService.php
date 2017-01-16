@@ -359,7 +359,6 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      */
     public function delete(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $this->deleteKvData($deliveryMonitoring);
         $data = $deliveryMonitoring->get();
 
         $sql = 'DELETE FROM ' . self::TABLE_NAME . '
