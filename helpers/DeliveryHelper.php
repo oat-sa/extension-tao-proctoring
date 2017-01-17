@@ -307,7 +307,7 @@ class DeliveryHelper
             
             $data = $deliveryMonitoringService->getData($deliveryExecution);
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
-            $this->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
+            $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
             $deliveryMonitoringService->save($data);
             
             $result[] = $deliveryExecution->getIdentifier();
