@@ -30,6 +30,8 @@ use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
 
 
 /**
@@ -48,18 +50,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private $testSessionService;
 
     /**
-     * Computes the state of the delivery and returns one of the extended state code
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return null|string
-     * @throws \common_Exception
-     */
-    public function getState(DeliveryExecution $deliveryExecution)
-    {
-        return $deliveryExecution->getState()->getUri();
-    }
-
-    /**
      * Sets a delivery execution in the awaiting state
      *
      * @param DeliveryExecution $deliveryExecution
@@ -67,7 +57,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AWAITING);
@@ -117,12 +107,13 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_AWAITING === $executionState) {
+            $proctor = \common_session_SessionManager::getSession()->getUser();
             $logData = [
-                'proctorUri' => \common_session_SessionManager::getSession()->getUser()->getIdentifier(),
+                'proctorUri' => $proctor->getIdentifier(),
                 'timestamp' => microtime(true),
             ];
             if (!empty($reason) && is_array($reason)) {
@@ -135,6 +126,8 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $logData['context'] = $this->getProgress($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
+            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager->trigger(new AuthorizationGranted($deliveryExecution, $proctor));
             $result = true;
         }
 
@@ -150,7 +143,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
@@ -189,7 +182,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        $executionState = $this->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {

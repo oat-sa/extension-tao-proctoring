@@ -25,7 +25,6 @@ use oat\oatbox\user\User;
 use oat\tao\helpers\UserHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -37,6 +36,9 @@ use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
 /**
  * class DeliveryMonitoringData
@@ -46,8 +48,10 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  * @package oat\taoProctoring
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
+class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, ServiceLocatorAwareInterface
 {
+    use ServiceLocatorAwareTrait;
+
     /**
      * @var array
      */
@@ -72,8 +76,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      * @var array
      */
     private $requiredFields = [
-        DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID,
-        DeliveryMonitoringService::COLUMN_STATUS,
+        DeliveryMonitoringService::DELIVERY_EXECUTION_ID,
+        DeliveryMonitoringService::STATUS,
     ];
 
     /** @var User */
@@ -82,27 +86,24 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     /**
      * DeliveryMonitoringData constructor.
      * @param DeliveryExecution $deliveryExecution
-     * @param bool $updateData
      */
-    public function __construct(DeliveryExecution $deliveryExecution, $updateData = true)
+    public function __construct(DeliveryExecution $deliveryExecution, $data)
     {
         $this->deliveryExecution = $deliveryExecution;
-
-        $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
-
-        $data = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
-            [DeliveryMonitoringService::COLUMN_DELIVERY_EXECUTION_ID => $deliveryExecutionId],
-        ], ['asArray' => true], true);
-
-        if (empty($data)) {
-            $this->addValue('delivery_execution_id', $deliveryExecutionId);
+        if (is_array($data) && !empty($data)) {
+            $this->data = $data;
         } else {
-            $this->data = $data[0];
+            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
         }
+    }
 
-        if ($updateData) {
-            $this->updateData();
-        }
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringData::update()
+     */
+    public function update($key, $value)
+    {
+       $this->addValue($key, $value, true);
     }
 
     /**
@@ -162,7 +163,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     public function get($refresh = false)
     {
-        if (empty($this->data) || $refresh) {
+        if ($refresh) {
             $this->updateData();
         }
         return $this->data;
@@ -184,19 +185,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     {
         if ($keys === null) {
             $keys = [
-                DeliveryMonitoringService::STATUS,
-                DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
-                DeliveryMonitoringService::TEST_TAKER,
-                DeliveryMonitoringService::TEST_TAKER_FIRST_NAME,
-                DeliveryMonitoringService::TEST_TAKER_LAST_NAME,
-                DeliveryMonitoringService::COLUMN_AUTHORIZED_BY,
-                DeliveryMonitoringService::START_TIME,
-                DeliveryMonitoringService::END_TIME,
                 DeliveryMonitoringService::REMAINING_TIME,
-                DeliveryMonitoringService::EXTRA_TIME,
-                DeliveryMonitoringService::TEST_CENTER_ID,
-                DeliveryMonitoringService::DELIVERY_ID,
-                DeliveryMonitoringService::DELIVERY_NAME,
+                DeliveryMonitoringService::EXTRA_TIME
             ];
         }
         foreach ($keys as $key) {
@@ -208,24 +198,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     }
 
     /**
-     * Update test session state
-     */
-    private function updateStatus()
-    {
-        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
-        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
-    }
-
-    /**
      * Update connectivity status (online|offline)
      */
     private function updateConnectivity()
     {
-        $serviceManager = $this->getServiceManager();
-        $deliveryExecutionStateService = $serviceManager->get(DeliveryExecutionStateService::SERVICE_ID);
-        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
-        $testSessionConnectivityStatusService = $serviceManager->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $status = $this->deliveryExecution->getState()->getUri();
+        $testSessionConnectivityStatusService = $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
@@ -235,78 +213,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
-    }
-
-    /**
-     * Update test-taker uri
-     */
-    private function updateTestTaker()
-    {
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER, $this->deliveryExecution->getUserIdentifier(), true);
-        $this->addExtraFieldsValues(true);
-    }
-
-    /**
-     * Update progress (current test-takers position)
-     */
-    private function updateCurrentAssessmentItem()
-    {
-        $result = null;
-
-        $session = $this->getTestSession();
-
-        if ($session !== null) {
-            if ($session->isRunning()) {
-                $route = $session->getRoute();
-                $currentSection = $session->getCurrentAssessmentSection();
-                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
-                $currentItem = $route->current();
-                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
-
-                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
-            } else {
-                $result = __('finished');
-            }
-        }
-        $this->addValue(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $result, true);
-    }
-
-    /**
-     * Update uri of proctor authorized the delivery
-     */
-    private function updateAuthorizedBy()
-    {
-        $authorizedBy = null;
-        $deliveryLog = $this->getDeliveryLog('TEST_AUTHORISE');
-        if (!empty($deliveryLog) && isset($deliveryLog[0]['data']['proctorUri'])) {
-            $authorizedBy = $deliveryLog[0]['data']['proctorUri'];
-        }
-        $this->addValue(DeliveryMonitoringService::COLUMN_AUTHORIZED_BY, $authorizedBy, true);
-    }
-
-    /**
-     * Update start time of delivery execution
-     */
-    private function updateStartTime()
-    {
-        list($usec, $sec) = explode(" ", $this->deliveryExecution->getStartTime());
-        $startTime = ((float)$usec + (float)$sec);
-        $this->addValue(DeliveryMonitoringService::START_TIME, $startTime, true);
-    }
-
-    /**
-     * Update end time of delivery execution
-     */
-    private function updateEndTime()
-    {
-        $finishTime = $this->deliveryExecution->getFinishTime();
-        if ($finishTime) {
-            list($usec, $sec) = explode(" ", $this->deliveryExecution->getFinishTime());
-            $finishTime = ((float)$usec + (float)$sec);
-        } else {
-            $finishTime = '';
-        }
-        $this->addValue(DeliveryMonitoringService::END_TIME, $finishTime, true);
     }
 
     /**
@@ -348,105 +254,16 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
      */
     private function updateExtraTime()
     {
-        $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
+        $testSession = $this->getTestSession();
+        if ($testSession instanceof TestSession) {
+            $timer = $testSession->getTimer();
+        } else {
+            $timer = new QtiTimer();
+            $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
+            $timer->load();
+        }
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
-    }
-
-    /**
-     * Update test center uri
-     */
-    private function updateTestCenterId()
-    {
-        $uri = null;
-        $delivery = $this->deliveryExecution->getDelivery();
-        $user = $this->getUser();
-
-        $serviceManager = $this->getServiceManager();
-
-        $testCenter = $serviceManager->get(EligibilityService::SERVICE_ID)->getTestCenter($delivery, $user);
-        if ($testCenter) {
-            $uri = $testCenter->getUri();
-        } else {
-            $deliverLog = $serviceManager->get(DeliveryLog::SERVICE_ID);
-            $loggedEvent = $deliverLog->get(
-                $this->deliveryExecution->getIdentifier(),
-                'TEST_AUTHORISE'
-            );
-            $loggedEvent = reset($loggedEvent);
-            $uri = isset($loggedEvent['data']['test_center']) ? $loggedEvent['data']['test_center'] : null;
-        }
-        $this->addValue(DeliveryMonitoringService::TEST_CENTER_ID, $uri, true);
-    }
-
-    /**
-     * Update delivery uri
-     */
-    private function updateDeliveryId()
-    {
-        $this->addValue(DeliveryMonitoringService::DELIVERY_ID, $this->deliveryExecution->getDelivery()->getUri(), true);
-    }
-
-    /**
-     * Update test-taker's first name
-     */
-    private function updateTestTakerFirstName(){
-        $result = UserHelper::getUserFirstName($this->getUser());
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, $result, true);
-    }
-
-    /**
-     * Update test-taker's last name
-     */
-    private function updateTestTakerLastName(){
-        $result = UserHelper::getUserLastName($this->getUser());
-        $this->addValue(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, $result, true);
-    }
-
-    /**
-     * Update deliver label
-     */
-    private function updateDeliveryName()
-    {
-        $this->addValue(DeliveryMonitoringService::DELIVERY_NAME, $this->deliveryExecution->getDelivery()->getLabel(), true);
-    }
-
-    /**
-     * @return User
-     */
-    private function getUser()
-    {
-        if (!$this->user){
-             $this->user = UserHelper::getUser($this->deliveryExecution->getUserIdentifier());
-        }
-        return $this->user;
-    }
-
-    /**
-     * @return string
-     */
-    private function getDeliveryLog($eventId = null)
-    {
-        $deliveryLogService = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
-        return $deliveryLogService->get($this->deliveryExecution->getIdentifier(), $eventId);
-    }
-
-    /**
-     * @param bool $overwrite
-     */
-    private function addExtraFieldsValues($overwrite = false)
-    {
-        $user = $this->getUser();
-        if ($user) {
-            $fields = DeliveryHelper::getExtraFieldsProperties();
-            foreach ($fields as $field) {
-
-                $values = $user->getPropertyValues($field['property']);
-                if (!empty($values) && is_array($values)) {
-                    $this->addValue($field['id'], (string)$values[0], $overwrite);
-                }
-            }
-        }
     }
 
     /**
@@ -455,14 +272,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private function getTestSession()
     {
         if ($this->testSession === null) {
-            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
         }
         return $this->testSession;
-    }
-
-    private function getServiceManager()
-    {
-        return ServiceManager::getServiceManager();
     }
 }

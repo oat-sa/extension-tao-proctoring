@@ -75,7 +75,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $deliveryExecutionId = $this->deliveryExecution->getIdentifier();
 
-        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID)->find([
+        $data = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID)->find([
             [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecutionId],
         ], ['asArray' => true], true);
 
@@ -84,6 +84,15 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         } else {
             $this->data = $data[0];
         }
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringData::update()
+     */
+    public function update($key, $value)
+    {
+        $this->addValue($key, $value, true);
     }
 
     /**

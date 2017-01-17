@@ -20,7 +20,7 @@
  */
 
 namespace oat\taoProctoring\model\monitorCache;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 
 /**
@@ -31,7 +31,16 @@ use oat\taoDelivery\models\classes\execution\DeliveryExecution;
  */
 interface DeliveryMonitoringService
 {
+    /**
+     * @deprecated
+     */
     const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
+
+    /**
+     * Service Id of the main Monitoring Cache Service
+     * @var string
+     */
+    const SERVICE_ID = 'taoProctoring/DeliveryMonitoring';
 
     const ID = 'id';
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
@@ -48,17 +57,17 @@ interface DeliveryMonitoringService
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
-    const TEST_CENTER_ID = 'test_center_id';
     const DELIVERY_ID = 'delivery_id';
     const DELIVERY_NAME = 'delivery_name';
     const CONNECTIVITY = 'last_connect';
 
     /**
+     * Retrieve the currently cached delivery data
+     * 
      * @param DeliveryExecution $deliveryExecution
-     * @param boolean $updateData
      * @return DeliveryMonitoringData
      */
-    public function getData(DeliveryExecution $deliveryExecution, $updateData = true);
+    public function getData(DeliveryExecution $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]
