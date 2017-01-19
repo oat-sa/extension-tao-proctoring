@@ -38,46 +38,6 @@ class BreadcrumbsHelper
     static protected $textConverterService;
 
     /**
-     * Create breadcrumb for TestCenter::index
-     * @return array
-     */
-    public static function testCenters()
-    {
-        return array(
-            'id' => 'testCenters',
-            'url' => _url('index', 'TestCenter'),
-            'label' => __('Home')
-        );
-    }
-
-    /**
-     * Create breadcrumb for TestCenter::testCenter
-     *
-     * @param core_kernel_classes_Resource $testCenter
-     * @param array $testCenters
-     * @return array
-     */
-    public static function testCenter(core_kernel_classes_Resource $testCenter, $testCenters = array())
-    {
-        //list also other available test centers
-        $breadcrumbs = array(
-            'id' => 'testCenter',
-            'url' => _url('testCenter', 'TestCenter', null, array('testCenter' => $testCenter->getUri())),
-            'label' => $testCenter->getLabel()
-        );
-
-        $otherTestSites = array_filter($testCenters, function($value) use ($testCenter) {
-            return $value['id'] != $testCenter->getUri();
-        });
-
-        if (count($otherTestSites)) {
-            $breadcrumbs['entries'] = $otherTestSites;
-        }
-
-        return $breadcrumbs;
-    }
-
-    /**
      * Create breadcrumb for Delivery::index
      *
      * @param core_kernel_classes_Resource $testCenter

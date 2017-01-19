@@ -117,7 +117,7 @@ class TestSessionService extends ConfigurableService
     public function getRuntimeInputParameters(DeliveryExecution $deliveryExecution)
     {
         $compiledDelivery = $deliveryExecution->getDelivery();
-        $runtime = ServiceManager::getServiceManager()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery->getUri());
+        $runtime = $this->getServiceLocator()->get(AssignmentService::CONFIG_ID)->getRuntime($compiledDelivery->getUri());
         $inputParameters = \tao_models_classes_service_ServiceCallHelper::getInputValues($runtime, array());
 
         return $inputParameters;
@@ -132,14 +132,13 @@ class TestSessionService extends ConfigurableService
     public function isExpired(DeliveryExecution $deliveryExecution)
     {
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
-            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+            $executionState = $deliveryExecution->getState()->getUri();
             if (!in_array($executionState, [DeliveryExecutionState::STATE_PAUSED, DeliveryExecutionState::STATE_ACTIVE]) ||
                 !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
-            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
             $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
             if ($wasPausedAt && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
@@ -174,7 +173,7 @@ class TestSessionService extends ConfigurableService
      */
     protected function getLastTestTakersEvent(DeliveryExecution $deliveryExecution)
     {
-        $deliveryLogService = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
         $testTakerIdentifier = $deliveryExecution->getUserIdentifier();
         $events = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier()));
 

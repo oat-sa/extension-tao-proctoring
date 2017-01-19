@@ -98,11 +98,13 @@ class DeliveryServer extends DefaultDeliveryServer
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
+
+        $runDeliveryUrl = _url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier()));
 
         // if the test taker is already authorized, straight forward to the execution
         if (DeliveryExecutionState::STATE_AUTHORIZED === $executionState) {
-            return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
+            return $this->redirect($runDeliveryUrl);
         }
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
@@ -120,6 +122,7 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
             $this->setData('showControls', true);
+            $this->setData('runDeliveryUrl', $runDeliveryUrl);
 
             //set template
             $this->setData('content-template', 'DeliveryServer/awaiting.tpl');
@@ -128,7 +131,7 @@ class DeliveryServer extends DefaultDeliveryServer
         } else {
             // inconsistent state
             common_Logger::i(get_called_class() . '::awaitingAuthorization(): cannot wait authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
-            return $this->redirect(_url('index'));
+            return $this->redirect($this->getReturnUrl());
         }
     }
     
@@ -138,8 +141,7 @@ class DeliveryServer extends DefaultDeliveryServer
     public function isAuthorized()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
 
         $authorized = false;
         $success = true;

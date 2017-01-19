@@ -47,18 +47,18 @@ interface DeliveryMonitoringData
     public function setTestSession(AssessmentTestSession $testSession);
 
     /**
-     * Add value.
-     * @param $key
-     * @param $value
-     * @param bool $overwrite
-     */
-    public function addValue($key, $value, $overwrite = false);
-
-    /**
      * Get delivery execution data
      * @return array
      */
     public function get();
+
+    /**
+     * Updates a single cashed variable
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function update($key, $value);
 
     /**
      * Validate data
