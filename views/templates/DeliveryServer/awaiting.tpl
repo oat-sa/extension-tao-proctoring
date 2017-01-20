@@ -17,6 +17,7 @@ use oat\tao\helpers\Template;
                     returnUrl : '<?=get_data('returnUrl')?>',
                     deliveryExecution : '<?=get_data('deliveryExecution')?>',
                     deliveryLabel : '<?=get_data('deliveryLabel')?>',
+                    runDeliveryUrl : '<?=get_data('runDeliveryUrl')?>',
                     deliveryInit : <?=get_data('init') ? 'true' : 'false'?>
                 });
             });

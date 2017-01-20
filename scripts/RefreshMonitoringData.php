@@ -69,7 +69,8 @@ class RefreshMonitoringData implements Action, ServiceLocatorAwareInterface
                 if ($delivery->exists()) {
                     $deliveryExecutions = $deliveryService->getCurrentDeliveryExecutions($delivery->getUri(), $testCenter->getUri());
                     foreach ($deliveryExecutions as $deliveryExecution) {
-                        $data = $deliveryMonitoringService->getData($deliveryExecution, true);
+                        $data = $deliveryMonitoringService->getData($deliveryExecution);
+                        $data->updateData();
                         if ($deliveryMonitoringService->save($data)) {
                             $report->add(
                                 new Report(

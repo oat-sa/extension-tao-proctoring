@@ -22,21 +22,28 @@
 namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
-use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\scripts\install\db\DbSetup;
+use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
- * Class RegisterReasonCategoryService
- *
- * @package oat\taoProctoring\scripts\install
- * @author Gyula Szucs, <gyula@taotesting.com>
+ * Setup the tables and the service to cache
+ * delivery data to allow monitoring
  */
-class RegisterReasonCategoryService extends InstallAction
+class SetupDeliveryMonitoring extends InstallAction
 {
     /**
      * @param $params
      */
     public function __invoke($params)
     {
-        $this->registerService(ReasonCategoryService::SERVICE_ID, new ReasonCategoryService());
+        $pm = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID);
+        $persistence = $pm->getPersistenceById('default');
+        DbSetup::generateTable($persistence);
+        $this->registerService(DeliveryMonitoringService::SERVICE_ID, new MonitorCacheService(array(
+            MonitorCacheService::OPTION_PERSISTENCE => 'default',
+            MonitorCacheService::OPTION_PRIMARY_COLUMNS => DbSetup::getPrimaryColumns()
+        )));
     }
 }
+

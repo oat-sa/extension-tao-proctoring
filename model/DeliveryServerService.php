@@ -47,11 +47,10 @@ class DeliveryServerService extends \taoDelivery_models_classes_DeliveryServerSe
             $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AWAITING),
             $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
         );
-        $eligibilityService = $this->getServiceManager()->get(EligibilityService::SERVICE_ID);
         $resumable = array();
         foreach ($started as $deliveryExecution) {
             $delivery = $deliveryExecution->getDelivery();
-            if ($delivery->exists() && $eligibilityService->isDeliveryEligible($delivery, $user)) {
+            if ($delivery->exists()) {
                 $resumable[] = $deliveryExecution;
             }
         }
