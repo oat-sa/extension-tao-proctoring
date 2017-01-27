@@ -12,4 +12,11 @@
             </section>
         </sections>
     </structure>
+    <structure id="tools" name="Tools" level="18" group="settings">
+        <description />
+        <icon id="icon-tools" src=""/>
+        <sections>
+            <section id="pause_executions" name="Pause active executions" url="/taoProctoring/Tools/pauseActiveExecutions" />
+        </sections>
+    </structure>
 </structures>
