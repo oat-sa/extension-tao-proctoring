@@ -53,6 +53,21 @@ class DataTableHelper
     const OPTION_FILTER = 'filter';
 
     /**
+     * The keyword for an ascending sort
+     */
+    const SORT_ASC = 'asc';
+
+    /**
+     * The keyword for a descending sort
+     */
+    const SORT_DESC = 'asc';
+
+    /**
+     * The default sort order to use when none is provided
+     */
+    const DEFAULT_SORT_ORDER = self::SORT_ASC;
+
+    /**
      * Paginates a collection to render a subset in a table
      * @param array|PaginatedStorage $collection - The full amount of lines to paginate
      * @param array [$options] - Allow to setup the page. These options are supported:
