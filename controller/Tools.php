@@ -41,22 +41,27 @@ class Tools extends SimplePageModule
      */
     public function pauseActiveExecutions()
     {
-        $reason = $this->getRequestParameter('reason');
-        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveryExecutions = $monitoringService->find(
-            [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
+        if ($this->isRequestPost()) {
+            $reason = __('Pause due to server maintenance');
+            $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+            $deliveryExecutions = $monitoringService->find(
+                [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
                 ['asArray' => true]
-        );
-        $ids = array_map(function ($deliveryExecution) {
-            return $deliveryExecution['delivery_execution_id'];
-        }, $deliveryExecutions);
-        $paused = DeliveryHelper::pauseExecutions($ids, $reason);
-        $notPaused = array_diff($ids, $paused);
+            );
+            $ids = array_map(function ($deliveryExecution) {
+                return $deliveryExecution['delivery_execution_id'];
+            }, $deliveryExecutions);
+            $paused = DeliveryHelper::pauseExecutions($ids, $reason);
+            $notPaused = array_diff($ids, $paused);
 
-        $this->returnJson([
-            'success' => !count($notPaused),
-            'processed' => $paused,
-            'unprocessed' => $notPaused
-        ]);
+            $this->returnJson([
+                'success' => !count($notPaused),
+                'message' => count($paused) . ' ' . __('sessions paused'),
+                'processed' => $paused,
+                'unprocessed' => $notPaused
+            ]);
+        } else {
+            $this->setView('Tools/pause_active_executions.tpl');
+        }
     }
 }

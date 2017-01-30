@@ -18,5 +18,10 @@ define({
         'actions' : {
             'index' : 'controller/Delivery/monitoring'
         }
+    },
+    'Tools' : {
+        'actions' : {
+            'pauseActiveExecutions' : 'controller/Tools/pauseActiveExecutions'
+        }
     }
 });
