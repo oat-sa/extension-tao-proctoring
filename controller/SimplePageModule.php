@@ -125,8 +125,8 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
         return [
             'page' => DataTableHelper::DEFAULT_PAGE,
             'rows' => DataTableHelper::DEFAULT_ROWS,
-            'sortby' => self::DEFAULT_SORT_COLUMN,
-            'sortorder' => self::DEFAULT_SORT_ORDER,
+            'sortby' => 'id',
+            'sortorder' => DataTableHelper::DEFAULT_SORT_ORDER,
             'filter' => null,
             'periodStart' => $today->format('Y-m-d'),
             'periodEnd' => $today->format('Y-m-d')
