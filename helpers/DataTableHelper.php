@@ -60,7 +60,7 @@ class DataTableHelper
     /**
      * The keyword for a descending sort
      */
-    const SORT_DESC = 'asc';
+    const SORT_DESC = 'desc';
 
     /**
      * The default sort order to use when none is provided
