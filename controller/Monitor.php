@@ -80,11 +80,12 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
+        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
-        $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions));
+        $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions, $requestOptions));
     }
 
     /**
