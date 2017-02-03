@@ -154,5 +154,14 @@ class Updater extends common_ext_ExtensionUpdater
         }
         
         $this->skip('4.0.0', '4.1.1');
+
+        if ($this->isVersion('4.1.1')) {
+            AclProxy::applyRule(new AccessRule(
+                'grant',
+                INSTANCE_ROLE_SYSADMIN,
+                ['ext'=>'taoProctoring', 'mod' => 'Tools', 'act' => 'pauseActiveExecutions']
+            ));
+            $this->setVersion('4.2.0');
+        }
     }
 }
