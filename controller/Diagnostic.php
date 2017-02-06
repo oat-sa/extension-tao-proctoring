@@ -127,6 +127,13 @@ class Diagnostic extends ProctoringModule
 
                 foreach($deliveries as $delivery){
                     $launchUrl =  LTIDeliveryTool::singleton()->getLaunchUrl(array('delivery' => $delivery->getUri()));
+
+                    //replace https or other protocol by http
+                    $parsedUrl = parse_url($launchUrl);
+                    if(isset($parsedUrl['scheme']) && $parsedUrl['scheme'] !== 'http'){
+                        $launchUrl = str_replace($parsedUrl['scheme'].'://', 'http://', $launchUrl);
+                    }
+
                     $acc_req = \OAuthRequest::from_consumer_and_token($test_consumer, $test_token, 'GET', $launchUrl, $ltiData);
                     $acc_req->sign_request($hmac_method, $test_consumer, $test_token);
 
