@@ -39,6 +39,7 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -485,5 +486,23 @@ class DeliveryHelper
         $data = $deliveryMonitoringService->getData($deliveryExecution);
         $data->update('hasBeenPaused', $paused);
         $deliveryMonitoringService->save($data);
+    }
+
+    /**
+     * Get the list of all available categories, sorted by action names
+     *
+     * @return array
+     */
+    public static function getAllReasonsCategories(){
+        /** @var ReasonCategoryService $categoryService */
+        $categoryService = ServiceManager::getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
+
+        return array(
+            'authorize' => array(),
+            'pause' => $categoryService->getIrregularities(),
+            'terminate' => $categoryService->getIrregularities(),
+            'report' => $categoryService->getIrregularities(),
+            'print' => [],
+        );
     }
 }

@@ -42,7 +42,14 @@ class Tools extends SimplePageModule
     public function pauseActiveExecutions()
     {
         if ($this->isRequestPost()) {
-            $reason = __('Pause due to server maintenance');
+            if ($this->hasRequestParameter('reason')) {
+                $reason = $this->getRequestParameter('reason');
+            } else {
+                $reason = [
+                    'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
+                    'comment' => __('Pause due to server maintenance'),
+                ];
+            }
             $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
             $deliveryExecutions = $monitoringService->find(
                 [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
@@ -61,6 +68,7 @@ class Tools extends SimplePageModule
                 'unprocessed' => $notPaused
             ]);
         } else {
+            $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
             $this->setView('Tools/pause_active_executions.tpl');
         }
     }

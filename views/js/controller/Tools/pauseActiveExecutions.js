@@ -19,27 +19,57 @@
 /**
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-define(['jquery', 'helpers', 'util/url', 'ui/feedback'], function($, helpers, url, feedback){
+define([
+    'jquery',
+    'i18n',
+    'helpers',
+    'util/url',
+    'ui/feedback',
+    'ui/cascadingComboBox',
+    'ui/bulkActionPopup'
+], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup){
     'use strict';
+    var $container = $('.js-pause-active-executions-container');
+    var categories = $container.data('reasoncategories');
+    var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.")
 
-	return {
+    function doPause(reason) {
+        $.ajax({
+            type: "POST",
+            data: {
+                reason : reason
+            },
+            url: url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
+            dataType: 'json',
+            success: function(data) {
+                helpers.loaded();
+                if (data.success) {
+                    feedback().success(data.message);
+                } else {
+                    feedback().error(data.message);
+                }
+            }
+        });
+    }
+
+    return {
         start : function(){
             $('.js-pause').on('click', function() {
-            	$.ajax({
-                    type: "POST",
-                    url: url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
-                    dataType: 'json',
-                    success: function(data) {
-                        helpers.loaded();
-                        if (data.success) {
-                            feedback().success(data.message);
-                        } else {
-                        	feedback().error(data.message);
-                        }
-                    }
-            	});
+                var config;
+
+                config = {
+                    renderTo : $container,
+                    actionName : msg,
+                    reason : true,
+                    allowedResources: [],
+                    reasonRequired: true,
+                    categoriesSelector: cascadingComboBox(categories['pause'])
+                };
+
+                bulkActionPopup(config).on('ok', function(reason){
+                    doPause(reason);
+                });
             });
         }
     };
-
 });
