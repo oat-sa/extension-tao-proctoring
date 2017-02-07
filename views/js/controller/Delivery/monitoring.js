@@ -141,7 +141,7 @@ define([
                                 unprocessed = _.map(response.unprocessed, function (id) {
                                     var execution = getExecutionData(id);
                                     if (execution) {
-                                        return __('Session %s - %s has not been processed', execution.delivery, execution.date);
+                                        return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
                                     }
                                 });
 
@@ -283,7 +283,7 @@ define([
                 }
                 formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.date + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
                 };
                 status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -296,7 +296,7 @@ define([
                 if (testTakerData.timer) {
                     formatted.extraTime = testTakerData.timer.extraTime;
                     formatted.consumedTime = testTakerData.timer.consumedExtraTime;
-                    formatted.remaining = testTakerData.timer.remaining;
+                    formatted.remaining_time = testTakerData.timer.remaining_time;
                 }
                 return formatted;
             }
@@ -563,9 +563,14 @@ define([
 
             // column: start time
             model.push({
-                id: 'date',
+                id: 'start_time',
                 sortable : true,
-                label: __('Started at')
+                filterable : true,
+                label: __('Started at'),
+                customFilter : {
+                    template : buildStatusFilter(),
+                    callback : statusFilterHandler
+                },
             });
 
             // column: delivery execution status
@@ -633,12 +638,12 @@ define([
 
             // column: remaining time
             model.push({
-                id: 'remaining',
+                id: 'remaining_time',
                 sortable : true,
                 label: __('Remaining'),
                 transform: function(value, row) {
                     var timer = _.isObject(row.timer) ? row.timer : {};
-                    var refinedValue = timer.remaining;
+                    var refinedValue = timer.remaining_time;
                     var remaining = parseInt(refinedValue, 10);
 
                     if (remaining || _.isFinite(remaining) ) {
@@ -782,7 +787,7 @@ define([
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
-                    sortby : 'date'
+                    sortby : 'start_time'
                 }, dataset);
         }
     };
