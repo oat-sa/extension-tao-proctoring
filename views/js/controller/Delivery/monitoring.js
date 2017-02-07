@@ -565,12 +565,7 @@ define([
             model.push({
                 id: 'start_time',
                 sortable : true,
-                filterable : true,
-                label: __('Started at'),
-                customFilter : {
-                    template : buildStatusFilter(),
-                    callback : statusFilterHandler
-                },
+                label: __('Started at')
             });
 
             // column: delivery execution status
