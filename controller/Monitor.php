@@ -23,7 +23,6 @@ namespace oat\taoProctoring\controller;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * Monitoring Delivery controller
@@ -63,7 +62,7 @@ class Monitor extends SimplePageModule
                 'delivery' => $delivery->getUri(),
                 'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
                 'extrafields' => DeliveryHelper::getExtraFields(),
-                'categories' => $this->getAllReasonsCategories(),
+                'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
                 'printReportButton' => json_encode(false),
                 'timeHandling' => json_encode(false),
             ),
@@ -88,24 +87,6 @@ class Monitor extends SimplePageModule
         $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions, $requestOptions));
     }
 
-    /**
-     * Get the list of all available categories, sorted by action names
-     *
-     * @return array
-     */
-    protected function getAllReasonsCategories(){
-        /** @var ReasonCategoryService $categoryService */
-        $categoryService = $this->getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
-    
-        return array(
-            'authorize' => array(),
-            'pause' => $categoryService->getIrregularities(),
-            'terminate' => $categoryService->getIrregularities(),
-            'report' => $categoryService->getIrregularities(),
-            'print' => [],
-        );
-    }
-    
     /**
      * Authorises a delivery execution
      *
