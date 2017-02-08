@@ -267,4 +267,8 @@
     .icon-history:before {
         @include icon-screen();
     }
+    #start_time_filter{
+      width: 180px;
+      font-size: 12px;
+    }
 }

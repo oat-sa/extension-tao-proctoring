@@ -565,7 +565,34 @@ define([
             model.push({
                 id: 'start_time',
                 sortable : true,
-                label: __('Started at')
+                label: __('Started at'),
+                filterable : true,
+                customFilter : {
+                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/><button class="icon-find" type="button"></button>',
+                    callback : function ($el) {
+                        //given from here:
+                        $el.datepicker({
+                            onSelect: function( selectedDate ) {
+                                if(!$(this).data().datepicker.first){
+                                    $(this).data().datepicker.inline = true
+                                    $(this).data().datepicker.first = selectedDate;
+                                }else{
+                                    console.log(selectedDate);
+                                    if(selectedDate > $(this).data().datepicker.first){
+                                        $(this).val($(this).data().datepicker.first+" - "+selectedDate);
+                                    }else{
+                                        $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
+                                    }
+                                    $(this).data().datepicker.inline = false;
+                                }
+                            },
+                            onClose:function(){
+                                delete $(this).data().datepicker.first;
+                                $(this).data().datepicker.inline = false;
+                            }
+                        })
+                    }
+                },
             });
 
             // column: delivery execution status
@@ -776,8 +803,9 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filterStrategy: 'multiple',
+                    filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
                     filter: true,
-                    filtercolumns:['status'],
                     tools: tools,
                     model: model,
                     selectable: true,
