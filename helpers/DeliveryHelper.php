@@ -374,9 +374,9 @@ class DeliveryHelper
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
-                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
+                    'start_time' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
                     'timer' => [
-                        'remaining' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
+                        'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
                         'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
                         'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
                     ],
