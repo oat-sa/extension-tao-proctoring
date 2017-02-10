@@ -93,7 +93,6 @@ class Monitor extends SimplePageModule
                 }
             }
         }
-        //var_dump($options['filters']); exit();
         $options['order'] = $requestOptions['sortBy'] . ' ' . mb_strtoupper($requestOptions['sortOrder']);
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
