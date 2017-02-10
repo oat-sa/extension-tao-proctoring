@@ -388,6 +388,21 @@ define([
             }
 
             /**
+             * Ser initial datatable filters
+             */
+            function setInitialFilters()
+            {
+                var now = new Date();
+                var nowStr =
+                    now.getFullYear() + '/' +
+                    ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
+                    ("0" + (now.getDate())).slice(-2);
+
+                $('#start_time_filter').val(nowStr + ' - ' + nowStr);
+                $list.datatable('filter');
+            }
+
+            /**
              * Additional action perfomed with filter element
              * @param {jQueryElement} $el
              */
@@ -568,29 +583,30 @@ define([
                 label: __('Started at'),
                 filterable : true,
                 customFilter : {
-                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/><button class="icon-find" type="button"></button>',
+                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
+                    '<button class="icon-find js-start_time_filter_button" type="button"></button>',
                     callback : function ($el) {
-                        //given from here:
                         $el.datepicker({
+                            dateFormat: "yy/mm/dd",
                             onSelect: function( selectedDate ) {
                                 if(!$(this).data().datepicker.first){
                                     $(this).data().datepicker.inline = true
                                     $(this).data().datepicker.first = selectedDate;
-                                }else{
-                                    console.log(selectedDate);
+                                } else {
                                     if(selectedDate > $(this).data().datepicker.first){
                                         $(this).val($(this).data().datepicker.first+" - "+selectedDate);
-                                    }else{
+                                    } else {
                                         $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
                                     }
                                     $(this).data().datepicker.inline = false;
+                                    $('.js-start_time_filter_button').trigger('click');
                                 }
                             },
                             onClose:function(){
                                 delete $(this).data().datepicker.first;
                                 $(this).data().datepicker.inline = false;
                             }
-                        })
+                        });
                     }
                 },
             });
@@ -812,6 +828,8 @@ define([
                     sortorder: 'desc',
                     sortby : 'start_time'
                 }, dataset);
+
+            setInitialFilters();
         }
     };
 });
