@@ -53,7 +53,7 @@ class ProctorService extends ConfigurableService
     {
         $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $criteria = $this->getCriteria($delivery, $context, $options);
-        $options = ['asArray' => true];
+        $options['asArray'] =  true;
         return $monitoringService->find($criteria, $options, true);
     }
 
