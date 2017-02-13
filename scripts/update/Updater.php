@@ -44,6 +44,7 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 
 /**
  *
@@ -168,28 +169,8 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('4.3.1')) {
             /** @var DeliveryMonitoringService $monitoring */
-            $monitoring = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-            $data = $monitoring->find();
-            foreach ($data as $deliveryData) {
-                try {
-                    $deliveryDataArr = $deliveryData->get();
-                    $deliveryData->update(
-                        DeliveryMonitoringService::START_TIME,
-                        \tao_helpers_Date::getTimeStamp($deliveryDataArr[DeliveryMonitoringService::START_TIME], true)
-                    );
-                    $endTime = $deliveryDataArr[DeliveryMonitoringService::END_TIME];
-                    if ($endTime) {
-                        $deliveryData->update(
-                            DeliveryMonitoringService::END_TIME,
-                            \tao_helpers_Date::getTimeStamp($endTime, true)
-                        );
-                    }
-                    $monitoring->save($deliveryData);
-                } catch (\common_exception_NotFound $e) {
-                    //Delivery execution not found; Skip
-                }
-            }
-
+            $action = new UpdateMonitoringTimeValues();
+            $action([]);
             $this->setVersion('4.4.0');
         }
     }
