@@ -63,12 +63,14 @@ class MonitorCacheService extends MonitoringStorage
 
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
         $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
-        $data->update(DeliveryMonitoringService::START_TIME, $deliveryExecution->getStartTime());
+        $data->update(
+            DeliveryMonitoringService::START_TIME,
+            \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
+        );
         $success = $this->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
-    
     }
     
     public function executionStateChanged(DeliveryExecutionState $event)
@@ -76,7 +78,10 @@ class MonitorCacheService extends MonitoringStorage
         $data = $this->getData($event->getDeliveryExecution());
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         if ($event->getState() == DeliveryExecution::STATE_FINISHIED) {
-            $data->update(DeliveryMonitoringService::END_TIME, $event->getDeliveryExecution()->getFinishTime());
+            $data->update(
+                DeliveryMonitoringService::END_TIME,
+                \tao_helpers_Date::getTimeStamp($event->getDeliveryExecution()->getFinishTime(), true)
+            );
         }
         $success = $this->save($data);
         if (!$success) {

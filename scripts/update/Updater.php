@@ -45,6 +45,7 @@ use oat\taoProctoring\controller\Monitor;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 
 /**
  *
@@ -160,6 +161,13 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('4.3.0')) {
             AclProxy::applyRule(new AccessRule('grant',TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'));
             $this->setVersion('4.3.1');
+        }
+
+        if ($this->isVersion('4.3.1')) {
+            /** @var DeliveryMonitoringService $monitoring */
+            $action = new UpdateMonitoringTimeValues();
+            $action([]);
+            $this->setVersion('4.4.0');
         }
     }
 }

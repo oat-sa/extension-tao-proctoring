@@ -201,14 +201,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
-        $whereClause = 'WHERE ';
         $parameters = [];
 
         $options['order'] = $this->prepareOrderStmt($options['order']);
         $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause .= $this->prepareCondition($criteria, $parameters, $selectClause);
-
+        $whereClause = $this->prepareCondition($criteria, $parameters, $selectClause);
+        if ($whereClause !== '') {
+            $whereClause = 'WHERE ' . $whereClause;
+        }
         $sql = $selectClause . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL;

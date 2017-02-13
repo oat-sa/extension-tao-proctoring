@@ -141,7 +141,7 @@ define([
                                 unprocessed = _.map(response.unprocessed, function (id) {
                                     var execution = getExecutionData(id);
                                     if (execution) {
-                                        return __('Session %s - %s has not been processed', execution.delivery, execution.date);
+                                        return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
                                     }
                                 });
 
@@ -283,7 +283,7 @@ define([
                 }
                 formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.date + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.test_taker_first_name + ' ' + testTakerData.test_taker_last_name
                 };
                 status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -296,7 +296,7 @@ define([
                 if (testTakerData.timer) {
                     formatted.extraTime = testTakerData.timer.extraTime;
                     formatted.consumedTime = testTakerData.timer.consumedExtraTime;
-                    formatted.remaining = testTakerData.timer.remaining;
+                    formatted.remaining_time = testTakerData.timer.remaining_time;
                 }
                 return formatted;
             }
@@ -385,6 +385,21 @@ define([
              */
             function buildStatusFilter(){
                 return statusFilterTpl({statuses: _status.getStatuses()});
+            }
+
+            /**
+             * Ser initial datatable filters
+             */
+            function setInitialFilters()
+            {
+                var now = new Date();
+                var nowStr =
+                    now.getFullYear() + '/' +
+                    ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
+                    ("0" + (now.getDate())).slice(-2);
+
+                $('#start_time_filter').val(nowStr + ' - ' + nowStr);
+                $list.datatable('filter');
             }
 
             /**
@@ -529,22 +544,22 @@ define([
 
             // column: test taker first name
             model.push({
-                id: 'firstname',
+                id: 'test_taker_first_name',
                 label: __('First name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.firstName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_first_name || '';
 
                 }
             });
 
             // column: test taker last name
             model.push({
-                id: 'lastname',
+                id: 'test_taker_last_name',
                 label: __('Last name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.lastName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_last_name || '';
 
                 }
             });
@@ -563,9 +578,37 @@ define([
 
             // column: start time
             model.push({
-                id: 'date',
+                id: 'start_time',
                 sortable : true,
-                label: __('Started at')
+                label: __('Started at'),
+                filterable : true,
+                customFilter : {
+                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
+                    '<button class="icon-find js-start_time_filter_button" type="button"></button>',
+                    callback : function ($el) {
+                        $el.datepicker({
+                            dateFormat: "yy/mm/dd",
+                            onSelect: function( selectedDate ) {
+                                if(!$(this).data().datepicker.first){
+                                    $(this).data().datepicker.inline = true
+                                    $(this).data().datepicker.first = selectedDate;
+                                } else {
+                                    if(selectedDate > $(this).data().datepicker.first){
+                                        $(this).val($(this).data().datepicker.first+" - "+selectedDate);
+                                    } else {
+                                        $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
+                                    }
+                                    $(this).data().datepicker.inline = false;
+                                    $('.js-start_time_filter_button').trigger('click');
+                                }
+                            },
+                            onClose:function(){
+                                delete $(this).data().datepicker.first;
+                                $(this).data().datepicker.inline = false;
+                            }
+                        });
+                    }
+                },
             });
 
             // column: delivery execution status
@@ -633,12 +676,12 @@ define([
 
             // column: remaining time
             model.push({
-                id: 'remaining',
+                id: 'remaining_time',
                 sortable : true,
                 label: __('Remaining'),
                 transform: function(value, row) {
                     var timer = _.isObject(row.timer) ? row.timer : {};
-                    var refinedValue = timer.remaining;
+                    var refinedValue = timer.remaining_time;
                     var remaining = parseInt(refinedValue, 10);
 
                     if (remaining || _.isFinite(remaining) ) {
@@ -776,14 +819,17 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filterStrategy: 'multiple',
+                    filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
                     filter: true,
-                    filtercolumns:['status'],
                     tools: tools,
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
-                    sortby : 'date'
+                    sortby : 'start_time'
                 }, dataset);
+
+            setInitialFilters();
         }
     };
 });
