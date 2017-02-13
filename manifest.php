@@ -29,6 +29,8 @@ use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\model\ProctorService;
+use oat\tao\model\user\TaoRoles;
+use oat\taoProctoring\controller\Tools;
 
 return array(
     'name' => 'taoProctoring',
@@ -38,7 +40,7 @@ return array(
     'version' => '4.4.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=7.46.0',
+        'tao' => '>=7.66.2',
         'taoDelivery' => '>=4.7.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
@@ -54,7 +56,7 @@ return array(
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
-        array('grant', INSTANCE_ROLE_SYSADMIN, ['ext'=>'taoProctoring', 'mod' => 'Tools', 'act' => 'pauseActiveExecutions']),
+        array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
     ),
     'install' => array(
         'php' => array(

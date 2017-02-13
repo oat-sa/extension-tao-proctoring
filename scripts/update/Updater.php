@@ -44,6 +44,7 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 
 /**
@@ -154,18 +155,13 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.0.0');
         }
         
-        $this->skip('4.0.0', '4.1.1');
+        $this->skip('4.0.0', '4.3.0');
 
-        if ($this->isVersion('4.1.1')) {
-            AclProxy::applyRule(new AccessRule(
-                'grant',
-                INSTANCE_ROLE_SYSADMIN,
-                ['ext'=>'taoProctoring', 'mod' => 'Tools', 'act' => 'pauseActiveExecutions']
-            ));
-            $this->setVersion('4.2.0');
+        // fix potentially missing roles, moved from 4.1.1
+        if ($this->isVersion('4.3.0')) {
+            AclProxy::applyRule(new AccessRule('grant',TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'));
+            $this->setVersion('4.3.1');
         }
-
-        $this->skip('4.2.0', '4.3.1');
 
         if ($this->isVersion('4.3.1')) {
             /** @var DeliveryMonitoringService $monitoring */
