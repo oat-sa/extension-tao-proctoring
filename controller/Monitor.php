@@ -35,7 +35,7 @@ use oat\generis\model\OntologyAwareTrait;
 class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
-    
+
     /**
      * Returns the currently proctored delivery
      *
@@ -66,12 +66,11 @@ class Monitor extends SimplePageModule
                 'printReportButton' => json_encode(false),
                 'timeHandling' => json_encode(false),
             ),
-            array(
-            ),
+            array(),
             'Monitoring/index.tpl'
         );
     }
-    
+
     /**
      * Gets the list of current executions for a delivery
      *
@@ -80,6 +79,20 @@ class Monitor extends SimplePageModule
     public function deliveryExecutions()
     {
         $requestOptions = $this->getRequestOptions(['sortBy' => 'date', 'sortOrder' => 'DESC']);
+        $filters = $this->getRequestParameter('filtercolumns');
+        if ($filters !== null) {
+            if (isset($filters['start_time'])) {
+                $times = explode(' - ', $filters['start_time']);
+                $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
+                $from->setTime(0, 0, 0);
+                $options['filters'][] = ['start_time' => '>' . $from->getTimestamp()];
+                if (isset($times[1])) {
+                    $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
+                    $to->setTime(23, 59, 59);
+                    $options['filters'][] = ['start_time' => '<' . $to->getTimestamp()];
+                }
+            }
+        }
         $options['order'] = $requestOptions['sortBy'] . ' ' . mb_strtoupper($requestOptions['sortOrder']);
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
@@ -99,28 +112,28 @@ class Monitor extends SimplePageModule
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
         $testCenter = $this->getRequestParameter('testCenter');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
-    
+
             $this->returnJson(array(
                 'success' => !count($notAuthorised),
                 'processed' => $authorised,
                 'unprocessed' => $notAuthorised
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
 
     /**
      * Terminates delivery executions
@@ -132,28 +145,28 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
             $notTerminated = array_diff($deliveryExecution, $terminated);
-    
+
             $this->returnJson(array(
                 'success' => !count($notTerminated),
                 'processed' => $terminated,
                 'unprocessed' => $notTerminated
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
     /**
      * Pauses delivery executions
      *
@@ -164,28 +177,28 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
             $notPaused = array_diff($deliveryExecution, $paused);
-    
+
             $this->returnJson(array(
                 'success' => !count($notPaused),
                 'processed' => $paused,
                 'unprocessed' => $notPaused
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
     /**
      * Report irregularities in delivery executions
      *
@@ -196,22 +209,22 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
             $notReported = array_diff($deliveryExecution, $reported);
-    
+
             $this->returnJson(array(
                 'success' => !count($notReported),
                 'processed' => $reported,
                 'unprocessed' => $notReported
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');

@@ -44,6 +44,7 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 
 /**
  *
@@ -165,5 +166,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('4.2.0', '4.3.1');
+
+        if ($this->isVersion('4.3.1')) {
+            /** @var DeliveryMonitoringService $monitoring */
+            $action = new UpdateMonitoringTimeValues();
+            $action([]);
+            $this->setVersion('4.4.0');
+        }
     }
 }

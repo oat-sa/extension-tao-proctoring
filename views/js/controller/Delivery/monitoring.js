@@ -388,6 +388,21 @@ define([
             }
 
             /**
+             * Ser initial datatable filters
+             */
+            function setInitialFilters()
+            {
+                var now = new Date();
+                var nowStr =
+                    now.getFullYear() + '/' +
+                    ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
+                    ("0" + (now.getDate())).slice(-2);
+
+                $('#start_time_filter').val(nowStr + ' - ' + nowStr);
+                $list.datatable('filter');
+            }
+
+            /**
              * Additional action perfomed with filter element
              * @param {jQueryElement} $el
              */
@@ -565,7 +580,35 @@ define([
             model.push({
                 id: 'start_time',
                 sortable : true,
-                label: __('Started at')
+                label: __('Started at'),
+                filterable : true,
+                customFilter : {
+                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
+                    '<button class="icon-find js-start_time_filter_button" type="button"></button>',
+                    callback : function ($el) {
+                        $el.datepicker({
+                            dateFormat: "yy/mm/dd",
+                            onSelect: function( selectedDate ) {
+                                if(!$(this).data().datepicker.first){
+                                    $(this).data().datepicker.inline = true
+                                    $(this).data().datepicker.first = selectedDate;
+                                } else {
+                                    if(selectedDate > $(this).data().datepicker.first){
+                                        $(this).val($(this).data().datepicker.first+" - "+selectedDate);
+                                    } else {
+                                        $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
+                                    }
+                                    $(this).data().datepicker.inline = false;
+                                    $('.js-start_time_filter_button').trigger('click');
+                                }
+                            },
+                            onClose:function(){
+                                delete $(this).data().datepicker.first;
+                                $(this).data().datepicker.inline = false;
+                            }
+                        });
+                    }
+                },
             });
 
             // column: delivery execution status
@@ -776,14 +819,17 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filterStrategy: 'multiple',
+                    filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
                     filter: true,
-                    filtercolumns:['status'],
                     tools: tools,
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
                     sortby : 'start_time'
                 }, dataset);
+
+            setInitialFilters();
         }
     };
 });
