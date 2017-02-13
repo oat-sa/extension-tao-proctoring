@@ -356,8 +356,8 @@ class DeliveryHelper
                 if ($user) {
                     /* @var $user User */
                     $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                    $testTaker['lastName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
-                    $testTaker['firstName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
+                    $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
+                    $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
                     $userExtraFields = self::_getUserExtraFields();
                     foreach($userExtraFields as $field){

@@ -283,7 +283,7 @@ define([
                 }
                 formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.test_taker_first_name + ' ' + testTakerData.test_taker_last_name
                 };
                 status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -544,22 +544,22 @@ define([
 
             // column: test taker first name
             model.push({
-                id: 'firstname',
+                id: 'test_taker_first_name',
                 label: __('First name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.firstName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_first_name || '';
 
                 }
             });
 
             // column: test taker last name
             model.push({
-                id: 'lastname',
+                id: 'test_taker_last_name',
                 label: __('Last name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.lastName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_last_name || '';
 
                 }
             });
