@@ -78,7 +78,7 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $requestOptions = $this->getRequestOptions(['sortBy' => 'date', 'sortOrder' => 'DESC']);
+        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'DESC']);
         $filters = $this->getRequestParameter('filtercolumns');
         if ($filters !== null) {
             if (isset($filters['start_time'])) {
