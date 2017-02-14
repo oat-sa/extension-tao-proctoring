@@ -81,15 +81,19 @@ class Monitor extends SimplePageModule
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'DESC']);
         $filters = $this->getRequestParameter('filtercolumns');
         if ($filters !== null) {
-            if (isset($filters['start_time'])) {
-                $times = explode(' - ', $filters['start_time']);
-                $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
-                $from->setTime(0, 0, 0);
-                $options['filters'][] = ['start_time' => '>' . $from->getTimestamp()];
-                if (isset($times[1])) {
-                    $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
-                    $to->setTime(23, 59, 59);
-                    $options['filters'][] = ['start_time' => '<' . $to->getTimestamp()];
+            foreach ($filters as $filterKey => $filterVal) {
+                if ($filterKey === 'start_time') {
+                    $times = explode(' - ', $filterVal);
+                    $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
+                    $from->setTime(0, 0, 0);
+                    $options['filters'][] = ['start_time' => '>' . $from->getTimestamp()];
+                    if (isset($times[1])) {
+                        $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
+                        $to->setTime(23, 59, 59);
+                        $options['filters'][] = ['start_time' => '<' . $to->getTimestamp()];
+                    }
+                } else {
+                    $options['filters'][] = [$filterKey => $filterVal];
                 }
             }
         }
