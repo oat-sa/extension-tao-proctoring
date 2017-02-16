@@ -104,7 +104,7 @@ define([
             var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var reportUrl = helpers._url('reportExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
             var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
-            var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {});
+            var serviceAllUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {});
             var tools = [];
             var model = [];
             var actionButtons;
