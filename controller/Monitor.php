@@ -43,7 +43,9 @@ class Monitor extends SimplePageModule
      */
     protected function getCurrentDelivery()
     {
-        return $this->getResource($this->getRequestParameter('delivery'));
+        return $this->hasRequestParameter('delivery')
+            ? $this->getResource($this->getRequestParameter('delivery'))
+            : null;
     }
 
     /**
@@ -55,20 +57,18 @@ class Monitor extends SimplePageModule
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
-        $this->composeView(
-            'delivery-monitoring',
-            array(
-                'ismanageable' => false,
-                'delivery' => $delivery->getUri(),
-                'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
-                'extrafields' => DeliveryHelper::getExtraFields(),
-                'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
-                'printReportButton' => json_encode(false),
-                'timeHandling' => json_encode(false),
-            ),
-            array(),
-            'Monitoring/index.tpl'
+        $data = array(
+            'ismanageable' => false,
+            'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
+            'extrafields' => DeliveryHelper::getExtraFields(),
+            'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
+            'printReportButton' => json_encode(false),
+            'timeHandling' => json_encode(false),
         );
+        if (!is_null($delivery)) {
+            $data['delivery'] = $delivery->getUri();
+        }
+        $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
     }
 
     /**
