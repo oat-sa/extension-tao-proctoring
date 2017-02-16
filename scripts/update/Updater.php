@@ -26,7 +26,6 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\oatbox\event\EventManager;
 use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoTestCenter\model\eligibility\EligiblityChanged;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoProctoring\model\ReasonCategoryService;
@@ -170,6 +169,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.4.0');
         }
 
-        $this->skip('4.4.0', '4.4.4');
+        $this->skip('4.4.0', '4.4.5');
     }
 }
