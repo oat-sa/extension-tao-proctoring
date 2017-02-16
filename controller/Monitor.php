@@ -60,7 +60,7 @@ class Monitor extends SimplePageModule
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
         $data = array(
             'ismanageable' => false,
-            'defaulttag' => $this->getRequestParameter('defaulttag'),
+            'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
