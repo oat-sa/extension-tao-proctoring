@@ -92,6 +92,7 @@ define([
             var extraFields = $container.data('extrafields');
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
+            var context = $container.data('context');
             var isManageable = $container.data('ismanageable');
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
@@ -104,8 +105,8 @@ define([
             var authoriseUrl = helpers._url('authoriseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
             var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var reportUrl = helpers._url('reportExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
-            var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
-            var serviceAllUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {});
+            var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, context : context});
+            var serviceAllUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {context : context});
             var tools = [];
             var model = [];
             var actionButtons;
