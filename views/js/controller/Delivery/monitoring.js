@@ -96,6 +96,7 @@ define([
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
             var defaultTag = $container.data('defaulttag');
+            var tagWaringBlock;
             var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
@@ -404,8 +405,14 @@ define([
 
                     if (applyTags) {
                         $list.find('.action-bar').children('.tool-tag').hide();
+                        tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
+                            timeout: {
+                                success: -1
+                            }
+                        });
                     } else {
                         $list.find('.action-bar').children('.tool-notag').hide();
+                        tagWaringBlock.close();
                     }
 
                 }
@@ -462,8 +469,8 @@ define([
                     id: 'notag',
                     icon: 'filter',
                     css: 'btn-warning',
-                    label: __('Remove filter by "%s" group', defaultTag),
-                    title: __('Remove default tag'),
+                    label: __('Remove default tag filtering'),
+                    title: __('Remove default tag filtering'),
                     action: function () {
                         setTagUsage(false);
                         $list.datatable('filter');
