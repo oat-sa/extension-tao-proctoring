@@ -21,10 +21,12 @@
 namespace oat\taoProctoring\controller;
 
 use oat\oatbox\service\ServiceNotFoundException;
-use oat\taoProctoring\helpers\BreadcrumbsHelper;
 use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\helpers\TestCenterHelper;
 use oat\oatbox\service\ServiceManager;
+use oat\generis\model\OntologyAwareTrait;
+use oat\taoProctoring\model\TestSessionHistoryService;
+use oat\taoProctoring\helpers\DataTableHelper;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -36,13 +38,13 @@ use oat\oatbox\service\ServiceManager;
  */
 class Reporting extends SimplePageModule
 {
+    use OntologyAwareTrait;
     /**
      * Display the session history of the current test center
      */
     public function sessionHistory()
     {
-        $testCenter     = $this->getCurrentTestCenter();
-        $delivery       = $this->getCurrentDelivery(false);
+        $delivery       = $this->getResource($this->getRequestParameter('delivery'));
         $sessions       = $this->getRequestParameter('session');
         $requestOptions = $this->getRequestOptions([
             'sortby'      => 'timestamp',
@@ -57,14 +59,20 @@ class Reporting extends SimplePageModule
         }
 
         $breadcrumbs = [
-            BreadcrumbsHelper::deliveries($testCenter, [
-                    BreadcrumbsHelper::diagnostics($testCenter),
-            ])
         ];
 
+        // log access to history
+        $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
+        foreach ($sessions as $sessionUri) {
+            $deliveryLog->log($sessionUri, 'HISTORY', []);
+        }
+
+        // retrieve history
+        $historyService = $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
+        $history = DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $requestOptions), $requestOptions);
+
         $viewData = [
-            'testCenter'  => $testCenter->getUri(),
-            'set'         => TestCenterHelper::getSessionHistory($sessions, true, $requestOptions),
+            'set'         => $history,
             'sessions'    => $sessions,
             'sortBy'      => $requestOptions['sortBy'],
             'sortOrder'   => $requestOptions['sortOrder'],
@@ -73,13 +81,8 @@ class Reporting extends SimplePageModule
         ];
 
         if ($delivery) {
-            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoring($testCenter, $delivery, DeliveryHelper::getDeliveries($testCenter));
             $viewData['delivery'] = $delivery->getUri();
-        } else {
-            $breadcrumbs[] = BreadcrumbsHelper::deliveryMonitoringAll($testCenter, DeliveryHelper::getDeliveries($testCenter));
         }
-
-        $breadcrumbs[] = BreadcrumbsHelper::sessionHistory($testCenter, $delivery, $sessions);
 
         if (count($sessions) > 1) {
             $title = __('Detailed Session History of a selection');
@@ -109,7 +112,8 @@ class Reporting extends SimplePageModule
             if (!is_array($sessions)) {
                 $sessions = $sessions ? explode(',', $sessions) : [];
             }
-            $this->returnJson(TestCenterHelper::getSessionHistory($sessions, false, $requestOptions));
+            $historyService = $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
+            $this->returnJson(DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $requestOptions), $requestOptions));
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No history service defined for proctoring');

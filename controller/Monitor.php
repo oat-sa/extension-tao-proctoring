@@ -20,10 +20,10 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * Monitoring Delivery controller
@@ -36,15 +36,17 @@ use oat\taoProctoring\model\ReasonCategoryService;
 class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
-    
+
     /**
      * Returns the currently proctored delivery
      *
-     * @return core_kernel_classes_Resource
+     * @return \core_kernel_classes_Resource
      */
     protected function getCurrentDelivery()
     {
-        return $this->getResource($this->getRequestParameter('delivery'));
+        return $this->hasRequestParameter('delivery')
+            ? $this->getResource($this->getRequestParameter('delivery'))
+            : null;
     }
 
     /**
@@ -55,24 +57,26 @@ class Monitor extends SimplePageModule
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
-        $this->composeView(
-            'delivery-monitoring',
-            array(
-                'ismanageable' => false,
-                'delivery' => $delivery->getUri(),
-                'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
-                'extrafields' => DeliveryHelper::getExtraFields(),
-                'categories' => $this->getAllReasonsCategories(),
-                'printReportButton' => json_encode(false),
-                'timeHandling' => json_encode(false),
-            ),
-            array(
-            ),
-            'Monitoring/index.tpl'
+        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
+        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
+        $data = array(
+            'ismanageable' => false,
+            'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
+            'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
+            'extrafields' => DeliveryHelper::getExtraFields(),
+            'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
+            'printReportButton' => json_encode(false),
+            'timeHandling' => json_encode(false),
         );
+        if (!is_null($delivery)) {
+            $data['delivery'] = $delivery->getUri();
+        }
+        if ($this->hasRequestParameter('context')) {
+            $data['context'] = $this->getRequestParameter('context');
+        }
+        $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
     }
-    
+
     /**
      * Gets the list of current executions for a delivery
      *
@@ -80,32 +84,34 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'desc']);
+        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'DESC']);
+        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
+        $filters = $this->getRequestParameter('filtercolumns');
+        if ($filters !== null) {
+            foreach ($filters as $filterKey => $filterVal) {
+                if ($filterKey === 'start_time') {
+                    $times = explode(' - ', $filterVal);
+                    $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
+                    $from->setTime(0, 0, 0);
+                    $options['filters'][] = ['start_time' => '>' . $from->getTimestamp()];
+                    if (isset($times[1])) {
+                        $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
+                        $to->setTime(23, 59, 59);
+                        $options['filters'][] = ['start_time' => '<' . $to->getTimestamp()];
+                    }
+                } else {
+                    $options['filters'][] = [$filterKey => $filterVal];
+                }
+            }
+        }
+        $options['order'] = $requestOptions['sortBy'] . ' ' . mb_strtoupper($requestOptions['sortOrder']);
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
+        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
         $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions, $requestOptions));
     }
 
-    /**
-     * Get the list of all available categories, sorted by action names
-     *
-     * @return array
-     */
-    protected function getAllReasonsCategories(){
-        /** @var ReasonCategoryService $categoryService */
-        $categoryService = $this->getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
-    
-        return array(
-            'authorize' => array(),
-            'pause' => $categoryService->getIrregularities(),
-            'terminate' => $categoryService->getIrregularities(),
-            'report' => $categoryService->getIrregularities(),
-            'print' => [],
-        );
-    }
-    
     /**
      * Authorises a delivery execution
      *
@@ -117,28 +123,28 @@ class Monitor extends SimplePageModule
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
         $testCenter = $this->getRequestParameter('testCenter');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
-    
+
             $this->returnJson(array(
                 'success' => !count($notAuthorised),
                 'processed' => $authorised,
                 'unprocessed' => $notAuthorised
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
 
     /**
      * Terminates delivery executions
@@ -150,28 +156,28 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
             $notTerminated = array_diff($deliveryExecution, $terminated);
-    
+
             $this->returnJson(array(
                 'success' => !count($notTerminated),
                 'processed' => $terminated,
                 'unprocessed' => $notTerminated
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
     /**
      * Pauses delivery executions
      *
@@ -182,28 +188,28 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
             $notPaused = array_diff($deliveryExecution, $paused);
-    
+
             $this->returnJson(array(
                 'success' => !count($notPaused),
                 'processed' => $paused,
                 'unprocessed' => $notPaused
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
     }
-    
+
     /**
      * Report irregularities in delivery executions
      *
@@ -214,22 +220,22 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecution = $this->getRequestParameter('execution');
         $reason = $this->getRequestParameter('reason');
-    
+
         if (!is_array($deliveryExecution)) {
             $deliveryExecution = array($deliveryExecution);
         }
-    
+
         try {
-    
+
             $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
             $notReported = array_diff($deliveryExecution, $reported);
-    
+
             $this->returnJson(array(
                 'success' => !count($notReported),
                 'processed' => $reported,
                 'unprocessed' => $notReported
             ));
-    
+
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');

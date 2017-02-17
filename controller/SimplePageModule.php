@@ -78,7 +78,7 @@ abstract class SimplePageModule extends \tao_actions_CommonModule
         } else {
             $this->setData('content-template', $template);
             $this->setData('content-extension', $extension);
-            $this->setView('layout.tpl', $currentExtension);
+            $this->setView('layout.tpl', 'taoProctoring');
         }
     }
 

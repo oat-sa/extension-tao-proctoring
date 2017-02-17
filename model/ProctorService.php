@@ -49,16 +49,34 @@ class ProctorService extends ConfigurableService
         return DeliveryAssemblyService::singleton()->getAllAssemblies();
     }
     
-    public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null)
+    public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $criteria = [
-            [DeliveryMonitoringService::DELIVERY_ID => $delivery->getUri()]
-        ];
-        
-        $options = ['asArray' => true];
+        $criteria = $this->getCriteria($delivery, $context, $options);
+        $options['asArray'] =  true;
         return $monitoringService->find($criteria, $options, true);
     }
-    
+
+    /**
+     * @param null $delivery
+     * @param null $context
+     * @param array $options
+     * @return array
+     */
+    protected function getCriteria($delivery = null, $context = null, $options = [])
+    {
+        $criteria = [];
+        if ($delivery !== null) {
+            $criteria = [
+                [DeliveryMonitoringService::DELIVERY_ID => $delivery->getUri()]
+            ];
+        }
+
+        if (isset($options['filters'])) {
+            $criteria[] = $options['filters'];
+        }
+
+        return $criteria;
+    }
 
 }

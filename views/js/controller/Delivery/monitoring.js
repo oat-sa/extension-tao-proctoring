@@ -92,18 +92,21 @@ define([
             var extraFields = $container.data('extrafields');
             var categories = $container.data('categories');
             var deliveryId = $container.data('delivery');
+            var context = $container.data('context');
             var isManageable = $container.data('ismanageable');
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
+            var defaultTag = $container.data('defaulttag');
+            var tagWaringBlock;
             var printReportButton = $container.data('printreportbutton');
-            var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var pauseUrl = helpers._url('pauseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var authoriseUrl = helpers._url('authoriseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var reportUrl = helpers._url('reportExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
-            var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
-            var serviceAllUrl = helpers._url('allDeliveriesExecutions', 'Delivery', 'taoProctoring', {testCenter : testCenterId});
+            var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
+            var pauseUrl = helpers._url('pauseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
+            var authoriseUrl = helpers._url('authoriseExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
+            var extraTimeUrl = helpers._url('extraTime', 'Delivery', 'taoProctoring', {delivery : deliveryId});
+            var reportUrl = helpers._url('reportExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
+            var serviceUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId, context : context});
+            var serviceAllUrl = helpers._url('deliveryExecutions', 'Monitor', 'taoProctoring', {context : context});
             var tools = [];
             var model = [];
             var actionButtons;
@@ -141,7 +144,7 @@ define([
                                 unprocessed = _.map(response.unprocessed, function (id) {
                                     var execution = getExecutionData(id);
                                     if (execution) {
-                                        return __('Session %s - %s has not been processed', execution.delivery, execution.date);
+                                        return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
                                     }
                                 });
 
@@ -219,7 +222,6 @@ define([
             // display the session history
             function showHistory(selection) {
                 var urlParams = {
-                    testCenter : testCenterId,
                     session: selection
                 };
                 if (deliveryId) {
@@ -283,7 +285,7 @@ define([
                 }
                 formatted = {
                     id : testTakerData.id,
-                    label: deliveryName + ' [' + testTakerData.date + '] ' + testTakerData.firstname + ' ' + testTakerData.lastname
+                    label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.test_taker_first_name + ' ' + testTakerData.test_taker_last_name
                 };
                 status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -296,7 +298,7 @@ define([
                 if (testTakerData.timer) {
                     formatted.extraTime = testTakerData.timer.extraTime;
                     formatted.consumedTime = testTakerData.timer.consumedExtraTime;
-                    formatted.remaining = testTakerData.timer.remaining;
+                    formatted.remaining_time = testTakerData.timer.remaining_time;
                 }
                 return formatted;
             }
@@ -388,6 +390,56 @@ define([
             }
 
             /**
+             * Prepare data to be sent on server + internal state saving
+             * @param {Boolean} applyTags
+             */
+            function setTagUsage(applyTags) {
+                if (defaultTag) {
+
+                    if (!$list.find('.tag').length) {
+                        var $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                        $filter.appendTo($list);
+                    }
+
+                    $list.find('.tag').val(applyTags);
+                    $list.data('applytags', applyTags);
+
+                    if (applyTags) {
+                        $list.find('.action-bar').children('.tool-tag').hide();
+                        tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
+                            timeout: {
+                                success: -1
+                            }
+                        });
+                    } else {
+                        $list.find('.action-bar').children('.tool-notag').hide();
+                        tagWaringBlock.close();
+                    }
+
+                }
+            }
+            
+            /**
+             * Ser initial datatable filters
+             */
+            function setInitialFilters()
+            {
+                var now = new Date();
+                var nowStr =
+                    now.getFullYear() + '/' +
+                    ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
+                    ("0" + (now.getDate())).slice(-2);
+
+                $('#start_time_filter').val(nowStr + ' - ' + nowStr);
+
+                if (defaultTag) {
+                    setTagUsage(true);
+                }
+
+                $list.datatable('filter');
+            }
+
+            /**
              * Additional action perfomed with filter element
              * @param {jQueryElement} $el
              */
@@ -413,6 +465,30 @@ define([
                 }
             });
 
+            if (defaultTag) {
+                tools.push({
+                    id: 'notag',
+                    icon: 'filter',
+                    css: 'btn-warning',
+                    label: __('Remove default tag filtering'),
+                    title: __('Remove default tag filtering'),
+                    action: function () {
+                        setTagUsage(false);
+                        $list.datatable('filter');
+                    }
+                });
+                tools.push({
+                    id: 'tag',
+                    icon: 'filter',
+                    title: __('Apply default tag'),
+                    label: __('Apply default tag'),
+                    action: function () {
+                        setTagUsage(true);
+                        $list.datatable('filter');
+                    }
+                });
+            }
+
             // tool: manage test takers (only for unique delivery)
             if (deliveryId && isManageable) {
                 tools.push({
@@ -425,7 +501,6 @@ define([
                     }
                 });
             }
-
             // tool: authorise the executions
             tools.push({
                 id: 'authorise',
@@ -519,7 +594,7 @@ define([
                     transform: function(value, row) {
                         var delivery = row && row.delivery;
                         if (delivery) {
-                            delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri, testCenter : testCenterId});
+                            delivery.url = helpers._url('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri});
                             value = deliveryLinkTpl(delivery);
                         }
                         return value;
@@ -529,22 +604,22 @@ define([
 
             // column: test taker first name
             model.push({
-                id: 'firstname',
+                id: 'test_taker_first_name',
                 label: __('First name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.firstName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_first_name || '';
 
                 }
             });
 
             // column: test taker last name
             model.push({
-                id: 'lastname',
+                id: 'test_taker_last_name',
                 label: __('Last name'),
                 sortable : true,
                 transform: function(value, row) {
-                    return row && row.testTaker && row.testTaker.lastName || '';
+                    return row && row.testTaker && row.testTaker.test_taker_last_name || '';
 
                 }
             });
@@ -563,9 +638,37 @@ define([
 
             // column: start time
             model.push({
-                id: 'date',
+                id: 'start_time',
                 sortable : true,
-                label: __('Started at')
+                label: __('Started at'),
+                filterable : true,
+                customFilter : {
+                    template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
+                    '<button class="icon-find js-start_time_filter_button" type="button"></button>',
+                    callback : function ($el) {
+                        $el.datepicker({
+                            dateFormat: "yy/mm/dd",
+                            onSelect: function( selectedDate ) {
+                                if(!$(this).data().datepicker.first){
+                                    $(this).data().datepicker.inline = true
+                                    $(this).data().datepicker.first = selectedDate;
+                                } else {
+                                    if(selectedDate > $(this).data().datepicker.first){
+                                        $(this).val($(this).data().datepicker.first+" - "+selectedDate);
+                                    } else {
+                                        $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
+                                    }
+                                    $(this).data().datepicker.inline = false;
+                                    $('.js-start_time_filter_button').trigger('click');
+                                }
+                            },
+                            onClose:function(){
+                                delete $(this).data().datepicker.first;
+                                $(this).data().datepicker.inline = false;
+                            }
+                        });
+                    }
+                },
             });
 
             // column: delivery execution status
@@ -633,12 +736,12 @@ define([
 
             // column: remaining time
             model.push({
-                id: 'remaining',
+                id: 'remaining_time',
                 sortable : true,
                 label: __('Remaining'),
                 transform: function(value, row) {
                     var timer = _.isObject(row.timer) ? row.timer : {};
-                    var refinedValue = timer.remaining;
+                    var refinedValue = timer.remaining_time;
                     var remaining = parseInt(refinedValue, 10);
 
                     if (remaining || _.isFinite(remaining) ) {
@@ -743,6 +846,12 @@ define([
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
 
+                    if (defaultTag) {
+                        var applyTags = $list.data('applytags');
+                        applyTags = !_.isUndefined(applyTags) ? applyTags : true;
+                        setTagUsage(applyTags);
+                    }
+
                     // highlight rows
                     if (highlightRows.length) {
                         _.forEach(highlightRows, function (v) {
@@ -776,14 +885,17 @@ define([
                         available: __('Current sessions'),
                         loading: __('Loading')
                     },
+                    filterStrategy: 'multiple',
+                    filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
                     filter: true,
-                    filtercolumns:['status'],
                     tools: tools,
                     model: model,
                     selectable: true,
                     sortorder: 'desc',
-                    sortby : 'date'
+                    sortby : 'start_time'
                 }, dataset);
+
+            setInitialFilters();
         }
     };
 });

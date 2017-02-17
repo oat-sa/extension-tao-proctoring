@@ -57,21 +57,11 @@ define([
             var sortOrder = $container.data('sortorder');
             var periodStart = $container.data('periodstart');
             var periodEnd = $container.data('periodEnd');
-            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, delivery : deliveryId, session: sessions});
-            var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {testCenter: testCenterId, delivery : deliveryId});
-            var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
+            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {delivery : deliveryId, session: sessions});
             var detailedHistory = false;
 
             var historyTable = historyTableFactory({
                     tools: [{
-                        id: 'back',
-                        icon: 'preview',
-                        title: __('Return to the session monitoring'),
-                        label: __('Monitoring'),
-                        action: function() {
-                            window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
-                        }
-                    }, {
                         id: 'show-detailed-report',
                         icon: 'insert-horizontal-line',
                         title: __('Show detailed session history messages'),

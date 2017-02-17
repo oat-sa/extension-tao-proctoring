@@ -39,6 +39,7 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoProctoring\model\ReasonCategoryService;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -355,8 +356,8 @@ class DeliveryHelper
                 if ($user) {
                     /* @var $user User */
                     $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                    $testTaker['lastName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
-                    $testTaker['firstName'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
+                    $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
+                    $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
                     $userExtraFields = self::_getUserExtraFields();
                     foreach($userExtraFields as $field){
@@ -373,9 +374,9 @@ class DeliveryHelper
                         'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
-                    'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
+                    'start_time' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
                     'timer' => [
-                        'remaining' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
+                        'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
                         'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
                         'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
                     ],
@@ -485,5 +486,23 @@ class DeliveryHelper
         $data = $deliveryMonitoringService->getData($deliveryExecution);
         $data->update('hasBeenPaused', $paused);
         $deliveryMonitoringService->save($data);
+    }
+
+    /**
+     * Get the list of all available categories, sorted by action names
+     *
+     * @return array
+     */
+    public static function getAllReasonsCategories(){
+        /** @var ReasonCategoryService $categoryService */
+        $categoryService = ServiceManager::getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
+
+        return array(
+            'authorize' => array(),
+            'pause' => $categoryService->getIrregularities(),
+            'terminate' => $categoryService->getIrregularities(),
+            'report' => $categoryService->getIrregularities(),
+            'print' => [],
+        );
     }
 }
