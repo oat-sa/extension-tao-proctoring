@@ -57,7 +57,8 @@ class Monitor extends SimplePageModule
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
+        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
+        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
         $data = array(
             'ismanageable' => false,
             'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
@@ -70,6 +71,9 @@ class Monitor extends SimplePageModule
         if (!is_null($delivery)) {
             $data['delivery'] = $delivery->getUri();
         }
+        if ($this->hasRequestParameter('context')) {
+            $data['context'] = $this->getRequestParameter('context');
+        }
         $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
     }
 
@@ -81,6 +85,7 @@ class Monitor extends SimplePageModule
     public function deliveryExecutions()
     {
         $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'DESC']);
+        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
         $filters = $this->getRequestParameter('filtercolumns');
         if ($filters !== null) {
             foreach ($filters as $filterKey => $filterVal) {
@@ -103,7 +108,7 @@ class Monitor extends SimplePageModule
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, null, $options);
+        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
         $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions, $requestOptions));
     }
 
