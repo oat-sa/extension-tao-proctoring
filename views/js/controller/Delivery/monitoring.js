@@ -95,6 +95,8 @@ define([
             var isManageable = $container.data('ismanageable');
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
+            var defaultTag = $container.data('defaulttag');
+            var tagWaringBlock;
             var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
@@ -387,6 +389,36 @@ define([
             }
 
             /**
+             * Prepare data to be sent on server + internal state saving
+             * @param {Boolean} applyTags
+             */
+            function setTagUsage(applyTags) {
+                if (defaultTag) {
+
+                    if (!$list.find('.tag').length) {
+                        var $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                        $filter.appendTo($list);
+                    }
+
+                    $list.find('.tag').val(applyTags);
+                    $list.data('applytags', applyTags);
+
+                    if (applyTags) {
+                        $list.find('.action-bar').children('.tool-tag').hide();
+                        tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
+                            timeout: {
+                                success: -1
+                            }
+                        });
+                    } else {
+                        $list.find('.action-bar').children('.tool-notag').hide();
+                        tagWaringBlock.close();
+                    }
+
+                }
+            }
+            
+            /**
              * Ser initial datatable filters
              */
             function setInitialFilters()
@@ -398,6 +430,11 @@ define([
                     ("0" + (now.getDate())).slice(-2);
 
                 $('#start_time_filter').val(nowStr + ' - ' + nowStr);
+
+                if (defaultTag) {
+                    setTagUsage(true);
+                }
+
                 $list.datatable('filter');
             }
 
@@ -427,6 +464,30 @@ define([
                 }
             });
 
+            if (defaultTag) {
+                tools.push({
+                    id: 'notag',
+                    icon: 'filter',
+                    css: 'btn-warning',
+                    label: __('Remove default tag filtering'),
+                    title: __('Remove default tag filtering'),
+                    action: function () {
+                        setTagUsage(false);
+                        $list.datatable('filter');
+                    }
+                });
+                tools.push({
+                    id: 'tag',
+                    icon: 'filter',
+                    title: __('Apply default tag'),
+                    label: __('Apply default tag'),
+                    action: function () {
+                        setTagUsage(true);
+                        $list.datatable('filter');
+                    }
+                });
+            }
+
             // tool: manage test takers (only for unique delivery)
             if (deliveryId && isManageable) {
                 tools.push({
@@ -439,7 +500,6 @@ define([
                     }
                 });
             }
-
             // tool: authorise the executions
             tools.push({
                 id: 'authorise',
@@ -784,6 +844,12 @@ define([
                         terminate : $list.find('.action-bar').children('.tool-terminate'),
                         report : $list.find('.action-bar').children('.tool-irregularity')
                     });
+
+                    if (defaultTag) {
+                        var applyTags = $list.data('applytags');
+                        applyTags = !_.isUndefined(applyTags) ? applyTags : true;
+                        setTagUsage(applyTags);
+                    }
 
                     // highlight rows
                     if (highlightRows.length) {

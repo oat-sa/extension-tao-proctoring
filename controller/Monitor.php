@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
@@ -39,7 +40,7 @@ class Monitor extends SimplePageModule
     /**
      * Returns the currently proctored delivery
      *
-     * @return core_kernel_classes_Resource
+     * @return \core_kernel_classes_Resource
      */
     protected function getCurrentDelivery()
     {
@@ -59,6 +60,7 @@ class Monitor extends SimplePageModule
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
         $data = array(
             'ismanageable' => false,
+            'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
