@@ -50,16 +50,17 @@ class Monitor extends SimplePageModule
     }
 
     /**
-     * Monitoring view of a selected delivery
+     * Gets the view parameters and data to display
+     * @return array
      */
-    public function index()
+    protected function getViewData()
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
-        $data = array(
+        $data = [
             'ismanageable' => false,
             'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
@@ -67,14 +68,35 @@ class Monitor extends SimplePageModule
             'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
             'printReportButton' => json_encode(false),
             'timeHandling' => json_encode(false),
-        );
+        ];
+
         if (!is_null($delivery)) {
             $data['delivery'] = $delivery->getUri();
         }
         if ($this->hasRequestParameter('context')) {
             $data['context'] = $this->getRequestParameter('context');
         }
-        $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
+        
+        return $data;
+    }
+
+    /**
+     * Monitoring view of a selected delivery
+     */
+    public function index()
+    {
+        $this->composeView('delivery-monitoring', $this->getViewData(), array(), 'Monitoring/index.tpl');
+    }
+
+    /**
+     * Lists all available deliveries
+     */
+    public function monitor()
+    {
+        $this->returnJson([
+            'success' => true,
+            'data' => $this->getViewData(),
+        ]);
     }
 
     /**

@@ -17,21 +17,21 @@
  *
  */
 define(['ui/breadcrumbs'], function(breadcrumbs){
-    
+    'use strict';
+
     /**
      * Wrap the generic breadcrumbs component into a very specialized
-     * 
+     *
      * @param {JQyery} $container
      * @param {Array} [crumbs]
      * @returns {unresolved}
      */
     return function breadcrumbFactory($container, crumbs){
         return breadcrumbs({
-            breadcrumbs : crumbs || $container.data('breadcrumbs'),
+            breadcrumbs : crumbs,
             renderTo: $container.find('.header'),
             replace: true,
             cls : 'action-bar horizontal-action-bar'
         });
     };
 });
-
