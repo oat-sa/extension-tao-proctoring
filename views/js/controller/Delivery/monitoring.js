@@ -1,4 +1,21 @@
 /**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ */
+/**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
@@ -91,6 +108,8 @@ define([
          * Entry point of the page
          */
         start : function start() {
+            var currentRoute = urlHelper.parse(window.location.href);
+            var deliveryId = decodeURIComponent(currentRoute.query.delivery);
             var container, $content, $list;
             var crumbs;
             var dataset;
@@ -99,7 +118,6 @@ define([
             var context;
             var defaultTag;
             var tagWaringBlock;
-            var deliveryId;
             var timeHandlingButton;
             var printReportButton;
             var tools = [];
@@ -425,10 +443,11 @@ define([
                  * @param {Boolean} applyTags
                  */
                 function setTagUsage(applyTags) {
+                    var $filter;
                     if (defaultTag) {
 
                         if (!$list.find('.tag').length) {
-                            var $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                            $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
                             $filter.appendTo($list);
                         }
 
@@ -487,8 +506,7 @@ define([
                     dataBroker.destroy();
                 });
 
-                return dataBroker.read('executions').then(function(data) {
-                    console.log('executions', data);
+                return dataBroker.read('executions', {delivery : deliveryId, context: context}).then(function(data) {
                     crumbs = data.breadcrumbs;
                     dataset = data.set;
                     extraFields = data.extrafields;
@@ -685,7 +703,7 @@ define([
                                     dateFormat: "yy/mm/dd",
                                     onSelect: function( selectedDate ) {
                                         if(!$(this).data().datepicker.first){
-                                            $(this).data().datepicker.inline = true
+                                            $(this).data().datepicker.inline = true;
                                             $(this).data().datepicker.first = selectedDate;
                                         } else {
                                             if(selectedDate > $(this).data().datepicker.first){
@@ -916,7 +934,7 @@ define([
                             });
                         })
                         .datatable({
-                            url: deliveryId ? urlHelper.build(executionsUrl, {delivery : deliveryId}) : executionsUrl,
+                            url: urlHelper.build(executionsUrl, {delivery : deliveryId, context: context}),
                             status: {
                                 empty: __('No sessions'),
                                 available: __('Current sessions'),
@@ -941,20 +959,3 @@ define([
         }
     };
 });
-/**
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; under version 2
- * of the License (non-upgradable).
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
- */
