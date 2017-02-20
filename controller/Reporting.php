@@ -44,7 +44,9 @@ class Reporting extends SimplePageModule
      */
     public function sessionHistory()
     {
-        $delivery       = $this->getResource($this->getRequestParameter('delivery'));
+        $delivery       = $this->hasRequestParameter('delivery')
+            ? $this->getResource($this->getRequestParameter('delivery'))
+            : null;
         $sessions       = $this->getRequestParameter('session');
         $requestOptions = $this->getRequestOptions([
             'sortby'      => 'timestamp',
