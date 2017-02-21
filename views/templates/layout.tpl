@@ -49,7 +49,10 @@ use oat\tao\model\theme\Theme;
                 </nav>
             </header>
             <div id="feedback-box"></div>
-            <?php Template::inc(get_data('content-template'),get_data('content-extension')); ?>
+            <div class="header toolbox"></div>
+            <?php /* actual content */
+            $contentTemplate = Layout::getContentTemplate();
+            Template::inc($contentTemplate['path'], $contentTemplate['ext']); ?>
         </div>
 
         <?= Layout::renderThemeTemplate(Theme::CONTEXT_BACKOFFICE, 'footer') ?>

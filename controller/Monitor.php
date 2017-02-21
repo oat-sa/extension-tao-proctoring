@@ -85,7 +85,7 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
-        $this->composeView('delivery-monitoring', $this->getViewData(), array(), 'Monitoring/index.tpl');
+        $this->composeView('delivery-monitoring', $this->getViewData());
     }
 
     /**
