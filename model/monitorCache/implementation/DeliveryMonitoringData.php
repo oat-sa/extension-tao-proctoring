@@ -22,18 +22,14 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\oatbox\user\User;
-use oat\tao\helpers\UserHelper;
-use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use oat\taoTests\models\runner\time\TimePoint;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -66,6 +62,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      * @var AssessmentTestSession
      */
     private $testSession;
+
+    /**
+     * @var array
+     */
+    private $testConfig;
 
     /**
      * @var array
@@ -176,6 +177,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     public function setTestSession(AssessmentTestSession $testSession)
     {
         $this->testSession = $testSession;
+        $this->configureTestSession();
     }
 
     /**
@@ -274,7 +276,45 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($this->testSession === null) {
             $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
             $this->testSession = $testSessionService->getTestSession($this->deliveryExecution);
+            $this->configureTestSession();
         }
+        
         return $this->testSession;
+    }
+
+    /**
+     * Ensure the test session is well configured
+     */
+    private function configureTestSession()
+    {
+        if ($this->testSession instanceof TestSession) {
+            $testConfig = $this->getTestConfig();
+
+            // sets the target from which computes the durations.
+            if (isset($testConfig['timer']) && isset($testConfig['timer']['target'])) {
+                switch (strtolower($testConfig['timer']['target'])) {
+                    case 'client':
+                        $target = TimePoint::TARGET_CLIENT;
+                        break;
+
+                    case 'server':
+                    default:
+                        $target = TimePoint::TARGET_SERVER;
+                }
+
+                $this->testSession->setTimerTarget($target);
+            }
+        }
+    }
+
+    /**
+     * @return array|object
+     */
+    private function getTestConfig()
+    {
+        if ($this->testConfig === null) {
+            $this->testConfig = $this->getServiceLocator()->get('taoQtiTest/testRunner');
+        }
+        return $this->testConfig;
     }
 }
