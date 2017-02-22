@@ -40,12 +40,16 @@ class DeliverySelection extends SimplePageModule
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
-        $deliveries = $service->getProctorableDeliveries($proctor);
+        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
+        $deliveries = $service->getProctorableDeliveries($proctor, $context);
         $data = array();
         foreach ($deliveries as $delivery) {
-            $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery);
+            $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
             $deliveryData = DeliveryHelper::buildDeliveryData($delivery, $executions);
-            $deliveryData['url'] = _url('index', 'Monitor', null, array('delivery' => $delivery->getUri()));
+            $deliveryData['url'] = _url('index', 'Monitor', null, is_null($context)
+                ? ['delivery' => $delivery->getUri()]
+                : ['delivery' => $delivery->getUri(), 'context' => $context]
+            );
             $data[] = $deliveryData;
         }
         
