@@ -45,6 +45,7 @@ use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
+use oat\taoProctoring\scripts\update\UpdateLastConnectivity;
 
 /**
  *
@@ -169,6 +170,14 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.4.0');
         }
 
-        $this->skip('4.4.0', '4.6.0');
+        $this->skip('4.4.0', '4.5.2');
+
+        if ($this->isVersion('4.5.2')) {
+            /** @var DeliveryMonitoringService $monitoring */
+            $action = new UpdateLastConnectivity();
+            $action([]);
+            $this->setVersion('4.5.3');
+        }
+      $this->skip('4.5.3', '4.6.0');
     }
 }
