@@ -20,10 +20,11 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DeliveryHelper;
+use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\ProctorService;
-use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Monitoring Delivery controller
@@ -55,6 +56,7 @@ class Monitor extends SimplePageModule
     public function index()
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
+        $resultService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
@@ -64,17 +66,19 @@ class Monitor extends SimplePageModule
             'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
-            'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
-            'printReportButton' => json_encode(false),
+            'categories' => DeliveryHelper::getAllReasonsCategories(),
+            'printReportButton' => json_encode($resultService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
             'timeHandling' => json_encode(false),
         );
+
         if (!is_null($delivery)) {
             $data['delivery'] = $delivery->getUri();
         }
         if ($this->hasRequestParameter('context')) {
             $data['context'] = $this->getRequestParameter('context');
         }
-        $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
+
+        $this->composeView('delivery-monitoring', $data, array(), 'Monitoring/index.tpl');
     }
 
     /**
