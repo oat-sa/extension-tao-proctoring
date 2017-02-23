@@ -82,8 +82,7 @@ class MonitorCacheService extends MonitoringStorage
         $user = \common_session_SessionManager::getSession()->getUser();
 
         if ($event->getState() == DeliveryExecution::STATE_AWAITING
-            && $user instanceof GuestTestUser
-            && $this->hasDeliveryGuestAccess($deliveryExecution->getDelivery())) {
+            && $user instanceof GuestTestUser) {
             $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
 
         }
@@ -98,20 +97,6 @@ class MonitorCacheService extends MonitoringStorage
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
-    }
-
-    protected function hasDeliveryGuestAccess(\core_kernel_classes_Resource $delivery )
-    {
-        $returnValue = false;
-        $properties = $delivery->getPropertiesValues(array(
-            new \core_kernel_classes_Property(TAO_DELIVERY_ACCESS_SETTINGS_PROP),
-        ));
-        $propAccessSettings = current($properties[TAO_DELIVERY_ACCESS_SETTINGS_PROP]);
-        $accessSetting = (!(is_object($propAccessSettings)) or ($propAccessSettings=="")) ? null : $propAccessSettings->getUri();
-        if( !is_null($accessSetting) ){
-            $returnValue = ($accessSetting === DELIVERY_GUEST_ACCESS);
-        }
-        return $returnValue;
     }
 
     /**
