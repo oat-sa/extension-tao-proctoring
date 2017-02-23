@@ -75,10 +75,10 @@ class MonitorCacheService extends MonitoringStorage
     
     public function executionStateChanged(DeliveryExecutionState $event)
     {
-        $data = $this->getData($event->getDeliveryExecution());
+        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
 
-        $deliveryExecution = $event->getDeliveryExecution();
         $user = \common_session_SessionManager::getSession()->getUser();
 
         if ($event->getState() == DeliveryExecution::STATE_AWAITING
