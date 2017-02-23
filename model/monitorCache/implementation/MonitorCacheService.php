@@ -48,6 +48,11 @@ class MonitorCacheService extends MonitoringStorage
     public function executionCreated(DeliveryExecutionCreated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
+        $state = \common_session_SessionManager::getSession()->getUser() instanceof GuestTestUser
+            ? DeliveryExecution::STATE_AUTHORIZED
+            : DeliveryExecution::STATE_PAUSED;
+        $deliveryExecution->setState($state);
+
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
@@ -81,7 +86,7 @@ class MonitorCacheService extends MonitoringStorage
 
         $user = \common_session_SessionManager::getSession()->getUser();
 
-        if ($event->getState() == DeliveryExecution::STATE_AWAITING
+        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
             && $user instanceof GuestTestUser) {
             $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
 
