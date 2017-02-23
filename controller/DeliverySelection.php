@@ -74,7 +74,7 @@ class DeliverySelection extends SimplePageModule
      */
     public function index()
     {
-        $this->composeView('delivery-index', $this->getViewData());
+        $this->composeView('delivery-index', $this->getViewData(), 'pages/index.tpl', 'tao');
     }
 
     /**
