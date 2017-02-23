@@ -51,6 +51,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
+
         $state = $deliveryExecution->getState()->getUri();
 
         if (in_array($state, [ProctoredDeliveryExecution::STATE_FINISHED, ProctoredDeliveryExecution::STATE_TERMINATED])) {
@@ -60,15 +61,20 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
             );
         }
 
-        if($user instanceof GuestTestUser && $this->hasDeliveryGuestAccess($deliveryExecution->getDelivery())){
-            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $deliveryExecutionStateService->waitExecution($deliveryExecution);
-            DeliveryHelper::authoriseExecutions([$deliveryExecution]);
-        }
+        $this->authorizeGuest($deliveryExecution, $user);
 
         if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
             $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
             throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
+        }
+    }
+
+    protected function authorizeGuest(DeliveryExecution $deliveryExecution, User $user)
+    {
+        if($user instanceof GuestTestUser && $this->hasDeliveryGuestAccess($deliveryExecution->getDelivery())){
+            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService->waitExecution($deliveryExecution);
+            DeliveryHelper::authoriseExecutions([$deliveryExecution]);
         }
     }
 
