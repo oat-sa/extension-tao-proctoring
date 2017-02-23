@@ -25,11 +25,11 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
@@ -77,6 +77,17 @@ class MonitorCacheService extends MonitoringStorage
     {
         $data = $this->getData($event->getDeliveryExecution());
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
+
+        $deliveryExecution = $event->getDeliveryExecution();
+        $user = \common_session_SessionManager::getSession()->getUser();
+
+        if ($event->getState() == DeliveryExecution::STATE_AWAITING
+            && $user instanceof GuestTestUser
+            && $this->hasDeliveryGuestAccess($deliveryExecution->getDelivery())) {
+            $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
+
+        }
+
         if ($event->getState() == DeliveryExecution::STATE_FINISHIED) {
             $data->update(
                 DeliveryMonitoringService::END_TIME,
@@ -87,6 +98,20 @@ class MonitorCacheService extends MonitoringStorage
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
+    }
+
+    protected function hasDeliveryGuestAccess(\core_kernel_classes_Resource $delivery )
+    {
+        $returnValue = false;
+        $properties = $delivery->getPropertiesValues(array(
+            new \core_kernel_classes_Property(TAO_DELIVERY_ACCESS_SETTINGS_PROP),
+        ));
+        $propAccessSettings = current($properties[TAO_DELIVERY_ACCESS_SETTINGS_PROP]);
+        $accessSetting = (!(is_object($propAccessSettings)) or ($propAccessSettings=="")) ? null : $propAccessSettings->getUri();
+        if( !is_null($accessSetting) ){
+            $returnValue = ($accessSetting === DELIVERY_GUEST_ACCESS);
+        }
+        return $returnValue;
     }
 
     /**
