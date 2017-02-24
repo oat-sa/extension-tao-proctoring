@@ -46,6 +46,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 use oat\taoProctoring\scripts\update\UpdateLastConnectivity;
+use \oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 
 /**
  *
@@ -177,6 +178,14 @@ class Updater extends common_ext_ExtensionUpdater
             $action = new UpdateLastConnectivity();
             $action([]);
             $this->setVersion('4.5.3');
+        }
+
+        if ($this->isVersion('4.5.3')) {
+            $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
+            $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
+            $service = new DeliveryExecutionStateService($options);
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            $this->setVersion('4.6.0');
         }
     }
 }

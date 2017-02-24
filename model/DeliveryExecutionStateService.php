@@ -22,15 +22,15 @@ namespace oat\taoProctoring\model;
 
 
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  * Interface DeliveryExecutionStateService
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryExecutionStateService
+interface DeliveryExecutionStateService extends StateServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/DeliveryExecutionState';
 
     /**
      * Sets a delivery execution in the awaiting state

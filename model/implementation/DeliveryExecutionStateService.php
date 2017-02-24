@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\implementation;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -30,9 +31,7 @@ use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
-
 
 /**
  * Class DeliveryExecutionStateService
@@ -48,6 +47,16 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      * @var TestSessionService
      */
     private $testSessionService;
+
+    /**
+     * @inheritdoc
+     * @param DeliveryExecution $deliveryExecution
+     * @param $state
+     */
+    public function setState(DeliveryExecutionInterface $deliveryExecution, $state)
+    {
+        $deliveryExecution->setState($state);
+    }
 
     /**
      * Sets a delivery execution in the awaiting state
