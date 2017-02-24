@@ -31,6 +31,7 @@ use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\model\ProctorService;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\scripts\install\RegisterServices;
 
 return array(
     'name' => 'taoProctoring',
@@ -66,6 +67,7 @@ return array(
             RegisterDeliveryServerService::class,
             SetupProctoringEventListeners::class,
             RegisterAuthProvider::class,
+            RegisterServices::class,
             RegisterReasonCategoryService::class
         ),
         'rdf' => array(
