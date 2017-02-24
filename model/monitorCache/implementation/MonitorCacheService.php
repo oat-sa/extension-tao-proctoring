@@ -25,11 +25,11 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoProctoring\model\monitorCache\update\DeliveryUpdate;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
@@ -48,6 +48,11 @@ class MonitorCacheService extends MonitoringStorage
     public function executionCreated(DeliveryExecutionCreated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
+        $state = \common_session_SessionManager::getSession()->getUser() instanceof GuestTestUser
+            ? DeliveryExecution::STATE_AUTHORIZED
+            : DeliveryExecution::STATE_PAUSED;
+        $deliveryExecution->setState($state);
+
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
@@ -75,8 +80,18 @@ class MonitorCacheService extends MonitoringStorage
     
     public function executionStateChanged(DeliveryExecutionState $event)
     {
-        $data = $this->getData($event->getDeliveryExecution());
+        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
+
+        $user = \common_session_SessionManager::getSession()->getUser();
+
+        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser) {
+            $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
+
+        }
+
         if ($event->getState() == DeliveryExecution::STATE_FINISHIED) {
             $data->update(
                 DeliveryMonitoringService::END_TIME,
