@@ -169,7 +169,7 @@ class AssessmentResultsService extends ConfigurableService
                     if ($category === $tag) {
                         foreach ($section->getRubricBlockRefs() as $rubric) {
                             ob_start();
-                            include $compilationDirs['private']->getPath() . '/' . basename($rubric->getHref());
+                            include $compilationDirs['private']->getPath() . '/' . ltrim($rubric->getHref(), './\\');
                             $rubrics[] = ob_get_clean();
                         }
                     }
