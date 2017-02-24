@@ -50,7 +50,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
     /**
      * @inheritdoc
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @param $state
      */
     public function setState(DeliveryExecutionInterface $deliveryExecution, $state)
