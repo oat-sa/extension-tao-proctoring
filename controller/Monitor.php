@@ -23,7 +23,6 @@ namespace oat\taoProctoring\controller;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\ProctorService;
 
 /**
@@ -56,7 +55,6 @@ class Monitor extends SimplePageModule
     public function index()
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
-        $resultService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
         $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
@@ -67,7 +65,7 @@ class Monitor extends SimplePageModule
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories(),
-            'printReportButton' => json_encode($resultService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
+            'printReportButton' => json_encode(false),
             'timeHandling' => json_encode(false),
         );
 
