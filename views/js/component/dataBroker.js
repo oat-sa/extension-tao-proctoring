@@ -23,13 +23,11 @@ define([
     'core/promise',
     'core/dataProvider/proxy',
     'core/dataProvider/proxy/ajax',
-    'core/dataProvider/proxy/htmlData',
     'core/dataProvider/dataBroker'
 ], function (_,
              Promise,
              proxyFactory,
              ajaxProxy,
-             htmlDataProxy,
              dataBrokerFactory) {
     'use strict';
 
@@ -39,26 +37,14 @@ define([
      * @param {Object} config - Some optional config entries
      * @param {String} config.scope
      * @param {middlewareHandler} [config.middlewares]
-     * @param {Object} [providers]
+     * @param {Object} [config.providers]
      * @returns {Promise}
      */
-    function proctoringDataBrokerFactory(config, providers) {
+    function proctoringDataBrokerFactory(config) {
         var initConfig = _.defaults({}, config, _defaults);
+        var providers = initConfig.providers || {};
         var dataBroker = dataBrokerFactory(initConfig);
         var initChain = [];
-
-        providers = providers || {};
-
-        if (!providers.default) {
-            if (!initConfig.scope) {
-                throw new TypeError('You must provide a CSS scope for the data broker!');
-            }
-
-            providers.default = proxyFactory('htmlData').init({
-                container: initConfig.scope,
-                eraseOnRead: true
-            });
-        }
 
         _.forEach(providers, function (provider, name) {
             if (provider instanceof Promise) {
@@ -78,7 +64,6 @@ define([
     }
 
     proxyFactory
-        .registerProvider('htmlData', htmlDataProxy)
         .registerProvider('ajax', ajaxProxy);
 
     return proctoringDataBrokerFactory;

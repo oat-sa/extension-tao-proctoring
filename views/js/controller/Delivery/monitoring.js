@@ -37,7 +37,6 @@ define([
     'taoProctoring/component/dataBroker',
     'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/extraTime/encoder',
-    'taoProctoring/component/breadcrumbs',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/monitoring',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
@@ -63,7 +62,6 @@ define([
     dataBrokerFactory,
     extraTimePopup,
     encodeExtraTime,
-    breadcrumbsFactory,
     _status,
     monitoringTpl,
     deliveryLinkTpl,
@@ -110,12 +108,11 @@ define([
         start : function start() {
             var currentRoute = urlHelper.parse(window.location.href);
             var deliveryId = decodeURIComponent(currentRoute.query.delivery);
+            var context = decodeURIComponent(currentRoute.query.context);
             var container, $content, $list;
-            var crumbs;
             var dataset;
             var extraFields;
             var categories;
-            var context;
             var defaultTag;
             var tagWaringBlock;
             var timeHandlingButton;
@@ -125,12 +122,6 @@ define([
             var actionButtons;
             var highlightRows = [];
             var actionList;
-
-            // Take care of the application controller. If the current controller is the entry point, we first
-            // need to wait for the history to dispatch the action, otherwise the controller will be called twice.
-            if (!appController.getState('dispatching')) {
-                return appController.start();
-            }
 
             container = containerFactory().changeScope(cssScope).write(monitoringTpl());
             $content = container.find('.content');
@@ -142,33 +133,33 @@ define([
             });
 
             dataBrokerFactory({
-                scope: cssScope
-            }, {
-                executions: proxyFactory('ajax').init({
-                    actions: {
-                        read: serviceUrl,
-                        authorize: {
-                            url: authorizeUrl,
-                            validate: validateParams
-                        },
-                        pause: {
-                            url: pauseUrl,
-                            validate: validateParams
-                        },
-                        terminate: {
-                            url: terminateUrl,
-                            validate: validateParams
-                        },
-                        report: {
-                            url: reportUrl,
-                            validate: validateParams
-                        },
-                        extraTime: {
-                            url: extraTimeUrl,
-                            validate: validateParams
+                providers: {
+                    executions: proxyFactory('ajax').init({
+                        actions: {
+                            read: serviceUrl,
+                            authorize: {
+                                url: authorizeUrl,
+                                validate: validateParams
+                            },
+                            pause: {
+                                url: pauseUrl,
+                                validate: validateParams
+                            },
+                            terminate: {
+                                url: terminateUrl,
+                                validate: validateParams
+                            },
+                            report: {
+                                url: reportUrl,
+                                validate: validateParams
+                            },
+                            extraTime: {
+                                url: extraTimeUrl,
+                                validate: validateParams
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }).then(function(dataBroker) {
                 // request the server with a selection of test takers
                 function request(action, selection, data, message) {
@@ -507,7 +498,6 @@ define([
                 });
 
                 return dataBroker.read('executions', {delivery : deliveryId, context: context}).then(function(data) {
-                    crumbs = data.breadcrumbs;
                     dataset = data.set;
                     extraFields = data.extrafields;
                     categories = data.categories;
@@ -516,8 +506,6 @@ define([
                     defaultTag = data.defaulttag;
                     timeHandlingButton = data.timehandling;
                     printReportButton = data.printreportbutton;
-
-                    breadcrumbsFactory(container.getElement(), crumbs);
 
                     // tool: page refresh
                     tools.push({

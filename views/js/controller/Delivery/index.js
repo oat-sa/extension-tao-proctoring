@@ -35,7 +35,6 @@ define([
     'ui/container',
     'taoProctoring/helper/status',
     'taoProctoring/component/dataBroker',
-    'taoProctoring/component/breadcrumbs',
     'tpl!taoProctoring/templates/delivery/index',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
@@ -56,7 +55,6 @@ define([
     containerFactory,
     _status,
     dataBrokerFactory,
-    breadcrumbsFactory,
     indexTpl,
     actionsTpl,
     statsTpl
@@ -151,13 +149,7 @@ define([
             var title = __("Sessions");
             var container, listBox, deliveries, categories;
 
-            // Take care of the application controller. If the current controller is the entry point, we first
-            // need to wait for the history to dispatch the action, otherwise the controller will be called twice.
-            if (!appController.getState('dispatching')) {
-                return appController.start();
-            }
-
-            container = containerFactory().changeScope(cssScope).write(indexTpl({title: title}));
+            container = containerFactory('.container').changeScope(cssScope).write(indexTpl({title: title}));
             listBox = listBoxFactory({
                 title: title,
                 textEmpty: __("No sessions available"),
@@ -181,29 +173,29 @@ define([
             });
 
             dataBrokerFactory({
-                scope: cssScope
-            }, {
-                deliveries: proxyFactory('ajax').init({
-                    actions: {
-                        read: serviceUrl
-                    }
-                }),
-                executions: proxyFactory('ajax').init({
-                    actions: {
-                        read: {
-                            url: sessionsUrl,
-                            validate: function(params) {
-                                return _.isPlainObject(params) && !_.isEmpty(params.delivery);
-                            }
-                        },
-                        pause: {
-                            url: pauseUrl,
-                            validate: function(params) {
-                                return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
+                providers: {
+                    deliveries: proxyFactory('ajax').init({
+                        actions: {
+                            read: serviceUrl
+                        }
+                    }),
+                    executions: proxyFactory('ajax').init({
+                        actions: {
+                            read: {
+                                url: sessionsUrl,
+                                validate: function(params) {
+                                    return _.isPlainObject(params) && !_.isEmpty(params.delivery);
+                                }
+                            },
+                            pause: {
+                                url: pauseUrl,
+                                validate: function(params) {
+                                    return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
+                                }
                             }
                         }
-                    }
-                })
+                    })
+                }
             }).then(function(dataBroker) {
                 // get the label of a delivery from its ID
                 function getDeliveryLabel(id) {
@@ -250,8 +242,6 @@ define([
 
                     dataBroker.read('deliveries').then(function (data) {
                         categories = data.categories;
-
-                        breadcrumbsFactory(container.getElement(), data.breadcrumbs);
 
                         deliveries = data.deliveries;
                         listBox.update(data.list);
