@@ -77,6 +77,15 @@ interface DeliveryExecutionStateService extends StateServiceInterface
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null);
 
     /**
+     * Cancel a delivery execution
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @param array $reason
+     * @return bool
+     */
+    public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null);
+
+    /**
      * Report irregularity to a delivery execution
      *
      * @todo remove this method to separate service
