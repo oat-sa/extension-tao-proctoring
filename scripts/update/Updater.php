@@ -185,6 +185,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
             $service = new DeliveryExecutionStateService($options);
             $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            OntologyUpdater::syncModels();
             $this->setVersion('4.6.0');
         }
     }
