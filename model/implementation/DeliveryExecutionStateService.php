@@ -317,13 +317,30 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 
     /**
      * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isCancelable(DeliveryExecution $deliveryExecution)
+    {
+        return $this->getTestSessionService()->getTestSession($deliveryExecution) === null;
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     * @return bool
      */
     protected function _cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        if ($session !== null) {
-            $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_CANCELED);
+        if ($session === null) {
+            $data = [
+                'reason' => $reason,
+                'timestamp' => microtime(true),
+            ];
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
+            return $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_CANCELED);
+        } else {
+            //todo throw an exception here
         }
     }
 

@@ -119,6 +119,8 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
             $this->setData('init', !!$this->getRequestParameter('init'));
             $this->setData('returnUrl', $this->getReturnUrl());
+            $this->setData('cancelUrl', _url('cancelAuthorization', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
+            $this->setData('cancelable', $deliveryExecutionStateService->isCancelable($deliveryExecution));
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
             $this->setData('showControls', true);
@@ -171,7 +173,24 @@ class DeliveryServer extends DefaultDeliveryServer
             'message' => $message
         ));
     }
-    
+
+    /**
+     * Cancel delivery authorization request.
+     */
+    public function cancelAuthorization()
+    {
+        $deliveryExecution = $this->getCurrentDeliveryExecution();
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService->cancelExecution(
+            $deliveryExecution,
+            [
+                'reasons' => ['category' => 'Examinee'],
+                'comment' => __('Assessment has been canceled'),
+            ]
+        );
+        return $this->redirect($this->getReturnUrl());
+    }
 
     protected function revoke(DeliveryExecution $deliveryExecution)
     {

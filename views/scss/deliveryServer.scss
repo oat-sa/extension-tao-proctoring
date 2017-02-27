@@ -7,7 +7,7 @@
 .awaiting-authorization {
     padding-top:40px;
     &.authorization-in-progress .listbox .list-box {
-        .text-link, .title{
+        .listbox-actions .action.play {
             color: #999;
         }
     }
@@ -28,5 +28,25 @@
     .success-message .icon-result-ok{
         margin-left: 6px;
         color : $success;
+    }
+    .listbox-actions{
+        position: absolute;
+        right: -1px;
+        bottom: -1px;
+        color: $uiClickableHoverBg;
+        outline: 0;
+        .action{
+            display: inline-block;
+            padding: 20px;
+            border-bottom: 3px solid !important;
+            height: 62px;
+            margin-left: -3px;
+            span {
+                margin-right:10px;
+            }
+            &:hover {
+                color: $info;
+            }
+        }
     }
 }
