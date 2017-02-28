@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use Doctrine\DBAL\Schema\SchemaException;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\oatbox\event\EventManager;
@@ -84,7 +85,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('3.14.0');
         }
 
-        if ($this->isBetween('3.14.0', '3.16.0')) {
+        if ($this->isBetween('3.14.0', '3.16.1')) {
             // ignore eligibility service
             
             try {
@@ -103,7 +104,7 @@ class Updater extends common_ext_ExtensionUpdater
                 foreach ($queries as $query) {
                     $persistence->exec($query);
                 }
-            } catch (SchemaException $e) {
+            } catch (SchemaException  $e) {
                         \common_Logger::i('Database Schema already up to date.');
             }
             
@@ -155,7 +156,7 @@ class Updater extends common_ext_ExtensionUpdater
             }
             $this->setVersion('4.0.0');
         }
-        
+
         $this->skip('4.0.0', '4.3.0');
 
         // fix potentially missing roles, moved from 4.1.1
@@ -180,13 +181,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.5.3');
         }
 
-        if ($this->isVersion('4.5.3')) {
+        $this->skip('4.5.3', '4.6.1');
+
+        if ($this->isVersion('4.6.1')) {
             $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
             $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
             $service = new DeliveryExecutionStateService($options);
             $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
             OntologyUpdater::syncModels();
-            $this->setVersion('4.6.0');
+            $this->setVersion('4.7.0');
         }
+    }
     }
 }
