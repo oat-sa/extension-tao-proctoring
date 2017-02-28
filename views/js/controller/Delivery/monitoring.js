@@ -24,7 +24,7 @@ define([
     'i18n',
     'core/promise',
     'core/dataProvider/proxy',
-    'core/appController',
+    'controller/app',
     'util/url',
     'layout/loading-bar',
     'core/encoder/time',
@@ -42,6 +42,7 @@ define([
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
     'ui/datatable',
+    'jqueryui',
     'select2'
 ], function (
     $,

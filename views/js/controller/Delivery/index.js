@@ -24,7 +24,7 @@ define([
     'i18n',
     'core/promise',
     'core/dataProvider/proxy',
-    'core/appController',
+    'controller/app',
     'util/url',
     'layout/loading-bar',
     'ui/listbox',
