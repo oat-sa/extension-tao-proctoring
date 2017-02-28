@@ -24,7 +24,7 @@ define([
     'i18n',
     'core/promise',
     'core/dataProvider/proxy',
-    'core/app',
+    'core/appController',
     'util/url',
     'layout/loading-bar',
     'ui/listbox',
@@ -172,30 +172,28 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory({
-                providers: {
-                    deliveries: proxyFactory('ajax').init({
-                        actions: {
-                            read: serviceUrl
-                        }
-                    }),
-                    executions: proxyFactory('ajax').init({
-                        actions: {
-                            read: {
-                                url: sessionsUrl,
-                                validate: function(params) {
-                                    return _.isPlainObject(params) && !_.isEmpty(params.delivery);
-                                }
-                            },
-                            pause: {
-                                url: pauseUrl,
-                                validate: function(params) {
-                                    return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
-                                }
+            dataBrokerFactory().loadProviders({
+                deliveries: proxyFactory('ajax').init({
+                    actions: {
+                        read: serviceUrl
+                    }
+                }),
+                executions: proxyFactory('ajax').init({
+                    actions: {
+                        read: {
+                            url: sessionsUrl,
+                            validate: function(params) {
+                                return _.isPlainObject(params) && !_.isEmpty(params.delivery);
+                            }
+                        },
+                        pause: {
+                            url: pauseUrl,
+                            validate: function(params) {
+                                return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
                             }
                         }
-                    })
-                }
+                    }
+                })
             }).then(function(dataBroker) {
                 // get the label of a delivery from its ID
                 function getDeliveryLabel(id) {
@@ -240,7 +238,7 @@ define([
                     loadingBar.start();
                     listBox.setLoading(true);
 
-                    dataBroker.read('deliveries').then(function (data) {
+                    dataBroker.readProvider('deliveries').then(function (data) {
                         categories = data.categories;
 
                         deliveries = data.deliveries;

@@ -24,7 +24,7 @@ define([
     'i18n',
     'core/promise',
     'core/dataProvider/proxy',
-    'core/app',
+    'core/appController',
     'util/url',
     'layout/loading-bar',
     'core/encoder/time',
@@ -132,34 +132,32 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory({
-                providers: {
-                    executions: proxyFactory('ajax').init({
-                        actions: {
-                            read: serviceUrl,
-                            authorize: {
-                                url: authorizeUrl,
-                                validate: validateParams
-                            },
-                            pause: {
-                                url: pauseUrl,
-                                validate: validateParams
-                            },
-                            terminate: {
-                                url: terminateUrl,
-                                validate: validateParams
-                            },
-                            report: {
-                                url: reportUrl,
-                                validate: validateParams
-                            },
-                            extraTime: {
-                                url: extraTimeUrl,
-                                validate: validateParams
-                            }
+            dataBrokerFactory().loadProviders({
+                executions: proxyFactory('ajax').init({
+                    actions: {
+                        read: serviceUrl,
+                        authorize: {
+                            url: authorizeUrl,
+                            validate: validateParams
+                        },
+                        pause: {
+                            url: pauseUrl,
+                            validate: validateParams
+                        },
+                        terminate: {
+                            url: terminateUrl,
+                            validate: validateParams
+                        },
+                        report: {
+                            url: reportUrl,
+                            validate: validateParams
+                        },
+                        extraTime: {
+                            url: extraTimeUrl,
+                            validate: validateParams
                         }
-                    })
-                }
+                    }
+                })
             }).then(function(dataBroker) {
                 // request the server with a selection of test takers
                 function request(action, selection, data, message) {
@@ -497,7 +495,7 @@ define([
                     dataBroker.destroy();
                 });
 
-                return dataBroker.read('executions', {delivery : deliveryId, context: context}).then(function(data) {
+                return dataBroker.readProvider('executions', {delivery : deliveryId, context: context}).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
                     categories = data.categories;
