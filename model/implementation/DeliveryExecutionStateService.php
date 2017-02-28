@@ -20,10 +20,8 @@
 
 namespace oat\taoProctoring\model\implementation;
 
-use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
-use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -32,14 +30,14 @@ use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState as DeliveryExecutionStateEvent;
+use oat\taoDelivery\model\execution\AbstractStateService;
 
 /**
  * Class DeliveryExecutionStateService
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryExecutionStateService extends ConfigurableService implements \oat\taoProctoring\model\DeliveryExecutionStateService
+class DeliveryExecutionStateService extends AbstractStateService
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
@@ -50,96 +48,25 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     private $testSessionService;
 
     /**
-     * @inheritdoc
-     * @param DeliveryExecutionInterface $deliveryExecution
-     * @param $state
-     */
-    public function setState(DeliveryExecutionInterface $deliveryExecution, $state, $reason = null, $testCenter = null)
-    {
-        if ($deliveryExecution->getState()->getUri() === $state) {
-            \common_Logger::w('Delivery execution ' . $deliveryExecution->getIdentifier() . ' already in state ' . $state);
-            return false;
-        }
-        $result = false;
-        //make sure that $deliveryExecution is \oat\taoDelivery\models\classes\execution\DeliveryExecution instance
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecution->getIdentifier());
-
-        $prevState = $deliveryExecution->getState();
-
-        switch ($state) {
-            case ProctoredDeliveryExecution::STATE_ACTIVE:
-                $result = $this->_resumeExecution($deliveryExecution, $reason, $testCenter);
-                break;
-            case ProctoredDeliveryExecution::STATE_AUTHORIZED:
-                $result = $this->_authoriseExecution($deliveryExecution, $reason, $testCenter);
-                break;
-            case ProctoredDeliveryExecution::STATE_AWAITING:
-                $result = $this->_waitExecution($deliveryExecution, $reason, $testCenter);
-                break;
-            case ProctoredDeliveryExecution::STATE_CANCELED:
-                $result = $this->_cancelExecution($deliveryExecution, $reason, $testCenter);
-                break;
-            case ProctoredDeliveryExecution::STATE_FINISHED:
-                $result = $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_FINISHED);
-                break;
-            case ProctoredDeliveryExecution::STATE_PAUSED:
-                $result = $this->_pauseExecution($deliveryExecution, $reason, $testCenter);
-                break;
-            case ProctoredDeliveryExecution::STATE_TERMINATED:
-                $result = $this->_terminateExecution($deliveryExecution, $reason, $testCenter);
-                break;
-        }
-
-        $event = new DeliveryExecutionStateEvent($deliveryExecution, $state, $prevState->getUri());
-        $this->getServiceManager()->get(EventManager::SERVICE_ID)->trigger($event);
-        \common_Logger::i("DeliveryExecutionState Event triggered.");
-
-        return $result;
-
-    }
-
-    /**
-     * Sets a delivery execution in the awaiting state
-     *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AWAITING);
-    }
-
-    /**
-     * @param DeliveryExecution $deliveryExecution
-     * @return bool
-     */
-    protected function _waitExecution(DeliveryExecution $deliveryExecution)
-    {
         $executionState = $deliveryExecution->getState()->getUri();
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
-            $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_AWAITING);
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AWAITING);
             return true;
         }
         return false;
     }
 
     /**
-     * Sets a delivery execution in the in progress state
-     *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
-    {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
-    }
-
-    /**
-     * @param DeliveryExecution $deliveryExecution
-     * @return bool
-     */
-    protected function _resumeExecution(DeliveryExecution $deliveryExecution)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $logData = [
@@ -157,24 +84,12 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
         } else {
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RUN', $logData);
         }
-        $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
+
+        $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
 
         $result = true;
 
         return $result;
-    }
-
-    /**
-     * Authorises a delivery execution
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
-     * @param string $testCenter test center uri
-     * @return bool
-     */
-    public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
-    {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AUTHORIZED, $reason, $testCenter);
     }
 
     /**
@@ -183,7 +98,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      * @param null $testCenter
      * @return bool
      */
-    protected function _authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
+    public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
@@ -203,7 +118,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
             $logData['context'] = $this->getProgress($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
-            $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_AUTHORIZED);
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AUTHORIZED);
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $eventManager->trigger(new AuthorizationGranted($deliveryExecution, $proctor));
             $result = true;
@@ -213,23 +128,11 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     }
 
     /**
-     * Terminates a delivery execution
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
-     * @return bool
-     */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
-    {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED, $reason);
-    }
-
-    /**
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
      */
-    protected function _terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
@@ -239,7 +142,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
 
-            $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_TERMINATED);
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             if ($session) {
@@ -262,23 +165,11 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     }
 
     /**
-     * Pauses a delivery execution
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
-     * @return bool
-     */
-    public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
-    {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED, $reason);
-    }
-
-    /**
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
      */
-    protected function _pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
@@ -297,7 +188,7 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
                 $this->getTestSessionService()->persist($session);
             } else {
                 $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
-                $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+                $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             }
             $result = true;
         }
@@ -310,9 +201,28 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
      * @param null $reason
      * @return bool
      */
+    public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @param null $reason
+     */
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED, $reason);
+        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($session === null) {
+            $data = [
+                'reason' => $reason,
+                'timestamp' => microtime(true),
+            ];
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
+            return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
+        } else {
+            //todo throw an exception here
+        }
     }
 
     /**
@@ -322,26 +232,6 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     public function isCancelable(DeliveryExecution $deliveryExecution)
     {
         return $this->getTestSessionService()->getTestSession($deliveryExecution) === null;
-    }
-
-    /**
-     * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
-     * @return bool
-     */
-    protected function _cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
-    {
-        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        if ($session === null) {
-            $data = [
-                'reason' => $reason,
-                'timestamp' => microtime(true),
-            ];
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
-            return $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_CANCELED);
-        } else {
-            //todo throw an exception here
-        }
     }
 
     /**
@@ -362,6 +252,41 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             'context' => $this->getProgress($deliveryExecution)
         ];
         return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function legacyTransition(DeliveryExecution $deliveryExecution, $state, $reason = null, $testCenter = null)
+    {
+        switch ($state) {
+            case ProctoredDeliveryExecution::STATE_ACTIVE:
+                $result = $this->resumeExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_AUTHORIZED:
+                $result = $this->authoriseExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_AWAITING:
+                $result = $this->waitExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_CANCELED:
+                $result = $this->cancelExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_FINISHED:
+                $result = $this->finishExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_PAUSED:
+                $result = $this->pauseExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            case ProctoredDeliveryExecution::STATE_TERMINATED:
+                $result = $this->terminateExecution($deliveryExecution, $reason, $testCenter);
+                break;
+            default:
+                $this->logWarning('Unrecognised state '.$state);
+                $result = $this->setState($deliveryExecution, $state);
+        }
+
+        return $result;
     }
 
     /**
