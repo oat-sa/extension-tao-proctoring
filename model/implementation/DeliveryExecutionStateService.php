@@ -37,7 +37,7 @@ use oat\taoDelivery\model\execution\AbstractStateService;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryExecutionStateService extends AbstractStateService
+class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
@@ -94,8 +94,8 @@ class DeliveryExecutionStateService extends AbstractStateService
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
-     * @param null $testCenter
+     * @param array $reason
+     * @param string $testCenter test center uri
      * @return bool
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
@@ -128,6 +128,8 @@ class DeliveryExecutionStateService extends AbstractStateService
     }
 
     /**
+     * Terminates a delivery execution
+     *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
@@ -165,6 +167,8 @@ class DeliveryExecutionStateService extends AbstractStateService
     }
 
     /**
+     * Pauses a delivery execution
+     *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
@@ -209,6 +213,7 @@ class DeliveryExecutionStateService extends AbstractStateService
     /**
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     * @return bool
      */
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
