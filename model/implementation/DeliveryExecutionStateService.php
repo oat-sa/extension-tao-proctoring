@@ -37,7 +37,7 @@ use oat\taoDelivery\model\execution\AbstractStateService;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryExecutionStateService extends AbstractStateService
+class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
@@ -94,8 +94,8 @@ class DeliveryExecutionStateService extends AbstractStateService
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
-     * @param null $testCenter
+     * @param array $reason
+     * @param string $testCenter test center uri
      * @return bool
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
@@ -128,8 +128,10 @@ class DeliveryExecutionStateService extends AbstractStateService
     }
 
     /**
+     * Terminates a delivery execution
+     *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
@@ -165,8 +167,10 @@ class DeliveryExecutionStateService extends AbstractStateService
     }
 
     /**
+     * Pauses a delivery execution
+     *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
@@ -209,12 +213,13 @@ class DeliveryExecutionStateService extends AbstractStateService
     /**
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     * @return bool
      */
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         if ($session !== null) {
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
+            return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         }
     }
 
