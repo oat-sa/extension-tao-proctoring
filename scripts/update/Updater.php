@@ -190,5 +190,14 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('4.7.0');
         }
+
+        if ($this->isVersion('4.7.0')) {
+            /** @var DeliveryExecutionStateService $service */
+            $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $service->setOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY, 'PT30M');
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            OntologyUpdater::syncModels();
+            $this->setVersion('4.8.0');
+        }
     }
 }

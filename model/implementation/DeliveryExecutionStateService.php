@@ -40,6 +40,10 @@ use oat\taoDelivery\model\execution\AbstractStateService;
 class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
+    /**
+     * @var string lifetime delivery executions in awaiting state
+     */
+    const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
     const OPTION_TIME_HANDLING = 'time_handling';
     
     /**
