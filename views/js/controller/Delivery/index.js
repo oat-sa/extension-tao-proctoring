@@ -172,7 +172,12 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory().loadProviders({
+            dataBrokerFactory().on('error', function(err) {
+                if (err.code === 403) {
+                    //we just leave if any 403 occurs
+                    window.location.reload(true);
+                }
+            }).loadProviders({
                 deliveries: proxyFactory('ajax').init({
                     actions: {
                         read: serviceUrl
