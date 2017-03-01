@@ -22,7 +22,6 @@
 namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionUpdater;
-use Doctrine\DBAL\Schema\SchemaException;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\oatbox\event\EventManager;
