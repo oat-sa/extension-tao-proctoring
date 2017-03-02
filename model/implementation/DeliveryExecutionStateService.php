@@ -80,14 +80,15 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
             'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
             'os_name' => OSService::singleton()->getClientName(),
             'os_version' => OSService::singleton()->getClientVersion(),
-            'timestamp' => microtime(true),
         ];
 
         if ($session) {
             $session->resume();
             $this->getTestSessionService()->persist($session);
+            $logData['timestamp'] = microtime(true);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RESUME', $logData);
         } else {
+            $logData['timestamp'] = microtime(true);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RUN', $logData);
         }
         $deliveryExecution->setState(ProctoredDeliveryExecution::STATE_ACTIVE);
