@@ -343,7 +343,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     public static function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
-        $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        $service->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)
