@@ -111,8 +111,8 @@ define([
             var $content = container.find('.content');
             var $list = container.find('.list');
             var currentRoute = urlHelper.parse(window.location.href);
-            var deliveryId = decodeURIComponent(currentRoute.query.delivery);
-            var context = decodeURIComponent(currentRoute.query.context);
+            var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
+            var context = currentRoute.query.context && decodeURIComponent(currentRoute.query.context);
             var dataset;
             var extraFields;
             var categories;
@@ -125,6 +125,7 @@ define([
             var actionButtons;
             var highlightRows = [];
             var actionList;
+            var serviceParams = {};
 
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('change.deliveryMonitoring');
@@ -165,13 +166,19 @@ define([
             }).then(function(dataBroker) {
                 // request the server with a selection of test takers
                 function request(action, selection, data, message) {
+                    var params;
                     if (selection && selection.length) {
                         loadingBar.start();
 
-                        dataBroker.getProvider('executions').action(action, _.merge({
-                            delivery : deliveryId,
+                        params = _.merge({
                             execution: selection
-                        }, data))
+                        }, data);
+
+                        if (deliveryId) {
+                            params.delivery = deliveryId;
+                        }
+
+                        dataBroker.getProvider('executions').action(action, params)
                             .then(function() {
                                 if (message) {
                                     feedback().success(message);
@@ -499,15 +506,29 @@ define([
                     dataBroker.destroy();
                 });
 
-                return dataBroker.readProvider('executions', {delivery : deliveryId, context: context}).then(function(data) {
+                if (deliveryId) {
+                    serviceParams.delivery = deliveryId;
+                }
+                if (context) {
+                    serviceParams.context = context;
+                }
+
+                return dataBroker.readProvider('executions', serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
                     categories = data.categories;
-                    deliveryId = data.delivery;
-                    context = data.context;
+                    deliveryId = data.delivery || deliveryId;
+                    context = data.context || context;
                     defaultTag = data.defaulttag;
                     timeHandlingButton = data.timehandling;
                     printReportButton = data.printreportbutton;
+
+                    if (deliveryId) {
+                        serviceParams.delivery = deliveryId;
+                    }
+                    if (context) {
+                        serviceParams.context = context;
+                    }
 
                     // tool: page refresh
                     tools.push({
@@ -924,7 +945,7 @@ define([
                             });
                         })
                         .datatable({
-                            url: urlHelper.build(executionsUrl, {delivery : deliveryId, context: context}),
+                            url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
                                 empty: __('No sessions'),
                                 available: __('Current sessions'),
