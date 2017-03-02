@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use Doctrine\DBAL\Schema\SchemaException;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\entryPoint\EntryPointService;
 use oat\oatbox\event\EventManager;
@@ -181,9 +182,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.5.3');
         }
 
-        $this->skip('4.5.3', '4.6.1');
+        $this->skip('4.5.3', '4.6.2');
 
-        if ($this->isVersion('4.6.1')) {
+         if ($this->isVersion('4.6.2')) {
             $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
             $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
             $service = new DeliveryExecutionStateService($options);
