@@ -145,7 +145,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Terminates a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
