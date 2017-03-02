@@ -188,7 +188,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
-        return $this->pauseExecution($deliveryExecution, $reason);
+        return $this->pause($deliveryExecution, $reason);
     }
 
     /**
