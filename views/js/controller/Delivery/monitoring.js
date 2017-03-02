@@ -107,10 +107,12 @@ define([
          * Entry point of the page
          */
         start : function start() {
+            var container = containerFactory().changeScope(cssScope).write(monitoringTpl());
+            var $content = container.find('.content');
+            var $list = container.find('.list');
             var currentRoute = urlHelper.parse(window.location.href);
             var deliveryId = decodeURIComponent(currentRoute.query.delivery);
             var context = decodeURIComponent(currentRoute.query.context);
-            var container, $content, $list;
             var dataset;
             var extraFields;
             var categories;
@@ -123,10 +125,6 @@ define([
             var actionButtons;
             var highlightRows = [];
             var actionList;
-
-            container = containerFactory().changeScope(cssScope).write(monitoringTpl());
-            $content = container.find('.content');
-            $list = container.find('.list');
 
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('change.deliveryMonitoring');
@@ -271,7 +269,7 @@ define([
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;
                     }
-                    window.location.href = urlHelper.route('sessionHistory', 'Reporting', 'taoProctoring', urlParams);
+                    appController.getRouter().redirect(urlHelper.route('index', 'Reporting', 'taoProctoring', urlParams));
                 }
 
                 // print the score reports

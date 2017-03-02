@@ -147,10 +147,9 @@ define([
          */
         start: function start() {
             var title = __("Sessions");
-            var container, listBox, deliveries, categories;
-
-            container = containerFactory('.container').changeScope(cssScope).write(indexTpl({title: title}));
-            listBox = listBoxFactory({
+            var deliveries, categories;
+            var container = containerFactory('.container').changeScope(cssScope).write(indexTpl({title: title}));
+            var listBox = listBoxFactory({
                 title: title,
                 textEmpty: __("No sessions available"),
                 textNumber: __("Available"),

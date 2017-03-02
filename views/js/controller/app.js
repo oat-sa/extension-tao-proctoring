@@ -21,9 +21,57 @@
 define([
     'jquery',
     'lodash',
-    'controller/app'
-], function ($, _, appController) {
+    'controller/app',
+    'core/dataProvider/request',
+    'ui/container',
+    'ui/breadcrumbs',
+    'util/url'
+], function ($, _, appController, request, containerFactory, breadcrumbsFactory, urlHelper) {
     'use strict';
+
+    var breadcrumbsUrl = urlHelper.route('load', 'Breadcrumbs', 'taoProctoring');
+    var indexUrl = urlHelper.route('index', 'DeliverySelection', 'taoProctoring');
+    var monitorUrl = urlHelper.route('index', 'Monitor', 'taoProctoring');
+    var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+    var knownRoutes = [{
+        url: indexUrl,
+        params: []
+    }, {
+        url: monitorUrl,
+        params: ['delivery']
+    }, {
+        url: historyUrl,
+        params: ['delivery', 'session']
+    }];
+
+    /**
+     * Gets the list of routes that lead to the provided route
+     * @param {String} route
+     * @returns {String[]}
+     */
+    function getRoutes(route) {
+        var routes = [];
+        var parsed = urlHelper.parse(route);
+
+        _.forEach(knownRoutes, function (knownRoute) {
+            var url = urlHelper.parse(knownRoute.url);
+            var params = {};
+
+            if (parsed.path === url.path) {
+                routes.push(route);
+                return false;
+            }
+
+            _.forEach(knownRoute.params, function (param) {
+                if (parsed.query[param]) {
+                    params[param] = decodeURIComponent(parsed.query[param]);
+                }
+            });
+
+            routes.push(urlHelper.build(knownRoute.url, params));
+        });
+        return routes;
+    }
 
     /**
      * The app controller takes care of the application navigation and routing.
@@ -32,8 +80,23 @@ define([
         /**
          * App controller entry point: set up the router.
          */
-        start: function start(){
-            appController.start();
+        start: function start() {
+            var toolbox = containerFactory('.header');
+            var breadcrumbs = breadcrumbsFactory({
+                renderTo: toolbox.getElement(),
+                replace: true,
+                cls: 'action-bar horizontal-action-bar'
+            });
+
+            appController
+                .on('change.breadcrumbs', function (route) {
+                    var routes = getRoutes(route);
+                    request(breadcrumbsUrl, {route: routes}, 'POST').then(function (data) {
+                        breadcrumbs.update(data);
+                    });
+                })
+                .apply('a', toolbox.getElement())
+                .start();
         }
     }, appController);
 });
