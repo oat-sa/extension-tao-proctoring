@@ -46,8 +46,8 @@ class ReportingService extends ConfigurableService implements Breadcrumbs
     {
         if (isset($parsedRoute['action'])) {
             switch ($parsedRoute['action']) {
-                case 'sessionHistory':
-                    return $this->breadcrumbsSessionHistory($route, $parsedRoute);
+                case 'index':
+                    return $this->breadcrumbsIndex($route, $parsedRoute);
             }
         }
         return null;
@@ -59,7 +59,7 @@ class ReportingService extends ConfigurableService implements Breadcrumbs
      * @param array $parsedRoute
      * @return array
      */
-    protected function breadcrumbsSessionHistory($route, $parsedRoute) {
+    protected function breadcrumbsIndex($route, $parsedRoute) {
         $urlContext = [];
         if (isset($parsedRoute['params'])) {
             if (isset($parsedRoute['params']['session'])) {

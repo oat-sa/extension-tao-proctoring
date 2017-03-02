@@ -1,7 +1,7 @@
 define({
     'Reporting' : {
         'actions' : {
-            'sessionHistory' : 'controller/Reporting/history'
+            'index' : 'controller/Reporting/history'
         }
     },
     'Irregularity' : {

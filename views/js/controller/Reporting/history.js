@@ -22,14 +22,32 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'helpers',
+    'util/url',
+    'controller/app',
+    'core/dataProvider/proxy',
     'layout/loading-bar',
+    'ui/container',
     'util/encode',
+    'taoProctoring/component/dataBroker',
     'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
-    'taoProctoring/component/breadcrumbs',
+    'tpl!taoProctoring/templates/reporting/index',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, dateRangeFactory, historyTableFactory, breadcrumbsFactory) {
+], function (
+    $,
+    _,
+    __,
+    urlHelper,
+    appController,
+    proxyFactory,
+    loadingBar,
+    containerFactory,
+    encode,
+    dataBrokerFactory,
+    dateRangeFactory,
+    historyTableFactory,
+    indexTpl
+) {
     'use strict';
 
     /**
@@ -38,72 +56,99 @@ define([
      */
     var cssScope = '.session-history';
 
+    var serviceUrl = urlHelper.route('sessionHistory', 'Reporting', 'taoProctoring');
+    var sessionsUrl = urlHelper.route('history', 'Reporting', 'taoProctoring');
+
+    // the page is always loading data when starting
+    loadingBar.start();
+
     /**
      * Controls the taoProctoring session history page
      *
      * @type {Object}
      */
-    var taoProctoringReportCtlr = {
+    return {
         /**
          * Entry point of the page
          */
         start : function start() {
-            var $container = $(cssScope);
-            var dataset = $container.data('set');
-            var testCenterId = $container.data('testcenter');
-            var deliveryId = $container.data('delivery');
-            var sessions = $container.data('sessions');
-            var sortBy = $container.data('sortBy');
-            var sortOrder = $container.data('sortorder');
-            var periodStart = $container.data('periodstart');
-            var periodEnd = $container.data('periodEnd');
-            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {delivery : deliveryId, session: sessions});
-            var detailedHistory = false;
+            var container = containerFactory().changeScope(cssScope).write(indexTpl());
+            var currentRoute = urlHelper.parse(window.location.href);
+            var deliveryId = decodeURIComponent(currentRoute.query.delivery);
+            var sessions = decodeURIComponent(currentRoute.query.session).split(',');
 
-            var historyTable = historyTableFactory({
-                    tools: [{
-                        id: 'show-detailed-report',
-                        icon: 'insert-horizontal-line',
-                        title: __('Show detailed session history messages'),
-                        label: __('Show detailed report'),
-                        action: function() {
-                            var tool = historyTable.config.tools.find(function (val) {return val.id === 'show-detailed-report'});
+            appController.on('change.history', function() {
+                appController.off('change.history');
+                container.destroy();
+            });
 
-                            historyTable.config.params.detailed = detailedHistory = !detailedHistory;
-                            tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
-                            historyTable.refresh();
-                        }
-                    }],
-                    params: {detailed: detailedHistory},
-                    service: serviceUrl,
-                    sortBy: sortBy,
-                    sortOrder: sortOrder
-                }, dataset)
-                .on('loading', function() {
-                    loadingBar.start();
+            dataBrokerFactory().on('error', function(err) {
+                if (err.code === 403) {
+                    //we just leave if any 403 occurs
+                    window.location.reload(true);
+                }
+            }).loadProviders({
+                service: proxyFactory('ajax').init({
+                    actions: {
+                        read: serviceUrl
+                    }
+                }),
+                sessions: proxyFactory('ajax').init({
+                    actions: {
+                        read: sessionsUrl
+                    }
                 })
-                .on('loaded', function() {
-                    loadingBar.stop();
-                })
-                .render($container.find('.list'));
-
-            breadcrumbsFactory($container, $container.data('breadcrumbs'));
-
-            dateRangeFactory({
-                start : periodStart,
-                end : periodEnd,
-                renderTo: $container.find('.panel')
-            }).on('change submit', function() {
-                historyTable.refresh({
-                    periodStart : this.getStart(),
-                    periodEnd : this.getEnd()
+            }).then(function(dataBroker) {
+                appController.on('change.history', function() {
+                    dataBroker.destroy();
                 });
+
+                return dataBroker.readProvider('service', {delivery : deliveryId, session: sessions}).then(function(data) {
+                    var detailedHistory = data.detailedHistory;
+                    var historyTable = historyTableFactory({
+                        tools: [{
+                            id: 'show-detailed-report',
+                            icon: 'insert-horizontal-line',
+                            title: __('Show detailed session history messages'),
+                            label: __('Show detailed report'),
+                            action: function() {
+                                var tool = historyTable.config.tools.find(function (val) {
+                                    return val.id === 'show-detailed-report';
+                                });
+
+                                historyTable.config.params.detailed = detailedHistory = !detailedHistory;
+                                tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
+                                historyTable.refresh();
+                            }
+                        }],
+                        params: {detailed: detailedHistory, delivery : deliveryId, session: sessions},
+                        service: sessionsUrl,
+                        sortBy: data.sortBy,
+                        sortOrder: data.sortOrder
+                    }, data.set)
+                        .on('loading', function() {
+                            loadingBar.start();
+                        })
+                        .on('loaded', function() {
+                            loadingBar.stop();
+                        })
+                        .render(container.find('.list'));
+
+                    dateRangeFactory({
+                        start : data.periodStart,
+                        end : data.periodEnd,
+                        renderTo: container.find('.panel')
+                    }).on('change submit', function() {
+                        historyTable.refresh({
+                            periodStart : this.getStart(),
+                            periodEnd : this.getEnd()
+                        });
+                    });
+                });
+            }).catch(function(err) {
+                appController.onError(err);
+                loadingBar.stop();
             });
         }
     };
-
-    // the page is always loading data when starting
-    loadingBar.start();
-
-    return taoProctoringReportCtlr;
 });
