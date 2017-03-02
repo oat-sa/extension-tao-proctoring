@@ -47,6 +47,7 @@ use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
 use oat\taoProctoring\scripts\update\UpdateLastConnectivity;
 use \oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use \oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  *
@@ -186,7 +187,7 @@ class Updater extends common_ext_ExtensionUpdater
             $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
             $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
             $service = new DeliveryExecutionStateService($options);
-            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            $this->getServiceManager()->register(StateServiceInterface::SERVICE_ID, $service);
             OntologyUpdater::syncModels();
             $this->setVersion('4.7.0');
         }
