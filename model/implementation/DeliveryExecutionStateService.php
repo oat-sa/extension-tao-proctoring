@@ -184,7 +184,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Alias for self::pause() (for backward capability).
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
