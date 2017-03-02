@@ -31,7 +31,7 @@ use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
-
+use oat\oatbox\log\LoggerAwareTrait;
 /**
  * Class DeliveryExecutionStateService
  * @package oat\taoProctoring\model
@@ -41,7 +41,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
-    
+
+    use LoggerAwareTrait;
+
     /**
      * @var TestSessionService
      */
@@ -254,9 +256,26 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        if ($session !== null) {
+        if ($session === null) {
+            $data = [
+                'reason' => $reason,
+                'timestamp' => microtime(true),
+            ];
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
             return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
+        } else {
+            $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
+            return false;
         }
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isCancelable(DeliveryExecution $deliveryExecution)
+    {
+        return $this->getTestSessionService()->getTestSession($deliveryExecution) === null;
     }
 
     /**
@@ -360,7 +379,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     public static function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
-        $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        $service->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)

@@ -23,7 +23,8 @@ define(['lodash', 'i18n'], function(_, __){
         _inprogress = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
         _paused = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
         _completed = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
-        _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
+        _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
+        _canceled = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled';
 
     var _status = {
         awaiting : {
@@ -95,6 +96,18 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : __('is terminated'),
                 report : true,
                 print: true,
+                time : true
+            }
+        },
+        canceled : {
+            code : _canceled,
+            label : __('Canceled'),
+            can : {
+                authorize : __('is canceled'),
+                pause : __('is canceled'),
+                terminate : __('is canceled'),
+                report : true,
+                print: __('is canceled'),
                 time : true
             }
         }
