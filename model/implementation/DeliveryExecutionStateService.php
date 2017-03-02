@@ -63,10 +63,21 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
+     * Alias for self::run() (for backward capability).
+     *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
+    {
+        $this->run($deliveryExecution);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function run(DeliveryExecution $deliveryExecution)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $logData = [
@@ -167,13 +178,25 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
-     * Pauses a delivery execution
+     * Alias for self::pause() (for backward capability).
      *
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        return $this->pauseExecution($deliveryExecution, $reason);
+    }
+
+    /**
+     * Pauses a delivery execution
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @param array $reason
+     * @return bool
+     */
+    public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
@@ -201,11 +224,23 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
+     * Alias for self::finish() (for backward capability).
+     *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
      */
     public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        return $this->finish($deliveryExecution, $reason);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @param null $reason
+     * @return bool
+     */
+    public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
         return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
     }
