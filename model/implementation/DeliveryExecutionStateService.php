@@ -159,19 +159,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            $logData = [
+                'reason' => $reason,
+                'timestamp' => microtime(true)
+            ];
             if ($session) {
-                $data = [
-                    'reason' => $reason,
-                    'timestamp' => microtime(true),
-                    'itemId' => $this->getCurrentItemId($deliveryExecution),
-                    'context' => $this->getProgress($deliveryExecution)
-                ];
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $data);
+                $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
+                $logData['context'] = $this->getProgress($deliveryExecution);
                 if ($session->isRunning()) {
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
             }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
 
