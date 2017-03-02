@@ -86,7 +86,10 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
             );
             if ($testSessionService->isExpired($deliveryExecution)) {
                 try {
-                    $deliveryExecutionStateService->cancelExecution($deliveryExecution);
+                    $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
+                        'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
+                        'comment' => __('Automatically reset by system due to authorized test not being launched by test taker.'),
+                    ]);
                     $count++;
                 } catch (\Exception $e) {
                     $this->addReport(Report::TYPE_ERROR, $e->getMessage());
