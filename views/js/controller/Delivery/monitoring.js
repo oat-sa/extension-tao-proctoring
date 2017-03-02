@@ -356,7 +356,6 @@ define([
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 var config;
 
-
                 config = _.merge(listSessions(actionName, _selection), {
                     renderTo : $content,
                     actionName : actionTitle,

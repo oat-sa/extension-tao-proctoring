@@ -86,6 +86,14 @@ interface DeliveryExecutionStateService extends StateServiceInterface
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null);
 
     /**
+     * Whether delivery execution can be canceled or not
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isCancelable(DeliveryExecution $deliveryExecution);
+
+    /**
      * Report irregularity to a delivery execution
      *
      * @todo remove this method to separate service
