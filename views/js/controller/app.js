@@ -19,14 +19,13 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'jquery',
     'lodash',
     'controller/app',
     'core/dataProvider/request',
     'ui/container',
     'ui/breadcrumbs',
     'util/url'
-], function ($, _, appController, request, containerFactory, breadcrumbsFactory, urlHelper) {
+], function (_, appController, request, containerFactory, breadcrumbsFactory, urlHelper) {
     'use strict';
 
     var breadcrumbsUrl = urlHelper.route('load', 'Breadcrumbs', 'taoProctoring');
