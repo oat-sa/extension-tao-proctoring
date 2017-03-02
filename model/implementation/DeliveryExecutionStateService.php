@@ -31,7 +31,7 @@ use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
-
+use oat\oatbox\log\LoggerAwareTrait;
 /**
  * Class DeliveryExecutionStateService
  * @package oat\taoProctoring\model
@@ -41,7 +41,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
-    
+
+    use LoggerAwareTrait;
+
     /**
      * @var TestSessionService
      */
@@ -226,7 +228,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
             return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
-            //todo throw an exception here
+            $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
+            return false;
         }
     }
 
