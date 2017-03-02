@@ -818,7 +818,7 @@ define([
 
                     // column: connectivity status of execution progress
                     model.push({
-                        id: 'connectivity',
+                        id: 'last_connect',
                         sortable: true,
                         label: __('Connectivity'),
                         transform: function(value, row) {

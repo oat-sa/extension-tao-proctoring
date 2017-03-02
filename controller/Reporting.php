@@ -20,12 +20,14 @@
 
 namespace oat\taoProctoring\controller;
 
-use oat\oatbox\service\ServiceNotFoundException;
-use oat\oatbox\service\ServiceManager;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoProctoring\model\TestSessionHistoryService;
+use oat\oatbox\service\ServiceManager;
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DataTableHelper;
+use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\model\TestSessionHistoryService;
 
 /**
  * Proctoring Reporting controllers for the assessment activity reporting screen.
@@ -45,7 +47,9 @@ class Reporting extends SimplePageModule
      */
     protected function getViewData()
     {
-        $delivery       = $this->getResource($this->getRequestParameter('delivery'));
+        $delivery       = $this->hasRequestParameter('delivery')
+            ? $this->getResource($this->getRequestParameter('delivery'))
+            : null;
         $sessions       = $this->getRequestParameter('session');
         $requestOptions = $this->getRequestOptions([
             'sortby'      => 'timestamp',
@@ -117,10 +121,10 @@ class Reporting extends SimplePageModule
     public function history()
     {
         try {
-            $sessions       = $this->getRequestParameter('session');
+            $sessions = $this->getRequestParameter('session');
             $requestOptions = $this->getRequestOptions([
-                'sortby'      => 'timestamp',
-                'sortorder'   => 'desc',
+                'sortby' => 'timestamp',
+                'sortorder' => 'desc',
                 'periodStart' => '',
                 'periodEnd' => '',
             ]);
@@ -154,12 +158,13 @@ class Reporting extends SimplePageModule
         }
         $result = [];
 
-        $deliveryService = ServiceManager::getServiceManager()->get('taoProctoring/delivery');
+        /** @var ProctorService $deliveryService */
+        $deliveryService = ServiceManager::getServiceManager()->get(ProctorService::SERVICE_ID);
         $currentUser = \common_session_SessionManager::getSession()->getUser();
         $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
 
-        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+        /** @var $assessmentResultsService AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
 
         foreach ($idList as $deliveryExecutionId) {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
@@ -203,12 +208,13 @@ class Reporting extends SimplePageModule
         }
         $result = [];
 
-        /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
-        $assessmentResultsService = $this->getServiceManager()->get('taoProctoring/AssessmentResults');
+        /** @var $assessmentResultsService AssessmentResultsService */
+        $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
 
         foreach ($idList as $deliveryExecutionId) {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
             $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
+
             if (!$deliveryData['end']) {
                 continue;
             }
@@ -223,14 +229,5 @@ class Reporting extends SimplePageModule
         $this->setData('rubrics', $result);
         $this->setData('content-template', 'Reporting/print_rubric.tpl');
         $this->setView('Reporting/layout.tpl');
-    }
-
-    /**
-     * Returns array of reports to datatable
-     */
-    public function reports(){
-        $testCenter     = $this->getCurrentTestCenter();
-        $requestOptions = $this->getRequestOptions();
-        $this->returnJson(TestCenterHelper::getReports($testCenter, $requestOptions));
     }
 }
