@@ -157,8 +157,10 @@ class Monitor extends SimplePageModule
 
             $this->returnJson(array(
                 'success' => !count($notAuthorised),
-                'processed' => $authorised,
-                'unprocessed' => $notAuthorised
+                'data' => [
+                    'processed' => $authorised,
+                    'unprocessed' => $notAuthorised
+                ]
             ));
 
         } catch (ServiceNotFoundException $e) {
@@ -190,8 +192,10 @@ class Monitor extends SimplePageModule
 
             $this->returnJson(array(
                 'success' => !count($notTerminated),
-                'processed' => $terminated,
-                'unprocessed' => $notTerminated
+                'data' => [
+                    'processed' => $terminated,
+                    'unprocessed' => $notTerminated
+                ]
             ));
 
         } catch (ServiceNotFoundException $e) {
@@ -222,8 +226,10 @@ class Monitor extends SimplePageModule
 
             $this->returnJson(array(
                 'success' => !count($notPaused),
-                'processed' => $paused,
-                'unprocessed' => $notPaused
+                'data' => [
+                    'processed' => $paused,
+                    'unprocessed' => $notPaused
+                ]
             ));
 
         } catch (ServiceNotFoundException $e) {
@@ -254,8 +260,10 @@ class Monitor extends SimplePageModule
 
             $this->returnJson(array(
                 'success' => !count($notReported),
-                'processed' => $reported,
-                'unprocessed' => $notReported
+                'data' => [
+                    'processed' => $reported,
+                    'unprocessed' => $notReported
+                ]
             ));
 
         } catch (ServiceNotFoundException $e) {

@@ -68,7 +68,7 @@ define([
     var cssScope = '.delivery-index';
 
     var serviceUrl = urlHelper.route('deliveries', 'DeliverySelection', 'taoProctoring');
-    var pauseUrl = urlHelper.route('pauseExecutions', 'Delivery', 'taoProctoring');
+    var pauseUrl = urlHelper.route('pauseExecutions', 'Monitor', 'taoProctoring');
     var sessionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
 
     /**
@@ -207,17 +207,21 @@ define([
                 //
                 function formatPauseWarning(response, deliveryExecutions) {
                     var messageContext, unprocessed;
+                    var responseData;
 
                     messageContext = '';
                     if (response) {
+                        responseData = response.data;
                         unprocessed = {};
-                        _.forEach(response.unprocessed, function (id) {
-                            var execution = deliveryExecutions[id];
-                            var uri = execution && execution.delivery && execution.delivery.uri;
-                            if (uri) {
-                                unprocessed[uri] = (unprocessed[uri] || 0) + 1;
-                            }
-                        });
+                        if (responseData) {
+                            _.forEach(responseData.unprocessed, function (id) {
+                                var execution = deliveryExecutions[id];
+                                var uri = execution && execution.delivery && execution.delivery.uri;
+                                if (uri) {
+                                    unprocessed[uri] = (unprocessed[uri] || 0) + 1;
+                                }
+                            });
+                        }
 
                         unprocessed = _.map(unprocessed, function (count, uri) {
                             if (count > 1) {
@@ -242,7 +246,7 @@ define([
                     loadingBar.start();
                     listBox.setLoading(true);
 
-                    dataBroker.readProvider('deliveries').then(function (data) {
+                    return dataBroker.readProvider('deliveries').then(function (data) {
                         categories = data.categories;
 
                         deliveries = data.deliveries;

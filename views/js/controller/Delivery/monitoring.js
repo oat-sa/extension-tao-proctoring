@@ -91,7 +91,7 @@ define([
     var extraTimeUnit = 60;
 
     function validateParams(params) {
-        return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
+        return _.isPlainObject(params) && (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) && !_.isEmpty(params.execution);
     }
 
     // the page is always loading data when starting
