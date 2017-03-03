@@ -22,13 +22,13 @@ define([
     'jquery',
     'lodash',
     'i18n',
+    'core/promise',
     'util/url',
     'controller/app',
-    'core/dataProvider/proxy',
     'layout/loading-bar',
     'ui/container',
     'util/encode',
-    'taoProctoring/component/dataBroker',
+    'taoProctoring/component/proxy',
     'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
     'tpl!taoProctoring/templates/reporting/index',
@@ -37,13 +37,13 @@ define([
     $,
     _,
     __,
+    Promise,
     urlHelper,
     appController,
-    proxyFactory,
     loadingBar,
     containerFactory,
     encode,
-    dataBrokerFactory,
+    proxyFactory,
     dateRangeFactory,
     historyTableFactory,
     indexTpl
@@ -58,6 +58,17 @@ define([
 
     var serviceUrl = urlHelper.route('sessionHistory', 'Reporting', 'taoProctoring');
     var sessionsUrl = urlHelper.route('history', 'Reporting', 'taoProctoring');
+
+    /**
+     * Filters the disconnection errors
+     * @param {Error} err
+     */
+    function handleOnDisconnect(err) {
+        if (err.code === 403) {
+            //we just leave if any 403 occurs
+            window.location.reload(true);
+        }
+    }
 
     // the page is always loading data when starting
     loadingBar.start();
@@ -82,28 +93,12 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory().on('error', function(err) {
-                if (err.code === 403) {
-                    //we just leave if any 403 occurs
-                    window.location.reload(true);
+            proxyFactory('ajax').init({
+                actions: {
+                    read: serviceUrl
                 }
-            }).loadProviders({
-                service: proxyFactory('ajax').init({
-                    actions: {
-                        read: serviceUrl
-                    }
-                }),
-                sessions: proxyFactory('ajax').init({
-                    actions: {
-                        read: sessionsUrl
-                    }
-                })
-            }).then(function(dataBroker) {
-                appController.on('change.history', function() {
-                    dataBroker.destroy();
-                });
-
-                return dataBroker.readProvider('service', {delivery : deliveryId, session: sessions}).then(function(data) {
+            }).then(function(proxyService) {
+                return proxyService.read({delivery : deliveryId, session: sessions}).then(function(data) {
                     var detailedHistory = data.detailedHistory;
                     var historyTable = historyTableFactory({
                         tools: [{
@@ -146,6 +141,7 @@ define([
                     });
                 });
             }).catch(function(err) {
+                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });

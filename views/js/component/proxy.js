@@ -20,15 +20,12 @@
  */
 define([
     'core/dataProvider/proxy',
-    'core/dataProvider/proxy/ajax',
-    'core/dataProvider/dataBroker'
+    'core/dataProvider/proxy/ajax'
 ], function (proxyFactory,
-             ajaxProxy,
-             dataBrokerFactory) {
+             ajaxProxy) {
     'use strict';
 
-    proxyFactory
+    // TODO: use a better implementation to load and register the providers
+    return proxyFactory
         .registerProvider('ajax', ajaxProxy);
-
-    return dataBrokerFactory;
 });

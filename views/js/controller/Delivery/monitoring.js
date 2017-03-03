@@ -23,7 +23,6 @@ define([
     'lodash',
     'i18n',
     'core/promise',
-    'core/dataProvider/proxy',
     'controller/app',
     'util/url',
     'layout/loading-bar',
@@ -34,7 +33,7 @@ define([
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
     'ui/container',
-    'taoProctoring/component/dataBroker',
+    'taoProctoring/component/proxy',
     'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/extraTime/encoder',
     'taoProctoring/helper/status',
@@ -49,7 +48,6 @@ define([
     _,
     __,
     Promise,
-    proxyFactory,
     appController,
     urlHelper,
     loadingBar,
@@ -60,7 +58,7 @@ define([
     bulkActionPopup,
     cascadingComboBox,
     containerFactory,
-    dataBrokerFactory,
+    proxyFactory,
     extraTimePopup,
     encodeExtraTime,
     _status,
@@ -90,6 +88,22 @@ define([
      */
     var extraTimeUnit = 60;
 
+    /**
+     * Filters the disconnection errors
+     * @param {Error} err
+     */
+    function handleOnDisconnect(err) {
+        if (err.code === 403) {
+            //we just leave if any 403 occurs
+            window.location.reload(true);
+        }
+    }
+
+    /**
+     * Validates the params to be sent along the provider's requests
+     * @param params
+     * @returns {boolean}
+     */
     function validateParams(params) {
         return _.isPlainObject(params) && (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) && !_.isEmpty(params.execution);
     }
@@ -132,38 +146,31 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory().on('error', function(err) {
-                if (err.code === 403) {
-                    //we just leave if any 403 occurs
-                    window.location.reload(true);
-                }
-            }).loadProviders({
-                executions: proxyFactory('ajax').init({
-                    actions: {
-                        read: serviceUrl,
-                        authorize: {
-                            url: authorizeUrl,
-                            validate: validateParams
-                        },
-                        pause: {
-                            url: pauseUrl,
-                            validate: validateParams
-                        },
-                        terminate: {
-                            url: terminateUrl,
-                            validate: validateParams
-                        },
-                        report: {
-                            url: reportUrl,
-                            validate: validateParams
-                        },
-                        extraTime: {
-                            url: extraTimeUrl,
-                            validate: validateParams
-                        }
+            proxyFactory('ajax').init({
+                actions: {
+                    read: serviceUrl,
+                    authorize: {
+                        url: authorizeUrl,
+                        validate: validateParams
+                    },
+                    pause: {
+                        url: pauseUrl,
+                        validate: validateParams
+                    },
+                    terminate: {
+                        url: terminateUrl,
+                        validate: validateParams
+                    },
+                    report: {
+                        url: reportUrl,
+                        validate: validateParams
+                    },
+                    extraTime: {
+                        url: extraTimeUrl,
+                        validate: validateParams
                     }
-                })
-            }).then(function(dataBroker) {
+                }
+            }).then(function(proxyExecutions) {
                 // request the server with a selection of test takers
                 function request(action, selection, data, message) {
                     var params;
@@ -178,7 +185,7 @@ define([
                             params.delivery = deliveryId;
                         }
 
-                        dataBroker.getProvider('executions').action(action, params)
+                        proxyExecutions.action(action, params)
                             .then(function() {
                                 if (message) {
                                     feedback().success(message);
@@ -187,6 +194,7 @@ define([
                             })
                             .catch(function(response) {
                                 var messageContext = '', unprocessed;
+                                handleOnDisconnect(response);
                                 if (response) {
                                     unprocessed = _.map(response.unprocessed, function (id) {
                                         var execution = getExecutionData(id);
@@ -502,10 +510,6 @@ define([
                     });
                 }
 
-                appController.on('change.deliveryMonitoring', function() {
-                    dataBroker.destroy();
-                });
-
                 if (deliveryId) {
                     serviceParams.delivery = deliveryId;
                 }
@@ -513,7 +517,7 @@ define([
                     serviceParams.context = context;
                 }
 
-                return dataBroker.readProvider('executions', serviceParams).then(function(data) {
+                return proxyExecutions.read(serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
                     categories = data.categories;
@@ -964,6 +968,7 @@ define([
                     setInitialFilters();
                 });
             }).catch(function(err) {
+                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });

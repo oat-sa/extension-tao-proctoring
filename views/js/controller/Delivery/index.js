@@ -23,7 +23,6 @@ define([
     'lodash',
     'i18n',
     'core/promise',
-    'core/dataProvider/proxy',
     'controller/app',
     'util/url',
     'layout/loading-bar',
@@ -34,7 +33,7 @@ define([
     'ui/cascadingComboBox',
     'ui/container',
     'taoProctoring/helper/status',
-    'taoProctoring/component/dataBroker',
+    'taoProctoring/component/proxy',
     'tpl!taoProctoring/templates/delivery/index',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
     'tpl!taoProctoring/templates/delivery/listBoxStats'
@@ -43,7 +42,6 @@ define([
     _,
     __,
     Promise,
-    proxyFactory,
     appController,
     urlHelper,
     loadingBar,
@@ -54,7 +52,7 @@ define([
     cascadingComboBox,
     containerFactory,
     _status,
-    dataBrokerFactory,
+    proxyFactory,
     indexTpl,
     actionsTpl,
     statsTpl
@@ -70,6 +68,17 @@ define([
     var serviceUrl = urlHelper.route('deliveries', 'DeliverySelection', 'taoProctoring');
     var pauseUrl = urlHelper.route('pauseExecutions', 'Monitor', 'taoProctoring');
     var sessionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
+
+    /**
+     * Filters the disconnection errors
+     * @param {Error} err
+     */
+    function handleOnDisconnect(err) {
+        if (err.code === 403) {
+            //we just leave if any 403 occurs
+            window.location.reload(true);
+        }
+    }
 
     /**
      * Gets a list of named sessions
@@ -171,34 +180,11 @@ define([
                 container.destroy();
             });
 
-            dataBrokerFactory().on('error', function(err) {
-                if (err.code === 403) {
-                    //we just leave if any 403 occurs
-                    window.location.reload(true);
+            proxyFactory('ajax').init({
+                actions: {
+                    read: serviceUrl
                 }
-            }).loadProviders({
-                deliveries: proxyFactory('ajax').init({
-                    actions: {
-                        read: serviceUrl
-                    }
-                }),
-                executions: proxyFactory('ajax').init({
-                    actions: {
-                        read: {
-                            url: sessionsUrl,
-                            validate: function(params) {
-                                return _.isPlainObject(params) && !_.isEmpty(params.delivery);
-                            }
-                        },
-                        pause: {
-                            url: pauseUrl,
-                            validate: function(params) {
-                                return _.isPlainObject(params) && !_.isEmpty(params.delivery) && !_.isEmpty(params.execution);
-                            }
-                        }
-                    }
-                })
-            }).then(function(dataBroker) {
+            }).then(function(proxyDeliveries) {
                 // get the label of a delivery from its ID
                 function getDeliveryLabel(id) {
                     return deliveries[id] && deliveries[id].label;
@@ -246,14 +232,39 @@ define([
                     loadingBar.start();
                     listBox.setLoading(true);
 
-                    return dataBroker.readProvider('deliveries').then(function (data) {
+                    return proxyDeliveries.read().then(function (data) {
                         categories = data.categories;
 
-                        deliveries = data.deliveries;
+                        deliveries = _.transform(data.list, function (result, delivery) {
+                            var props = delivery.properties;
+                            var tplData = {
+                                locked: delivery.stats.awaitingApproval,
+                                inProgress: delivery.stats.inProgress,
+                                paused: delivery.stats.paused
+                            };
+
+                            if (props && props.periodStart && props.periodEnd) {
+                                tplData.showProperties = true;
+                                tplData.periodStart = props.periodStart;
+                                tplData.periodEnd = props.periodEnd;
+
+                                //add a special class for boxes that have more information to display
+                                delivery.cls = 'has-properties-displayed';
+                            }
+                            delivery.html = actionsTpl({
+                                id: delivery.id
+                            });
+                            delivery.content = statsTpl(tplData);
+                            delivery.cls = ((delivery.cls || '') + ' router').trim();
+
+                            result[delivery.id] = delivery;
+                        }, {});
+
                         listBox.update(data.list);
                         loadingBar.stop();
 
                     }).catch(function (err) {
+                        handleOnDisconnect(err);
                         appController.onError(err);
                     });
                 }
@@ -287,40 +298,6 @@ define([
                     });
                 }
 
-                appController.on('change.deliveryIndex', function() {
-                    dataBroker.destroy();
-                });
-
-                dataBroker.getMiddlewares().use('read', function(request, response, next) {
-                    if (response && response.list) {
-                        response.deliveries = _.transform(response.list, function (result, delivery) {
-                            var props = delivery.properties;
-                            var tplData = {
-                                locked: delivery.stats.awaitingApproval,
-                                inProgress: delivery.stats.inProgress,
-                                paused: delivery.stats.paused
-                            };
-
-                            if (props && props.periodStart && props.periodEnd) {
-                                tplData.showProperties = true;
-                                tplData.periodStart = props.periodStart;
-                                tplData.periodEnd = props.periodEnd;
-
-                                //add a special class for boxes that have more information to display
-                                delivery.cls = 'has-properties-displayed';
-                            }
-                            delivery.html = actionsTpl({
-                                id: delivery.id
-                            });
-                            delivery.content = statsTpl(tplData);
-                            delivery.cls = ((delivery.cls || '') + ' router').trim();
-
-                            result[delivery.id] = delivery;
-                        }, {});
-                    }
-                    next();
-                });
-
                 listBox.getElement().on('click', '.pause', function (e) {
                     var deliveryId = $(this).data('delivery');
 
@@ -345,6 +322,7 @@ define([
                             feedback().info(__('There is no delivery in progress'));
                         }
                     }).catch(function (err) {
+                        handleOnDisconnect(err);
                         appController.onError(err);
                     }).then(function() {
                         loadingBar.stop();
@@ -354,6 +332,7 @@ define([
                 refresh();
 
             }).catch(function(err) {
+                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });
