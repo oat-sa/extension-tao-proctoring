@@ -21,12 +21,12 @@
 
 namespace oat\taoProctoring\model;
 
-use \oat\taoOutcomeUi\model\ResultsService;
-use \oat\oatbox\service\ConfigurableService;
-use \oat\oatbox\service\ServiceManager;
-use qtism\data\View;
-use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoProctoring\model\implementation\TestSessionService;
+use qtism\data\View;
 
 /**
  * Class AssessmentResultsService
@@ -38,7 +38,10 @@ use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterf
  */
 class AssessmentResultsService extends ConfigurableService
 {
+    /** @deprecated */
     const CONFIG_ID = 'taoProctoring/AssessmentResults';
+
+    const SERVICE_ID = 'taoProctoring/AssessmentResults';
 
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
@@ -166,7 +169,7 @@ class AssessmentResultsService extends ConfigurableService
                     if ($category === $tag) {
                         foreach ($section->getRubricBlockRefs() as $rubric) {
                             ob_start();
-                            include($compilationDirs['private']->getPath() . $rubric->getHref());
+                            include $compilationDirs['private']->getPath() . '/' . ltrim($rubric->getHref(), './\\');
                             $rubrics[] = ob_get_clean();
                         }
                     }
@@ -179,7 +182,8 @@ class AssessmentResultsService extends ConfigurableService
 
     /**
      * Get result service instance.
-     * @return \oat\taoOutcomeUi\model\ResultsService;
+     * @param \core_kernel_classes_Resource $delivery
+     * @return ResultsService
      */
     protected function getResultService(\core_kernel_classes_Resource $delivery)
     {

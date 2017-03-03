@@ -20,10 +20,10 @@
 
 namespace oat\taoProctoring\controller;
 
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\ProctorService;
-use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Monitoring Delivery controller
@@ -64,17 +64,19 @@ class Monitor extends SimplePageModule
             'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
-            'categories' => \oat\taoProctoring\helpers\DeliveryHelper::getAllReasonsCategories(),
+            'categories' => DeliveryHelper::getAllReasonsCategories(),
             'printReportButton' => json_encode(false),
             'timeHandling' => json_encode(false),
         );
+
         if (!is_null($delivery)) {
             $data['delivery'] = $delivery->getUri();
         }
         if ($this->hasRequestParameter('context')) {
             $data['context'] = $this->getRequestParameter('context');
         }
-        $this->composeView('delivery-monitoring',$data,array(),'Monitoring/index.tpl');
+
+        $this->composeView('delivery-monitoring', $data, array(), 'Monitoring/index.tpl');
     }
 
     /**

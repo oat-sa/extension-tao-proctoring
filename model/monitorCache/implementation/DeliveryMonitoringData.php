@@ -200,7 +200,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     /**
      * Update connectivity status (online|offline)
      */
-    private function updateConnectivity()
+    private function updateLastConnect()
     {
         $status = $this->deliveryExecution->getState()->getUri();
         $testSessionConnectivityStatusService = $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);

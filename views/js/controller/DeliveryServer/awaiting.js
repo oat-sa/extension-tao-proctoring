@@ -28,8 +28,11 @@ define([
     'ui/dialog/alert',
     'core/polling',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
-    'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, authSuccessTpl){
+    'util/url',
+    'ui/dialog/confirm',
+    'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess',
+    'tpl!taoProctoring/templates/deliveryServer/authorizationListBoxActions'
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, url, dialogConfirm, authSuccessTpl, listBoxActionsTpl){
     'use strict';
 
     /**
@@ -63,7 +66,7 @@ define([
                 label : config.deliveryLabel,
                 url : runDeliveryUrl,
                 content : __('Please wait, authorization in process ...'),
-                text : __('Proceed')
+                html : listBoxActionsTpl({id : config.deliveryExecution, cancelable: config.cancelable})
             }];
             var list = listBox({
                 title : config.deliveryInit ? __('Start Test') : __('Resume Test'),
@@ -79,7 +82,26 @@ define([
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();
 
-            loadingBar.start();
+            loadingBar.start(false);
+
+            $container.on('click', '.js-cancel', function (e) {
+                //prevent clicking the parent link that goes to the monitoring screen
+                e.stopPropagation();
+                e.preventDefault();
+
+                dialogConfirm(
+                    __('Are you sure you want to end the test?'),
+                    function () {
+                        window.location.href = config.cancelUrl;
+                    }
+                );
+            });
+            $container.on('click', '.js-proceed', function (e) {
+                if ($container.hasClass('authorization-in-progress')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            });
 
             polling({
                 action : function (){

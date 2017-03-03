@@ -19,7 +19,6 @@
  *
  */
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
-use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
@@ -31,13 +30,14 @@ use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\model\ProctorService;
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\scripts\install\RegisterServices;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.5.1',
+    'version' => '4.8.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.66.2',
@@ -66,6 +66,7 @@ return array(
             RegisterDeliveryServerService::class,
             SetupProctoringEventListeners::class,
             RegisterAuthProvider::class,
+            RegisterServices::class,
             RegisterReasonCategoryService::class
         ),
         'rdf' => array(

@@ -356,7 +356,6 @@ define([
                 var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                 var config;
 
-
                 config = _.merge(listSessions(actionName, _selection), {
                     renderTo : $content,
                     actionName : actionTitle,
@@ -775,7 +774,7 @@ define([
 
             // column: connectivity status of execution progress
             model.push({
-                id: 'connectivity',
+                id: 'last_connect',
                 sortable: true,
                 label: __('Connectivity'),
                 transform: function(value, row) {
