@@ -22,6 +22,7 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use \oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  * Action to register necessary extension services
@@ -41,6 +42,6 @@ class RegisterServices extends InstallAction
             DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY => 'PT30M',
             DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
         ]);
-        $this->registerService(DeliveryExecutionStateService::SERVICE_ID, $service);
+        $this->registerService(StateServiceInterface::SERVICE_ID, $service);
     }
 }

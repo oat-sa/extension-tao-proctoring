@@ -40,8 +40,8 @@
   </rdf:Description>
 
   <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled">
-    <rdfs:label xml:lang="en-US"><![CDATA[Terminated]]></rdfs:label>
-    <rdfs:comment xml:lang="en-US"><![CDATA[Terminated status of a delivery execution]]></rdfs:comment>
+    <rdfs:label xml:lang="en-US"><![CDATA[Canceled]]></rdfs:label>
+    <rdfs:comment xml:lang="en-US"><![CDATA[Canceled status of a delivery execution]]></rdfs:comment>
     <rdfs:subClassOf rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatus"/>
   </rdf:Description>
  </rdf:RDF>

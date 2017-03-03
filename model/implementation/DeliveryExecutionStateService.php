@@ -31,7 +31,7 @@ use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
-
+use oat\oatbox\log\LoggerAwareTrait;
 /**
  * Class DeliveryExecutionStateService
  * @package oat\taoProctoring\model
@@ -45,7 +45,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
     const OPTION_TIME_HANDLING = 'time_handling';
-    
+
+    use LoggerAwareTrait;
+
     /**
      * @var TestSessionService
      */
@@ -67,10 +69,21 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
+     * Alias for self::run() (for backward capability).
+     *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
+    {
+        $this->run($deliveryExecution);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function run(DeliveryExecution $deliveryExecution)
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $logData = [
@@ -78,14 +91,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
             'os_name' => OSService::singleton()->getClientName(),
             'os_version' => OSService::singleton()->getClientVersion(),
-            'timestamp' => microtime(true),
         ];
 
         if ($session) {
             $session->resume();
             $this->getTestSessionService()->persist($session);
+            $logData['timestamp'] = microtime(true);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RESUME', $logData);
         } else {
+            $logData['timestamp'] = microtime(true);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RUN', $logData);
         }
 
@@ -135,7 +149,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Terminates a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
@@ -151,19 +165,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            $logData = [
+                'reason' => $reason,
+                'timestamp' => microtime(true)
+            ];
             if ($session) {
-                $data = [
-                    'reason' => $reason,
-                    'timestamp' => microtime(true),
-                    'itemId' => $this->getCurrentItemId($deliveryExecution),
-                    'context' => $this->getProgress($deliveryExecution)
-                ];
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $data);
+                $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
+                $logData['context'] = $this->getProgress($deliveryExecution);
                 if ($session->isRunning()) {
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
             }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
 
@@ -171,13 +185,25 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
-     * Pauses a delivery execution
+     * Alias for self::pause() (for backward capability).
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param array $reason
      * @return bool
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        return $this->pause($deliveryExecution, $reason);
+    }
+
+    /**
+     * Pauses a delivery execution
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @param array $reason
+     * @return bool
+     */
+    public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
@@ -205,11 +231,23 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
+     * Alias for self::finish() (for backward capability).
+     *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
      */
     public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        return $this->finish($deliveryExecution, $reason);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @param null $reason
+     * @return bool
+     */
+    public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
         return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
     }
@@ -230,7 +268,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
             return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
-            //todo throw an exception here
+            $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
+            return false;
         }
     }
 
@@ -344,7 +383,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     public static function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
-        $deliveryExecution->getImplementation()->setState(ProctoredDeliveryExecution::STATE_PAUSED);
+        $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
+        $service->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)

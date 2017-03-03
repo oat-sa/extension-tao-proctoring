@@ -119,7 +119,7 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
             $this->setData('init', !!$this->getRequestParameter('init'));
             $this->setData('returnUrl', $this->getReturnUrl());
-            $this->setData('cancelUrl', _url('cancelAuthorization', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
+            $this->setData('cancelUrl', _url('cancelExecution', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
             $this->setData('cancelable', $deliveryExecutionStateService->isCancelable($deliveryExecution));
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
@@ -177,17 +177,23 @@ class DeliveryServer extends DefaultDeliveryServer
     /**
      * Cancel delivery authorization request.
      */
-    public function cancelAuthorization()
+    public function cancelExecution()
     {
+
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $reason = [
+            'reasons' => ['category' => 'Examinee', 'subCategory' => 'Navigation'],
+        ];
+        if ($deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_AUTHORIZED) {
+            $reason['comment'] = __('Automatically reset by system due to the test taker choosing not to proceed with the authorized.');
+        } else {
+            $reason['comment'] = __('Automatically reset by system due to authorization request being cancelled by test taker.');
+        }
         $deliveryExecutionStateService->cancelExecution(
             $deliveryExecution,
-            [
-                'reasons' => ['category' => 'Examinee'],
-                'comment' => __('Assessment has been canceled'),
-            ]
+            $reason
         );
         return $this->redirect($this->getReturnUrl());
     }

@@ -19,7 +19,6 @@
  *
  */
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
-use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
