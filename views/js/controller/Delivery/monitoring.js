@@ -405,14 +405,11 @@ define([
 
                     if (applyTags) {
                         $list.find('.action-bar').children('.tool-tag').hide();
-                        tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
-                            timeout: {
-                                success: -1
-                            }
-                        });
+                        $list.find('.tags').removeClass('hidden');
+                        $list.find('.tag-list').text(defaultTag.split(',').join(', '));
                     } else {
                         $list.find('.action-bar').children('.tool-notag').hide();
-                        tagWaringBlock.close();
+                        $list.find('.tags').addClass('hidden');
                     }
 
                 }
