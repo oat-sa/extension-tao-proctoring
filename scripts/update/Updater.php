@@ -201,5 +201,8 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('4.8.0');
         }
+
+        $this->skip('4.8.0', '4.8.1');
+
     }
 }

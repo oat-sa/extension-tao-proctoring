@@ -94,10 +94,9 @@ define([
             var deliveryId = $container.data('delivery');
             var context = $container.data('context');
             var isManageable = $container.data('ismanageable');
-            var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
             var defaultTag = $container.data('defaulttag');
-            var tagWaringBlock;
+            var defaultAvailableLabel = __('Current sessions');
             var printReportButton = $container.data('printreportbutton');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId});
             var terminateUrl = helpers._url('terminateExecutions', 'Monitor', 'taoProctoring', {delivery : deliveryId});
@@ -393,10 +392,11 @@ define([
              * @param {Boolean} applyTags
              */
             function setTagUsage(applyTags) {
+                var $filter;
                 if (defaultTag) {
 
                     if (!$list.find('.tag').length) {
-                        var $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                        $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
                         $filter.appendTo($list);
                     }
 
@@ -405,21 +405,18 @@ define([
 
                     if (applyTags) {
                         $list.find('.action-bar').children('.tool-tag').hide();
-                        tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
-                            timeout: {
-                                success: -1
-                            }
-                        });
                     } else {
                         $list.find('.action-bar').children('.tool-notag').hide();
-                        tagWaringBlock.close();
                     }
-
                 }
             }
-            
+
+            function getTagsUsage() {
+                return $list.data('applytags');
+            }
+
             /**
-             * Ser initial datatable filters
+             * Set initial datatable filters
              */
             function setInitialFilters()
             {
@@ -881,7 +878,9 @@ define([
                     url: deliveryId ? serviceUrl : serviceAllUrl,
                     status: {
                         empty: __('No sessions'),
-                        available: __('Current sessions'),
+                        available: function () {
+                            return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
+                        },
                         loading: __('Loading')
                     },
                     filterStrategy: 'multiple',
