@@ -524,8 +524,8 @@ define([
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
                     defaultTag = data.defaulttag;
-                    timeHandlingButton = data.timehandling;
-                    printReportButton = data.printreportbutton;
+                    timeHandlingButton = data.timeHandling;
+                    printReportButton = data.printReportButton;
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
