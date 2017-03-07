@@ -35,7 +35,7 @@ module.exports = function(grunt) {
             paths : paths,
             modules : [{
                 name: 'taoProctoring/controller/app',
-                include: ['lib/require', 'loader/bootstrap'],
+                include: ['lib/require', 'loader/bootstrap'].concat(libs),
                 exclude : ['json!i18ntr/messages.json']
             }, {
                 name: 'taoProctoring/controller/routes',
