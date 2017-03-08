@@ -22,7 +22,6 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'core/promise',
     'controller/app',
     'util/url',
     'layout/loading-bar',
@@ -47,7 +46,6 @@ define([
     $,
     _,
     __,
-    Promise,
     appController,
     urlHelper,
     loadingBar,
@@ -411,10 +409,7 @@ define([
                 function execBulkAction(actionName, actionTitle, selection, cb){
                     var _selection = _.isArray(selection) ? selection : [selection];
                     var askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
-                    var config;
-
-
-                    config = _.merge(listSessions(actionName, _selection), {
+                    var config = _.merge(listSessions(actionName, _selection), {
                         renderTo : $content,
                         actionName : actionTitle,
                         reason : askForReason,

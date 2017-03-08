@@ -19,10 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
-    'jquery',
-    'lodash',
     'i18n',
-    'core/promise',
     'util/url',
     'controller/app',
     'layout/loading-bar',
@@ -34,10 +31,7 @@ define([
     'tpl!taoProctoring/templates/reporting/index',
     'ui/datatable'
 ], function (
-    $,
-    _,
     __,
-    Promise,
     urlHelper,
     appController,
     loadingBar,
