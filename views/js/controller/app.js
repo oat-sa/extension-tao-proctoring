@@ -90,9 +90,13 @@ define([
             appController
                 .on('change.breadcrumbs', function (route) {
                     var routes = getRoutes(route);
-                    request(breadcrumbsUrl, {route: routes}, 'POST').then(function (data) {
-                        breadcrumbs.update(data);
-                    });
+                    request(breadcrumbsUrl, {route: routes}, 'POST')
+                        .then(function (data) {
+                            breadcrumbs.update(data);
+                        })
+                        .catch(function(err) {
+                            appController.onError(err);
+                        });
                 })
                 .apply('a', toolbox.getElement())
                 .start();
