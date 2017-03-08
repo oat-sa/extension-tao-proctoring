@@ -24,6 +24,7 @@ use oat\taoProctoring\model\PaginatedStorage;
 
 /**
  * Provides common data helper for datatable component.
+ * @todo Move this class in taoCore, make an abstract/interface and its implementation
  */
 class DataTableHelper
 {
@@ -96,6 +97,7 @@ class DataTableHelper
         $offset = ($page - 1) * $rows;
 
         $result = array(
+            'success' => true,
             'offset' => $offset,
             'amount' => $amount,
             'total' => $total,

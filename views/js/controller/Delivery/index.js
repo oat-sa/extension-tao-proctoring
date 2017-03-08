@@ -96,50 +96,15 @@ define([
     }
 
     /**
-     * Gets the list of sessions for a particular delivery
-     * @param {String} deliveryId
-     * @returns {Promise}
+     * Validates the params to be sent along the provider's requests
+     * @param params
+     * @returns {boolean}
      */
-    function getDeliverySessions(deliveryId) {
-        return new Promise(function(resolve, reject) {
-            $.ajax({
-                url: sessionsUrl,
-                data: {
-                    delivery: deliveryId
-                },
-                dataType: 'json',
-                type: 'GET'
-            }).done(function (response) {
-                if (_.isPlainObject(response) && _.isArray(response.data)) {
-                    resolve(response.data);
-                } else {
-                    reject(response);
-                }
-            }).fail(reject);
-        });
-    }
-
-    /**
-     * Request a pause on the listed delivery sessions
-     * @param {String} deliveryId
-     * @param {Array} sessions
-     * @param {Object} reason
-     * @returns {Promise}
-     * @returns {*}
-     */
-    function requestPause(deliveryId, sessions, reason) {
-        return new Promise(function(resolve, reject) {
-            $.ajax({
-                url: pauseUrl,
-                data: {
-                    delivery: deliveryId,
-                    execution: _.pluck(sessions, 'id'),
-                    reason: reason
-                },
-                dataType: 'json',
-                type: 'POST'
-            }).done(resolve).fail(reject);
-        });
+    function validateParams(params) {
+        return _.isPlainObject(params) &&
+            (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
+            (_.isUndefined(params.execution) || !_.isEmpty(params.execution)) &&
+            (_.isUndefined(params.reason) || !_.isEmpty(params.reason));
     }
 
     // the page is always loading data when starting
@@ -156,7 +121,7 @@ define([
          */
         start: function start() {
             var title = __("Sessions");
-            var deliveries, categories;
+            var deliveries, categories, proxyDeliveries, proxySessions;
             var container = containerFactory('.container').changeScope(cssScope).write(indexTpl({title: title}));
             var listBox = listBoxFactory({
                 title: title,
@@ -180,11 +145,29 @@ define([
                 container.destroy();
             });
 
-            proxyFactory('ajax').init({
-                actions: {
-                    read: serviceUrl
-                }
-            }).then(function(proxyDeliveries) {
+            Promise.all([
+                proxyFactory('ajax').init({
+                    actions: {
+                        read: serviceUrl
+                    }
+                }).then(function(proxy) {
+                    proxyDeliveries = proxy;
+                }),
+                proxyFactory('ajax').init({
+                    actions: {
+                        read: {
+                            url: sessionsUrl,
+                            validate: validateParams
+                        },
+                        pause: {
+                            url: pauseUrl,
+                            validate: validateParams
+                        }
+                    }
+                }).then(function(proxy) {
+                    proxySessions = proxy;
+                })
+            ]).then(function() {
                 // get the label of a delivery from its ID
                 function getDeliveryLabel(id) {
                     return deliveries[id] && deliveries[id].label;
@@ -285,15 +268,21 @@ define([
                         })
                             .on('cancel', resolve)
                             .on('ok', function (reason) {
-                                requestPause(deliveryId, selection, reason).then(function(response) {
-                                    if (response && response.success) {
-                                        feedback().success('Selected deliveries successfully paused');
-                                        refresh().then(resolve).catch(reject);
-                                    } else {
-                                        feedback().warning(__('Something went wrong ...') + '<br>' + formatPauseWarning(response, deliveryExecutions), {encodeHtml: false});
+                                proxySessions.action('pause', {
+                                    delivery: deliveryId,
+                                    execution: _.pluck(selection, 'id'),
+                                    reason: reason
+                                }).then(function() {
+                                    feedback().success('Selected deliveries successfully paused');
+                                    refresh().then(resolve).catch(reject);
+                                }).catch(function(err) {
+                                    if (err.response && err.response.success === false) {
+                                        feedback().warning(__('Something went wrong ...') + '<br>' + formatPauseWarning(err.response, deliveryExecutions), {encodeHtml: false});
                                         resolve();
+                                    } else {
+                                        reject(err);
                                     }
-                                }).catch(reject);
+                                });
                             });
                     });
                 }
@@ -308,7 +297,7 @@ define([
                     e.preventDefault();
 
                     //get list of all test taker for the selected delivery
-                    getDeliverySessions(deliveryId).then(function(sessions) {
+                    proxySessions.read({delivery: deliveryId}).then(function(sessions) {
                         var deliveryExecutions = {};
                         var inProgressExecs;
                         inProgressExecs = _.filter(sessions, function (session) {
