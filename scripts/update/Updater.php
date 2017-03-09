@@ -31,6 +31,7 @@ use oat\tao\model\event\MetadataModified;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\GroupAssignment;
@@ -41,6 +42,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\breadcrumbs\DeliverySelectionService;
 use oat\taoProctoring\model\breadcrumbs\MonitorService;
 use oat\taoProctoring\model\breadcrumbs\ReportingService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
@@ -180,9 +182,29 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.5.3');
         }
 
-        $this->skip('4.5.3', '4.6.1');
+        $this->skip('4.5.3', '4.6.2');
+
+         if ($this->isVersion('4.6.2')) {
+            $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
+            $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
+            $service = new DeliveryExecutionStateService($options);
+            $this->getServiceManager()->register(StateServiceInterface::SERVICE_ID, $service);
+            OntologyUpdater::syncModels();
+            $this->setVersion('4.7.0');
+        }
+
+        if ($this->isVersion('4.7.0')) {
+            /** @var DeliveryExecutionStateService $service */
+            $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $service->setOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY, 'PT30M');
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            OntologyUpdater::syncModels();
+            $this->setVersion('4.8.0');
+        }
+
+        $this->skip('4.8.0', '4.8.1');
         
-        if ($this->isVersion('4.6.1')) {
+        if ($this->isVersion('4.8.1')) {
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class));
             
             $breadcrumbsDeliveries = new DeliverySelectionService();
@@ -197,7 +219,7 @@ class Updater extends common_ext_ExtensionUpdater
             $breadcrumbsReporting->setServiceManager($this->getServiceManager());
             $this->getServiceManager()->register(ReportingService::SERVICE_ID, $breadcrumbsReporting);
             
-            $this->setVersion('4.7.0');
+            $this->setVersion('4.9.0');
         }
     }
 }

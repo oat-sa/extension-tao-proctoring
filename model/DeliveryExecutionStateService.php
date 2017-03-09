@@ -22,15 +22,15 @@ namespace oat\taoProctoring\model;
 
 
 use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**
  * Interface DeliveryExecutionStateService
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryExecutionStateService
+interface DeliveryExecutionStateService extends StateServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/DeliveryExecutionState';
 
     /**
      * Sets a delivery execution in the awaiting state
@@ -75,6 +75,23 @@ interface DeliveryExecutionStateService
      * @return bool
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null);
+
+    /**
+     * Cancel a delivery execution
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @param array $reason
+     * @return bool
+     */
+    public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null);
+
+    /**
+     * Whether delivery execution can be canceled or not
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    public function isCancelable(DeliveryExecution $deliveryExecution);
 
     /**
      * Report irregularity to a delivery execution

@@ -50,7 +50,10 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
     {
         $state = $deliveryExecution->getState()->getUri();
 
-        if (in_array($state, [ProctoredDeliveryExecution::STATE_FINISHED, ProctoredDeliveryExecution::STATE_TERMINATED])) {
+        if (in_array($state, [
+            ProctoredDeliveryExecution::STATE_FINISHED,
+            ProctoredDeliveryExecution::STATE_CANCELED,
+            ProctoredDeliveryExecution::STATE_TERMINATED])) {
             throw new UnAuthorizedException(
                 _url('index', 'DeliveryServer', 'taoProctoring'),
                 'Terminated/Finished delivery cannot be resumed'

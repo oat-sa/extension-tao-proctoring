@@ -124,7 +124,7 @@ class TestSessionService extends ConfigurableService
     }
 
     /**
-     * Checks if delivery execution was expired after pausing
+     * Checks if delivery execution was expired after pausing or abandoned after authorization
      *
      * @param DeliveryExecution $deliveryExecution
      * @return bool
@@ -133,12 +133,30 @@ class TestSessionService extends ConfigurableService
     {
         if (!isset($this->cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $executionState = $deliveryExecution->getState()->getUri();
-            if (!in_array($executionState, [DeliveryExecutionState::STATE_PAUSED, DeliveryExecutionState::STATE_ACTIVE]) ||
+            if (!in_array($executionState, [
+                DeliveryExecutionState::STATE_PAUSED,
+                DeliveryExecutionState::STATE_ACTIVE,
+                DeliveryExecutionState::STATE_AWAITING,
+                DeliveryExecutionState::STATE_AUTHORIZED,
+            ]) ||
                 !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
                 return $this->cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
+            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+            if (($executionState === DeliveryExecutionState::STATE_AUTHORIZED ||
+                  $executionState === DeliveryExecutionState::STATE_AWAITING) &&
+                $deliveryExecutionStateService->isCancelable($deliveryExecution)) {
+                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
+                $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
+                $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
+                if ($started->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
+                    $this->cache[$deliveryExecution->getIdentifier()]['expired'] = true;
+                    return $this->cache[$deliveryExecution->getIdentifier()]['expired'];
+                }
+            }
 
             $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
             if ($wasPausedAt && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {

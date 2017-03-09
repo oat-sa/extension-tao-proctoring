@@ -125,10 +125,12 @@ define([
             var currentRoute = urlHelper.parse(window.location.href);
             var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
             var context = currentRoute.query.context && decodeURIComponent(currentRoute.query.context);
+            var defaultAvailableLabel = __('Current sessions');
             var dataset;
             var extraFields;
             var categories;
             var defaultTag;
+            var isManageable;
             var tagWaringBlock;
             var timeHandlingButton;
             var printReportButton;
@@ -459,21 +461,18 @@ define([
 
                         if (applyTags) {
                             $list.find('.action-bar').children('.tool-tag').hide();
-                            tagWaringBlock = feedback().warning(__('Currently you are only viewing the test session in the "%s" group', defaultTag), {
-                                timeout: {
-                                    success: -1
-                                }
-                            });
                         } else {
                             $list.find('.action-bar').children('.tool-notag').hide();
-                            tagWaringBlock.close();
                         }
-
                     }
                 }
 
+                function getTagsUsage() {
+                    return $list.data('applytags');
+                }
+
                 /**
-                 * Ser initial datatable filters
+                 * Set initial datatable filters
                  */
                 function setInitialFilters()
                 {
@@ -518,6 +517,7 @@ define([
                     categories = data.categories;
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
+                    isManageable = data.ismanageable;
                     defaultTag = data.defaulttag;
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
@@ -947,7 +947,9 @@ define([
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
                                 empty: __('No sessions'),
-                                available: __('Current sessions'),
+                                available: function () {
+                                    return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
+                                },
                                 loading: __('Loading')
                             },
                             filterStrategy: 'multiple',

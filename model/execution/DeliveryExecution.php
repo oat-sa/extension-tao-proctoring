@@ -35,4 +35,6 @@ interface DeliveryExecution extends \oat\taoDelivery\model\execution\DeliveryExe
     const STATE_FINISHED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
 
     const STATE_TERMINATED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
+
+    const STATE_CANCELED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled';
 }
