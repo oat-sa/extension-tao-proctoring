@@ -130,8 +130,6 @@ define([
             var extraFields;
             var categories;
             var defaultTag;
-            var isManageable;
-            var tagWaringBlock;
             var timeHandlingButton;
             var printReportButton;
             var tools = [];
@@ -519,7 +517,6 @@ define([
                     categories = data.categories;
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
-                    isManageable = data.ismanageable;
                     defaultTag = data.defaulttag;
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
