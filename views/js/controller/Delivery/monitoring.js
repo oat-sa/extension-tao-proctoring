@@ -194,8 +194,10 @@ define([
                             })
                             .catch(function(err) {
                                 var messageContext = '', unprocessed;
+                                var responseData;
                                 if (err.response) {
-                                    unprocessed = _.map(err.response.unprocessed, function (id) {
+                                    responseData = err.response.data;
+                                    unprocessed = _.map(responseData.unprocessed, function (id) {
                                         var execution = getExecutionData(id);
                                         if (execution) {
                                             return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
@@ -205,8 +207,8 @@ define([
                                     if (unprocessed.length) {
                                         messageContext += '<br>' + unprocessed.join('<br>');
                                     }
-                                    if (err.response.error) {
-                                        messageContext += '<br>' + encode.html(err.response.error);
+                                    if (responseData.error) {
+                                        messageContext += '<br>' + encode.html(responseData.error);
                                     }
                                 } else {
                                     handleOnDisconnect(err);
