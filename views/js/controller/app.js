@@ -28,7 +28,7 @@ define([
 ], function (_, appController, request, containerFactory, breadcrumbsFactory, urlHelper) {
     'use strict';
 
-    var breadcrumbsUrl = urlHelper.route('load', 'Breadcrumbs', 'taoProctoring');
+    var breadcrumbsUrl = urlHelper.route('load', 'Breadcrumbs', 'tao');
     var indexUrl = urlHelper.route('index', 'DeliverySelection', 'taoProctoring');
     var monitorUrl = urlHelper.route('index', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
