@@ -190,11 +190,10 @@ define([
                                 }
                                 $list.datatable('refresh');
                             })
-                            .catch(function(response) {
+                            .catch(function(err) {
                                 var messageContext = '', unprocessed;
-                                handleOnDisconnect(response);
-                                if (response) {
-                                    unprocessed = _.map(response.unprocessed, function (id) {
+                                if (err.response) {
+                                    unprocessed = _.map(err.response.unprocessed, function (id) {
                                         var execution = getExecutionData(id);
                                         if (execution) {
                                             return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
@@ -204,11 +203,12 @@ define([
                                     if (unprocessed.length) {
                                         messageContext += '<br>' + unprocessed.join('<br>');
                                     }
-                                    if (response.error) {
-                                        messageContext += '<br>' + encode.html(response.error);
+                                    if (err.response.error) {
+                                        messageContext += '<br>' + encode.html(err.response.error);
                                     }
+                                } else {
+                                    handleOnDisconnect(err);
                                 }
-
                                 feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
                             })
                             .then(function() {

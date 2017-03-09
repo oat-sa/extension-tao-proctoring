@@ -39,6 +39,12 @@ class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
 
+    const ERROR_AUTHORIZE_EXECUTIONS = 1;
+    const ERROR_PAUSE_EXECUTIONS = 2;
+    const ERROR_TERMINATE_EXECUTIONS = 3;
+    const ERROR_REPORT_IRREGULARITIES = 4;
+    const ERROR_SET_EXTRA_TIME = 5;
+
     /**
      * Returns the currently proctored delivery
      *
@@ -157,13 +163,20 @@ class Monitor extends SimplePageModule
             $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
             $notAuthorised = array_diff($deliveryExecution, $authorised);
 
-            $this->returnJson(array(
+            $response = [
                 'success' => !count($notAuthorised),
                 'data' => [
                     'processed' => $authorised,
                     'unprocessed' => $notAuthorised
                 ]
-            ));
+            ];
+
+            if (!$response['success']) {
+                $response['errorCode'] = self::ERROR_AUTHORIZE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been authorized');
+            }
+
+            $this->returnJson($response);
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -192,13 +205,20 @@ class Monitor extends SimplePageModule
             $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
             $notTerminated = array_diff($deliveryExecution, $terminated);
 
-            $this->returnJson(array(
+            $response = [
                 'success' => !count($notTerminated),
                 'data' => [
                     'processed' => $terminated,
                     'unprocessed' => $notTerminated
                 ]
-            ));
+            ];
+
+            if (!$response['success']) {
+                $response['errorCode'] = self::ERROR_TERMINATE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been terminated');
+            }
+
+            $this->returnJson($response);
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -226,13 +246,20 @@ class Monitor extends SimplePageModule
             $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
             $notPaused = array_diff($deliveryExecution, $paused);
 
-            $this->returnJson(array(
+            $response = [
                 'success' => !count($notPaused),
                 'data' => [
                     'processed' => $paused,
                     'unprocessed' => $notPaused
                 ]
-            ));
+            ];
+
+            if (!$response['success']) {
+                $response['errorCode'] = self::ERROR_PAUSE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been paused');
+            }
+
+            $this->returnJson($response);
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
@@ -260,13 +287,60 @@ class Monitor extends SimplePageModule
             $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
             $notReported = array_diff($deliveryExecution, $reported);
 
-            $this->returnJson(array(
+            $response = [
                 'success' => !count($notReported),
                 'data' => [
                     'processed' => $reported,
                     'unprocessed' => $notReported
                 ]
-            ));
+            ];
+
+            if (!$response['success']) {
+                $response['errorCode'] = self::ERROR_REPORT_IRREGULARITIES;
+                $response['errorMsg'] = __('Some delivery executions have not been reported');
+            }
+
+            $this->returnJson($response);
+
+        } catch (ServiceNotFoundException $e) {
+            \common_Logger::w('No delivery service defined for proctoring');
+            $this->returnError('Proctoring interface not available');
+        }
+    }
+
+    /**
+     * Extra Time handling: add or remove time on delivery executions
+     *
+     * @throws \common_Exception
+     */
+    public function extraTime()
+    {
+        $deliveryExecution = $this->getRequestParameter('execution');
+        $extraTime = floatval($this->getRequestParameter('time'));
+
+        if (!is_array($deliveryExecution)) {
+            $deliveryExecution = array($deliveryExecution);
+        }
+
+        try {
+
+            $reported = DeliveryHelper::setExtraTime($deliveryExecution, $extraTime);
+            $notReported = array_diff($deliveryExecution, $reported);
+
+            $response = [
+                'success' => !count($notReported),
+                'data' => [
+                    'processed' => $reported,
+                    'unprocessed' => $notReported
+                ]
+            ];
+
+            if (!$response['success']) {
+                $response['errorCode'] = self::ERROR_SET_EXTRA_TIME;
+                $response['errorMsg'] = __('Some delivery executions have not been updated');
+            }
+
+            $this->returnJson($response);
 
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');

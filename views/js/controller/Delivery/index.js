@@ -276,7 +276,7 @@ define([
                                     feedback().success('Selected deliveries successfully paused');
                                     refresh().then(resolve).catch(reject);
                                 }).catch(function(err) {
-                                    if (err.response && err.response.success === false) {
+                                    if (err.response) {
                                         feedback().warning(__('Something went wrong ...') + '<br>' + formatPauseWarning(err.response, deliveryExecutions), {encodeHtml: false});
                                         resolve();
                                     } else {
