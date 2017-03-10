@@ -1,4 +1,4 @@
-/*
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
@@ -13,25 +13,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
- *
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
  */
-define(['ui/breadcrumbs'], function(breadcrumbs){
+/**
+ * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
+ */
+define([
+    'core/dataProvider/proxy',
+    'core/dataProvider/proxy/ajax'
+], function (proxyFactory,
+             ajaxProxy) {
     'use strict';
 
-    /**
-     * Wrap the generic breadcrumbs component into a very specialized
-     *
-     * @param {JQyery} $container
-     * @param {Array} [crumbs]
-     * @returns {unresolved}
-     */
-    return function breadcrumbFactory($container, crumbs){
-        return breadcrumbs({
-            breadcrumbs : crumbs,
-            renderTo: $container.find('.header'),
-            replace: true,
-            cls : 'action-bar horizontal-action-bar'
-        });
-    };
+    // TODO: use a better implementation to load and register the providers
+    return proxyFactory
+        .registerProvider('ajax', ajaxProxy);
 });

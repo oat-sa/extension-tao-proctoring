@@ -33,53 +33,26 @@ use DateTime;
  * @license GPL-2.0
  *
  */
-abstract class SimplePageModule extends \tao_actions_CommonModule
+abstract class SimplePageModule extends \tao_actions_SinglePageModule
 {
-    protected function singlePage($cssClass, $data = array(), $template = '', $extension = '')
-    {
-        $currentExtension = \Context::getInstance()->getExtensionName();
-        $template = empty($template) ? 'pages/index.tpl' : $template;
-        $extension = empty($extension) ? $currentExtension : $extension;
-        $this->setData('content-template', array($template, $extension));
-        $this->setView('layout.tpl', 'tao');
-    }
-    
     /**
-     * Main method to render a view for all proctoring related controller actions
+     * Retrieve the data from the url and make the base initialization
      *
-     * @param string $cssClass
-     * @param array $data
-     * @param array $breadcrumbs
-     * @param String $template
-     * @param String $extension
+     * @return void
      */
-    protected function composeView($cssClass, $data = array(), $breadcrumbs = array(), $template = '', $extension = '')
+    protected function defaultData()
     {
-        $data['breadcrumbs'] = $breadcrumbs;
-
-        foreach($data as $key => $value) {
-            if (is_array($value) || is_object($value)) {
-                $data[$key] = json_encode($value);
-            }
-        }
-
-        $this->defaultData();
+        parent::defaultData();
         $this->setData('userLabel', SessionManager::getSession()->getUserLabel());
-        $this->setData('clientConfigUrl', $this->getClientConfigUrl());
-        $this->setData('cls', $cssClass);
-        $this->setData('data', $data);
-        
-        $currentExtension = \Context::getInstance()->getExtensionName();
-        $template = empty($template) ? 'pages/index.tpl' : $template;
-        $extension = empty($extension) ? $currentExtension : $extension;
+    }
 
-        if (\tao_helpers_Request::isAjax()) {
-            $this->setView($template, $extension);
-        } else {
-            $this->setData('content-template', $template);
-            $this->setData('content-extension', $extension);
-            $this->setView('layout.tpl', 'taoProctoring');
-        }
+    /**
+     * Gets the path to the layout
+     * @return array
+     */
+    protected function getLayout()
+    {
+        return ['layout.tpl', 'taoProctoring'];
     }
 
     /**
