@@ -47,6 +47,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 
@@ -207,17 +208,7 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('4.8.1')) {
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class));
             
-            $breadcrumbsDeliveries = new DeliverySelectionService();
-            $breadcrumbsDeliveries->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(DeliverySelectionService::SERVICE_ID, $breadcrumbsDeliveries);
-            
-            $breadcrumbsMonitor = new MonitorService();
-            $breadcrumbsMonitor->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(MonitorService::SERVICE_ID, $breadcrumbsMonitor);
-            
-            $breadcrumbsReporting = new ReportingService();
-            $breadcrumbsReporting->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(ReportingService::SERVICE_ID, $breadcrumbsReporting);
+            $this->runExtensionScript(RegisterBreadcrumbsServices::class);
             
             $this->setVersion('4.9.0');
         }

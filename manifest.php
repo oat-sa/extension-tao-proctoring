@@ -24,6 +24,7 @@ use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
+use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
@@ -68,6 +69,7 @@ return array(
             SetupProctoringEventListeners::class,
             RegisterAuthProvider::class,
             RegisterServices::class,
+            RegisterBreadcrumbsServices::class,
             RegisterReasonCategoryService::class
         ),
         'rdf' => array(
