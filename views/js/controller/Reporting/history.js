@@ -24,6 +24,7 @@ define([
     'controller/app',
     'layout/loading-bar',
     'ui/container',
+    'ui/button',
     'util/encode',
     'taoProctoring/component/proxy',
     'taoProctoring/component/dateRange',
@@ -36,6 +37,7 @@ define([
     appController,
     loadingBar,
     containerFactory,
+    buttonFactory,
     encode,
     proxyFactory,
     dateRangeFactory,
@@ -81,11 +83,16 @@ define([
             var currentRoute = urlHelper.parse(window.location.href);
             var deliveryId = decodeURIComponent(currentRoute.query.delivery);
             var sessions = decodeURIComponent(currentRoute.query.session).split(',');
+            var monitoringUrl = decodeURIComponent(currentRoute.query.monitoring);
 
-            appController.on('change.history', function() {
-                appController.off('change.history');
-                container.destroy();
-            });
+            appController
+                .on('set-referrer.history', function(route) {
+                    monitoringUrl = route;
+                })
+                .on('change.history', function() {
+                    appController.off('.history');
+                    container.destroy();
+                });
 
             proxyFactory('ajax').init({
                 actions: {
@@ -123,6 +130,10 @@ define([
                         })
                         .render(container.find('.list'));
 
+                    if (data.monitoringUrl) {
+                        monitoringUrl = data.monitoringUrl;
+                    }
+
                     dateRangeFactory({
                         start : data.periodStart,
                         end : data.periodEnd,
@@ -132,6 +143,20 @@ define([
                             periodStart : this.getStart(),
                             periodEnd : this.getEnd()
                         });
+                    });
+
+                    buttonFactory({
+                        id: 'back',
+                        type: 'info',
+                        label: __('Back to sessions'),
+                        cls: 'back-button',
+                        renderTo: container.find('.panel')
+                    }).on('click', function () {
+                        if (monitoringUrl) {
+                            appController.getRouter().redirect(monitoringUrl);
+                        } else {
+                            history.go(-1);
+                        }
                     });
                 });
             }).catch(function(err) {

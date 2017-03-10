@@ -140,7 +140,7 @@ define([
             });
 
             appController.on('change.deliveryIndex', function() {
-                appController.off('change.deliveryIndex');
+                appController.off('.deliveryIndex');
                 listBox.destroy();
                 container.destroy();
             });

@@ -140,7 +140,7 @@ define([
             var serviceParams = {};
 
             appController.on('change.deliveryMonitoring', function() {
-                appController.off('change.deliveryMonitoring');
+                appController.off('.deliveryMonitoring');
                 container.destroy();
             });
 
@@ -278,13 +278,16 @@ define([
 
                 // display the session history
                 function showHistory(selection) {
+                    var monitoringRoute = window.location + '';
                     var urlParams = {
                         session: selection
                     };
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;
                     }
-                    appController.getRouter().redirect(urlHelper.route('index', 'Reporting', 'taoProctoring', urlParams));
+                    appController.getRouter().redirect(urlHelper.route('index', 'Reporting', 'taoProctoring', urlParams)).then(function() {
+                        appController.trigger('set-referrer', monitoringRoute);
+                    });
                 }
 
                 // print the score reports
