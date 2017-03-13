@@ -144,6 +144,24 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     }
 
     /**
+     * Gets the back url that returns to the page listing the sessions
+     * @param $delivery
+     * @return string
+     */
+    public function getBackUrl($delivery = null)
+    {
+        $params = [];
+        if ($delivery) {
+            if ($delivery instanceof \core_kernel_classes_Resource) {
+                $delivery = $delivery->getUri();
+            }
+            $params['delivery'] = $delivery . '';
+        }
+        return _url('index', 'Monitor', 'taoProctoring', $params);
+    }
+
+
+    /**
      * @param array $data event data from delivery log
      * @return string
      */

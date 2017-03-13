@@ -80,6 +80,7 @@ class Reporting extends SimplePageModule
             'sortOrder'   => $requestOptions['sortOrder'],
             'periodStart' => $requestOptions['periodStart'],
             'periodEnd'   => $requestOptions['periodEnd'],
+            'monitoringUrl' => $historyService->getBackUrl($delivery),
         ];
 
         if ($delivery) {
