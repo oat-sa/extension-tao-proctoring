@@ -42,6 +42,13 @@ interface TestSessionHistoryService
     public function getSessionsHistory(array $sessions, $options);
 
     /**
+     * Gets the url that leads to the page listing the history
+     * @param $delivery
+     * @return string
+     */
+    public function getHistoryUrl($delivery = null);
+    
+    /**
      * Gets the back url that returns to the page listing the sessions
      * @param $delivery
      * @return string

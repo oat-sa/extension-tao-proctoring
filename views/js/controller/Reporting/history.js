@@ -81,9 +81,9 @@ define([
         start : function start() {
             var container = containerFactory().changeScope(cssScope).write(indexTpl());
             var currentRoute = urlHelper.parse(window.location.href);
-            var deliveryId = decodeURIComponent(currentRoute.query.delivery);
+            var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
             var sessions = decodeURIComponent(currentRoute.query.session).split(',');
-            var monitoringUrl = decodeURIComponent(currentRoute.query.monitoring);
+            var monitoringUrl = currentRoute.query.monitoring && decodeURIComponent(currentRoute.query.monitoring);
 
             appController
                 .on('set-referrer.history', function(route) {
