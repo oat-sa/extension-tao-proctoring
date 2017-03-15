@@ -22,13 +22,8 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\oatbox\user\User;
-use oat\tao\helpers\UserHelper;
-use oat\taoProctoring\helpers\DeliveryHelper;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
-use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\runner\session\TestSession;
@@ -79,9 +74,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         DeliveryMonitoringService::DELIVERY_EXECUTION_ID,
         DeliveryMonitoringService::STATUS,
     ];
-
-    /** @var User */
-    private $user;
 
     /**
      * DeliveryMonitoringData constructor.
@@ -209,7 +201,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
             // to ensure that during sorting by connectivity all similar statuses grouped together
-            $lastConnectivity = crc32($status);
+            $lastConnectivity = PHP_INT_MIN + substr(abs(crc32($status)), 0, 3);
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
