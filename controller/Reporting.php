@@ -40,10 +40,12 @@ use oat\taoProctoring\model\TestSessionHistoryService;
 class Reporting extends SimplePageModule
 {
     use OntologyAwareTrait;
+
     /**
-     * Display the session history of the current test center
+     * Gets the view parameters and data to display
+     * @return array
      */
-    public function sessionHistory()
+    protected function getViewData()
     {
         $delivery       = $this->hasRequestParameter('delivery')
             ? $this->getResource($this->getRequestParameter('delivery'))
@@ -60,9 +62,6 @@ class Reporting extends SimplePageModule
         if (!is_array($sessions)) {
             $sessions = $sessions ? explode(',', $sessions) : [];
         }
-
-        $breadcrumbs = [
-        ];
 
         // log access to history
         $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
@@ -88,14 +87,32 @@ class Reporting extends SimplePageModule
         }
 
         if (count($sessions) > 1) {
-            $title = __('Detailed Session History of a selection');
+            $viewData['title'] = __('Detailed Session History of a selection');
         } else {
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
-            $title = __('Detailed Session History of %s', $deliveryExecution->getLabel());
+            $viewData['title'] = __('Detailed Session History of %s', $deliveryExecution->getLabel());
         }
-
-        $this->setData('title', $title);
-        $this->composeView('session-history', $viewData, $breadcrumbs);
+        
+        return $viewData;
+    }
+    
+    /**
+     * Display the session history of the current test center
+     */
+    public function index()
+    {
+        $this->composeView('session-history', null, 'pages/index.tpl', 'tao');
+    }
+    
+    /**
+     * Display the session history of the current test center
+     */
+    public function sessionHistory()
+    {
+        $this->returnJson([
+            'success' => true,
+            'data' => $this->getViewData(),
+        ]);
     }
 
     /**

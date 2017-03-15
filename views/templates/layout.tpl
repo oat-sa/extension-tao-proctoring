@@ -15,7 +15,7 @@ use oat\tao\model\theme\Theme;
         <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
         <link rel="stylesheet" href="<?= Layout::getThemeStylesheet(Theme::CONTEXT_FRONTOFFICE) ?>" />
         <link rel="shortcut icon" href="<?= Template::img('favicon.ico', 'tao') ?>"/>
-        <?= Layout::getAmdLoader(Template::js('loader/backoffice.min.js', 'tao'), 'controller/backoffice') ?>
+        <?= Layout::getAmdLoader(Template::js('loader/app.min.js', 'taoProctoring'), 'taoProctoring/controller/app') ?>
     </head>
     <body class="proctoring-scope">
 <?php Template::inc('blocks/requirement-check.tpl', 'tao'); ?>
@@ -49,7 +49,10 @@ use oat\tao\model\theme\Theme;
                 </nav>
             </header>
             <div id="feedback-box"></div>
-            <?php Template::inc(get_data('content-template'),get_data('content-extension')); ?>
+            <div class="header toolbox"></div>
+            <?php /* actual content */
+            $contentTemplate = Layout::getContentTemplate();
+            Template::inc($contentTemplate['path'], $contentTemplate['ext']); ?>
         </div>
 
         <?= Layout::renderThemeTemplate(Theme::CONTEXT_BACKOFFICE, 'footer') ?>
