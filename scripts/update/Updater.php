@@ -219,5 +219,7 @@ class Updater extends common_ext_ExtensionUpdater
             $action([]);
             $this->setVersion('4.9.1');
         }
+
+        $this->skip('4.9.1', '4.9.2');
     }
 }
