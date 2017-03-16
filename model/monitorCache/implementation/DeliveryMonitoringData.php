@@ -201,7 +201,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
             // to ensure that during sorting by connectivity all similar statuses grouped together
-            $lastConnectivity = PHP_INT_MIN + substr(abs(crc32($status)), 0, 3);
+            $lastConnectivity = (~PHP_INT_MAX) + substr(abs(crc32($status)), 0, 3);
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
