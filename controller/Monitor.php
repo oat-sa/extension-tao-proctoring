@@ -134,7 +134,7 @@ class Monitor extends SimplePageModule
                 }
             }
         }
-        $options['order'] = $requestOptions['sortBy'] . ' ' . mb_strtoupper($requestOptions['sortOrder']);
+        $options['order'] = DeliveryHelper::adjustColumnName($requestOptions['sortBy']) . ' ' . mb_strtoupper($requestOptions['sortOrder']);
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
