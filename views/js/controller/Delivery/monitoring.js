@@ -648,21 +648,18 @@ define([
                     }
 
                     // column: delivery (only for all deliveries view)
-                    if (!deliveryId) {
-                        model.push({
-                            id: 'delivery',
-                            label: __('Session'),
-                            sortable : true,
-                            transform: function(value, row) {
-                                var delivery = row && row.delivery;
-                                if (delivery) {
-                                    delivery.url = urlHelper.route('monitoring', 'Delivery', 'taoProctoring', {delivery : delivery.uri});
-                                    value = deliveryLinkTpl(delivery);
-                                }
-                                return value;
+                    model.push({
+                        id: 'delivery',
+                        label: __('Session'),
+                        sortable : true,
+                        transform: function(value) {
+                            if (value) {
+                                value.url = urlHelper.route('monitoring', 'Delivery', 'taoProctoring', {delivery : value.uri});
+                                value = deliveryLinkTpl(value);
                             }
-                        });
-                    }
+                            return value;
+                        }
+                    });
 
                     // column: test taker first name
                     model.push({
