@@ -32,6 +32,8 @@ use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+
 /**
  * Class DeliveryExecutionStateService
  * @package oat\taoProctoring\model
@@ -121,7 +123,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
-        if (ProctoredDeliveryExecution::STATE_AWAITING === $executionState) {
+        if ($this->canBeAuthorised($deliveryExecution)) {
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $logData = [
                 'proctorUri' => $proctor->getIdentifier(),
@@ -332,6 +334,34 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             default:
                 $this->logWarning('Unrecognised state '.$state);
                 $result = $this->setState($deliveryExecution, $state);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Whether delivery execution can be moved to authorised state.
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     */
+    protected function canBeAuthorised(DeliveryExecution $deliveryExecution)
+    {
+        $result = false;
+        $user = \common_session_SessionManager::getSession()->getUser();
+        $stateUri = $deliveryExecution->getState()->getUri();
+        if ($stateUri === ProctoredDeliveryExecution::STATE_AWAITING) {
+            $result = true;
+        }
+
+        if (
+            $user instanceof GuestTestUser &&
+            !in_array($stateUri, [
+                ProctoredDeliveryExecution::STATE_FINISHIED,
+                ProctoredDeliveryExecution::STATE_TERMINATED,
+                ProctoredDeliveryExecution::STATE_CANCELED,
+            ])
+        ){
+            $result = true;
         }
 
         return $result;
