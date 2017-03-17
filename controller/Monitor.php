@@ -71,7 +71,6 @@ class Monitor extends SimplePageModule
         $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
         $data = [
             'ismanageable' => false,
-            'defaulttag' => $this->hasRequestParameter('defaulttag') ? $this->getRequestParameter('defaulttag') : '',
             'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories(),

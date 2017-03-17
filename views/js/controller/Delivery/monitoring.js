@@ -22,6 +22,7 @@ define([
     'jquery',
     'lodash',
     'i18n',
+    'module',
     'controller/app',
     'util/url',
     'layout/loading-bar',
@@ -46,6 +47,7 @@ define([
     $,
     _,
     __,
+    module,
     appController,
     urlHelper,
     loadingBar,
@@ -124,14 +126,14 @@ define([
             var container = containerFactory().changeScope(cssScope).write(monitoringTpl());
             var $content = container.find('.content');
             var $list = container.find('.list');
-            var currentRoute = urlHelper.parse(window.location.href);
-            var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
-            var context = currentRoute.query.context && decodeURIComponent(currentRoute.query.context);
+            var pageParams = module.config();
+            var deliveryId = pageParams.delivery;
+            var context = pageParams.context;
+            var defaultTag = pageParams.defaultTag;
             var defaultAvailableLabel = __('Current sessions');
             var dataset;
             var extraFields;
             var categories;
-            var defaultTag;
             var timeHandlingButton;
             var printReportButton;
             var tools = [];
@@ -523,7 +525,6 @@ define([
                     categories = data.categories;
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
-                    defaultTag = data.defaulttag;
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
