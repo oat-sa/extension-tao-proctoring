@@ -204,12 +204,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('4.8.0', '4.8.1');
-
+        
         if ($this->isVersion('4.8.1')) {
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class));
-
+            
             $this->runExtensionScript(RegisterBreadcrumbsServices::class);
-
+            
             $this->setVersion('4.9.0');
         }
 

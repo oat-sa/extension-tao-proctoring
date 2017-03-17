@@ -79,6 +79,8 @@ define([
     var reportUrl = urlHelper.route('reportExecutions', 'Monitor', 'taoProctoring');
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
+    var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+    var deliveryUrl = urlHelper.route('monitoring', 'Delivery', 'taoProctoring');
 
     /**
      * The extra time unit: by default in minutes
@@ -138,9 +140,10 @@ define([
             var highlightRows = [];
             var actionList;
             var serviceParams = {};
+            var sessionsHistoryUrl = historyUrl;
 
             appController.on('change.deliveryMonitoring', function() {
-                appController.off('change.deliveryMonitoring');
+                appController.off('.deliveryMonitoring');
                 container.destroy();
             });
 
@@ -278,13 +281,16 @@ define([
 
                 // display the session history
                 function showHistory(selection) {
+                    var monitoringRoute = window.location + '';
                     var urlParams = {
                         session: selection
                     };
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;
                     }
-                    appController.getRouter().redirect(urlHelper.route('index', 'Reporting', 'taoProctoring', urlParams));
+                    appController.getRouter().redirect(urlHelper.build(sessionsHistoryUrl, urlParams)).then(function() {
+                        appController.trigger('set-referrer', monitoringRoute);
+                    });
                 }
 
                 // print the score reports
@@ -520,6 +526,7 @@ define([
                     defaultTag = data.defaulttag;
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
+                    sessionsHistoryUrl = data.historyUrl || historyUrl;
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
@@ -652,10 +659,11 @@ define([
                         id: 'delivery',
                         label: __('Session'),
                         sortable : true,
-                        transform: function(value) {
-                            if (value) {
-                                value.url = urlHelper.route('monitoring', 'Delivery', 'taoProctoring', {delivery : value.uri});
-                                value = deliveryLinkTpl(value);
+                        transform: function(value, row) {
+                            var delivery = row && row.delivery;
+                            if (delivery) {
+                                delivery.url = urlHelper.build(deliveryUrl, {delivery : delivery.uri});
+                                value = deliveryLinkTpl(delivery);
                             }
                             return value;
                         }

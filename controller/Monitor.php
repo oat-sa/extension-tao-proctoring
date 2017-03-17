@@ -26,6 +26,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\model\TestSessionHistoryService;
 
 /**
  * Monitoring Delivery controller
@@ -76,6 +77,7 @@ class Monitor extends SimplePageModule
             'categories' => DeliveryHelper::getAllReasonsCategories(),
             'printReportButton' => $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID)->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
             'timeHandling' => $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
+            'historyUrl' => $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
         ];
 
         if (!is_null($delivery)) {
