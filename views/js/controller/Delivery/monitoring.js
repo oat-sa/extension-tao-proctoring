@@ -127,7 +127,7 @@ define([
             var $content = container.find('.content');
             var $list = container.find('.list');
             var pageParams = module.config();
-            var deliveryId = pageParams.deliveryId;
+            var deliveryId = pageParams.delivery;
             var context = pageParams.context;
             var defaultTag = pageParams.defaultTag;
             var defaultAvailableLabel = __('Current sessions');
