@@ -126,11 +126,10 @@ define([
             var container = containerFactory().changeScope(cssScope).write(monitoringTpl());
             var $content = container.find('.content');
             var $list = container.find('.list');
-            var currentRoute = urlHelper.parse(window.location.href);
             var pageParams = module.config();
-            var deliveryId = pageParams.deliveryId || currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
-            var context = pageParams.context || currentRoute.query.context && decodeURIComponent(currentRoute.query.context);
-            var defaultTag = pageParams.defaultTag || currentRoute.query.defaultTag && decodeURIComponent(currentRoute.query.defaultTag);
+            var deliveryId = pageParams.deliveryId;
+            var context = pageParams.context;
+            var defaultTag = pageParams.defaultTag;
             var defaultAvailableLabel = __('Current sessions');
             var dataset;
             var extraFields;
@@ -526,7 +525,6 @@ define([
                     categories = data.categories;
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
-                    defaultTag = data.defaulttag;
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
