@@ -53,6 +53,14 @@ class DeliveryHelper
      * @var array
      */
     private static $extraFields = [];
+
+    /**
+     * Translation map to convert frontend data column into database column
+     * @var array
+     */
+    private static $columnsMap = [
+        'delivery' => DeliveryMonitoringService::DELIVERY_NAME
+    ];
     
     public static function buildDeliveryData($delivery, $executions)
     {
@@ -324,6 +332,20 @@ class DeliveryHelper
     
     public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
         return self::adjustDeliveryExecutions($deliveryExecutions, $sortOptions);
+    }
+
+    /**
+     * Converts a frontend column name into database column name. 
+     * Useful to translate the name of a column to sort.
+     * @param string $column
+     * @return string
+     */
+    public static function adjustColumnName($column)
+    {
+        if (isset(self::$columnsMap[$column])) {
+            $column = self::$columnsMap[$column];
+        }
+        return $column;
     }
 
     /**

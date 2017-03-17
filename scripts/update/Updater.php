@@ -213,6 +213,13 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.9.0');
         }
 
-        $this->skip('4.9.0', '4.9.1');
+        if ($this->isVersion('4.9.0')) {
+            /** @var DeliveryMonitoringService $monitoring */
+            $action = new UpdateLastConnectivity();
+            $action([]);
+            $this->setVersion('4.9.1');
+        }
+
+        $this->skip('4.9.1', '4.10.3');
     }
 }

@@ -72,6 +72,7 @@ class MonitorCacheService extends MonitoringStorage
             DeliveryMonitoringService::START_TIME,
             \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
         );
+        $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $success = $this->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
@@ -83,7 +84,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = $event->getDeliveryExecution();
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
-
+        $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = \common_session_SessionManager::getSession()->getUser();
 
         if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
@@ -119,7 +120,8 @@ class MonitorCacheService extends MonitoringStorage
             $data->setTestSession($event->getSession());
             $data->updateData([
                 DeliveryMonitoringService::REMAINING_TIME,
-                DeliveryMonitoringService::EXTRA_TIME
+                DeliveryMonitoringService::EXTRA_TIME,
+                DeliveryMonitoringService::CONNECTIVITY
             ]);
         }
         $success = $this->save($data);

@@ -434,6 +434,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $args[] = isset($orderRule[1]) && strcasecmp($orderRule[1], 'desc') === 0 ? SORT_DESC : SORT_ASC;
         }
 
+        $args[] = SORT_STRING | SORT_FLAG_CASE;
         $args[] = &$data;
         call_user_func_array('array_multisort', $args);
         return array_pop($args);

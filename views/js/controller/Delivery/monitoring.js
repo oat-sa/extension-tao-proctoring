@@ -655,21 +655,19 @@ define([
                     }
 
                     // column: delivery (only for all deliveries view)
-                    if (!deliveryId) {
-                        model.push({
-                            id: 'delivery',
-                            label: __('Session'),
-                            sortable : true,
-                            transform: function(value, row) {
-                                var delivery = row && row.delivery;
-                                if (delivery) {
-                                    delivery.url = urlHelper.build(deliveryUrl, {delivery : delivery.uri});
-                                    value = deliveryLinkTpl(delivery);
-                                }
-                                return value;
+                    model.push({
+                        id: 'delivery',
+                        label: __('Session'),
+                        sortable : true,
+                        transform: function(value, row) {
+                            var delivery = row && row.delivery;
+                            if (delivery) {
+                                delivery.url = urlHelper.build(deliveryUrl, {delivery : delivery.uri});
+                                value = deliveryLinkTpl(delivery);
                             }
-                        });
-                    }
+                            return value;
+                        }
+                    });
 
                     // column: test taker first name
                     model.push({

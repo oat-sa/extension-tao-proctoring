@@ -187,9 +187,9 @@ class DeliveryServer extends DefaultDeliveryServer
             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Navigation'],
         ];
         if ($deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_AUTHORIZED) {
-            $reason['comment'] = __('Automatically reset by system due to the test taker choosing not to proceed with the authorized.');
+            $reason['comment'] = __('Automatically reset by the system due to the test taker choosing not to proceed with the authorized test.');
         } else {
-            $reason['comment'] = __('Automatically reset by system due to authorization request being cancelled by test taker.');
+            $reason['comment'] = __('Automatically reset by the system due to authorization request being cancelled by test taker.');
         }
         $deliveryExecutionStateService->cancelExecution(
             $deliveryExecution,
