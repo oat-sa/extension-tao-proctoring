@@ -23,32 +23,33 @@ namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use Doctrine\DBAL\Schema\SchemaException;
-use oat\tao\scripts\update\OntologyUpdater;
-use oat\tao\model\entryPoint\EntryPointService;
 use oat\oatbox\event\EventManager;
-use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoDeliveryRdf\model\GroupAssignment;
-use oat\taoDelivery\model\AssignmentService;
-use oat\taoProctoring\model\ReasonCategoryService;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\model\event\MetadataModified;
+use oat\tao\model\user\TaoRoles;
+use oat\tao\scripts\update\OntologyUpdater;
+use oat\taoDelivery\model\AssignmentService;
+use oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\taoDeliveryRdf\model\GroupAssignment;
+use oat\taoProctoring\controller\DeliverySelection;
+use oat\taoProctoring\controller\Monitor;
+use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\model\breadcrumbs\DeliverySelectionService;
+use oat\taoProctoring\model\breadcrumbs\MonitorService;
+use oat\taoProctoring\model\breadcrumbs\ReportingService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
-use oat\tao\model\event\MetadataModified;
+use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\tao\model\accessControl\func\AclProxy;
-use oat\tao\model\accessControl\func\AccessRule;
-use oat\taoProctoring\controller\DeliverySelection;
-use oat\taoProctoring\controller\Monitor;
-use oat\tao\model\user\TaoRoles;
-use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoProctoring\controller\Tools;
-use oat\taoProctoring\scripts\update\UpdateMonitoringTimeValues;
-use oat\taoProctoring\scripts\update\UpdateLastConnectivity;
-use \oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use \oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoTests\models\event\TestChangedEvent;
 
 /**
  *
@@ -105,7 +106,7 @@ class Updater extends common_ext_ExtensionUpdater
                 foreach ($queries as $query) {
                     $persistence->exec($query);
                 }
-            } catch (SchemaException  $e) {
+            } catch (SchemaException $e) {
                         \common_Logger::i('Database Schema already up to date.');
             }
             
@@ -201,5 +202,24 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('4.8.0');
         }
+
+        $this->skip('4.8.0', '4.8.1');
+        
+        if ($this->isVersion('4.8.1')) {
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class));
+            
+            $this->runExtensionScript(RegisterBreadcrumbsServices::class);
+            
+            $this->setVersion('4.9.0');
+        }
+
+        if ($this->isVersion('4.9.0')) {
+            /** @var DeliveryMonitoringService $monitoring */
+            $action = new UpdateLastConnectivity();
+            $action([]);
+            $this->setVersion('4.9.1');
+        }
+
+        $this->skip('4.9.1', '4.10.4');
     }
 }

@@ -158,12 +158,12 @@ class DeliveryServer extends DefaultDeliveryServer
             case DeliveryExecutionState::STATE_TERMINATED:
             case DeliveryExecutionState::STATE_FINISHED:
                 $success = false;
-                $message = __('This test has been terminated');
+                $message = __('The assessment has been terminated.');
                 break;
                 
             case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
-                $message = __('This test has been suspended');
+                $message = __('The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.');
                 break;
         }
 
@@ -187,9 +187,9 @@ class DeliveryServer extends DefaultDeliveryServer
             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Navigation'],
         ];
         if ($deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_AUTHORIZED) {
-            $reason['comment'] = __('Automatically reset by system due to the test taker choosing not to proceed with the authorized.');
+            $reason['comment'] = __('Automatically reset by the system due to the test taker choosing not to proceed with the authorized test.');
         } else {
-            $reason['comment'] = __('Automatically reset by system due to authorization request being cancelled by test taker.');
+            $reason['comment'] = __('Automatically reset by the system due to authorization request being cancelled by test taker.');
         }
         $deliveryExecutionStateService->cancelExecution(
             $deliveryExecution,

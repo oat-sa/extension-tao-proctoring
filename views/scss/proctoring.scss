@@ -29,15 +29,6 @@
         }
     }
 
-    form.daterange {
-        label {
-            padding : 0;
-        }
-        input {
-            margin: 0 10px;
-        }
-    }
-
     table.datatable {
         [class^="icon-"] {
             padding: 0;
@@ -101,6 +92,19 @@
     }
 
     .panel {
+        @include flex-container();
+        .back-button, .daterange {
+            margin: 10px 4px;
+        }
+        .daterange {
+            @include simple-flex-box();
+            label {
+                padding : 0;
+            }
+            input {
+                margin: 0 10px;
+            }
+        }
         .action-bar {
             background: whiten($info, .1);
             padding: 3px;

@@ -35,8 +35,9 @@ class DeliverySelection extends SimplePageModule
 {
     /**
      * Lists all available deliveries
+     * @return array
      */
-    public function index()
+    protected function getDeliveries()
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
@@ -52,14 +53,38 @@ class DeliverySelection extends SimplePageModule
             );
             $data[] = $deliveryData;
         }
-        
-        $this->composeView(
-            'delivery-index',
-            array(
-                'testcenter' => 1234567,
-                'list' => $data,
-                'categories' => []
-            )
-        );
+
+        return $data;
+    }
+
+    /**
+     * Gets the view parameters and data to display
+     * @return array
+     */
+    protected function getViewData()
+    {
+        return [
+            'list' => $this->getDeliveries(),
+            'categories' => DeliveryHelper::getAllReasonsCategories(),
+        ];
+    }
+
+    /**
+     * Lists all available deliveries
+     */
+    public function index()
+    {
+        $this->composeView('delivery-index', null, 'pages/index.tpl', 'tao');
+    }
+
+    /**
+     * Lists all available deliveries
+     */
+    public function deliveries()
+    {
+        $this->returnJson([
+            'success' => true,
+            'data' => $this->getViewData(),
+        ]);
     }
 }

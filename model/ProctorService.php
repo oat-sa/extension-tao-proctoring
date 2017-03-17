@@ -72,7 +72,7 @@ class ProctorService extends ConfigurableService
             ];
         }
 
-        if (isset($options['filters'])) {
+        if (isset($options['filters']) && $options['filters']) {
             $criteria[] = $options['filters'];
         }
 

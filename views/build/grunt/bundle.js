@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     var libs        = grunt.option('mainlibs');
     var ext         = require(root + '/tao/views/build/tasks/helpers/extensions')(grunt, root);
     var out         = 'output';
-    
+
     var paths = {
         'taoProctoring'          : root + '/taoProctoring/views/js',
         'taoProctoringCss'       :  root + '/taoProctoring/views/css',
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
         'taoItems'               : root + '/taoItems/views/js',
         'taoQtiTest'             : root + '/taoQtiTest/views/js'
     };
-    
+
     /**
      * Remove bundled and bundling files
      */
@@ -34,6 +34,10 @@ module.exports = function(grunt) {
             mainConfigFile : './config/requirejs.build.js',
             paths : paths,
             modules : [{
+                name: 'taoProctoring/controller/app',
+                include: ['lib/require', 'loader/bootstrap'].concat(libs),
+                exclude : ['json!i18ntr/messages.json']
+            }, {
                 name: 'taoProctoring/controller/routes',
                 include : ext.getExtensionsControllers(['taoProctoring']),
                 exclude : ['mathJax'].concat(libs)
@@ -46,6 +50,8 @@ module.exports = function(grunt) {
      */
     copy.taoproctoringbundle = {
         files: [
+            { src: [out + '/taoProctoring/controller/app.js'],       dest: root + '/taoProctoring/views/js/loader/app.min.js' },
+            { src: [out + '/taoProctoring/controller/app.js.map'],   dest: root + '/taoProctoring/views/js/loader/app.min.js.map' },
             { src: [out + '/taoProctoring/controller/routes.js'],  dest: root + '/taoProctoring/views/js/controllers.min.js' },
             { src: [out + '/taoProctoring/controller/routes.js.map'],  dest: root + '/taoProctoring/views/js/controllers.min.js.map' }
         ]

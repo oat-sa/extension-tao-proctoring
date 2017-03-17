@@ -18,29 +18,30 @@
  *
  *
  */
-use oat\taoProctoring\scripts\install\RegisterAuthProvider;
-use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
+use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
-use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
-use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
-use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
-use oat\taoProctoring\scripts\install\RegisterProctoringLog;
-use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
-use oat\taoProctoring\model\ProctorService;
-use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\scripts\install\RegisterAuthProvider;
+use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
+use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
+use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
+use oat\taoProctoring\scripts\install\RegisterProctoringLog;
+use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterServices;
+use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
+use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.8.0',
+    'version' => '4.10.4',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=7.66.2',
+        'tao' => '>=7.81.1',
         'taoDelivery' => '>=4.7.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
@@ -53,6 +54,7 @@ return array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
         array('grant', ProctorService::ROLE_PROCTOR, DeliverySelection::class),
         array('grant', ProctorService::ROLE_PROCTOR, Monitor::class),
+        array('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
@@ -67,6 +69,7 @@ return array(
             SetupProctoringEventListeners::class,
             RegisterAuthProvider::class,
             RegisterServices::class,
+            RegisterBreadcrumbsServices::class,
             RegisterReasonCategoryService::class
         ),
         'rdf' => array(
