@@ -343,7 +343,7 @@ define([
                     if (_.isObject(testTakerData.delivery)) {
                         deliveryName = testTakerData.delivery.label;
                     } else {
-                        deliveryName = $(testTakerData.delivery).text();
+                        deliveryName = testTakerData.delivery;
                     }
                     formatted = {
                         id : testTakerData.id,
