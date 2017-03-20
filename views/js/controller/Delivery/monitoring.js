@@ -38,7 +38,6 @@ define([
     'taoProctoring/component/extraTime/encoder',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/monitoring',
-    'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
     'ui/datatable',
     'jqueryui',
@@ -63,7 +62,6 @@ define([
     encodeExtraTime,
     _status,
     monitoringTpl,
-    deliveryLinkTpl,
     statusFilterTpl
 ) {
     'use strict';
@@ -82,7 +80,6 @@ define([
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
-    var deliveryUrl = urlHelper.route('monitoring', 'Delivery', 'taoProctoring');
 
     /**
      * The extra time unit: by default in minutes
@@ -663,8 +660,7 @@ define([
                         transform: function(value, row) {
                             var delivery = row && row.delivery;
                             if (delivery) {
-                                delivery.url = urlHelper.build(deliveryUrl, {delivery : delivery.uri});
-                                value = deliveryLinkTpl(delivery);
+                                value = delivery.label;
                             }
                             return value;
                         }
