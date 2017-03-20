@@ -656,7 +656,7 @@ define([
 
                     // column: delivery (only for all deliveries view)
                     model.push({
-                        id: 'delivery',
+                        id: 'deliveryLabel',
                         label: __('Session'),
                         sortable : true,
                         transform: function(value, row) {
