@@ -1,1 +1,1 @@
-<a class="elipsis" href="{{url}}" title="{{{label}}}">{{{label}}}</a>
+<span class="elipsis" title="{{{label}}}">{{{label}}}</span>

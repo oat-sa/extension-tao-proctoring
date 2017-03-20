@@ -38,6 +38,7 @@ define([
     'taoProctoring/component/extraTime/encoder',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/monitoring',
+    'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
     'ui/datatable',
     'jqueryui',
@@ -62,6 +63,7 @@ define([
     encodeExtraTime,
     _status,
     monitoringTpl,
+    deliveryLinkTpl,
     statusFilterTpl
 ) {
     'use strict';
@@ -343,7 +345,7 @@ define([
                     if (_.isObject(testTakerData.delivery)) {
                         deliveryName = testTakerData.delivery.label;
                     } else {
-                        deliveryName = $(testTakerData.delivery).text();
+                        deliveryName = testTakerData.delivery;
                     }
                     formatted = {
                         id : testTakerData.id,
@@ -660,7 +662,7 @@ define([
                         transform: function(value, row) {
                             var delivery = row && row.delivery;
                             if (delivery) {
-                                value = delivery.label;
+                                value = deliveryLinkTpl(delivery);
                             }
                             return value;
                         }
