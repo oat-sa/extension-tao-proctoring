@@ -62,7 +62,7 @@ class DeliverySelectionService extends ConfigurableService implements Breadcrumb
     {
         return [
             'id' => 'deliverySelection',
-            'url' => '/taoProctoring/DeliverySelection/index',
+            'url' => _url('index', 'DeliverySelection', 'taoProctoring'),
             'label' => __('Deliveries'),
         ];
     }
