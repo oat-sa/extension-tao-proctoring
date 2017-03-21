@@ -29,9 +29,9 @@ use qtism\runtime\tests\AssessmentTestSession;
 
 /**
  * Class QtiRunnerMessageService
- * 
+ *
  * Defines a service that will provide messages for the test runner
- * 
+ *
  * @package oat\taoQtiTest\models
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
@@ -41,7 +41,27 @@ class TestRunnerMessageService extends QtiRunnerMessageService
         $userRoles = \common_session_SessionManager::getSession()->getUserRoles();
         return in_array(ProctorService::ROLE_PROCTOR, $userRoles);
     }
-    
+
+    /**
+     * Gets a message about the paused status of the assessment when a proctor is the sender
+     * @param AssessmentTestSession $testSession
+     * @return string
+     */
+    protected function getProctorPausedStateMessage(AssessmentTestSession $testSession)
+    {
+        return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+    }
+
+    /**
+     * Gets a message about the terminated status of the assessment when a proctor is the sender
+     * @param AssessmentTestSession $testSession
+     * @return string
+     */
+    protected function getProctorTerminatedStateMessage(AssessmentTestSession $testSession)
+    {
+        return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+    }
+
     /**
      * Gets a message about the paused status of the assessment
      * @param AssessmentTestSession $testSession
@@ -50,9 +70,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
     protected function getPausedStateMessage(AssessmentTestSession $testSession)
     {
         if ($this->isProctorAction($testSession)) {
-            return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+            return $this->getProctorPausedStateMessage($testSession);
         }
-        
+
         return __('The assessment has been suspended. To resume your assessment, please relaunch it.');
     }
 
@@ -64,9 +84,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
     protected function getTerminatedStateMessage(AssessmentTestSession $testSession)
     {
         if ($this->isProctorAction($testSession)) {
-            return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+            return $this->getProctorTerminatedStateMessage($testSession);
         }
-        
+
         return __('The assessment has been terminated. You cannot interact with it anymore.');
     }
 }
