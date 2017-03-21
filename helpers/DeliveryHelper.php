@@ -59,7 +59,8 @@ class DeliveryHelper
      * @var array
      */
     private static $columnsMap = [
-        'delivery' => DeliveryMonitoringService::DELIVERY_NAME
+        'delivery' => DeliveryMonitoringService::DELIVERY_NAME,
+        'deliveryLabel' => DeliveryMonitoringService::DELIVERY_NAME,
     ];
     
     public static function buildDeliveryData($delivery, $executions)
