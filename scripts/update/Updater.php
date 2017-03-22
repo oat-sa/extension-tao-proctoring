@@ -46,6 +46,7 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
+use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 
@@ -222,21 +223,10 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('4.10.8')) {
 
-            $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
-            $urlService->setOption('ProctoringHome', [
-                    'ext' => 'taoProctoring',
-                    'controller' => 'TestCenter',
-                    'action' => 'index',
-                ]
-            );
-            $urlService->setOption('ProctoringLogout', [
-                    'ext' => 'tao',
-                    'controller' => 'Main',
-                    'action' => 'logout',
-                ]
-            );
-            $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
-
+            $action = new SetUpProctoringUrlService();
+            $action->setServiceLocator($this->getServiceManager());
+            $action([]);
+            
             $this->setVersion('4.11.0');
         }
     }
