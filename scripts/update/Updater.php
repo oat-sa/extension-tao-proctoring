@@ -47,6 +47,7 @@ use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 
@@ -219,15 +220,24 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.9.1');
         }
 
-        $this->skip('4.9.1', '4.10.8');
 
-        if ($this->isVersion('4.10.8')) {
+        $this->skip('4.9.1', '4.10.9');
+
+       if ($this->isVersion('4.10.9')) {
+            
+            $this->runExtensionScript(RegisterRunnerMessageService::class);
+
+            
+            $this->setVersion('4.11.0');
+        }
+      
+        if ($this->isVersion('4.11.0')) {
 
             $action = new SetUpProctoringUrlService();
             $action->setServiceLocator($this->getServiceManager());
             $action([]);
-            
-            $this->setVersion('4.11.0');
+
+            $this->setVersion('4.12.0');
         }
     }
 }
