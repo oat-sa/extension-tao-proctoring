@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\controller;
 
 use common_session_SessionManager as SessionManager;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DataTableHelper;
 use DateTime;
 
@@ -52,6 +53,8 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
      */
     protected function getLayout()
     {
+        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
+        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
         return ['layout.tpl', 'taoProctoring'];
     }
 

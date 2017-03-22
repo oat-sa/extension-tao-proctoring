@@ -28,6 +28,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
@@ -39,9 +40,6 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoProctoring\model\breadcrumbs\DeliverySelectionService;
-use oat\taoProctoring\model\breadcrumbs\MonitorService;
-use oat\taoProctoring\model\breadcrumbs\ReportingService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
@@ -221,5 +219,25 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('4.9.1', '4.10.8');
+
+        if ($this->isVersion('4.10.8')) {
+
+            $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+            $urlService->setOption('ProctoringHome', [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'TestCenter',
+                    'action' => 'index',
+                ]
+            );
+            $urlService->setOption('ProctoringLogout', [
+                    'ext' => 'tao',
+                    'controller' => 'Main',
+                    'action' => 'logout',
+                ]
+            );
+            $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+
+            $this->setVersion('4.11.0');
+        }
     }
 }

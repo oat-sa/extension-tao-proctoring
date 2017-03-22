@@ -22,6 +22,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
@@ -94,6 +95,8 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
+        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
+        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
         $this->composeView('delivery-monitoring', null, 'pages/index.tpl', 'tao');
     }
 

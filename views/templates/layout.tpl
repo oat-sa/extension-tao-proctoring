@@ -28,7 +28,7 @@ use oat\tao\model\theme\Theme;
                     <div class="settings-menu">
                         <ul class="clearfix plain">
                             <li data-control="home">
-                                <a id="home" href="<?= _url('index', 'TestCenter', 'taoProctoring') ?>">
+                                <a id="home" href="<?= has_data('homeUrl') ? get_data('homeUrl') : _url('index', 'TestCenter', 'taoProctoring')?>">
                                     <span class="icon-home"></span>
                                 </a>
                             </li>
@@ -39,7 +39,7 @@ use oat\tao\model\theme\Theme;
                                 </span>
                             </li>
                             <li class="infoControl sep-before" data-control="logout">
-                                <a id="logout" class="" href="<?= _url('logout', 'Main', 'tao') ?>">
+                                <a id="logout" href="<?= has_data('logout') ? get_data('logout') : _url('logout', 'Main', 'tao')?>">
                                     <span class="icon-logout"></span>
                                     <span class="text"><?= __("Logout") ?></span>
                                 </a>
