@@ -48,6 +48,7 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
+use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 
@@ -221,5 +222,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('4.9.1', '4.10.9');
+
+        if ($this->isVersion('4.10.9')) {
+            
+            $this->runExtensionScript(RegisterRunnerMessageService::class);
+            
+            $this->setVersion('4.11.0');
+        }
     }
 }
