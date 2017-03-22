@@ -33,13 +33,14 @@ use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
+use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.11.0',
+    'version' => '4.12.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.81.1',
@@ -72,6 +73,7 @@ return array(
             RegisterServices::class,
             RegisterBreadcrumbsServices::class,
             RegisterReasonCategoryService::class,
+            SetUpProctoringUrlService::class,
             RegisterRunnerMessageService::class,
         ),
         'rdf' => array(
