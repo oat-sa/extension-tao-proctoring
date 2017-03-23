@@ -50,6 +50,7 @@ use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
  *
@@ -238,6 +239,14 @@ class Updater extends common_ext_ExtensionUpdater
             $action([]);
 
             $this->setVersion('4.12.0');
+        }
+
+        if ($this->isVersion('4.12.0')) {
+            $service = new ActivityMonitoringService([]);
+            $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
+            AclProxy::applyRule(new AccessRule('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, \oat\taoProctoring\controller\Tools::class));
+            //array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools'));
+            $this->setVersion('4.13.0');
         }
     }
 }

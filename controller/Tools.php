@@ -37,6 +37,14 @@ class Tools extends SimplePageModule
     use OntologyAwareTrait;
 
     /**
+     *
+     */
+    public function assessmentActivity()
+    {
+        $this->setView('Tools/assessment_activity.tpl');
+    }
+
+    /**
      * Action pauses all the active delivery executions
      */
     public function pauseActiveExecutions()
