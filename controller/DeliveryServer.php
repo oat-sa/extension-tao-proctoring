@@ -22,8 +22,8 @@ namespace oat\taoProctoring\controller;
 
 use common_Logger;
 use common_session_SessionManager;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
-use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -127,6 +127,8 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('runDeliveryUrl', $runDeliveryUrl);
 
             //set template
+            $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
+            $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
             $this->setData('content-template', 'DeliveryServer/awaiting.tpl');
             $this->setData('content-extension', 'taoProctoring');
             $this->setView('DeliveryServer/layout.tpl', 'taoDelivery');

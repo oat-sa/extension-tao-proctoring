@@ -29,23 +29,25 @@ use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
+use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
+use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.10.9',
+    'version' => '4.12.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.81.1',
         'taoDelivery' => '>=4.7.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
-        'taoQtiTest' => '>=5.38.0',
+        'taoQtiTest' => '>=6.18.0',
         'taoOutcomeUi' => '>=2.6.6',
         'generis' => '>=3.13.2',
     ),
@@ -70,7 +72,9 @@ return array(
             RegisterAuthProvider::class,
             RegisterServices::class,
             RegisterBreadcrumbsServices::class,
-            RegisterReasonCategoryService::class
+            RegisterReasonCategoryService::class,
+            SetUpProctoringUrlService::class,
+            RegisterRunnerMessageService::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
