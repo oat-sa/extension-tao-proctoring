@@ -24,6 +24,7 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
  * Class Tools
@@ -37,10 +38,13 @@ class Tools extends SimplePageModule
     use OntologyAwareTrait;
 
     /**
-     *
+     * 
      */
     public function assessmentActivity()
     {
+        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $this->setData('activity_data', $service->getData());
+        $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
         $this->setView('Tools/assessment_activity.tpl');
     }
 
@@ -49,35 +53,30 @@ class Tools extends SimplePageModule
      */
     public function pauseActiveExecutions()
     {
-        if ($this->isRequestPost()) {
-            if ($this->hasRequestParameter('reason')) {
-                $reason = $this->getRequestParameter('reason');
-            } else {
-                $reason = [
-                    'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
-                    'comment' => __('Pause due to server maintenance'),
-                ];
-            }
-            $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-            $deliveryExecutions = $monitoringService->find(
-                [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
-                ['asArray' => true]
-            );
-            $ids = array_map(function ($deliveryExecution) {
-                return $deliveryExecution['delivery_execution_id'];
-            }, $deliveryExecutions);
-            $paused = DeliveryHelper::pauseExecutions($ids, $reason);
-            $notPaused = array_diff($ids, $paused);
-
-            $this->returnJson([
-                'success' => !count($notPaused),
-                'message' => count($paused) . ' ' . __('sessions paused'),
-                'processed' => $paused,
-                'unprocessed' => $notPaused
-            ]);
-        } else {
-            $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
-            $this->setView('Tools/pause_active_executions.tpl');
+        if (!$this->isRequestPost()) {
+            throw new \common_exception_BadRequest('Invalid request. Only POST method allowed.');
         }
+
+        $reason = $this->hasRequestParameter('reason') ? $this->getRequestParameter('reason') : [
+            'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
+            'comment' => __('Pause due to server maintenance'),
+        ];
+        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryExecutions = $monitoringService->find(
+            [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
+            ['asArray' => true]
+        );
+        $ids = array_map(function ($deliveryExecution) {
+            return $deliveryExecution['delivery_execution_id'];
+        }, $deliveryExecutions);
+        $paused = DeliveryHelper::pauseExecutions($ids, $reason);
+        $notPaused = array_diff($ids, $paused);
+
+        $this->returnJson([
+            'success' => !count($notPaused),
+            'message' => count($paused) . ' ' . __('sessions paused'),
+            'processed' => $paused,
+            'unprocessed' => $notPaused
+        ]);
     }
 }

@@ -245,7 +245,6 @@ class Updater extends common_ext_ExtensionUpdater
             $service = new ActivityMonitoringService([]);
             $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
             AclProxy::applyRule(new AccessRule('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, \oat\taoProctoring\controller\Tools::class));
-            //array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools'));
             $this->setVersion('4.13.0');
         }
     }
