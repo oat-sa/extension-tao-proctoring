@@ -241,7 +241,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.12.0');
         }
 
-        if ($this->isVersion('4.12.0')) {
+        $this->skip('4.12.0', '4.12.2');
+
+        if ($this->isVersion('4.12.2')) {
             $service = new ActivityMonitoringService([]);
             $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
             AclProxy::applyRule(new AccessRule('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, \oat\taoProctoring\controller\Tools::class));
