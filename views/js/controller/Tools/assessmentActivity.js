@@ -26,9 +26,11 @@ define([
     'util/url',
     'ui/feedback',
     'ui/cascadingComboBox',
+    'ui/bulkActionPopup',
     'ui/bulkActionPopup'
 ], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup){
     'use strict';
+
     var $container = $('.js-pause-active-executions-container');
     var categories = $container.data('reasoncategories');
     var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.")

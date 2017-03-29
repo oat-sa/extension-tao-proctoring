@@ -23,6 +23,7 @@ namespace oat\taoProctoring\scripts\install;
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use \oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
  * Action to register necessary extension services
@@ -37,11 +38,17 @@ class RegisterServices extends InstallAction
      */
     public function __invoke($params)
     {
-        $service = new DeliveryExecutionStateService([
+        $deliveryExecutionStateService = new DeliveryExecutionStateService([
             DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
             DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY => 'PT30M',
             DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
         ]);
-        $this->registerService(StateServiceInterface::SERVICE_ID, $service);
+        $this->registerService(StateServiceInterface::SERVICE_ID, $deliveryExecutionStateService);
+
+        $activityMonitoringService = new ActivityMonitoringService([
+            ActivityMonitoringService::OPTION_ACTIVE_USER_THRESHOLD => 300,
+        ]);
+        $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $activityMonitoringService);
+
     }
 }
