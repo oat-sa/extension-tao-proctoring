@@ -24,6 +24,7 @@ namespace oat\taoProctoring\model;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoEventLog\model\requestLog\RequestLogStorage;
 
 /**
  * Service to manage and monitor assessment activity
@@ -33,6 +34,9 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 class ActivityMonitoringService extends ConfigurableService
 {
     const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
+
+    /** Threshold in seconds */
+    const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
     /**
      * Return comprehensive activity monitoring data.
@@ -55,6 +59,10 @@ class ActivityMonitoringService extends ConfigurableService
         ];
     }
 
+    /**
+     * @param null|string $state
+     * @return int
+     */
     protected function getNumberOfAssessments($state = null)
     {
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -65,8 +73,21 @@ class ActivityMonitoringService extends ConfigurableService
         }
     }
 
+    /**
+     * @param null|string $role
+     * @return int
+     */
     protected function getNumberOfActiveUsers($role = null)
     {
-        return rand(0, 5000);
+        /** @var  RequestLogStorage $requestLogService */
+        $requestLogService = $this->getServiceManager()->get(RequestLogStorage::SERVICE_ID);
+        $now = microtime(true);
+        $filter = [
+            [RequestLogStorage::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
+        ];
+        if ($role !== null) {
+            $filter[] = [RequestLogStorage::USER_ROLES, 'like', '%,' . $role . ',%'];
+        }
+        return $requestLogService->count($filter);
     }
 }
