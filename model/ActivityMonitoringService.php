@@ -88,6 +88,6 @@ class ActivityMonitoringService extends ConfigurableService
         if ($role !== null) {
             $filter[] = [RequestLogStorage::USER_ROLES, 'like', '%,' . $role . ',%'];
         }
-        return $requestLogService->count($filter);
+        return $requestLogService->count($filter, ['group'=>RequestLogStorage::USER_ID]);
     }
 }
