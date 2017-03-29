@@ -33,6 +33,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
  * Class DeliveryExecutionStateService
@@ -95,7 +96,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'os_version' => OSService::singleton()->getClientVersion(),
         ];
 
-        if ($session) {
+        if ($session && $session->getState() !== AssessmentTestSessionState::INITIAL) {
             $session->resume();
             $this->getTestSessionService()->persist($session);
             $logData['timestamp'] = microtime(true);

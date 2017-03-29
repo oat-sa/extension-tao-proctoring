@@ -243,7 +243,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('4.12.0', '4.12.2');
 
-        if ($this->isVersion('4.12.2')) {
+       if ($this->isVersion('4.12.2')) {
             $service = new ActivityMonitoringService([
                 ActivityMonitoringService::OPTION_ACTIVE_USER_THRESHOLD => 300,
             ]);
