@@ -16,7 +16,7 @@
         <description />
         <icon id="icon-tools" src=""/>
         <sections>
-            <section id="pause_executions" name="Pause active executions" url="/taoProctoring/Tools/pauseActiveExecutions" />
+            <section id="assessment_activity" name="Assessment Activity" url="/taoProctoring/Tools/assessmentActivity" />
         </sections>
     </structure>
 </structures>
