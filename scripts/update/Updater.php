@@ -50,6 +50,7 @@ use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\textConverter\ProctoringTextConverter;
 use oat\taoProctoring\scripts\install\addDiagnosticSettings;
 use oat\taoProctoring\scripts\install\createDiagnosticTable;
+use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoTests\models\event\TestChangedEvent;
 
@@ -658,6 +659,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('3.16.0', '3.16.1');
+
+        if ($this->isVersion('3.16.1')) {
+            $action = new RegisterGuiSettingsService();
+            $action->setServiceLocator($this->getServiceManager());
+            $action->__invoke([]);
+            $this->setVersion('3.17.0');
+        }
     }
 
     private function refreshMonitoringData()

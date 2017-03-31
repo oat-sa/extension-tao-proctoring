@@ -20,13 +20,14 @@
  */
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
 use oat\taoProctoring\scripts\install\RegisterEligibilityService;
+use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '3.16.1',
+    'version' => '3.17.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.23.0',
@@ -65,7 +66,8 @@ return array(
             'oat\\taoProctoring\\scripts\\install\\RegisterSessionStateListener',
             RegisterAuthProvider::class,
             'oat\\taoProctoring\\scripts\\install\\RegisterReasonCategoryService',
-            RegisterEligibilityService::class
+            RegisterEligibilityService::class,
+            RegisterGuiSettingsService::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctor.rdf',

@@ -96,6 +96,8 @@ define([
             var testCenterId = $container.data('testcenter');
             var timeHandlingButton = $container.data('timehandling');
             var printReportButton = $container.data('printreportbutton');
+            var refreshBtn = $container.data('refreshbtn');
+            var autoRefresh = $container.data('autorefresh');
             var manageUrl = helpers._url('manage', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var terminateUrl = helpers._url('terminateExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
             var pauseUrl = helpers._url('pauseExecutions', 'Delivery', 'taoProctoring', {delivery : deliveryId, testCenter : testCenterId});
@@ -402,16 +404,27 @@ define([
 
             breadcrumbsFactory($container, crumbs);
 
-            // tool: page refresh
-            tools.push({
-                id: 'refresh',
-                icon: 'reset',
-                title: __('Refresh the page'),
-                label: __('Refresh'),
-                action: function() {
+            /**
+             * configurable parameter to show button
+             */
+            if (refreshBtn) {
+                // tool: page refresh
+                tools.push({
+                    id: 'refresh',
+                    icon: 'reset',
+                    title: __('Refresh the page'),
+                    label: __('Refresh'),
+                    action: function () {
+                        $list.datatable('refresh');
+                    }
+                });
+            }
+
+            if (autoRefresh) {
+                setInterval(function () {
                     $list.datatable('refresh');
-                }
-            });
+                }, autoRefresh);
+            }
 
             // tool: manage test takers (only for unique delivery)
             if (deliveryId && isManageable) {
