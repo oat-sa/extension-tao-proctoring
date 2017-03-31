@@ -59,9 +59,31 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
                 'Terminated/Finished delivery cannot be resumed'
             );
         }
-        if ($state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
-            $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
-            throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
+        if ($this->isProctored($deliveryExecution) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+            $this->throwUnAuthorizedException($deliveryExecution);
         }
+    }
+
+    /**
+     * Whenever or not a delivery execution should be proctored
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return boolean
+     */
+    protected function isProctored(DeliveryExecution $deliveryExecution)
+    {
+        return true;
+    }
+
+    /**
+     * Throw the appropriate Exception
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @throws UnAuthorizedException
+     */
+    protected function throwUnAuthorizedException(DeliveryExecution $deliveryExecution)
+    {
+        $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+        throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
     }
 }
