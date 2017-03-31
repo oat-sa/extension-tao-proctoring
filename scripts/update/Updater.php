@@ -666,6 +666,8 @@ class Updater extends common_ext_ExtensionUpdater
             $action->__invoke([]);
             $this->setVersion('3.17.0');
         }
+
+        $this->skip('3.17.0', '3.17.1');
     }
 
     private function refreshMonitoringData()
