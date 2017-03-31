@@ -28,7 +28,6 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
-use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
@@ -46,6 +45,7 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
+use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
@@ -228,9 +228,8 @@ class Updater extends common_ext_ExtensionUpdater
             
             $this->runExtensionScript(RegisterRunnerMessageService::class);
 
-            
             $this->setVersion('4.11.0');
-        }
+       }
       
         if ($this->isVersion('4.11.0')) {
 
@@ -251,6 +250,16 @@ class Updater extends common_ext_ExtensionUpdater
             AclProxy::applyRule(new AccessRule('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, \oat\taoProctoring\controller\Tools::class));
             $this->setVersion('4.13.0');
         }
+
         $this->skip('4.13.0', '4.13.1');
+
+        if ($this->isVersion('4.13.1')) {
+
+            $action = new RegisterGuiSettingsService();
+            $action->setServiceLocator($this->getServiceManager());
+            $action->__invoke([]);
+
+            $this->setVersion('4.14.0');
+        }
     }
 }

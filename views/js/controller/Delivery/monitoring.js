@@ -535,16 +535,30 @@ define([
                         serviceParams.context = context;
                     }
 
-                    // tool: page refresh
-                    tools.push({
-                        id: 'refresh',
-                        icon: 'reset',
-                        title: __('Refresh the page'),
-                        label: __('Refresh'),
-                        action: function() {
+                    /**
+                     * configurable parameter to show button
+                     */
+                    if (data.refreshBtn) {
+                        // tool: page refresh
+                        tools.push({
+                            id: 'refresh',
+                            icon: 'reset',
+                            title: __('Refresh the page'),
+                            label: __('Refresh'),
+                            action: function () {
+                                $list.datatable('refresh');
+                            }
+                        });
+                    }
+
+                    /**
+                     * Configurable parameter to auto renew datatable
+                     */
+                    if (data.autoRefresh) {
+                        setInterval(function () {
                             $list.datatable('refresh');
-                        }
-                    });
+                        }, data.autoRefresh);
+                    }
 
                     if (defaultTag) {
                         tools.push({
