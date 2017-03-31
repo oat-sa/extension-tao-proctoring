@@ -26,6 +26,7 @@ use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
+use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
@@ -40,7 +41,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.12.1',
+    'version' => '4.14.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.81.1',
@@ -49,6 +50,7 @@ return array(
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=6.18.0',
         'taoOutcomeUi' => '>=2.6.6',
+        'taoEventLog' => '>=0.6.0',
         'generis' => '>=3.13.2',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
@@ -61,6 +63,7 @@ return array(
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
         array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
+        array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools')),
     ),
     'install' => array(
         'php' => array(
@@ -75,6 +78,7 @@ return array(
             RegisterReasonCategoryService::class,
             SetUpProctoringUrlService::class,
             RegisterRunnerMessageService::class,
+            RegisterGuiSettingsService::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

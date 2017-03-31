@@ -19,7 +19,7 @@
     <rdfs:label xml:lang="en-US"><![CDATA[Proctor Manager]]></rdfs:label>
     <rdfs:comment xml:lang="en-US"><![CDATA[The Proctoring Manager Role]]></rdfs:comment>
   </rdf:Description>
-  
+
   <!--  Delivery states -->
   <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting">
     <rdfs:label xml:lang="en-US"><![CDATA[Awaiting]]></rdfs:label>

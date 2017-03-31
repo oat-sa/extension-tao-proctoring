@@ -25,6 +25,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\TestSessionHistoryService;
@@ -78,6 +79,8 @@ class Monitor extends SimplePageModule
             'printReportButton' => $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID)->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
             'timeHandling' => $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
             'historyUrl' => $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
+            'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
+            'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
         ];
 
         if (!is_null($delivery)) {

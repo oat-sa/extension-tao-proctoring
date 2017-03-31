@@ -20,8 +20,9 @@ define({
         }
     },
     'Tools' : {
+        'css': 'tools',
         'actions' : {
-            'pauseActiveExecutions' : 'controller/Tools/pauseActiveExecutions'
+            'assessmentActivity' : 'controller/Tools/assessmentActivity'
         }
     }
 });
