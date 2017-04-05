@@ -273,7 +273,7 @@ class Updater extends common_ext_ExtensionUpdater
                 [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']
             );
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
-            $this->setVersion('4.14.1');
+            $this->setVersion('4.15.0');
         }
     }
 }

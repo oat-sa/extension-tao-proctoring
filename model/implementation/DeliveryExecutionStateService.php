@@ -34,6 +34,7 @@ use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
+use GuzzleHttp\Psr7\ServerRequest;
 
 /**
  * Class DeliveryExecutionStateService
@@ -224,9 +225,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->suspend();
                     $this->getTestSessionService()->persist($session);
                 }
-            } else {
-                $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             }
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
         }
@@ -416,8 +416,12 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
         /** @var DeliveryExecutionStateService $service */
-        $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
-        $service->pause($deliveryExecution);
+        $requestParams = \Context::getInstance()->getRequest()->getParameters();
+        $reason = null;
+        if (isset($requestParams['reason'])) {
+            $reason = $requestParams['reason'];
+        }
+        $this->pause($deliveryExecution, $reason);
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)
