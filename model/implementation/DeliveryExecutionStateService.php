@@ -220,13 +220,14 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             if ($session) {
                 $data['itemId'] = $this->getCurrentItemId($deliveryExecution);
                 $data['context'] = $this->getProgress($deliveryExecution);
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
-                $session->suspend();
-                $this->getTestSessionService()->persist($session);
+                if ($session->getState() !== AssessmentTestSessionState::SUSPENDED) {
+                    $session->suspend();
+                    $this->getTestSessionService()->persist($session);
+                }
             } else {
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
                 $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
         }
 
@@ -411,11 +412,12 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Pause delivery execution if test session was paused.
      * @param TestExecutionPausedEvent $event
      */
-    public static function catchSessionPause(TestExecutionPausedEvent $event)
+    public function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
+        /** @var DeliveryExecutionStateService $service */
         $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
-        $service->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
+        $service->pause($deliveryExecution);
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)
