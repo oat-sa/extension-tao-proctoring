@@ -34,7 +34,6 @@ use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use GuzzleHttp\Psr7\ServerRequest;
 
 /**
  * Class DeliveryExecutionStateService
