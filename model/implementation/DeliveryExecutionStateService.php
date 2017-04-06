@@ -217,6 +217,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'reason' => $reason,
                 'timestamp' => microtime(true),
             ];
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             if ($session) {
                 $data['itemId'] = $this->getCurrentItemId($deliveryExecution);
                 $data['context'] = $this->getProgress($deliveryExecution);
@@ -225,7 +226,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $this->getTestSessionService()->persist($session);
                 }
             }
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
         }
@@ -420,7 +420,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         if (isset($requestParams['reason'])) {
             $reason = $requestParams['reason'];
         }
-        $this->pause($deliveryExecution, $reason);
+        if ($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_PAUSED) {
+            $this->pause($deliveryExecution, $reason);
+        }
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)
