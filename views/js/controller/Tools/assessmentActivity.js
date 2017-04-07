@@ -27,8 +27,8 @@ define([
     'ui/feedback',
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
-    'ui/bulkActionPopup'
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup){
+    'ui/datatable',
+], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, datatable){
     'use strict';
 
     var $container = $('.js-pause-active-executions-container');
@@ -54,8 +54,73 @@ define([
         });
     }
 
+
     return {
         start : function(){
+            var $deliveryList = $('.js-delivery-list');
+            var deliveryListModel = [
+                {
+                    id: 'label',
+                    label: __('Delivery'),
+                    sortable : true
+                },
+                {
+                    id: 'Awaiting',
+                    label: __('Awaiting'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Authorized',
+                    label: __('Authorized'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Paused',
+                    label: __('Paused'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Active',
+                    label: __('Active'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Terminated',
+                    label: __('Terminated'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Canceled',
+                    label: __('Canceled'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+                {
+                    id: 'Finished',
+                    label: __('Finished'),
+                    sortable : true,
+                    transform: function(value, row) {return value.toString();}
+                },
+            ];
+
+            $deliveryList.datatable({
+                url: url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
+                filter: false,
+                model: deliveryListModel,
+                paginationStrategyTop : 'none',
+                paginationStrategyBottom : 'none',
+                selectable : true,
+                sortorder : 'asc',
+                sortby : 'label'
+            }, deliveryListModel);
+            $deliveryList.datatable('refresh');
+
+
             $('.js-pause').on('click', function() {
                 var config;
 
