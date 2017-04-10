@@ -76,12 +76,12 @@ class DeliveryServer extends DefaultDeliveryServer
     /**
      * Displays the execution screen
      *
-     * FIXME all state management must be centralized into a service, 
+     * FIXME all state management must be centralized into a service,
       * it should'nt be on the controller.
      *
      * @throws common_exception_Error
      */
-    public function runDeliveryExecution() 
+    public function runDeliveryExecution()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -94,7 +94,7 @@ class DeliveryServer extends DefaultDeliveryServer
     /**
      * The awaiting authorization screen
      */
-    public function awaitingAuthorization() 
+    public function awaitingAuthorization()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -136,7 +136,7 @@ class DeliveryServer extends DefaultDeliveryServer
             return $this->redirect($this->getReturnUrl());
         }
     }
-    
+
     /**
      * The action called to check if the requested delivery execution has been authorized by the proctor
      */
@@ -148,19 +148,19 @@ class DeliveryServer extends DefaultDeliveryServer
         $authorized = false;
         $success = true;
         $message = null;
-        
+
         // reacts to a few particular states
         switch ($executionState) {
             case DeliveryExecutionState::STATE_AUTHORIZED:
                     $authorized = true;
                 break;
-            
+
             case DeliveryExecutionState::STATE_TERMINATED:
             case DeliveryExecutionState::STATE_FINISHED:
                 $success = false;
                 $message = __('The assessment has been terminated.');
                 break;
-                
+
             case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
                 $message = __('The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.');
