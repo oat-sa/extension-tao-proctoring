@@ -39,7 +39,7 @@ define([
      * The polling delay used to refresh the list
      * @type {Number}
      */
-    var refreshPolling = 10 * 1000; // once every 10 seconds
+    var refreshPolling = 1 * 1000; // once every 1 second
 
     /**
      * The CSS scope
