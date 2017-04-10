@@ -102,11 +102,6 @@ class DeliveryServer extends DefaultDeliveryServer
 
         $runDeliveryUrl = _url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier()));
 
-        // if the test taker is already authorized, straight forward to the execution
-        if (DeliveryExecutionState::STATE_AUTHORIZED === $executionState) {
-            return $this->redirect($runDeliveryUrl);
-        }
-
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
             $deliveryExecutionStateService->pauseExecution($deliveryExecution);
@@ -114,7 +109,10 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // we need to change the state of the delivery execution
         if (!in_array($executionState , array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
-            $deliveryExecutionStateService->waitExecution($deliveryExecution);
+            if (DeliveryExecutionState::STATE_AUTHORIZED !== $executionState) {
+                $deliveryExecutionStateService->waitExecution($deliveryExecution);
+            }
+
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
             $this->setData('init', !!$this->getRequestParameter('init'));
