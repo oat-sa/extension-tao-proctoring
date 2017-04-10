@@ -217,16 +217,16 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'reason' => $reason,
                 'timestamp' => microtime(true),
             ];
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             if ($session) {
                 $data['itemId'] = $this->getCurrentItemId($deliveryExecution);
                 $data['context'] = $this->getProgress($deliveryExecution);
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
-                $session->suspend();
-                $this->getTestSessionService()->persist($session);
-            } else {
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
-                $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
+                if ($session->getState() !== AssessmentTestSessionState::SUSPENDED) {
+                    $session->suspend();
+                    $this->getTestSessionService()->persist($session);
+                }
             }
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
         }
 
@@ -411,11 +411,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Pause delivery execution if test session was paused.
      * @param TestExecutionPausedEvent $event
      */
-    public static function catchSessionPause(TestExecutionPausedEvent $event)
+    public function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
-        $service = ServiceManager::getServiceManager()->get(self::SERVICE_ID);
-        $service->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
+        /** @var DeliveryExecutionStateService $service */
+        $requestParams = \Context::getInstance()->getRequest()->getParameters();
+        $reason = null;
+        if (isset($requestParams['reason'])) {
+            $reason = $requestParams['reason'];
+        }
+        if ($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_PAUSED) {
+            $this->pause($deliveryExecution, $reason);
+        }
     }
 
     protected function getProgress(DeliveryExecution $deliveryExecution)

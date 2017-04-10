@@ -51,6 +51,7 @@ use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoTests\models\event\TestExecutionPausedEvent;
 
 /**
  *
@@ -260,6 +261,19 @@ class Updater extends common_ext_ExtensionUpdater
             $action->__invoke([]);
 
             $this->setVersion('4.14.0');
+        }
+
+        if ($this->isVersion('4.14.0')) {
+
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(TestExecutionPausedEvent::class,
+                [DeliveryExecutionStateService::class, 'catchSessionPause']
+            );
+            $eventManager->attach(TestExecutionPausedEvent::class,
+                [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']
+            );
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('4.15.0');
         }
     }
 }
