@@ -31,7 +31,7 @@ use oat\oatbox\user\User;
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class TestTakerAuthorizationService extends ConfigurableService implements AuthorizationProvider
+class TestTakerAuthorizationService extends ConfigurableService
 {
     const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
 
@@ -61,18 +61,19 @@ class TestTakerAuthorizationService extends ConfigurableService implements Autho
                 'Terminated/Finished delivery cannot be resumed'
             );
         }
-        if ($this->isProctored($deliveryExecution) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+        if ($this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
             $this->throwUnAuthorizedException($deliveryExecution);
         }
     }
 
     /**
-     * Whenever or not a delivery execution should be proctored
+     * Whenever or not a delivery execution for a given delivery
+     * should be proctored
      *
-     * @param DeliveryExecution $deliveryExecution
+     * @param string $deliveryId
      * @return boolean
      */
-    public function isProctored(DeliveryExecution $deliveryExecution)
+    public function isProctored($deliveryId, User $user)
     {
         return true;
     }

@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\model;
 
 
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 
 /**

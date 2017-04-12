@@ -21,7 +21,7 @@
 namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -34,6 +34,8 @@ use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\oatbox\user\User;
 
 /**
  * Class DeliveryExecutionStateService
@@ -55,6 +57,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @var TestSessionService
      */
     private $testSessionService;
+
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoDelivery\model\execution\AbstractStateService::getInitialStatus()
+     */
+    public function getInitialStatus($deliveryId, User $user)
+    {
+        $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
+        return $service->isProctored($deliveryId, $user)
+            ? DeliveryExecution::STATE_PAUSED
+            : DeliveryExecution::STATE_ACTIVE;
+    }
 
     /**
      * @param DeliveryExecution $deliveryExecution
@@ -308,8 +322,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * @inheritdoc
      */
-    public function legacyTransition(DeliveryExecution $deliveryExecution, $state, $reason = null, $testCenter = null)
+    public function legacyTransition(DeliveryExecution $deliveryExecution, $state)
     {
+        $reason = null;
+        $testCenter = null;
         switch ($state) {
             case ProctoredDeliveryExecution::STATE_ACTIVE:
                 $result = $this->resumeExecution($deliveryExecution, $reason, $testCenter);
