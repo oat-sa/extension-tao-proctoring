@@ -39,7 +39,7 @@ define([
      * The polling delay used to refresh the list
      * @type {Number}
      */
-    var refreshPolling = 1 * 1000; // once every 1 second
+    var refreshPolling = 10 * 1000; // once every 10 seconds
 
     /**
      * The CSS scope
@@ -130,7 +130,9 @@ define([
                 },
                 interval : refreshPolling,
                 autoStart : true
-            });
+            })
+            // Trigger the action immediately
+            .next();
 
             /**
              * Function to be called when the delivery execution has been authorized
