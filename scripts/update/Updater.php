@@ -277,9 +277,11 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.15.0');
         }
 
-        if ($this->isVersion('4.15.0')) {
+        $this->skip('4.15.0', '4.16.0');
+
+        if ($this->isVersion('4.16.0')) {
             $this->getServiceManager()->register(TestTakerAuthorizationService::SERVICE_ID, new TestTakerAuthorizationService());
-            $this->setVersion('4.16.0');
+            $this->setVersion('4.17.0');
         }
     }
 }

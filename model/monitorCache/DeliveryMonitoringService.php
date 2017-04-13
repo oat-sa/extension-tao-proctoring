@@ -85,4 +85,9 @@ interface DeliveryMonitoringService
      * @return mixed
      */
     public function delete(DeliveryMonitoringData $deliveryMonitoring);
+
+    /**
+     * @return integer
+     */
+    public function count();
 }
