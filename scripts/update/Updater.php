@@ -52,6 +52,7 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 
 /**
  *
@@ -278,5 +279,9 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('4.15.0', '4.16.0');
 
+        if ($this->isVersion('4.16.0')) {
+            $this->getServiceManager()->register(TestTakerAuthorizationService::SERVICE_ID, new TestTakerAuthorizationService());
+            $this->setVersion('4.17.0');
+        }
     }
 }

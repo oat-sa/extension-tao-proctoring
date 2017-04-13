@@ -48,10 +48,6 @@ class MonitorCacheService extends MonitoringStorage
     public function executionCreated(DeliveryExecutionCreated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
-        $state = \common_session_SessionManager::getSession()->getUser() instanceof GuestTestUser
-            ? DeliveryExecution::STATE_AUTHORIZED
-            : DeliveryExecution::STATE_PAUSED;
-        $deliveryExecution->setState($state);
 
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());

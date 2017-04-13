@@ -72,6 +72,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     public function testIsAuthorized()
     {
         $authorizationProvider = new ProctorAuthorizationProvider();
+        $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
         $user = $this->prophesize(User::class)->reveal();
         
         $authorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_AUTHORIZED);
@@ -84,6 +85,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     public function testIsUnauthorized()
     {
         $authorizationProvider = new ProctorAuthorizationProvider();
+        $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
         $user = $this->prophesize(User::class)->reveal();
         $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
         $authorizationProvider->verifyResumeAuthorization($unauthorized,$user);
