@@ -25,6 +25,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 
 /**
  * Manage the Delivery authorization.
@@ -75,7 +76,7 @@ class TestTakerAuthorizationService extends ConfigurableService
      */
     public function isProctored($deliveryId, User $user)
     {
-        return true;
+        return !($user instanceof GuestTestUser);
     }
 
     /**
