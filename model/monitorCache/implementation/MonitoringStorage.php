@@ -250,6 +250,31 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
+     * @param array $criteria
+     * @return mixed
+     */
+    public function count(array $criteria = [])
+    {
+        $this->joins = [];
+        $parameters = [];
+
+        $selectClause = "select COUNT(*) FROM (SELECT t.delivery_execution_id ";
+        $fromClause = "FROM " . self::TABLE_NAME . " t ";
+        $whereClause = $this->prepareCondition($criteria, $parameters, $selectClause);
+        if ($whereClause !== '') {
+            $whereClause = 'WHERE ' . $whereClause;
+        }
+        $sql = $selectClause . $fromClause . PHP_EOL .
+            implode(PHP_EOL, $this->joins) . PHP_EOL .
+            $whereClause . PHP_EOL .
+            'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . ') as count_q';
+
+        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $result = $stmt->fetch(\PDO::FETCH_BOTH);
+        return intval($result[0]);
+    }
+
+    /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
      */
