@@ -130,7 +130,9 @@ define([
                 },
                 interval : refreshPolling,
                 autoStart : true
-            });
+            })
+            // Trigger the action immediately
+            .next();
 
             /**
              * Function to be called when the delivery execution has been authorized

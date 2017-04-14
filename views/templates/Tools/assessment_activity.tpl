@@ -46,7 +46,7 @@ $data = get_data('activity_data');
             <div class="grid-row">
                 <div class="col-3 dashboard-block">
                     <h4><span class="icon icon-play"></span> <?= __('Assessments in \'In Progress\' state') ?></h4>
-                    <span class="dashboard-block-number"><?= $data['in_progress_assessmen'] ?></span>
+                    <span class="dashboard-block-number"><?= $data['in_progress_assessments'] ?></span>
                 </div>
                 <div class="col-3 dashboard-block">
                     <h4><span class="icon icon-end-attempt"></span> <?= __('Assessments in \'Finished\' state') ?></h4>
@@ -59,6 +59,11 @@ $data = get_data('activity_data');
                 <div class="col-3 dashboard-block">
                     <h4><span class="icon icon-result-nok"></span> <?= __('Assessments in \'Cancelled\' state') ?></h4>
                     <span class="dashboard-block-number"><?= $data['cancelled_assessments'] ?></span>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="col-12">
+                    <div class="js-delivery-list"></div>
                 </div>
             </div>
         </div>

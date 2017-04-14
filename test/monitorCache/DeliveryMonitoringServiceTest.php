@@ -290,6 +290,80 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals($result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
     }
 
+    public function testCount()
+    {
+        $this->loadFixture();
+
+        $result = $this->service->count();
+        $this->assertEquals(4, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
+        ]);
+        $this->assertEquals(1, $result);
+
+
+        $result = $this->service->count([
+            ['error_code' => '1'],
+            'OR',
+            ['error_code' => '2'],
+        ]);
+        $this->assertEquals(2, $result);
+
+
+        $result = $this->service->count([
+            ['error_code' => '1'],
+            'AND',
+            ['session_id' => 'i1450191587554175'],
+        ]);
+        $this->assertEquals(1, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_STATUS => 'finished_test'],
+            ['error_code' => '1'],
+        ]);
+        $this->assertEquals(0, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_STATUS => 'finished_test'],
+            'AND',
+            [['error_code' => '0'], 'OR', ['error_code' => '1']],
+        ]);
+        $this->assertEquals(1, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_STATUS => 'finished_test'],
+            ['error_code' => '0'],
+        ]);
+        $this->assertEquals(1, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_STATUS => 'finished_test'],
+        ]);
+        $this->assertEquals(2, $result);
+
+
+        $result = $this->service->count([
+            ['error_code' => '>=0'],
+        ]);
+        $this->assertEquals(4, $result);
+
+
+        $result = $this->service->count([
+            [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => [
+                'http://sample/first.rdf#i1450191587554175_test_record',
+                'http://sample/first.rdf#i1450191587554176_test_record',
+                'http://sample/first.rdf#i1450191587554177_test_record'
+            ]],
+        ]);
+        $this->assertEquals(3, $result);
+    }
+
     protected function loadFixture()
     {
         $this->setUp();

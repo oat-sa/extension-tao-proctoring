@@ -25,6 +25,7 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 
 /**
  * Service to manage and monitor assessment activity
@@ -39,6 +40,34 @@ class ActivityMonitoringService extends ConfigurableService
     const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
     /**
+     * @var array list of all the statuses uris
+     */
+    protected $deliveryStatuses = [
+        DeliveryExecution::STATE_AWAITING,
+        DeliveryExecution::STATE_AUTHORIZED,
+        DeliveryExecution::STATE_PAUSED,
+        DeliveryExecution::STATE_ACTIVE,
+        DeliveryExecution::STATE_TERMINATED,
+        DeliveryExecution::STATE_CANCELED,
+        DeliveryExecution::STATE_FINISHIED,
+    ];
+
+    /**
+     * ActivityMonitoringService constructor.
+     * @param array $options
+     */
+    public function __construct(array $options = array())
+    {
+        parent::__construct($options);
+
+        $deliveryStatuses = [];
+        foreach ($this->deliveryStatuses as $deliveryStatus) {
+            $deliveryStatuses[] = new \core_kernel_classes_Resource($deliveryStatus);
+        }
+        $this->deliveryStatuses = $deliveryStatuses;
+    }
+
+    /**
      * Return comprehensive activity monitoring data.
      * @return array
      */
@@ -50,12 +79,13 @@ class ActivityMonitoringService extends ConfigurableService
             'active_test_takers' => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
             'total_assessments' => $this->getNumberOfAssessments(),
             'awaiting_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AWAITING),
-            'authorized_but_not_started_assessments' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED),
-            'paused_assessments' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED),
-            'in_progress_assessmen' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE),
-            'terminated_assessment' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_TERMINATED),
-            'cancelled_assessments' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_CANCELED),
-            'finished_assessments' =>$this->getNumberOfAssessments(DeliveryExecution::STATE_FINISHIED),
+            'authorized_but_not_started_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED),
+            'paused_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED),
+            'in_progress_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE),
+            'terminated_assessment' => $this->getNumberOfAssessments(DeliveryExecution::STATE_TERMINATED),
+            'cancelled_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_CANCELED),
+            'finished_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_FINISHIED),
+            'deliveries_statistics' => $this->getStatesByDelivery(),
         ];
     }
 
@@ -67,9 +97,9 @@ class ActivityMonitoringService extends ConfigurableService
     {
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         if ($state === null) {
-            return count($deliveryMonitoringService->find());
+            return $deliveryMonitoringService->count();
         } else {
-            return count($deliveryMonitoringService->find([DeliveryMonitoringService::STATUS => $state]));
+            return $deliveryMonitoringService->count([DeliveryMonitoringService::STATUS => $state]);
         }
     }
 
@@ -89,5 +119,31 @@ class ActivityMonitoringService extends ConfigurableService
             $filter[] = [RequestLogStorage::USER_ROLES, 'like', '%,' . $role . ',%'];
         }
         return $requestLogService->count($filter, ['group'=>RequestLogStorage::USER_ID]);
+    }
+
+    /**
+     * Get list of all the deliveries and number of it's executions in each status
+     * Result indexed by delivery Uri
+     * @return array
+     */
+    protected function getStatesByDelivery()
+    {
+        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveries = DeliveryAssemblyService::singleton()->getAllAssemblies();
+        $result = [];
+        foreach ($deliveries as $delivery) {
+            $deliveryData = [];
+            foreach ($this->deliveryStatuses as $deliveryStatus) {
+                $deliveryData[$deliveryStatus->getLabel()] = $deliveryMonitoringService->count([
+                    [DeliveryMonitoringService::STATUS => $deliveryStatus->getUri()],
+                    'AND',
+                    ['delivery_id' => $delivery->getUri()]
+                ]);
+            }
+            $deliveryData['label'] = $delivery->getLabel();
+            $result[$delivery->getUri()] = $deliveryData;
+
+        }
+        return $result;
     }
 }

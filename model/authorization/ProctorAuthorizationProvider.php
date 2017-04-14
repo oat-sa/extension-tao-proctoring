@@ -27,7 +27,7 @@ use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 
 /**
- * Manage the Delivery authorization.
+ * Delegate the authorization to the Proctor Authorization Service
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
@@ -39,7 +39,8 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
-        // always allow start
+        $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
+        $service->verifyStartAuthorization($deliveryId, $user);
     }
 
     /**
@@ -48,42 +49,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
-        $state = $deliveryExecution->getState()->getUri();
-
-        if (in_array($state, [
-            ProctoredDeliveryExecution::STATE_FINISHED,
-            ProctoredDeliveryExecution::STATE_CANCELED,
-            ProctoredDeliveryExecution::STATE_TERMINATED])) {
-            throw new UnAuthorizedException(
-                _url('index', 'DeliveryServer', 'taoProctoring'),
-                'Terminated/Finished delivery cannot be resumed'
-            );
-        }
-        if ($this->isProctored($deliveryExecution) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
-            $this->throwUnAuthorizedException($deliveryExecution);
-        }
-    }
-
-    /**
-     * Whenever or not a delivery execution should be proctored
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return boolean
-     */
-    protected function isProctored(DeliveryExecution $deliveryExecution)
-    {
-        return true;
-    }
-
-    /**
-     * Throw the appropriate Exception
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @throws UnAuthorizedException
-     */
-    protected function throwUnAuthorizedException(DeliveryExecution $deliveryExecution)
-    {
-        $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
-        throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
+        $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
+        $service->verifyResumeAuthorization($deliveryExecution, $user);
     }
 }

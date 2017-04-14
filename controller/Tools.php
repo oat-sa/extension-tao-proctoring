@@ -25,6 +25,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoProctoring\model\datatable\DeliveriesActivityDatatable;
 
 /**
  * Class Tools
@@ -38,7 +39,7 @@ class Tools extends SimplePageModule
     use OntologyAwareTrait;
 
     /**
-     * 
+     * Show assessment activity dashboard
      */
     public function assessmentActivity()
     {
@@ -46,6 +47,14 @@ class Tools extends SimplePageModule
         $this->setData('activity_data', $service->getData());
         $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
         $this->setView('Tools/assessment_activity.tpl');
+    }
+
+    /**
+     * Get assessment activity data
+     */
+    public function deliveriesActivityData()
+    {
+        $this->returnJson(new DeliveriesActivityDatatable());
     }
 
     /**
