@@ -136,6 +136,8 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories(),
                 'printReportButton' => json_encode($assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
                 'timeHandling' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING)),
+                'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
+                'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
             ),
             array(
                 BreadcrumbsHelper::testCenters(),
