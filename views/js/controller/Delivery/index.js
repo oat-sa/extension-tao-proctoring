@@ -22,6 +22,7 @@ define([
     'jquery',
     'lodash',
     'i18n',
+    'module',
     'core/promise',
     'controller/app',
     'util/url',
@@ -41,6 +42,7 @@ define([
     $,
     _,
     __,
+    module,
     Promise,
     appController,
     urlHelper,
@@ -121,6 +123,8 @@ define([
          */
         start: function start() {
             var title = __("Sessions");
+            var pageParams = module.config();
+            var context = pageParams.context;
             var deliveries, categories, proxyDeliveries, proxySessions;
             var container = containerFactory('.container').changeScope(cssScope).write(indexTpl({title: title}));
             var listBox = listBoxFactory({
@@ -215,7 +219,7 @@ define([
                     loadingBar.start();
                     listBox.setLoading(true);
 
-                    return proxyDeliveries.read().then(function (data) {
+                    return proxyDeliveries.read({context: context}).then(function (data) {
                         categories = data.categories;
 
                         deliveries = _.transform(data.list, function (result, delivery) {
