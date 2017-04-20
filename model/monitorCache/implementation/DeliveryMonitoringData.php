@@ -342,7 +342,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
     }
-    
+
     /**
      * Update extra time allowed for the delivery execution
      */
@@ -351,6 +351,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
+    }
+
+    /**
+     * Update extra time allowed for the delivery execution
+     */
+    private function updateLastActivity()
+    {
+        $this->addValue(DeliveryMonitoringService::LAST_ACTIVITY, microtime(true), true);
     }
 
     /**

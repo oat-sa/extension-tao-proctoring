@@ -79,6 +79,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const COLUMN_REMAINING_TIME = DeliveryMonitoringServiceInterface::REMAINING_TIME;
     const COLUMN_EXTRA_TIME = DeliveryMonitoringServiceInterface::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringServiceInterface::CONSUMED_EXTRA_TIME;
+    const COLUMN_LAST_ACTIVITY = DeliveryMonitoringServiceInterface::LAST_ACTIVITY;
 
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';
@@ -116,7 +117,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
         if ($updateData) {
             $this->data[$id]->updateData();
         }
-        
+
         return $this->data[$id];
     }
 
@@ -169,7 +170,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
      *    [['error_code' => ['0', '1']],
      * ]);
      * ```
-     * 
+     *
      * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
@@ -520,7 +521,7 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     {
         $whereClause = '';
 
-        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
+        //if condition is [ [ key => val ] ] then flatten to [ key => val ]
         if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
             $condition = current($condition);
         }

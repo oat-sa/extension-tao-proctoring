@@ -44,6 +44,7 @@ interface DeliveryMonitoringService
     const REMAINING_TIME = 'remaining_time';
     const EXTRA_TIME = 'extra_time';
     const CONSUMED_EXTRA_TIME = 'consumed_extra_time';
+    const LAST_ACTIVITY = 'last_activity';
 
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
