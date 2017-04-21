@@ -267,9 +267,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
         $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
         $eventManager->trigger(new DeliveryExecutionFinished($deliveryExecution));
-        return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
+        return $result;
     }
 
     /**
