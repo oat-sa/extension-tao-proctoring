@@ -8,7 +8,7 @@ $data = get_data('activity_data');
             <div class="grid-row">
                <h2><?= __('User Activity') ?></h2>
             </div>
-            <div class="grid-row">
+            <div class="grid-row user-activity">
                 <div class="col-4 dashboard-block">
                     <span class="dashboard-block-number"><?= $data['active_users'] ?></span>
                     <h3><span class="icon icon-users"></span> <?= __('Active users') ?></h3>
@@ -25,26 +25,24 @@ $data = get_data('activity_data');
             <div class="grid-row">
                 <h2><?= __('Current Assessment Activity') ?></h2>
             </div>
-            <div class="grid-row">
-                <div class="col-3 dashboard-block">
+            <div class="grid-row assessment-activity">
+                <div class="col-4 dashboard-block">
                     <h4><span class="icon icon-play"></span> <?= __('Total Current Assessment Activity') ?></h4>
                     <span class="dashboard-block-number"><?= $data['total_current_assessments'] ?></span>
                 </div>
-            </div>
-            <div class="grid-row">
-                <div class="col-3 dashboard-block">
+                <div class="col-2 dashboard-block">
                     <h4><span class="icon icon-play"></span> <?= __('In Progress') ?></h4>
                     <span class="dashboard-block-number"><?= $data['in_progress_assessments'] ?></span>
                 </div>
-                <div class="col-3 dashboard-block">
+                <div class="col-2 dashboard-block">
                     <h4><span class="icon icon-time"></span> <?= __('Awaiting') ?></h4>
                     <span class="dashboard-block-number"><?= $data['awaiting_assessments'] ?></span>
                 </div>
-                <div class="col-3 dashboard-block">
+                <div class="col-2 dashboard-block">
                     <h4><span class="icon icon-continue"></span> <?= __('Authorized') ?></h4>
                     <span class="dashboard-block-number"><?= $data['authorized_but_not_started_assessments'] ?></span>
                 </div>
-                <div class="col-3 dashboard-block">
+                <div class="col-2 dashboard-block">
                     <h4><span class="icon icon-pause"></span> <?= __('Paused\' state') ?></h4>
                     <span class="dashboard-block-number"><?= $data['paused_assessments'] ?></span>
                 </div>
