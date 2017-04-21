@@ -26,6 +26,7 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
+use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
@@ -266,6 +267,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+        $eventManager->trigger(new DeliveryExecutionFinished($deliveryExecution));
         return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
     }
 

@@ -53,6 +53,7 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoEventLog\model\LoggerService;
 
 /**
  *
@@ -284,6 +285,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.17.0');
         }
 
-        $this->skip('4.17.0', '4.17.1');
+        $this->skip('4.17.0', '4.18.0');
     }
 }
