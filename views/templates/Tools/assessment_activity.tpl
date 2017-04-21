@@ -10,16 +10,12 @@ $data = get_data('activity_data');
             </div>
             <div class="grid-row">
                 <div class="col-4 dashboard-block">
-                    <span class="dashboard-block-number"><?= $data['active_users'] ?></span>
-                    <h3><span class="icon icon-users"></span> <?= __('Active users') ?></h3>
+                    <span class="dashboard-block-number"><?= $data['active_test_takers'] ?></span>
+                    <h3><span class="icon icon-test-takers"></span> <?= __('Active test-takers') ?></h3>
                 </div>
                 <div class="col-4 dashboard-block">
                     <span class="dashboard-block-number"><?= $data['active_proctors'] ?></span>
                     <h3><span class="icon icon-test-taker"></span> <?= __('Active proctors') ?></h3>
-                </div>
-                <div class="col-4 dashboard-block">
-                    <span class="dashboard-block-number"><?= $data['active_test_takers'] ?></span>
-                    <h3><span class="icon icon-test-takers"></span> <?= __('Active test-takers') ?></h3>
                 </div>
             </div>
             <div class="grid-row">
