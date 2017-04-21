@@ -80,7 +80,6 @@ class ActivityMonitoringService extends ConfigurableService
         $current = $awaiting + $authorized + $paused + $active;
 
         return [
-            'active_users' => $this->getNumberOfActiveUsers(),
             'active_proctors' => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
             'active_test_takers' => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
             'total_assessments' => $this->getNumberOfAssessments(),

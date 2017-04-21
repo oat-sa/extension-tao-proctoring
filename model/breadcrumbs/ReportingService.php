@@ -69,6 +69,9 @@ class ReportingService extends ConfigurableService implements Breadcrumbs
             if (isset($parsedRoute['params']['delivery'])) {
                 $urlContext['delivery'] = $parsedRoute['params']['delivery'];
             }
+            if (isset($parsedRoute['params']['context'])) {
+                $urlContext['context'] = $parsedRoute['params']['context'];
+            }
         }
 
         $breadcrumbs = array(
