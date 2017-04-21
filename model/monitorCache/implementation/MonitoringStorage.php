@@ -604,7 +604,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $op = 'IS NULL';
             } else if(is_array($value)){
                 $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
-            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
+            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
                 $value = $matches[2];
                 $op = $matches[1] ? $matches[1] : "=";
                 $op .= ' ?';
