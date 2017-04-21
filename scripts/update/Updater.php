@@ -283,7 +283,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(TestTakerAuthorizationService::SERVICE_ID, new TestTakerAuthorizationService());
             $this->setVersion('4.17.0');
         }
-
-        $this->skip('4.17.0', '4.18.0');
+        $this->skip('4.17.0', '4.18.1');
     }
 }

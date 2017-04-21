@@ -34,13 +34,13 @@ define([
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
     var knownRoutes = [{
         url: indexUrl,
-        params: []
+        params: ['context']
     }, {
         url: monitorUrl,
-        params: ['delivery']
+        params: ['delivery', 'context']
     }, {
         url: historyUrl,
-        params: ['delivery', 'session']
+        params: ['delivery', 'session', 'context']
     }];
 
     /**
