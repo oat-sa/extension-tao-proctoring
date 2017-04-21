@@ -73,18 +73,22 @@ class ActivityMonitoringService extends ConfigurableService
      */
     public function getData()
     {
+        $awaiting = $this->getNumberOfAssessments(DeliveryExecution::STATE_AWAITING);
+        $authorized = $this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED);
+        $paused = $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED);
+        $active = $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE);
+        $current = $awaiting + $authorized + $paused + $active;
+
         return [
             'active_users' => $this->getNumberOfActiveUsers(),
             'active_proctors' => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
             'active_test_takers' => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
             'total_assessments' => $this->getNumberOfAssessments(),
-            'awaiting_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AWAITING),
-            'authorized_but_not_started_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED),
-            'paused_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED),
-            'in_progress_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE),
-            'terminated_assessment' => $this->getNumberOfAssessments(DeliveryExecution::STATE_TERMINATED),
-            'cancelled_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_CANCELED),
-            'finished_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_FINISHIED),
+            'total_current_assessments' => $current,
+            'awaiting_assessments' => $awaiting,
+            'authorized_but_not_started_assessments' => $authorized,
+            'paused_assessments' => $paused,
+            'in_progress_assessments' => $active,
             'deliveries_statistics' => $this->getStatesByDelivery(),
         ];
     }
