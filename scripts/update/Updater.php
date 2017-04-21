@@ -53,7 +53,6 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
-use oat\taoEventLog\model\LoggerService;
 
 /**
  *
