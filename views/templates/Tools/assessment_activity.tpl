@@ -52,7 +52,6 @@ $data = get_data('activity_data');
             <div class="grid-row">
                 <div class="col-12 activity-chart">
                     <div class="js-completed-assessments" data-config="<?= _dh(json_encode($completedAssessmentsConfig)) ?>"></div>
-                    <div class="js-completed-assessments-refresh-bar refresh-bar"><div class="js-refresh-bar-progress refresh-bar-progress"></div></div>
                 </div>
             </div>
         </div>

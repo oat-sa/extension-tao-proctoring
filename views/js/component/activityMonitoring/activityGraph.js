@@ -111,7 +111,7 @@ define([
             .on('render', function() {
                 chart = c3.generate(initConfig.graphConfig);
                 if (initConfig.autoRefresh) {
-                    $(initConfig.graphConfig.bindto).append($(
+                    $(initConfig.graphConfig.bindto).after($(
                         '<div class="js-completed-assessments-refresh-bar refresh-bar"><div class="js-refresh-bar-progress refresh-bar-progress"></div></div>'
                     ));
                     $refreshProgress = $('.js-refresh-bar-progress');

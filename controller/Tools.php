@@ -80,7 +80,7 @@ class Tools extends SimplePageModule
             $from->sub($interval);
             $countEvents = $eventLog->count([
                 ['occurred', 'between', $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
-                //['event_name', '=', DeliveryExecutionFinished::class],
+                ['event_name', '=', DeliveryExecutionFinished::class],
             ]);
             $result['time'][] = $to->setTimezone($tz)->format('Y-m-d H:i:s');
             $result['amount'][] = $countEvents;
