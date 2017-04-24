@@ -39,6 +39,9 @@ class ActivityMonitoringService extends ConfigurableService
     /** Threshold in seconds */
     const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
+    /** Interval of refreshing assessment activity graph in seconds. 0 - no auto refresh */
+    const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
+
     /**
      * @var array list of all the statuses uris
      */
@@ -132,11 +135,11 @@ class ActivityMonitoringService extends ConfigurableService
         }
 
         if ($interval->format('%i') > 0) {
-            $date->setTime($date->format('h'), $date->format('i')+1, 0, 0);
+            $date->setTime($date->format('H'), $date->format('i')+1, 0, 0);
             $amount = $amount === null ? 60 : $amount;
         }
         if ($interval->format('%h') > 0) {
-            $date->setTime($date->format('h')+1, 0, 0, 0);
+            $date->setTime($date->format('H')+1, 0, 0, 0);
             $amount = $amount === null ? 24 : $amount;
         }
         if ($interval->format('%d') > 0) {

@@ -47,6 +47,10 @@ class Tools extends SimplePageModule
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
         $this->setData('activity_data', $service->getData());
         $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
+        $this->setData('completed_assessments_config', [
+            ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH =>
+                $service->getOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH),
+        ]);
         $this->setView('Tools/assessment_activity.tpl');
     }
 
@@ -66,7 +70,7 @@ class Tools extends SimplePageModule
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
-        $interval = new \DateInterval('PT1M');
+        $interval = new \DateInterval('PT1H');
         $timeKeys = $service->getTimeKeys($interval);
         $tz = new \DateTimeZone( \common_session_SessionManager::getSession()->getTimeZone());
 
@@ -76,7 +80,7 @@ class Tools extends SimplePageModule
             $from->sub($interval);
             $countEvents = $eventLog->count([
                 ['occurred', 'between', $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
-                ['event_name', '=', DeliveryExecutionFinished::class],
+                //['event_name', '=', DeliveryExecutionFinished::class],
             ]);
             $result['time'][] = $to->setTimezone($tz)->format('Y-m-d H:i:s');
             $result['amount'][] = $countEvents;
