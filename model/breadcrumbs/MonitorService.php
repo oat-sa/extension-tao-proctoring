@@ -62,6 +62,9 @@ class MonitorService extends ConfigurableService implements Breadcrumbs
      */
     protected function breadcrumbsIndex($route, $parsedRoute)
     {
+        $routeContext = null;
+        $routeDelivery = null;
+        
         if (isset($parsedRoute['params'])) {
             if (isset($parsedRoute['params']['delivery'])) {
                 $routeDelivery = $parsedRoute['params']['delivery'];
@@ -69,11 +72,8 @@ class MonitorService extends ConfigurableService implements Breadcrumbs
             if (isset($parsedRoute['params']['context'])) {
                 $routeContext = $parsedRoute['params']['context'];
             }
-        } else {
-            $routeContext = null;
-            $routeDelivery = null;
         }
-        
+
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $deliveries = $service->getProctorableDeliveries($proctor, $routeContext);
