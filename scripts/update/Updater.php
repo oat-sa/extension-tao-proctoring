@@ -39,6 +39,7 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
@@ -286,10 +287,19 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('4.17.0', '4.19.1');
 
         if ($this->isVersion('4.19.1')) {
+
+            /** @var GuiSettingsService $guiService */
+            $guiService = $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID);
+            $guiService->setOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE, true);
+            $this->getServiceManager()->register(GuiSettingsService::SERVICE_ID, $guiService);
+            $this->setVersion('4.20.0');
+        }
+
+        if ($this->isVersion('4.20.0')) {
             $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
             $service->setOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH, 30);
             $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
-            $this->setVersion('4.20.0');
+            $this->setVersion('4.21.0');
         }
     }
 }

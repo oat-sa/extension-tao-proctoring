@@ -42,7 +42,9 @@ class RegisterGuiSettingsService extends InstallAction
             /**
              * Without Auto Refresh for the content
              */
-            GuiSettingsService::PROCTORING_AUTO_REFRESH => 0
+            GuiSettingsService::PROCTORING_AUTO_REFRESH => 0,
+
+            GuiSettingsService::PROCTORING_ALLOW_PAUSE => true
         ]);
 
         $service->setServiceManager($this->getServiceManager());
