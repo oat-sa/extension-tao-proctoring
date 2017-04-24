@@ -594,27 +594,27 @@ define([
                         action: authorize
                     });
 
-                    // tool: pause the executions
-                    tools.push({
-                        id: 'pause',
-                        icon: 'pause',
-                        title: __('Pause sessions'),
-                        label: __('Pause'),
-                        massAction: true,
-                        action: pause
-                    });
-
                     if(data.canPause === null || data.canPause){
-                        // tool: terminate the executions
+                        // tool: pause the executions
                         tools.push({
-                            id: 'terminate',
-                            icon: 'stop',
-                            title: __('Terminate sessions'),
-                            label: __('Terminate'),
+                            id: 'pause',
+                            icon: 'pause',
+                            title: __('Pause sessions'),
+                            label: __('Pause'),
                             massAction: true,
-                            action: terminate
+                            action: pause
                         });
                     }
+
+                    // tool: terminate the executions
+                    tools.push({
+                        id: 'terminate',
+                        icon: 'stop',
+                        title: __('Terminate sessions'),
+                        label: __('Terminate'),
+                        massAction: true,
+                        action: terminate
+                    });
 
                     // tool: report irregularities
                     tools.push({
