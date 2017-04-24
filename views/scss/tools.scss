@@ -7,8 +7,8 @@
       margin-top: 0;
     }
   }
-  .col-4 {
-    &.dashboard-block {
+  .user-activity {
+    .dashboard-block {
       padding: 10px 20px;
       @include simple-border($darkBlueGrey);
       background: $mediumBlueGrey;
@@ -17,8 +17,8 @@
       font-size: 2em;
     }
   }
-  .col-2, .col-3 {
-    &.dashboard-block {
+  .assessment-activity {
+    .dashboard-block {
       padding: 8px 15px;
       @include simple-border(lighten($colorWheel-12, 40%));
       background: lighten($colorWheel-12, 50%);
