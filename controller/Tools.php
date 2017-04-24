@@ -26,6 +26,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\datatable\DeliveriesActivityDatatable;
+use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 
 /**
  * Class Tools
@@ -55,6 +56,33 @@ class Tools extends SimplePageModule
     public function deliveriesActivityData()
     {
         $this->returnJson(new DeliveriesActivityDatatable());
+    }
+
+    /**
+     * Get completed assessments data
+     */
+    public function completedAssessmentsData()
+    {
+        /** @var ActivityMonitoringService $service */
+        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
+        $interval = new \DateInterval('PT1M');
+        $timeKeys = $service->getTimeKeys($interval);
+        $tz = new \DateTimeZone( \common_session_SessionManager::getSession()->getTimeZone());
+
+        foreach ($timeKeys as $timeKey) {
+            $to = clone($timeKey);
+            $from = clone($to);
+            $from->sub($interval);
+            $countEvents = $eventLog->count([
+                ['occurred', 'between', $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
+                ['event_name', '=', DeliveryExecutionFinished::class],
+            ]);
+            $result['time'][] = $to->setTimezone($tz)->format('Y-m-d H:i:s');
+            $result['amount'][] = $countEvents;
+        }
+
+        $this->returnJson($result, 200);
     }
 
     /**
@@ -88,4 +116,6 @@ class Tools extends SimplePageModule
             'unprocessed' => $notPaused
         ]);
     }
+
+
 }

@@ -48,6 +48,11 @@ $data = get_data('activity_data');
                     <div class="js-delivery-list"></div>
                 </div>
             </div>
+            <div class="grid-row">
+                <div class="col-12">
+                    <div class="js-completed-assessments activity-chart"></div>
+                </div>
+            </div>
         </div>
         <div class="col-3">
             <div class="grid-row">

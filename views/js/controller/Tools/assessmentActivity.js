@@ -28,7 +28,9 @@ define([
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
     'ui/datatable',
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, datatable){
+    'd3',
+    'c3',
+], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, datatable, d3, c3){
     'use strict';
 
     var $container = $('.js-pause-active-executions-container');
@@ -68,45 +70,85 @@ define([
                     id: 'Awaiting',
                     label: __('Awaiting'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Authorized',
                     label: __('Authorized'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Paused',
                     label: __('Paused'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Active',
                     label: __('Active'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Terminated',
                     label: __('Terminated'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Canceled',
                     label: __('Canceled'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Finished',
                     label: __('Finished'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
             ];
+
+            c3.generate({
+                bindto: '.js-completed-assessments',
+                data: {
+                    x: 'time',
+                    xFormat: '%Y-%m-%d %H:%M:%S',
+                    mimeType: 'json',
+                    url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring'),
+                    type: 'bar'
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%H:%M',
+                        },
+                        label: {
+                            text: __('Hours'),
+                            position: 'bottom center'
+                        }
+                    },
+                    y: {
+                        label: {
+                            text: __('Completed tests'),
+                            position: 'top'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    format: {
+                        name: function () {
+                            return __('Completed');
+                        }
+                    }
+                },
+                legend: {
+                    show: false
+                }
+            });
 
             $deliveryList.datatable({
                 url: url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
