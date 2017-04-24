@@ -594,15 +594,17 @@ define([
                         action: authorize
                     });
 
-                    // tool: pause the executions
-                    tools.push({
-                        id: 'pause',
-                        icon: 'pause',
-                        title: __('Pause sessions'),
-                        label: __('Pause'),
-                        massAction: true,
-                        action: pause
-                    });
+                    if(data.canPause === null || data.canPause){
+                        // tool: pause the executions
+                        tools.push({
+                            id: 'pause',
+                            icon: 'pause',
+                            title: __('Pause sessions'),
+                            label: __('Pause'),
+                            massAction: true,
+                            action: pause
+                        });
+                    }
 
                     // tool: terminate the executions
                     tools.push({
@@ -798,21 +800,23 @@ define([
                         }]
                     });
 
-                    // action: pause the execution
-                    model.push({
-                        id: 'pauseCl',
-                        label: __('Pause'),
-                        type: 'actions',
-                        actions: [{
-                            id: 'pause',
-                            icon: 'pause',
-                            title: __('Pause session'),
-                            disabled: function() {
-                                return !canDo('pause', this.state);
-                            },
-                            action: pause
-                        }]
-                    });
+                    if(data.canPause === null || data.canPause){
+                        // action: pause the execution
+                        model.push({
+                            id: 'pauseCl',
+                            label: __('Pause'),
+                            type: 'actions',
+                            actions: [{
+                                id: 'pause',
+                                icon: 'pause',
+                                title: __('Pause session'),
+                                disabled: function() {
+                                    return !canDo('pause', this.state);
+                                },
+                                action: pause
+                            }]
+                        });
+                    }
 
                     // column: remaining time
                     model.push({

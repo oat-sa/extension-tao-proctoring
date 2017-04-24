@@ -44,6 +44,11 @@ class GuiSettingsService extends ConfigurableService
      */
     const PROCTORING_AUTO_REFRESH = 'autoRefresh';
 
+    /**
+     * Allow or not proctor to  pause a delivery
+     */
+    const PROCTORING_ALLOW_PAUSE = 'canPause';
+
     public function __construct(array $options = array())
     {
         parent::__construct($options);
