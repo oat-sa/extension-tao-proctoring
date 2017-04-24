@@ -23,6 +23,7 @@ define([
     'lodash',
     'i18n',
     'helpers',
+    'moment',
     'layout/loading-bar',
     'core/encoder/time',
     'util/encode',
@@ -36,6 +37,7 @@ define([
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
+    'tpl!taoProctoring/templates/delivery/approximatedTimer',
     'ui/datatable',
     'select2'
 ], function (
@@ -43,6 +45,7 @@ define([
     _,
     __,
     helpers,
+    moment,
     loadingBar,
     timeEncoder,
     encode,
@@ -55,7 +58,8 @@ define([
     breadcrumbsFactory,
     _status,
     deliveryLinkTpl,
-    statusFilterTpl
+    statusFilterTpl,
+    approximatedTimerTpl
 ) {
     'use strict';
 
@@ -94,6 +98,8 @@ define([
             var deliveryId = $container.data('delivery');
             var isManageable = $container.data('ismanageable');
             var testCenterId = $container.data('testcenter');
+            var approximateTimer = $container.data('approximatetimer');
+            var approximateTimerWarning = $container.data('approximatetimerwarning');
             var timeHandlingButton = $container.data('timehandling');
             var printReportButton = $container.data('printreportbutton');
             var refreshBtn = $container.data('refreshbtn');
@@ -651,16 +657,37 @@ define([
                 label: __('Remaining'),
                 transform: function(value, row) {
                     var timer = _.isObject(row.timer) ? row.timer : {};
-                    var refinedValue = timer.remaining;
+                    var refinedValue = approximateTimer ? timer.approximatedRemaining : timer.remaining;
                     var remaining = parseInt(refinedValue, 10);
+                    var since = parseInt(timer.since, 10);
 
                     if (remaining || _.isFinite(remaining) ) {
+                        if (remaining < 0 && timer.extraTime) {
+                            timer.consumedExtraTime += -remaining;
+                            remaining = 0;
+                        }
+
                         if (remaining) {
                             refinedValue = timeEncoder.encode(remaining);
                         } else {
                             refinedValue = '';
                         }
-                        refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
+
+                        if (!remaining || (timer.extraTime && timer.extraTime <= timer.consumedExtraTime)) {
+                            refinedValue = __('Timed out');
+                        } else {
+                            refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
+                        }
+
+
+                        if (approximateTimer) {
+                            refinedValue = approximatedTimerTpl({
+                                timer: refinedValue,
+                                since: approximateTimerWarning && _.isFinite(since) && since >= approximateTimerWarning ? (
+                                    __("Last test taker's activity: %s", moment.duration(-since, "seconds").humanize(true))
+                                ) : null
+                            });
+                        }
                     }
 
                     return refinedValue;

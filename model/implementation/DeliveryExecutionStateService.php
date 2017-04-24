@@ -41,7 +41,9 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
 {
     const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     const OPTION_TIME_HANDLING = 'time_handling';
-    
+    const OPTION_APPROXIMATE_TIMER = 'approximate_timer';
+    const OPTION_APPROXIMATE_TIMER_WARNING = 'approximate_timer_warning';
+
     /**
      * @var TestSessionService
      */

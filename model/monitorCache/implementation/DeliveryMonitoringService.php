@@ -79,7 +79,9 @@ class DeliveryMonitoringService extends ConfigurableService implements DeliveryM
     const COLUMN_REMAINING_TIME = DeliveryMonitoringServiceInterface::REMAINING_TIME;
     const COLUMN_EXTRA_TIME = DeliveryMonitoringServiceInterface::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringServiceInterface::CONSUMED_EXTRA_TIME;
-    const COLUMN_LAST_ACTIVITY = DeliveryMonitoringServiceInterface::LAST_ACTIVITY;
+    const COLUMN_LAST_TEST_TAKER_ACTIVITY = DeliveryMonitoringServiceInterface::LAST_TEST_TAKER_ACTIVITY;
+    const COLUMN_LAST_TEST_STATE_CHANGE = DeliveryMonitoringServiceInterface::LAST_TEST_STATE_CHANGE;
+    const COLUMN_LAST_PAUSE_TIMESTAMP = DeliveryMonitoringServiceInterface::LAST_PAUSE_TIMESTAMP;
 
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';

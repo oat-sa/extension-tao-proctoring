@@ -22,7 +22,6 @@
 namespace oat\taoProctoring\model\monitorCache\update;
 
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoQtiTest\models\event\QtiMoveEvent;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\oatbox\service\ServiceManager;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -37,11 +36,6 @@ class TestUpdate
 
     public static function testStateChange(QtiTestChangeEvent $event)
     {
-        $session = $event->getSession();
-        $sessionMemento = $event->getSessionMemento();
-        $currentItem = $session->getCurrentAssessmentItemRef();
-        $previousItem = $sessionMemento->getItem();
-
         $dataKeys = [
             DeliveryMonitoringService::STATUS,
             DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
@@ -50,10 +44,10 @@ class TestUpdate
             DeliveryMonitoringService::REMAINING_TIME,
             DeliveryMonitoringService::EXTRA_TIME,
         ];
-        if (($session->getState() == AssessmentTestSessionState::INTERACTING) &&
-            ($session->getState() != $sessionMemento->getState() || //!$currentItem || !$previousItem ||
-             $previousItem->getIdentifier() != $currentItem->getIdentifier())) {
-            $dataKeys[] = DeliveryMonitoringService::LAST_ACTIVITY;
+
+        $session = $event->getSession();
+        if ($session->getState() == AssessmentTestSessionState::INTERACTING) {
+            $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
         }
 
         /** @var DeliveryMonitoringService $service */

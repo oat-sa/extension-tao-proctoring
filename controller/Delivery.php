@@ -79,7 +79,7 @@ class Delivery extends ProctoringModule
 
         /** @var $assessmentResultsService \oat\taoProctoring\model\AssessmentResultsService */
         $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::CONFIG_ID);
-        
+
         /** @var $deliveryExecutionStateService \oat\taoProctoring\model\implementation\DeliveryExecutionStateService */
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
@@ -94,6 +94,8 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories(),
                 'printReportButton' => json_encode($assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
                 'timeHandling' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING)),
+                'approximateTimer' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER)),
+                'approximateTimerWarning' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER_WARNING)),
                 'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
                 'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
             ),
@@ -136,6 +138,8 @@ class Delivery extends ProctoringModule
                 'categories' => $this->getAllReasonsCategories(),
                 'printReportButton' => json_encode($assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON)),
                 'timeHandling' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING)),
+                'approximateTimer' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER)),
+                'approximateTimerWarning' => json_encode($deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER_WARNING)),
                 'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
                 'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
             ),
@@ -550,7 +554,7 @@ class Delivery extends ProctoringModule
 
     /**
      * Extra Time handling: add or remove time on delivery executions
-     * 
+     *
      * @throws \common_Exception
      */
     public function extraTime()
