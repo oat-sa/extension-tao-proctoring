@@ -93,7 +93,8 @@
 
     .panel {
         @include flex-container();
-        .back-button, .daterange {
+        @include vendor-prefix(justify-content, flex-end, property, (-webkit-, ''));
+        .back-button, .exit-button, .daterange {
             margin: 10px 4px;
         }
         .daterange {

@@ -30,9 +30,11 @@ define([
     'util/encode',
     'ui/feedback',
     'ui/dialog',
+    'ui/dialog/confirm',
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
     'ui/container',
+    'ui/button',
     'taoProctoring/component/proxy',
     'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/extraTime/encoder',
@@ -55,9 +57,11 @@ define([
     encode,
     feedback,
     dialog,
+    dialogConfirm,
     bulkActionPopup,
     cascadingComboBox,
     containerFactory,
+    buttonFactory,
     proxyFactory,
     extraTimePopup,
     encodeExtraTime,
@@ -82,6 +86,7 @@ define([
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+    var indexUrl = urlHelper.route('index', 'DeliverySelection', 'taoProctoring');
 
     /**
      * The extra time unit: by default in minutes
@@ -129,6 +134,7 @@ define([
             var deliveryId = pageParams.delivery;
             var context = pageParams.context;
             var defaultTag = pageParams.defaultTag;
+            var exitUrl = pageParams.exitUrl;
             var defaultAvailableLabel = __('Current sessions');
             var dataset;
             var extraFields;
@@ -146,6 +152,27 @@ define([
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
+            });
+
+            buttonFactory({
+                id: 'exit',
+                type: 'info',
+                label: __('Exit'),
+                cls: 'exit-button',
+                renderTo: container.find('.panel')
+            }).on('click', function () {
+                dialogConfirm(__('You are about to leave this page. Continue?'), function () {
+                    if (exitUrl) {
+                        window.location.href = exitUrl;
+                    } else {
+                        if (window.self === window.top) {
+                            // this action could fail if the window has not been opened by a script
+                            // in that case, the next instruction should redirect the page anyway
+                            window.self.close();
+                        }
+                        appController.getRouter().redirect(indexUrl);
+                    }
+                });
             });
 
             proxyFactory('ajax').init({
