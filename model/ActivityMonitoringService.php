@@ -135,20 +135,20 @@ class ActivityMonitoringService extends ConfigurableService
         }
 
         if ($interval->format('%i') > 0) {
-            $date->setTime($date->format('H'), $date->format('i')+1, 0, 0);
+            $date->setTime($date->format('H'), $date->format('i')+1, 0);
             $amount = $amount === null ? 60 : $amount;
         }
         if ($interval->format('%h') > 0) {
-            $date->setTime($date->format('H')+1, 0, 0, 0);
+            $date->setTime($date->format('H')+1, 0, 0);
             $amount = $amount === null ? 24 : $amount;
         }
         if ($interval->format('%d') > 0) {
-            $date->setTime(0, 0, 0, 0);
+            $date->setTime(0, 0, 0);
             $date->setDate($date->format('Y'), $date->format('m'), $date->format('d')+1);
             $amount = $amount === null ? cal_days_in_month(CAL_GREGORIAN, $date->format('m'), $date->format('Y')) : $amount;
         }
         if ($interval->format('%m') > 0) {
-            $date->setTime(0, 0, 0, 0);
+            $date->setTime(0, 0, 0);
             $date->setDate($date->format('Y'), $date->format('m')+1, 1);
             $amount = $amount === null ? 12 : $amount;
         }
