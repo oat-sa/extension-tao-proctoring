@@ -100,9 +100,15 @@ define([
              * Refresh the graph
              * @param {Object} [params]
              */
-            refresh: function refresh() {
+            refresh: function refresh(newConfig) {
                 if (chart) {
-                    chart.load();
+                    initConfig = _.merge({}, initConfig, newConfig);
+                    //there is no way to update graph with new config
+                    chart.internal.config.axis_x_tick_format = initConfig.graphConfig.axis.x.tick.format;
+                    chart.axis.labels({
+                        x: initConfig.graphConfig.axis.x.label.text
+                    });
+                    chart.load(initConfig.graphConfig.data);
                 }
             }
         };

@@ -67,17 +67,14 @@ class Tools extends SimplePageModule
      */
     public function completedAssessmentsData()
     {
-        /** @var ActivityMonitoringService $service */
-        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
-        $interval = new \DateInterval('PT1H');
-        $timeKeys = $service->getTimeKeys($interval);
+        $timeKeys = $this->getTimeKeys();
         $tz = new \DateTimeZone( \common_session_SessionManager::getSession()->getTimeZone());
 
         foreach ($timeKeys as $timeKey) {
             $to = clone($timeKey);
             $from = clone($to);
-            $from->sub($interval);
+            $from->sub($this->getInterval());
             $countEvents = $eventLog->count([
                 ['occurred', 'between', $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
                 ['event_name', '=', DeliveryExecutionFinished::class],
@@ -121,5 +118,68 @@ class Tools extends SimplePageModule
         ]);
     }
 
+    /**
+     * @return \DateInterval
+     */
+    private function getInterval()
+    {
+        $interval = new \DateInterval('PT1H');
+        if ($this->hasRequestParameter('interval')) {
+            switch ($this->getRequestParameter('interval')) {
+                case 'day':
+                    $interval = new \DateInterval('PT1H');
+                    break;
+                case 'week':
+                    $interval = new \DateInterval('P1D');
+                    break;
+                case 'month':
+                    $interval = new \DateInterval('P1D');
+                    break;
+                case 'prevmonth':
+                    $interval = new \DateInterval('P1D');
+                    break;
+                default:
+                    $interval = new \DateInterval('PT1H');
+                    break;
+            }
+        }
+        return $interval;
+    }
 
+    /**
+     * @return \DateTime[]
+     */
+    private function getTimeKeys()
+    {
+        /** @var ActivityMonitoringService $service */
+        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+
+        $amount = null;
+        $startDate = null;
+        if ($this->hasRequestParameter('interval')) {
+            switch ($this->getRequestParameter('interval')) {
+                case 'day':
+                    $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                    break;
+                case 'week':
+                    $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                    $amount = 7;
+                    break;
+                case 'month':
+                    $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                    $amount = cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y'));
+                    break;
+                case 'prevmonth':
+                    $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                    $startDate->sub(new \DateInterval('P'.cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y')).'D'));
+                    $amount = cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y'));
+                    break;
+                default:
+                    $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
+                    break;
+            }
+        }
+
+        return $service->getTimeKeys($this->getInterval(), $startDate, $amount);
+    }
 }

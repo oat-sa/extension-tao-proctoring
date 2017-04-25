@@ -30,7 +30,7 @@ define([
     'taoProctoring/component/activityMonitoring/activityGraph',
     'd3',
     'ui/datatable',
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, activityGraph, d3){
+], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, activityGraphFactory, d3){
     'use strict';
 
     var $container = $('.js-pause-active-executions-container');
@@ -61,6 +61,7 @@ define([
     return {
         start : function(){
             var $deliveryList = $('.js-delivery-list');
+            var activityGraph;
             var deliveryListModel = [
                 {
                     id: 'label',
@@ -140,8 +141,30 @@ define([
                     doPause(reason);
                 });
             });
+
+            $('.js-activity-chart-interval').on('change', function () {
+                var interval = $(this).val();
+                activityGraph.refresh({
+                    graphConfig : {
+                        data : {
+                            url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', {'interval' : interval})
+                        },
+                        axis : {
+                            x : {
+                                tick : {
+                                    format: interval === 'day' ? '%H:%M' : '%m-%d'
+                                },
+                                label : {
+                                    text:  interval === 'day' ? __('Hours') : __('Days')
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
             activityGraphConfig = $('.js-completed-assessments').data('config');
-            activityGraph({
+            activityGraph = activityGraphFactory({
                 autoRefresh : parseInt(activityGraphConfig.completed_assessments_auto_refresh, 10) * 1000,
                 autoRefreshBar : true,
                 graphConfig : {

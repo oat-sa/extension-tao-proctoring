@@ -10,11 +10,11 @@ $data = get_data('activity_data');
                <h2><?= __('User Activity') ?></h2>
             </div>
             <div class="grid-row user-activity">
-                <div class="col-4 dashboard-block">
+                <div class="col-6 dashboard-block">
                     <span class="dashboard-block-number"><?= $data['active_test_takers'] ?></span>
                     <h3><span class="icon icon-test-takers"></span> <?= __('Active test-takers') ?></h3>
                 </div>
-                <div class="col-4 dashboard-block">
+                <div class="col-6 dashboard-block">
                     <span class="dashboard-block-number"><?= $data['active_proctors'] ?></span>
                     <h3><span class="icon icon-test-taker"></span> <?= __('Active proctors') ?></h3>
                 </div>
@@ -45,13 +45,19 @@ $data = get_data('activity_data');
                 </div>
             </div>
             <div class="grid-row">
-                <div class="col-12">
-                    <div class="js-delivery-list"></div>
+                <div class="col-12 activity-chart">
+                    <select class="js-activity-chart-interval">
+                        <option value="day"><?= __('Last Day') ?></option>
+                        <option value="week"><?= __('Last Week') ?></option>
+                        <option value="month"><?= __('Last Month') ?></option>
+                        <option value="prevmonth"><?= __('Previous Month') ?></option>
+                    </select>
+                    <div class="js-completed-assessments" data-config="<?= _dh(json_encode($completedAssessmentsConfig)) ?>"></div>
                 </div>
             </div>
             <div class="grid-row">
-                <div class="col-12 activity-chart">
-                    <div class="js-completed-assessments" data-config="<?= _dh(json_encode($completedAssessmentsConfig)) ?>"></div>
+                <div class="col-12">
+                    <div class="js-delivery-list"></div>
                 </div>
             </div>
         </div>
