@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\helpers\DataTableHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\TestSessionHistoryService;
 
@@ -81,6 +82,7 @@ class Reporting extends SimplePageModule
             'periodStart' => $requestOptions['periodStart'],
             'periodEnd'   => $requestOptions['periodEnd'],
             'monitoringUrl' => $historyService->getBackUrl($delivery),
+            'exitUrl'     => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getExitUrl(),
         ];
 
         if ($delivery) {

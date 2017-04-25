@@ -33,6 +33,7 @@ define([
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
     'ui/container',
+    'taoProctoring/component/exitButton',
     'taoProctoring/component/proxy',
     'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/extraTime/encoder',
@@ -58,6 +59,7 @@ define([
     bulkActionPopup,
     cascadingComboBox,
     containerFactory,
+    exitButtonFactory,
     proxyFactory,
     extraTimePopup,
     encodeExtraTime,
@@ -527,6 +529,12 @@ define([
                     timeHandlingButton = data.timeHandling;
                     printReportButton = data.printReportButton;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
+
+                    if (data.exitUrl) {
+                        exitButtonFactory(function() {
+                            window.location.href = data.exitUrl;
+                        }).render(container.find('.panel'));
+                    }
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;

@@ -53,4 +53,13 @@ class GuiSettingsService extends ConfigurableService
     {
         parent::__construct($options);
     }
+
+    /**
+     * Gets the URL that exits the proctor pages
+     * @return string|null
+     */
+    public function getExitUrl()
+    {
+        return null;
+    }
 }

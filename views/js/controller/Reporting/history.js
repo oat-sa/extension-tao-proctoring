@@ -26,6 +26,7 @@ define([
     'ui/container',
     'ui/button',
     'util/encode',
+    'taoProctoring/component/exitButton',
     'taoProctoring/component/proxy',
     'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
@@ -39,6 +40,7 @@ define([
     containerFactory,
     buttonFactory,
     encode,
+    exitButtonFactory,
     proxyFactory,
     dateRangeFactory,
     historyTableFactory,
@@ -158,6 +160,12 @@ define([
                             history.go(-1);
                         }
                     });
+
+                    if (data.exitUrl) {
+                        exitButtonFactory(function() {
+                            window.location.href = data.exitUrl;
+                        }).render(container.find('.panel'));
+                    }
                 });
             }).catch(function(err) {
                 handleOnDisconnect(err);
