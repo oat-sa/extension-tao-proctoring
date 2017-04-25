@@ -294,5 +294,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(GuiSettingsService::SERVICE_ID, $guiService);
             $this->setVersion('4.20.0');
         }
+
+        $this->skip('4.20.0', '5.0.0');
     }
 }
