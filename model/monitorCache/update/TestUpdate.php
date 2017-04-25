@@ -24,6 +24,7 @@ namespace oat\taoProctoring\model\monitorCache\update;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\oatbox\service\ServiceManager;
+use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
  *
@@ -35,24 +36,30 @@ class TestUpdate
 
     public static function testStateChange(QtiTestChangeEvent $event)
     {
-        /** @var DeliveryMonitoringService $service */
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution, false);
-        $data->setTestSession($event->getSession());
-        $data->updateData([
+        $dataKeys = [
             DeliveryMonitoringService::STATUS,
             DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
             DeliveryMonitoringService::START_TIME,
             DeliveryMonitoringService::END_TIME,
             DeliveryMonitoringService::REMAINING_TIME,
             DeliveryMonitoringService::EXTRA_TIME,
-        ]);
+        ];
+
+        $session = $event->getSession();
+        if ($session->getState() == AssessmentTestSessionState::INTERACTING) {
+            $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
+        }
+
+        /** @var DeliveryMonitoringService $service */
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $service->getData($deliveryExecution, false);
+        $data->setTestSession($session);
+        $data->updateData($dataKeys);
         $success = $service->save($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }
     }
-
 
 }

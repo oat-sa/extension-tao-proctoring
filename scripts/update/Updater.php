@@ -668,6 +668,28 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('3.17.0', '3.17.2');
+
+        if ($this->isVersion('3.17.2')) {
+            try {
+                $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            } catch (ServiceNotFoundException $e) {
+                $service = new DeliveryExecutionStateService(
+                    [
+                        DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
+                        DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
+                        DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER => false,
+                    ]
+                );
+            }
+
+            $service->setOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER, false);
+            $service->setOption(DeliveryExecutionStateService::OPTION_APPROXIMATE_TIMER_WARNING, 1440);
+
+            $this->getServiceManager()->propagate($service);
+            $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+
+            $this->setVersion('3.18.0');
+        }
     }
 
     private function refreshMonitoringData()

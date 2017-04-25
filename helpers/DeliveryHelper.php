@@ -24,7 +24,6 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
-use oat\taoDelivery\helper\Delivery;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
@@ -40,6 +39,7 @@ use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringServic
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -495,7 +495,7 @@ class DeliveryHelper
 
         $testSession = $testSessionService->getTestSession($deliveryExecution);
         if ($testSession instanceof TestSession) {
-            $timer = $testSession->getTimer(); 
+            $timer = $testSession->getTimer();
         } else {
             $timer = new QtiTimer();
             $timer->setStorage(new QtiTimeStorage($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier()));
@@ -504,7 +504,7 @@ class DeliveryHelper
 
         return $timer;
     }
-    
+
     /**
      * Sets the extra time to a list of delivery executions
      *
@@ -533,7 +533,7 @@ class DeliveryHelper
                 $testSession = $testSessionService->getTestSession($deliveryExecution);
                 if ($testSession) {
                     $testSession->getRoute()->setPosition(0);
-                    
+
                     $testSession->setState(AssessmentTestSessionState::INTERACTING);
 
                     // The duration store contains durations (time spent) on test, testPart(s) and assessmentSection(s).
@@ -556,13 +556,13 @@ class DeliveryHelper
                     $testSessionService->persist($testSession);
                 }
             }
-            
+
             $timer = self::getDeliveryTimer($deliveryExecution);
             $timer->setExtraTime($extraTime)->save();
-            
+
             $data = $deliveryMonitoringService->getData($deliveryExecution, true);
             $deliveryMonitoringService->save($data);
-            
+
             $result[] = $deliveryExecution->getIdentifier();
         }
 
@@ -589,17 +589,19 @@ class DeliveryHelper
             $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
             $executions = [];
+            $now = microtime(true);
 
             foreach($deliveryExecutions as $cachedData) {
 
+                $executionState = $cachedData[DeliveryMonitoringService::COLUMN_STATUS];
                 $state = [
-                    'status' => $cachedData[DeliveryMonitoringService::COLUMN_STATUS],
+                    'status' => $executionState,
                     'progress' => $cachedData[DeliveryMonitoringService::COLUMN_CURRENT_ASSESSMENT_ITEM]
                 ];
 
                 $testTaker = [];
                 $extraFields = [];
-                
+
                 $user = UserHelper::getUser($cachedData[DeliveryMonitoringService::TEST_TAKER]);
                 if ($user) {
                     /* @var $user User */
@@ -616,6 +618,38 @@ class DeliveryHelper
                 $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
                 $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
 
+                $timer = [
+                    'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
+                    'extraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME]),
+                    'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME]),
+                ];
+                if (!is_null($timer['remaining']) && ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
+                    if (isset($cachedData[DeliveryMonitoringService::COLUMN_LAST_TEST_TAKER_ACTIVITY])) {
+                        $lastActivity = $cachedData[DeliveryMonitoringService::COLUMN_LAST_TEST_TAKER_ACTIVITY];
+                        $elapsed = $now - $lastActivity;
+                    } else {
+                        $lastActivity = null;
+                        $elapsed = 0;
+                    }
+
+                    if (isset($cachedData[DeliveryMonitoringService::COLUMN_LAST_PAUSE_TIMESTAMP])) {
+                        $lastPauseTimestamp = $cachedData[DeliveryMonitoringService::COLUMN_LAST_PAUSE_TIMESTAMP];
+                    } else {
+                        $lastPauseTimestamp = null;
+                    }
+
+                    if (ProctoredDeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) {
+                        $elapsedApprox = $lastPauseTimestamp - $lastActivity;
+                    } else {
+                        $elapsedApprox = $elapsed;
+                    }
+                    $timer['lastActivity'] = $lastActivity;
+                    $timer['since'] = $elapsed . 's';
+                    $timer['approximatedRemaining'] = round(floatval($timer['remaining']) - $elapsedApprox) . 's';
+                } else {
+                    $timer['remaining'] = null;
+                }
+
                 $executions[] = array(
                     'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                     'delivery' => array(
@@ -623,11 +657,7 @@ class DeliveryHelper
                         'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                     ),
                     'date' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::COLUMN_START_TIME]),
-                    'timer' => [
-                        'remaining' => $cachedData[DeliveryMonitoringService::COLUMN_REMAINING_TIME],
-                        'extraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_EXTRA_TIME]),
-                        'consumedExtraTime' => floatval($cachedData[DeliveryMonitoringService::COLUMN_CONSUMED_EXTRA_TIME]),
-                    ],
+                    'timer' => $timer,
                     'testTaker' => $testTaker,
                     'extraFields' => $extraFields,
                     'state' => $state,
@@ -641,7 +671,7 @@ class DeliveryHelper
 
     /**
      * Get array of user specific extra fields to be displayed in the monitoring data table
-     * 
+     *
      * @return array
      */
     private static function _getUserExtraFields(){
@@ -665,7 +695,7 @@ class DeliveryHelper
 
     /**
      * Return array of extra fields to be displayed in the monitoring data table
-     * 
+     *
      * @return array
      */
     public static function getExtraFields(){

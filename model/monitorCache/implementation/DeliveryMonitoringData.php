@@ -33,8 +33,6 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\runner\session\TestSession;
-use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
@@ -215,6 +213,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
+        $this->addValue(DeliveryMonitoringService::LAST_TEST_STATE_CHANGE, microtime(true), true);
+        if ($status == ProctoredDeliveryExecution::STATE_PAUSED) {
+            $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
+        }
     }
 
     /**
@@ -342,7 +344,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
 
         $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
     }
-    
+
     /**
      * Update extra time allowed for the delivery execution
      */
@@ -351,6 +353,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
         $timer = DeliveryHelper::getDeliveryTimer($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
+    }
+
+    /**
+     * Update extra time allowed for the delivery execution
+     */
+    private function updateLastTestTakerActivity()
+    {
+        $this->addValue(DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY, microtime(true), true);
     }
 
     /**
