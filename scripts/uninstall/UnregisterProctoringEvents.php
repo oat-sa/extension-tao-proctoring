@@ -16,7 +16,7 @@
  *
  * Copyright (c) 2017  (original work) Open Assessment Technologies SA;
  *
- * @author Alexander Zagovorichev <zagovorichev@1pt.com>
+ * @author Joel Bout, <joel@taotesting.com>
  */
 
 namespace oat\taoProctoring\scripts\uninstall;
