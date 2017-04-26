@@ -69,7 +69,7 @@ define([
                 html : listBoxActionsTpl({id : config.deliveryExecution, cancelable: config.cancelable})
             }];
             var list = listBox({
-                title : config.deliveryInit ? __('Start Test') : __('Resume Test'),
+                title : '',
                 textEmpty : '',
                 textNumber : '',
                 textLoading : '',
