@@ -49,13 +49,14 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
                 array(RdsDeliveryLogService::DELIVERY_EXECUTION_ID),
                 'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::DELIVERY_EXECUTION_ID
             );
+
+            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+            foreach ($queries as $query) {
+                $persistence->exec($query);
+            }
+
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
-        }
-        
-        $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
-        foreach ($queries as $query) {
-            $persistence->exec($query);
         }
         
         $this->registerService(

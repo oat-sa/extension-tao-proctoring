@@ -35,13 +35,15 @@ use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\uninstall\RestoreServices;
+use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.20.1',
+    'version' => '4.21.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=7.81.1',
@@ -85,6 +87,10 @@ return array(
         )
     ),
     'uninstall' => array(
+        'php' => [
+            RestoreServices::class,
+            UnregisterProctoringEvents::class
+        ]
     ),
     'routes' => array(
         'taoProctoring' => 'oat\\taoProctoring\\controller'
