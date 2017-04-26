@@ -19,8 +19,7 @@ use oat\tao\helpers\Template;
                     cancelable : '<?=get_data('cancelable')?>',
                     deliveryExecution : '<?=get_data('deliveryExecution')?>',
                     deliveryLabel : '<?=get_data('deliveryLabel')?>',
-                    runDeliveryUrl : '<?=get_data('runDeliveryUrl')?>',
-                    deliveryInit : <?=get_data('init') ? 'true' : 'false'?>
+                    runDeliveryUrl : '<?=get_data('runDeliveryUrl')?>'
                 });
             });
         });
