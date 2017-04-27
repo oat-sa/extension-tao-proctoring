@@ -43,10 +43,10 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.22.0',
+    'version' => '5.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=7.81.1',
+        'tao' => '>=9.0.0',
         'taoDelivery' => '>=5.0.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
@@ -102,9 +102,6 @@ return array(
 
 		#BASE URL (usually the domain root)
 		'BASE_URL' => ROOT_URL.'taoProctoring/',
-
-	    #BASE WWW required by JS
-	    'BASE_WWW' => ROOT_URL.'taoProctoring/views/'
 	),
     'extra' => array(
         'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',
