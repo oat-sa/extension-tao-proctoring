@@ -295,6 +295,14 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.20.0');
         }
 
-        $this->skip('4.20.0', '5.0.0');
+        $this->skip('4.20.0', '4.21.0');
+
+        if ($this->isVersion('4.20.1')) {
+            $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+            $service->setOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH, 30);
+            $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
+            $this->setVersion('4.21.0');
+        }
+        $this->skip('4.21.0', '5.0.0');
     }
 }
