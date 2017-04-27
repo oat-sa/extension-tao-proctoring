@@ -303,5 +303,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
             $this->setVersion('4.21.0');
         }
+        $this->skip('4.21.0', '4.22.0');
     }
 }
