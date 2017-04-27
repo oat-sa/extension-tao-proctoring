@@ -27,13 +27,16 @@ define([
     'ui/feedback',
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
+    'taoProctoring/component/activityMonitoring/activityGraph',
+    'd3',
     'ui/datatable',
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, datatable){
+], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, activityGraph, d3){
     'use strict';
 
     var $container = $('.js-pause-active-executions-container');
     var categories = $container.data('reasoncategories');
-    var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.")
+    var activityGraphConfig;
+    var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.");
 
     function doPause(reason) {
         $.ajax({
@@ -68,43 +71,43 @@ define([
                     id: 'Awaiting',
                     label: __('Awaiting'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Authorized',
                     label: __('Authorized'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Paused',
                     label: __('Paused'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Active',
                     label: __('Active'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Terminated',
                     label: __('Terminated'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Canceled',
                     label: __('Canceled'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
                 {
                     id: 'Finished',
                     label: __('Finished'),
                     sortable : true,
-                    transform: function(value, row) {return value.toString();}
+                    transform: function(value) {return value.toString();}
                 },
             ];
 
@@ -137,6 +140,40 @@ define([
                     doPause(reason);
                 });
             });
+            activityGraphConfig = $('.js-completed-assessments').data('config');
+            activityGraph({
+                autoRefresh : parseInt(activityGraphConfig.completed_assessments_auto_refresh, 10) * 1000,
+                autoRefreshBar : true,
+                graphConfig : {
+                    bindto : '.js-completed-assessments',
+                    data: {
+                        url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring')
+                    },
+                    axis: {
+                        x: {
+                            label: {
+                                text: __('Hours'),
+                            }
+                        },
+                        y: {
+                            label: {
+                                text: __('Completed tests'),
+                            },
+                            tick: {format: d3.format("d")},
+                        }
+                    },
+                    tooltip: {
+                        format: {
+                            name: function () {
+                                return __('Completed');
+                            }
+                        }
+                    },
+                    legend: {
+                        show: false
+                    }
+                }
+            }).render();
         }
     };
 });

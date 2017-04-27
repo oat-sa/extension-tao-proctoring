@@ -1,5 +1,6 @@
 <?php
 $reasonCategories = get_data('reasonCategories');
+$completedAssessmentsConfig = get_data('completed_assessments_config');
 $data = get_data('activity_data');
 ?>
 <div class="activity-dashboard">
@@ -46,6 +47,11 @@ $data = get_data('activity_data');
             <div class="grid-row">
                 <div class="col-12">
                     <div class="js-delivery-list"></div>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="col-12 activity-chart">
+                    <div class="js-completed-assessments" data-config="<?= _dh(json_encode($completedAssessmentsConfig)) ?>"></div>
                 </div>
             </div>
         </div>
