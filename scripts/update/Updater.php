@@ -295,7 +295,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('4.20.0');
         }
 
-        $this->skip('4.20.0', '4.20.1');
+        $this->skip('4.20.0', '4.21.0');
 
         if ($this->isVersion('4.20.1')) {
             $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);

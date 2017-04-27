@@ -26,8 +26,9 @@ define([
     'ui/component',
     'util/url',
     'c3',
-    'd3'
-], function ($, _, __, component, url, c3) {
+    'tpl!taoProctoring/component/activityMonitoring/progressbar',
+    'core/polling',
+], function ($, _, __, component, url, c3, progressbarTpl, pollingFactory) {
     'use strict';
 
     /**
@@ -76,11 +77,23 @@ define([
      * @param duration
      */
     function runRefreshProgressBar($refreshProgress, duration) {
-        $refreshProgress.stop();
-        $refreshProgress.css({width:'0%'});
-        $refreshProgress.animate({
-            width: '100%'
-        }, duration, 'linear');
+        duration = duration / 1000;
+        $refreshProgress.css({
+            '-webkit-transition': 'width 0s',
+            '-moz-transition': 'width 0s',
+            '-o-transition': 'width 0s',
+            'transition': 'width 0s',
+            'width': '0%'
+        });
+        //hack to refresh width
+        $refreshProgress.hide().show();
+        $refreshProgress.css({
+            '-webkit-transition': 'width ' + duration + 's linear',
+            '-moz-transition': 'width ' + duration + 's linear',
+            '-o-transition': 'width ' + duration + 's linear',
+            'transition': 'width ' + duration + 's linear',
+            'width': '100%'
+        });
     }
 
     /**
@@ -95,6 +108,8 @@ define([
         var initConfig = _.merge({}, _defaults, config);
         var chart;
         var $refreshProgress;
+        var $progressbar;
+        var polling;
         var activityGraph = {
             /**
              * Refresh the graph
@@ -117,20 +132,29 @@ define([
             .on('render', function() {
                 chart = c3.generate(initConfig.graphConfig);
                 if (initConfig.autoRefresh) {
-                    $(initConfig.graphConfig.bindto).after($(
-                        '<div class="js-completed-assessments-refresh-bar refresh-bar"><div class="js-refresh-bar-progress refresh-bar-progress"></div></div>'
-                    ));
-                    $refreshProgress = $('.js-refresh-bar-progress');
+                    $progressbar = $(progressbarTpl());
+                    $(initConfig.graphConfig.bindto).after($progressbar);
+                    $refreshProgress = $progressbar.find('.js-refresh-bar-progress');
 
                     if (initConfig.autoRefreshBar) {
                         runRefreshProgressBar($refreshProgress, initConfig.autoRefresh);
                     }
-                    setInterval(function() {
-                        chart.load(initConfig.graphConfig.data);
-                        if (initConfig.autoRefreshBar) {
-                            runRefreshProgressBar($refreshProgress, initConfig.autoRefresh);
-                        }
-                    }, initConfig.autoRefresh);
+
+                    polling = pollingFactory({
+                         action: function() {
+                             chart.load(initConfig.graphConfig.data);
+                             if (initConfig.autoRefreshBar) {
+                                 runRefreshProgressBar($refreshProgress, initConfig.autoRefresh);
+                             }
+                         },
+                         interval: initConfig.autoRefresh,
+                         autoStart: true
+                    });
+                }
+            })
+            .on('destroy', function() {
+                if (polling) {
+                    polling.stop();
                 }
             })
             .init(initConfig);

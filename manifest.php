@@ -35,6 +35,8 @@ use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\uninstall\RestoreServices;
+use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
 return array(
     'name' => 'taoProctoring',
@@ -85,6 +87,10 @@ return array(
         )
     ),
     'uninstall' => array(
+        'php' => [
+            RestoreServices::class,
+            UnregisterProctoringEvents::class
+        ]
     ),
     'routes' => array(
         'taoProctoring' => 'oat\\taoProctoring\\controller'
