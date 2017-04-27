@@ -46,7 +46,7 @@ $data = get_data('activity_data');
             </div>
             <div class="grid-row">
                 <div class="col-12 activity-chart">
-                    <select class="js-activity-chart-interval">
+                    <select class="select2 js-activity-chart-interval" data-has-search="false">
                         <option value="day"><?= __('Last Day') ?></option>
                         <option value="week"><?= __('Last Week') ?></option>
                         <option value="month"><?= __('Last Month') ?></option>
