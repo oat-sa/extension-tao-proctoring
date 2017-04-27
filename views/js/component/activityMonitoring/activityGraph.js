@@ -27,7 +27,7 @@ define([
     'util/url',
     'c3',
     'tpl!taoProctoring/component/activityMonitoring/progressbar',
-    'core/polling',
+    'core/polling'
 ], function ($, _, __, component, url, c3, progressbarTpl, pollingFactory) {
     'use strict';
 
@@ -45,7 +45,7 @@ define([
         graphConfig : {
             padding: {
                 bottom: 0,
-                left: 35,
+                left: 35
             },
             data: {
                 x: 'time',
@@ -57,7 +57,7 @@ define([
                 x: {
                     type: 'timeseries',
                     tick: {
-                        format: '%H:%M',
+                        format: '%H:%M'
                     },
                     label: {
                         position: 'bottom center'
@@ -68,7 +68,7 @@ define([
                         position: 'top'
                     }
                 }
-            },
+            }
         }
     };
 
@@ -113,7 +113,7 @@ define([
         var activityGraph = {
             /**
              * Refresh the graph
-             * @param {Object} [params]
+             * @param {Object} newConfig
              */
             refresh: function refresh(newConfig) {
                 if (chart) {
@@ -141,14 +141,14 @@ define([
                     }
 
                     polling = pollingFactory({
-                         action: function() {
-                             chart.load(initConfig.graphConfig.data);
-                             if (initConfig.autoRefreshBar) {
-                                 runRefreshProgressBar($refreshProgress, initConfig.autoRefresh);
-                             }
-                         },
-                         interval: initConfig.autoRefresh,
-                         autoStart: true
+                        action: function() {
+                            chart.load(initConfig.graphConfig.data);
+                            if (initConfig.autoRefreshBar) {
+                                runRefreshProgressBar($refreshProgress, initConfig.autoRefresh);
+                            }
+                        },
+                        interval: initConfig.autoRefresh,
+                        autoStart: true
                     });
                 }
             })
