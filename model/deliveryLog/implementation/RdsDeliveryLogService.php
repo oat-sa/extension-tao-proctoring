@@ -103,7 +103,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 
     public function flush()
     {
-        $query = 'DELETE FROM ' . self::TABLE_NAME;
+        $query = 'TRUNCATE ' . self::TABLE_NAME;
 
         try{
             $this->getPersistence()->exec($query);
