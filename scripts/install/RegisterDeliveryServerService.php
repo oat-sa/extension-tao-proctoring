@@ -36,16 +36,11 @@ class RegisterDeliveryServerService extends \common_ext_action_InstallAction
      */
     public function __invoke($params)
     {
-        $serviceManager = ServiceManager::getServiceManager();
-
-        $deliveryExt = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
-        $deliveryServerConfig = $deliveryExt->getConfig('deliveryServer');
-        $deliveryServerOptions = $deliveryServerConfig->getOptions();
-
-        $deliveryServerService = new DeliveryServerService($deliveryServerOptions);
-        $deliveryServerService->setServiceManager($serviceManager);
-        $serviceManager->register(DeliveryServerService::CONFIG_ID, $deliveryServerService);
-
+        $deliveryConfig = $this->getServiceManager()->get(\taoDelivery_models_classes_DeliveryServerService::CONFIG_ID)->getOptions();
+        $this->getServiceManager()->register(
+            \taoDelivery_models_classes_DeliveryServerService::CONFIG_ID,
+            new DeliveryServerService($deliveryConfig)
+        );
     }
 }
 

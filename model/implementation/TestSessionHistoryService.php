@@ -51,6 +51,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         'test_terminate',
         'test_irregularity',
         'pause',
+        'unsecured-launch-prohibited',
         'focus-loss-prohibited',
         'leave-fullscreen-prohibited',
         'pause-on-disconnect',
@@ -141,6 +142,41 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
 
         return $history;
     }
+
+    /**
+     * Gets the url that leads to the page listing the history
+     * @param $delivery
+     * @return string
+     */
+    public function getHistoryUrl($delivery = null)
+    {
+        $params = [];
+        if ($delivery) {
+            if ($delivery instanceof \core_kernel_classes_Resource) {
+                $delivery = $delivery->getUri();
+            }
+            $params['delivery'] = $delivery . '';
+        }
+        return _url('index', 'Reporting', 'taoProctoring', $params);
+    }
+
+    /**
+     * Gets the back url that returns to the page listing the sessions
+     * @param $delivery
+     * @return string
+     */
+    public function getBackUrl($delivery = null)
+    {
+        $params = [];
+        if ($delivery) {
+            if ($delivery instanceof \core_kernel_classes_Resource) {
+                $delivery = $delivery->getUri();
+            }
+            $params['delivery'] = $delivery . '';
+        }
+        return _url('index', 'Monitor', 'taoProctoring', $params);
+    }
+
 
     /**
      * @param array $data event data from delivery log

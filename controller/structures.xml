@@ -1,62 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE structures SYSTEM "../doc/structures.dtd">
 <structures>
-    <structure id="test_center" name="Test Centers" level="15" group="main">
-        <description>Test center contains test taker and groups and are administer by a proctor</description>
-        <icon id="icon-test-takers" src=""/>
-        <sections>
-            <section id="manage_testcenter" name="Manage Test Center" url="/taoProctoring/TestCenterManager/index">
-                <trees>
-                    <tree name="Test Center List"
-                          className="Test Center"
-                          rootNode="http://www.tao.lu/Ontologies/TAOTestCenter.rdf#TestCenter"
-                          dataUrl="/taoProctoring/TestCenterManager/getOntologyData"
-                          selectClass="testcenter-class-properties"
-                          selectInstance="testcenter-properties"
-                          moveInstance="testcenter-move"
-                          delete="testcenter-delete"
-                            />
-                </trees>
-                <actions>
-                    <action id="testcenter-class-properties" name="Properties" url="/tao/PropertiesAuthoring/index"
-                            group="content" context="class">
-                        <icon id="icon-edit"/>
-                    </action>
-                    <action id="testcenter-properties" name="Properties" url="/taoProctoring/TestCenterManager/editCenter"
-                            group="content" context="instance">
-                        <icon id="icon-edit"/>
-                    </action>
-                    <action id="testcenter-filter" name="Filter" context="*" group="search" binding="filter">
-                        <icon id="icon-filter"/>
-                    </action>
-                    <action id="testcenter-search" name="Search" url="/taoProctoring/TestCenterManager/search" context="*"
-                            group="search" binding="launchFinder">
-                        <icon id="icon-find"/>
-                    </action>
-                    <action id="testcenter-class-new" name="New class" url="/taoProctoring/TestCenterManager/addSubClass"
-                            context="resource" group="tree" binding="subClass">
-                        <icon id="icon-folder-open"/>
-                    </action>
-                    <action id="testcenter-delete" name="Delete" url="/taoProctoring/TestCenterManager/delete"
-                            context="resource" group="tree" binding="removeNode">
-                        <icon id="icon-bin"/>
-                    </action>
-                    <action id="testcenter-move" name="Move" url="/taoProctoring/TestCenterManager/moveInstance"
-                            context="instance" group="none" binding="moveNode">
-                        <icon id="icon-move-item"/>
-                    </action>
-                    <action id="testcenter-duplicate" name="Duplicate" url="/taoProctoring/TestCenterManager/cloneInstance"
-                            context="instance" group="tree" binding="duplicateNode">
-                        <icon id="icon-copy"/>
-                    </action>
-                    <action id="testcenter-new" name="New Test Center" url="/taoProctoring/TestCenterManager/addInstance"
-                            context="resource" group="tree" binding="instanciate">
-                        <icon id="icon-users"/>
-                    </action>
-                </actions>
-            </section>
-        </sections>
-    </structure>
     <structure id="results" name="Results" level="5" group="main">
         <sections>
             <section id="manage_results" name="Manage Results" url="/taoOutcomeUi/Results/index">
@@ -66,6 +10,13 @@
                     </action>
                 </actions>
             </section>
+        </sections>
+    </structure>
+    <structure id="tools" name="Tools" level="18" group="settings">
+        <description />
+        <icon id="icon-tools" src=""/>
+        <sections>
+            <section id="assessment_activity" name="Assessment Activity" url="/taoProctoring/Tools/assessmentActivity" />
         </sections>
     </structure>
 </structures>

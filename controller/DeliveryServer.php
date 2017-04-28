@@ -22,8 +22,8 @@ namespace oat\taoProctoring\controller;
 
 use common_Logger;
 use common_session_SessionManager;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
-use oat\taoDelivery\model\authorization\DeliveryAuthorizationProvider;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -76,12 +76,12 @@ class DeliveryServer extends DefaultDeliveryServer
     /**
      * Displays the execution screen
      *
-     * FIXME all state management must be centralized into a service, 
+     * FIXME all state management must be centralized into a service,
       * it should'nt be on the controller.
      *
      * @throws common_exception_Error
      */
-    public function runDeliveryExecution() 
+    public function runDeliveryExecution()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -94,16 +94,13 @@ class DeliveryServer extends DefaultDeliveryServer
     /**
      * The awaiting authorization screen
      */
-    public function awaitingAuthorization() 
+    public function awaitingAuthorization()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
 
-        // if the test taker is already authorized, straight forward to the execution
-        if (DeliveryExecutionState::STATE_AUTHORIZED === $executionState) {
-            return $this->redirect(_url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier())));
-        }
+        $runDeliveryUrl = _url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier()));
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
@@ -112,54 +109,60 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // we need to change the state of the delivery execution
         if (!in_array($executionState , array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
-            $deliveryExecutionStateService->waitExecution($deliveryExecution);
+            if (DeliveryExecutionState::STATE_AUTHORIZED !== $executionState) {
+                $deliveryExecutionStateService->waitExecution($deliveryExecution);
+            }
+
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
             $this->setData('deliveryLabel', $deliveryExecution->getLabel());
-            $this->setData('init', !!$this->getRequestParameter('init'));
             $this->setData('returnUrl', $this->getReturnUrl());
+            $this->setData('cancelUrl', _url('cancelExecution', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
+            $this->setData('cancelable', $deliveryExecutionStateService->isCancelable($deliveryExecution));
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
             $this->setData('showControls', true);
+            $this->setData('runDeliveryUrl', $runDeliveryUrl);
 
             //set template
+            $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
+            $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
             $this->setData('content-template', 'DeliveryServer/awaiting.tpl');
             $this->setData('content-extension', 'taoProctoring');
             $this->setView('DeliveryServer/layout.tpl', 'taoDelivery');
         } else {
             // inconsistent state
             common_Logger::i(get_called_class() . '::awaitingAuthorization(): cannot wait authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
-            return $this->redirect(_url('index'));
+            return $this->redirect($this->getReturnUrl());
         }
     }
-    
+
     /**
      * The action called to check if the requested delivery execution has been authorized by the proctor
      */
     public function isAuthorized()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $executionState = $deliveryExecutionStateService->getState($deliveryExecution);
+        $executionState = $deliveryExecution->getState()->getUri();
 
         $authorized = false;
         $success = true;
         $message = null;
-        
+
         // reacts to a few particular states
         switch ($executionState) {
             case DeliveryExecutionState::STATE_AUTHORIZED:
                     $authorized = true;
                 break;
-            
+
             case DeliveryExecutionState::STATE_TERMINATED:
             case DeliveryExecutionState::STATE_FINISHED:
                 $success = false;
-                $message = __('This test has been terminated');
+                $message = __('The assessment has been terminated.');
                 break;
-                
+
             case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
-                $message = __('This test has been suspended');
+                $message = __('The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.');
                 break;
         }
 
@@ -169,7 +172,30 @@ class DeliveryServer extends DefaultDeliveryServer
             'message' => $message
         ));
     }
-    
+
+    /**
+     * Cancel delivery authorization request.
+     */
+    public function cancelExecution()
+    {
+
+        $deliveryExecution = $this->getCurrentDeliveryExecution();
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $reason = [
+            'reasons' => ['category' => 'Examinee', 'subCategory' => 'Navigation'],
+        ];
+        if ($deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_AUTHORIZED) {
+            $reason['comment'] = __('Automatically reset by the system due to the test taker choosing not to proceed with the authorized test.');
+        } else {
+            $reason['comment'] = __('Automatically reset by the system due to authorization request being cancelled by test taker.');
+        }
+        $deliveryExecutionStateService->cancelExecution(
+            $deliveryExecution,
+            $reason
+        );
+        return $this->redirect($this->getReturnUrl());
+    }
 
     protected function revoke(DeliveryExecution $deliveryExecution)
     {
@@ -184,15 +210,5 @@ class DeliveryServer extends DefaultDeliveryServer
                 ]
             );
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function _initDeliveryExecution()
-    {
-        $deliveryExecution = parent::_initDeliveryExecution();
-        $deliveryExecution->setState(DeliveryExecutionState::STATE_PAUSED);
-        return $deliveryExecution;
     }
 }

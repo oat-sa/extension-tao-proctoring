@@ -19,17 +19,31 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
-    'jquery',
-    'lodash',
     'i18n',
-    'helpers',
+    'util/url',
+    'controller/app',
     'layout/loading-bar',
+    'ui/container',
+    'ui/button',
     'util/encode',
+    'taoProctoring/component/proxy',
     'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
-    'taoProctoring/component/breadcrumbs',
+    'tpl!taoProctoring/templates/reporting/index',
     'ui/datatable'
-], function ($, _, __, helpers, loadingBar, encode, dateRangeFactory, historyTableFactory, breadcrumbsFactory) {
+], function (
+    __,
+    urlHelper,
+    appController,
+    loadingBar,
+    containerFactory,
+    buttonFactory,
+    encode,
+    proxyFactory,
+    dateRangeFactory,
+    historyTableFactory,
+    indexTpl
+) {
     'use strict';
 
     /**
@@ -38,82 +52,118 @@ define([
      */
     var cssScope = '.session-history';
 
+    var serviceUrl = urlHelper.route('sessionHistory', 'Reporting', 'taoProctoring');
+    var sessionsUrl = urlHelper.route('history', 'Reporting', 'taoProctoring');
+
+    /**
+     * Filters the disconnection errors
+     * @param {Error} err
+     */
+    function handleOnDisconnect(err) {
+        if (err.code === 403) {
+            //we just leave if any 403 occurs
+            window.location.reload(true);
+        }
+    }
+
+    // the page is always loading data when starting
+    loadingBar.start();
+
     /**
      * Controls the taoProctoring session history page
      *
      * @type {Object}
      */
-    var taoProctoringReportCtlr = {
+    return {
         /**
          * Entry point of the page
          */
         start : function start() {
-            var $container = $(cssScope);
-            var dataset = $container.data('set');
-            var testCenterId = $container.data('testcenter');
-            var deliveryId = $container.data('delivery');
-            var sessions = $container.data('sessions');
-            var sortBy = $container.data('sortBy');
-            var sortOrder = $container.data('sortorder');
-            var periodStart = $container.data('periodstart');
-            var periodEnd = $container.data('periodEnd');
-            var serviceUrl = helpers._url('history', 'Reporting', 'taoProctoring', {testCenter : testCenterId, delivery : deliveryId, session: sessions});
-            var monitoringUrl = helpers._url('monitoring', 'Delivery', 'taoProctoring', {testCenter: testCenterId, delivery : deliveryId});
-            var monitoringAllUrl = helpers._url('monitoringAll', 'Delivery', 'taoProctoring', {testCenter: testCenterId});
-            var detailedHistory = false;
+            var container = containerFactory().changeScope(cssScope).write(indexTpl());
+            var currentRoute = urlHelper.parse(window.location.href);
+            var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
+            var sessions = decodeURIComponent(currentRoute.query.session).split(',');
+            var monitoringUrl = currentRoute.query.monitoring && decodeURIComponent(currentRoute.query.monitoring);
 
-            var historyTable = historyTableFactory({
-                    tools: [{
-                        id: 'back',
-                        icon: 'preview',
-                        title: __('Return to the session monitoring'),
-                        label: __('Monitoring'),
-                        action: function() {
-                            window.location.href = deliveryId ? monitoringUrl : monitoringAllUrl;
-                        }
-                    }, {
-                        id: 'show-detailed-report',
-                        icon: 'insert-horizontal-line',
-                        title: __('Show detailed session history messages'),
-                        label: __('Show detailed report'),
-                        action: function() {
-                            var tool = historyTable.config.tools.find(function (val) {return val.id === 'show-detailed-report'});
-
-                            historyTable.config.params.detailed = detailedHistory = !detailedHistory;
-                            tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
-                            historyTable.refresh();
-                        }
-                    }],
-                    params: {detailed: detailedHistory},
-                    service: serviceUrl,
-                    sortBy: sortBy,
-                    sortOrder: sortOrder
-                }, dataset)
-                .on('loading', function() {
-                    loadingBar.start();
+            appController
+                .on('set-referrer.history', function(route) {
+                    monitoringUrl = route;
                 })
-                .on('loaded', function() {
-                    loadingBar.stop();
-                })
-                .render($container.find('.list'));
-
-            breadcrumbsFactory($container, $container.data('breadcrumbs'));
-
-            dateRangeFactory({
-                start : periodStart,
-                end : periodEnd,
-                renderTo: $container.find('.panel')
-            }).on('change submit', function() {
-                historyTable.refresh({
-                    periodStart : this.getStart(),
-                    periodEnd : this.getEnd()
+                .on('change.history', function() {
+                    appController.off('.history');
+                    container.destroy();
                 });
+
+            proxyFactory('ajax').init({
+                actions: {
+                    read: serviceUrl
+                }
+            }).then(function(proxyService) {
+                return proxyService.read({delivery : deliveryId, session: sessions}).then(function(data) {
+                    var detailedHistory = data.detailedHistory;
+                    var historyTable = historyTableFactory({
+                        tools: [{
+                            id: 'show-detailed-report',
+                            icon: 'insert-horizontal-line',
+                            title: __('Show detailed session history messages'),
+                            label: __('Show detailed report'),
+                            action: function() {
+                                var tool = historyTable.config.tools.find(function (val) {
+                                    return val.id === 'show-detailed-report';
+                                });
+
+                                historyTable.config.params.detailed = detailedHistory = !detailedHistory;
+                                tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
+                                historyTable.refresh();
+                            }
+                        }],
+                        params: {detailed: detailedHistory, delivery : deliveryId, session: sessions},
+                        service: sessionsUrl,
+                        sortBy: data.sortBy,
+                        sortOrder: data.sortOrder
+                    }, data.set)
+                        .on('loading', function() {
+                            loadingBar.start();
+                        })
+                        .on('loaded', function() {
+                            loadingBar.stop();
+                        })
+                        .render(container.find('.list'));
+
+                    if (data.monitoringUrl) {
+                        monitoringUrl = data.monitoringUrl;
+                    }
+
+                    dateRangeFactory({
+                        start : data.periodStart,
+                        end : data.periodEnd,
+                        renderTo: container.find('.panel')
+                    }).on('change submit', function() {
+                        historyTable.refresh({
+                            periodStart : this.getStart(),
+                            periodEnd : this.getEnd()
+                        });
+                    });
+
+                    buttonFactory({
+                        id: 'back',
+                        type: 'info',
+                        label: __('Back to sessions'),
+                        cls: 'back-button',
+                        renderTo: container.find('.panel')
+                    }).on('click', function () {
+                        if (monitoringUrl) {
+                            appController.getRouter().redirect(monitoringUrl);
+                        } else {
+                            history.go(-1);
+                        }
+                    });
+                });
+            }).catch(function(err) {
+                handleOnDisconnect(err);
+                appController.onError(err);
+                loadingBar.stop();
             });
         }
     };
-
-    // the page is always loading data when starting
-    loadingBar.start();
-
-    return taoProctoringReportCtlr;
 });

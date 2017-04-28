@@ -24,6 +24,7 @@ use oat\taoProctoring\model\PaginatedStorage;
 
 /**
  * Provides common data helper for datatable component.
+ * @todo Move this class in taoCore, make an abstract/interface and its implementation
  */
 class DataTableHelper
 {
@@ -51,6 +52,21 @@ class DataTableHelper
      * The index of the option providing the page filter
      */
     const OPTION_FILTER = 'filter';
+
+    /**
+     * The keyword for an ascending sort
+     */
+    const SORT_ASC = 'asc';
+
+    /**
+     * The keyword for a descending sort
+     */
+    const SORT_DESC = 'desc';
+
+    /**
+     * The default sort order to use when none is provided
+     */
+    const DEFAULT_SORT_ORDER = self::SORT_ASC;
 
     /**
      * Paginates a collection to render a subset in a table
@@ -81,6 +97,7 @@ class DataTableHelper
         $offset = ($page - 1) * $rows;
 
         $result = array(
+            'success' => true,
             'offset' => $offset,
             'amount' => $amount,
             'total' => $total,

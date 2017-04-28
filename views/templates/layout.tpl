@@ -15,7 +15,7 @@ use oat\tao\model\theme\Theme;
         <link rel="stylesheet" href="<?= Template::css('proctoring.css', 'taoProctoring') ?>"/>
         <link rel="stylesheet" href="<?= Layout::getThemeStylesheet(Theme::CONTEXT_FRONTOFFICE) ?>" />
         <link rel="shortcut icon" href="<?= Template::img('favicon.ico', 'tao') ?>"/>
-        <?= Layout::getAmdLoader(Template::js('loader/backoffice.min.js', 'tao'), 'controller/backoffice') ?>
+        <?= Layout::getAmdLoader(Template::js('loader/app.min.js', 'taoProctoring'), 'taoProctoring/controller/app') ?>
     </head>
     <body class="proctoring-scope">
 <?php Template::inc('blocks/requirement-check.tpl', 'tao'); ?>
@@ -28,7 +28,7 @@ use oat\tao\model\theme\Theme;
                     <div class="settings-menu">
                         <ul class="clearfix plain">
                             <li data-control="home">
-                                <a id="home" href="<?= _url('index', 'TestCenter', 'taoProctoring') ?>">
+                                <a id="home" href="<?= has_data('homeUrl') ? get_data('homeUrl') : _url('index', 'TestCenter', 'taoProctoring')?>">
                                     <span class="icon-home"></span>
                                 </a>
                             </li>
@@ -39,7 +39,7 @@ use oat\tao\model\theme\Theme;
                                 </span>
                             </li>
                             <li class="infoControl sep-before" data-control="logout">
-                                <a id="logout" class="" href="<?= _url('logout', 'Main', 'tao') ?>">
+                                <a id="logout" href="<?= has_data('logout') ? get_data('logout') : _url('logout', 'Main', 'tao')?>">
                                     <span class="icon-logout"></span>
                                     <span class="text"><?= __("Logout") ?></span>
                                 </a>
@@ -49,7 +49,10 @@ use oat\tao\model\theme\Theme;
                 </nav>
             </header>
             <div id="feedback-box"></div>
-            <?php Template::inc(get_data('content-template')); ?>
+            <div class="header toolbox"></div>
+            <?php /* actual content */
+            $contentTemplate = Layout::getContentTemplate();
+            Template::inc($contentTemplate['path'], $contentTemplate['ext']); ?>
         </div>
 
         <?= Layout::renderThemeTemplate(Theme::CONTEXT_BACKOFFICE, 'footer') ?>

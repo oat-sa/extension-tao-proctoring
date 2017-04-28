@@ -1,0 +1,31 @@
+@import "inc/bootstrap";
+@import "activity-chart";
+.activity-dashboard {
+  width: 100%;
+  margin: 10px;
+  .dashboard-block {
+    h4,h3,h2 {
+      margin-top: 0;
+    }
+  }
+  .user-activity {
+    .dashboard-block {
+      padding: 10px 20px;
+      @include simple-border($darkBlueGrey);
+      background: $mediumBlueGrey;
+    }
+    .dashboard-block-number {
+      font-size: 2em;
+    }
+  }
+  .assessment-activity {
+    .dashboard-block {
+      padding: 8px 15px;
+      @include simple-border(lighten($colorWheel-12, 40%));
+      background: lighten($colorWheel-12, 50%);
+    }
+    .dashboard-block-number {
+      font-size: 1.5em;
+    }
+  }
+}

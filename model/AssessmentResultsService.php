@@ -21,11 +21,12 @@
 
 namespace oat\taoProctoring\model;
 
-use \oat\taoOutcomeUi\model\ResultsService;
-use \oat\oatbox\service\ConfigurableService;
-use \oat\oatbox\service\ServiceManager;
-use qtism\data\View;
+use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ServiceManager;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use qtism\data\View;
 
 /**
  * Class AssessmentResultsService
@@ -37,17 +38,20 @@ use oat\taoProctoring\model\implementation\TestSessionService;
  */
 class AssessmentResultsService extends ConfigurableService
 {
+    /** @deprecated */
     const CONFIG_ID = 'taoProctoring/AssessmentResults';
+
+    const SERVICE_ID = 'taoProctoring/AssessmentResults';
 
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
 
     /**
      * Get test taker data as associative array
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
      */
-    public function getTestTakerData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    public function getTestTakerData(DeliveryExecutionInterface $deliveryExecution)
     {
         $data = $this->getResultService($deliveryExecution->getDelivery())->getTestTakerData($deliveryExecution->getIdentifier());
         $result = $this->propertiesToArray($data);
@@ -56,10 +60,10 @@ class AssessmentResultsService extends ConfigurableService
 
     /**
      * Get test data as associative array
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
      */
-    public function getTestData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    public function getTestData(DeliveryExecutionInterface $deliveryExecution)
     {
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
         $testUri = $resultService->getTestsFromDeliveryResult($deliveryExecution->getIdentifier());
@@ -77,10 +81,10 @@ class AssessmentResultsService extends ConfigurableService
 
     /**
      * Get session results
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
      */
-    public function getResultsData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    public function getResultsData(DeliveryExecutionInterface $deliveryExecution)
     {
         $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
@@ -104,10 +108,10 @@ class AssessmentResultsService extends ConfigurableService
 
     /**
      * Get delivery execution data
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
      */
-    public function getDeliveryData(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    public function getDeliveryData(DeliveryExecutionInterface $deliveryExecution)
     {
         $result = [
             'start' => $deliveryExecution->getStartTime(),
@@ -123,10 +127,10 @@ class AssessmentResultsService extends ConfigurableService
      * Rubric is considered printed if it included to the section which has an item tagged by specified tag
      * (@see )
      *
-     * @param \taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return string
      */
-    public function getPrintableRubric(\taoDelivery_models_classes_execution_DeliveryExecution $deliveryExecution)
+    public function getPrintableRubric(DeliveryExecutionInterface $deliveryExecution)
     {
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         $session = $testSessionService->getTestSession($deliveryExecution);
@@ -165,7 +169,7 @@ class AssessmentResultsService extends ConfigurableService
                     if ($category === $tag) {
                         foreach ($section->getRubricBlockRefs() as $rubric) {
                             ob_start();
-                            include($compilationDirs['private']->getPath() . $rubric->getHref());
+                            include $compilationDirs['private']->getPath() . '/' . ltrim($rubric->getHref(), './\\');
                             $rubrics[] = ob_get_clean();
                         }
                     }
@@ -178,7 +182,8 @@ class AssessmentResultsService extends ConfigurableService
 
     /**
      * Get result service instance.
-     * @return \oat\taoOutcomeUi\model\ResultsService;
+     * @param \core_kernel_classes_Resource $delivery
+     * @return ResultsService
      */
     protected function getResultService(\core_kernel_classes_Resource $delivery)
     {

@@ -23,15 +23,16 @@ define(['lodash', 'i18n'], function(_, __){
         _inprogress = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
         _paused = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
         _completed = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
-        _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated';
+        _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
+        _canceled = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled';
 
     var _status = {
-        awaiting : {
-            code : _awaiting,
-            label : __('Awaiting'),
+        inprogress : {
+            code : _inprogress,
+            label : __('In Progress'),
             can : {
-                authorize : true,
-                pause : __('not in progress'),
+                authorize : __('already authorized'),
+                pause : true,
                 terminate : true,
                 report : true,
                 print : __('not finished'),
@@ -50,27 +51,27 @@ define(['lodash', 'i18n'], function(_, __){
                 time : true
             }
         },
-        inprogress : {
-            code : _inprogress,
-            label : __('In Progress'),
+        awaiting : {
+            code : _awaiting,
+            label : __('Awaiting'),
             can : {
-                authorize : __('already authorized'),
-                pause : true,
+                authorize : true,
+                pause : __('not in progress'),
                 terminate : true,
                 report : true,
                 print : __('not finished'),
                 time : true
             }
         },
-        paused : {
-            code : _paused,
-            label : __('Paused'),
+        canceled : {
+            code : _canceled,
+            label : __('Canceled'),
             can : {
-                authorize : __('is paused'),
-                pause : __('is already paused'),
-                terminate : true,
+                authorize : __('is canceled'),
+                pause : __('is canceled'),
+                terminate : __('is canceled'),
                 report : true,
-                print : __('not finished'),
+                print: __('is canceled'),
                 time : true
             }
         },
@@ -83,6 +84,18 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : __('is completed'),
                 report : true,
                 print: true,
+                time : true
+            }
+        },
+        paused : {
+            code : _paused,
+            label : __('Paused'),
+            can : {
+                authorize : __('is paused'),
+                pause : __('is already paused'),
+                terminate : true,
+                report : true,
+                print : __('not finished'),
                 time : true
             }
         },

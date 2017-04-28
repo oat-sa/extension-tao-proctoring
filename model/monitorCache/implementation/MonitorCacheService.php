@@ -21,8 +21,18 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMonitoringServiceInterface;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\tao\model\event\MetadataModified;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoQtiTest\models\event\QtiTestChangeEvent;
+use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
+use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoTests\models\event\TestChangedEvent;
+use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
 
 /**
  * Class MonitorCacheService
@@ -32,183 +42,138 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService as DeliveryMo
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class MonitorCacheService extends DeliveryMonitoringService
+class MonitorCacheService extends MonitoringStorage
 {
 
-    const COLUMN_ID = DeliveryMonitoringServiceInterface::DELIVERY_EXECUTION_ID;
-
-    /**
-     * @inheritdoc
-     */
-    protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function executionCreated(DeliveryExecutionCreated $event)
     {
-        $data = $deliveryMonitoring->get();
+        $deliveryExecution = $event->getDeliveryExecution();
 
-        $primaryTableData = $this->extractPrimaryData($data);
-
-        $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
-
-        if ($result) {
-            $this->saveKvData($deliveryMonitoring);
+        $data = $this->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
+        $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
+        // need to add user to event
+        $firstNames = $event->getUser()->getPropertyValues(PROPERTY_USER_FIRSTNAME);
+        if (!empty($firstNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
+        }
+        $lastNames = $event->getUser()->getPropertyValues(PROPERTY_USER_LASTNAME);
+        if (!empty($lastNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
         }
 
-        return $result;
+        $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
+        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
+        $data->update(
+            DeliveryMonitoringService::START_TIME,
+            \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
+        );
+        $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+        }
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    
+    public function executionStateChanged(DeliveryExecutionState $event)
     {
-        $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
+        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::STATUS, $event->getState());
+        $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
+        $user = \common_session_SessionManager::getSession()->getUser();
 
-        if (!$isNewRecord) {
-            $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
-            $kvTableData = $this->extractKvData($data);
+        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser) {
+            $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
 
-            if (empty($kvTableData)) {
-                return;
-            }
+        }
 
-            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
-            FROM ' . self::KV_TABLE_NAME . '
-            WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
-            $keys = array_fill(0, count($kvTableData), '?');
-            $query .= implode(',', $keys);
-            $query .= ')';
-
-            $params = array_merge([$id], array_keys($kvTableData));
-
-            $stmt = $this->getPersistence()->query($query, $params);
-            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
-
-            foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] === $kvDataValue) {
-                    continue;
-                }
-
-                if (array_key_exists($kvDataKey, $existent)) {
-                    $this->getPersistence()->exec(
-                        'UPDATE ' . self::KV_TABLE_NAME . '
-                          SET '  . self::KV_COLUMN_VALUE . ' = ?
-                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
-                          AND ' . self::KV_COLUMN_KEY . ' = ?;',
-                        [$kvDataValue, $id, $kvDataKey]
-                    );
-                } else {
-                    $this->getPersistence()->insert(
-                        self::KV_TABLE_NAME,
-                        array(
-                            self::KV_COLUMN_PARENT_ID => $id,
-                            self::KV_COLUMN_KEY => $kvDataKey,
-                            self::KV_COLUMN_VALUE => $kvDataValue,
-                        )
-                    );
-                }
-            }
+        if ($event->getState() == DeliveryExecution::STATE_FINISHIED) {
+            $data->update(
+                DeliveryMonitoringService::END_TIME,
+                \tao_helpers_Date::getTimeStamp($event->getDeliveryExecution()->getFinishTime(), true)
+            );
+        }
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
     }
 
     /**
-     * @param $condition
-     * @param $parameters
-     * @param $selectClause
-     * @return string
+     * Something changed in the state of the test execution
+     * (for example: the current item in the test)
+     *
+     * @param TestChangedEvent $event
      */
-    protected function prepareCondition($condition, &$parameters, &$selectClause)
+    public function testStateChanged(TestChangedEvent $event)
     {
-        $whereClause = '';
-
-        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
-             $condition = current($condition);
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $this->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
+        if ($event instanceof QtiTestChangeEvent) {
+            $data->setTestSession($event->getSession());
+            $data->updateData([
+                DeliveryMonitoringService::REMAINING_TIME,
+                DeliveryMonitoringService::EXTRA_TIME,
+                DeliveryMonitoringService::CONNECTIVITY
+            ]);
         }
-
-        if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
-            $whereClause .= " $condition ";
-        } else if (is_array($condition) && count($condition) > 1) {
-            $whereClause .=  '(';
-            $previousCondition = null;
-            foreach ($condition as $subCondition) {
-                if (is_array($subCondition) && is_array($previousCondition)) {
-                    $whereClause .= 'AND';
-                }
-                $whereClause .=  $this->prepareCondition($subCondition, $parameters, $selectClause);
-                $previousCondition = $subCondition;
-            }
-            $whereClause .=  ')';
-        } else if (is_array($condition) && count($condition) === 1) {
-            $primaryColumns = $this->getPrimaryColumns();
-            $key = array_keys($condition)[0];
-            $value = $condition[$key];
-
-            if ($value === null) {
-                $op = 'IS NULL';
-            } else if(is_array($value)){
-                $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
-            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|NOT\sLIKE))?(.*)$/', $value, $matches)) {
-                $value = $matches[2];
-                $op = $matches[1] ? $matches[1] : "=";
-                $op .= ' ?';
-            }
-
-            if (in_array($key, $primaryColumns)) {
-                $whereClause .= " t.$key $op ";
-            } else {
-                $joinNum = count($this->joins);
-                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
-
-                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
-                $parameters[] = trim($key);
-            }
-
-            if(is_array($value)){
-               $parameters = array_merge($parameters, $value);
-            } else if ($value !== null) {
-                $parameters[] = trim($value);
-            }
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for teststate could not be updated');
         }
-        return $whereClause;
     }
 
     /**
-     * @inheritdoc
+     * The status of the test execution has changed
+     * (for example: from running to paused)
+     *
+     * @param QtiTestStateChangeEvent $event
      */
-    protected function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
     {
-        $result = false;
-        $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
-
-        if (!$isNewRecord) {
-            $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
-                    WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
-            $result = true;
+        // assumes test execution id = delivery execution id
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $this->getData($deliveryExecution);
+        $data->setTestSession($event->getSession());
+        $data->updateData([
+            DeliveryMonitoringService::CONNECTIVITY
+        ]);
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for teststate could not be updated');
         }
-
-        return $result;
     }
 
     /**
-     * Check if record for delivery execution already exists in the storage.
-     * @todo add isNewRecord property to DeliveryMonitoringDataInterface to prevent repeated queries to DB.
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean
+     * Update the label of the delivery across the entrie cache
+     *
+     * @param MetadataModified $event
      */
-    protected function isNewRecord(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function deliverylabelChanged(MetadataModified $event)
     {
-        $data = $deliveryMonitoring->get();
-        $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+        $resource = $event->getResource();
+        if ($event->getMetadataUri() === RDFS_LABEL) {
+            $assemblyClass = DeliveryAssemblyService::singleton()->getRootClass();
+            if ($resource->isInstanceOf($assemblyClass)) {
+                $update = new DeliveryUpdater();
+                $update->changeLabel($this, $resource->getUri(), $event->getMetadataValue());
+            }
+        }
+    }
 
-        $sql = "SELECT EXISTS( " . PHP_EOL .
-            "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-            "FROM " . self::TABLE_NAME . PHP_EOL .
-            "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
-        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
-
-        return !((boolean) $exists);
+    /**
+     * Sets the protor who authorized this delivery execution
+     * @param AuthorizationGranted $event
+     */
+    public function deliveryAuthorized(AuthorizationGranted $event)
+    {
+        $data = $this->getData($event->getDeliveryExecution());
+        $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
+        if (!$this->save($data)) {
+            \common_Logger::w('monitor cache for authorization could not be updated');
+        }
     }
 }

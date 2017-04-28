@@ -37,25 +37,6 @@ use oat\taoProctoring\model\EligibilityService;
  */
 class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
 {
-
-    protected function getProvider($canByPassProctor = false)
-    {
-        $noopResource = new \core_kernel_classes_Resource('foo');
-    
-        //$prophecy = $this->prophesize(EligibilityService::class);
-        $prophet = new Prophet();
-        $prophecy = $prophet->prophesize();
-        $prophecy->willExtend(EligibilityService::class);
-        
-        $prophecy->getTestCenter(Argument::any(), Argument::any())->willReturn($noopResource);
-        $prophecy->getEligibility(Argument::any(), Argument::any())->willReturn($noopResource);
-        $prophecy->canByPassProctor(Argument::any())->willReturn($canByPassProctor);
-    
-        $provider = new ProctorAuthorizationProvider();
-        $provider->eligibilityService = $prophecy->reveal();
-        return $provider;
-    }
-    
     /**
      * Get the mocked delivery execution
      *
@@ -81,7 +62,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     public function testGetAuthorizationProviderAPI()
     {
-        $authorizationProvider = $this->getProvider();
+        $authorizationProvider = new ProctorAuthorizationProvider();
         $this->assertInstanceOf(AuthorizationProvider::class, $authorizationProvider, "Check if the provider implements the authorizationProvider interface");
     }
 
@@ -90,7 +71,8 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     public function testIsAuthorized()
     {
-        $authorizationProvider = $this->getProvider();
+        $authorizationProvider = new ProctorAuthorizationProvider();
+        $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
         $user = $this->prophesize(User::class)->reveal();
         
         $authorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_AUTHORIZED);
@@ -102,18 +84,8 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     public function testIsUnauthorized()
     {
-        $authorizationProvider = $this->getProvider();
-        $user = $this->prophesize(User::class)->reveal();
-        $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
-        $authorizationProvider->verifyResumeAuthorization($unauthorized,$user);
-    }
-    
-    /**
-     * Test bypass flag
-     */
-    public function testBypass()
-    {
-        $authorizationProvider = $this->getProvider(true);
+        $authorizationProvider = new ProctorAuthorizationProvider();
+        $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
         $user = $this->prophesize(User::class)->reveal();
         $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
         $authorizationProvider->verifyResumeAuthorization($unauthorized,$user);
