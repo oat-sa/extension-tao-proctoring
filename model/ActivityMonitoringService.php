@@ -39,6 +39,9 @@ class ActivityMonitoringService extends ConfigurableService
     /** Threshold in seconds */
     const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
+    /** Interval of refreshing assessment activity graph in seconds. 0 - no auto refresh */
+    const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
+
     /**
      * @var array list of all the statuses uris
      */
@@ -73,19 +76,89 @@ class ActivityMonitoringService extends ConfigurableService
      */
     public function getData()
     {
+        $awaiting = $this->getNumberOfAssessments(DeliveryExecution::STATE_AWAITING);
+        $authorized = $this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED);
+        $paused = $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED);
+        $active = $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE);
+        $current = $awaiting + $authorized + $paused + $active;
+
         return [
             'active_proctors' => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
             'active_test_takers' => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
             'total_assessments' => $this->getNumberOfAssessments(),
-            'awaiting_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AWAITING),
-            'authorized_but_not_started_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_AUTHORIZED),
-            'paused_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED),
-            'in_progress_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE),
-            'terminated_assessment' => $this->getNumberOfAssessments(DeliveryExecution::STATE_TERMINATED),
-            'cancelled_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_CANCELED),
-            'finished_assessments' => $this->getNumberOfAssessments(DeliveryExecution::STATE_FINISHIED),
+            'total_current_assessments' => $current,
+            'awaiting_assessments' => $awaiting,
+            'authorized_but_not_started_assessments' => $authorized,
+            'paused_assessments' => $paused,
+            'in_progress_assessments' => $active,
             'deliveries_statistics' => $this->getStatesByDelivery(),
         ];
+    }
+
+    /**
+     * Get array of DateTime objects build from $date (or current time if not given) $amount times back with given interval
+     * Example:
+     * $timeKeys = $service->getTimeKeys(new \DateInterval('PT1H'), new \DateTime('now'), 24);
+     *
+     *   array (
+     *     0 =>
+     *       DateTime::__set_state(array(
+     *       'date' => '2017-04-24 08:00:00.000000',
+     *       'timezone_type' => 1,
+     *       'timezone' => '+00:00',
+     *     )),
+     *     1 =>
+     *       DateTime::__set_state(array(
+     *       'date' => '2017-04-24 07:00:00.000000',
+     *       'timezone_type' => 1,
+     *       'timezone' => '+00:00',
+     *     )),
+     *     2 =>
+     *       DateTime::__set_state(array(
+     *       'date' => '2017-04-24 06:00:00.000000',
+     *       'timezone_type' => 1,
+     *       'timezone' => '+00:00',
+     *     )),
+     *       ...
+     *   )
+     *
+     * @param \DateInterval $interval
+     * @param \DateTime|null $date
+     * @param null $amount
+     * @return \DateTime[]
+     */
+    public function getTimeKeys(\DateInterval $interval, \DateTime $date = null, $amount = null)
+    {
+        $timeKeys = [];
+        if ($date === null) {
+            $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
+
+        if ($interval->format('%i') > 0) {
+            $date->setTime($date->format('H'), $date->format('i')+1, 0);
+            $amount = $amount === null ? 60 : $amount;
+        }
+        if ($interval->format('%h') > 0) {
+            $date->setTime($date->format('H')+1, 0, 0);
+            $amount = $amount === null ? 24 : $amount;
+        }
+        if ($interval->format('%d') > 0) {
+            $date->setTime(0, 0, 0);
+            $date->setDate($date->format('Y'), $date->format('m'), $date->format('d')+1);
+            $amount = $amount === null ? cal_days_in_month(CAL_GREGORIAN, $date->format('m'), $date->format('Y')) : $amount;
+        }
+        if ($interval->format('%m') > 0) {
+            $date->setTime(0, 0, 0);
+            $date->setDate($date->format('Y'), $date->format('m')+1, 1);
+            $amount = $amount === null ? 12 : $amount;
+        }
+
+        while ($amount > 0) {
+            $timeKeys[] = new \DateTime($date->format(\DateTime::ISO8601), new \DateTimeZone('UTC'));
+            $date->sub($interval);
+            $amount--;
+        }
+        return $timeKeys;
     }
 
     /**

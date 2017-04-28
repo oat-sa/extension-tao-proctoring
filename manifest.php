@@ -35,22 +35,24 @@ use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\uninstall\RestoreServices;
+use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
 return array(
     'name' => 'taoProctoring',
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '4.18.0',
+    'version' => '5.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=7.81.1',
+        'tao' => '>=9.0.0',
         'taoDelivery' => '>=5.0.0',
         'taoDeliveryRdf' => '>=1.0',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=6.18.0',
         'taoOutcomeUi' => '>=2.6.6',
-        'taoEventLog' => '>=0.6.0',
+        'taoEventLog' => '>=0.8.0',
         'generis' => '>=3.13.2',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
@@ -85,6 +87,10 @@ return array(
         )
     ),
     'uninstall' => array(
+        'php' => [
+            RestoreServices::class,
+            UnregisterProctoringEvents::class
+        ]
     ),
     'routes' => array(
         'taoProctoring' => 'oat\\taoProctoring\\controller'
@@ -96,9 +102,6 @@ return array(
 
 		#BASE URL (usually the domain root)
 		'BASE_URL' => ROOT_URL.'taoProctoring/',
-
-	    #BASE WWW required by JS
-	    'BASE_WWW' => ROOT_URL.'taoProctoring/views/'
 	),
     'extra' => array(
         'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',

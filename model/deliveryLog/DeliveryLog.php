@@ -55,4 +55,10 @@ interface DeliveryLog
      * @return mixed
      */
     public function get($deliveryExecutionId, $eventId = null);
+
+    /**
+     *
+     * @return bool true if it correctly flush false otherwise
+     */
+    public function flush();
 }
