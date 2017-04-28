@@ -100,6 +100,19 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         return $result;
     }
 
+
+    public function flush()
+    {
+        $query = 'TRUNCATE ' . self::TABLE_NAME;
+
+        try{
+            $this->getPersistence()->exec($query);
+        } catch (\PDOException $e){
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @param $data
      * @return array
