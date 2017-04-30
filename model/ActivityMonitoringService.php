@@ -42,6 +42,9 @@ class ActivityMonitoringService extends ConfigurableService
     /** Interval of refreshing assessment activity graph in seconds. 0 - no auto refresh */
     const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
 
+    /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
+    const AUTO_REFRESH_INTERVAL = 'auto_refresh_interval';
+
     /**
      * @var array list of all the statuses uris
      */

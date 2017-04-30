@@ -45,13 +45,34 @@ class Tools extends SimplePageModule
     public function assessmentActivity()
     {
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+
+        // Data
         $this->setData('activity_data', $service->getData());
         $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
+
+        // Config
         $this->setData('completed_assessments_config', [
             ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH =>
                 $service->getOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH),
         ]);
+        $this->setData('assessment_activity_config', [
+            ActivityMonitoringService::AUTO_REFRESH_INTERVAL =>
+                $service->getOption(ActivityMonitoringService::AUTO_REFRESH_INTERVAL),
+        ]);
+
         $this->setView('Tools/assessment_activity.tpl');
+    }
+
+    /**
+     * Show assessment activity data as json
+     */
+    public function assessmentActivityData()
+    {
+        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $this->returnJson([
+            'success' => true,
+            'data' => $service->getData()
+        ]);
     }
 
     /**
