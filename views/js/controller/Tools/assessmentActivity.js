@@ -21,16 +21,30 @@
  */
 define([
     'jquery',
+    'd3',
     'i18n',
     'helpers',
     'util/url',
+    'core/dataProvider/request',
+    'core/polling',
     'ui/feedback',
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
     'taoProctoring/component/activityMonitoring/activityGraph',
-    'd3',
-    'ui/datatable',
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, activityGraphFactory, d3){
+    'ui/datatable'
+], function(
+    $,
+    d3,
+    __,
+    helpers,
+    url,
+    request,
+    polling,
+    feedback,
+    cascadingComboBox,
+    bulkActionPopup,
+    activityGraphFactory
+){
     'use strict';
 
     var $container = $('.js-pause-active-executions-container');
@@ -57,11 +71,51 @@ define([
         });
     }
 
+    function updateUserActivity(data) {
+        var $userActivityContainer = $('.user-activity');
+
+        // Active Test Takers
+        $('.active-test-takers', $userActivityContainer).text(data.active_test_takers);
+
+        // Active Proctors
+        $('.active-proctors', $userActivityContainer).text(data.active_proctors);
+    }
+
+    function updateAssessmentActivity(data) {
+        var $assessmentActivityContainer = $('.assessment-activity');
+
+        // Total Current Assessments
+        $('.total-current-assessments', $assessmentActivityContainer).text(data.total_current_assessments);
+
+        // In Progress
+        $('.in-progress-assessments', $assessmentActivityContainer).text(data.in_progress_assessments);
+
+        // Awaiting
+        $('.awaiting-assessments', $assessmentActivityContainer).text(data.awaiting_assessments);
+
+        // Authorized
+        $('.authorized-but-not-started-assessments', $assessmentActivityContainer).text(data.authorized_but_not_started_assessments);
+
+        // Paused
+        $('.paused-assessments', $assessmentActivityContainer).text(data.paused_assessments);
+    }
+
+    function updateActivityGraph(data) {
+        var $activityGraphContainer = $();
+
+    }
+
+    function updateDeliveryList(data) {
+        var $deliveryListContainer = $('.js-delivery-list');
+    }
+
 
     return {
         start : function(){
             var $deliveryList = $('.js-delivery-list');
             var activityGraph;
+            var assessmentActivityAutoRefreshInterval;
+            var assessmentActivityConfig;
             var deliveryListModel = [
                 {
                     id: 'label',
@@ -111,7 +165,9 @@ define([
                     transform: function(value) {return value.toString();}
                 },
             ];
+            var poll;
 
+            // Datatable
             $deliveryList.datatable({
                 url: url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
                 filter: false,
@@ -124,7 +180,32 @@ define([
             }, deliveryListModel);
             $deliveryList.datatable('refresh');
 
+            // Assessment Activity Data
+            assessmentActivityConfig = $('.activity-dashboard').data('config');
+            assessmentActivityAutoRefreshInterval = parseInt(assessmentActivityConfig.auto_refresh_interval) * 1000;
 
+            if (assessmentActivityAutoRefreshInterval) {
+                poll = polling({
+                    action: function () {
+                        request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
+                        .then(function (data) {
+                            updateUserActivity(data);
+                            updateAssessmentActivity(data);
+                            // updateActivityGraph(data);
+                            // updateDeliveryList(data);
+                            $deliveryList.datatable('refresh');
+                        })
+                        .catch(function (err) {
+                            feedback().error(err.message);
+                            poll.stop();
+                        });
+                    },
+                    interval: 3 * 1000, //assessmentActivityAutoRefreshInterval,
+                    autoStart: true
+                });
+            }
+
+            // Pause
             $('.js-pause').on('click', function() {
                 var config;
 
@@ -142,6 +223,7 @@ define([
                 });
             });
 
+            // Activity Graph
             $('.js-activity-chart-interval').on('change', function () {
                 var interval = $(this).val();
                 activityGraph.refresh({
