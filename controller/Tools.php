@@ -133,9 +133,11 @@ class Tools extends SimplePageModule
 
         $this->returnJson([
             'success' => !count($notPaused),
-            'message' => count($paused) . ' ' . __('sessions paused'),
-            'processed' => $paused,
-            'unprocessed' => $notPaused
+            'data' => [
+                'message' => count($paused) . ' ' . __('sessions paused'),
+                'processed' => $paused,
+                'unprocessed' => $notPaused
+            ]
         ]);
     }
 

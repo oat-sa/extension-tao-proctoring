@@ -47,33 +47,93 @@ define([
 ){
     'use strict';
 
-    var $container = $('.js-pause-active-executions-container');
-    var categories = $container.data('reasoncategories');
-    var activityGraphConfig;
-    var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.");
+    var $container = $('.activity-dashboard');
+
+    // Pause Action
+    var $pauseActiveExecutionsContainer = $('.js-pause-active-executions-container', $container);
+    var pauseReasonCategories = $pauseActiveExecutionsContainer.data('reasoncategories');
+    var pauseMsg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.");
+
+    // User Activity
+    var $userActivityContainer = $('.user-activity', $container);
+
+    // Current Assessment Activity
+    var $assessmentActivityContainer = $('.assessment-activity', $container);
+
+    // Activity Graph
+    var $activityGraphContainer = $('.js-completed-assessments', $container);
+    var activityGraph;
+
+    // Delivery List
+    var $deliveryListContainer = $('.js-delivery-list', $container);
+    var $deliveryListDatatable;
+    var deliveryListModel = [
+        {
+            id: 'label',
+            label: __('Delivery'),
+            sortable : true
+        },
+        {
+            id: 'Awaiting',
+            label: __('Awaiting'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Authorized',
+            label: __('Authorized'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Paused',
+            label: __('Paused'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Active',
+            label: __('Active'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Terminated',
+            label: __('Terminated'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Canceled',
+            label: __('Canceled'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+        {
+            id: 'Finished',
+            label: __('Finished'),
+            sortable : true,
+            transform: function(value) {return value.toString();}
+        },
+    ];
 
     function doPause(reason) {
-        $.ajax({
-            type: "POST",
-            data: {
-                reason : reason
-            },
-            url: url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
-            dataType: 'json',
-            success: function(data) {
-                helpers.loaded();
-                if (data.success) {
-                    feedback().success(data.message);
-                } else {
-                    feedback().error(data.message);
-                }
-            }
+        request(
+            url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
+            { reason: reason },
+            'POST'
+        )
+        .then(function (data) {
+            helpers.loaded();
+            feedback().success(data.message);
+        })
+        .catch(function (err) {
+            helpers.loaded();
+            feedback().error(err.message);
         });
     }
 
     function updateUserActivity(data) {
-        var $userActivityContainer = $('.user-activity');
-
         // Active Test Takers
         $('.active-test-takers', $userActivityContainer).text(data.active_test_takers);
 
@@ -82,8 +142,6 @@ define([
     }
 
     function updateAssessmentActivity(data) {
-        var $assessmentActivityContainer = $('.assessment-activity');
-
         // Total Current Assessments
         $('.total-current-assessments', $assessmentActivityContainer).text(data.total_current_assessments);
 
@@ -100,157 +158,13 @@ define([
         $('.paused-assessments', $assessmentActivityContainer).text(data.paused_assessments);
     }
 
-    function updateActivityGraph(data) {
-        var $activityGraphContainer = $();
-
-    }
-
-    function updateDeliveryList(data) {
-        var $deliveryListContainer = $('.js-delivery-list');
-    }
-
-
-    return {
-        start : function(){
-            var $deliveryList = $('.js-delivery-list');
-            var activityGraph;
-            var assessmentActivityAutoRefreshInterval;
-            var assessmentActivityConfig;
-            var deliveryListModel = [
-                {
-                    id: 'label',
-                    label: __('Delivery'),
-                    sortable : true
-                },
-                {
-                    id: 'Awaiting',
-                    label: __('Awaiting'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Authorized',
-                    label: __('Authorized'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Paused',
-                    label: __('Paused'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Active',
-                    label: __('Active'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Terminated',
-                    label: __('Terminated'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Canceled',
-                    label: __('Canceled'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Finished',
-                    label: __('Finished'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-            ];
-            var poll;
-
-            // Datatable
-            $deliveryList.datatable({
-                url: url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
-                filter: false,
-                model: deliveryListModel,
-                paginationStrategyTop : 'none',
-                paginationStrategyBottom : 'none',
-                selectable : true,
-                sortorder : 'asc',
-                sortby : 'label'
-            }, deliveryListModel);
-            $deliveryList.datatable('refresh');
-
-            // Assessment Activity Data
-            assessmentActivityConfig = $('.activity-dashboard').data('config');
-            assessmentActivityAutoRefreshInterval = parseInt(assessmentActivityConfig.auto_refresh_interval) * 1000;
-
-            if (assessmentActivityAutoRefreshInterval) {
-                poll = polling({
-                    action: function () {
-                        request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
-                        .then(function (data) {
-                            updateUserActivity(data);
-                            updateAssessmentActivity(data);
-                            // updateActivityGraph(data);
-                            // updateDeliveryList(data);
-                            $deliveryList.datatable('refresh');
-                        })
-                        .catch(function (err) {
-                            feedback().error(err.message);
-                            poll.stop();
-                        });
-                    },
-                    interval: 3 * 1000, //assessmentActivityAutoRefreshInterval,
-                    autoStart: true
-                });
-            }
-
-            // Pause
-            $('.js-pause').on('click', function() {
-                var config;
-
-                config = {
-                    renderTo : $container,
-                    actionName : msg,
-                    reason : true,
-                    allowedResources: [],
-                    reasonRequired: true,
-                    categoriesSelector: cascadingComboBox(categories['pause'])
-                };
-
-                bulkActionPopup(config).on('ok', function(reason){
-                    doPause(reason);
-                });
-            });
-
-            // Activity Graph
-            $('.js-activity-chart-interval').on('change', function () {
-                var interval = $(this).val();
-                activityGraph.refresh({
-                    graphConfig : {
-                        data : {
-                            url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', {'interval' : interval})
-                        },
-                        axis : {
-                            x : {
-                                tick : {
-                                    format: interval === 'day' ? '%H:%M' : '%m-%d'
-                                },
-                                label : {
-                                    text:  interval === 'day' ? __('Hours') : __('Days')
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-
-            activityGraphConfig = $('.js-completed-assessments').data('config');
+    function updateActivityGraph(config) {
+        if (!activityGraph) {
             activityGraph = activityGraphFactory({
-                autoRefresh : parseInt(activityGraphConfig.completed_assessments_auto_refresh, 10) * 1000,
-                autoRefreshBar : true,
-                graphConfig : {
-                    bindto : '.js-completed-assessments',
+                autoRefresh: config.autoRefresh,
+                autoRefreshBar: true,
+                graphConfig: {
+                    bindto: config.bindto,
                     data: {
                         url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring')
                     },
@@ -278,7 +192,107 @@ define([
                         show: false
                     }
                 }
-            }).render();
+            })
+            .render();
+        } else {
+            activityGraph.refresh({
+                graphConfig: {
+                    data: {
+                        url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', { interval: config.interval })
+                    },
+                    axis: {
+                        x: {
+                            tick: {
+                                format: config.interval === 'day' ? '%H:%M' : '%m-%d'
+                            },
+                            label: {
+                                text: config.interval === 'day' ? __('Hours') : __('Days')
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function updateDeliveryList() {
+        if (!$deliveryListDatatable) {
+            $deliveryListDatatable = $deliveryListContainer.datatable({
+                url:                      url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
+                filter:                   false,
+                model:                    deliveryListModel,
+                paginationStrategyTop:    'none',
+                paginationStrategyBottom: 'none',
+                selectable:               true,
+                sortorder:                'asc',
+                sortby:                   'label'
+            }, deliveryListModel);
+        }
+
+        $deliveryListDatatable.datatable('refresh');
+    }
+
+
+    return {
+        start: function () {
+            var activityGraphConfig = $activityGraphContainer.data('config');
+            var assessmentActivityAutoRefreshInterval;
+            var assessmentActivityConfig = $('.activity-dashboard').data('config');
+            var poll;
+
+            // Assessment Activity Data
+            assessmentActivityAutoRefreshInterval = parseInt(assessmentActivityConfig.auto_refresh_interval) * 1000;
+
+            if (assessmentActivityAutoRefreshInterval) {
+                poll = polling({
+                    action: function () {
+                        request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
+                        .then(function (data) {
+                            updateUserActivity(data);
+                            updateAssessmentActivity(data);
+                            updateDeliveryList(data);
+                        })
+                        .catch(function (err) {
+                            feedback().error(err.message);
+                            poll.stop();
+                        });
+                    },
+                    interval: assessmentActivityAutoRefreshInterval,
+                    autoStart: true
+                });
+            }
+
+            // Activity Graph
+            updateActivityGraph({
+                autoRefresh: parseInt(activityGraphConfig.completed_assessments_auto_refresh, 10) * 1000,
+                bindto: $activityGraphContainer.selector
+            });
+
+            $('.js-activity-chart-interval')
+            .on('change', function () {
+                updateActivityGraph({
+                    interval: $(this).val()
+                });
+            });
+
+            // Datatable
+            updateDeliveryList();
+
+            // Pause
+            $('.js-pause')
+            .on('click', function() {
+                bulkActionPopup({
+                    renderTo: $pauseActiveExecutionsContainer,
+                    actionName: pauseMsg,
+                    reason: true,
+                    allowedResources: [],
+                    reasonRequired: true,
+                    categoriesSelector: cascadingComboBox(pauseReasonCategories['pause'])
+                })
+                .on('ok', function(reason) {
+                    doPause(reason);
+                });
+            });
         }
     };
 });
