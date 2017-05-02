@@ -673,7 +673,7 @@ define([
                             refinedValue = '';
                         }
 
-                        if (!remaining || (timer.extraTime && timer.extraTime <= timer.consumedExtraTime)) {
+                        if (!remaining && !timer.extraTime || (timer.extraTime && timer.extraTime <= timer.consumedExtraTime)) {
                             refinedValue = __('Timed out');
                         } else {
                             refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
