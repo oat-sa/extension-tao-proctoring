@@ -662,8 +662,10 @@ define([
                     var since = parseInt(timer.since, 10);
 
                     if (remaining || _.isFinite(remaining) ) {
-                        if (remaining < 0 && timer.extraTime) {
-                            timer.consumedExtraTime += -remaining;
+                        if (remaining < 0) {
+                            if (timer.extraTime) {
+                                timer.consumedExtraTime += -remaining;
+                            }
                             remaining = 0;
                         }
 
@@ -673,7 +675,7 @@ define([
                             refinedValue = '';
                         }
 
-                        if (!remaining && !timer.extraTime || (timer.extraTime && timer.extraTime <= timer.consumedExtraTime)) {
+                        if ((!remaining && !timer.extraTime) || (timer.extraTime && timer.extraTime <= timer.consumedExtraTime)) {
                             refinedValue = __('Timed out');
                         } else {
                             refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
