@@ -48,14 +48,10 @@ class Tools extends SimplePageModule
 
         // Data
         $this->setData('activity_data', $service->getData());
-        $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
+        $this->setData('reason_categories', DeliveryHelper::getAllReasonsCategories());
 
         // Config
-        $this->setData('completed_assessments_config', [
-            ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH =>
-                $service->getOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH),
-        ]);
-        $this->setData('assessment_activity_config', [
+        $this->setData('config', [
             ActivityMonitoringService::AUTO_REFRESH_INTERVAL =>
                 $service->getOption(ActivityMonitoringService::AUTO_REFRESH_INTERVAL),
         ]);
@@ -69,24 +65,32 @@ class Tools extends SimplePageModule
     public function assessmentActivityData()
     {
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+
+        // todo - optimize these calls (only need one call to getData())
+
+        // Assessment Activity Data
+        $assessmentActivityData = $service->getData();
+
+        // deliveries activity data
+        $deliveriesActivity = new DeliveriesActivityDatatable();
+
+        // completed assessments data
+        $completedAssessments = $this->completedAssessmentsData();
+
         $this->returnJson([
             'success' => true,
-            'data' => $service->getData()
+            'data' => [
+                'assessment_activity' => $assessmentActivityData,
+                'deliveries_activity' => $deliveriesActivity,
+                'completed_assessments' => $completedAssessments
+            ]
         ]);
-    }
-
-    /**
-     * Get assessment activity data
-     */
-    public function deliveriesActivityData()
-    {
-        $this->returnJson(new DeliveriesActivityDatatable());
     }
 
     /**
      * Get completed assessments data
      */
-    public function completedAssessmentsData()
+    private function completedAssessmentsData()
     {
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
         $timeKeys = $this->getTimeKeys();
@@ -104,7 +108,7 @@ class Tools extends SimplePageModule
             $result['amount'][] = $countEvents;
         }
 
-        $this->returnJson($result, 200);
+        return $result;
     }
 
     /**
