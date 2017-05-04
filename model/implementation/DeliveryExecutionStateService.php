@@ -33,7 +33,6 @@ use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
-use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\oatbox\user\User;
@@ -65,8 +64,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function getInitialStatus($deliveryId, User $user)
     {
-        $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
-        return $service->isProctored($deliveryId, $user)
+        return $this->getTestTakerAuthorizationService()->isProctored($deliveryId, $user)
             ? DeliveryExecution::STATE_PAUSED
             : DeliveryExecution::STATE_ACTIVE;
     }
@@ -371,13 +369,14 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     {
         $result = false;
         $user = \common_session_SessionManager::getSession()->getUser();
+        $isProctored = $this->getTestTakerAuthorizationService()->isProctored($deliveryExecution->getDelivery()->getUri(), $user);
         $stateUri = $deliveryExecution->getState()->getUri();
         if ($stateUri === ProctoredDeliveryExecution::STATE_AWAITING) {
             $result = true;
         }
 
         if (
-            $user instanceof GuestTestUser &&
+            !$isProctored &&
             !in_array($stateUri, [
                 ProctoredDeliveryExecution::STATE_FINISHIED,
                 ProctoredDeliveryExecution::STATE_TERMINATED,
@@ -409,6 +408,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         }
         return $this->testSessionService;
+    }
+
+    private function getTestTakerAuthorizationService()
+    {
+        return $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
     }
 
     /**
