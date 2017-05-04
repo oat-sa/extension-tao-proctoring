@@ -20,12 +20,14 @@
 namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
 
 /**
  * Manage the Delivery authorization.
@@ -64,6 +66,12 @@ class TestTakerAuthorizationService extends ConfigurableService
         }
         if ($this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
             $this->throwUnAuthorizedException($deliveryExecution);
+        }
+
+        //resume unproctored paused tests
+        if(!$this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state == ProctoredDeliveryExecution::STATE_PAUSED  ){
+            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService->resumeExecution($deliveryExecution);
         }
     }
 
