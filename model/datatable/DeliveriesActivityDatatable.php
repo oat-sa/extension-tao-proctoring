@@ -44,20 +44,22 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     /**
      * DeliveriesActivityDatatable constructor.
      */
-    public function __construct()
+    public function __construct($data = null)
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
-        $request = DatatableRequest::fromGlobals();
-        $this->request = $request;
+        $this->data = $data;
+        $this->request = DatatableRequest::fromGlobals();
     }
 
     public function getPayload()
     {
-        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-        $data = $service->getData()['deliveries_statistics'];
+        if (is_null($this->data)) {
+            $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
+            $data = $service->getData();
+        }
 
-        $this->doSorting($data);
-        $result = $this->doPostProcessing($data);
+        $this->doSorting($this->data['deliveries_statistics']);
+        $result = $this->doPostProcessing($this->data['deliveries_statistics']);
 
         return $result;
     }
