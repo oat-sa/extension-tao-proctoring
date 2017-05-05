@@ -375,8 +375,8 @@ class DeliveryHelper
                 $testTaker = [];
                 $extraFields = [];
                 
-                $user = UserHelper::getUser($cachedData[DeliveryMonitoringService::TEST_TAKER]);
-                if ($user) {
+                $user = new core_kernel_classes_Resource($cachedData[DeliveryMonitoringService::TEST_TAKER]);
+                if ($user->exists()) {
                     /* @var $user User */
                     $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
                     $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
