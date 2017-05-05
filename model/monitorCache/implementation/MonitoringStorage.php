@@ -552,6 +552,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function getKvData(array $ids)
     {
+        if (empty($ids)) {
+            return [];
+        }
         $result = [];
         $sql = 'SELECT * FROM ' . self::KV_TABLE_NAME . '
                 WHERE ' . self::KV_COLUMN_PARENT_ID . ' IN(' . join(',', array_map(function(){ return '?'; }, $ids)) . ')';
