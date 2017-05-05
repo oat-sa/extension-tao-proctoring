@@ -375,17 +375,13 @@ class DeliveryHelper
                 $testTaker = [];
                 $extraFields = [];
                 
-                $user = new core_kernel_classes_Resource($cachedData[DeliveryMonitoringService::TEST_TAKER]);
-                if ($user->exists()) {
-                    /* @var $user User */
-                    $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                    $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
-                    $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
+                /* @var $user User */
+                $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
+                $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
+                $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
-                    $userExtraFields = self::_getUserExtraFields();
-                    foreach($userExtraFields as $field){
-                        $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
-                    }
+                foreach(self::_getUserExtraFields() as $field){
+                    $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
                 }
 
                 $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
