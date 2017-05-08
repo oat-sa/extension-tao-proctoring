@@ -77,7 +77,10 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
             unset($filters['start_time']);
         }
         $options['filters'] = $filters;
-        $options['order'] = DeliveryHelper::adjustColumnName($this->request->getSortBy()) . ' ' . $this->request->getSortOrder();
+        $orderCol = DeliveryHelper::adjustColumnName($this->request->getSortBy());
+        if ($orderCol) {
+            $options['order'] = $orderCol . ' ' . $this->request->getSortOrder();
+        }
         $options['limit'] = $this->request->getRows();
         $options['offset'] = ($this->request->getPage() - 1) * $this->request->getRows();
 

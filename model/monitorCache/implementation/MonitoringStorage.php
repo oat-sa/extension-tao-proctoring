@@ -217,9 +217,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL;
 
-//        if ($options['order']['primary']) {
-//            $sql .= "ORDER BY " . $options['order']['primary'];
-//        }
         $sql .= "ORDER BY " . $options['order'];
 
         if (isset($options['limit']))  {
@@ -258,11 +255,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function count(array $criteria = [])
     {
         $this->joins = [];
-        $parameters = [];
+        $this->queryParams = [];
 
         $selectClause = "select COUNT(*) FROM (SELECT t.delivery_execution_id ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause = $this->prepareCondition($criteria, $parameters, $selectClause);
+        $whereClause = $this->prepareCondition($criteria, $this->queryParams, $selectClause);
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
@@ -271,7 +268,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $whereClause . PHP_EOL .
             'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . ') as count_q';
 
-        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
         $result = $stmt->fetch(\PDO::FETCH_BOTH);
         return intval($result[0]);
     }
