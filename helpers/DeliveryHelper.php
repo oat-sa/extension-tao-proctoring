@@ -357,57 +357,54 @@ class DeliveryHelper
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    private static function adjustDeliveryExecutions($deliveryExecutions, $options) {
+    private static function adjustDeliveryExecutions($deliveryExecutions) {
 
-        // paginate, then format the data
-        //return DataTableHelper::paginate($deliveryExecutions, $options, function($deliveryExecutions) {
-            $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-            $executions = [];
+        $executions = [];
 
-            foreach($deliveryExecutions as $cachedData) {
+        foreach ($deliveryExecutions as $cachedData) {
 
-                $state = [
-                    'status' => $cachedData[DeliveryMonitoringService::STATUS],
-                    'progress' => $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]
-                ];
+            $state = [
+                'status' => $cachedData[DeliveryMonitoringService::STATUS],
+                'progress' => $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]
+            ];
 
-                $testTaker = [];
-                $extraFields = [];
-                
-                /* @var $user User */
-                $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-                $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
-                $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
+            $testTaker = [];
+            $extraFields = [];
 
-                foreach(self::_getUserExtraFields() as $field){
-                    $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
-                }
+            /* @var $user User */
+            $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
+            $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
+            $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
-                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
-                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
-
-                $executions[] = array(
-                    'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
-                    'delivery' => array(
-                        'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                        'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
-                    ),
-                    'start_time' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
-                    'timer' => [
-                        'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
-                        'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
-                        'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
-                    ],
-                    'testTaker' => $testTaker,
-                    'extraFields' => $extraFields,
-                    'state' => $state,
-                    'online' => $online,
-                );
+            foreach(self::_getUserExtraFields() as $field){
+                $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
 
-            return $executions;
-        //});
+            $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+            $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+
+            $executions[] = array(
+                'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
+                'delivery' => array(
+                    'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
+                    'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
+                ),
+                'start_time' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
+                'timer' => [
+                    'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
+                    'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
+                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
+                ],
+                'testTaker' => $testTaker,
+                'extraFields' => $extraFields,
+                'state' => $state,
+                'online' => $online,
+            );
+        }
+
+        return $executions;
     }
 
     /**
