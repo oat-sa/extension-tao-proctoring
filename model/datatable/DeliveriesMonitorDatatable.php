@@ -43,6 +43,11 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
     protected $request;
 
     /**
+     * @var DatatableRequest
+     */
+    protected $datatableRequest;
+
+    /**
      * @var \core_kernel_classes_Resource
      */
     protected $delivery;
@@ -50,39 +55,43 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
     /**
      * DeliveriesMonitorDatatable constructor.
      * @param \core_kernel_classes_Resource $delivery
+     * @param \Request $request
      */
-    public function __construct(\core_kernel_classes_Resource $delivery)
+    public function __construct(\core_kernel_classes_Resource $delivery, $request)
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
-        $request = DatatableRequest::fromGlobals();
+        $this->datatableRequest = DatatableRequest::fromGlobals();
         $this->request = $request;
         $this->delivery = $delivery;
     }
 
     public function getPayload()
     {
-        $context = $this->getRequestData()->hasParameter('context') ? $this->getRequestData()->getParameter('context') : null;
-        $filters = $this->request->getFilters();
-        $options = [];
-        if (isset($filters['start_time'])) {
-            $times = explode(' - ', $filters['start_time']);
-            $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
-            $from->setTime(0, 0, 0);
-            $filters[] = ['start_time' => '>' . $from->getTimestamp()];
-            if (isset($times[1])) {
-                $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
-                $to->setTime(23, 59, 59);
-                $filters[] = ['start_time' => '<' . $to->getTimestamp()];
+        $context = $this->request->hasParameter('context') ? $this->request->getParameter('context') : null;
+        $filters = [];
+        foreach ($this->datatableRequest->getFilters() as $filterKey => $filterValue) {
+            if ($filterKey === 'start_time') {
+                $times = explode(' - ', $filterValue);
+                $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
+                $from->setTime(0, 0, 0);
+                $filters[] = ['start_time' => '>' . $from->getTimestamp()];
+                if (isset($times[1])) {
+                    $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
+                    $to->setTime(23, 59, 59);
+                    $filters[] = ['start_time' => '<' . $to->getTimestamp()];
+                }
+            } else {
+                $filters[] = [$filterKey => $filterValue];
             }
-            unset($filters['start_time']);
         }
+        $options = [];
         $options['filters'] = $filters;
-        $orderCol = DeliveryHelper::adjustColumnName($this->request->getSortBy());
+        $orderCol = DeliveryHelper::adjustColumnName($this->datatableRequest->getSortBy());
         if ($orderCol) {
-            $options['order'] = $orderCol . ' ' . $this->request->getSortOrder();
+            $options['order'] = $orderCol . ' ' . $this->datatableRequest->getSortOrder();
         }
-        $options['limit'] = $this->request->getRows();
-        $options['offset'] = ($this->request->getPage() - 1) * $this->request->getRows();
+        $options['limit'] = $this->datatableRequest->getRows();
+        $options['offset'] = ($this->datatableRequest->getPage() - 1) * $this->datatableRequest->getRows();
 
         $service = $this->getServiceLocator()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
@@ -109,18 +118,10 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
         return [
             'success' => true,
             'total' => $total,
-            'page' => $this->request->getPage(),
-            'rows' => $this->request->getRows(),
+            'page' => $this->datatableRequest->getPage(),
+            'rows' => $this->datatableRequest->getRows(),
             'data' => DeliveryHelper::buildDeliveryExecutionData($executionsData),
         ];
-    }
-
-    /**
-     * @return \Request
-     */
-    protected function getRequestData()
-    {
-        return \Context::getInstance()->getRequest();
     }
 
     /**
