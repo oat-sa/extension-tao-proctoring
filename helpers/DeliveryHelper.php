@@ -330,7 +330,14 @@ class DeliveryHelper
     {
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
     }
-    
+
+    public static function isDeliveryExecutionFinished($deliveryExecutionId)
+    {
+        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+
+        return (boolean) $deliveryExecution->getFinishTime();
+    }
+
     public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
         return self::adjustDeliveryExecutions($deliveryExecutions, $sortOptions);
     }

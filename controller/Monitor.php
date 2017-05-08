@@ -224,6 +224,13 @@ class Monitor extends SimplePageModule
             if (!$response['success']) {
                 $response['errorCode'] = self::ERROR_TERMINATE_EXECUTIONS;
                 $response['errorMsg'] = __('Some delivery executions have not been terminated');
+
+                // Check for finished tests
+                foreach ($notTerminated as $uri) {
+                    if (DeliveryHelper::isDeliveryExecutionFinished($uri)) {
+                        $response['data']['unprocessedReasons'][$uri] = __('Delivery execution cannot be terminated because it has been finished.');
+                    }
+                }
             }
 
             $this->returnJson($response);
@@ -265,6 +272,13 @@ class Monitor extends SimplePageModule
             if (!$response['success']) {
                 $response['errorCode'] = self::ERROR_PAUSE_EXECUTIONS;
                 $response['errorMsg'] = __('Some delivery executions have not been paused');
+
+                // Check for finished tests
+                foreach ($notPaused as $uri) {
+                    if (DeliveryHelper::isDeliveryExecutionFinished($uri)) {
+                        $response['data']['unprocessedReasons'][$uri] = __('Delivery execution cannot be paused because it has been finished.');
+                    }
+                }
             }
 
             $this->returnJson($response);
@@ -346,6 +360,13 @@ class Monitor extends SimplePageModule
             if (!$response['success']) {
                 $response['errorCode'] = self::ERROR_SET_EXTRA_TIME;
                 $response['errorMsg'] = __('Some delivery executions have not been updated');
+
+                // Check for finished tests
+                foreach ($notReported as $uri) {
+                    if (DeliveryHelper::isDeliveryExecutionFinished($uri)) {
+                        $response['data']['unprocessedReasons'][$uri] = __('Delivery execution cannot be granted extra time because it has been finished.');
+                    }
+                }
             }
 
             $this->returnJson($response);
