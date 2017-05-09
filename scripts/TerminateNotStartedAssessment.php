@@ -74,7 +74,8 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find([
-            DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_AUTHORIZED
+            DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_AUTHORIZED,
+            DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_AWAITING,
         ]);
 
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */

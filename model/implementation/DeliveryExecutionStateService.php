@@ -81,6 +81,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AWAITING);
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AWAITING_AUTHORISATION', [
+                'timestamp' => microtime(true),
+                'context' => $this->getProgress($deliveryExecution),
+            ]);
             return true;
         }
         return false;
