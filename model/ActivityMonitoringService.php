@@ -39,11 +39,8 @@ class ActivityMonitoringService extends ConfigurableService
     /** Threshold in seconds */
     const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
-    /** Interval of refreshing assessment activity graph in seconds. 0 - no auto refresh */
-    const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
-
     /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
-    const AUTO_REFRESH_INTERVAL = 'auto_refresh_interval';
+    const OPTION_AUTO_REFRESH_INTERVAL = 'auto_refresh_interval';
 
     /**
      * @var array list of all the statuses uris

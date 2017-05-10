@@ -305,5 +305,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('5.1.1', '5.2.1');
+
+        if ($this->isVersion('5.2.1')) {
+            $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+            $service->setOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH, NULL);
+            $service->setOption(ActivityMonitoringService::OPTION_AUTO_REFRESH_INTERVAL, 60);
+            $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
+            $this->setVersion('5.3.0');
+        }
     }
 }

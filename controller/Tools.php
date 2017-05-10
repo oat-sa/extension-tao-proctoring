@@ -52,8 +52,8 @@ class Tools extends SimplePageModule
 
         // Config
         $this->setData('config', [
-            ActivityMonitoringService::AUTO_REFRESH_INTERVAL =>
-                $service->getOption(ActivityMonitoringService::AUTO_REFRESH_INTERVAL),
+            ActivityMonitoringService::OPTION_AUTO_REFRESH_INTERVAL =>
+                $service->getOption(ActivityMonitoringService::OPTION_AUTO_REFRESH_INTERVAL),
         ]);
 
         $this->setView('Tools/assessment_activity.tpl');
