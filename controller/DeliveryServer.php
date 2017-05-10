@@ -74,24 +74,6 @@ class DeliveryServer extends DefaultDeliveryServer
     }
 
     /**
-     * Displays the execution screen
-     *
-     * FIXME all state management must be centralized into a service,
-      * it should'nt be on the controller.
-     *
-     * @throws common_exception_Error
-     */
-    public function runDeliveryExecution()
-    {
-        $deliveryExecution = $this->getCurrentDeliveryExecution();
-        $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-
-        // ok, the delivery execution can be processed
-        parent::runDeliveryExecution();
-        $deliveryExecutionStateService->resumeExecution($deliveryExecution);
-    }
-
-    /**
      * The awaiting authorization screen
      */
     public function awaitingAuthorization()
