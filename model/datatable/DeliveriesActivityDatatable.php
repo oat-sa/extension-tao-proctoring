@@ -72,7 +72,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     {
         $payload = [
             'data' => $result,
-            'page' => (integer) $this->request->getPage(),
+            'page' => 1, // No pagination, so always page 1
             'records' => (integer) count($result),
             'total' => (integer) count($result)
         ];
@@ -84,9 +84,9 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doSorting(array &$result)
     {
-        $sortBy = $this->request->getSortBy();
-        $sortOrder = strcasecmp($this->request->getSortOrder(), 'asc') === 0 ? SORT_ASC : SORT_DESC;
-        $flag = ($sortBy === 'label') ? SORT_STRING | SORT_FLAG_CASE : SORT_NUMERIC;
+        $sortBy = 'label';
+        $sortOrder = SORT_ASC;
+        $flag = SORT_STRING | SORT_FLAG_CASE;
         array_multisort(array_column($result, $sortBy), $sortOrder, $flag, $result);
     }
 

@@ -108,8 +108,9 @@ define([
                 paginationStrategyTop:    'none',
                 paginationStrategyBottom: 'none',
                 selectable:               true,
-                sortorder:                'asc',
-                sortby:                   'label'
+                // Set in backend
+                // sortorder:                'asc',
+                // sortby:                   'label'
             }, {});
         })
 
