@@ -67,8 +67,6 @@ class Tools extends SimplePageModule
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
         $data = $service->getData();
 
-        // todo - optimize these calls (only need one call to getData())
-
         // Assessment Activity Data
         $assessmentActivityData = $data;
 

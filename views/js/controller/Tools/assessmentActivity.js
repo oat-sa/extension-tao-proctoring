@@ -34,7 +34,7 @@ define([
     'taoProctoring/component/activityMonitoring/userActivity/userActivity',
     'taoProctoring/component/activityMonitoring/currentAssessmentActivity/currentAssessmentActivity',
     'taoProctoring/component/activityMonitoring/activityGraph',
-    'ui/datatable'
+    'taoProctoring/component/activityMonitoring/deliveriesList/deliveriesList'
 ], function(
     $,
     d3,
@@ -49,7 +49,8 @@ define([
     bulkActionPopup,
     userActivityFactory,
     currentAssessmentActivityFactory,
-    activityGraphFactory
+    activityGraphFactory,
+    deliveriesListFactory
 ){
     'use strict';
 
@@ -65,59 +66,6 @@ define([
     var $activityGraphContainer = $('.js-completed-assessments', $container);
     var $activityGraphInterval = $('.js-activity-chart-interval', $container);
     var activityGraph;
-
-    // Delivery List
-    var $deliveryListContainer = $('.js-delivery-list', $container);
-    var $deliveryListDatatable;
-    var deliveryListModel = [
-        {
-            id: 'label',
-            label: __('Delivery'),
-            sortable : true
-        },
-        {
-            id: 'Awaiting',
-            label: __('Awaiting'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Authorized',
-            label: __('Authorized'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Paused',
-            label: __('Paused'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Active',
-            label: __('Active'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Terminated',
-            label: __('Terminated'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Canceled',
-            label: __('Canceled'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-        {
-            id: 'Finished',
-            label: __('Finished'),
-            sortable : true,
-            transform: function(value) {return value.toString();}
-        },
-    ];
 
     function doPause(reason) {
         request(
@@ -192,29 +140,13 @@ define([
         }
     }
 
-    function updateDeliveryList(data) {
-        if (!$deliveryListDatatable) {
-            $deliveryListDatatable = $deliveryListContainer.datatable({
-                filter:                   false,
-                model:                    deliveryListModel,
-                paginationStrategyTop:    'none',
-                paginationStrategyBottom: 'none',
-                selectable:               true,
-                sortorder:                'asc',
-                sortby:                   'label'
-            }, data);
-        } else {
-            $deliveryListDatatable.datatable('refresh', data);
-        }
-    }
-
-
     return {
         start: function () {
             // var $container = ...;
             var autoRefreshInterval;
             var config = $('.activity-dashboard').data('config');
             var currentAssessmentActivity;
+            var deliveriesList;
             var poll;
             var userActivity;
 
@@ -228,7 +160,10 @@ define([
 
             // Completed assessment activity
 
-            // Deliveries activity
+            // Deliveries List
+            deliveriesList = deliveriesListFactory()
+            .render($('.js-delivery-list'));
+
 
             poll = polling({
                 action: function () {
@@ -246,7 +181,7 @@ define([
                             paused     : { value: data.assessment_activity && data.assessment_activity.paused_assessments }
                         });
                         updateActivityGraph(data.completed_assessments);
-                        updateDeliveryList(data.deliveries_activity);
+                        deliveriesList.update(data.deliveries_activity);
                     })
                     .catch(function (err) {
                         feedback().error(err.message);
@@ -265,7 +200,10 @@ define([
 
             $activityGraphInterval
             .on('change', function () {
-                updateActivityGraph();
+                poll.next();
+                if (!autoRefreshInterval) {
+                    poll.stop();
+                }
             });
 
             // Pause
