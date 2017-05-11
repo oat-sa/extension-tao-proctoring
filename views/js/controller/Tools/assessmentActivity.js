@@ -21,133 +21,125 @@
  */
 define([
     'jquery',
+    'd3',
+    'lodash',
     'i18n',
     'helpers',
     'util/url',
+    'core/dataProvider/request',
+    'core/polling',
     'ui/feedback',
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
+    'taoProctoring/component/activityMonitoring/userActivity/userActivity',
+    'taoProctoring/component/activityMonitoring/currentAssessmentActivity/currentAssessmentActivity',
     'taoProctoring/component/activityMonitoring/activityGraph',
-    'd3',
-    'ui/datatable',
-], function($, __, helpers, url, feedback, cascadingComboBox, bulkActionPopup, activityGraphFactory, d3){
+    'taoProctoring/component/activityMonitoring/deliveriesList/deliveriesList'
+], function(
+    $,
+    d3,
+    _,
+    __,
+    helpers,
+    url,
+    request,
+    polling,
+    feedback,
+    cascadingComboBox,
+    bulkActionPopup,
+    userActivityFactory,
+    currentAssessmentActivityFactory,
+    activityGraphFactory,
+    deliveriesListFactory
+){
     'use strict';
 
-    var $container = $('.js-pause-active-executions-container');
-    var categories = $container.data('reasoncategories');
-    var activityGraphConfig;
-    var msg = __("Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.");
+    var pauseMsg = __('Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.');
 
     function doPause(reason) {
-        $.ajax({
-            type: "POST",
-            data: {
-                reason : reason
-            },
-            url: url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
-            dataType: 'json',
-            success: function(data) {
-                helpers.loaded();
-                if (data.success) {
-                    feedback().success(data.message);
-                } else {
-                    feedback().error(data.message);
-                }
-            }
+        request(
+            url.route('pauseActiveExecutions', 'Tools', 'taoProctoring'),
+            { reason: reason },
+            'POST'
+        )
+        .then(function (data) {
+            helpers.loaded();
+            feedback().success(data.message);
+        })
+        .catch(function (err) {
+            helpers.loaded();
+            feedback().error(err.message);
         });
     }
 
-
     return {
-        start : function(){
-            var $deliveryList = $('.js-delivery-list');
+        start: function () {
+            var $container = $('.activity-dashboard');
             var activityGraph;
-            var deliveryListModel = [
-                {
-                    id: 'label',
-                    label: __('Delivery'),
-                    sortable : true
-                },
-                {
-                    id: 'Awaiting',
-                    label: __('Awaiting'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Authorized',
-                    label: __('Authorized'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Paused',
-                    label: __('Paused'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Active',
-                    label: __('Active'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Terminated',
-                    label: __('Terminated'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Canceled',
-                    label: __('Canceled'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-                {
-                    id: 'Finished',
-                    label: __('Finished'),
-                    sortable : true,
-                    transform: function(value) {return value.toString();}
-                },
-            ];
+            var assessmentActivityAutoRefreshInterval;
+            var completedAssessmentsAutoRefreshInterval;
+            var config;
+            var currentAssessmentActivity;
+            var deliveriesList;
+            var pauseReasonCategories;
+            var poll;
+            var userActivity;
 
-            $deliveryList.datatable({
-                url: url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
-                filter: false,
-                model: deliveryListModel,
-                paginationStrategyTop : 'none',
-                paginationStrategyBottom : 'none',
-                selectable : true,
-                sortorder : 'asc',
-                sortby : 'label'
-            }, deliveryListModel);
-            $deliveryList.datatable('refresh');
+            config = $container.data('config');
+            assessmentActivityAutoRefreshInterval = parseInt(config.assessment_activity_auto_refresh) * 1000;
+            completedAssessmentsAutoRefreshInterval = parseInt(config.completed_assessments_auto_refresh) * 1000;
 
+            // User Activity
+            userActivity = userActivityFactory()
+            .render($('.user-activity', $container));
 
-            $('.js-pause').on('click', function() {
-                var config;
+            // Current Assessment Activity
+            currentAssessmentActivity = currentAssessmentActivityFactory()
+            .render($('.assessment-activity', $container));
 
-                config = {
-                    renderTo : $container,
-                    actionName : msg,
-                    reason : true,
-                    allowedResources: [],
-                    reasonRequired: true,
-                    categoriesSelector: cascadingComboBox(categories['pause'])
-                };
+            // Completed Assessment Activity
+            activityGraph = activityGraphFactory({
+                autoRefresh: completedAssessmentsAutoRefreshInterval,
+                autoRefreshBar: true,
+                graphConfig: {
+                    bindto: $('.js-completed-assessments', $container).selector,
+                    data: {
+                        url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring')
+                    },
+                    axis: {
+                        x: {
+                            label: {
+                                text: __('Hours'),
+                            }
+                        },
+                        y: {
+                            label: {
+                                text: __('Completed tests'),
+                            },
+                            tick: { format: d3.format('d') },
+                        }
+                    },
+                    tooltip: {
+                        format: {
+                            name: function () {
+                                return __('Completed');
+                            }
+                        }
+                    },
+                    legend: {
+                        show: false
+                    }
+                }
+            })
+            .render();
 
-                bulkActionPopup(config).on('ok', function(reason){
-                    doPause(reason);
-                });
-            });
-
-            $('.js-activity-chart-interval').on('change', function () {
+            $('.js-activity-chart-interval', $container)
+            .on('change', function () {
                 var interval = $(this).val();
                 activityGraph.refresh({
                     graphConfig : {
                         data : {
-                            url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', {'interval' : interval})
+                            url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', { 'interval' : interval })
                         },
                         axis : {
                             x : {
@@ -163,40 +155,60 @@ define([
                 });
             });
 
-            activityGraphConfig = $('.js-completed-assessments').data('config');
-            activityGraph = activityGraphFactory({
-                autoRefresh : parseInt(activityGraphConfig.completed_assessments_auto_refresh, 10) * 1000,
-                autoRefreshBar : true,
-                graphConfig : {
-                    bindto : '.js-completed-assessments',
-                    data: {
-                        url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring')
-                    },
-                    axis: {
-                        x: {
-                            label: {
-                                text: __('Hours'),
-                            }
-                        },
-                        y: {
-                            label: {
-                                text: __('Completed tests'),
-                            },
-                            tick: {format: d3.format("d")},
-                        }
-                    },
-                    tooltip: {
-                        format: {
-                            name: function () {
-                                return __('Completed');
-                            }
-                        }
-                    },
-                    legend: {
-                        show: false
-                    }
+            // Deliveries List
+            deliveriesList = deliveriesListFactory()
+            .render($('.js-delivery-list'));
+
+            // Refresh
+            poll = polling({
+                action: function () {
+                    request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
+                    .then(function (data) {
+                        userActivity.update({
+                            activeProctorsValue   : data && data.active_proctors,
+                            activeTestTakersValue : data && data.active_test_takers_value
+                        });
+                        currentAssessmentActivity.update({
+                            awaiting   : { value: data && data.awaiting_assessments },
+                            authorized : { value: data && data.authorized_but_not_started_assessments },
+                            current    : { value: data && data.total_current_assessments },
+                            inProgress : { value: data && data.in_progress_assessments },
+                            paused     : { value: data && data.paused_assessments }
+                        });
+                        deliveriesList.update();
+                    })
+                    .catch(function (err) {
+                        feedback().error(err.message);
+                        poll.stop();
+                    });
                 }
-            }).render();
+            })
+            .next()
+            .stop();
+
+            if (assessmentActivityAutoRefreshInterval) {
+                poll.setInterval(assessmentActivityAutoRefreshInterval);
+                poll.start();
+            }
+
+
+            // Pause
+            pauseReasonCategories = $('.js-pause-active-executions-container').data('reasoncategories');
+
+            $('.js-pause', $container)
+            .on('click', function() {
+                bulkActionPopup({
+                    renderTo: $('.js-pause-active-executions-container', $container),
+                    actionName: pauseMsg,
+                    reason: true,
+                    allowedResources: [],
+                    reasonRequired: true,
+                    categoriesSelector: cascadingComboBox(pauseReasonCategories['pause'])
+                })
+                .on('ok', function(reason) {
+                    doPause(reason);
+                });
+            });
         }
     };
 });
