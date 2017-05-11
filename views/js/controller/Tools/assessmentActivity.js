@@ -22,6 +22,7 @@
 define([
     'jquery',
     'd3',
+    'lodash',
     'i18n',
     'helpers',
     'util/url',
@@ -30,11 +31,14 @@ define([
     'ui/feedback',
     'ui/cascadingComboBox',
     'ui/bulkActionPopup',
+    'taoProctoring/component/activityMonitoring/userActivity/userActivity',
+    'taoProctoring/component/activityMonitoring/currentAssessmentActivity/currentAssessmentActivity',
     'taoProctoring/component/activityMonitoring/activityGraph',
     'ui/datatable'
 ], function(
     $,
     d3,
+    _,
     __,
     helpers,
     url,
@@ -43,6 +47,8 @@ define([
     feedback,
     cascadingComboBox,
     bulkActionPopup,
+    userActivityFactory,
+    currentAssessmentActivityFactory,
     activityGraphFactory
 ){
     'use strict';
@@ -54,12 +60,6 @@ define([
     var $pauseActiveExecutionsContainer = $('.js-pause-active-executions-container', $container);
     var pauseReasonCategories = $pauseActiveExecutionsContainer.data('reasoncategories');
     var pauseMsg = __('Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.');
-
-    // User Activity
-    var $userActivityContainer = $('.user-activity', $container);
-
-    // Current Assessment Activity
-    var $assessmentActivityContainer = $('.assessment-activity', $container);
 
     // Activity Graph
     var $activityGraphContainer = $('.js-completed-assessments', $container);
@@ -135,30 +135,6 @@ define([
         });
     }
 
-    function updateUserActivity(data) {
-        // Active Test Takers
-        $('.active-test-takers', $userActivityContainer).text(data.active_test_takers);
-
-        // Active Proctors
-        $('.active-proctors', $userActivityContainer).text(data.active_proctors);
-    }
-
-    function updateAssessmentActivity(data) {
-        // Total Current Assessments
-        $('.total-current-assessments', $assessmentActivityContainer).text(data.total_current_assessments);
-
-        // In Progress
-        $('.in-progress-assessments', $assessmentActivityContainer).text(data.in_progress_assessments);
-
-        // Awaiting
-        $('.awaiting-assessments', $assessmentActivityContainer).text(data.awaiting_assessments);
-
-        // Authorized
-        $('.authorized-but-not-started-assessments', $assessmentActivityContainer).text(data.authorized_but_not_started_assessments);
-
-        // Paused
-        $('.paused-assessments', $assessmentActivityContainer).text(data.paused_assessments);
-    }
 
     function updateActivityGraph(data) {
         if (!activityGraph) {
@@ -235,16 +211,40 @@ define([
 
     return {
         start: function () {
+            // var $container = ...;
             var autoRefreshInterval;
             var config = $('.activity-dashboard').data('config');
+            var currentAssessmentActivity;
             var poll;
+            var userActivity;
+
+            // User Activity
+            userActivity = userActivityFactory()
+            .render($('.user-activity', $container));
+
+            // Current Assessment Activity
+            currentAssessmentActivity = currentAssessmentActivityFactory()
+            .render($('.assessment-activity', $container));
+
+            // Completed assessment activity
+
+            // Deliveries activity
 
             poll = polling({
                 action: function () {
                     request(url.route('assessmentActivityData', 'Tools', 'taoProctoring', { interval: $activityGraphInterval.val() }))
                     .then(function (data) {
-                        updateUserActivity(data.assessment_activity);
-                        updateAssessmentActivity(data.assessment_activity);
+                        userActivity.update({
+                            activeProctorsValue   : data.assessment_activity && data.assessment_activity.active_proctors,
+                            activeTestTakersValue : data.assessment_activity && data.assessment_activity.active_test_takers_value
+                        });
+                        currentAssessmentActivity.update({
+                            awaiting   : { value: data.assessment_activity && data.assessment_activity.awaiting_assessments },
+                            authorized : { value: data.assessment_activity && data.assessment_activity.authorized_but_not_started_assessments },
+                            current    : { value: data.assessment_activity && data.assessment_activity.total_current_assessments },
+                            inProgress : { value: data.assessment_activity && data.assessment_activity.in_progress_assessments },
+                            paused     : { value: data.assessment_activity && data.assessment_activity.paused_assessments }
+                        });
                         updateActivityGraph(data.completed_assessments);
                         updateDeliveryList(data.deliveries_activity);
                     })
