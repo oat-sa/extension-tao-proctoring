@@ -45,21 +45,36 @@ class Tools extends SimplePageModule
     public function assessmentActivity()
     {
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
-        $this->setData('activity_data', $service->getData());
-        $this->setData('reasonCategories', DeliveryHelper::getAllReasonsCategories());
-        $this->setData('completed_assessments_config', [
+
+        // Reason categories
+        $this->setData('reason_categories', DeliveryHelper::getAllReasonsCategories());
+
+        // Config
+        $this->setData('config', [
+            ActivityMonitoringService::OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH =>
+                $service->getOption(ActivityMonitoringService::OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH),
             ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH =>
                 $service->getOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH),
         ]);
+
         $this->setView('Tools/assessment_activity.tpl');
     }
 
     /**
-     * Get assessment activity data
+     * Show assessment activity data as json
      */
-    public function deliveriesActivityData()
+    public function assessmentActivityData()
     {
-        $this->returnJson(new DeliveriesActivityDatatable());
+        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $data = $service->getData();
+
+        // Assessment Activity Data
+        $assessmentActivityData = $data;
+
+        $this->returnJson([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
     /**
@@ -67,14 +82,18 @@ class Tools extends SimplePageModule
      */
     public function completedAssessmentsData()
     {
+        $timePeriod = $this->getRequestParameter('interval');
+
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
-        $timeKeys = $this->getTimeKeys();
-        $tz = new \DateTimeZone( \common_session_SessionManager::getSession()->getTimeZone());
+
+        $tz = new \DateTimeZone(\common_session_SessionManager::getSession()->getTimeZone());
+        $timeKeys = $this->getTimeKeys($timePeriod);
+        $interval = $this->getInterval($timePeriod);
 
         foreach ($timeKeys as $timeKey) {
             $to = clone($timeKey);
             $from = clone($to);
-            $from->sub($this->getInterval());
+            $from->sub($interval);
             $countEvents = $eventLog->count([
                 ['occurred', 'between', $from->format('Y-m-d H:i:s'), $to->format('Y-m-d H:i:s')],
                 ['event_name', '=', DeliveryExecutionFinished::class],
@@ -84,6 +103,14 @@ class Tools extends SimplePageModule
         }
 
         $this->returnJson($result, 200);
+    }
+
+    /**
+     *
+     */
+    public function deliveriesActivityData()
+    {
+        $this->returnJson(new DeliveriesActivityDatatable());
     }
 
     /**
@@ -112,20 +139,23 @@ class Tools extends SimplePageModule
 
         $this->returnJson([
             'success' => !count($notPaused),
-            'message' => count($paused) . ' ' . __('sessions paused'),
-            'processed' => $paused,
-            'unprocessed' => $notPaused
+            'data' => [
+                'message' => count($paused) . ' ' . __('sessions paused'),
+                'processed' => $paused,
+                'unprocessed' => $notPaused
+            ]
         ]);
     }
 
     /**
      * @return \DateInterval
      */
-    private function getInterval()
+    private function getInterval($timePeriod)
     {
         $interval = new \DateInterval('PT1H');
-        if ($this->hasRequestParameter('interval')) {
-            switch ($this->getRequestParameter('interval')) {
+
+        if ($timePeriod) {
+            switch ($timePeriod) {
                 case 'day':
                     $interval = new \DateInterval('PT1H');
                     break;
@@ -143,21 +173,23 @@ class Tools extends SimplePageModule
                     break;
             }
         }
+
         return $interval;
     }
 
     /**
      * @return \DateTime[]
      */
-    private function getTimeKeys()
+    private function getTimeKeys($timePeriod)
     {
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
 
         $amount = null;
         $startDate = null;
-        if ($this->hasRequestParameter('interval')) {
-            switch ($this->getRequestParameter('interval')) {
+
+        if ($timePeriod) {
+            switch ($timePeriod) {
                 case 'day':
                     $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
                     break;
@@ -180,6 +212,6 @@ class Tools extends SimplePageModule
             }
         }
 
-        return $service->getTimeKeys($this->getInterval(), $startDate, $amount);
+        return $service->getTimeKeys($this->getInterval($timePeriod), $startDate, $amount);
     }
 }
