@@ -76,7 +76,8 @@ define([
         start: function () {
             var $container = $('.activity-dashboard');
             var activityGraph;
-            var autoRefreshInterval;
+            var assessmentActivityAutoRefreshInterval;
+            var completedAssessmentsAutoRefreshInterval;
             var config = $('.activity-dashboard').data('config');
             var currentAssessmentActivity;
             var deliveriesList;
@@ -84,7 +85,8 @@ define([
             var poll;
             var userActivity;
 
-            autoRefreshInterval = parseInt(config.auto_refresh_interval) * 1000;
+            assessmentActivityAutoRefreshInterval = parseInt(config.assessment_activity_auto_refresh) * 1000;
+            completedAssessmentsAutoRefreshInterval = parseInt(config.completed_assessments_auto_refresh) * 1000;
 
             // User Activity
             userActivity = userActivityFactory()
@@ -96,7 +98,7 @@ define([
 
             // Completed Assessment Activity
             activityGraph = activityGraphFactory({
-                autoRefresh: autoRefreshInterval,
+                autoRefresh: completedAssessmentsAutoRefreshInterval,
                 autoRefreshBar: true,
                 graphConfig: {
                     bindto: $('.js-completed-assessments', $container).selector,
@@ -183,8 +185,8 @@ define([
             .next()
             .stop();
 
-            if (autoRefreshInterval) {
-                poll.setInterval(autoRefreshInterval);
+            if (assessmentActivityAutoRefreshInterval) {
+                poll.setInterval(assessmentActivityAutoRefreshInterval);
                 poll.start();
             }
 
