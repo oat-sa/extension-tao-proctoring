@@ -165,17 +165,17 @@ define([
                     request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
                     .then(function (data) {
                         userActivity.update({
-                            activeProctorsValue   : data.assessment_activity && data.assessment_activity.active_proctors,
-                            activeTestTakersValue : data.assessment_activity && data.assessment_activity.active_test_takers_value
+                            activeProctorsValue   : data && data.active_proctors,
+                            activeTestTakersValue : data && data.active_test_takers_value
                         });
                         currentAssessmentActivity.update({
-                            awaiting   : { value: data.assessment_activity && data.assessment_activity.awaiting_assessments },
-                            authorized : { value: data.assessment_activity && data.assessment_activity.authorized_but_not_started_assessments },
-                            current    : { value: data.assessment_activity && data.assessment_activity.total_current_assessments },
-                            inProgress : { value: data.assessment_activity && data.assessment_activity.in_progress_assessments },
-                            paused     : { value: data.assessment_activity && data.assessment_activity.paused_assessments }
+                            awaiting   : { value: data && data.awaiting_assessments },
+                            authorized : { value: data && data.authorized_but_not_started_assessments },
+                            current    : { value: data && data.total_current_assessments },
+                            inProgress : { value: data && data.in_progress_assessments },
+                            paused     : { value: data && data.paused_assessments }
                         });
-                        deliveriesList.update(data.deliveries_activity);
+                        deliveriesList.update();
                     })
                     .catch(function (err) {
                         feedback().error(err.message);

@@ -19,9 +19,10 @@
 define([
     'jquery',
     'i18n',
+    'util/url',
     'ui/component',
     'ui/datatable'
-], function ($, __, component) {
+], function ($, __, url, component) {
     'use strict';
 
     /**
@@ -93,25 +94,23 @@ define([
         return component({
             /**
              * Update component datatable
-             *
-             * @param {Object} data - Data passed from taoProctoring/Tools/assessmentActivity endpoint
              */
-            update: function update(data) {
-                this.$datatable.datatable('refresh', data);
+            update: function update() {
+                this.$datatable.datatable('refresh');
             }
         }, _defaults)
 
         .on('render', function () {
             this.$datatable = this.getElement().datatable({
+                url:                      url.route('deliveriesActivityData', 'Tools', 'taoProctoring'),
                 filter:                   false,
                 model:                    this.config.model,
                 paginationStrategyTop:    'none',
                 paginationStrategyBottom: 'none',
                 selectable:               true,
-                // Set in backend
-                // sortorder:                'asc',
-                // sortby:                   'label'
-            }, {});
+                sortorder:                'asc',
+                sortby:                   'label'
+            }, this.config.model);
         })
 
         .init(config);

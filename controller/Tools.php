@@ -71,15 +71,9 @@ class Tools extends SimplePageModule
         // Assessment Activity Data
         $assessmentActivityData = $data;
 
-        // deliveries activity data
-        $deliveriesActivity = new DeliveriesActivityDatatable($data);
-
         $this->returnJson([
             'success' => true,
-            'data' => [
-                'assessment_activity' => $assessmentActivityData,
-                'deliveries_activity' => $deliveriesActivity,
-            ]
+            'data' => $data
         ]);
     }
 
@@ -109,6 +103,14 @@ class Tools extends SimplePageModule
         }
 
         $this->returnJson($result, 200);
+    }
+
+    /**
+     *
+     */
+    public function deliveriesActivityData()
+    {
+        $this->returnJson(new DeliveriesActivityDatatable());
     }
 
     /**

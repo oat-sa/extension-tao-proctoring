@@ -44,22 +44,19 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     /**
      * DeliveriesActivityDatatable constructor.
      */
-    public function __construct($data = null)
+    public function __construct()
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
-        $this->data = $data;
         $this->request = DatatableRequest::fromGlobals();
     }
 
     public function getPayload()
     {
-        if (is_null($this->data)) {
-            $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-            $this->data = $service->getData();
-        }
+        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
+        $data = $service->getData()['deliveries_statistics'];
 
-        $this->doSorting($this->data['deliveries_statistics']);
-        $result = $this->doPostProcessing($this->data['deliveries_statistics']);
+        $this->doSorting($data);
+        $result = $this->doPostProcessing($data);
 
         return $result;
     }
@@ -72,7 +69,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     {
         $payload = [
             'data' => $result,
-            'page' => 1, // No pagination, so always page 1
+            'page' => (integer) $this->request->getPage(),
             'records' => (integer) count($result),
             'total' => (integer) count($result)
         ];
@@ -84,9 +81,9 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doSorting(array &$result)
     {
-        $sortBy = 'label';
-        $sortOrder = SORT_ASC;
-        $flag = SORT_STRING | SORT_FLAG_CASE;
+        $sortBy = $this->request->getSortBy();
+        $sortOrder = strcasecmp($this->request->getSortOrder(), 'asc') === 0 ? SORT_ASC : SORT_DESC;
+        $flag = ($sortBy === 'label') ? SORT_STRING | SORT_FLAG_CASE : SORT_NUMERIC;
         array_multisort(array_column($result, $sortBy), $sortOrder, $flag, $result);
     }
 
