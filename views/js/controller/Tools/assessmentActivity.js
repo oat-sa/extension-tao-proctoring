@@ -78,13 +78,14 @@ define([
             var activityGraph;
             var assessmentActivityAutoRefreshInterval;
             var completedAssessmentsAutoRefreshInterval;
-            var config = $('.activity-dashboard').data('config');
+            var config;
             var currentAssessmentActivity;
             var deliveriesList;
             var pauseReasonCategories;
             var poll;
             var userActivity;
 
+            config = $container.data('config');
             assessmentActivityAutoRefreshInterval = parseInt(config.assessment_activity_auto_refresh) * 1000;
             completedAssessmentsAutoRefreshInterval = parseInt(config.completed_assessments_auto_refresh) * 1000;
 
