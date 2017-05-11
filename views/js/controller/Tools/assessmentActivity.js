@@ -54,18 +54,7 @@ define([
 ){
     'use strict';
 
-    var $container = $('.activity-dashboard');
-
-    // Pause Action
-    var $pauseActiveExecutionsButton = $('.js-pause');
-    var $pauseActiveExecutionsContainer = $('.js-pause-active-executions-container', $container);
-    var pauseReasonCategories = $pauseActiveExecutionsContainer.data('reasoncategories');
     var pauseMsg = __('Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action.');
-
-    // Activity Graph
-    var $activityGraphContainer = $('.js-completed-assessments', $container);
-    var $activityGraphInterval = $('.js-activity-chart-interval', $container);
-    var activityGraph;
 
     function doPause(reason) {
         request(
@@ -83,15 +72,36 @@ define([
         });
     }
 
+    return {
+        start: function () {
+            var $container = $('.activity-dashboard');
+            var activityGraph;
+            var autoRefreshInterval;
+            var config = $('.activity-dashboard').data('config');
+            var currentAssessmentActivity;
+            var deliveriesList;
+            var pauseReasonCategories;
+            var poll;
+            var userActivity;
 
-    function updateActivityGraph(data) {
-        if (!activityGraph) {
+            autoRefreshInterval = parseInt(config.auto_refresh_interval) * 1000;
+
+            // User Activity
+            userActivity = userActivityFactory()
+            .render($('.user-activity', $container));
+
+            // Current Assessment Activity
+            currentAssessmentActivity = currentAssessmentActivityFactory()
+            .render($('.assessment-activity', $container));
+
+            // Completed Assessment Activity
             activityGraph = activityGraphFactory({
+                autoRefresh: autoRefreshInterval,
                 autoRefreshBar: true,
                 graphConfig: {
-                    bindto: $activityGraphContainer.selector,
+                    bindto: $('.js-completed-assessments', $container).selector,
                     data: {
-                        json: data
+                        url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring')
                     },
                     axis: {
                         x: {
@@ -119,55 +129,37 @@ define([
                 }
             })
             .render();
-        } else {
-            activityGraph.refresh({
-                graphConfig: {
-                    data: {
-                        json: data
-                    },
-                    axis: {
-                        x: {
-                            tick: {
-                                format: $activityGraphInterval.val() === 'day' ? '%H:%M' : '%m-%d'
-                            },
-                            label: {
-                                text: $activityGraphInterval.val() === 'day' ? __('Hours') : __('Days')
+
+            $('.js-activity-chart-interval', $container)
+            .on('change', function () {
+                var interval = $(this).val();
+                activityGraph.refresh({
+                    graphConfig : {
+                        data : {
+                            url: url.route('completedAssessmentsData', 'Tools', 'taoProctoring', { 'interval' : interval })
+                        },
+                        axis : {
+                            x : {
+                                tick : {
+                                    format: interval === 'day' ? '%H:%M' : '%m-%d'
+                                },
+                                label : {
+                                    text:  interval === 'day' ? __('Hours') : __('Days')
+                                }
                             }
                         }
                     }
-                }
+                });
             });
-        }
-    }
-
-    return {
-        start: function () {
-            // var $container = ...;
-            var autoRefreshInterval;
-            var config = $('.activity-dashboard').data('config');
-            var currentAssessmentActivity;
-            var deliveriesList;
-            var poll;
-            var userActivity;
-
-            // User Activity
-            userActivity = userActivityFactory()
-            .render($('.user-activity', $container));
-
-            // Current Assessment Activity
-            currentAssessmentActivity = currentAssessmentActivityFactory()
-            .render($('.assessment-activity', $container));
-
-            // Completed assessment activity
 
             // Deliveries List
             deliveriesList = deliveriesListFactory()
             .render($('.js-delivery-list'));
 
-
+            // Refresh
             poll = polling({
                 action: function () {
-                    request(url.route('assessmentActivityData', 'Tools', 'taoProctoring', { interval: $activityGraphInterval.val() }))
+                    request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
                     .then(function (data) {
                         userActivity.update({
                             activeProctorsValue   : data.assessment_activity && data.assessment_activity.active_proctors,
@@ -180,7 +172,6 @@ define([
                             inProgress : { value: data.assessment_activity && data.assessment_activity.in_progress_assessments },
                             paused     : { value: data.assessment_activity && data.assessment_activity.paused_assessments }
                         });
-                        updateActivityGraph(data.completed_assessments);
                         deliveriesList.update(data.deliveries_activity);
                     })
                     .catch(function (err) {
@@ -192,25 +183,19 @@ define([
             .next()
             .stop();
 
-            autoRefreshInterval = parseInt(config.auto_refresh_interval) * 1000;
             if (autoRefreshInterval) {
                 poll.setInterval(autoRefreshInterval);
                 poll.start();
             }
 
-            $activityGraphInterval
-            .on('change', function () {
-                poll.next();
-                if (!autoRefreshInterval) {
-                    poll.stop();
-                }
-            });
 
             // Pause
-            $pauseActiveExecutionsButton
+            pauseReasonCategories = $('.js-pause-active-executions-container').data('reasoncategories');
+
+            $('.js-pause', $container)
             .on('click', function() {
                 bulkActionPopup({
-                    renderTo: $pauseActiveExecutionsContainer,
+                    renderTo: $('.js-pause-active-executions-container', $container),
                     actionName: pauseMsg,
                     reason: true,
                     allowedResources: [],

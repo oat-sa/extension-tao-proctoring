@@ -73,16 +73,11 @@ class Tools extends SimplePageModule
         // deliveries activity data
         $deliveriesActivity = new DeliveriesActivityDatatable($data);
 
-        // completed assessments data
-        $interval = $this->getRequestParameter('interval');
-        $completedAssessments = $this->completedAssessmentsData($interval);
-
         $this->returnJson([
             'success' => true,
             'data' => [
                 'assessment_activity' => $assessmentActivityData,
                 'deliveries_activity' => $deliveriesActivity,
-                'completed_assessments' => $completedAssessments
             ]
         ]);
     }
@@ -90,8 +85,10 @@ class Tools extends SimplePageModule
     /**
      * Get completed assessments data
      */
-    private function completedAssessmentsData($param)
+    public function completedAssessmentsData()
     {
+        $param = $this->getRequestParameter('interval');
+
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
 
         $tz = new \DateTimeZone(\common_session_SessionManager::getSession()->getTimeZone());
@@ -110,7 +107,7 @@ class Tools extends SimplePageModule
             $result['amount'][] = $countEvents;
         }
 
-        return $result;
+        $this->returnJson($result, 200);
     }
 
     /**
