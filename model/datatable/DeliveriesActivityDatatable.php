@@ -55,7 +55,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     {
         if (is_null($this->data)) {
             $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-            $data = $service->getData();
+            $this->data = $service->getData();
         }
 
         $this->doSorting($this->data['deliveries_statistics']);
