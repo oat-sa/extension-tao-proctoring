@@ -87,13 +87,13 @@ class Tools extends SimplePageModule
      */
     public function completedAssessmentsData()
     {
-        $param = $this->getRequestParameter('interval');
+        $timePeriod = $this->getRequestParameter('interval');
 
         $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
 
         $tz = new \DateTimeZone(\common_session_SessionManager::getSession()->getTimeZone());
-        $timeKeys = $this->getTimeKeys($param);
-        $interval = $this->getInterval($param);
+        $timeKeys = $this->getTimeKeys($timePeriod);
+        $interval = $this->getInterval($timePeriod);
 
         foreach ($timeKeys as $timeKey) {
             $to = clone($timeKey);
@@ -147,12 +147,12 @@ class Tools extends SimplePageModule
     /**
      * @return \DateInterval
      */
-    private function getInterval($param)
+    private function getInterval($timePeriod)
     {
         $interval = new \DateInterval('PT1H');
 
-        if ($param) {
-            switch ($param) {
+        if ($timePeriod) {
+            switch ($timePeriod) {
                 case 'day':
                     $interval = new \DateInterval('PT1H');
                     break;
@@ -177,7 +177,7 @@ class Tools extends SimplePageModule
     /**
      * @return \DateTime[]
      */
-    private function getTimeKeys($param)
+    private function getTimeKeys($timePeriod)
     {
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
@@ -185,8 +185,8 @@ class Tools extends SimplePageModule
         $amount = null;
         $startDate = null;
 
-        if ($param) {
-            switch ($param) {
+        if ($timePeriod) {
+            switch ($timePeriod) {
                 case 'day':
                     $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
                     break;
@@ -209,6 +209,6 @@ class Tools extends SimplePageModule
             }
         }
 
-        return $service->getTimeKeys($this->getInterval($param), $startDate, $amount);
+        return $service->getTimeKeys($this->getInterval($timePeriod), $startDate, $amount);
     }
 }
