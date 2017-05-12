@@ -47,8 +47,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     public function __construct()
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
-        $request = DatatableRequest::fromGlobals();
-        $this->request = $request;
+        $this->request = DatatableRequest::fromGlobals();
     }
 
     public function getPayload()

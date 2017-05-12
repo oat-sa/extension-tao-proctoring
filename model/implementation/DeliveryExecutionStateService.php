@@ -113,6 +113,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
             'os_name' => OSService::singleton()->getClientName(),
             'os_version' => OSService::singleton()->getClientVersion(),
+            'context' => $this->getContext($deliveryExecution),
         ];
 
         if ($session && $session->getState() !== AssessmentTestSessionState::INITIAL) {
@@ -156,7 +157,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 $logData['test_center'] = $testCenter;
             }
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
-            $logData['context'] = $this->getProgress($deliveryExecution);
+            $logData['context'] = $this->getContext($deliveryExecution);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AUTHORIZED);
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
@@ -189,11 +190,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             $logData = [
                 'reason' => $reason,
-                'timestamp' => microtime(true)
+                'timestamp' => microtime(true),
+                'context' => $this->getContext($deliveryExecution),
             ];
             if ($session) {
                 $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
-                $logData['context'] = $this->getProgress($deliveryExecution);
                 if ($session->isRunning()) {
                     $session->endTestSession();
                 }
@@ -235,11 +236,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $data = [
                 'reason' => $reason,
                 'timestamp' => microtime(true),
+                'context' => $this->getContext($deliveryExecution),
             ];
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
             if ($session) {
                 $data['itemId'] = $this->getCurrentItemId($deliveryExecution);
-                $data['context'] = $this->getProgress($deliveryExecution);
                 if ($session->getState() !== AssessmentTestSessionState::SUSPENDED) {
                     $session->suspend();
                     $this->getTestSessionService()->persist($session);
@@ -291,6 +292,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $data = [
                 'reason' => $reason,
                 'timestamp' => microtime(true),
+                'context' => $this->getContext($deliveryExecution),
             ];
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
             return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
@@ -324,7 +326,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'reason' => $reason,
             'timestamp' => microtime(true),
             'itemId' => $this->getCurrentItemId($deliveryExecution),
-            'context' => $this->getProgress($deliveryExecution)
+            'context' => $this->getContext($deliveryExecution)
         ];
         return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
     }
@@ -410,7 +412,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     private function getTestSessionService()
     {
         if ($this->testSessionService === null) {
-            $this->testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $this->testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
         }
         return $this->testSessionService;
     }
@@ -451,24 +453,27 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         }
     }
 
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return null|string
+     */
     protected function getProgress(DeliveryExecution $deliveryExecution)
     {
-        $result = null;
-
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        $this->getTestSessionService()->getProgress($session);
+    }
 
-        if ($session !== null) {
-            if ($session->isRunning()) {
-                $route = $session->getRoute();
-                $currentSection = $session->getCurrentAssessmentSection();
-                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
-                $currentItem = $route->current();
-                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
-
-                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
-            } else {
-                $result = __('finished');
-            }
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @return string
+     */
+    protected function getContext(DeliveryExecution $deliveryExecution)
+    {
+        $result = $this->getProgress($deliveryExecution);
+        if (!$result) {
+            $result = 'cli' === php_sapi_name()
+                ? $_SERVER['PHP_SELF']
+                : \Context::getInstance()->getRequest()->getRequestURI();
         }
         return $result;
     }

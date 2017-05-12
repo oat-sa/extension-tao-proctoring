@@ -195,14 +195,28 @@ define([
                                 $list.datatable('refresh');
                             })
                             .catch(function(err) {
-                                var messageContext = '', unprocessed;
-                                var responseData;
+                                var messageContext = '',
+                                    responseData,
+                                    unprocessed;
+
                                 if (err.response) {
                                     responseData = err.response.data;
-                                    unprocessed = _.map(responseData.unprocessed, function (id) {
-                                        var execution = getExecutionData(id);
-                                        if (execution) {
-                                            return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
+                                    unprocessed = _.map(responseData.unprocessed, function (msg, id) {
+                                        var execution;
+
+                                        if (!id) {
+                                            id = msg;
+                                            msg = null;
+                                        }
+
+                                        if (msg) {
+                                            return msg;
+                                        } else {
+                                            execution = getExecutionData(id);
+
+                                            if (execution) {
+                                                return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
+                                            }
                                         }
                                     });
 
