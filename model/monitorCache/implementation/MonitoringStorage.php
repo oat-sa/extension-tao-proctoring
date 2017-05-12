@@ -227,8 +227,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if ($together) {
+            $ids = array_column($data, static::COLUMN_ID);
+            $kvData = $this->getKvData($ids);
             foreach ($data as &$row) {
-                $row = array_merge($row, $this->getKvData($row[static::COLUMN_ID]));
+                $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
             }
             unset($row);
 
@@ -545,18 +547,21 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     /**
      * Get secondary data by parent data id
-     * @param integer $id
+     * @param array $ids
      * @return array
      */
-    protected function getKvData($id)
+    protected function getKvData(array $ids)
     {
+        if (empty($ids)) {
+            return [];
+        }
         $result = [];
         $sql = 'SELECT * FROM ' . self::KV_TABLE_NAME . '
-                WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-        $secondaryData = $this->getPersistence()->query($sql, [$id])->fetchAll(\PDO::FETCH_ASSOC);
+                WHERE ' . self::KV_COLUMN_PARENT_ID . ' IN(' . join(',', array_map(function(){ return '?'; }, $ids)) . ')';
+        $secondaryData = $this->getPersistence()->query($sql, $ids)->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($secondaryData as $data) {
-            $result[$data[self::KV_COLUMN_KEY]] = $data[self::KV_COLUMN_VALUE];
+            $result[$data[self::KV_COLUMN_PARENT_ID]][$data[self::KV_COLUMN_KEY]] = $data[self::KV_COLUMN_VALUE];
         }
 
         return $result;

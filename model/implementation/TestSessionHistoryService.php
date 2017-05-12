@@ -24,6 +24,7 @@ use \oat\oatbox\service\ConfigurableService;
 use DateTime;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\tao\helpers\UserHelper;
 
 /**
  * Service is used to retrieve test session history
@@ -120,6 +121,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 }
 
                 $author = $this->getAuthor($data);
+                $user = UserHelper::getUser($author->getUri());
                 $details = $this->getEventDetails($data);
                 $context = $this->getEventContext($data);
                 $role = $this->getUserRole($author);
@@ -130,7 +132,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 }
                 $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
                 $exportable['role'] = $role;
-                $exportable['actor'] = _dh($author->getLabel());
+                $exportable['actor'] = _dh(UserHelper::getUserName($user, true));
                 $exportable['event'] = $eventId;
                 $exportable['details'] = $details;
                 $exportable['context'] = $context;
@@ -194,6 +196,13 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                     : array_merge([$data['data']['reason']['reasons']], [$data['data']['reason']['comment']]);
             } else if (isset($data['data']['exitCode'])) {
                 $details = $data['data']['exitCode'];
+            } else if (isset($data['data']['itemId'])) {
+                $details = $data['data']['itemId'];
+            } else if (isset($data['data']['web_browser_name'])) {
+                $details = ($data['data']['web_browser_name'] . ' ') .
+                    (isset($data['data']['web_browser_version']) ? $data['data']['web_browser_version'] . '; ' : '') .
+                    (isset($data['data']['os_name']) ? $data['data']['os_name'] . ' ' : '') .
+                    (isset($data['data']['os_version']) ? $data['data']['os_version'] . ' ' : '');
             } else if (is_string($data['data'])) {
                 $details = $data['data'];
             }
