@@ -62,6 +62,25 @@ class DeliveryHelper
         'delivery' => DeliveryMonitoringService::DELIVERY_NAME,
         'deliveryLabel' => DeliveryMonitoringService::DELIVERY_NAME,
     ];
+
+    /**
+     * Creates a standard error message with different actions
+     *
+     * @param {DeliveryExecution} $deliveryExecution
+     * @param {String} $action
+     */
+    private static function createErrorMessage($deliveryExecution, $action)
+    {
+        if ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_FINISHED) {
+            $errorMsg = __('%s could not be %s because it is finished. Please refresh your data.', $deliveryExecution->getLabel(), $action);
+        } else if ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_TERMINATED) {
+            $errorMsg = __('%s could not be %s because it is terminated. Please refresh your data.', $deliveryExecution->getLabel(), $action);
+        } else {
+            $errorMsg = __('%s could not be %s.', $deliveryExecution->getLabel(), $action);
+        }
+
+        return $errorMsg;
+    }
     
     public static function buildDeliveryData($delivery, $executions)
     {
@@ -145,13 +164,16 @@ class DeliveryHelper
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        $result = array();
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
+
             if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
-                $result[] = $deliveryExecution->getIdentifier();
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('authorized'));
             }
         }
 
@@ -170,13 +192,16 @@ class DeliveryHelper
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        $result = array();
-        foreach($deliveryExecutions as $deliveryExecution) {
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
+
             if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution->getIdentifier();
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
             }
         }
 
@@ -195,13 +220,16 @@ class DeliveryHelper
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        $result = array();
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
+
             if ($deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution->getIdentifier();
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('paused'));
             }
         }
 
@@ -220,13 +248,16 @@ class DeliveryHelper
     {
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        $result = array();
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
+
             if ($deliveryExecutionStateService->reportExecution($deliveryExecution, $reason)) {
-                $result[] = $deliveryExecution->getIdentifier();
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('reported for irregularity'));
             }
         }
 
@@ -329,13 +360,6 @@ class DeliveryHelper
     public static function getDeliveryExecutionById($deliveryExecutionId)
     {
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
-    }
-
-    public static function isDeliveryExecutionFinished($deliveryExecutionId)
-    {
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
-
-        return (boolean) $deliveryExecution->getFinishTime();
     }
 
     public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {

@@ -195,19 +195,26 @@ define([
                                 $list.datatable('refresh');
                             })
                             .catch(function(err) {
-                                var errorReason,
-                                    messageContext = '',
+                                var messageContext = '',
                                     responseData,
                                     unprocessed;
+
                                 if (err.response) {
                                     responseData = err.response.data;
-                                    unprocessed = _.map(responseData.unprocessed, function (id) {
-                                        var execution = getExecutionData(id);
-                                        if (execution) {
-                                            errorReason = responseData.unprocessedReasons[id];
-                                            if (errorReason) {
-                                                return __('Session %s - %s has not been processed with following reason: %s', execution.delivery.label, execution.start_time, errorReason);
-                                            } else {
+                                    unprocessed = _.map(responseData.unprocessed, function (msg, id) {
+                                        var execution;
+
+                                        if (!id) {
+                                            id = msg;
+                                            msg = null;
+                                        }
+
+                                        if (msg) {
+                                            return msg;
+                                        } else {
+                                            execution = getExecutionData(id);
+
+                                            if (execution) {
                                                 return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
                                             }
                                         }
