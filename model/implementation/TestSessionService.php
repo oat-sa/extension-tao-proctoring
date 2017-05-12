@@ -27,6 +27,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
+use qtism\runtime\tests\AssessmentTestSession;
 
 /**
  * Interface TestSessionService
@@ -91,6 +92,30 @@ class TestSessionService extends QtiTestSessionService
         }
 
         return self::$cache[$deliveryExecution->getIdentifier()]['expired'];
+    }
+
+    /**
+     * @param AssessmentTestSession $session
+     * @return null|string
+     */
+    public function getProgress(AssessmentTestSession $session = null)
+    {
+        $result = null;
+
+        if ($session !== null) {
+            if ($session->isRunning()) {
+                $route = $session->getRoute();
+                $currentSection = $session->getCurrentAssessmentSection();
+                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
+                $currentItem = $route->current();
+                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
+
+                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
+            } else {
+                $result = __('finished');
+            }
+        }
+        return $result;
     }
 
     /**
