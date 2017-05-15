@@ -107,6 +107,9 @@ define([
                     .on('load.datatable', function() {
                         self.trigger('loaded');
                     })
+                    .on('error.datatable', function (e, err) {
+                        self.trigger('error', err);
+                    })
                     .datatable({
                         url: initConfig.service,
                         params: initConfig.params,
