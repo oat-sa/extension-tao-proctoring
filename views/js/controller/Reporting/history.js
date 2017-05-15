@@ -55,17 +55,6 @@ define([
     var serviceUrl = urlHelper.route('sessionHistory', 'Reporting', 'taoProctoring');
     var sessionsUrl = urlHelper.route('history', 'Reporting', 'taoProctoring');
 
-    /**
-     * Filters the disconnection errors
-     * @param {Error} err
-     */
-    function handleOnDisconnect(err) {
-        if (err.code === 403) {
-            //we just leave if any 403 occurs
-            window.location.reload(true);
-        }
-    }
-
     // the page is always loading data when starting
     loadingBar.start();
 
@@ -128,6 +117,9 @@ define([
                         .on('loaded', function() {
                             loadingBar.stop();
                         })
+                        .on('error',function(err){
+                            appController.onError(err);
+                        })
                         .render(container.find('.list'));
 
                     if (data.monitoringUrl) {
@@ -160,7 +152,6 @@ define([
                     });
                 });
             }).catch(function(err) {
-                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });

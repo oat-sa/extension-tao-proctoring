@@ -90,17 +90,6 @@ define([
     var extraTimeUnit = 60;
 
     /**
-     * Filters the disconnection errors
-     * @param {Error} err
-     */
-    function handleOnDisconnect(err) {
-        if (err.code === 403) {
-            //we just leave if any 403 occurs
-            window.location.reload(true);
-        }
-    }
-
-    /**
      * Validates the params to be sent along the provider's requests
      * @param params
      * @returns {boolean}
@@ -226,9 +215,8 @@ define([
                                     if (responseData.error) {
                                         messageContext += '<br>' + encode.html(responseData.error);
                                     }
-                                } else {
-                                    handleOnDisconnect(err);
                                 }
+                                appController.onError(err);
                                 feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
                             })
                             .then(function() {
@@ -305,6 +293,8 @@ define([
                     }
                     appController.getRouter().redirect(urlHelper.build(sessionsHistoryUrl, urlParams)).then(function() {
                         appController.trigger('set-referrer', monitoringRoute);
+                    }).catch(function(err){
+                        appController.onError(err);
                     });
                 }
 
@@ -977,8 +967,9 @@ define([
                                     }
                                 });
                             });
-                        })
-                        .datatable({
+                        }).on('error.datatable', function(e, err){
+                                appController.onError(err);
+                        }).datatable({
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
                                 empty: __('No sessions'),
@@ -1000,7 +991,6 @@ define([
                     setInitialFilters();
                 });
             }).catch(function(err) {
-                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });
