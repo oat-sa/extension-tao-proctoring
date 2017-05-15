@@ -72,17 +72,6 @@ define([
     var sessionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
 
     /**
-     * Filters the disconnection errors
-     * @param {Error} err
-     */
-    function handleOnDisconnect(err) {
-        if (err.code === 403) {
-            //we just leave if any 403 occurs
-            window.location.reload(true);
-        }
-    }
-
-    /**
      * Gets a list of named sessions
      * @param {Array} sessions
      * @returns {Array}
@@ -251,7 +240,6 @@ define([
                         loadingBar.stop();
 
                     }).catch(function (err) {
-                        handleOnDisconnect(err);
                         appController.onError(err);
                     });
                 }
@@ -315,7 +303,6 @@ define([
                             feedback().info(__('There is no delivery in progress'));
                         }
                     }).catch(function (err) {
-                        handleOnDisconnect(err);
                         appController.onError(err);
                     }).then(function() {
                         loadingBar.stop();
@@ -325,7 +312,6 @@ define([
                 refresh();
 
             }).catch(function(err) {
-                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });
