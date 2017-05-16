@@ -29,13 +29,13 @@ class SetUpProctoringUrlService extends InstallAction
 {
     public function __invoke($params) {
         $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
-        $urlService->setOption('ProctoringHome', [
+        $urlService->setRoute('ProctoringHome', [
                 'ext' => 'taoProctoring',
                 'controller' => 'TestCenter',
                 'action' => 'index',
             ]
         );
-        $urlService->setOption('ProctoringLogout', [
+        $urlService->setRoute('ProctoringLogout', [
                 'ext' => 'tao',
                 'controller' => 'Main',
                 'action' => 'logout',
