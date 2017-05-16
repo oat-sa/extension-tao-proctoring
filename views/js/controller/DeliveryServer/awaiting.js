@@ -60,11 +60,10 @@ define([
 
             var $container = $(cssScope);
             var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
-            var runDeliveryUrl = config.runDeliveryUrl;
             var boxes = [{
                 id : 'goToDelivery',
                 label : config.deliveryLabel,
-                url : runDeliveryUrl,
+                url : false,
                 content : __('Please wait, authorization in process ...'),
                 html : listBoxActionsTpl({id : config.deliveryExecution, cancelable: config.cancelable})
             }];
