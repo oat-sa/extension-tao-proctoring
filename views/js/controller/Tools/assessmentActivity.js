@@ -165,8 +165,8 @@ define([
                     request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
                     .then(function (data) {
                         userActivity.update({
-                            activeProctorsValue   : data && data.active_proctors,
-                            activeTestTakersValue : data && data.active_test_takers_value
+                            activeProctors : {value : data && data.active_proctors},
+                            activeTestTakers : {value : data && data.active_test_takers}
                         });
                         currentAssessmentActivity.update({
                             awaiting   : { value: data && data.awaiting_assessments },
