@@ -90,17 +90,6 @@ define([
     var extraTimeUnit = 60;
 
     /**
-     * Filters the disconnection errors
-     * @param {Error} err
-     */
-    function handleOnDisconnect(err) {
-        if (err.code === 403) {
-            //we just leave if any 403 occurs
-            window.location.reload(true);
-        }
-    }
-
-    /**
      * Validates the params to be sent along the provider's requests
      * @param params
      * @returns {boolean}
@@ -195,14 +184,28 @@ define([
                                 $list.datatable('refresh');
                             })
                             .catch(function(err) {
-                                var messageContext = '', unprocessed;
-                                var responseData;
+                                var messageContext = '',
+                                    responseData,
+                                    unprocessed;
+
                                 if (err.response) {
                                     responseData = err.response.data;
-                                    unprocessed = _.map(responseData.unprocessed, function (id) {
-                                        var execution = getExecutionData(id);
-                                        if (execution) {
-                                            return __('Session %s - %s has not been processed', execution.delivery, execution.start_time);
+                                    unprocessed = _.map(responseData.unprocessed, function (msg, id) {
+                                        var execution;
+
+                                        if (!id) {
+                                            id = msg;
+                                            msg = null;
+                                        }
+
+                                        if (msg) {
+                                            return msg;
+                                        } else {
+                                            execution = getExecutionData(id);
+
+                                            if (execution) {
+                                                return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
+                                            }
                                         }
                                     });
 
@@ -212,9 +215,8 @@ define([
                                     if (responseData.error) {
                                         messageContext += '<br>' + encode.html(responseData.error);
                                     }
-                                } else {
-                                    handleOnDisconnect(err);
                                 }
+                                appController.onError(err);
                                 feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
                             })
                             .then(function() {
@@ -291,6 +293,8 @@ define([
                     }
                     appController.getRouter().redirect(urlHelper.build(sessionsHistoryUrl, urlParams)).then(function() {
                         appController.trigger('set-referrer', monitoringRoute);
+                    }).catch(function(err){
+                        appController.onError(err);
                     });
                 }
 
@@ -963,8 +967,9 @@ define([
                                     }
                                 });
                             });
-                        })
-                        .datatable({
+                        }).on('error.datatable', function(e, err){
+                                appController.onError(err);
+                        }).datatable({
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
                                 empty: __('No sessions'),
@@ -986,7 +991,6 @@ define([
                     setInitialFilters();
                 });
             }).catch(function(err) {
-                handleOnDisconnect(err);
                 appController.onError(err);
                 loadingBar.stop();
             });

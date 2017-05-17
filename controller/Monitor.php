@@ -144,15 +144,11 @@ class Monitor extends SimplePageModule
 
         try {
 
-            $authorised = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
-            $notAuthorised = array_diff($deliveryExecution, $authorised);
+            $data = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
 
             $response = [
-                'success' => !count($notAuthorised),
-                'data' => [
-                    'processed' => $authorised,
-                    'unprocessed' => $notAuthorised
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {
@@ -185,16 +181,11 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
-            $terminated = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
-            $notTerminated = array_diff($deliveryExecution, $terminated);
+            $data = DeliveryHelper::terminateExecutions($deliveryExecution, $reason);
 
             $response = [
-                'success' => !count($notTerminated),
-                'data' => [
-                    'processed' => $terminated,
-                    'unprocessed' => $notTerminated
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {
@@ -203,7 +194,6 @@ class Monitor extends SimplePageModule
             }
 
             $this->returnJson($response);
-
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
@@ -226,16 +216,11 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
-            $paused = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
-            $notPaused = array_diff($deliveryExecution, $paused);
+            $data = DeliveryHelper::pauseExecutions($deliveryExecution, $reason);
 
             $response = [
-                'success' => !count($notPaused),
-                'data' => [
-                    'processed' => $paused,
-                    'unprocessed' => $notPaused
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {
@@ -244,7 +229,6 @@ class Monitor extends SimplePageModule
             }
 
             $this->returnJson($response);
-
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
@@ -267,16 +251,11 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
-            $reported = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
-            $notReported = array_diff($deliveryExecution, $reported);
+            $data = DeliveryHelper::reportExecutions($deliveryExecution, $reason);
 
             $response = [
-                'success' => !count($notReported),
-                'data' => [
-                    'processed' => $reported,
-                    'unprocessed' => $notReported
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {
@@ -285,7 +264,6 @@ class Monitor extends SimplePageModule
             }
 
             $this->returnJson($response);
-
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
@@ -307,7 +285,6 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
             $reported = DeliveryHelper::setExtraTime($deliveryExecution, $extraTime);
             $notReported = array_diff($deliveryExecution, $reported);
 
@@ -325,7 +302,6 @@ class Monitor extends SimplePageModule
             }
 
             $this->returnJson($response);
-
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
