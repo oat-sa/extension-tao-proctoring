@@ -69,10 +69,10 @@ define([
             update: function update(data) {
                 _.merge(this.config, data);
 
-                $(this.config.activeProctors.container, this.getElement())
+                $('.'+this.config.activeProctors.container, this.getElement())
                 .text(this.config.activeProctors.value);
 
-                $(this.config.activeTestTakers.container, this.getElement())
+                $('.'+this.config.activeTestTakers.container, this.getElement())
                 .text(this.config.activeTestTakers.value);
             }
         }, _defaults)

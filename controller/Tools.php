@@ -68,9 +68,6 @@ class Tools extends SimplePageModule
         $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
         $data = $service->getData();
 
-        // Assessment Activity Data
-        $assessmentActivityData = $data;
-
         $this->returnJson([
             'success' => true,
             'data' => $data
