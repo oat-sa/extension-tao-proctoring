@@ -59,7 +59,6 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
      */
     public function __construct(\core_kernel_classes_Resource $delivery = null, $request)
     {
-        $this->setServiceLocator(ServiceManager::getServiceManager());
         $this->datatableRequest = DatatableRequest::fromGlobals();
         $this->request = $request;
         $this->delivery = $delivery;

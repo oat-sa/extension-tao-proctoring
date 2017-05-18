@@ -120,7 +120,9 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $this->returnJson(new DeliveriesMonitorDatatable($this->getCurrentDelivery(), $this->getRequest()));
+        $dataTable = new DeliveriesMonitorDatatable($this->getCurrentDelivery(), $this->getRequest());
+        $this->getServiceManager()->propagate($dataTable);
+        $this->returnJson($dataTable);
     }
 
     /**
