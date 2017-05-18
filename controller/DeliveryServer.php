@@ -82,6 +82,8 @@ class DeliveryServer extends DefaultDeliveryServer
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $executionState = $deliveryExecution->getState()->getUri();
 
+        $runDeliveryUrl = _url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
             $deliveryExecutionStateService->pauseExecution($deliveryExecution);
@@ -101,6 +103,7 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
             $this->setData('showControls', true);
+            $this->setData('runDeliveryUrl', $runDeliveryUrl);
 
             //set template
             $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));

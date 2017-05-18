@@ -60,10 +60,11 @@ define([
 
             var $container = $(cssScope);
             var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
+            var runDeliveryUrl = config.runDeliveryUrl;
             var boxes = [{
                 id : 'goToDelivery',
                 label : config.deliveryLabel,
-                url : false,
+                url : runDeliveryUrl,
                 content : __('Please wait, authorization in process ...'),
                 html : listBoxActionsTpl({id : config.deliveryExecution, cancelable: config.cancelable})
             }];
@@ -96,6 +97,13 @@ define([
                 );
             });
             $container.on('click', '.js-proceed', function (e) {
+                if ($container.hasClass('authorization-in-progress')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            });
+
+            $container.on('click', '.block.box', function (e) {
                 if ($container.hasClass('authorization-in-progress')) {
                     e.stopPropagation();
                     e.preventDefault();
