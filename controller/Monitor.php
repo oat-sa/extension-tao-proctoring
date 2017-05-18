@@ -67,13 +67,10 @@ class Monitor extends SimplePageModule
     protected function getViewData()
     {
         $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
-        $proctor = \common_session_SessionManager::getSession()->getUser();
         $delivery = $this->getCurrentDelivery();
-        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
         $data = [
             'ismanageable' => false,
-            'set' => DeliveryHelper::buildDeliveryExecutionData($executions),
+            'set' => [],
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories(),
             'printReportButton' => $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID)->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
