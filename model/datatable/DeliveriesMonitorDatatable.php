@@ -96,14 +96,9 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
         $service = $this->getServiceLocator()->get(ProctorService::SERVICE_ID);
         $proctor = \common_session_SessionManager::getSession()->getUser();
         $executions = $service->getProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
-        $total = $service->getProctorableDeliveryExecutions($proctor, $this->delivery, $context, array_merge(
-            $options,
-            [
-                'limit' => null,
-                'offset' => 0,
-            ]
-        ));
-        $result = $this->doPostProcessing($executions, count($total));
+        $total = $service->countProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
+        $totalPages = ceil($total / $this->datatableRequest->getRows());
+        $result = $this->doPostProcessing($executions, $totalPages);
 
         return $result;
     }

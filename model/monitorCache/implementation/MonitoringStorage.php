@@ -94,6 +94,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected $joins = [];
     protected $queryParams = [];
     protected $selectColumns = [];
+    protected $groupColumns = [];
 
     /**
      * @var DeliveryMonitoringData[]
@@ -198,6 +199,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $this->joins = [];
         $this->queryParams = [];
         $this->selectColumns = ['t.*'];
+        $this->groupColumns = ['t.delivery_execution_id'];
         $defaultOptions = [
             'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
@@ -216,7 +218,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL .
-            'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . PHP_EOL;
+            'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
 
         $sql .= "ORDER BY " . $options['order'];
 
@@ -455,6 +457,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                                   AND kv_t_$joinNum.monitoring_key = ?";
                 $this->queryParams[] = $colName;
                 $this->selectColumns[] = "kv_t_$joinNum.monitoring_value as $colName";
+                $this->groupColumns[] = "kv_t_$joinNum.monitoring_value";
             }
         }
 
