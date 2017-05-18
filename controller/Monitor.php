@@ -29,6 +29,7 @@ use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\TestSessionHistoryService;
+use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
 
 /**
  * Monitoring Delivery controller
@@ -119,32 +120,9 @@ class Monitor extends SimplePageModule
      */
     public function deliveryExecutions()
     {
-        $requestOptions = $this->getRequestOptions(['sortby' => 'date', 'sortorder' => 'DESC']);
-        $context = $this->hasRequestParameter('context') ? $this->getRequestParameter('context') : null;
-        $filters = $this->getRequestParameter('filtercolumns');
-        if ($filters !== null) {
-            foreach ($filters as $filterKey => $filterVal) {
-                if ($filterKey === 'start_time') {
-                    $times = explode(' - ', $filterVal);
-                    $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
-                    $from->setTime(0, 0, 0);
-                    $options['filters'][] = ['start_time' => '>' . $from->getTimestamp()];
-                    if (isset($times[1])) {
-                        $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
-                        $to->setTime(23, 59, 59);
-                        $options['filters'][] = ['start_time' => '<' . $to->getTimestamp()];
-                    }
-                } else {
-                    $options['filters'][] = [$filterKey => $filterVal];
-                }
-            }
-        }
-        $options['order'] = DeliveryHelper::adjustColumnName($requestOptions['sortBy']) . ' ' . mb_strtoupper($requestOptions['sortOrder']);
-        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
-        $proctor = \common_session_SessionManager::getSession()->getUser();
-        $delivery = $this->getCurrentDelivery();
-        $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
-        $this->returnJson(DeliveryHelper::buildDeliveryExecutionData($executions, $requestOptions));
+        $dataTable = new DeliveriesMonitorDatatable($this->getCurrentDelivery(), $this->getRequest());
+        $this->getServiceManager()->propagate($dataTable);
+        $this->returnJson($dataTable);
     }
 
     /**

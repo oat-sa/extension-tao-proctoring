@@ -57,6 +57,14 @@ class ProctorService extends ConfigurableService
         return $monitoringService->find($criteria, $options, true);
     }
 
+    public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
+    {
+        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $criteria = $this->getCriteria($delivery, $context, $options);
+        return $monitoringService->count($criteria, $options);
+    }
+
+
     /**
      * @param null $delivery
      * @param null $context

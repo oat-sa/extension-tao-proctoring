@@ -92,6 +92,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const DEFAULT_SORT_ORDER = 'DESC';
 
     protected $joins = [];
+    protected $queryParams = [];
+    protected $selectColumns = [];
+    protected $groupColumns = [];
 
     /**
      * @var DeliveryMonitoringData[]
@@ -194,6 +197,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $result = [];
         $this->joins = [];
+        $this->queryParams = [];
+        $this->selectColumns = ['t.*'];
+        $this->groupColumns = ['t.delivery_execution_id'];
         $defaultOptions = [
             'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
@@ -201,28 +207,26 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
-        $parameters = [];
-
         $options['order'] = $this->prepareOrderStmt($options['order']);
-        $selectClause = "SELECT DISTINCT t.* ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause = $this->prepareCondition($criteria, $parameters, $selectClause);
+
+        $whereClause = $this->prepareCondition($criteria, $this->queryParams, $selectClause);
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
-        $sql = $selectClause . $fromClause . PHP_EOL .
+        $selectClause = "SELECT " . implode(',', $this->selectColumns);
+        $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL;
+            $whereClause . PHP_EOL .
+            'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
 
-        if ($options['order']['primary']) {
-            $sql .= "ORDER BY " . $options['order']['primary'];
-        }
+        $sql .= "ORDER BY " . $options['order'];
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
         }
 
-        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
 
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -233,10 +237,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
             }
             unset($row);
-
-            if ($data) {
-                $data = $this->orderResult($data, $options['order']);
-            }
         }
 
         if ($options['asArray']) {
@@ -258,11 +258,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function count(array $criteria = [])
     {
         $this->joins = [];
-        $parameters = [];
+        $this->queryParams = [];
 
         $selectClause = "select COUNT(*) FROM (SELECT t.delivery_execution_id ";
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause = $this->prepareCondition($criteria, $parameters, $selectClause);
+        $whereClause = $this->prepareCondition($criteria, $this->queryParams, $selectClause);
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
@@ -271,7 +271,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $whereClause . PHP_EOL .
             'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . ') as count_q';
 
-        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
         $result = $stmt->fetch(\PDO::FETCH_BOTH);
         return intval($result[0]);
     }
@@ -438,58 +438,30 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
-     * @param array $data
-     * @param $order
-     * @return array
-     */
-    protected function orderResult(array $data, array $order)
-    {
-        if (empty($order['kv'])) {
-            return $data;
-        }
-        $sortingData = [];
-        foreach ($order['kv'] as $orderRule) {
-            foreach ($data as $key => $row) {
-                $sortingData[$orderRule[0]][$key] = isset($row[$orderRule[0]]) ? $row[$orderRule[0]] : null;
-            }
-        }
-
-        $args = [];
-
-        foreach ($order['kv'] as $orderRule) {
-            $args[] = $sortingData[$orderRule[0]];
-            $args[] = isset($orderRule[1]) && strcasecmp($orderRule[1], 'desc') === 0 ? SORT_DESC : SORT_ASC;
-        }
-
-        $args[] = SORT_STRING | SORT_FLAG_CASE;
-        $args[] = &$data;
-        call_user_func_array('array_multisort', $args);
-        return array_pop($args);
-    }
-
-    /**
      * @param $order
      * @return array
      */
     protected function prepareOrderStmt($order)
     {
         $order = explode(',', $order);
-        $result = [
-            'primary' => [],
-            'kv' => [],
-        ];
+        $result = [];
         $primaryTableColumns = $this->getPrimaryColumns();
         foreach ($order as $ruleNum => $orderRule) {
             preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?/i', $orderRule, $ruleParts);
-            if (in_array($ruleParts[1], $primaryTableColumns)) {
-                $result['primary'][] = $orderRule;
-            } else {
-                array_shift($ruleParts);
-                $result['kv'][] = $ruleParts;
+            $result[] = $orderRule;
+            if (!in_array($ruleParts[1], $primaryTableColumns)) {
+                $colName = $ruleParts[1];
+                $joinNum = count($this->joins);
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum 
+                                  ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . "
+                                  AND kv_t_$joinNum.monitoring_key = ?";
+                $this->queryParams[] = $colName;
+                $this->selectColumns[] = "kv_t_$joinNum.monitoring_value as $colName";
+                $this->groupColumns[] = "kv_t_$joinNum.monitoring_value";
             }
         }
 
-        $result['primary'] = implode(', ', $result['primary']);
+        $result = implode(', ', $result);
 
         return $result;
     }
