@@ -197,7 +197,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = [];
         $this->joins = [];
         $this->queryParams = [];
-        $this->selectColumns = ['DISTINCT t.*'];
+        $this->selectColumns = ['t.*'];
         $defaultOptions = [
             'order' => static::COLUMN_ID." ASC",
             'offset' => 0,
@@ -215,7 +215,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $selectClause = "SELECT " . implode(',', $this->selectColumns);
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL;
+            $whereClause . PHP_EOL .
+            'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . PHP_EOL;
 
         $sql .= "ORDER BY " . $options['order'];
 
