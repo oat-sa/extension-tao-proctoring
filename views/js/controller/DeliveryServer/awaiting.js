@@ -98,15 +98,13 @@ define([
             });
             $container.on('click', '.js-proceed', function (e) {
                 if ($container.hasClass('authorization-in-progress')) {
-                    e.stopPropagation();
-                    e.preventDefault();
+                    return false;
                 }
             });
 
             $container.on('click', '.block.box', function (e) {
                 if ($container.hasClass('authorization-in-progress')) {
-                    e.stopPropagation();
-                    e.preventDefault();
+                    return false;
                 }
             });
 
