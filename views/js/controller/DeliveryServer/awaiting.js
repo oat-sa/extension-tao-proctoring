@@ -79,6 +79,15 @@ define([
             });
             var $content = $container.find('.listbox .content');
 
+            var deliveryStarted = false;
+            var runDelivery = function runDelivery () {
+                loadingBar.start();
+                deliveryStarted = true;
+            };
+            var isRunnable = function isRunnable () {
+                return !$container.hasClass('authorization-in-progress') && !deliveryStarted;
+            };
+
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();
 
@@ -97,15 +106,19 @@ define([
                 );
             });
             $container.on('click', '.js-proceed', function (e) {
-                if ($container.hasClass('authorization-in-progress')) {
+                if (!isRunnable()) {
                     return false;
                 }
+
+                runDelivery();
             });
 
             $container.on('click', '.block.box', function (e) {
-                if ($container.hasClass('authorization-in-progress')) {
+                if (!isRunnable()) {
                     return false;
                 }
+
+                runDelivery();
             });
 
             polling({
@@ -143,9 +156,9 @@ define([
              * Function to be called when the delivery execution has been authorized
              */
             function authorized(){
+                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
                 loadingBar.stop();
                 $container.addClass('authorization-granted').removeClass('authorization-in-progress');
-                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
             }
 
             /**
