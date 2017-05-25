@@ -83,6 +83,7 @@ define([
             var runDelivery = function runDelivery () {
                 loadingBar.start();
                 deliveryStarted = true;
+                window.location.href = runDeliveryUrl;
             };
             var isRunnable = function isRunnable () {
                 return !$container.hasClass('authorization-in-progress') && !deliveryStarted;
@@ -106,19 +107,17 @@ define([
                 );
             });
             $container.on('click', '.js-proceed', function (e) {
-                if (!isRunnable()) {
-                    return false;
+                if (isRunnable()) {
+                    runDelivery();
                 }
-
-                runDelivery();
+                return false;
             });
 
             $container.on('click', '.block.box', function (e) {
-                if (!isRunnable()) {
-                    return false;
+                if (isRunnable()) {
+                    runDelivery();
                 }
-
-                runDelivery();
+                return false;
             });
 
             polling({
