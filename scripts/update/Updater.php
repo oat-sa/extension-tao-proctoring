@@ -54,6 +54,7 @@ use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoEventLog\model\LoggerService;
 
 /**
  *
@@ -314,5 +315,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('5.3.0', '5.9.0');
+
+        if ($this->isVersion('5.9.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $eventManager->attach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('5.9.1');
+        }
     }
 }
