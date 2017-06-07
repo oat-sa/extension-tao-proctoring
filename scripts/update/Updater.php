@@ -28,6 +28,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
@@ -317,11 +318,23 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('5.3.0', '5.9.0');
 
         if ($this->isVersion('5.9.0')) {
+            $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+            $urlService->setRoute('ProctoringDeliveryServer', [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'DeliveryServer',
+                    'action' => 'index',
+                ]
+            );
+            $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+            $this->setVersion('5.10.0');
+        }
+
+        if ($this->isVersion('5.10.0')) {
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->detach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
             $eventManager->attach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
-            $this->setVersion('5.9.1');
+            $this->setVersion('5.10.1');
         }
     }
 }

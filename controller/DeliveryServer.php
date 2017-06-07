@@ -70,7 +70,7 @@ class DeliveryServer extends DefaultDeliveryServer
      */
     protected function getReturnUrl()
     {
-        return _url('index', 'DeliveryServer', 'taoProctoring');
+        return $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringDeliveryServer');
     }
 
     /**
