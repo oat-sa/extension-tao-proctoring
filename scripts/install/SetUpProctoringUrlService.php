@@ -41,6 +41,12 @@ class SetUpProctoringUrlService extends InstallAction
                 'action' => 'logout',
             ]
         );
+        $urlService->setRoute('ProctoringDeliveryServer', [
+                'ext' => 'taoProctoring',
+                'controller' => 'DeliveryServer',
+                'action' => 'index',
+            ]
+        );
         $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
     }
 }
