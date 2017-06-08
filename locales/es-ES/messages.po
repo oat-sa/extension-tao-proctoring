@@ -68,13 +68,13 @@ msgid "All Sessions"
 msgstr ""
 
 msgid "already authorized"
-msgstr ""
+msgstr "Ya autorizado"
 
 msgid "Assessment Activity Reporting"
 msgstr ""
 
 msgid "Assessment has been paused due to attempt to switch to another window/tab."
-msgstr ""
+msgstr "La prueba se ha detenido debido a un intento de cambiar a otra ventana/pestaña."
 
 msgid "Assign administrator"
 msgstr ""
@@ -137,16 +137,16 @@ msgid "Authorized"
 msgstr ""
 
 msgid "Authorized but not started"
-msgstr ""
+msgstr "Autorizado, pero no empezado"
 
 msgid "Authorized proctors"
 msgstr ""
 
 msgid "Authorized, you may proceed"
-msgstr ""
+msgstr "Autorizado, Ud. puede proceder"
 
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 msgid "Available Deliveries"
 msgstr ""
@@ -158,10 +158,10 @@ msgid "Available test takers"
 msgstr ""
 
 msgid "Awaiting"
-msgstr ""
+msgstr "Esperando"
 
 msgid "Back"
-msgstr ""
+msgstr "Atrás"
 
 msgid "Bandwidth"
 msgstr ""
@@ -173,10 +173,10 @@ msgid "Browser"
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 msgid "cancel"
-msgstr ""
+msgstr "cancelar"
 
 msgid "cancel the action"
 msgstr ""
@@ -227,20 +227,20 @@ msgid "Current sessions"
 msgstr ""
 
 msgid "date"
-msgstr ""
+msgstr "echa"
 
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 msgid "date"
-msgstr ""
+msgstr "fecha"
 
 msgid "Define sub-centers"
 msgstr ""
 
 #, tao-public
 msgid "Delete"
-msgstr ""
+msgstr "eliminar"
 
 msgid "Deliveries"
 msgstr ""
@@ -387,16 +387,16 @@ msgid "In Progress"
 msgstr ""
 
 msgid "is already paused"
-msgstr ""
+msgstr "ya en pausa"
 
 msgid "is completed"
-msgstr ""
+msgstr "está completo"
 
 msgid "is paused"
-msgstr ""
+msgstr "en pausa"
 
 msgid "is terminated"
-msgstr ""
+msgstr "terminado"
 
 msgid "Issue Category"
 msgstr ""
@@ -429,13 +429,13 @@ msgid "List of readiness checks"
 msgstr ""
 
 msgid "Loading"
-msgstr ""
+msgstr "Cargando"
 
 msgid "Login"
-msgstr ""
+msgstr "Inicio de sesión"
 
 msgid "Logout"
-msgstr ""
+msgstr "Cerrar la sesión"
 
 msgid "Manage"
 msgstr ""
@@ -458,7 +458,7 @@ msgid "Manage Test Takers"
 msgstr ""
 
 msgid "minutes"
-msgstr ""
+msgstr "minutos"
 
 msgid "Monitor"
 msgstr ""
@@ -596,10 +596,10 @@ msgid "Please select one or more test site to manage proctors"
 msgstr ""
 
 msgid "Please wait, authorization in process ..."
-msgstr ""
+msgstr "Espere por favor autorización en proceso ..."
 
 msgid "Please, make your selection"
-msgstr ""
+msgstr "Por favor, haga su selección"
 
 msgid "Power Outage"
 msgstr ""
@@ -623,7 +623,7 @@ msgid "Printing"
 msgstr ""
 
 msgid "Proceed"
-msgstr ""
+msgstr "Proceda"
 
 msgid "Proctor"
 msgstr ""
@@ -672,10 +672,10 @@ msgid "Readiness checks already done"
 msgstr ""
 
 msgid "Refresh"
-msgstr ""
+msgstr "Recargue"
 
 msgid "Refresh the page"
-msgstr ""
+msgstr "Recargue la página"
 
 msgid "Remaining"
 msgstr ""
@@ -721,7 +721,7 @@ msgid "Results"
 msgstr ""
 
 msgid "Resume Test"
-msgstr ""
+msgstr "Continuar la prueba"
 
 msgid "Return to the list"
 msgstr ""
@@ -797,13 +797,13 @@ msgid "Show the detailed session history"
 msgstr ""
 
 msgid "Something went wrong ..."
-msgstr ""
+msgstr "Algo salió mal ..."
 
 msgid "Something went wrong during the export"
 msgstr ""
 
 msgid "Start"
-msgstr ""
+msgstr "Inicio"
 
 msgid "Start date of the export"
 msgstr ""
