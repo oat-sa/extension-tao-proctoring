@@ -325,7 +325,9 @@ class Updater extends common_ext_ExtensionUpdater
                 ]
             );
             $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
-            $this->setVersion('5.10.1');
+            $this->setVersion('5.10.0');
         }
+        
+        $this->skip('5.10.0', '5.10.1');
     }
 }
