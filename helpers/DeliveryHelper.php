@@ -20,26 +20,23 @@
 
 namespace oat\taoProctoring\helpers;
 
-use oat\oatbox\service\ServiceNotFoundException;
-use oat\oatbox\user\User;
-use oat\oatbox\service\ServiceManager;
 use core_kernel_classes_Resource;
-use oat\taoDelivery\helper\Delivery;
-use oat\taoProctoring\model\implementation\TestSessionService;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\oatbox\service\ServiceManager;
+use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\common\datatypes\QtiDuration;
-use tao_helpers_Date as DateHelper;
-use oat\tao\helpers\UserHelper;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use oat\taoProctoring\model\TestSessionConnectivityStatusService;
-use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
-use oat\taoProctoring\model\ReasonCategoryService;
+use tao_helpers_Date as DateHelper;
 
 /**
  * This temporary helpers is a temporary way to return data to the controller.
@@ -65,9 +62,9 @@ class DeliveryHelper
 
     /**
      * Creates a standard error message with different actions
-     *
      * @param {DeliveryExecution} $deliveryExecution
      * @param {String} $action
+     * @return string
      */
     private static function createErrorMessage($deliveryExecution, $action)
     {
@@ -382,11 +379,9 @@ class DeliveryHelper
 
     /**
      * Adjusts a list of delivery executions: add information, format the result
-     *
      * @param DeliveryExecution[] $deliveryExecutions
-     * @param array $options
      * @return array
-     * @throws \oat\oatbox\service\ServiceNotFoundException
+     * @internal param array $options
      */
     private static function adjustDeliveryExecutions($deliveryExecutions) {
 
@@ -422,10 +417,11 @@ class DeliveryHelper
                     'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                 ),
                 'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
+                'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
                 'timer' => [
-                    'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
-                    'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',
-                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]):'',
+                    'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '',
+                    'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '',
+                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''
                 ],
                 'testTaker' => $testTaker,
                 'extraFields' => $extraFields,

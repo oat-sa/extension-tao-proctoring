@@ -67,7 +67,6 @@ class Monitor extends SimplePageModule
      */
     protected function getViewData()
     {
-        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $delivery = $this->getCurrentDelivery();
         $data = [
             'ismanageable' => false,
@@ -88,7 +87,7 @@ class Monitor extends SimplePageModule
         if ($this->hasRequestParameter('context')) {
             $data['context'] = $this->getRequestParameter('context');
         }
-        
+
         return $data;
     }
 
