@@ -26,15 +26,12 @@ use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
-use qtism\common\datatypes\QtiDuration;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use tao_helpers_Date as DateHelper;
 
@@ -59,6 +56,14 @@ class DeliveryHelper
         'delivery' => DeliveryMonitoringService::DELIVERY_NAME,
         'deliveryLabel' => DeliveryMonitoringService::DELIVERY_NAME,
     ];
+
+    /**
+     * @return \oat\oatbox\service\ConfigurableService
+     */
+    private static function getDeliveryExecutionManagerService()
+    {
+        return ServiceManager::getServiceManager()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
 
     /**
      * Creates a standard error message with different actions
@@ -270,22 +275,7 @@ class DeliveryHelper
      */
     public static function getDeliveryTimer($deliveryExecution)
     {
-        if (is_string($deliveryExecution)) {
-            $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
-        }
-
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
-
-        $testSession = $testSessionService->getTestSession($deliveryExecution);
-        if ($testSession instanceof TestSession) {
-            $timer = $testSession->getTimer(); 
-        } else {
-            $timer = new QtiTimer();
-            $timer->setStorage(new QtiTimeStorage($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier()));
-            $timer->load();
-        }
-
-        return $timer;
+        return self::getDeliveryExecutionManagerService()->getDeliveryTimer($deliveryExecution);
     }
     
     /**
@@ -298,65 +288,12 @@ class DeliveryHelper
      */
     public static function setExtraTime($deliveryExecutions, $extraTime = null)
     {
-        $serviceManager = ServiceManager::getServiceManager();
-        $deliveryMonitoringService = $serviceManager->get(DeliveryMonitoringService::SERVICE_ID);
-
-        $result = array();
-        foreach($deliveryExecutions as $deliveryExecution) {
-            if (is_string($deliveryExecution)) {
-                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
-            }
-
-            // reopen the execution if already closed
-            if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHIED) {
-                $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
-                $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
-
-                /* @var TestSession $testSession */
-                $testSession = $testSessionService->getTestSession($deliveryExecution);
-                if ($testSession) {
-                    $testSession->getRoute()->setPosition(0);
-                    
-                    $testSession->setState(AssessmentTestSessionState::INTERACTING);
-
-                    // The duration store contains durations (time spent) on test, testPart(s) and assessmentSection(s).
-                    $durationStore = $testSession->getDurationStore();
-
-                    $offsetDuration = new QtiDuration("PT${extraTime}S");
-                    $testDefinition = $testSession->getAssessmentTest();
-                    $currentDuration = $durationStore[$testDefinition->getIdentifier()];
-
-                    $offsetSeconds = $offsetDuration->getSeconds(true);
-                    $currentSeconds = $currentDuration->getSeconds(true);
-                    $newSeconds = $currentSeconds - $offsetSeconds;
-                    if ($newSeconds < 0) {
-                        $newSeconds = 0;
-                    }
-
-                    // Replace test duration with new duration.
-                    $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
-
-                    $testSessionService->persist($testSession);
-                }
-            }
-            
-            $timer = self::getDeliveryTimer($deliveryExecution);
-            $timer->setExtraTime($extraTime)->save();
-            
-            $data = $deliveryMonitoringService->getData($deliveryExecution);
-            $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
-            $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
-            $deliveryMonitoringService->save($data);
-            
-            $result[] = $deliveryExecution->getIdentifier();
-        }
-
-        return $result;
+        return self::getDeliveryExecutionManagerService()->setExtraTime($deliveryExecutions, $extraTime);
     }
 
     public static function getDeliveryExecutionById($deliveryExecutionId)
     {
-        return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+        return self::getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
     }
 
     public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
