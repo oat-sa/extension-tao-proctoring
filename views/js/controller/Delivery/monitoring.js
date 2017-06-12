@@ -40,6 +40,8 @@ define([
     'tpl!taoProctoring/templates/delivery/monitoring',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
     'tpl!taoProctoring/templates/delivery/statusFilter',
+    'moment',
+    'util/locale',
     'ui/datatable',
     'jqueryui',
     'select2'
@@ -64,7 +66,9 @@ define([
     _status,
     monitoringTpl,
     deliveryLinkTpl,
-    statusFilterTpl
+    statusFilterTpl,
+    moment,
+    locale
 ) {
     'use strict';
 
@@ -728,6 +732,24 @@ define([
                         sortable : true,
                         label: __('Started at'),
                         filterable : true,
+                        transform: function(value) {
+                            return locale.formatDateTime(value);
+                        },
+                        filterTransform: function (value) {
+                            var values = value.split(" - ");
+                            var result = '';
+                            if (values[0]) {
+                                result = moment(values[0], 'YYYY/MM/DD').format('X');
+                            }
+                            if (values[1]) {
+                                values[1] = moment(values[1], 'YYYY/MM/DD').add(1, 'd').format('X');
+                                if (result !== '') {
+                                    result += ' - ';
+                                }
+                                result += values[1];
+                            }
+                            return result;
+                        },
                         customFilter : {
                             template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
                             '<button class="icon-find js-start_time_filter_button" type="button"></button>',

@@ -393,7 +393,6 @@ class DeliveryHelper
         $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         $executions = [];
-
         foreach ($deliveryExecutions as $cachedData) {
 
             $state = [
@@ -422,7 +421,7 @@ class DeliveryHelper
                     'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
                     'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
                 ),
-                'start_time' => DateHelper::displayeDate($cachedData[DeliveryMonitoringService::START_TIME]),
+                'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
                 'timer' => [
                     'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME]))?$cachedData[DeliveryMonitoringService::REMAINING_TIME]:'',
                     'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME]))?floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]):'',

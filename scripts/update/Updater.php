@@ -28,6 +28,7 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
@@ -313,6 +314,20 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.3.0');
         }
 
-        $this->skip('5.3.0', '5.8.2');
+        $this->skip('5.3.0', '5.9.0');
+
+        if ($this->isVersion('5.9.0')) {
+            $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+            $urlService->setRoute('ProctoringDeliveryServer', [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'DeliveryServer',
+                    'action' => 'index',
+                ]
+            );
+            $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+            $this->setVersion('5.10.0');
+        }
+        
+        $this->skip('5.10.0', '5.10.2');
     }
 }

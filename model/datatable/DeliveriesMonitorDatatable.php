@@ -71,13 +71,9 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
         foreach ($this->datatableRequest->getFilters() as $filterKey => $filterValue) {
             if ($filterKey === 'start_time') {
                 $times = explode(' - ', $filterValue);
-                $from = \DateTime::createFromFormat('Y/m/d', $times[0]);
-                $from->setTime(0, 0, 0);
-                $filters[] = ['start_time' => '>' . $from->getTimestamp()];
+                $filters[] = ['start_time' => '>' . $times[0]];
                 if (isset($times[1])) {
-                    $to = \DateTime::createFromFormat('Y/m/d', $times[1]);
-                    $to->setTime(23, 59, 59);
-                    $filters[] = ['start_time' => '<' . $to->getTimestamp()];
+                    $filters[] = ['start_time' => '<' . $times[1]];
                 }
             } else {
                 $filters[] = [$filterKey => $filterValue];
