@@ -127,6 +127,7 @@ define([
             var extraFields;
             var categories;
             var timeHandlingButton;
+            var allowedConnectivity;
             var printReportButton;
             var tools = [];
             var model = [];
@@ -533,6 +534,7 @@ define([
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
                     timeHandlingButton = data.timeHandling;
+                    allowedConnectivity = data.onlineStatus || false;
                     printReportButton = data.printReportButton;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
 
@@ -883,18 +885,20 @@ define([
                         });
                     }
 
-                    // column: connectivity status of execution progress
-                    model.push({
-                        id: 'last_connect',
-                        sortable: true,
-                        label: __('Connectivity'),
-                        transform: function(value, row) {
-                            if (row.state.status === _status.STATUS_INPROGRESS) {
-                                return row.online ? __('online') : __('offline');
+                    if (allowedConnectivity) {
+                        // column: connectivity status of execution progress
+                        model.push({
+                            id: 'last_connect',
+                            sortable: true,
+                            label: __('Connectivity'),
+                            transform: function(value, row) {
+                                if (row.state.status === _status.STATUS_INPROGRESS) {
+                                    return row.online ? __('online') : __('offline');
+                                }
+                                return '';
                             }
-                            return '';
-                        }
-                    });
+                        });
+                    }
 
                     // column: delivery execution progress
                     model.push({
