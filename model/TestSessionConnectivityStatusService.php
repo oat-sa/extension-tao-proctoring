@@ -42,4 +42,10 @@ interface TestSessionConnectivityStatusService
      * @return null|timestamp
      */
     public function getLastOnline($sessionId);
+
+    /**
+     * Allow us to know if we should call the isOnline method
+     * @return bool
+     */
+    public function hasOnlineMode();
 }
