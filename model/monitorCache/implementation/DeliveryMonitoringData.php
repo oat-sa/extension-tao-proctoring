@@ -195,9 +195,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     private function updateLastConnect()
     {
         $status = $this->deliveryExecution->getState()->getUri();
+        /** @var TestSessionConnectivityStatusService $testSessionConnectivityStatusService */
         $testSessionConnectivityStatusService = $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
-        if (ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
+        if ($testSessionConnectivityStatusService->hasOnlineMode() && ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
         }else{
             // to ensure that during sorting by connectivity all similar statuses grouped together
