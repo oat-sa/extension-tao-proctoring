@@ -390,6 +390,7 @@ class DeliveryHelper
      */
     private static function adjustDeliveryExecutions($deliveryExecutions) {
 
+        /** @var TestSessionConnectivityStatusService $testSessionConnectivityStatusService */
         $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
 
         $executions = [];
@@ -412,10 +413,7 @@ class DeliveryHelper
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
 
-            $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
-            $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
-
-            $executions[] = array(
+            $execution = array(
                 'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                 'delivery' => array(
                     'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
@@ -430,8 +428,13 @@ class DeliveryHelper
                 'testTaker' => $testTaker,
                 'extraFields' => $extraFields,
                 'state' => $state,
-                'online' => $online,
             );
+
+            if($testSessionConnectivityStatusService->hasOnlineMode()){
+                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+                $execution['online'] = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+            }
+            $executions[] = $execution;
         }
 
         return $executions;
