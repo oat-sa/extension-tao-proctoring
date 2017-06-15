@@ -329,5 +329,10 @@ class Updater extends common_ext_ExtensionUpdater
         }
         
         $this->skip('5.10.0', '5.10.3');
+
+        if ($this->isVersion('5.10.3')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('5.11.0');
+        }
     }
 }

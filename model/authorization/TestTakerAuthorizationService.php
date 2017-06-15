@@ -26,6 +26,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\ProctorService;
 
 /**
  * Manage the Delivery authorization.
@@ -68,15 +69,27 @@ class TestTakerAuthorizationService extends ConfigurableService
     }
 
     /**
-     * Whenever or not a delivery execution for a given delivery
-     * should be proctored
+     * Check if delivery id proctored
      *
      * @param string $deliveryId
      * @return boolean
      */
     public function isProctored($deliveryId, User $user)
     {
-        return !($user instanceof GuestTestUser);
+        $propertyUri = null;
+
+        if ($deliveryId) {
+            $delivery = new \core_kernel_classes_Resource($deliveryId);
+            $property = new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR);
+            $propertyValue = $delivery->getOnePropertyValue($property);
+            $propertyUri = $propertyValue ? $propertyValue->getUri() : null;
+        }
+
+        if ($propertyUri == ProctorService::ACCESSIBLE_PROCTOR_ENABLED  && !($user instanceof GuestTestUser)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
