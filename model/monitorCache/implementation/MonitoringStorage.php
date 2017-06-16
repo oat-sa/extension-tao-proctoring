@@ -21,13 +21,11 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use core_kernel_classes_Resource;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 
 /**
  * Class DeliveryMonitoringService
@@ -88,8 +86,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
 
-    const DEFAULT_SORT_COLUMN = self::COLUMN_START_TIME;
-    const DEFAULT_SORT_ORDER = 'DESC';
+    const DEFAULT_SORT_COLUMN = self::COLUMN_ID;
+    const DEFAULT_SORT_ORDER = 'ASC';
+    const DEFAULT_SORT_TYPE = 'string';
 
     protected $joins = [];
     protected $queryParams = [];
@@ -185,7 +184,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * </ul>
      * @param array $options
      * <ul>
-     *   <li>string `$options['order']='id ASC'`</li>
+     *   <li>string `$options['order']='id ASC numeric'`</li>
      *   <li>integer `$options['limit']=null`</li>
      *   <li>integer `$options['offset']=0`</li>
      *   <li>integer `$options['asArray']=false` whether data should be returned as multidimensional or as array of `DeliveryMonitoringData` instances</li>
@@ -201,7 +200,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $this->selectColumns = ['t.*'];
         $this->groupColumns = ['t.delivery_execution_id'];
         $defaultOptions = [
-            'order' => static::COLUMN_ID." ASC",
+            'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
             'offset' => 0,
             'asArray' => false
         ];
@@ -447,8 +446,12 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = [];
         $primaryTableColumns = $this->getPrimaryColumns();
         foreach ($order as $ruleNum => $orderRule) {
-            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?/i', $orderRule, $ruleParts);
-            $result[] = $orderRule;
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s(string|numeric)?/i', $orderRule, $ruleParts);
+
+            $result[] = (isset($ruleParts[3]) && $ruleParts[3] === 'numeric')
+                ? sprintf("cast(%s as decimal) %s", $ruleParts[1], $ruleParts[2])
+                : sprintf('%s %s', $ruleParts[1], $ruleParts[2]);
+
             if (!in_array($ruleParts[1], $primaryTableColumns)) {
                 $colName = $ruleParts[1];
                 $joinNum = count($this->joins);
