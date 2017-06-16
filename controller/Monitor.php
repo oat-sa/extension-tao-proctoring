@@ -25,11 +25,11 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\TestSessionHistoryService;
-use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
 
 /**
  * Monitoring Delivery controller
@@ -43,11 +43,13 @@ class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
 
-    const ERROR_AUTHORIZE_EXECUTIONS = 1;
-    const ERROR_PAUSE_EXECUTIONS = 2;
-    const ERROR_TERMINATE_EXECUTIONS = 3;
-    const ERROR_REPORT_IRREGULARITIES = 4;
-    const ERROR_SET_EXTRA_TIME = 5;
+    /** @var DeliveryExecutionManagerService */
+    protected $deliveryExecutionManagerService;
+
+    public function __construct()
+    {
+        $this->deliveryExecutionManagerService = $this->getServiceManager()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
 
     /**
      * Returns the currently proctored delivery
@@ -150,8 +152,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = self::ERROR_AUTHORIZE_EXECUTIONS;
-                $response['errorMsg'] = __('Some delivery executions have not been authorized');
+                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_AUTHORIZE_EXECUTIONS;
+                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_AUTHORIZE_EXECUTIONS);
             }
 
             $this->returnJson($response);
@@ -187,8 +189,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = self::ERROR_TERMINATE_EXECUTIONS;
-                $response['errorMsg'] = __('Some delivery executions have not been terminated');
+                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_TERMINATE_EXECUTIONS;
+                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_TERMINATE_EXECUTIONS);
             }
 
             $this->returnJson($response);
@@ -222,8 +224,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = self::ERROR_PAUSE_EXECUTIONS;
-                $response['errorMsg'] = __('Some delivery executions have not been paused');
+                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_PAUSE_EXECUTIONS;
+                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_PAUSE_EXECUTIONS);
             }
 
             $this->returnJson($response);
@@ -257,8 +259,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = self::ERROR_REPORT_IRREGULARITIES;
-                $response['errorMsg'] = __('Some delivery executions have not been reported');
+                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_REPORT_IRREGULARITIES;
+                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_REPORT_IRREGULARITIES);
             }
 
             $this->returnJson($response);
@@ -295,8 +297,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = self::ERROR_SET_EXTRA_TIME;
-                $response['errorMsg'] = __('Some delivery executions have not been updated');
+                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_SET_EXTRA_TIME;
+                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_SET_EXTRA_TIME);
             }
 
             $this->returnJson($response);
