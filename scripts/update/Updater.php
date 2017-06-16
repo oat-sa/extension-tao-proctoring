@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use common_persistence_Manager;
 use Doctrine\DBAL\Schema\SchemaException;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ServiceNotFoundException;
@@ -42,7 +43,6 @@ use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
@@ -334,11 +334,15 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('5.10.3')) {
             /** @var DeliveryMonitoringService $monitoringService */
             $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-            /** @var DeliveryMonitoringData $data */
-            foreach ($monitoringService->find([], [], true) as $data) {
-                $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
-                $monitoringService->save($data);
-            }
+            $persistenceManager = $this->getServiceManager()->get(common_persistence_Manager::SERVICE_ID);
+            $persistence = $persistenceManager->getPersistenceById($monitoringService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+
+            $persistence->getPlatForm()->getQueryBuilder()
+                ->update('kv_delivery_monitoring')
+                ->set('monitoring_value', "REPLACE(monitoring_value, 's', '')")
+                ->where('monitoring_key = ? and monitoring_value is not null')
+                ->setParameters(['remaining_time'])
+                ->execute();
 
             $this->setVersion('5.11.0');
         }
