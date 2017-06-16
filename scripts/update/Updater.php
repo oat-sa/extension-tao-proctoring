@@ -334,7 +334,7 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('5.10.3')) {
             /** @var DeliveryMonitoringService $monitoringService */
             $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-            /** @var DeliveryMonitoringData $r */
+            /** @var DeliveryMonitoringData $data */
             foreach ($monitoringService->find([], [], true) as $data) {
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
                 $monitoringService->save($data);
