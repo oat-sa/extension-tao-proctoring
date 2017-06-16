@@ -446,7 +446,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = [];
         $primaryTableColumns = $this->getPrimaryColumns();
         foreach ($order as $ruleNum => $orderRule) {
-            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s(string|numeric)?/i', $orderRule, $ruleParts);
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
 
             $result[] = (isset($ruleParts[3]) && $ruleParts[3] === 'numeric')
                 ? sprintf("cast(%s as decimal) %s", $ruleParts[1], $ruleParts[2])
