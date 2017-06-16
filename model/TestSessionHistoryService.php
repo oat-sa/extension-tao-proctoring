@@ -29,6 +29,8 @@ interface TestSessionHistoryService
 {
     const SERVICE_ID = 'taoProctoring/TestSessionHistoryService';
 
+    const PROCTOR_ROLES = 'proctorRoles';
+
     /**
      * @param array $sessions List of session ids
      * @param array $options The following option is handled:
