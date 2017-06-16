@@ -332,10 +332,9 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('5.10.0', '5.10.3');
 
         if ($this->isVersion('5.10.3')) {
-            /** @var DeliveryMonitoringService $monitoringService */
-            $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-            $persistenceManager = $this->getServiceManager()->get(common_persistence_Manager::SERVICE_ID);
-            $persistence = $persistenceManager->getPersistenceById($monitoringService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+            $persistence = $this->getServiceManager()
+                ->get(common_persistence_Manager::SERVICE_ID)
+                ->getPersistenceById('default');
 
             $persistence->getPlatForm()->getQueryBuilder()
                 ->update('kv_delivery_monitoring')
