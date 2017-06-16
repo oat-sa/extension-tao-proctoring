@@ -42,6 +42,7 @@ use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
@@ -328,6 +329,18 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.10.0');
         }
         
-        $this->skip('5.10.0', '5.11.0');
+        $this->skip('5.10.0', '5.10.3');
+
+        if ($this->isVersion('5.10.3')) {
+            /** @var DeliveryMonitoringService $monitoringService */
+            $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+            /** @var DeliveryMonitoringData $r */
+            foreach ($monitoringService->find([], [], true) as $data) {
+                $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
+                $monitoringService->save($data);
+            }
+
+            $this->setVersion('5.11.0');
+        }
     }
 }

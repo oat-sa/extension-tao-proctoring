@@ -449,7 +449,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
 
             $result[] = (isset($ruleParts[3]) && $ruleParts[3] === 'numeric')
-                ? sprintf("cast(%s as decimal) %s", $ruleParts[1], $ruleParts[2])
+                ? sprintf("cast(nullif(%s, '') as decimal) %s", $ruleParts[1], $ruleParts[2])
                 : sprintf('%s %s', $ruleParts[1], $ruleParts[2]);
 
             if (!in_array($ruleParts[1], $primaryTableColumns)) {
