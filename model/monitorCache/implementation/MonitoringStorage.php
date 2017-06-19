@@ -448,10 +448,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         foreach ($order as $ruleNum => $orderRule) {
             preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
 
-            $result[] = (isset($ruleParts[3]) && $ruleParts[3] === 'numeric')
-                ? sprintf("cast(nullif(%s, '') as decimal) %s", $ruleParts[1], $ruleParts[2])
-                : sprintf('%s %s', $ruleParts[1], $ruleParts[2]);
-
             if (!in_array($ruleParts[1], $primaryTableColumns)) {
                 $colName = $ruleParts[1];
                 $joinNum = count($this->joins);
@@ -461,7 +457,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $this->queryParams[] = $colName;
                 $this->selectColumns[] = "kv_t_$joinNum.monitoring_value as $colName";
                 $this->groupColumns[] = "kv_t_$joinNum.monitoring_value";
+
+                $sortingColumn = "kv_t_$joinNum.monitoring_value";
+            } else {
+                $sortingColumn = $ruleParts[1];
             }
+
+            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
+                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
+                : sprintf('%s %s', $sortingColumn, $ruleParts[2]);
         }
 
         $result = implode(', ', $result);
