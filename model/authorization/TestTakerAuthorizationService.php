@@ -27,6 +27,7 @@ use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use oat\taoProctoring\model\ProctorService;
+use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Manage the Delivery authorization.
@@ -35,6 +36,8 @@ use oat\taoProctoring\model\ProctorService;
  */
 class TestTakerAuthorizationService extends ConfigurableService
 {
+    use OntologyAwareTrait;
+
     const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
 
     /**
@@ -79,8 +82,8 @@ class TestTakerAuthorizationService extends ConfigurableService
         $propertyUri = null;
 
         if ($deliveryId) {
-            $delivery = new \core_kernel_classes_Resource($deliveryId);
-            $property = new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR);
+            $delivery = $this->getResource($deliveryId);
+            $property = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
             $propertyValue = $delivery->getOnePropertyValue($property);
             $propertyUri = $propertyValue ? $propertyValue->getUri() : null;
         }
