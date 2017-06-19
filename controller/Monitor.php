@@ -285,7 +285,7 @@ class Monitor extends SimplePageModule
         }
 
         try {
-            $reported = DeliveryHelper::setExtraTime($deliveryExecution, $extraTime);
+            $reported = $this->deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
             $notReported = array_diff($deliveryExecution, $reported);
 
             $response = [
