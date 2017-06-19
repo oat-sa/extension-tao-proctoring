@@ -20,7 +20,6 @@
 namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
@@ -43,6 +42,8 @@ class TestTakerAuthorizationService extends ConfigurableService
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
+     * @param $deliveryId
+     * @param User $user
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
@@ -52,6 +53,9 @@ class TestTakerAuthorizationService extends ConfigurableService
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyResumeAuthorization()
+     * @param DeliveryExecution $deliveryExecution
+     * @param User $user
+     * @throws UnAuthorizedException
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
@@ -60,7 +64,8 @@ class TestTakerAuthorizationService extends ConfigurableService
         if (in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
-            ProctoredDeliveryExecution::STATE_TERMINATED])) {
+            ProctoredDeliveryExecution::STATE_TERMINATED])
+        ) {
             throw new UnAuthorizedException(
                 _url('index', 'DeliveryServer', 'taoProctoring'),
                 'Terminated/Finished delivery cannot be resumed'
@@ -75,7 +80,9 @@ class TestTakerAuthorizationService extends ConfigurableService
      * Check if delivery id proctored
      *
      * @param string $deliveryId
-     * @return boolean
+     * @param User $user
+     * @return bool
+     * @internal param core_kernel_classes_Resource $delivery
      */
     public function isProctored($deliveryId, User $user)
     {
