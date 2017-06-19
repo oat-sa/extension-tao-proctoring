@@ -465,7 +465,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
             $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
                 ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
-                : sprintf('%s %s', $sortingColumn, $ruleParts[2]);
+                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
         }
 
         $result = implode(', ', $result);
