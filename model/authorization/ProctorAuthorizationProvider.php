@@ -36,9 +36,12 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
+     * @param string $deliveryId
+     * @param User $user
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
+        /** @var TestTakerAuthorizationService $service */
         $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
         $service->verifyStartAuthorization($deliveryId, $user);
     }
@@ -46,9 +49,12 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyResumeAuthorization()
+     * @param DeliveryExecution $deliveryExecution
+     * @param User $user
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
+        /** @var TestTakerAuthorizationService $service */
         $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);
         $service->verifyResumeAuthorization($deliveryExecution, $user);
     }
