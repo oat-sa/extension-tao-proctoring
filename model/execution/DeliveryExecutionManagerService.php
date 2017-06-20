@@ -39,32 +39,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
 {
     const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
 
-    const ERROR_AUTHORIZE_EXECUTIONS = 1;
-    const ERROR_PAUSE_EXECUTIONS = 2;
-    const ERROR_TERMINATE_EXECUTIONS = 3;
-    const ERROR_REPORT_IRREGULARITIES = 4;
-    const ERROR_SET_EXTRA_TIME = 5;
-
-    public $errorsMap = [
-        self::ERROR_AUTHORIZE_EXECUTIONS => 'Some delivery executions have not been authorized',
-        self::ERROR_PAUSE_EXECUTIONS => 'Some delivery executions have not been paused',
-        self::ERROR_TERMINATE_EXECUTIONS => 'Some delivery executions have not been terminated',
-        self::ERROR_REPORT_IRREGULARITIES => 'Some delivery executions have not been reported',
-        self::ERROR_SET_EXTRA_TIME => 'Some delivery executions have not been updated',
-    ];
-
-    /**
-     * Returns error message using defined error code
-     * @param $code
-     * @return string
-     */
-    public function getErrorMessageByCode($code)
-    {
-        return isset($this->errorsMap[$code])
-            ? __($this->errorsMap[$code])
-            : __('Unknown error during the attempt to change delivery execution');
-    }
-
     /**
      * @param $deliveryExecutionId
      * @return DeliveryExecutionInterface

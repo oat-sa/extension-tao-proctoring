@@ -43,6 +43,12 @@ class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
 
+    const ERROR_AUTHORIZE_EXECUTIONS = 1;
+    const ERROR_PAUSE_EXECUTIONS = 2;
+    const ERROR_TERMINATE_EXECUTIONS = 3;
+    const ERROR_REPORT_IRREGULARITIES = 4;
+    const ERROR_SET_EXTRA_TIME = 5;
+
     /** @var DeliveryExecutionManagerService */
     protected $deliveryExecutionManagerService;
 
@@ -152,8 +158,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_AUTHORIZE_EXECUTIONS;
-                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_AUTHORIZE_EXECUTIONS);
+                $response['errorCode'] = self::ERROR_AUTHORIZE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been authorized');
             }
 
             $this->returnJson($response);
@@ -189,8 +195,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_TERMINATE_EXECUTIONS;
-                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_TERMINATE_EXECUTIONS);
+                $response['errorCode'] = self::ERROR_TERMINATE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been terminated');
             }
 
             $this->returnJson($response);
@@ -224,8 +230,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_PAUSE_EXECUTIONS;
-                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_PAUSE_EXECUTIONS);
+                $response['errorCode'] = self::ERROR_PAUSE_EXECUTIONS;
+                $response['errorMsg'] = __('Some delivery executions have not been paused');
             }
 
             $this->returnJson($response);
@@ -259,8 +265,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_REPORT_IRREGULARITIES;
-                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_REPORT_IRREGULARITIES);
+                $response['errorCode'] = self::ERROR_REPORT_IRREGULARITIES;
+                $response['errorMsg'] = __('Some delivery executions have not been reported');
             }
 
             $this->returnJson($response);
@@ -293,8 +299,8 @@ class Monitor extends SimplePageModule
             ];
 
             if (!$response['success']) {
-                $response['errorCode'] = DeliveryExecutionManagerService::ERROR_SET_EXTRA_TIME;
-                $response['errorMsg'] = $this->deliveryExecutionManagerService->getErrorMessageByCode(DeliveryExecutionManagerService::ERROR_SET_EXTRA_TIME);
+                $response['errorCode'] = self::ERROR_SET_EXTRA_TIME;
+                $response['errorMsg'] = __('Some delivery executions have not been updated');
             }
 
             $this->returnJson($response);
