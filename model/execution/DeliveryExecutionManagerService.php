@@ -113,7 +113,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $result = [];
+        $result = ['processed' => [], 'unprocessed' => []];
+
+        /** @var DeliveryExecution $deliveryExecution */
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
@@ -163,9 +165,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $data = $deliveryMonitoringService->getData($deliveryExecution);
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
-            $deliveryMonitoringService->save($data);
-
-            $result[] = $deliveryExecution->getIdentifier();
+            if ($deliveryMonitoringService->save($data)) {
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = false;
+            }
         }
 
         return $result;

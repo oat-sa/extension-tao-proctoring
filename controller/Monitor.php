@@ -285,15 +285,11 @@ class Monitor extends SimplePageModule
         }
 
         try {
-            $reported = $this->deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
-            $notReported = array_diff($deliveryExecution, $reported);
+            $data = $this->deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
             $response = [
-                'success' => !count($notReported),
-                'data' => [
-                    'processed' => $reported,
-                    'unprocessed' => $notReported
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {
