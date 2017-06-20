@@ -848,6 +848,7 @@ define([
                     model.push({
                         id: 'remaining_time',
                         sortable : true,
+                        sorttype: 'numeric',
                         label: __('Remaining'),
                         transform: function(value, row) {
                             var timer = _.isObject(row.timer) ? row.timer : {};
