@@ -41,7 +41,6 @@ use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoProctoring\model\execution\StateService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
