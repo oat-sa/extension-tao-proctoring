@@ -352,7 +352,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.12.0');
         }
 
-        if ($this->isVersion('5.12.0')) {
+        $this->skip('5.12.0', '5.12.1');
+
+        if ($this->isVersion('5.12.1')) {
             $this->getServiceManager()->register(
                 DeliveryExecutionManagerService::SERVICE_ID,
                 new DeliveryExecutionManagerService()
