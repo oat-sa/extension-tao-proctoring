@@ -353,5 +353,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('5.12.0', '5.12.1');
 
+        $this->skip('5.12.1', '5.12.2');
+
     }
 }
