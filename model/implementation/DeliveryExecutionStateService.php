@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoringDeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -58,6 +59,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @var TestSessionService
      */
     private $testSessionService;
+
+    /**
+     * @return array
+     */
+    public function getDeliveryStates()
+    {
+        return [
+            ProctoringDeliveryExecution::STATE_FINISHIED,
+            ProctoringDeliveryExecution::STATE_ACTIVE,
+            ProctoringDeliveryExecution::STATE_PAUSED,
+            ProctoringDeliveryExecution::STATE_TERMINATED,
+        ];
+    }
 
     /**
      * (non-PHPdoc)

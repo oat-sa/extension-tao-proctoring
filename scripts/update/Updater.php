@@ -354,12 +354,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('5.12.0', '5.12.1');
 
-        if ($this->isVersion('5.12.1')) {
-            $service = new StateService;
-            $service->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(StateService::SERVICE_ID, $service);
-            $this->setVersion('5.12.2');
-        }
+        $this->skip('5.12.1', '5.12.2');
 
     }
 }
