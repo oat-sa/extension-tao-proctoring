@@ -40,7 +40,10 @@ use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
+use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -49,13 +52,11 @@ use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
-use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
+use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 
 /**
  *
@@ -328,7 +329,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
             $this->setVersion('5.10.0');
         }
-        
+
         $this->skip('5.10.0', '5.10.3');
 
         if ($this->isVersion('5.10.3')) {
@@ -351,9 +352,14 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.12.0');
         }
 
-        $this->skip('5.12.0', '5.12.1');
+        $this->skip('5.12.0', '5.12.2');
 
-        $this->skip('5.12.1', '5.12.2');
-
+        if ($this->isVersion('5.12.2')) {
+            $this->getServiceManager()->register(
+                DeliveryExecutionManagerService::SERVICE_ID,
+                new DeliveryExecutionManagerService()
+            );
+            $this->setVersion('5.13.0');
+        }
     }
 }

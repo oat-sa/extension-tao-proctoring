@@ -878,7 +878,8 @@ define([
                                 icon : 'time',
                                 action : timeHandling,
                                 hidden: function() {
-                                    return !canDo('time', this.state);
+                                    var allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
+                                    return !canDo('time', this.state) || !allowExtraTime;
                                 }
                             }]
                         });
