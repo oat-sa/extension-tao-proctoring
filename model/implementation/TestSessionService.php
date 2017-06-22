@@ -23,10 +23,10 @@ namespace oat\taoProctoring\model\implementation;
 use DateInterval;
 use DateTimeImmutable;
 use oat\oatbox\service\ServiceManager;
-use oat\taoAct\model\runner\config\QtiRunnerConfig;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
 use qtism\runtime\tests\AssessmentTestSession;
 
