@@ -57,6 +57,9 @@ use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoEventLog\model\LoggerService;
+
 
 /**
  *
@@ -360,6 +363,14 @@ class Updater extends common_ext_ExtensionUpdater
                 new DeliveryExecutionManagerService()
             );
             $this->setVersion('5.13.0');
+        }
+      
+        if ($this->isVersion('5.13.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $eventManager->attach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('5.13.1');
         }
     }
 }
