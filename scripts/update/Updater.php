@@ -57,7 +57,6 @@ use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoEventLog\model\LoggerService;
 
 
