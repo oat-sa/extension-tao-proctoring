@@ -39,6 +39,11 @@ class ProctorService extends ConfigurableService
     
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
+    const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
+
+    const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
+
+
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
@@ -46,9 +51,11 @@ class ProctorService extends ConfigurableService
      */
     public function getProctorableDeliveries(User $proctor, $context = null)
     {
-        return DeliveryAssemblyService::singleton()->getAllAssemblies();
+        return DeliveryAssemblyService::singleton()->getRootClass()->searchInstances(
+            array(self::ACCESSIBLE_PROCTOR => self::ACCESSIBLE_PROCTOR_ENABLED), array('recursive' => true)
+        );
     }
-    
+
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
