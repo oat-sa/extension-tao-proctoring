@@ -32,6 +32,9 @@ use oat\generis\model\OntologyAwareTrait;
  * @package oat\taoProctoring\scripts\tools
  * @author Aleksej Tikhanovich, <aleksej@taotesting.com>
  * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri --prod --mode=off`
+ * $uri - Uri of delivery
+ * --prod - Start script in production mode
+ * --mode - (off|on) change proctorable status to on or off state
  */
 class UpdateProctorableStatus implements Action
 {
