@@ -14,12 +14,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  *
  *
  */
 
-namespace oat\taoProctoring\scripts;
+namespace oat\taoProctoring\scripts\tools;
 
 use oat\oatbox\action\Action;
 use oat\taoProctoring\model\ProctorService;
@@ -27,15 +27,30 @@ use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 
 /**
- * Class UpdateOldDeliveriesProctoringStatus
+ * Class UpdateProctorableStatus
  *
- * @package oat\taoProctoring\scripts
+ * @package oat\taoProctoring\scripts\tools
  * @author Aleksej Tikhanovich, <aleksej@taotesting.com>
- * Run example: `sudo php index.php 'oat\taoProctoring\scripts\UpdateOldDeliveriesProctoringStatus' $uri $uri --dryrun`
+ * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri --prod --mode=off`
  */
-class UpdateOldDeliveriesProctoringStatus implements Action
+class UpdateProctorableStatus implements Action
 {
     use OntologyAwareTrait;
+
+    /**
+     * @var bool
+     */
+    private $dryrun = true;
+
+    /**
+     * @var bool
+     */
+    private $mode = true;
+
+    /**
+     * @var array
+     */
+    private $uriArray = [];
 
     /**
      * @var \Report
@@ -48,18 +63,18 @@ class UpdateOldDeliveriesProctoringStatus implements Action
      */
     public function __invoke($params)
     {
-        $dryrun = in_array('dryrun', $params) || in_array('--dryrun', $params);
+        $this->verifyParams($params);
 
         $this->report = new Report(
             Report::TYPE_INFO,
-            'Cancellation of updating deliveries...'
+            'Starting of updating deliveries...'
         );
 
-        if ($dryrun) {
+        if ($this->dryrun) {
             $this->addReport(Report::TYPE_INFO, "Note: script ran in 'dryrun' mode. Data will not be updated.");
         }
 
-        $deliveries = $this->getDeliveries($params);
+        $deliveries = $this->getDeliveries();
 
         $accessibleProperty = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
 
@@ -68,10 +83,14 @@ class UpdateOldDeliveriesProctoringStatus implements Action
         foreach ($deliveries as $delivery) {
             if ($delivery->exists()) {
                 try {
-                    if(!$dryrun) {
-                        $delivery->setPropertyValue($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                    if(!$this->dryrun) {
+                        if ($this->mode) {
+                            $delivery->editPropertyValues($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                        } else {
+                            $delivery->removePropertyValue($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                        }
                     } else {
-                        $this->addReport(Report::TYPE_INFO, "Update ".$delivery->getUri());
+                        $this->addReport(Report::TYPE_INFO, "Updated ".$delivery->getUri());
                     }
 
                     $count++;
@@ -89,18 +108,15 @@ class UpdateOldDeliveriesProctoringStatus implements Action
     }
 
     /**
-     * @param array $params
      * @return array
      */
-    protected function getDeliveries($params = [])
+    protected function getDeliveries()
     {
-        if ($params) {
-            $deliveries = array();
-            foreach ($params as $uri) {
-                if (\common_Utils::isUri($uri)){
-                    $delivery = $this->getResource($uri);
-                    $deliveries[] = $delivery;
-                }
+        $deliveries = [];
+        if ($this->uriArray) {
+            foreach ($this->uriArray as $uri) {
+                $delivery = $this->getResource($uri);
+                $deliveries[] = $delivery;
             }
         } else {
             $deliveryClass = $this->getClass('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
@@ -120,5 +136,21 @@ class UpdateOldDeliveriesProctoringStatus implements Action
             $type,
             $message
         ));
+    }
+
+    /**
+     * @param $params
+     */
+    protected function verifyParams($params)
+    {
+        if ($params && is_array($params)) {
+            foreach ($params as $uri) {
+                if (\common_Utils::isUri($uri)){
+                    $uriArray[] = $uri;
+                }
+            }
+            $this->dryrun = (in_array('prod', $params) || in_array('--prod', $params)) ? false : true;
+            $this->mode = (in_array('--mode=off', $params) || in_array('mode=off', $params)) ? false : true;
+        }
     }
 }
