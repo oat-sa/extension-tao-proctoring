@@ -692,14 +692,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('3.18.0');
         }
 
-        $this->skip('3.18.0', '3.18.1');
-
-        if ($this->isVersion('3.18.1')) {
-            $service = new StateService;
-            $service->setServiceManager($this->getServiceManager());
-            $this->getServiceManager()->register(StateService::SERVICE_ID, $service);
-            $this->setVersion('3.18.2');
-        }
+        $this->skip('3.18.0', '3.18.2');
 
     }
 
