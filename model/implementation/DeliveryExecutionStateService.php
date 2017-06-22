@@ -45,6 +45,19 @@ class DeliveryExecutionStateService extends ConfigurableService implements \oat\
     const OPTION_APPROXIMATE_TIMER_WARNING = 'approximate_timer_warning';
 
     /**
+     * @return array
+     */
+    public function getDeliveryStates()
+    {
+        return [
+            ProctoredDeliveryExecution::STATE_FINISHIED,
+            ProctoredDeliveryExecution::STATE_ACTIVE,
+            ProctoredDeliveryExecution::STATE_PAUSED,
+            ProctoredDeliveryExecution::STATE_TERMINATED,
+        ];
+    }
+
+    /**
      * @var TestSessionService
      */
     private $testSessionService;

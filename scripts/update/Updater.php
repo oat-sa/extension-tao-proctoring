@@ -36,6 +36,7 @@ use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\DiagnosticStorage;
+use oat\taoProctoring\model\execution\StateService;
 use oat\taoProctoring\model\EligibilityService;
 use oat\taoProctoring\model\entrypoint\ProctoringDeliveryServer;
 use oat\taoProctoring\model\event\EligiblityChanged;
@@ -691,7 +692,8 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('3.18.0');
         }
 
-        $this->skip('3.18.0', '3.18.1');
+        $this->skip('3.18.0', '3.18.2');
+
     }
 
     private function refreshMonitoringData()
