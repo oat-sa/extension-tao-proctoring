@@ -60,6 +60,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     private $testSessionService;
 
     /**
+     * @return array
+     */
+    public function getDeliveryStates()
+    {
+        return [
+            ProctoredDeliveryExecution::STATE_FINISHIED,
+            ProctoredDeliveryExecution::STATE_ACTIVE,
+            ProctoredDeliveryExecution::STATE_PAUSED,
+            ProctoredDeliveryExecution::STATE_TERMINATED,
+        ];
+    }
+
+    /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\execution\AbstractStateService::getInitialStatus()
      */

@@ -69,9 +69,9 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     private $authorRoles = [];
 
     /**
-     * @var \core_kernel_classes_Resource
+     * @var \core_kernel_classes_Resource[]
      */
-    private $proctorRole = [];
+    private $proctorRoles = [];
 
     /**
      * TestSessionHistoryService constructor.
@@ -80,7 +80,12 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->proctorRole = new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole');
+        $roles = $this->getOption(self::PROCTOR_ROLES);
+        if(is_null($roles)){
+            $roles = [];
+        }
+        $this->proctorRoles = array_merge([new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole')], $roles);
+
     }
 
     /**
@@ -302,7 +307,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     {
         $userService = \tao_models_classes_UserService::singleton();
         if (!isset($this->authorRoles[$user->getUri()])) {
-            $this->authorRoles[$user->getUri()] = ($userService->userHasRoles($user, $this->proctorRole)) ? __('Proctor') : __('Test-Taker');
+            $this->authorRoles[$user->getUri()] = ($userService->userHasRoles($user, $this->proctorRoles)) ? __('Proctor') : __('Test-Taker');
         }
         return $this->authorRoles[$user->getUri()];
     }

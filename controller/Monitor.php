@@ -25,11 +25,11 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\TestSessionHistoryService;
-use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
 
 /**
  * Monitoring Delivery controller
@@ -49,6 +49,14 @@ class Monitor extends SimplePageModule
     const ERROR_REPORT_IRREGULARITIES = 4;
     const ERROR_SET_EXTRA_TIME = 5;
 
+    /** @var DeliveryExecutionManagerService */
+    protected $deliveryExecutionManagerService;
+
+    public function __construct()
+    {
+        $this->deliveryExecutionManagerService = $this->getServiceManager()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
+
     /**
      * Returns the currently proctored delivery
      *
@@ -67,7 +75,6 @@ class Monitor extends SimplePageModule
      */
     protected function getViewData()
     {
-        $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $delivery = $this->getCurrentDelivery();
         $data = [
             'ismanageable' => false,
@@ -88,7 +95,7 @@ class Monitor extends SimplePageModule
         if ($this->hasRequestParameter('context')) {
             $data['context'] = $this->getRequestParameter('context');
         }
-        
+
         return $data;
     }
 
@@ -284,15 +291,11 @@ class Monitor extends SimplePageModule
         }
 
         try {
-            $reported = DeliveryHelper::setExtraTime($deliveryExecution, $extraTime);
-            $notReported = array_diff($deliveryExecution, $reported);
+            $data = $this->deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
             $response = [
-                'success' => !count($notReported),
-                'data' => [
-                    'processed' => $reported,
-                    'unprocessed' => $notReported
-                ]
+                'success' => !count($data['unprocessed']),
+                'data' => $data
             ];
 
             if (!$response['success']) {

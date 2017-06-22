@@ -20,12 +20,13 @@
 namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\ProctorService;
+use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Manage the Delivery authorization.
@@ -34,11 +35,15 @@ use oat\taoDeliveryRdf\model\guest\GuestTestUser;
  */
 class TestTakerAuthorizationService extends ConfigurableService
 {
+    use OntologyAwareTrait;
+
     const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
 
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
+     * @param $deliveryId
+     * @param User $user
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
@@ -48,6 +53,9 @@ class TestTakerAuthorizationService extends ConfigurableService
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyResumeAuthorization()
+     * @param DeliveryExecution $deliveryExecution
+     * @param User $user
+     * @throws UnAuthorizedException
      */
     public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
     {
@@ -56,7 +64,8 @@ class TestTakerAuthorizationService extends ConfigurableService
         if (in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
-            ProctoredDeliveryExecution::STATE_TERMINATED])) {
+            ProctoredDeliveryExecution::STATE_TERMINATED])
+        ) {
             throw new UnAuthorizedException(
                 _url('index', 'DeliveryServer', 'taoProctoring'),
                 'Terminated/Finished delivery cannot be resumed'
@@ -68,15 +77,29 @@ class TestTakerAuthorizationService extends ConfigurableService
     }
 
     /**
-     * Whenever or not a delivery execution for a given delivery
-     * should be proctored
+     * Check if delivery id proctored
      *
      * @param string $deliveryId
-     * @return boolean
+     * @param User $user
+     * @return bool
+     * @internal param core_kernel_classes_Resource $delivery
      */
     public function isProctored($deliveryId, User $user)
     {
-        return !($user instanceof GuestTestUser);
+        $propertyUri = null;
+
+        if ($deliveryId) {
+            $delivery = $this->getResource($deliveryId);
+            $property = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
+            $propertyValue = $delivery->getOnePropertyValue($property);
+            $propertyUri = $propertyValue ? $propertyValue->getUri() : null;
+        }
+
+        if ($propertyUri == ProctorService::ACCESSIBLE_PROCTOR_ENABLED  && !($user instanceof GuestTestUser)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
