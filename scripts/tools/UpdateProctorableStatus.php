@@ -68,14 +68,14 @@ class UpdateProctorableStatus implements Action
     {
         $this->verifyParams($params);
 
-        $this->report = new Report(
+        if ($this->dryrun) {
+            $this->addReport(Report::TYPE_WARNING, "Note: script ran in 'dryrun' mode. Data will not be updated.");
+        }
+
+        $this->addReport(
             Report::TYPE_INFO,
             'Starting of updating deliveries...'
         );
-
-        if ($this->dryrun) {
-            $this->addReport(Report::TYPE_INFO, "Note: script ran in 'dryrun' mode. Data will not be updated.");
-        }
 
         $deliveries = $this->getDeliveries();
 
@@ -92,9 +92,8 @@ class UpdateProctorableStatus implements Action
                         } else {
                             $delivery->removePropertyValue($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
                         }
-                    } else {
-                        $this->addReport(Report::TYPE_INFO, "Updated ".$delivery->getUri());
                     }
+                    $this->addReport(Report::TYPE_INFO, "Updated ".$delivery->getUri());
 
                     $count++;
                 } catch (\Exception $e) {
@@ -105,7 +104,7 @@ class UpdateProctorableStatus implements Action
         }
 
         $msg = $count > 0 ? "{$count} deliveries has been updated." : "Deliveries not found.";
-        $this->addReport(Report::TYPE_INFO, $msg);
+        $this->addReport(Report::TYPE_SUCCESS, $msg);
 
         return $this->report;
     }
@@ -135,10 +134,18 @@ class UpdateProctorableStatus implements Action
      */
     protected function addReport($type, $message)
     {
-        $this->report->add(new Report(
-            $type,
-            $message
-        ));
+        if (!$this->report instanceof Report) {
+            $this->report = new Report(
+                $type,
+                $message
+            );
+        } else {
+            $this->report->add(new Report(
+                $type,
+                $message
+            ));
+        }
+
     }
 
     /**
