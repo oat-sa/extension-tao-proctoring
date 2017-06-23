@@ -62,7 +62,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * @return array
      */
-    public function getDeliveryStates()
+    public function getDeliveriesStates()
     {
         return [
             ProctoredDeliveryExecution::STATE_FINISHIED,
