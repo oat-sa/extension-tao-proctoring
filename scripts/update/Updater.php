@@ -373,10 +373,10 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('5.13.1');
         }
+      
+        $this->skip('5.13.1', '5.15.1');
 
-        $this->skip('5.13.1', '5.15.0');
-
-        if ($this->isVersion('5.15.0')) {
+        if ($this->isVersion('5.15.1')) {
             $this->getServiceManager()->register(SectionPauseService::SERVICE_ID, new ProctoredSectionPauseService());
             $this->setVersion('5.16.0');
         }
