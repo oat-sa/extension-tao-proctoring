@@ -29,6 +29,7 @@ use oat\taoProctoring\model\datatable\DeliveriesMonitorDatatable;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoProctoring\model\TestSessionHistoryService;
 
 /**
@@ -87,6 +88,7 @@ class Monitor extends SimplePageModule
             'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
             'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
             'canPause' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE),
+            'onlineStatus' => $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
         ];
 
         if (!is_null($delivery)) {
