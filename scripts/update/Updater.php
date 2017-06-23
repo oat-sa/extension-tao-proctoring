@@ -44,6 +44,7 @@ use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -54,6 +55,7 @@ use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
@@ -360,6 +362,11 @@ class Updater extends common_ext_ExtensionUpdater
                 new DeliveryExecutionManagerService()
             );
             $this->setVersion('5.13.0');
+        }
+
+        if ($this->isVersion('5.13.0')) {
+            $this->getServiceManager()->register(SectionPauseService::SERVICE_ID, new ProctoredSectionPauseService());
+            $this->setVersion('5.14.0');
         }
     }
 }
