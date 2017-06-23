@@ -236,7 +236,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         if ($hasTimer) {
-            $result = $remaining . 's';
+            $result = $remaining;
         }
 
         $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);

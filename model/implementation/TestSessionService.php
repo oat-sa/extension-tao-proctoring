@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -102,20 +103,101 @@ class TestSessionService extends QtiTestSessionService
     {
         $result = null;
 
+        $testConfig = $this->getServiceManager()->get(QtiRunnerConfig::SERVICE_ID);
+        $reviewConfig = $testConfig->getConfigValue('review');
+        $displaySubsectionTitle = isset($reviewConfig['displaySubsectionTitle']) ? (bool) $reviewConfig['displaySubsectionTitle'] : true;
+
         if ($session !== null) {
             if ($session->isRunning()) {
                 $route = $session->getRoute();
-                $currentSection = $session->getCurrentAssessmentSection();
-                $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
                 $currentItem = $route->current();
-                $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
+                if ($displaySubsectionTitle) {
+                    $currentSection = $session->getCurrentAssessmentSection();
+                    $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
+                    $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
 
-                $result = __('%1$s - item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1, count($sectionItems));
+                    $result = __('%1$s - Item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1,
+                        count($sectionItems));
+                } else {
+                    // we need only top section and items from there
+                    $parts = $this->getMappedItems($session);
+                    foreach ($parts as $part) {
+                        foreach ($part['sections'] as $section) {
+                            foreach ($section['items'] as $key => $item) {
+                                if ($currentItem->getAssessmentItemRef()->getIdentifier() == $key) {
+                                    $result = __('%1$s - Item %2$s/%3$s', $section['label'], $item['positionInSection'] + 1,
+                                    count($section['items']));
+                                    break 3;
+                                 }
+                             }
+                         }
+                     }
+                }
             } else {
                 $result = __('finished');
             }
         }
         return $result;
+    }
+
+    /**
+     * Load all items as there should be viewed
+     * @param $session
+     * @return array
+     */
+    private function getMappedItems($session)
+    {
+        $parts = [];
+        $route = $session->getRoute();
+        $routeItems = $route->getAllRouteItems();
+        $offset = $route->getRouteItemPosition($routeItems[0]);
+        $offsetPart = 0;
+        $offsetSection = 0;
+        $lastPart = null;
+        $lastSection = null;
+        foreach ($routeItems as $routeItem) {
+            $sections = $routeItem->getAssessmentSections()->getArrayCopy();
+            $section = $sections[0];
+            $sectionId = $section->getIdentifier();
+            $testPart = $routeItem->getTestPart();
+            $partId = $testPart->getIdentifier();
+            $itemRef = $routeItem->getAssessmentItemRef();
+            $itemId = $itemRef->getIdentifier();
+
+            if ($lastPart != $partId) {
+                $offsetPart = 0;
+                $lastPart = $partId;
+            }
+            if ($lastSection != $sectionId) {
+                $offsetSection = 0;
+                $lastSection = $sectionId;
+            }
+
+            if (!isset($parts[$partId])) {
+                $parts[$partId] = [
+                    'label' => $partId,
+                    'sections' => []
+                ];
+            }
+            if (!isset($parts[$partId]['sections'][$sectionId])) {
+                $parts[$partId]['sections'][$sectionId] = [
+                    'label' => $section->getTitle(),
+                    'items' => []
+                ];
+            }
+
+            $parts[$partId]['sections'][$sectionId]['items'][$itemId] = [
+                'positionInSection' => $offsetSection,
+                'sectionLabel' => $section->getTitle(),
+                'partLabel' => $partId
+            ];
+
+            $offset ++;
+            $offsetSection ++;
+            $offsetPart ++;
+        }
+
+        return $parts;
     }
 
     /**

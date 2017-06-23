@@ -19,6 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
 define([
+    'lodash',
     'i18n',
     'util/url',
     'controller/app',
@@ -32,6 +33,7 @@ define([
     'tpl!taoProctoring/templates/reporting/index',
     'ui/datatable'
 ], function (
+    _,
     __,
     urlHelper,
     appController,
@@ -97,9 +99,7 @@ define([
                             title: __('Show detailed session history messages'),
                             label: __('Show detailed report'),
                             action: function() {
-                                var tool = historyTable.config.tools.find(function (val) {
-                                    return val.id === 'show-detailed-report';
-                                });
+                                var tool = _.find(historyTable.config.tools, {'id' : 'show-detailed-report'});
 
                                 historyTable.config.params.detailed = detailedHistory = !detailedHistory;
                                 tool.label = detailedHistory ? __('Show brief report') : __('Show detailed report');
