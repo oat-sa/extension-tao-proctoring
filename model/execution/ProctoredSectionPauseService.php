@@ -36,31 +36,21 @@ class ProctoredSectionPauseService extends SectionPauseService
     use OntologyAwareTrait;
 
     /**
-     * @var TestTakerAuthorizationService
-     */
-    private $testTakerAuthorizationService;
-
-    public function __construct(array $options = array())
-    {
-        parent::__construct($options);
-        $this->testTakerAuthorizationService = ServiceManager::getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
-    }
-
-    /**
      * Checked that section can be paused
      * @param TestSession $session
      * @return bool
      */
-    public function isPaused(TestSession $session = null)
+    public function isPausable(TestSession $session = null)
     {
-        $isPaused = false;
+        $isPausable = false;
         if ($session->getState() === AssessmentTestSessionState::INTERACTING) {
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
             $user = UserHelper::getUser($session->getUserUri());
             $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
-            $isPaused = $this->testTakerAuthorizationService->isProctored($deliveryExecution->getDelivery(), $user) && $itemRef->getCategories()->contains('x-tao-proctored-auto-pause');
+            $isPausable = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user)
+                && $itemRef->getCategories()->contains('x-tao-proctored-auto-pause');
         }
-        return $isPaused;
+        return $isPausable;
     }
 }

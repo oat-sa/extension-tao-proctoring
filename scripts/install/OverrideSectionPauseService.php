@@ -18,7 +18,7 @@
  *
  * @author Alexander Zagovorychev <zagovorichev@1pt.com>
  */
-namespace oat\taoDelivery\scripts\install;
+namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
