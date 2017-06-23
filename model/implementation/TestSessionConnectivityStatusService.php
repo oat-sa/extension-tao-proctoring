@@ -31,13 +31,18 @@ use oat\taoProctoring\model\TestSessionConnectivityStatusService as TestSessionC
  */
 class TestSessionConnectivityStatusService extends ConfigurableService implements TestSessionConnectivityStatusServiceInterface
 {
+
+    const HAS_ONLINE_MODE = 'onlineMode';
+
     /**
      * Whether test session is online
      * @param string $sessionId test session identifier
      * @return bool
      */
     public function isOnline($sessionId) {
-        \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
+        if(!$this->hasOnlineMode()){
+            \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
+        }
         $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionId);
         return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_ACTIVE;
     }
@@ -52,6 +57,11 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
             return microtime(true);
         }
         return null;
+    }
+
+    public function hasOnlineMode()
+    {
+        return ($this->hasOption(self::HAS_ONLINE_MODE)) ? $this->getOption(self::HAS_ONLINE_MODE) : false;
     }
 
 

@@ -59,6 +59,8 @@ use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
+use oat\taoEventLog\model\LoggerService;
+
 
 /**
  *
@@ -365,8 +367,18 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         if ($this->isVersion('5.13.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $eventManager->attach('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('5.13.1');
+        }
+
+        $this->skip('5.13.1', '5.15.0');
+
+        if ($this->isVersion('5.15.0')) {
             $this->getServiceManager()->register(SectionPauseService::SERVICE_ID, new ProctoredSectionPauseService());
-            $this->setVersion('5.14.0');
+            $this->setVersion('5.16.0');
         }
     }
 }
