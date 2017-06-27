@@ -380,6 +380,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(SectionPauseService::SERVICE_ID, new ProctoredSectionPauseService());
             $this->setVersion('5.16.0');
         }
-        $this->skip('5.16.0', '5.16.1');
+
+        $this->skip('5.16.0', '5.16.2');
     }
 }
