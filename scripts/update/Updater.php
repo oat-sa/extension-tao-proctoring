@@ -322,7 +322,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('5.3.0', '5.9.0');
 
-        if ($this->isVersion('5.9.0')) {
+        if ($this->isVersion('5.9.0') || $this->isVersion('5.9.1')) {
             $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
             $urlService->setRoute('ProctoringDeliveryServer', [
                     'ext' => 'taoProctoring',
@@ -380,5 +380,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(SectionPauseService::SERVICE_ID, new ProctoredSectionPauseService());
             $this->setVersion('5.16.0');
         }
+
+        $this->skip('5.16.0', '5.16.1');
     }
 }
