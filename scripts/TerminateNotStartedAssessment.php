@@ -69,7 +69,8 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
 
         $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
 
-        $count = 0;
+        $cancel = 0;
+        $pause = 0;
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
@@ -92,20 +93,24 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
                             'comment' => __('Automatically reset by the system due to authorized test not being launched by test taker.'),
                         ]);
+                        $cancel++;
                     } else {
                         $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
                             'comment' => __('Automatically paused by the system due to authorized test not being launched by test taker.'),
                         ]);
+                        $pause++;
                     }
-                    $count++;
+
                 }
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
             }
         }
 
-        $msg = $count > 0 ? "{$count} executions has been canceled." : "Expired executions not found.";
+        $msg = $cancel > 0 ? "{$cancel} executions has been canceled. " : "" . $pause > 0 ? "{$pause} executions has been paused." : "";
+        $msg = !$msg ? "Expired executions not found." : $msg;
+
         $this->addReport(Report::TYPE_INFO, $msg);
 
         common_Logger::d('Cancellation of expired delivery executions finished at ' . date(DATE_RFC3339));
