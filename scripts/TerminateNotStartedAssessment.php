@@ -108,7 +108,7 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
             }
         }
 
-        $msg = $cancel > 0 ? "{$cancel} executions has been canceled. " : "" . $pause > 0 ? "{$pause} executions has been paused." : "";
+        $msg = ($cancel > 0 ? "{$cancel} executions has been canceled. " : "") . ($pause > 0 ? "{$pause} executions has been paused." : "");
         $msg = !$msg ? "Expired executions not found." : $msg;
 
         $this->addReport(Report::TYPE_INFO, $msg);
