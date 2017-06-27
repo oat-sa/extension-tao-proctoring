@@ -54,7 +54,7 @@ class RestoreServices extends UninstallAction
 
         // restore entry points
         $entryPointService = $this->getServiceManager()->get(EntryPointService::SERVICE_ID);
-        $entryPointService->deactivateEntryPoint('proctoring');
+        $entryPointService->removeEntryPoint('proctoring');
         $entryPointService->overrideEntryPoint('deliveryServer', new \taoDelivery_models_classes_entrypoint_FrontOfficeEntryPoint());
         $this->getServiceManager()->register(EntryPointService::SERVICE_ID, $entryPointService);
 
