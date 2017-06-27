@@ -68,8 +68,7 @@ class TestSessionService extends QtiTestSessionService
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
             if (($executionState === DeliveryExecutionState::STATE_AUTHORIZED ||
-                  $executionState === DeliveryExecutionState::STATE_AWAITING) &&
-                $deliveryExecutionStateService->isCancelable($deliveryExecution)) {
+                  $executionState === DeliveryExecutionState::STATE_AWAITING)) {
                 $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
                 $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
                 $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
