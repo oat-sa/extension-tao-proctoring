@@ -1145,7 +1145,7 @@ msgid "My Tests"
 msgstr "Mis exámenes"
 
 msgid "Resume"
-msgstr "Resumen"
+msgstr "Empezar"
 
 msgid "Start"
 msgstr "Inicio"
