@@ -636,26 +636,6 @@ define([
                         action: report
                     });
 
-                    // tool: display sessions history
-                    tools.push({
-                        id: 'history',
-                        icon: 'history',
-                        title: __('Show the detailed session history'),
-                        label: __('History'),
-                        massAction: true,
-                        action: showHistory
-                    });
-
-                    // tools: print score report
-                    tools.push({
-                        id : 'printRubric',
-                        title : __('Print the score report'),
-                        icon : 'print',
-                        label : __('Print Score'),
-                        massAction: true,
-                        action : printResults
-                    });
-
                     // tools: print results
                     if (printReportButton) {
                         tools.push({
