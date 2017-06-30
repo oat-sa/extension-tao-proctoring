@@ -25,6 +25,8 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\execution\ProctoredDeliveryFactoryEventsService;
+use oat\taoProctoring\model\execution\ProctoredDeliveryFactoryService;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
 
@@ -87,7 +89,7 @@ class TestTakerAuthorizationService extends ConfigurableService
     public function isProctored($deliveryId, User $user)
     {
         $propertyUri = null;
-
+        $proctoredByDefault = $this->getServiceManager()->get(ProctoredDeliveryFactoryEventsService::SERVICE_ID)->getOption('proctoredByDefault');
         if ($deliveryId) {
             $delivery = $this->getResource($deliveryId);
             $property = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
@@ -95,7 +97,10 @@ class TestTakerAuthorizationService extends ConfigurableService
             $propertyUri = $propertyValue ? $propertyValue->getUri() : null;
         }
 
-        if ($propertyUri == ProctorService::ACCESSIBLE_PROCTOR_ENABLED  && !($user instanceof GuestTestUser)) {
+        if (
+            ($proctoredByDefault && !$propertyUri)
+            || ($propertyUri == ProctorService::ACCESSIBLE_PROCTOR_ENABLED && !($user instanceof GuestTestUser))
+        ) {
             return true;
         } else {
             return false;

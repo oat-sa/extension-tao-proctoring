@@ -36,12 +36,14 @@ class ProctorService extends ConfigurableService
     use OntologyAwareTrait;
 
     const SERVICE_ID = 'taoProctoring/ProctorAccess';
-    
+
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
     const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
 
     const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
+
+    const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
 
 
     /**
