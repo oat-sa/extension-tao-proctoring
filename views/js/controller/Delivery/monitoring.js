@@ -434,13 +434,23 @@ define([
                         reasonRequired: true,
                         categoriesSelector: cascadingComboBox(categories[actionName] || {})
                     });
+                    var warningMessage;
+                    var warningReasons;
 
                     if (!config.allowedResources.length) {
-                        if (_selection.length > 1) {
-                            feedback().warning(__('No report available for these test sessions'));
+                        if (config.deniedResources && config.deniedResources.length > 1) {
+                            warningMessage = __('Cannot') + ' ' + actionName + ' ' + __('these test sessions.');
                         } else {
-                            feedback().warning(__('No report available for this test session'));
+                            warningMessage = __('Cannot') + ' ' + actionName + ' ' + __('this test session.');
                         }
+
+                        warningReasons = (config.deniedResources.length > 1 ? __('Reasons:') : __('Reason:')) + ' ';
+                        warningReasons += _.map(config.deniedResources, function (deniedResource, index) {
+                            var opener = (index > 0 ? __('test') : __('Test')) + ' ';
+                            return opener + deniedResource.id + ' ' + deniedResource.reason;
+                        }).join(',');
+
+                        feedback().warning(warningMessage + ' ' + warningReasons);
                     } else {
                         bulkActionPopup(config).on('ok', function(reason){
                             //execute callback
