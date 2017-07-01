@@ -434,23 +434,33 @@ define([
                         reasonRequired: true,
                         categoriesSelector: cascadingComboBox(categories[actionName] || {})
                     });
+                    var warningAction;
                     var warningMessage;
                     var warningReasons;
 
                     if (!config.allowedResources.length) {
-                        if (config.deniedResources && config.deniedResources.length > 1) {
-                            warningMessage = __('Cannot') + ' ' + actionName + ' ' + __('these test sessions.');
+                        if (config.deniedResources) {
+                            if (config.deniedResources.length > 1) {
+                                warningAction = __('Cannot') + ' ' + actionName + ' ' + __('these test sessions.');
+                                warningReasons += _.map(config.deniedResources, function (deniedResource, index) {
+                                    var opener = (index > 0 ? __('test') : __('Test')) + ' ';
+                                    return opener + deniedResource.id + ' ' + deniedResource.reason;
+                                }).join(',') + '.';
+                                warningMessage = warningAction + ' ' + warningReasons;
+                            } else {
+                                warningAction = __('Cannot') + ' ' + actionName;
+                                warningReasons = __('this test session') + ' ' + config.deniedResources[0].reason;
+                                warningMessage = warningAction + ' ' + __('because') + ' ' + warningReasons;
+                            }
                         } else {
-                            warningMessage = __('Cannot') + ' ' + actionName + ' ' + __('this test session.');
+                            if (_selection.length > 1) {
+                                warningMessage = __('No report available for these test sessions');
+                            } else {
+                                warningMessage = __('No report available for this test session.');
+                            }
                         }
 
-                        warningReasons = (config.deniedResources.length > 1 ? __('Reasons:') : __('Reason:')) + ' ';
-                        warningReasons += _.map(config.deniedResources, function (deniedResource, index) {
-                            var opener = (index > 0 ? __('test') : __('Test')) + ' ';
-                            return opener + deniedResource.id + ' ' + deniedResource.reason;
-                        }).join(',');
-
-                        feedback().warning(warningMessage + ' ' + warningReasons);
+                        feedback().warning(warningMessage);
                     } else {
                         bulkActionPopup(config).on('ok', function(reason){
                             //execute callback
