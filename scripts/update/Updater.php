@@ -50,6 +50,7 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\model\ProctorServiceRoute;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
@@ -382,5 +383,10 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('5.16.0', '5.16.4');
+
+        if ($this->isVersion('5.16.4')) {
+            $this->getServiceManager()->register(ProctorService::SERVICE_ID, new ProctorServiceRoute());
+            $this->setVersion('5.17.0');
+        }
     }
 }

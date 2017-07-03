@@ -94,4 +94,15 @@ class ProctorService extends ConfigurableService
         return $criteria;
     }
 
+    /**
+     * By default used only one ProctorService
+     * But when ProctorService extended and has many implementations
+     * then ProctorServiceRoute will determine which ProctorService should be used in the current context
+     * @return bool
+     */
+    public function isSuitable()
+    {
+        return true;
+    }
+
 }

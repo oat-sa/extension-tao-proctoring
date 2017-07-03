@@ -19,4 +19,4 @@
  * 
  */  
 
-return new oat\taoProctoring\model\ProctorService();
+return new oat\taoProctoring\model\ProctorServiceRoute();
