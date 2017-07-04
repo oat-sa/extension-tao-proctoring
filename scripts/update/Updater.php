@@ -383,12 +383,11 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.16.0');
         }
 
-        $this->skip('5.16.0', '5.16.3');
+        $this->skip('5.16.0', '5.16.4');
 
         if ($this->isVersion('5.16.3')) {
             $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
             $this->setVersion('5.17.0');
         }
-
     }
 }
