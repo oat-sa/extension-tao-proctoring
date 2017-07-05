@@ -16,7 +16,7 @@
  *
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
  *
- * @author Alexander Zagovorychev <zagovorichev@1pt.com>
+ * @author Aleksej Tikhanovich <aleksej@taotesting.com>
  */
 namespace oat\taoProctoring\scripts\install;
 
@@ -24,21 +24,25 @@ use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
-use oat\taoProctoring\model\execution\ProctoredDeliveryFactoryEventsService;
+use oat\taoProctoring\model\ProctorService;
 
 class OverrideDeliveryFactoryService extends InstallAction
 {
     public function __invoke($params)
     {
-        $configParams['proctoredByDefault'] = true;
-        $service = new ProctoredDeliveryFactoryEventsService($configParams);
+
+        $proctorService = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
+        $config = $proctorService->getOptions();
+        $config[ProctorService::PROCTORED_BY_DEFAULT] = true;
+
+        $service = new ProctorService($config);
         $service->setServiceManager($this->getServiceManager());
-        $this->getServiceManager()->register(ProctoredDeliveryFactoryEventsService::SERVICE_ID, $service);
+        $this->getServiceManager()->register(ProctorService::SERVICE_ID, $service);
 
         /** @var EventManager $eventManager */
         $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-        $eventManager->attach(DeliveryUpdatedEvent::class, [ProctoredDeliveryFactoryEventsService::class, 'update']);
-        $eventManager->attach(DeliveryCreatedEvent::class, [ProctoredDeliveryFactoryEventsService::class, 'create']);
+        $eventManager->attach(DeliveryCreatedEvent::class, [ProctorService::SERVICE_ID, 'listenCreateDeliveryEvent']);
+        $eventManager->attach(DeliveryUpdatedEvent::class, [ProctorService::SERVICE_ID, 'listenUpdateDeliveryEvent']);
         $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
 
     }

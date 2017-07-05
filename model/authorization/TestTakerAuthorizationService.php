@@ -89,12 +89,12 @@ class TestTakerAuthorizationService extends ConfigurableService
     public function isProctored($deliveryId, User $user)
     {
         $propertyUri = null;
-        $proctoredByDefault = $this->getServiceManager()->get(ProctoredDeliveryFactoryEventsService::SERVICE_ID)->getOption('proctoredByDefault');
+        $proctoredByDefault = $this->getServiceManager()->get(ProctorService::SERVICE_ID)->getOption(ProctorService::PROCTORED_BY_DEFAULT);
         if ($deliveryId) {
             $delivery = $this->getResource($deliveryId);
-            $property = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
-            $propertyValue = $delivery->getOnePropertyValue($property);
-            $propertyUri = $propertyValue ? $propertyValue->getUri() : null;
+            $accessibleProperty = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
+            $accessiblePropertyValue = $delivery->getOnePropertyValue($accessibleProperty);
+            $propertyUri = $accessiblePropertyValue ? $accessiblePropertyValue->getUri() : null;
         }
 
         if (
