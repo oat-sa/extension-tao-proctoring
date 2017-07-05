@@ -457,23 +457,20 @@ define([
                     var maxReasons = 2;
                     var warningAction;
                     var warningReason;
+                    var warningReasonOmission = __('...');
 
                     deniedResources = deniedResources || [];
                     selection = selection || [];
 
                     warningAction = getWarningAction(action, deniedResources.length > 1 || selection.length > 1);
                     warningReason = _(deniedResources || [{}])
+                        .slice(0, maxReasons)
                         .map(function (deniedResource, index) {
                             return getWarningReason(deniedResource.reason, deniedResource.id || (index + 1));
                         })
-                        .slice(0, maxReasons)
                         .join(' ');
 
-                    if (deniedResources.length > maxReasons) {
-                        warningReason += __('...');
-                    }
-
-                    return warningAction + ' ' + warningReason;
+                    return __('%s %s%s', warningAction, warningReason, (deniedResources.length > maxReasons ? warningReasonOmission : ''));
 
                     function getWarningAction(actionName, isPlural) {
                         if (isPlural) {
