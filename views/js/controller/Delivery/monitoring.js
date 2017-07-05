@@ -454,37 +454,65 @@ define([
                  * @param {Object[]} deniedResources
                  */
                 function buildWarningMessage(action, selection, deniedResources) {
+                    var maxReasons = 2;
                     var warningAction;
-                    var warningReasons;
-                    var warningMessage;
+                    var warningReason;
 
-                    if (deniedResources) {
-                        if (deniedResources.length > 1) {
-                            warningAction = __('Cannot %s these test sessions.', action);
-                            warningReasons = _(deniedResources)
-                                .map(function (deniedResource) {
-                                    return __('Test %s %s.', deniedResource.id, deniedResource.reason);
-                                })
-                                .slice(0, 2)
-                                .join(' ');
+                    deniedResources = deniedResources || [];
+                    selection = selection || [];
 
-                            if (deniedResources.length > 2) {
-                                warningReasons += __('...');
-                            }
+                    warningAction = getWarningAction(action, deniedResources.length > 1 || selection.length > 1);
+                    warningReason = _(deniedResources || [{}])
+                        .map(function (deniedResource, index) {
+                            return getWarningReason(deniedResource.reason, deniedResource.id || (index + 1));
+                        })
+                        .slice(0, maxReasons)
+                        .join(' ');
 
-                            warningMessage = __('%s %s', warningAction, warningReasons);
+                    if (deniedResources.length > maxReasons) {
+                        warningReason += __('...');
+                    }
+
+                    return warningAction + ' ' + warningReason;
+
+                    function getWarningAction(actionName, isPlural) {
+                        if (isPlural) {
+                            return {
+                                authorize: __('Cannot authorize test sessions.'),
+                                pause: __('Cannot pause test sessions.'),
+                                print: __('Cannot print test sessions.'),
+                                report: __('Cannot generate report on test sessions.'),
+                                terminate: __('Cannot terminate test sessions.'),
+                                time: __('Cannot extend test sessions.'),
+                                default: __('No report available for test sessions.')
+                            }[actionName || 'default'];
                         } else {
-                            warningMessage = __('Cannot %s this test session because test %s.', action, deniedResources[0].reason);
-                        }
-                    } else {
-                        if (selection.length > 1) {
-                            warningMessage = __('No report available for these test sessions.');
-                        } else {
-                            warningMessage = __('No report available for this test session.');
+                            return {
+                                authorize: __('Cannot authorize test session.'),
+                                pause: __('Cannot pause test session.'),
+                                print: __('Cannot print test session.'),
+                                report: __('Cannot generate report on test session.'),
+                                terminate: __('Cannot terminate test session.'),
+                                time: __('Cannot extend test session.'),
+                                default: __('No report available for test session.')
+                            }[actionName || 'default'];
                         }
                     }
 
-                    return warningMessage;
+                    function getWarningReason(reason, testId) {
+                        return {
+                            'already authorized': __('Test %s is already authorized.', testId),
+                            'not finished': __('Test %s is not finished.', testId),
+                            'not started': __('Test %s is not started.', testId),
+                            'not in progress': __('Test %s is not in progress.', testId),
+                            'is canceled': __('Test %s is canceled.', testId),
+                            'is completed': __('Test %s is completed.', testId),
+                            'is already paused': __('Test %s is already paused.', testId),
+                            'is paused': __('Test %s is paused.', testId),
+                            'is terminated': __('Test %s is terminated.', testId),
+                            'default': __('Action not allowed for test %s.', testId)
+                        }[reason || 'default'];
+                    }
                 }
 
                 /**
