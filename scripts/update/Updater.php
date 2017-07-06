@@ -36,6 +36,8 @@ use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
+use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
@@ -51,6 +53,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
@@ -382,5 +385,22 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('5.16.0', '5.16.4');
+
+        if ($this->isVersion('5.16.4')) {
+            $proctorService = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
+            $config = $proctorService->getOptions();
+            $config[ProctorService::PROCTORED_BY_DEFAULT] = true;
+
+            $service = new ProctorService($config);
+            $service->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(ProctorService::SERVICE_ID, $service);
+
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->attach(DeliveryCreatedEvent::class, [ProctorService::SERVICE_ID, 'listenCreateDeliveryEvent']);
+            $eventManager->attach(DeliveryUpdatedEvent::class, [ProctorService::SERVICE_ID, 'listenUpdateDeliveryEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('5.16.5');
+        }
     }
 }
