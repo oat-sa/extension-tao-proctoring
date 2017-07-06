@@ -366,6 +366,9 @@ define([
                         formatted.allowed = (status.can[actionName] === true);
                         if(!formatted.allowed){
                             formatted.reason = status.can[actionName];
+                            formatted.warning = status.warning[actionName] ?
+                                status.warning[actionName](null, testTakerData.id) :
+                                __('Unable to perform action on test %s.', testTakerData.id);
                         }
                     }
                     if (testTakerData.timer) {
@@ -452,71 +455,64 @@ define([
                  * @param {String} action
                  * @param {String[]} selection
                  * @param {Object[]} deniedResources
+                 * @returns {String}
                  */
                 function buildWarningMessage(action, selection, deniedResources) {
+                    var isPlural = selection.length > 1;
                     var maxReasons = 2;
                     var warningAction;
+                    var warningOmission = __('...');
                     var warningReason;
-                    var warningReasonOmission = __('...');
 
-                    deniedResources = deniedResources || [];
-                    selection = selection || [];
+                    deniedResources = deniedResources || [{}];
 
-                    warningAction = getWarningAction(action, deniedResources.length > 1 || selection.length > 1);
-                    warningReason = _(deniedResources || [{}])
+                    switch (action) {
+                        case 'authorize':
+                            warningAction = isPlural ?
+                                __('Cannot authorize test sessions.') :
+                                __('Cannot authorize test session.');
+                            break;
+                        case 'pause':
+                            warningAction = isPlural ?
+                                __('Cannot pause test sessions.') :
+                                __('Cannot pause test session.');
+                            break;
+                        case 'terminate':
+                            warningAction = isPlural ?
+                                __('Cannot terminate test sessions.') :
+                                __('Cannot terminate test session.');
+                            break;
+                        case 'report':
+                            warningAction = isPlural ?
+                                __('Cannot report test sessions.') :
+                                __('Cannot report test session.');
+                            break;
+                        case 'print':
+                            warningAction = isPlural ?
+                                __('Cannot print test sessions.') :
+                                __('Cannot print test session.');
+                            break;
+                        case 'time':
+                            warningAction = isPlural ?
+                                __('Cannot extend test sessions.') :
+                                __('Cannot extend test session.');
+                            break;
+                        default:
+                            warningAction = __('Cannot execute action.');
+                    }
+
+                    warningReason = _(deniedResources)
                         .slice(0, maxReasons)
-                        .map(function (deniedResource, index) {
-                            return getWarningReason(deniedResource.reason, deniedResource.id || (index + 1));
+                        .map(function (deniedResource) {
+                            return deniedResource.warning;
                         })
                         .join(' ');
 
-                    return __('%s %s%s', warningAction, warningReason, (deniedResources.length > maxReasons ? warningReasonOmission : ''));
-
-                    function getWarningAction(actionName, isPlural) {
-                        if (isPlural) {
-                            return {
-                                authorize: __('Cannot authorize test sessions.'),
-                                pause: __('Cannot pause test sessions.'),
-                                print: __('Cannot print test sessions.'),
-                                report: __('Cannot generate report on test sessions.'),
-                                terminate: __('Cannot terminate test sessions.'),
-                                time: __('Cannot extend test sessions.'),
-                                default: __('No report available for test sessions.')
-                            }[actionName || 'default'];
-                        } else {
-                            return {
-                                authorize: __('Cannot authorize test session.'),
-                                pause: __('Cannot pause test session.'),
-                                print: __('Cannot print test session.'),
-                                report: __('Cannot generate report on test session.'),
-                                terminate: __('Cannot terminate test session.'),
-                                time: __('Cannot extend test session.'),
-                                default: __('No report available for test session.')
-                            }[actionName || 'default'];
-                        }
+                    if (deniedResources.length > maxReasons) {
+                        warningReason += warningOmission;
                     }
 
-                    function getWarningReason(reason, testId) {
-                        return {
-                            // present perfect - for actions currently happening
-                            'not in progress': __('Test %s has not been in progress.', testId),
-
-                            // past perfect - for actions that have been completed
-                            'not finished': __('Test %s had not been finished.', testId),
-                            'not started': __('Test %s had not been started.', testId),
-                            'canceled': __('Test %s had been canceled.', testId),
-                            'completed': __('Test %s had been completed.', testId),
-                            'paused': __('Test %s had been paused.', testId),
-                            'terminated': __('Test %s had been terminated.', testId),
-
-                            // past perfect (with adjective) - for actions that have been completed but need emphasis to distinguish from the warning action (e.g. Canont terminate because test has 'already' been terminated.).
-                            'already authorized': __('Test %s had already been authorized.', testId),
-                            'already paused': __('Test %s had already been paused.', testId),
-                            'already terminated': __('Test %s had already been terminated', testId),
-
-                            'default': __('Action not allowed for test %s.', testId)
-                        }[reason || 'default'];
-                    }
+                    return warningAction + ' ' + warningReason;
                 }
 
                 /**

@@ -37,6 +37,26 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had already been authorized.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had already been authorized.', username);
+                    } else {
+                        return __('Test had already been authorized.');
+                    }
+                },
+                print : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been finished.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been finished.', username);
+                    } else {
+                        return __('Test had not been finished.');
+                    }
+                }
             }
         },
         authorized : {
@@ -49,6 +69,35 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not started'), //not in progress
                 print : __('not finished'),
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had already been authorized.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had already been authorized.', username);
+                    } else {
+                        return __('Test had already been authorized.');
+                    }
+                },
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been started.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been started.', username);
+                    } else {
+                        return __('Test had not been started.');
+                    }
+                },
+                print : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been finished.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been finished.', username);
+                    } else {
+                        return __('Test had not been finished.');
+                    }
+                }
             }
         },
         awaiting : {
@@ -61,6 +110,26 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 time : true
+            },
+            warning : {
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been in progress.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been in progress.', username);
+                    } else {
+                        return __('Test had not been in progress.');
+                    }
+                },
+                print : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been finished.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been finished.', username);
+                    } else {
+                        return __('Test had not been finished.');
+                    }
+                }
             }
         },
         canceled : {
@@ -73,6 +142,44 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print: __('canceled'),
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been canceled.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been canceled.', username);
+                    } else {
+                        return __('Test had been canceled.');
+                    }
+                },
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been canceled.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been canceled.', username);
+                    } else {
+                        return __('Test had been canceled.');
+                    }
+                },
+                terminate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been canceled.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been canceled.', username);
+                    } else {
+                        return __('Test had been canceled.');
+                    }
+                },
+                print : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been canceled.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been canceled.', username);
+                    } else {
+                        return __('Test had been canceled.');
+                    }
+                }
             }
         },
         completed : {
@@ -85,6 +192,35 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print: true,
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been completed.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been completed.', username);
+                    } else {
+                        return __('Test had been completed.');
+                    }
+                },
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been completed.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been completed.', username);
+                    } else {
+                        return __('Test had been completed.');
+                    }
+                },
+                terminate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been completed.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been completed.', username);
+                    } else {
+                        return __('Test had been completed.');
+                    }
+                }
             }
         },
         paused : {
@@ -97,6 +233,35 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been paused.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been paused.', username);
+                    } else {
+                        return __('Test had been paused.');
+                    }
+                },
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had already been paused.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had already been paused.', username);
+                    } else {
+                        return __('Test had already been paused.');
+                    }
+                },
+                print : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had not been finished.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had not been finished.', username);
+                    } else {
+                        return __('Test had not been finished.');
+                    }
+                }
             }
         },
         terminated : {
@@ -109,6 +274,35 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print: true,
                 time : true
+            },
+            warning : {
+                authorize : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been terminated.', username);
+                    } else {
+                        return __('Test had been terminated.');
+                    }
+                },
+                pause : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been terminated.', username);
+                    } else {
+                        return __('Test had been terminated.');
+                    }
+                },
+                terminate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had already been terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had already been terminated.', username);
+                    } else {
+                        return __('Test had alredy been terminated.');
+                    }
+                },
             }
         }
     };
