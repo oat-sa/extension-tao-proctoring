@@ -49,7 +49,7 @@
 
    <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible">
      <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-     <rdfs:label xml:lang="en-US"><![CDATA[Proctoring]]></rdfs:label>
+     <rdfs:label xml:lang="en-US"><![CDATA[Require Proctoring]]></rdfs:label>
      <rdfs:comment xml:lang="en-US"><![CDATA[Require Proctoring on selected deliveries]]></rdfs:comment>
      <widget:widget rdf:resource="http://www.tao.lu/datatypes/WidgetDefinitions.rdf#CheckBox"/>
      <generis:is_language_dependent rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#False"/>
@@ -65,8 +65,8 @@
    </rdf:Description>
 
    <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled">
-     <rdfs:label xml:lang="en-US"><![CDATA[Require Proctoring]]></rdfs:label>
-     <rdfs:comment xml:lang="en-US"><![CDATA[Require Proctoring]]></rdfs:comment>
+     <rdfs:label xml:lang="en-US"><![CDATA[Enable]]></rdfs:label>
+     <rdfs:comment xml:lang="en-US"><![CDATA[Enable]]></rdfs:comment>
      <rdf:type rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode"/>
    </rdf:Description>
 
