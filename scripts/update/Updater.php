@@ -402,5 +402,10 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('5.16.5');
         }
+
+        if ($this->isVersion('5.16.5')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('5.16.6');
+        }
     }
 }
