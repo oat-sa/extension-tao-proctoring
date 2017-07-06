@@ -498,15 +498,22 @@ define([
 
                     function getWarningReason(reason, testId) {
                         return {
-                            'already authorized': __('Test %s is already authorized.', testId),
-                            'not finished': __('Test %s is not finished.', testId),
-                            'not started': __('Test %s is not started.', testId),
-                            'not in progress': __('Test %s is not in progress.', testId),
-                            'is canceled': __('Test %s is canceled.', testId),
-                            'is completed': __('Test %s is completed.', testId),
-                            'is already paused': __('Test %s is already paused.', testId),
-                            'is paused': __('Test %s is paused.', testId),
-                            'is terminated': __('Test %s is terminated.', testId),
+                            // present perfect - for actions currently happening
+                            'not in progress': __('Test %s has not been in progress.', testId),
+
+                            // past perfect - for actions that have been completed
+                            'not finished': __('Test %s had not been finished.', testId),
+                            'not started': __('Test %s had not been started.', testId),
+                            'canceled': __('Test %s had been canceled.', testId),
+                            'completed': __('Test %s had been completed.', testId),
+                            'paused': __('Test %s had been paused.', testId),
+                            'terminated': __('Test %s had been terminated.', testId),
+
+                            // past perfect (with adjective) - for actions that have been completed but need emphasis to distinguish from the warning action (e.g. Canont terminate because test has 'already' been terminated.).
+                            'already authorized': __('Test %s had already been authorized.', testId),
+                            'already paused': __('Test %s had already been paused.', testId),
+                            'already terminated': __('Test %s had already been terminated', testId),
+
                             'default': __('Action not allowed for test %s.', testId)
                         }[reason || 'default'];
                     }

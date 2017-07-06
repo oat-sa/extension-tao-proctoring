@@ -67,11 +67,11 @@ define(['lodash', 'i18n'], function(_, __){
             code : _canceled,
             label : __('Canceled'),
             can : {
-                authorize : __('is canceled'),
-                pause : __('is canceled'),
-                terminate : __('is canceled'),
+                authorize : __('canceled'),
+                pause : __('canceled'),
+                terminate : __('canceled'),
                 report : true,
-                print: __('is canceled'),
+                print: __('canceled'),
                 time : true
             }
         },
@@ -79,9 +79,9 @@ define(['lodash', 'i18n'], function(_, __){
             code : _completed,
             label : __('Completed'),
             can : {
-                authorize : __('is completed'),
-                pause : __('is completed'),
-                terminate : __('is completed'),
+                authorize : __('completed'),
+                pause : __('completed'),
+                terminate : __('completed'),
                 report : true,
                 print: true,
                 time : true
@@ -91,8 +91,8 @@ define(['lodash', 'i18n'], function(_, __){
             code : _paused,
             label : __('Paused'),
             can : {
-                authorize : __('is paused'),
-                pause : __('is already paused'),
+                authorize : __('paused'),
+                pause : __('already paused'),
                 terminate : true,
                 report : true,
                 print : __('not finished'),
@@ -103,9 +103,9 @@ define(['lodash', 'i18n'], function(_, __){
             code : _terminated,
             label : __('Terminated'),
             can : {
-                authorize : __('is terminated'),
-                pause : __('is terminated'),
-                terminate : __('is terminated'),
+                authorize : __('terminated'),
+                pause : __('terminated'),
+                terminate : __('already terminated'),
                 report : true,
                 print: true,
                 time : true
