@@ -28,7 +28,6 @@ use oat\oatbox\filesystem\FileSystemService;
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\task\Queue;
 use oat\tao\model\export\implementation\CsvExporter;
-use oat\taoDevTools\actions\ExtensionsManager;
 
 abstract class AbstractIrregularityReport extends ConfigurableService implements Action
 {
