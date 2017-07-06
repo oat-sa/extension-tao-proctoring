@@ -67,24 +67,18 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
         $to         = $params['to'];
 
         $delivery = new \core_kernel_classes_Resource($deliveryId);
-
         $data = $this->getIrregularitiesTable( $delivery ,  $from , $to );
-
         $exporter = new CsvExporter($data);
         $csv      = $exporter->export();
-
         /**
          * @var FileSystemService $fileSystemService
          */
         $fileSystemService = ServiceManager::getServiceManager()->get(FileSystemService::SERVICE_ID);
         $fileSystem        = $fileSystemService->getFileSystem('taskQueueStorage');
-
         $fileName          = 'irregularities/' . \tao_helpers_File::getSafeFileName($delivery->getLabel() . ' ' . $from . ' ' . $to . '.csv' );
-
         $return            = $fileSystem->put($fileName , $csv);
-
         if($return === false) {
-            $report = new \common_report_Report(\common_report_Report::TYPE_ERROR , __('unable to greate irregularities export for %s' , $delivery->getLabel()));
+            $report = new \common_report_Report(\common_report_Report::TYPE_ERROR , __('unable to create irregularities export for %s' , $delivery->getLabel()));
         } else {
             $report = new \common_report_Report(\common_report_Report::TYPE_SUCCESS , __('successfully create export for %s' , $delivery->getLabel()) , $fileName);
             $report->add(new \common_report_Report(\common_report_Report::TYPE_INFO , $return));
