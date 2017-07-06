@@ -356,7 +356,73 @@ define(['lodash', 'i18n'], function(_, __){
         });
     }
 
+    /**
+     * Create a warning message for execBulkAction()
+     * @param {String} action
+     * @param {String[]} selection
+     * @param {Object[]} deniedResources
+     * @returns {String}
+     */
+    function buildWarningMessage(action, selection, deniedResources) {
+        var isPlural = selection.length > 1;
+        var maxReasons = 2;
+        var warningAction;
+        var warningOmission = __('...');
+        var warningReason;
+
+        deniedResources = deniedResources || [{}];
+
+        switch (action) {
+            case 'authorize':
+                warningAction = isPlural ?
+                    __('Cannot authorize test sessions.') :
+                    __('Cannot authorize test session.');
+                break;
+            case 'pause':
+                warningAction = isPlural ?
+                    __('Cannot pause test sessions.') :
+                    __('Cannot pause test session.');
+                break;
+            case 'terminate':
+                warningAction = isPlural ?
+                    __('Cannot terminate test sessions.') :
+                    __('Cannot terminate test session.');
+                break;
+            case 'report':
+                warningAction = isPlural ?
+                    __('Cannot report test sessions.') :
+                    __('Cannot report test session.');
+                break;
+            case 'print':
+                warningAction = isPlural ?
+                    __('Cannot print test sessions.') :
+                    __('Cannot print test session.');
+                break;
+            case 'time':
+                warningAction = isPlural ?
+                    __('Cannot extend test sessions.') :
+                    __('Cannot extend test session.');
+                break;
+            default:
+                warningAction = __('Cannot execute action.');
+        }
+
+        warningReason = _(deniedResources)
+            .slice(0, maxReasons)
+            .map(function (deniedResource) {
+                return deniedResource.warning;
+            })
+            .join(' ');
+
+        if (deniedResources.length > maxReasons) {
+            warningReason += warningOmission;
+        }
+
+        return warningAction + ' ' + warningReason;
+    }
+
     return {
+        buildWarningMessage : buildWarningMessage,
         getStatuses : getStatuses,
         getStatus : getStatus,
         getStatusByCode : getStatusByCode,
