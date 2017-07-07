@@ -66,6 +66,12 @@ class ActivityMonitoringService extends ConfigurableService
     /** Total assessments field */
     const FIELD_TOTAL_ASSESSMENTS = 'total_assessments';
 
+    /** Deliveries statistics field*/
+    const FIELD_DELIVERIES_STATISTICS = 'deliveries_statistics';
+
+    /** Retired deliveries field*/
+    const FIELD_RETIRED_DELIVERIES = 'retired_deliveries';
+
     /** Total current assessment field */
     const FIELD_TOTAL_CURRENT_ASSESSMENTS = 'total_current_assessments';
 
@@ -123,8 +129,8 @@ class ActivityMonitoringService extends ConfigurableService
         ];
 
         $deliveryStates = $this->getStatesByDelivery();
-        $deliveryStates['retired_deliveries'] = $this->getRetiredDeliveries($assessments, $deliveryStates);
-        $assessments['deliveries_statistics'] = $deliveryStates;
+        $deliveryStates[self::FIELD_RETIRED_DELIVERIES] = $this->getRetiredDeliveries($assessments, $deliveryStates);
+        $assessments[self::FIELD_DELIVERIES_STATISTICS] = $deliveryStates;
         return $assessments;
     }
 
@@ -278,11 +284,10 @@ class ActivityMonitoringService extends ConfigurableService
                 ? $assessmentsDeliveryStatusesMaps[$uri]
                 : null;
 
-            foreach ($assessments as $key => $value) {
-                if ($key == $assessmentKey) {
-                    $assessmentNumber = $value;
-                }
+            if (isset($assessments[$assessmentKey])) {
+                $assessmentNumber = $assessments[$assessmentKey];
             }
+
             $deliveryNumber = 0;
             foreach ($deliveryStates as $deliveryState) {
                 if (isset($deliveryState[$label])) {
