@@ -30,15 +30,6 @@ class OverrideDeliveryFactoryService extends InstallAction
 {
     public function __invoke($params)
     {
-
-        $proctorService = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
-        $config = $proctorService->getOptions();
-        $config[ProctorService::PROCTORED_BY_DEFAULT] = true;
-
-        $service = new ProctorService($config);
-        $service->setServiceManager($this->getServiceManager());
-        $this->getServiceManager()->register(ProctorService::SERVICE_ID, $service);
-
         /** @var EventManager $eventManager */
         $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
         $eventManager->attach(DeliveryCreatedEvent::class, [ProctorService::SERVICE_ID, 'listenCreateDeliveryEvent']);
