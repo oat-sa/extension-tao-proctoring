@@ -74,7 +74,7 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
          * @var FileSystemService $fileSystemService
          */
         $fileSystemService = ServiceManager::getServiceManager()->get(FileSystemService::SERVICE_ID);
-        $fileSystem        = $fileSystemService->getFileSystem('taskQueueStorage');
+        $fileSystem        = $fileSystemService->getFileSystem(Queue::FILE_SYSTEM_ID);
         $fileName          = 'irregularities/' . \tao_helpers_File::getSafeFileName($delivery->getLabel() . ' ' . $from . ' ' . $to . '.csv' );
         $return            = $fileSystem->put($fileName , $csv);
         if($return === false) {
