@@ -33,7 +33,7 @@ class OverrideDeliveryFactoryService extends InstallAction
 
         $proctorService = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
         $config = $proctorService->getOptions();
-        $config[ProctorService::PROCTORED_BY_DEFAULT] = true;
+        $config[ProctorService::PROCTORED_BY_DEFAULT] = false;
 
         $service = new ProctorService($config);
         $service->setServiceManager($this->getServiceManager());
