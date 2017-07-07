@@ -45,6 +45,39 @@ class ActivityMonitoringService extends ConfigurableService
     /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
     const OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH = 'assessment_activity_auto_refresh';
 
+    /** State of awaiting assessment */
+    const STATE_AWAITING_ASSESSMENT = 'awaiting_assessments';
+
+    /** State of authorized assessment */
+    const STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS = 'authorized_but_not_started_assessments';
+
+    /** State of paused assessment */
+    const STATE_PAUSED_ASSESSMENTS = 'paused_assessments';
+
+    /** State of in progress assessment */
+    const STATE_IN_PROGRESS_ASSESSMENTS = 'in_progress_assessments';
+
+    /** Active proctors field */
+    const FIELD_ACTIVE_PROCTORS = 'active_proctors';
+
+    /** Active Test Takers field */
+    const FIELD_ACTIVE_TEST_TAKERS = 'active_test_takers';
+
+    /** Total assessments field */
+    const FIELD_TOTAL_ASSESSMENTS = 'total_assessments';
+
+    /** Deliveries statistics field*/
+    const FIELD_DELIVERIES_STATISTICS = 'deliveries_statistics';
+
+    /** Retired deliveries field*/
+    const FIELD_RETIRED_DELIVERIES = 'retired_deliveries';
+
+    /** Total current assessment field */
+    const FIELD_TOTAL_CURRENT_ASSESSMENTS = 'total_current_assessments';
+
+    const LABEL_RETIRED_DELIVERIES = 'Retired Deliveries';
+
+
     /**
      * @var array list of all the statuses uris
      */
@@ -84,18 +117,21 @@ class ActivityMonitoringService extends ConfigurableService
         $paused = $this->getNumberOfAssessments(DeliveryExecution::STATE_PAUSED);
         $active = $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE);
         $current = $awaiting + $authorized + $paused + $active;
-
-        return [
-            'active_proctors' => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
-            'active_test_takers' => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
-            'total_assessments' => $this->getNumberOfAssessments(),
-            'total_current_assessments' => $current,
-            'awaiting_assessments' => $awaiting,
-            'authorized_but_not_started_assessments' => $authorized,
-            'paused_assessments' => $paused,
-            'in_progress_assessments' => $active,
-            'deliveries_statistics' => $this->getStatesByDelivery(),
+        $assessments = [
+            self::FIELD_ACTIVE_PROCTORS => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
+            self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
+            self::FIELD_TOTAL_ASSESSMENTS => $this->getNumberOfAssessments(),
+            self::FIELD_TOTAL_CURRENT_ASSESSMENTS => $current,
+            self::STATE_AWAITING_ASSESSMENT => $awaiting,
+            self::STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS => $authorized,
+            self::STATE_PAUSED_ASSESSMENTS => $paused,
+            self::STATE_IN_PROGRESS_ASSESSMENTS => $active
         ];
+
+        $deliveryStates = $this->getStatesByDelivery();
+        $deliveryStates[self::FIELD_RETIRED_DELIVERIES] = $this->getRetiredDeliveries($assessments, $deliveryStates);
+        $assessments[self::FIELD_DELIVERIES_STATISTICS] = $deliveryStates;
+        return $assessments;
     }
 
     /**
@@ -220,5 +256,50 @@ class ActivityMonitoringService extends ConfigurableService
 
         }
         return $result;
+    }
+
+    /**
+     * Get statistic for retired deliveries
+     * @param array $assessments
+     * @param array $deliveryStates
+     * @return array
+     */
+    protected function getRetiredDeliveries($assessments, $deliveryStates)
+    {
+        $assessmentsDeliveryStatusesMaps = [
+            DeliveryExecution::STATE_AWAITING   => self::STATE_AWAITING_ASSESSMENT,
+            DeliveryExecution::STATE_AUTHORIZED => self::STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS,
+            DeliveryExecution::STATE_PAUSED     => self::STATE_PAUSED_ASSESSMENTS,
+            DeliveryExecution::STATE_ACTIVE     => self::STATE_IN_PROGRESS_ASSESSMENTS
+        ];
+
+        $retiredDeliveries = [];
+
+        foreach ($this->deliveryStatuses as $deliveryStatus) {
+            $label = $deliveryStatus->getLabel();
+            $uri = $deliveryStatus->getUri();
+            $assessmentNumber = 0;
+
+            $assessmentKey = isset($assessmentsDeliveryStatusesMaps[$uri])
+                ? $assessmentsDeliveryStatusesMaps[$uri]
+                : null;
+
+            if (isset($assessments[$assessmentKey])) {
+                $assessmentNumber = $assessments[$assessmentKey];
+            }
+
+            $deliveryNumber = 0;
+            foreach ($deliveryStates as $deliveryState) {
+                if (isset($deliveryState[$label])) {
+                    $deliveryNumber += $deliveryState[$label];
+                }
+            }
+
+            $count = $assessmentNumber - $deliveryNumber;
+
+            $retiredDeliveries[$label] = ($count < 0) ? 0 : $count;
+        }
+        $retiredDeliveries['label'] = self::LABEL_RETIRED_DELIVERIES;
+        return $retiredDeliveries;
     }
 }
