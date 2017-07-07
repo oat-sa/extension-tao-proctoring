@@ -85,13 +85,6 @@ class ActivityMonitoringService extends ConfigurableService
         DeliveryExecution::STATE_FINISHIED,
     ];
 
-    protected $assessmentsDeliveryStatusesMaps = [
-        DeliveryExecution::STATE_AWAITING   => self::STATE_AWAITING_ASSESSMENT,
-        DeliveryExecution::STATE_AUTHORIZED => self::STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS,
-        DeliveryExecution::STATE_PAUSED     => self::STATE_PAUSED_ASSESSMENTS,
-        DeliveryExecution::STATE_ACTIVE     => self::STATE_IN_PROGRESS_ASSESSMENTS
-    ];
-
     /**
      * ActivityMonitoringService constructor.
      * @param array $options
@@ -267,12 +260,24 @@ class ActivityMonitoringService extends ConfigurableService
      */
     protected function getRetiredDeliveries($assessments, $deliveryStates)
     {
+        $assessmentsDeliveryStatusesMaps = [
+            DeliveryExecution::STATE_AWAITING   => self::STATE_AWAITING_ASSESSMENT,
+            DeliveryExecution::STATE_AUTHORIZED => self::STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS,
+            DeliveryExecution::STATE_PAUSED     => self::STATE_PAUSED_ASSESSMENTS,
+            DeliveryExecution::STATE_ACTIVE     => self::STATE_IN_PROGRESS_ASSESSMENTS
+        ];
+
         $retiredDeliveries = [];
+
         foreach ($this->deliveryStatuses as $deliveryStatus) {
             $label = $deliveryStatus->getLabel();
             $uri = $deliveryStatus->getUri();
             $assessmentNumber = 0;
-            $assessmentKey = $this->assessmentsDeliveryStatusesMaps[$uri];
+
+            $assessmentKey = isset($assessmentsDeliveryStatusesMaps[$uri])
+                ? $assessmentsDeliveryStatusesMaps[$uri]
+                : null;
+
             foreach ($assessments as $key => $value) {
                 if ($key == $assessmentKey) {
                     $assessmentNumber = $value;
