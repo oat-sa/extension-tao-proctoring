@@ -409,9 +409,9 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('5.16.6');
         }
-        $this->skip('5.16.6', '5.16.8');
+        $this->skip('5.16.6', '5.16.9');
 
-         if ($this->isVersion('5.16.8')) {
+         if ($this->isVersion('5.16.9')) {
             $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
             $this->setVersion('5.17.0');
          }
