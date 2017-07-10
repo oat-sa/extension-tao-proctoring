@@ -53,6 +53,8 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\model\service\AbstractIrregularityReport;
+use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
@@ -407,7 +409,11 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('5.16.6');
         }
-
         $this->skip('5.16.6', '5.16.9');
+
+         if ($this->isVersion('5.16.9')) {
+            $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
+            $this->setVersion('5.17.0');
+         }
     }
 }
