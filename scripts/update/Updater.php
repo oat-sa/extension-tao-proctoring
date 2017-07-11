@@ -52,11 +52,11 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
-use oat\taoProctoring\model\ProctorServiceRoute;
+use oat\taoProctoring\model\ProctorServiceInterface;
+use oat\taoProctoring\model\ProctorServiceDelegator;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
-use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
@@ -412,13 +412,25 @@ class Updater extends common_ext_ExtensionUpdater
         }
         $this->skip('5.16.6', '5.16.9');
 
-         if ($this->isVersion('5.16.9')) {
+        if ($this->isVersion('5.16.9')) {
             $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
             $this->setVersion('5.17.0');
-         }
+        }
 
         if ($this->isVersion('5.17.0')) {
-            $this->getServiceManager()->register(ProctorService::SERVICE_ID, new ProctorServiceRoute());
+            $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
+
+            if (!is_a($service, ProctorServiceDelegator::class)) {
+                $parameters = $service->getOptions();
+
+                $handler = new ProctorServiceDelegator([
+                    ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
+                        get_class($service),
+                    ],
+                    ProctorServiceDelegator::PROCTOR_SERVICE_OPTIONS => $parameters
+                ]);
+                $this->getServiceManager()->register(ProctorService::SERVICE_ID, $handler);
+            }
             $this->setVersion('5.18.0');
         }
     }

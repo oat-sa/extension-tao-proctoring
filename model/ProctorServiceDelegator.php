@@ -26,14 +26,20 @@ use oat\oatbox\service\ConfigurableService;
 
 /**
  * Service which allows to use many proctorServices according to condition
- * Class ProctorServiceRoute
+ * Class ProctorServiceDelegator
  * @package oat\taoProctoring\model
  */
-class ProctorServiceRoute extends ConfigurableService
+class ProctorServiceDelegator extends ConfigurableService implements ProctorServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/ProctorAccess';
+    /**
+     * Services which could handle the request
+     */
+    const PROCTOR_SERVICE_HANDLERS = 'handlers';
 
-    const PROCTOR_SERVICE_ROUTES = 'routes';
+    /**
+     * Options for the proctor services
+     */
+    const PROCTOR_SERVICE_OPTIONS = 'options';
 
     /**
      * @var ProctorService
@@ -49,20 +55,24 @@ class ProctorServiceRoute extends ConfigurableService
     {
         parent::__construct($options);
 
-        if ($this->hasOption(self::PROCTOR_SERVICE_ROUTES)) {
-            $routes = $this->getOption(self::PROCTOR_SERVICE_ROUTES);
-            foreach ($routes as $route) {
-                if (!class_exists($route)) {
-                    throw new \common_exception_NoImplementation('Invalid configuration of the ProctorServiceRoute.');
-                }
-                /** @var ProctorService $routeService */
-                $routeService = new $route($options);
-                if (!is_a($routeService, ProctorService::class)) {
-                    throw new \common_exception_NoImplementation('RouteService should be instance of ProctorService. Property serviceClass in the configuration of the ProctorServiceRoute is incorrect');
+        if ($this->hasOption(self::PROCTOR_SERVICE_HANDLERS)) {
+            $handlers = $this->getOption(self::PROCTOR_SERVICE_HANDLERS);
+            foreach ($handlers as $handler) {
+                if (!class_exists($handler)) {
+                    throw new \common_exception_NoImplementation('Invalid configuration of the ProctorServiceDelegator.');
                 }
 
-                if ($routeService->isSuitable()) {
-                    $this->extendedService = $routeService;
+                /** @var ProctorService $handlerService */
+                $options = $this->hasOption(self::PROCTOR_SERVICE_OPTIONS) ?
+                    $this->getOption(self::PROCTOR_SERVICE_OPTIONS) : [];
+
+                $handlerService = new $handler($options);
+                if (!is_a($handlerService, ProctorService::class)) {
+                    throw new \common_exception_NoImplementation('Handler should be instance of ProctorService. Property serviceClass in the configuration of the ProctorServiceDelegator is incorrect');
+                }
+
+                if ($handlerService->isSuitable()) {
+                    $this->extendedService = $handlerService;
                     break;
                 }
             }
@@ -74,6 +84,7 @@ class ProctorServiceRoute extends ConfigurableService
     }
 
     /**
+     * Delegate request to the responsible service
      * @param $name
      * @param $arguments
      * @return mixed

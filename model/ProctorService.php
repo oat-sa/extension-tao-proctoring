@@ -33,11 +33,9 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class ProctorService extends ConfigurableService
+class ProctorService extends ConfigurableService implements ProctorServiceInterface
 {
     use OntologyAwareTrait;
-
-    const SERVICE_ID = 'taoProctoring/ProctorAccess';
 
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
