@@ -19,4 +19,6 @@
  * 
  */  
 
-return new oat\taoProctoring\model\ProctorServiceRoute();
+return new oat\taoProctoring\model\ProctorService([
+    \oat\taoProctoring\model\ProctorService::PROCTORED_BY_DEFAULT => false
+]);

@@ -17,14 +17,14 @@
  */
 
 define([
-    'lodash',
     'jquery',
-    'i18n',
-    'ui/feedback',
-    'layout/loading-bar',
-    'helpers',
+    'lodash',
+    'ui/hider',
+    'util/url',
+    'report',
+    'ui/taskQueue/table',
     'jquery.fileDownload'
-], function (_, $, __, feedback, loadingBar, helpers){
+], function ($, _, hider, urlHelper, report, taskQueueTableFactory) {
     'use strict';
 
     /**
@@ -37,36 +37,96 @@ define([
          * Entry point of the page
          */
         start : function start(){
-            var $form = $('#export-form');
 
-            $form.on('submit', function (e) {
+            var $header = $('header.section-header');
+            var $formContainer = $('.print-form');
+            var $reportContainer = $('.print-report');
+            var $form = $('form', $formContainer);
+            var $submitter = $('.form-submitter', $form);
+            var $sent = $(":input[name='" + $form.attr('name') + "_sent']", $form);
+            var asyncQueue = $header.data('async-queue');
+            var $containers = $('.main-container');
 
-                e.stopPropagation();
-                e.preventDefault();
-                loadingBar.start();
+            function switchContainer(purpose) {
+                hider.hide($containers);
+                hider.show($containers.filter('[data-purpose="' + purpose + '"]'));
+            }
 
-                var self = $(this),
-                    uri = $('[name="uri"]', self).val(),
-                    from = $('[name="from"]', self).val(),
-                    to = $('[name="to"]', self).val(),
-                    params = {'uri': uri, 'from': from, 'to': to},
-                    exportUrl = helpers._url('exportIrregularities', 'Irregularity', 'taoProctoring', params);
+            function refreshTree() {
+                $('.tree').trigger('refresh.taotree', [{
+                    uri : $header.data('select-node')
+                }]);
+            }
 
-                $.fileDownload(exportUrl, {
-                    successCallback : function () {
-                        loadingBar.stop();
-                    },
-                    failCallback : function (jqXHR) {
-                        loadingBar.stop();
-                        var response = $.parseJSON($(jqXHR).text());
-                        if (response) {
-                            feedback().error(new Error(response.message));
-                        }
-                    }
+            function displayReport(response) {
+                switchContainer('report');
+                $reportContainer.append(response);
+
+                // Fold action (show detailed report)
+                hider.toggle($('#fold', $reportContainer), response.nested);
+                $('#fold > input[type="checkbox"]', $reportContainer).on('click', function() {
+                    report.fold();
                 });
 
+                // Continue button
+                $('#import-continue', $reportContainer).on('click', refreshTree);
+            }
+
+            switchContainer('form');
+
+            //overwrite the submit behaviour
+            $submitter.off('click').on('click', function (e) {
+                var params = {};
+                var instances = [];
+                var classes = [];
+
+                e.preventDefault();
+                if (parseInt($sent.val(), 10)) {
+                    // prepare download params
+                    _.forEach($form.serializeArray(), function (param) {
+                        if (param.name.indexOf('instances_') === 0) {
+                            instances.push(param.value);
+                        } else if (param.name.indexOf('classes_') === 0) {
+                            classes.push(param.value);
+                        } else {
+                            params[param.name] = param.value;
+                        }
+                    });
+
+                    if (asyncQueue) {
+                        // display report after form submit
+                        $.ajax({
+                            url: $form.attr('action'),
+                            data: params,
+                            type: 'POST',
+                            dataType: "text"
+                        }).done(displayReport);
+                    } else {
+                        // download file after form submit
+                        $.fileDownload($form.attr('action'), {
+                            httpMethod: 'POST',
+                            data: params,
+                            failCallback: displayReport,
+                            successCallback: refreshTree
+                        });
+                    }
+                }
             });
+
+            if (asyncQueue) {
+                taskQueueTableFactory({
+                    rows: 10,
+                    context: $header.data('queue'),
+                    dataUrl: urlHelper.route('getTasks', 'TaskQueueData', 'tao'),
+                    statusUrl: urlHelper.route('getStatus', 'TaskQueueData', 'tao'),
+                    removeUrl: urlHelper.route('archiveTask', 'TaskQueueData', 'tao'),
+                    downloadUrl: urlHelper.route('downloadTask', 'TaskQueueData', 'tao')
+                })
+                    .init()
+                    .render($containers.filter('.print-tasks'));
+            }
         }
+
     };
 
     return IrregularityCtlr;
