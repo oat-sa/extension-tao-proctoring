@@ -493,10 +493,9 @@ define([
                 {
                     var now = new Date();
                     var nowStr =
-                        now.getFullYear() + '/' +
                         ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
-                        ("0" + (now.getDate())).slice(-2);
-
+                        ("0" + (now.getDate())).slice(-2) + '/' +
+                        now.getFullYear();
                     $('#start_time_filter').val(nowStr + ' - ' + nowStr);
 
                     if (defaultTag) {
@@ -720,10 +719,10 @@ define([
                             var values = value.split(" - ");
                             var result = '';
                             if (values[0]) {
-                                result = moment(values[0], 'YYYY/MM/DD').format('X');
+                                result = moment(values[0], 'MM/DD/YYYY').format('X');
                             }
                             if (values[1]) {
-                                values[1] = moment(values[1], 'YYYY/MM/DD').add(1, 'd').format('X');
+                                values[1] = moment(values[1], 'MM/DD/YYYY').add(1, 'd').format('X');
                                 if (result !== '') {
                                     result += ' - ';
                                 }
@@ -736,7 +735,7 @@ define([
                             '<button class="icon-find js-start_time_filter_button" type="button"></button>',
                             callback : function ($el) {
                                 $el.datepicker({
-                                    dateFormat: "yy/mm/dd",
+                                    dateFormat: "mm/dd/yy",
                                     onSelect: function( selectedDate ) {
                                         if(!$(this).data().datepicker.first){
                                             $(this).data().datepicker.inline = true;
