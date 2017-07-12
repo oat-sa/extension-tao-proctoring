@@ -25,4 +25,6 @@ namespace oat\taoProctoring\model;
 interface ProctorServiceInterface
 {
     const SERVICE_ID = 'taoProctoring/ProctorAccess';
+
+    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 }

@@ -37,11 +37,6 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
     const PROCTOR_SERVICE_HANDLERS = 'handlers';
 
     /**
-     * Options for the proctor services
-     */
-    const PROCTOR_SERVICE_OPTIONS = 'options';
-
-    /**
      * @var ProctorService
      */
     private $extendedService;
@@ -51,8 +46,8 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
         if (!isset($this->extendedService))
         {
             foreach ($this->getOption(self::PROCTOR_SERVICE_HANDLERS) as $handler) {
-                if (!is_a($handler, ProctorService::class)) {
-                    throw new \common_exception_NoImplementation('Handler should be instance of ProctorService. Property serviceClass in the configuration of the ProctorServiceDelegator is incorrect');
+                if (!is_a($handler, ProctorServiceHandler::class)) {
+                    throw new \common_exception_NoImplementation('Handler should be instance of ProctorServiceHandler.');
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
                 if ($handler->isSuitable()) {
@@ -63,14 +58,28 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
         }
         return $this->extendedService;
     }
-    
+
     public function registerHandler($handler)
     {
         $handlers = $this->getOption(self::PROCTOR_SERVICE_HANDLERS);
-        $handlers[] = $handler;
+        $exists = false;
+
+        // change options on the existing handlers
+        foreach ($handlers as $key => $_handler) {
+            if ($_handler instanceof $handler) {
+                $handlers[$key] = $handler;
+                $exists = true;
+                break;
+            }
+        }
+
+        // new handler should be added to the top of the list
+        if (!$exists) {
+            $handlers = array_merge([$handler], $handlers);
+        }
+
         $this->setOption(self::PROCTOR_SERVICE_HANDLERS, $handlers);
     }
-    
 
     /**
      * Delegate request to the responsible service

@@ -418,18 +418,11 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         if ($this->isVersion('5.17.0')) {
-            $service = $this->getServiceManager()->get(ProctorService::SERVICE_ID);
 
+            $service = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
             if (!is_a($service, ProctorServiceDelegator::class)) {
-                $parameters = $service->getOptions();
-
-                $handler = new ProctorServiceDelegator([
-                    ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
-                        get_class($service),
-                    ],
-                    ProctorServiceDelegator::PROCTOR_SERVICE_OPTIONS => $parameters
-                ]);
-                $this->getServiceManager()->register(ProctorService::SERVICE_ID, $handler);
+                $delegator = new ProctorServiceDelegator([ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [$service]]);
+                $this->getServiceManager()->register(ProctorServiceInterface::SERVICE_ID, $delegator);
             }
             $this->setVersion('5.18.0');
         }
