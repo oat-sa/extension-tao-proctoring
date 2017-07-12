@@ -1,4 +1,6 @@
 <?php
+use oat\taoProctoring\model\ProctorServiceDelegator;
+use oat\taoProctoring\model\ProctorService;
 /**  
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,11 +21,8 @@
  * 
  */  
 
-return new \oat\taoProctoring\model\ProctorServiceDelegator([
-    \oat\taoProctoring\model\ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
-        \oat\taoProctoring\model\ProctorService::class
-    ],
-    \oat\taoProctoring\model\ProctorServiceDelegator::PROCTOR_SERVICE_OPTIONS => [
-        \oat\taoProctoring\model\ProctorService::PROCTORED_BY_DEFAULT => false
+return new ProctorServiceDelegator([
+    ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
+        new ProctorService([ProctorService::PROCTORED_BY_DEFAULT => false])
     ]
 ]);

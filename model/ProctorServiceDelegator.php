@@ -46,42 +46,31 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     private $extendedService;
 
-    /**
-     * ProctorServiceRoute constructor.
-     * @param array $options
-     * @throws \common_exception_NoImplementation
-     */
-    public function __construct(array $options = array())
+    public function getResponsibleService()
     {
-        parent::__construct($options);
-
-        if ($this->hasOption(self::PROCTOR_SERVICE_HANDLERS)) {
-            $handlers = $this->getOption(self::PROCTOR_SERVICE_HANDLERS);
-            foreach ($handlers as $handler) {
-                if (!class_exists($handler)) {
-                    throw new \common_exception_NoImplementation('Invalid configuration of the ProctorServiceDelegator.');
-                }
-
-                /** @var ProctorService $handlerService */
-                $options = $this->hasOption(self::PROCTOR_SERVICE_OPTIONS) ?
-                    $this->getOption(self::PROCTOR_SERVICE_OPTIONS) : [];
-
-                $handlerService = new $handler($options);
-                if (!is_a($handlerService, ProctorService::class)) {
+        if (!isset($this->extendedService))
+        {
+            foreach ($this->getOption(self::PROCTOR_SERVICE_HANDLERS) as $handler) {
+                if (!is_a($handler, ProctorService::class)) {
                     throw new \common_exception_NoImplementation('Handler should be instance of ProctorService. Property serviceClass in the configuration of the ProctorServiceDelegator is incorrect');
                 }
-
-                if ($handlerService->isSuitable()) {
-                    $this->extendedService = $handlerService;
+                $handler->setServiceLocator($this->getServiceLocator());
+                if ($handler->isSuitable()) {
+                    $this->extendedService = $handler;
                     break;
                 }
             }
         }
-
-        if (!$this->extendedService) {
-            $this->extendedService = new ProctorService($options);
-        }
+        return $this->extendedService;
     }
+    
+    public function registerHandler($handler)
+    {
+        $handlers = $this->getOption(self::PROCTOR_SERVICE_HANDLERS);
+        $handlers[] = $handler;
+        $this->setOption(self::PROCTOR_SERVICE_HANDLERS, $handlers);
+    }
+    
 
     /**
      * Delegate request to the responsible service
@@ -91,7 +80,6 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     public function __call($name, $arguments)
     {
-        $this->extendedService->setServiceManager($this->getServiceManager());
-        return call_user_func_array([$this->extendedService, $name], $arguments);
+        return call_user_func_array([$this->getResponsibleService(), $name], $arguments);
     }
 }
