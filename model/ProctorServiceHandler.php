@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\model;
 
 
-interface ProctorServiceHandler
+interface ProctorServiceHandler extends ProctorServiceInterface
 {
     public function isSuitable();
 }

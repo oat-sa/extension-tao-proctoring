@@ -45,6 +45,8 @@ class ProctorService extends ConfigurableService implements ProctorServiceInterf
 
     const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
 
+    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor

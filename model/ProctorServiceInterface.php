@@ -22,9 +22,35 @@
 namespace oat\taoProctoring\model;
 
 
+use oat\oatbox\user\User;
+
 interface ProctorServiceInterface
 {
     const SERVICE_ID = 'taoProctoring/ProctorAccess';
 
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+    /**
+     * Gets all deliveries available for a proctor
+     * @param User $proctor
+     * @param $context
+     * @return array
+     */
+    public function getProctorableDeliveries(User $proctor, $context = null);
+
+    /**
+     * @param User $proctor
+     * @param null $delivery
+     * @param null $context
+     * @param array $options
+     * @return mixed
+     */
+    public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = []);
+
+    /**
+     * @param User $proctor
+     * @param null $delivery
+     * @param null $context
+     * @param array $options
+     * @return mixed
+     */
+    public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = []);
 }
