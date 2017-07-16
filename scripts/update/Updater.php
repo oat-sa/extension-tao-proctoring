@@ -415,5 +415,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
             $this->setVersion('5.17.0');
          }
+
+        $this->skip('5.17.0', '5.18.0');
     }
 }
