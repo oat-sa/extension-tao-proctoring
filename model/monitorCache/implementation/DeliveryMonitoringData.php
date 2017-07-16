@@ -178,7 +178,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($keys === null) {
             $keys = [
                 DeliveryMonitoringService::REMAINING_TIME,
-                DeliveryMonitoringService::EXTRA_TIME
+                DeliveryMonitoringService::EXTRA_TIME,
+                DeliveryMonitoringService::EXTENDED_TIME
             ];
         }
         foreach ($keys as $key) {
@@ -255,7 +256,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
             $timer->load();
         }
-        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
+        $testSessionLimits = $testSession->getCurrentTestPart()->getTimeLimits();
+        if ($testSessionLimits->getMaxTime()) {
+            $maxTime = $testSessionLimits->getMaxTime()->getSeconds(true);
+        } else {
+            $maxTime = $testSession->getAssessmentTest()->getTimeLimits()->getMaxTime()->getSeconds(true);
+        }
+        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTime), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }
 

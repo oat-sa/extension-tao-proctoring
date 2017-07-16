@@ -80,9 +80,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
      * @param null $extraTime
+     * @param null $extendedTime
      * @return array
      */
-    public function setExtraTime($deliveryExecutions, $extraTime = null)
+    public function setExtraTime($deliveryExecutions, $extraTime = null, $extendedTime = null)
     {
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -90,7 +91,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $result = ['processed' => [], 'unprocessed' => []];
 
         /** @var DeliveryExecution $deliveryExecution */
-        foreach($deliveryExecutions as $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
             }
@@ -133,11 +134,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             /** @var QtiTimer $timer */
             $timer = $this->getDeliveryTimer($deliveryExecution);
-            $timer->setExtraTime($extraTime)->save();
+            $timer->setExtraTime($extraTime);
+            $timer->setExtendedTime($extendedTime)->save();
 
             /** @var DeliveryMonitoringData $data */
             $data = $deliveryMonitoringService->getData($deliveryExecution);
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
+            $data->update(DeliveryMonitoringService::EXTENDED_TIME, $extendedTime);
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
