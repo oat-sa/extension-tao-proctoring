@@ -21,6 +21,8 @@
 namespace oat\taoProctoring\model;
 
 use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 
 /**
@@ -35,11 +37,11 @@ class DeliveryServerService extends \taoDelivery_models_classes_DeliveryServerSe
     /**
      * Get resumable (active) deliveries.
      * @param User $user User instance. If not given then all deliveries will be returned regardless of user URI.
-     * @return type
+     * @return DeliveryExecutionInterface[]
      */
     public function getResumableDeliveries(User $user)
     {
-        $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        $deliveryExecutionService = ServiceProxy::singleton();
         $userUri = $user->getIdentifier();
         $started = array_merge(
             $deliveryExecutionService->getActiveDeliveryExecutions($userUri),

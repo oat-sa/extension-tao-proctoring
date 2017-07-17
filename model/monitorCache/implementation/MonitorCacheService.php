@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
@@ -109,7 +110,7 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function testStateChanged(TestChangedEvent $event)
     {
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         if ($event instanceof QtiTestChangeEvent) {
@@ -135,7 +136,7 @@ class MonitorCacheService extends MonitoringStorage
     public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
     {
         // assumes test execution id = delivery execution id
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
         $data = $this->getData($deliveryExecution);
         $data->setTestSession($event->getSession());
         $data->updateData([
