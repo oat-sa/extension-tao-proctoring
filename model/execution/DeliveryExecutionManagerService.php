@@ -28,6 +28,7 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\common\datatypes\QtiDuration;
+use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use taoDelivery_models_classes_execution_ServiceProxy;
 
@@ -94,6 +95,27 @@ class DeliveryExecutionManagerService extends ConfigurableService
         foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
+            }
+
+            if ($extendedTime) {
+                /** @var TestSessionService $testSessionService */
+                $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+                $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
+                /** @var AssessmentTest $testDefinition */
+                $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+                $deliveryExecutionArray[] = $deliveryExecution;
+                $extraTime = null;
+                if ($maxTime = $testDefinition->getTimeLimits()->getMaxTime()) {
+                    $seconds = $maxTime->getSeconds(true);
+                    $secondsNew = $seconds * $extendedTime;
+                    $extraTime = floor(($secondsNew - $seconds) / 60) * 60;
+                    $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+                    $data = $deliveryMonitoringService->getData($deliveryExecution);
+                    $dataArray = $data->get();
+                    if (!isset($dataArray[DeliveryMonitoringService::REMAINING_TIME])) {
+                        $data->update(DeliveryMonitoringService::REMAINING_TIME, $seconds);
+                    }
+                }
             }
 
             // reopen the execution if already closed

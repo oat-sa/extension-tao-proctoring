@@ -257,7 +257,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->load();
         }
         $testSessionLimits = $testSession->getCurrentTestPart()->getTimeLimits();
-        if ($testSessionLimits->getMaxTime()) {
+        if ($testSessionLimits) {
             $maxTime = $testSessionLimits->getMaxTime()->getSeconds(true);
         } else {
             $maxTime = $testSession->getAssessmentTest()->getTimeLimits()->getMaxTime()->getSeconds(true);
