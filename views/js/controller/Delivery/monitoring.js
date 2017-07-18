@@ -492,11 +492,12 @@ define([
                 function setInitialFilters()
                 {
                     var now = new Date();
-                    var nowStr =
-                        now.getFullYear() + '/' +
-                        ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
-                        ("0" + (now.getDate())).slice(-2);
+                    var dateFormat = locale.getDateTimeFormat().split(" ");
+                    var nowStr = dateFormat[0];
 
+                    nowStr = nowStr.replace("YYYY", now.getFullYear());
+                    nowStr = nowStr.replace("MM", ("0" + (now.getMonth() + 1)).slice(-2));
+                    nowStr = nowStr.replace("DD", ("0" + (now.getDate())).slice(-2));
                     $('#start_time_filter').val(nowStr + ' - ' + nowStr);
 
                     if (defaultTag) {
@@ -719,11 +720,12 @@ define([
                         filterTransform: function (value) {
                             var values = value.split(" - ");
                             var result = '';
+                            var dateFormat = locale.getDateTimeFormat();
                             if (values[0]) {
-                                result = moment(values[0], 'YYYY/MM/DD').format('X');
+                                result = moment(values[0], dateFormat).format('X');
                             }
                             if (values[1]) {
-                                values[1] = moment(values[1], 'YYYY/MM/DD').add(1, 'd').format('X');
+                                values[1] = moment(values[1], dateFormat).add(1, 'd').format('X');
                                 if (result !== '') {
                                     result += ' - ';
                                 }
@@ -735,8 +737,13 @@ define([
                             template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
                             '<button class="icon-find js-start_time_filter_button" type="button"></button>',
                             callback : function ($el) {
+                                var dateFormat = locale.getDateTimeFormat().split(" ");
+                                var dateFormatStr = dateFormat[0];
+                                dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
+                                dateFormatStr = dateFormatStr.replace('MM', 'mm');
+                                dateFormatStr = dateFormatStr.replace('DD', 'dd');
                                 $el.datepicker({
-                                    dateFormat: "yy/mm/dd",
+                                    dateFormat: dateFormatStr,
                                     onSelect: function( selectedDate ) {
                                         if(!$(this).data().datepicker.first){
                                             $(this).data().datepicker.inline = true;
