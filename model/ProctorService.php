@@ -33,7 +33,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class ProctorService extends ConfigurableService implements ProctorServiceInterface, ProctorServiceHandler
+class ProctorService extends ConfigurableService implements ProctorServiceHandler
 {
     use OntologyAwareTrait;
 
@@ -133,10 +133,8 @@ class ProctorService extends ConfigurableService implements ProctorServiceInterf
     }
 
     /**
-     * By default used only one ProctorService
-     * But when ProctorService extended and has many implementations
-     * then ProctorServiceRoute will determine which ProctorService should be used in the current context
-     * @return bool
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceHandler::isSuitable()
      */
     public function isSuitable()
     {

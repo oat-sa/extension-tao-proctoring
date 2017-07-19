@@ -23,7 +23,10 @@ namespace oat\taoProctoring\model;
 
 
 use oat\oatbox\user\User;
-
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
+/**
+ * Interface for services that manage proctor access rights
+ */
 interface ProctorServiceInterface
 {
     const SERVICE_ID = 'taoProctoring/ProctorAccess';
@@ -31,26 +34,31 @@ interface ProctorServiceInterface
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
-     * @param $context
-     * @return array
+     * @param string $context
+     * @return \core_kernel_classes_Resource[] deliveries
      */
     public function getProctorableDeliveries(User $proctor, $context = null);
 
     /**
+     * Returns the data of the delivery executions the proctor is allowed to see and manager
+     *
      * @param User $proctor
-     * @param null $delivery
-     * @param null $context
+     * @param \core_kernel_classes_Resource $delivery
+     * @param string $context
      * @param array $options
-     * @return mixed
+     * @return DeliveryMonitoringData[]
      */
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = []);
 
     /**
+     * Returns the ammount of delivery ececutions a proctor is allowed to administer.
+     * Uses the same filtering options as getProctorableDeliveryExecutions
+     *
      * @param User $proctor
-     * @param null $delivery
-     * @param null $context
+     * @param \core_kernel_classes_Resource $delivery
+     * @param string $context
      * @param array $options
-     * @return mixed
+     * @return integer
      */
     public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = []);
 }
