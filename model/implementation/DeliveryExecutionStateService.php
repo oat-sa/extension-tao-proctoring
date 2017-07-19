@@ -20,8 +20,8 @@
 
 namespace oat\taoProctoring\model\implementation;
 
-use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -454,7 +454,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function catchSessionPause(TestExecutionPausedEvent $event)
     {
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
         /** @var DeliveryExecutionStateService $service */
         $requestParams = \Context::getInstance()->getRequest()->getParameters();
         $reason = null;

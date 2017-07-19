@@ -21,6 +21,8 @@
 namespace oat\taoProctoring\model\execution;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -29,7 +31,6 @@ use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\common\datatypes\QtiDuration;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use taoDelivery_models_classes_execution_ServiceProxy;
 
 /**
  * Class DeliveryExecutionManagerService
@@ -45,7 +46,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      */
     public function getDeliveryExecutionById($deliveryExecutionId)
     {
-        return taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+        return ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
     }
 
     /**

@@ -20,8 +20,8 @@
  */
 
 namespace oat\taoProctoring\model\monitorCache;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 
 /**
  * Interface DeliveryMonitoringService
@@ -64,10 +64,10 @@ interface DeliveryMonitoringService
     /**
      * Retrieve the currently cached delivery data
      * 
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return DeliveryMonitoringData
      */
-    public function getData(DeliveryExecution $deliveryExecution);
+    public function getData(DeliveryExecutionInterface $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]
