@@ -45,8 +45,6 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
 
     const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
 
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
-
     /**
      * Gets all deliveries available for a proctor
      * @param User $proctor
@@ -95,41 +93,6 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
         }
 
         return $criteria;
-    }
-
-    /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function listenCreateDeliveryEvent(DeliveryCreatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        if (!empty($data['delivery'])) {
-            /** @var  $delivery */
-            $delivery = $this->getResource($data['delivery']);
-            $property = $this->getOption(self::PROCTORED_BY_DEFAULT);
-            if ($property) {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
-            } else {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-            }
-        }
-    }
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function listenUpdateDeliveryEvent(DeliveryUpdatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        $deliveryData = !empty($data['data']) ? $data['data'] : [];
-        if (!empty($data['delivery'])) {
-            $delivery = $this->getResource($data['delivery']);
-            if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-            }
-        }
     }
 
     /**
