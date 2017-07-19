@@ -126,7 +126,7 @@ class MonitorCacheServiceThread extends \Thread
 
     /**
      * Get delivery execution mock
-     * @return \oat\taoDelivery\models\classes\execution\DeliveryExecution
+     * @return \oat\taoDelivery\model\execution\DeliveryExecution
      */
     protected function getDeliveryExecution()
     {

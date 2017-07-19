@@ -32,7 +32,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution;
  * @author Aleh Hutnikau Bout, <joel@taotesting.com>
  * @package taoDelivery
  */
-class DeliveryServerService extends \taoDelivery_models_classes_DeliveryServerService
+class DeliveryServerService extends \oat\taoDelivery\model\execution\DeliveryServerService
 {
     /**
      * Get resumable (active) deliveries.
