@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\user\User;
 
 /**
  * Service which allows to use many proctorServices according to condition
@@ -41,6 +42,12 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     private $extendedService;
 
+    /**
+     * Returns applicable ProctorServices
+     *
+     * @throws \common_exception_NoImplementation
+     * @return \oat\taoProctoring\model\ProctorService
+     */
     public function getResponsibleService()
     {
         if (!isset($this->extendedService))
@@ -82,13 +89,29 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
     }
 
     /**
-     * Delegate request to the responsible service
-     * @param $name
-     * @param $arguments
-     * @return mixed
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceInterface::getProctorableDeliveries()
      */
-    public function __call($name, $arguments)
+    public function getProctorableDeliveries(User $proctor, $context = null)
     {
-        return call_user_func_array([$this->getResponsibleService(), $name], $arguments);
+        return $this->getResponsibleService()->getProctorableDeliveries($proctor, $context);
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceInterface::getProctorableDeliveryExecutions()
+     */
+    public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
+    {
+        return $this->getResponsibleService()->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceInterface::countProctorableDeliveryExecutions()
+     */
+    public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
+    {
+        return $this->getResponsibleService()->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 }

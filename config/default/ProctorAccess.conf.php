@@ -22,6 +22,6 @@ use oat\taoProctoring\model\ProctorService;
 
 return new ProctorServiceDelegator([
     ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
-        new ProctorService([ProctorService::PROCTORED_BY_DEFAULT => false])
+        new ProctorService()
     ]
 ]);

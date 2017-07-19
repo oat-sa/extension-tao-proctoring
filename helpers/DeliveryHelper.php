@@ -126,7 +126,6 @@ class DeliveryHelper
             'id' => $delivery->getUri(),
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri())),
             'label' => $delivery->getLabel(),
-            'text' => __('Monitor'),
             'stats' => array(
                 'awaitingApproval' => $awaiting,
                 'inProgress' => $inprogress,

@@ -21,7 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -104,7 +105,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringService::getData()
      */
-    public function getData(DeliveryExecution $deliveryExecution)
+    public function getData(DeliveryExecutionInterface $deliveryExecution)
     {
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
@@ -242,7 +243,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $result = $data;
         } else {
             foreach($data as $row) {
-                $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
                 $result[] = $this->getData($deliveryExecution);
             }
         }

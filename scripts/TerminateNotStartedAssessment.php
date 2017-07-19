@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\scripts;
 
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
@@ -67,7 +68,7 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDeliveryRdf');
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest');
 
-        $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        $deliveryExecutionService = ServiceProxy::singleton();
 
         $cancel = 0;
         $pause = 0;

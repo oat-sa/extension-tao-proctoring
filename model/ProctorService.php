@@ -33,7 +33,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class ProctorService extends ConfigurableService implements ProctorServiceInterface, ProctorServiceHandler
+class ProctorService extends ConfigurableService implements ProctorServiceHandler
 {
     use OntologyAwareTrait;
 
@@ -44,8 +44,6 @@ class ProctorService extends ConfigurableService implements ProctorServiceInterf
     const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
 
     const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
-
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
     /**
      * Gets all deliveries available for a proctor
@@ -98,45 +96,8 @@ class ProctorService extends ConfigurableService implements ProctorServiceInterf
     }
 
     /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function listenCreateDeliveryEvent(DeliveryCreatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        if (!empty($data['delivery'])) {
-            /** @var  $delivery */
-            $delivery = $this->getResource($data['delivery']);
-            $property = $this->getOption(self::PROCTORED_BY_DEFAULT);
-            if ($property) {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
-            } else {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-            }
-        }
-    }
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function listenUpdateDeliveryEvent(DeliveryUpdatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        $deliveryData = !empty($data['data']) ? $data['data'] : [];
-        if (!empty($data['delivery'])) {
-            $delivery = $this->getResource($data['delivery']);
-            if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-                $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-            }
-        }
-    }
-
-    /**
-     * By default used only one ProctorService
-     * But when ProctorService extended and has many implementations
-     * then ProctorServiceRoute will determine which ProctorService should be used in the current context
-     * @return bool
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceHandler::isSuitable()
      */
     public function isSuitable()
     {

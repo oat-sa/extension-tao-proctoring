@@ -24,5 +24,11 @@ namespace oat\taoProctoring\model;
 
 interface ProctorServiceHandler extends ProctorServiceInterface
 {
+    /**
+     * By default used only one ProctorService
+     * But when ProctorService extended and has many implementations
+     * then ProctorServiceRoute will determine which ProctorService should be used in the current context
+     * @return bool
+     */
     public function isSuitable();
 }
