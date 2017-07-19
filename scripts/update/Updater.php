@@ -418,9 +418,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.17.0');
          }
 
-        $this->skip('5.17.0', '5.18.0');
+        $this->skip('5.17.0', '5.18.1');
 
-        if ($this->isVersion('5.18.0')) {
+        if ($this->isVersion('5.18.1')) {
             
             $proctorService = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
             $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
