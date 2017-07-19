@@ -14,14 +14,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA;
-*/
+ * Copyright (c) 2017  (original work) Open Assessment Technologies SA;
+ *
+ * @author Alexander Zagovorichev <zagovorichev@1pt.com>
+ */
 
-use oat\taoProctoring\model\ProctorServiceDelegator;
-use oat\taoProctoring\model\ProctorService;
+namespace oat\taoProctoring\model;
 
-return new ProctorServiceDelegator([
-    ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [
-        new ProctorService()
-    ]
-]);
+
+interface ProctorServiceHandler extends ProctorServiceInterface
+{
+    /**
+     * By default used only one ProctorService
+     * But when ProctorService extended and has many implementations
+     * then ProctorServiceRoute will determine which ProctorService should be used in the current context
+     * @return bool
+     */
+    public function isSuitable();
+}
