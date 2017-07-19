@@ -21,12 +21,11 @@ namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
-use oat\taoProctoring\model\execution\ProctoredDeliveryFactoryEventsService;
-use oat\taoProctoring\model\execution\ProctoredDeliveryFactoryService;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
 
@@ -55,11 +54,11 @@ class TestTakerAuthorizationService extends ConfigurableService
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyResumeAuthorization()
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @param User $user
      * @throws UnAuthorizedException
      */
-    public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
+    public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         $state = $deliveryExecution->getState()->getUri();
 

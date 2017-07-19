@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\scripts;
 
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
@@ -30,7 +31,7 @@ use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use common_Logger;
 use common_report_Report as Report;
-use oat\taoDelivery\models\classes\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * Script that terminates assessments, paused longer than XXX
@@ -41,7 +42,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
     use ServiceLocatorAwareTrait;
 
     /**
-     * @var \Report
+     * @var Report
      */
     protected $report;
 
@@ -67,7 +68,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDeliveryRdf');
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest');
 
-        $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        $deliveryExecutionService = ServiceProxy::singleton();
 
         $count = 0;
         $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);

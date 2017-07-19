@@ -23,7 +23,8 @@ namespace oat\taoProctoring\scripts;
 
 use common_report_Report as Report;
 use oat\oatbox\action\Action;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringService;
+use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
@@ -42,7 +43,7 @@ class UpdateMonitoringCache implements Action, ServiceLocatorAwareInterface
     use ServiceLocatorAwareTrait;
 
     /**
-     * @var \Report
+     * @var Report
      */
     protected $report;
 
@@ -52,11 +53,11 @@ class UpdateMonitoringCache implements Action, ServiceLocatorAwareInterface
      */
     public function __invoke($params)
     {
-        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
         $deliveries = $deliveryClass->getInstances(true);
 
-        $deliveryExecutionService = \taoDelivery_models_classes_execution_ServiceProxy::singleton();
+        $deliveryExecutionService = ServiceProxy::singleton();
 
         $this->report = new Report(
             Report::TYPE_INFO,

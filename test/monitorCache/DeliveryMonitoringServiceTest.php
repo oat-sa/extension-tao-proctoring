@@ -440,7 +440,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $id = $this->deliveryExecutionId;
         }
         $prophet = new \Prophecy\Prophet();
-        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\models\classes\execution\DeliveryExecution');
+        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
