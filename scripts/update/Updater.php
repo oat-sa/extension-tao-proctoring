@@ -52,6 +52,8 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\model\ProctorServiceDelegator;
+use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
