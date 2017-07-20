@@ -23,9 +23,16 @@ define([
     'lodash',
     'ui/component',
     'tpl!taoProctoring/component/dateRange/form',
+    'util/locale',
     'jquery.timePicker'
-], function ($, _, component, formTpl) {
+], function ($, _, component, formTpl, locale) {
     'use strict';
+
+    var dateFormat = locale.getDateTimeFormat().split(" ");
+    var dateFormatStr = dateFormat[0];
+    dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
+    dateFormatStr = dateFormatStr.replace('MM', 'mm');
+    dateFormatStr = dateFormatStr.replace('DD', 'dd');
 
     /**
      * Some default config
@@ -33,9 +40,8 @@ define([
      * @private
      */
     var _defaults = {
-        dateFormat: 'yy-mm-dd'
+        dateFormat: dateFormatStr
     };
-
     /**
      * Creates a dates range with date pickers
      *

@@ -24,6 +24,8 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
+use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
@@ -31,18 +33,17 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class ProctorService extends ConfigurableService
+class ProctorService extends ConfigurableService implements ProctorServiceHandler
 {
     use OntologyAwareTrait;
 
-    const SERVICE_ID = 'taoProctoring/ProctorAccess';
-    
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
     const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
 
     const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
 
+    const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
 
     /**
      * Gets all deliveries available for a proctor
@@ -92,6 +93,15 @@ class ProctorService extends ConfigurableService
         }
 
         return $criteria;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \oat\taoProctoring\model\ProctorServiceHandler::isSuitable()
+     */
+    public function isSuitable()
+    {
+        return true;
     }
 
 }

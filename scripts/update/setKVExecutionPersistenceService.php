@@ -23,10 +23,9 @@ namespace oat\taoProctoring\scripts\update;
 
 use common_ext_ExtensionsManager;
 use common_report_Report;
-use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\model\execution\KeyValueService;
+use oat\taoDelivery\model\execution\implementation\KeyValueService;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use taoDelivery_models_classes_execution_ServiceProxy;
 
 /**
  * This one required in order to move from deprecated implementation
@@ -38,11 +37,12 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
     /**
      * @param $params
      * @return common_report_Report
+     * @throws \ReflectionException
      */
     public function __invoke($params)
     {
         $ext = common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
-        $oldService = $ext->getConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY);
+        $oldService = $ext->getConfig(ServiceProxy::CONFIG_KEY);
         $persistenceOption = $oldService->getOption($oldService::OPTION_PERSISTENCE);
         $newService = new KeyValueService([
             KeyValueService::OPTION_PERSISTENCE => $persistenceOption,
@@ -50,7 +50,7 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
 
 
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find(
             [
                 ['start_time' => '>0']
@@ -71,7 +71,7 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
 
         }
 
-        $ext->setConfig(taoDelivery_models_classes_execution_ServiceProxy::CONFIG_KEY, $newService);
+        $ext->setConfig(ServiceProxy::CONFIG_KEY, $newService);
 
         return new common_report_Report(common_report_Report::TYPE_SUCCESS,
             'Execution KV storage updated to oat\taoDelivery\model\execution\KeyValueService');

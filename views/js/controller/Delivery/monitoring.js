@@ -366,6 +366,9 @@ define([
                         formatted.allowed = (status.can[actionName] === true);
                         if(!formatted.allowed){
                             formatted.reason = status.can[actionName];
+                            formatted.warning = status.warning[actionName] ?
+                                status.warning[actionName](null, testTakerData.id) :
+                                __('Unable to perform action on test %s.', testTakerData.id);
                         }
                     }
                     if (testTakerData.timer) {
@@ -436,11 +439,7 @@ define([
                     });
 
                     if (!config.allowedResources.length) {
-                        if (_selection.length > 1) {
-                            feedback().warning(__('No report available for these test sessions'));
-                        } else {
-                            feedback().warning(__('No report available for this test session'));
-                        }
+                        feedback().warning(_status.buildWarningMessage(actionName, _selection, config.deniedResources));
                     } else {
                         bulkActionPopup(config).on('ok', function(reason){
                             //execute callback
@@ -493,11 +492,12 @@ define([
                 function setInitialFilters()
                 {
                     var now = new Date();
-                    var nowStr =
-                        now.getFullYear() + '/' +
-                        ("0" + (now.getMonth() + 1)).slice(-2) + '/' +
-                        ("0" + (now.getDate())).slice(-2);
+                    var dateFormat = locale.getDateTimeFormat().split(" ");
+                    var nowStr = dateFormat[0];
 
+                    nowStr = nowStr.replace("YYYY", now.getFullYear());
+                    nowStr = nowStr.replace("MM", ("0" + (now.getMonth() + 1)).slice(-2));
+                    nowStr = nowStr.replace("DD", ("0" + (now.getDate())).slice(-2));
                     $('#start_time_filter').val(nowStr + ' - ' + nowStr);
 
                     if (defaultTag) {
@@ -636,26 +636,6 @@ define([
                         action: report
                     });
 
-                    // tool: display sessions history
-                    tools.push({
-                        id: 'history',
-                        icon: 'history',
-                        title: __('Show the detailed session history'),
-                        label: __('History'),
-                        massAction: true,
-                        action: showHistory
-                    });
-
-                    // tools: print score report
-                    tools.push({
-                        id : 'printRubric',
-                        title : __('Print the score report'),
-                        icon : 'print',
-                        label : __('Print Score'),
-                        massAction: true,
-                        action : printResults
-                    });
-
                     // tools: print results
                     if (printReportButton) {
                         tools.push({
@@ -740,11 +720,12 @@ define([
                         filterTransform: function (value) {
                             var values = value.split(" - ");
                             var result = '';
+                            var dateFormat = locale.getDateTimeFormat();
                             if (values[0]) {
-                                result = moment(values[0], 'YYYY/MM/DD').format('X');
+                                result = moment(values[0], dateFormat).format('X');
                             }
                             if (values[1]) {
-                                values[1] = moment(values[1], 'YYYY/MM/DD').add(1, 'd').format('X');
+                                values[1] = moment(values[1], dateFormat).add(1, 'd').format('X');
                                 if (result !== '') {
                                     result += ' - ';
                                 }
@@ -756,8 +737,13 @@ define([
                             template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
                             '<button class="icon-find js-start_time_filter_button" type="button"></button>',
                             callback : function ($el) {
+                                var dateFormat = locale.getDateTimeFormat().split(" ");
+                                var dateFormatStr = dateFormat[0];
+                                dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
+                                dateFormatStr = dateFormatStr.replace('MM', 'mm');
+                                dateFormatStr = dateFormatStr.replace('DD', 'dd');
                                 $el.datepicker({
-                                    dateFormat: "yy/mm/dd",
+                                    dateFormat: dateFormatStr,
                                     onSelect: function( selectedDate ) {
                                         if(!$(this).data().datepicker.first){
                                             $(this).data().datepicker.inline = true;

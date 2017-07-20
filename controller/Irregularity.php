@@ -25,6 +25,7 @@ use oat\tao\model\export\implementation\CsvExporter;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\controller\form\IrregularitiesExportForm;
+use oat\taoProctoring\model\service\IrregularityReport;
 
 /**
  * Irregularity controller
@@ -34,8 +35,16 @@ use oat\taoProctoring\controller\form\IrregularitiesExportForm;
  * @license GPL-2.0
  *
  */
-class Irregularity extends \tao_actions_CommonModule
+class Irregularity extends \tao_actions_QueueAction
 {
+
+    protected function setQueueData() {
+        $this->setData('queueId', 'export/irregularity');
+        $this->setView('Irregularities/index.tpl');
+    }
+
+
+
     /**
      * Displays the form to export irregularities
      */
@@ -45,80 +54,53 @@ class Irregularity extends \tao_actions_CommonModule
         $formContainer = new IrregularitiesExportForm($this->getRequestParameter('uri'));
         $myForm = $formContainer->getForm();
 
+        $asyncQueue = $this->isAsyncQueue();
 
-        $this->setData('myForm', $myForm->render());
-        $this->setData('formTitle', __('Export Irregularities'));
+        if ($myForm->isValid() && $myForm->isSubmited()) {
+            $delivery = new \core_kernel_classes_Resource(\tao_helpers_Uri::decode($this->getRequestParameter('uri')));
+            $from = ($this->hasRequestParameter('from')) ? strtotime($this->getRequestParameter('from')) : '';
+            $to = ($this->hasRequestParameter('to')) ? strtotime($this->getRequestParameter('to')) : '';
 
-        $this->setView('form.tpl', 'tao');
-    }
+            $task = $this->getIrregularities($delivery, $from, $to);
+            $report = $this->getTaskReport($task);
 
-    public function exportIrregularities()
-    {
-        if (!$this->hasRequestParameter('uri')) {
-            $response = array(
-                'success' => false,
-                'message' => __('You must select a delivery in order to export its irregularities')
-            );
-            $this->returnJson($response, 200);
+            if (!$asyncQueue) {
+                $filename = $this->getReportAttachment($report);
+                if ($filename) {
+                    $file = $this->getFile($filename);
+                    if ($file !== false) {
 
-            return;
-        }
-        $delivery = new \core_kernel_classes_Resource(\tao_helpers_Uri::decode($this->getRequestParameter('uri')));
-        $from = ($this->hasRequestParameter('from')) ? strtotime($this->getRequestParameter('from')) : '';
-        $to = ($this->hasRequestParameter('to')) ? strtotime($this->getRequestParameter('to')) : '';
-
-        try {
-            $export = $this->getIrregularities($delivery, $from, $to);
-        } catch (\common_Exception $e) {
-            $response = array('success' => false, 'message' => __('Something went wrong during the export'));
-            $this->returnJson($response, 200);
-
-            return;
-        }
-        setcookie('fileDownload', 'true', 0, '/');
-        $exporter = new CsvExporter($export);
-        $exporter->export(false, true);
-    }
-
-
-    private function getIrregularities($delivery, $from = '', $to = ''){
-        $export = array(
-            array(__('date'), __('author'), __('test taker'), __('category'), __('subcategory'), __('comment'))
-        );
-
-        $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
-        $service = ResultsService::singleton();
-        $implementation = $service->getReadableImplementation($delivery);
-
-        $service->setImplementation($implementation);
-
-
-        $results = $service->getImplementation()->getResultByDelivery(array($delivery->getUri()));
-
-        foreach($results as $res){
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
-            $logs = $deliveryLog->get(
-                $deliveryExecution->getIdentifier(),
-                'TEST_IRREGULARITY'
-            );
-            foreach($logs as $data){
-                $exportable = array();
-                if((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)){
-
-                    $testTaker = new \core_kernel_classes_Resource($res['testTakerIdentifier']);
-                    $author = new \core_kernel_classes_Resource($data['created_by']);
-                    $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
-                    $exportable[] = $author->getLabel();
-                    $exportable[] = $testTaker->getLabel();
-                    $exportable[] = $data['data']['reason']['reasons']['category'];
-                    $exportable[] = (isset($data['data']['reason']['reasons']['subCategory'])) ? $data['data']['reason']['reasons']['subCategory'] : '';
-                    $exportable[] = $data['data']['reason']['comment'];
-                    $export[] = $exportable;
+                        $this->prepareDownload($filename, 'text/csv');
+                        \tao_helpers_Http::returnStream(new \GuzzleHttp\Psr7\Stream($file));
+                        return;
+                    }
                 }
             }
+
+            $this->returnReport($report);
+
+        } else {
+
+            $this->setData('asyncQueue', $asyncQueue);
+            $this->setData('myForm', $myForm->render());
+            $this->setQueueData();
         }
 
-        return $export;
+    }
+
+    /**
+     * @param $delivery
+     * @param string $from
+     * @param string $to
+     * @return array
+     */
+    private function getIrregularities($delivery, $from = '', $to = ''){
+        /**
+         * @var $IrregularityReport IrregularityReport
+         */
+        $IrregularityReport = $this->getServiceManager()->get(IrregularityReport::SERVICE_ID);
+
+        return $IrregularityReport->getIrregularities($delivery, $from , $to );
 
     }
 }
