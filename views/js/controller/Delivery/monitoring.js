@@ -873,6 +873,15 @@ define([
                         });
                     }
 
+                    model.push({
+                        id: 'extendedTime',
+                        label: __('Extended Time'),
+                        transform: function(value, row) {
+                            var timer = _.isObject(row.timer) ? row.timer : {};
+                            return timer.extendedTime;
+                        }
+                    });
+
                     if (allowedConnectivity) {
                         // column: connectivity status of execution progress
                         model.push({
