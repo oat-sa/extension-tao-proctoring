@@ -110,7 +110,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     $seconds = $maxTime->getSeconds(true);
                     $secondsNew = $seconds * $extendedTime;
                     $extraTime = floor(($secondsNew - $seconds) / 60) * 60;
-                    $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
                     $data = $deliveryMonitoringService->getData($deliveryExecution);
                     $dataArray = $data->get();
                     if (!isset($dataArray[DeliveryMonitoringService::REMAINING_TIME])) {
@@ -157,8 +156,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             /** @var QtiTimer $timer */
             $timer = $this->getDeliveryTimer($deliveryExecution);
-            $timer->setExtraTime($extraTime);
-            $timer->setExtendedTime($extendedTime)->save();
+            $timer
+                ->setExtraTime($extraTime)
+                ->setExtendedTime($extendedTime)
+                ->save();
 
             /** @var DeliveryMonitoringData $data */
             $data = $deliveryMonitoringService->getData($deliveryExecution);
