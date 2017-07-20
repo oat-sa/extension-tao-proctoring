@@ -21,11 +21,9 @@
 
 namespace oat\taoProctoring\test\monitorCache;
 
-use oat\oatbox\service\ServiceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
-use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**

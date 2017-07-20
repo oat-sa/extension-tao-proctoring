@@ -19,6 +19,7 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\TestSessionHistoryService as TestSessionHistoryServiceInterface;
 use \oat\oatbox\service\ConfigurableService;
 use DateTime;
@@ -104,13 +105,14 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         $periodStart = $this->getPeriodStart($options);
         $periodEnd = $this->getPeriodEnd($options);
 
+        /** @var DeliveryLog $deliveryLog */
         $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
 
         //empty array means that all events (except listed in self::$eventsToExclude) will be represented in the report
         $eventsToInclude = $options['detailed'] ? [] : self::$briefEvents;
 
         foreach ($sessions as $sessionUri) {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessionUri);
             $logs = $deliveryLog->get($deliveryExecution->getIdentifier());
             $exportable = [];
 

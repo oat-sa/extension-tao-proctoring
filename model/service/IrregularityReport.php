@@ -21,13 +21,19 @@ namespace oat\taoProctoring\model\service;
 
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 class IrregularityReport extends AbstractIrregularityReport
 {
 
-
+    /**
+     * @param \core_kernel_classes_Resource $delivery
+     * @param string $from
+     * @param string $to
+     * @return array
+     */
     public function getIrregularitiesTable(\core_kernel_classes_Resource $delivery, $from = '', $to = '')
     {
         $export = array(
@@ -44,7 +50,7 @@ class IrregularityReport extends AbstractIrregularityReport
         $results = $service->getImplementation()->getResultByDelivery(array($delivery->getUri()));
 
         foreach ($results as $res) {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
             $logs = $deliveryLog->get(
                 $deliveryExecution->getIdentifier(),
                 'TEST_IRREGULARITY'

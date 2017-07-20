@@ -21,6 +21,7 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService as TestSessionConnectivityStatusServiceInterface;
 
 /**
@@ -43,7 +44,7 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
         if(!$this->hasOnlineMode()){
             \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
         }
-        $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionId);
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessionId);
         return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_ACTIVE;
     }
 

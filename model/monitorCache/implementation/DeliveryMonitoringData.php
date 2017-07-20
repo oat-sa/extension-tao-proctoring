@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
@@ -77,9 +77,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
     /**
      * DeliveryMonitoringData constructor.
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      */
-    public function __construct(DeliveryExecution $deliveryExecution, $data)
+    public function __construct(DeliveryExecutionInterface $deliveryExecution, $data)
     {
         $this->deliveryExecution = $deliveryExecution;
         if (is_array($data) && !empty($data)) {

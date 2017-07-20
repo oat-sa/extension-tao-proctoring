@@ -37,6 +37,9 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\update\TestTakerUpdate;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoEventLog\model\LoggerService;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
+use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 
 /**
  * Class RegisterSessionStateListener
@@ -64,6 +67,9 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
 
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
+
+        $this->registerEvent(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
+        $this->registerEvent(DeliveryUpdatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryUpdated']);
     }
 }
 

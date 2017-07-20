@@ -24,6 +24,8 @@ namespace oat\taoProctoring\scripts\uninstall;
 
 use oat\oatbox\extension\UninstallAction;
 use oat\tao\model\entryPoint\EntryPointService;
+use oat\taoDelivery\model\entrypoint\FrontOfficeEntryPoint;
+use oat\taoDelivery\model\execution\DeliveryServerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
@@ -55,7 +57,7 @@ class RestoreServices extends UninstallAction
         // restore entry points
         $entryPointService = $this->getServiceManager()->get(EntryPointService::SERVICE_ID);
         $entryPointService->removeEntryPoint('proctoring');
-        $entryPointService->overrideEntryPoint('deliveryServer', new \taoDelivery_models_classes_entrypoint_FrontOfficeEntryPoint());
+        $entryPointService->overrideEntryPoint('deliveryServer', new FrontOfficeEntryPoint());
         $this->getServiceManager()->register(EntryPointService::SERVICE_ID, $entryPointService);
 
         // remove unneeded services
@@ -71,11 +73,8 @@ class RestoreServices extends UninstallAction
         $this->unregisterService(ReportingService::SERVICE_ID);
 
         // restore delivery server
-        $deliveryConfig = $this->getServiceManager()->get(\taoDelivery_models_classes_DeliveryServerService::CONFIG_ID)->getOptions();
-        $this->getServiceManager()->register(
-            \taoDelivery_models_classes_DeliveryServerService::CONFIG_ID,
-            new \taoDelivery_models_classes_DeliveryServerService($deliveryConfig)
-        );
+        $deliveryConfig = $this->getServiceManager()->get(DeliveryServerService::SERVICE_ID)->getOptions();
+        $this->getServiceManager()->register(DeliveryServerService::SERVICE_ID, new DeliveryServerService($deliveryConfig));
 
         // restore authorisation provider
         $authService->unregister(ProctorAuthorizationProvider::class);

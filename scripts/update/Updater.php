@@ -52,6 +52,8 @@ use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\ProctorService;
+use oat\taoProctoring\model\ProctorServiceDelegator;
+use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
@@ -416,6 +418,33 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('5.17.0');
          }
 
-        $this->skip('5.17.0', '5.18.0');
+        $this->skip('5.17.0', '5.18.1');
+
+        if ($this->isVersion('5.18.1')) {
+            
+            $proctorService = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
+            $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
+            if ($proctorService->hasOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT)) {
+                $authService->setOption(
+                    TestTakerAuthorizationService::PROCTORED_BY_DEFAULT,
+                    $proctorService->getOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT)
+                );
+                $this->getServiceManager()->register(TestTakerAuthorizationService::SERVICE_ID, $authService);
+            }
+            
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryCreatedEvent::class, [ProctorService::SERVICE_ID, 'listenCreateDeliveryEvent']);
+            $eventManager->detach(DeliveryUpdatedEvent::class, [ProctorService::SERVICE_ID, 'listenUpdateDeliveryEvent']);
+            $eventManager->attach(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
+            $eventManager->attach(DeliveryUpdatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryUpdated']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            
+            $service = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
+            if (!is_a($service, ProctorServiceDelegator::class)) {
+                $delegator = new ProctorServiceDelegator([ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [$service]]);
+                $this->getServiceManager()->register(ProctorServiceInterface::SERVICE_ID, $delegator);
+            }
+            $this->setVersion('6.0.0');
+        }
     }
 }

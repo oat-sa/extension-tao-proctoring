@@ -23,6 +23,7 @@ namespace oat\taoProctoring\controller;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\helpers\DataTableHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
@@ -90,7 +91,7 @@ class Reporting extends SimplePageModule
         if (count($sessions) > 1) {
             $viewData['title'] = __('Detailed Session History of a selection');
         } else {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
             $viewData['title'] = __('Detailed Session History of %s', $deliveryExecution->getLabel());
         }
         
@@ -168,7 +169,7 @@ class Reporting extends SimplePageModule
         $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
 
         foreach ($idList as $deliveryExecutionId) {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
             $delivery = $deliveryExecution->getDelivery();
             if (!isset($deliveries[$delivery->getUri()])) {
                 \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
@@ -213,7 +214,7 @@ class Reporting extends SimplePageModule
         $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
 
         foreach ($idList as $deliveryExecutionId) {
-            $deliveryExecution = \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
             $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);
 
             if (!$deliveryData['end']) {

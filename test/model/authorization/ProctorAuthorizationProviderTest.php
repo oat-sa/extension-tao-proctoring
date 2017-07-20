@@ -24,6 +24,7 @@ use oat\oatbox\user\User;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\ProctorService;
@@ -61,7 +62,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     {
         $prophet = new Prophet();
         $prophecy = $prophet->prophesize();
-        $prophecy->willImplement(DeliveryExecution::class);
+        $prophecy->willImplement(DeliveryExecutionInterface::class);
         $prophecy->getDelivery()->willReturn($this->getDelivery());
         $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($executionStateUri));
         $prophecy->getIdentifier()->willReturn('fakeDeliveryExecution');
