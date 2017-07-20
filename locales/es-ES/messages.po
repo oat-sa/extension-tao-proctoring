@@ -891,7 +891,7 @@ msgid "Something went wrong during the export"
 msgstr ""
 
 msgid "Start"
-msgstr "Inicio"
+msgstr "Empezar"
 
 msgid "Start date of the export"
 msgstr ""
@@ -1145,10 +1145,10 @@ msgid "My Tests"
 msgstr "Mis exámenes"
 
 msgid "Resume"
-msgstr "Empezar"
+msgstr "Reanudar"
 
 msgid "Start"
-msgstr "Inicio"
+msgstr "Empezar"
 
 msgid "Started at %s"
 msgstr "Comenzó a las %s"
