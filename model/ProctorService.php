@@ -37,6 +37,11 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
 {
     use OntologyAwareTrait;
 
+    /**
+     * @deprecated constant moved to the \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
+     */
+    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+
     const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
     const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
