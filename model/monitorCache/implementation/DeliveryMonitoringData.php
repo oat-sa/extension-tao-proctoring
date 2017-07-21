@@ -257,18 +257,38 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->load();
         }
         $maxTimeSeconds = null;
-        if ($testPart = $testSession->getCurrentTestPart()) {
-            if ($testSessionLimits = $testPart->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : null;
-            }
-        } else {
+
+        if ($timeLimits = $testSession->getAssessmentTest()->getTimeLimits()) {
             $timeLimits = $testSession->getAssessmentTest()->getTimeLimits();
             $maxTimeSeconds = $timeLimits->hasMaxTime()
                 ? $timeLimits->getMaxTime()->getSeconds(true)
                 : null;
         }
+
+        if ($testPart = $testSession->getCurrentTestPart()) {
+            if ($testSessionLimits = $testPart->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
+        if ($section = $testSession->getCurrentAssessmentSection()) {
+            if ($testSessionLimits = $section->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
+        if ($test = $testSession->getCurrentAssessmentItemSession()) {
+            if ($testSessionLimits = $test->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }
