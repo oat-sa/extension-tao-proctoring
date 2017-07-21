@@ -52,6 +52,7 @@ interface DeliveryMonitoringService
     const END_TIME = 'end_time';
     const REMAINING_TIME = 'remaining_time';
     const EXTRA_TIME = 'extra_time';
+    const EXTENDED_TIME = 'extended_time';
     const CONSUMED_EXTRA_TIME = 'consumed_extra_time';
     const ALLOW_EXTRA_TIME = 'allow_extra_time';
 
