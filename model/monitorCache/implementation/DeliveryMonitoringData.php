@@ -256,14 +256,20 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
             $timer->load();
         }
+        $maxTimeSeconds = null;
         if ($testPart = $testSession->getCurrentTestPart()) {
             if ($testSessionLimits = $testPart->getTimeLimits()) {
-                $maxTime = $testSessionLimits->getMaxTime()->getSeconds(true);
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : null;
             }
         } else {
-            $maxTime = $testSession->getAssessmentTest()->getTimeLimits()->getMaxTime()->getSeconds(true);
+            $timeLimits = $testSession->getAssessmentTest()->getTimeLimits();
+            $maxTimeSeconds = $timeLimits->hasMaxTime()
+                ? $timeLimits->getMaxTime()->getSeconds(true)
+                : null;
         }
-        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTime), true);
+        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }
 
