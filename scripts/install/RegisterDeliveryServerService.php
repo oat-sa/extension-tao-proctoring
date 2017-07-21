@@ -22,7 +22,6 @@
 namespace oat\taoProctoring\scripts\install;
 
 use oat\taoProctoring\model\DeliveryServerService;
-use oat\oatbox\service\ServiceManager;
 
 /**
  * Class RegisterDeliveryServerService
@@ -33,12 +32,13 @@ class RegisterDeliveryServerService extends \common_ext_action_InstallAction
 {
     /**
      * @param $params
+     * @throws \common_Exception
      */
     public function __invoke($params)
     {
-        $deliveryConfig = $this->getServiceManager()->get(\taoDelivery_models_classes_DeliveryServerService::CONFIG_ID)->getOptions();
+        $deliveryConfig = $this->getServiceManager()->get(DeliveryServerService::SERVICE_ID)->getOptions();
         $this->getServiceManager()->register(
-            \taoDelivery_models_classes_DeliveryServerService::CONFIG_ID,
+            DeliveryServerService::SERVICE_ID,
             new DeliveryServerService($deliveryConfig)
         );
     }

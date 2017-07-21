@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
@@ -77,9 +77,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
     /**
      * DeliveryMonitoringData constructor.
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      */
-    public function __construct(DeliveryExecution $deliveryExecution, $data)
+    public function __construct(DeliveryExecutionInterface $deliveryExecution, $data)
     {
         $this->deliveryExecution = $deliveryExecution;
         if (is_array($data) && !empty($data)) {
@@ -178,7 +178,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($keys === null) {
             $keys = [
                 DeliveryMonitoringService::REMAINING_TIME,
-                DeliveryMonitoringService::EXTRA_TIME
+                DeliveryMonitoringService::EXTRA_TIME,
+                DeliveryMonitoringService::EXTENDED_TIME
             ];
         }
         foreach ($keys as $key) {
@@ -255,7 +256,40 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
             $timer->load();
         }
-        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
+        $maxTimeSeconds = null;
+
+        if ($timeLimits = $testSession->getAssessmentTest()->getTimeLimits()) {
+            $timeLimits = $testSession->getAssessmentTest()->getTimeLimits();
+            $maxTimeSeconds = $timeLimits->hasMaxTime()
+                ? $timeLimits->getMaxTime()->getSeconds(true)
+                : null;
+        }
+
+        if ($testPart = $testSession->getCurrentTestPart()) {
+            if ($testSessionLimits = $testPart->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
+        if ($section = $testSession->getCurrentAssessmentSection()) {
+            if ($testSessionLimits = $section->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
+        if ($test = $testSession->getCurrentAssessmentItemSession()) {
+            if ($testSessionLimits = $test->getTimeLimits()) {
+                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
+                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                    : $maxTimeSeconds;
+            }
+        }
+
+        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
     }
 

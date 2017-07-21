@@ -21,6 +21,8 @@
 namespace oat\taoProctoring\model\execution;
 
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -28,8 +30,8 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\common\datatypes\QtiDuration;
+use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use taoDelivery_models_classes_execution_ServiceProxy;
 
 /**
  * Class DeliveryExecutionManagerService
@@ -45,7 +47,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      */
     public function getDeliveryExecutionById($deliveryExecutionId)
     {
-        return taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+        return ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
     }
 
     /**
@@ -80,9 +82,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
      * @param null $extraTime
+     * @param null $extendedTime
      * @return array
      */
-    public function setExtraTime($deliveryExecutions, $extraTime = null)
+    public function setExtraTime($deliveryExecutions, $extraTime = null, $extendedTime = null)
     {
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -90,9 +93,29 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $result = ['processed' => [], 'unprocessed' => []];
 
         /** @var DeliveryExecution $deliveryExecution */
-        foreach($deliveryExecutions as $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
+            }
+
+            if ($extendedTime) {
+                /** @var TestSessionService $testSessionService */
+                $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+                $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
+                /** @var AssessmentTest $testDefinition */
+                $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+                $deliveryExecutionArray[] = $deliveryExecution;
+                $extraTime = null;
+                if ($maxTime = $testDefinition->getTimeLimits()->getMaxTime()) {
+                    $seconds = $maxTime->getSeconds(true);
+                    $secondsNew = $seconds * $extendedTime;
+                    $extraTime = floor(($secondsNew - $seconds) / 60) * 60;
+                    $data = $deliveryMonitoringService->getData($deliveryExecution);
+                    $dataArray = $data->get();
+                    if (!isset($dataArray[DeliveryMonitoringService::REMAINING_TIME])) {
+                        $data->update(DeliveryMonitoringService::REMAINING_TIME, $seconds);
+                    }
+                }
             }
 
             // reopen the execution if already closed
@@ -133,11 +156,15 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             /** @var QtiTimer $timer */
             $timer = $this->getDeliveryTimer($deliveryExecution);
-            $timer->setExtraTime($extraTime)->save();
+            $timer
+                ->setExtraTime($extraTime)
+                ->setExtendedTime($extendedTime)
+                ->save();
 
             /** @var DeliveryMonitoringData $data */
             $data = $deliveryMonitoringService->getData($deliveryExecution);
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
+            $data->update(DeliveryMonitoringService::EXTENDED_TIME, $extendedTime);
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;

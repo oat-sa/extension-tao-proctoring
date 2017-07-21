@@ -282,12 +282,13 @@ class DeliveryHelper
      *
      * @param array $deliveryExecutions
      * @param float $extraTime
+     * @param float $extendedTime
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function setExtraTime($deliveryExecutions, $extraTime = null)
+    public static function setExtraTime($deliveryExecutions, $extraTime = null, $extendedTime = null)
     {
-        return self::getDeliveryExecutionManagerService()->setExtraTime($deliveryExecutions, $extraTime);
+        return self::getDeliveryExecutionManagerService()->setExtraTime($deliveryExecutions, $extraTime, $extendedTime);
     }
 
     public static function getDeliveryExecutionById($deliveryExecutionId)
@@ -355,6 +356,7 @@ class DeliveryHelper
                 'timer' => [
                     'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '',
                     'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '',
+                    'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
                     'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''
                 ],
                 'testTaker' => $testTaker,

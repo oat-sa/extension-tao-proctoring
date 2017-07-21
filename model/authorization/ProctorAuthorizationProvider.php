@@ -22,9 +22,8 @@ namespace oat\taoProctoring\model\authorization;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
 use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
-use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 
 /**
  * Delegate the authorization to the Proctor Authorization Service
@@ -52,7 +51,7 @@ class ProctorAuthorizationProvider extends ConfigurableService implements Author
      * @param DeliveryExecution $deliveryExecution
      * @param User $user
      */
-    public function verifyResumeAuthorization(DeliveryExecution $deliveryExecution, User $user)
+    public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         /** @var TestTakerAuthorizationService $service */
         $service = $this->getServiceLocator()->get(TestTakerAuthorizationService::SERVICE_ID);

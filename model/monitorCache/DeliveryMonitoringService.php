@@ -20,8 +20,8 @@
  */
 
 namespace oat\taoProctoring\model\monitorCache;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 
 /**
  * Interface DeliveryMonitoringService
@@ -52,6 +52,7 @@ interface DeliveryMonitoringService
     const END_TIME = 'end_time';
     const REMAINING_TIME = 'remaining_time';
     const EXTRA_TIME = 'extra_time';
+    const EXTENDED_TIME = 'extended_time';
     const CONSUMED_EXTRA_TIME = 'consumed_extra_time';
     const ALLOW_EXTRA_TIME = 'allow_extra_time';
 
@@ -64,10 +65,10 @@ interface DeliveryMonitoringService
     /**
      * Retrieve the currently cached delivery data
      * 
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionInterface $deliveryExecution
      * @return DeliveryMonitoringData
      */
-    public function getData(DeliveryExecution $deliveryExecution);
+    public function getData(DeliveryExecutionInterface $deliveryExecution);
 
     /**
      * @return DeliveryMonitoringData[]
