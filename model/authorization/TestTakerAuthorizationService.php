@@ -134,33 +134,6 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         return $this;
     }
 
-    /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function onDeliveryCreated(DeliveryCreatedEvent $event)
-    {
-        $delivery = $this->getResource($event->getDeliveryUri());
-        $proctored = $this->getOption(self::PROCTORED_BY_DEFAULT);
-        $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), (
-            $proctored ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
-        ));
-    }
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function onDeliveryUpdated(DeliveryUpdatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        $deliveryData = !empty($data['data']) ? $data['data'] : [];
-        $delivery = $this->getResource($event->getDeliveryUri());
-        if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-            $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-        }
-    }
-
     public function isSuitable()
     {
         return true;

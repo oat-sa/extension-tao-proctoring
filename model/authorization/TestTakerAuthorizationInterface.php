@@ -67,16 +67,4 @@ interface TestTakerAuthorizationInterface
      * @return \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
      */
     public function setProctoredByDefault($proctored);
-
-    /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function onDeliveryCreated(DeliveryCreatedEvent $event);
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function onDeliveryUpdated(DeliveryUpdatedEvent $event);
 }

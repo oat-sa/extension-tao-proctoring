@@ -76,22 +76,4 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
     {
         return $this->getResponsibleService()->setProctoredByDefault($proctored);
     }
-
-    /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function onDeliveryCreated(DeliveryCreatedEvent $event)
-    {
-        return $this->getResponsibleService()->onDeliveryCreated($event);
-    }
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function onDeliveryUpdated(DeliveryUpdatedEvent $event)
-    {
-        return $this->getResponsibleService()->onDeliveryUpdated($event);
-    }
 }
