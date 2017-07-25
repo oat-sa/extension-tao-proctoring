@@ -97,21 +97,23 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
         $executions = $service->getProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
         $total = $service->countProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
         $totalPages = ceil($total / $this->datatableRequest->getRows());
-        $result = $this->doPostProcessing($executions, $totalPages);
+        $result = $this->doPostProcessing($executions, $total, $totalPages);
 
         return $result;
     }
 
     /**
      * @param array $executionsData
-     * @param integer $total
+     * @param integer $amount
+     * @param integer $pages
      * @return array
      */
-    protected function doPostProcessing(array $executionsData, $total)
+    protected function doPostProcessing(array $executionsData, $amount, $pages)
     {
         return [
             'success' => true,
-            'total' => $total,
+            'amount' => $amount,
+            'total' => $pages,
             'page' => $this->datatableRequest->getPage(),
             'rows' => $this->datatableRequest->getRows(),
             'data' => DeliveryHelper::buildDeliveryExecutionData($executionsData),
