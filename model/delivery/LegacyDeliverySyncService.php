@@ -45,8 +45,8 @@ class LegacyDeliverySyncService extends ConfigurableService
     {
         $delivery = $this->getResource($event->getDeliveryUri());
         $proctored = $this->getOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT);
-        $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), (
-        $proctored ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+        $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), (
+            $proctored ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
         ));
     }
 
@@ -60,7 +60,7 @@ class LegacyDeliverySyncService extends ConfigurableService
         $deliveryData = !empty($data['data']) ? $data['data'] : [];
         $delivery = $this->getResource($event->getDeliveryUri());
         if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-            $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
+            $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
         }
     }
 }
