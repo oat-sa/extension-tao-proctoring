@@ -22,5 +22,13 @@
 namespace oat\taoProctoring\model;
 
 
-interface ProctorServiceHandler extends ProctorServiceInterface, DelegatorServiceHandler
-{ }
+interface DelegatorServiceHandler
+{
+    /**
+     * By default used only one Delegated Service
+     * But when delegated Service extended and has many implementations
+     * then delegated Service will determine which Service should be used in the current context
+     * @return bool
+     */
+    public function isSuitable();
+}

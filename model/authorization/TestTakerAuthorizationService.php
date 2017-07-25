@@ -22,6 +22,7 @@ namespace oat\taoProctoring\model\authorization;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\DelegatorServiceHandler;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
@@ -36,13 +37,9 @@ use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class TestTakerAuthorizationService extends ConfigurableService
+class TestTakerAuthorizationService extends ConfigurableService implements TestTakerAuthorizationInterface, DelegatorServiceHandler
 {
     use OntologyAwareTrait;
-
-    const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
-
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
     /**
      * (non-PHPdoc)
@@ -162,5 +159,10 @@ class TestTakerAuthorizationService extends ConfigurableService
         if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
             $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
         }
+    }
+
+    public function isSuitable()
+    {
+        return true;
     }
 }

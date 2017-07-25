@@ -44,6 +44,8 @@ use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
@@ -57,6 +59,7 @@ use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
+use oat\taoProctoring\model\ServicesDelegatorInterface;
 use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
@@ -446,6 +449,24 @@ class Updater extends common_ext_ExtensionUpdater
             }
             $this->setVersion('6.0.0');
         }
+
         $this->skip('6.0.0', '6.1.0');
+
+        if ($this->isVersion('6.1.0')) {
+
+            $service = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
+            if (!is_a($service, TestTakerAuthorizationDelegator::class)) {
+                $delegator = new TestTakerAuthorizationDelegator ([
+                    ServicesDelegatorInterface::SERVICE_HANDLERS => [
+                        new TestTakerAuthorizationService(
+                            [TestTakerAuthorizationService::PROCTORED_BY_DEFAULT => false]
+                        ),
+                    ],
+                ]);
+                $this->getServiceManager()->register(TestTakerAuthorizationInterface::SERVICE_ID, $delegator);
+            }
+
+            $this->setVersion('7.0.0');
+        }
     }
 }
