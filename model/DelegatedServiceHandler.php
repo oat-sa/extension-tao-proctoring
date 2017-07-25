@@ -22,7 +22,9 @@
 namespace oat\taoProctoring\model;
 
 
-interface DelegatorServiceHandler
+use oat\oatbox\PhpSerializable;
+
+interface DelegatedServiceHandler extends PhpSerializable
 {
     /**
      * By default used only one Delegated Service

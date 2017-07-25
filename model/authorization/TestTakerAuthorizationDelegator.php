@@ -26,9 +26,9 @@ use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
-use oat\taoProctoring\model\ServicesDelegator;
+use oat\taoProctoring\model\ServiceDelegator;
 
-class TestTakerAuthorizationDelegator extends ServicesDelegator implements TestTakerAuthorizationInterface
+class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTakerAuthorizationInterface
 {
     /**
      * (non-PHPdoc)

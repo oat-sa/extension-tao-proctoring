@@ -30,7 +30,7 @@ use oat\oatbox\user\User;
  * Class ProctorServiceDelegator
  * @package oat\taoProctoring\model
  */
-class ProctorServiceDelegator extends ServicesDelegator
+class ProctorServiceDelegator extends ServiceDelegator
 {
     /** @deprecated need to be used SERVICE_HANDLERS */
     const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;

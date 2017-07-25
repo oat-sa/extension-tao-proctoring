@@ -22,5 +22,5 @@
 namespace oat\taoProctoring\model;
 
 
-interface ProctorServiceHandler extends ProctorServiceInterface, DelegatorServiceHandler
+interface ProctorServiceHandler extends ProctorServiceInterface, DelegatedServiceHandler
 { }

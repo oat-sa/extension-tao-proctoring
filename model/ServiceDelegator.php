@@ -24,7 +24,7 @@ namespace oat\taoProctoring\model;
 
 use oat\oatbox\service\ConfigurableService;
 
-abstract class ServicesDelegator extends ConfigurableService implements ServicesDelegatorInterface
+abstract class ServiceDelegator extends ConfigurableService implements ServiceDelegatorInterface
 {
 
     /**
@@ -36,15 +36,15 @@ abstract class ServicesDelegator extends ConfigurableService implements Services
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
-     * @return ConfigurableService
+     * @return DelegatedServiceHandler
      */
     public function getResponsibleService()
     {
         if (!isset($this->service))
         {
-            /** @var DelegatorServiceHandler $handler */
+            /** @var DelegatedServiceHandler $handler */
             foreach ($this->getOption(self::SERVICE_HANDLERS) as $handler) {
-                if (!is_a($handler, DelegatorServiceHandler::class)) {
+                if (!is_a($handler, DelegatedServiceHandler::class)) {
                     throw new \common_exception_NoImplementation('Handler should be instance of DelegatorServiceHandler.');
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
@@ -60,7 +60,7 @@ abstract class ServicesDelegator extends ConfigurableService implements Services
     /**
      * @param $handler
      */
-    public function registerHandler($handler)
+    public function registerHandler(DelegatedServiceHandler $handler)
     {
         $handlers = $this->getOption(self::SERVICE_HANDLERS);
         $exists = false;

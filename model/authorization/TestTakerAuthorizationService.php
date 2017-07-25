@@ -22,7 +22,7 @@ namespace oat\taoProctoring\model\authorization;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoProctoring\model\DelegatorServiceHandler;
+use oat\taoProctoring\model\DelegatedServiceHandler;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
@@ -37,7 +37,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class TestTakerAuthorizationService extends ConfigurableService implements TestTakerAuthorizationInterface, DelegatorServiceHandler
+class TestTakerAuthorizationService extends ConfigurableService implements TestTakerAuthorizationInterface, DelegatedServiceHandler
 {
     use OntologyAwareTrait;
 

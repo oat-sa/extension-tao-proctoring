@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\model;
 
 
-interface ServicesDelegatorInterface
+interface ServiceDelegatorInterface
 {
     /**
      * Services which could handle the request
@@ -33,12 +33,12 @@ interface ServicesDelegatorInterface
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
-     * @return \oat\oatbox\service\ConfigurableService
+     * @return DelegatedServiceHandler
      */
     public function getResponsibleService();
 
     /**
      * @param $handler
      */
-    public function registerHandler($handler);
+    public function registerHandler(DelegatedServiceHandler $handler);
 }

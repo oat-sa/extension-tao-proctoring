@@ -59,7 +59,7 @@ use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
-use oat\taoProctoring\model\ServicesDelegatorInterface;
+use oat\taoProctoring\model\ServiceDelegatorInterface;
 use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
@@ -457,7 +457,7 @@ class Updater extends common_ext_ExtensionUpdater
             $service = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
             if (!is_a($service, TestTakerAuthorizationDelegator::class)) {
                 $delegator = new TestTakerAuthorizationDelegator ([
-                    ServicesDelegatorInterface::SERVICE_HANDLERS => [
+                    ServiceDelegatorInterface::SERVICE_HANDLERS => [
                         new TestTakerAuthorizationService(
                             [TestTakerAuthorizationService::PROCTORED_BY_DEFAULT => false]
                         ),

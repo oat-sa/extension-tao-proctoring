@@ -19,10 +19,10 @@
 
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
-use oat\taoProctoring\model\ServicesDelegator;
+use oat\taoProctoring\model\ServiceDelegator;
 
 return new TestTakerAuthorizationDelegator ([
-        ServicesDelegator::SERVICE_HANDLERS => [
+        ServiceDelegator::SERVICE_HANDLERS => [
             new TestTakerAuthorizationService(
                 [TestTakerAuthorizationService::PROCTORED_BY_DEFAULT => false]
             ),
