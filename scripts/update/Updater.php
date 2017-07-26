@@ -47,6 +47,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\GuiSettingsService;
@@ -60,7 +61,6 @@ use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\model\ServiceDelegatorInterface;
-use oat\taoProctoring\scripts\install\OverrideDeliveryFactoryService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
@@ -465,6 +465,15 @@ class Updater extends common_ext_ExtensionUpdater
                 ]);
                 $this->getServiceManager()->register(TestTakerAuthorizationInterface::SERVICE_ID, $delegator);
             }
+
+            $service = new DeliverySyncService();
+            $this->getServiceManager()->register(DeliverySyncService::SERVICE_ID, $service);
+
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
+            $eventManager->detach(DeliveryUpdatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryUpdated']);
+            $eventManager->attach(DeliveryCreatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryCreated']);
+            $eventManager->attach(DeliveryUpdatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryUpdated']);
 
             $this->setVersion('7.0.0');
         }
