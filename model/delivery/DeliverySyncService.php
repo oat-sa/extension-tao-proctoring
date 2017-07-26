@@ -46,9 +46,12 @@ class DeliverySyncService extends ConfigurableService
     public function onDeliveryCreated(DeliveryCreatedEvent $event)
     {
         $delivery = $this->getResource($event->getDeliveryUri());
-        $proctored = $this->getOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT);
+
+        $proctoredByDefault = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)
+            ->isProctoredByDefault();
+
         $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), (
-            $proctored ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+        $proctoredByDefault ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
         ));
     }
 

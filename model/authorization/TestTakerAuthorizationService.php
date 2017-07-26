@@ -138,4 +138,9 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     {
         return true;
     }
+
+    public function isProctoredByDefault()
+    {
+        return $this->getOption(self::PROCTORED_BY_DEFAULT);
+    }
 }
