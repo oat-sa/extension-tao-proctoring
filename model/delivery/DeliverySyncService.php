@@ -28,10 +28,12 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\ProctorService;
 
 /**
- * Listen service for legacy delivery
+ * Listen service for delivery events.
+ * Checking current state of http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible and setting correct value.
+ *
  * @author Aleksej Tikhanovich <aleksej@taotesting.com>
  */
-class LegacyDeliverySyncService extends ConfigurableService
+class DeliverySyncService extends ConfigurableService
 {
     use OntologyAwareTrait;
 
