@@ -23,6 +23,7 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\DelegatedServiceHandler;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
@@ -89,9 +90,10 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     public function isProctored($deliveryId, User $user)
     {
         $propertyUri = null;
-        $proctoredByDefault = $this->hasOption(self::PROCTORED_BY_DEFAULT)
-            ? $this->getOption(self::PROCTORED_BY_DEFAULT)
-            : true;
+
+        /** @var DeliverySyncService $deliverySyncService */
+        $deliverySyncService = $this->getServiceManager()->get(DeliverySyncService::SERVICE_ID);
+        $proctoredByDefault = $deliverySyncService->isProctoredByDefault();
 
         if ($deliveryId) {
             $delivery = $this->getResource($deliveryId);
@@ -120,45 +122,6 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     {
         $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
         throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
-    }
-
-    /**
-     * Whenever or not new deliveries should be proctored by default
-     *
-     * @param boolean $proctored
-     * @return \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
-     */
-    public function setProctoredByDefault($proctored)
-    {
-        $this->setOption(self::PROCTORED_BY_DEFAULT, $proctored);
-        return $this;
-    }
-
-    /**
-     * Listen create event for delivery
-     * @param DeliveryCreatedEvent $event
-     */
-    public function onDeliveryCreated(DeliveryCreatedEvent $event)
-    {
-        $delivery = $this->getResource($event->getDeliveryUri());
-        $proctored = $this->getOption(self::PROCTORED_BY_DEFAULT);
-        $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), (
-            $proctored ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
-        ));
-    }
-
-    /**
-     * Listen update event for delivery
-     * @param DeliveryUpdatedEvent $event
-     */
-    public function onDeliveryUpdated(DeliveryUpdatedEvent $event)
-    {
-        $data = $event->jsonSerialize();
-        $deliveryData = !empty($data['data']) ? $data['data'] : [];
-        $delivery = $this->getResource($event->getDeliveryUri());
-        if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-            $delivery->editPropertyValues(new \core_kernel_classes_Property(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
-        }
     }
 
     public function isSuitable()
