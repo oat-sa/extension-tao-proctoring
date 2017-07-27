@@ -454,8 +454,16 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('6.1.0')) {
 
-            $service = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
-            if (!is_a($service, TestTakerAuthorizationDelegator::class)) {
+            $authService = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
+            // register DeliverySyncService
+            $oldDefault = $authService->hasOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
+                ? $authService->getOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
+                : false;
+            $syncService = new DeliverySyncService();
+            $this->getServiceManager()->register(DeliverySyncService::SERVICE_ID, $syncService->setProctoredByDefault($oldDefault));
+
+            // wrap auth service
+            if (!is_a($authService, TestTakerAuthorizationDelegator::class)) {
                 $delegator = new TestTakerAuthorizationDelegator ([
                     ServiceDelegatorInterface::SERVICE_HANDLERS => [
                         new TestTakerAuthorizationService(),
@@ -463,17 +471,6 @@ class Updater extends common_ext_ExtensionUpdater
                 ]);
                 $this->getServiceManager()->register(TestTakerAuthorizationInterface::SERVICE_ID, $delegator);
             }
-
-            $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
-
-            $service = new DeliverySyncService([DeliverySyncService::PROCTORED_BY_DEFAULT => false]);
-
-            $proctoredByDefault = $authService->hasOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
-                ? $authService->getOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
-                : false;
-
-            $service->setOption(DeliverySyncService::PROCTORED_BY_DEFAULT, $proctoredByDefault);
-            $this->getServiceManager()->register(DeliverySyncService::SERVICE_ID, $service);
 
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->detach(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
