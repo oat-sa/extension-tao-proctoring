@@ -70,6 +70,7 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
 
         $service = new DeliverySyncService();
+        $service->setOption(DeliverySyncService::PROCTORED_BY_DEFAULT, false);
         $this->getServiceManager()->register(DeliverySyncService::SERVICE_ID, $service);
 
         /**

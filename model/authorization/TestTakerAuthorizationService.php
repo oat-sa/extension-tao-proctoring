@@ -23,6 +23,7 @@ use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\DelegatedServiceHandler;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
@@ -89,9 +90,10 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     public function isProctored($deliveryId, User $user)
     {
         $propertyUri = null;
-        $proctoredByDefault = $this->hasOption(self::PROCTORED_BY_DEFAULT)
-            ? $this->getOption(self::PROCTORED_BY_DEFAULT)
-            : true;
+
+        /** @var DeliverySyncService $deliverySyncService */
+        $deliverySyncService = $this->getServiceManager()->get(DeliverySyncService::SERVICE_ID);
+        $proctoredByDefault = $deliverySyncService->isProctoredByDefault();
 
         if ($deliveryId) {
             $delivery = $this->getResource($deliveryId);
@@ -122,25 +124,8 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
     }
 
-    /**
-     * Whenever or not new deliveries should be proctored by default
-     *
-     * @param boolean $proctored
-     * @return \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
-     */
-    public function setProctoredByDefault($proctored)
-    {
-        $this->setOption(self::PROCTORED_BY_DEFAULT, $proctored);
-        return $this;
-    }
-
     public function isSuitable()
     {
         return true;
-    }
-
-    public function isProctoredByDefault()
-    {
-        return $this->getOption(self::PROCTORED_BY_DEFAULT);
     }
 }

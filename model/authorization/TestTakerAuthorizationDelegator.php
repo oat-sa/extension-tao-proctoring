@@ -66,14 +66,4 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
         return $this->getResponsibleService()->isProctored($deliveryId, $user);
     }
 
-    /**
-     * Whenever or not new deliveries should be proctored by default
-     *
-     * @param boolean $proctored
-     * @return \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
-     */
-    public function setProctoredByDefault($proctored)
-    {
-        return $this->getResponsibleService()->setProctoredByDefault($proctored);
-    }
 }

@@ -31,8 +31,6 @@ interface TestTakerAuthorizationInterface
 {
     const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
 
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
-
     /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
@@ -50,21 +48,4 @@ interface TestTakerAuthorizationInterface
      */
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user);
 
-    /**
-     * Check if delivery id proctored
-     *
-     * @param string $deliveryId
-     * @param User $user
-     * @return bool
-     * @internal param core_kernel_classes_Resource $delivery
-     */
-    public function isProctored($deliveryId, User $user);
-
-    /**
-     * Whenever or not new deliveries should be proctored by default
-     *
-     * @param boolean $proctored
-     * @return \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
-     */
-    public function setProctoredByDefault($proctored);
 }

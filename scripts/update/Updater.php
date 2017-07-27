@@ -458,15 +458,21 @@ class Updater extends common_ext_ExtensionUpdater
             if (!is_a($service, TestTakerAuthorizationDelegator::class)) {
                 $delegator = new TestTakerAuthorizationDelegator ([
                     ServiceDelegatorInterface::SERVICE_HANDLERS => [
-                        new TestTakerAuthorizationService(
-                            [TestTakerAuthorizationService::PROCTORED_BY_DEFAULT => false]
-                        ),
+                        new TestTakerAuthorizationService(),
                     ],
                 ]);
                 $this->getServiceManager()->register(TestTakerAuthorizationInterface::SERVICE_ID, $delegator);
             }
 
-            $service = new DeliverySyncService();
+            $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
+
+            $service = new DeliverySyncService([DeliverySyncService::PROCTORED_BY_DEFAULT => false]);
+
+            $proctoredByDefault = $authService->hasOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
+                ? $authService->getOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
+                : false;
+
+            $service->setOption(DeliverySyncService::PROCTORED_BY_DEFAULT, $proctoredByDefault);
             $this->getServiceManager()->register(DeliverySyncService::SERVICE_ID, $service);
 
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);

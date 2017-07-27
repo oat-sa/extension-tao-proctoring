@@ -37,7 +37,9 @@ class DeliverySyncService extends ConfigurableService
 {
     use OntologyAwareTrait;
 
-    const SERVICE_ID = 'taoProctoring/LegacyDeliverySync';
+    const SERVICE_ID = 'taoProctoring/DeliverySync';
+
+    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
     /**
      * Listen create event for delivery
@@ -47,8 +49,7 @@ class DeliverySyncService extends ConfigurableService
     {
         $delivery = $this->getResource($event->getDeliveryUri());
 
-        $proctoredByDefault = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)
-            ->isProctoredByDefault();
+        $proctoredByDefault = $this->isProctoredByDefault();
 
         $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), (
         $proctoredByDefault ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
@@ -67,5 +68,26 @@ class DeliverySyncService extends ConfigurableService
         if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
             $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
         }
+    }
+
+    /**
+     * Whenever or not new deliveries should be proctored by default
+     * @param boolean $proctored
+     * @return $this
+     */
+    public function setProctoredByDefault($proctored)
+    {
+        $this->setOption(self::PROCTORED_BY_DEFAULT, $proctored);
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isProctoredByDefault()
+    {
+        return $this->hasOption(self::PROCTORED_BY_DEFAULT)
+            ? $this->getOption(self::PROCTORED_BY_DEFAULT)
+            : true;
     }
 }
