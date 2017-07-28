@@ -450,9 +450,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('6.0.0');
         }
 
-        $this->skip('6.0.0', '6.1.0');
+        $this->skip('6.0.0', '6.1.2');
 
-        if ($this->isVersion('6.1.0')) {
+        if ($this->isVersion('6.1.2')) {
 
             $authService = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
             // register DeliverySyncService

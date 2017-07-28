@@ -878,7 +878,7 @@ define([
                         label: __('Extended Time'),
                         transform: function(value, row) {
                             var timer = _.isObject(row.timer) ? row.timer : {};
-                            return 'x' + timer.extendedTime;
+                            return (timer.extendedTime ? 'x' : '') + timer.extendedTime;
                         }
                     });
 
