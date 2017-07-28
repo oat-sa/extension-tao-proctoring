@@ -38,43 +38,43 @@ define([
                 sortable : true
             },
             {
-                id: 'Awaiting',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
                 label: __('Awaiting'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Authorized',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 label: __('Authorized'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Paused',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
                 label: __('Paused'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Active',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 label: __('Active'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Terminated',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
                 label: __('Terminated'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Canceled',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled',
                 label: __('Canceled'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'Finished',
+                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
                 label: __('Finished'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
