@@ -466,7 +466,7 @@ class Updater extends common_ext_ExtensionUpdater
             if (!is_a($authService, TestTakerAuthorizationDelegator::class)) {
                 $delegator = new TestTakerAuthorizationDelegator ([
                     ServiceDelegatorInterface::SERVICE_HANDLERS => [
-                        $authService,
+                        new TestTakerAuthorizationService(),
                     ],
                 ]);
                 $this->getServiceManager()->register(TestTakerAuthorizationInterface::SERVICE_ID, $delegator);
