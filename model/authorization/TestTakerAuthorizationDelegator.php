@@ -38,7 +38,7 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
-        return $this->getResponsibleService()->verifyStartAuthorization($deliveryId, $user);
+        return $this->getResponsibleService($deliveryId, $user)->verifyStartAuthorization($deliveryId, $user);
     }
 
     /**
@@ -50,7 +50,8 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
      */
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
-        return $this->getResponsibleService()->verifyResumeAuthorization($deliveryExecution, $user);
+        $deliveryId = $deliveryExecution->getDelivery()->getUri();
+        return $this->getResponsibleService($deliveryId, $user)->verifyResumeAuthorization($deliveryExecution, $user);
     }
 
     /**
@@ -63,7 +64,7 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
      */
     public function isProctored($deliveryId, User $user)
     {
-        return $this->getResponsibleService()->isProctored($deliveryId, $user);
+        return $this->getResponsibleService($deliveryId, $user)->isProctored($deliveryId, $user);
     }
 
 }

@@ -22,6 +22,8 @@
 namespace oat\taoProctoring\model;
 
 
+use oat\oatbox\user\User;
+
 interface ServiceDelegatorInterface
 {
     /**
@@ -33,9 +35,11 @@ interface ServiceDelegatorInterface
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
+     * @param $deliveryId
+     * @param $user
      * @return DelegatedServiceHandler
      */
-    public function getResponsibleService();
+    public function getResponsibleService($deliveryId = null, User $user);
 
     /**
      * @param $handler

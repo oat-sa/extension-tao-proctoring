@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 
 use oat\oatbox\PhpSerializable;
+use oat\oatbox\user\User;
 
 interface DelegatedServiceHandler extends PhpSerializable
 {
@@ -30,7 +31,9 @@ interface DelegatedServiceHandler extends PhpSerializable
      * By default used only one Delegated Service
      * But when delegated Service extended and has many implementations
      * then delegated Service will determine which Service should be used in the current context
+     * @param $deliveryId
+     * @param $user
      * @return bool
      */
-    public function isSuitable();
+    public function isSuitable($deliveryId = null, User $user);
 }

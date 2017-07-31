@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\user\User;
 
 abstract class ServiceDelegator extends ConfigurableService implements ServiceDelegatorInterface
 {
@@ -36,9 +37,11 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
+     * @param $deliveryId
+     * @param $user
      * @return DelegatedServiceHandler
      */
-    public function getResponsibleService()
+    public function getResponsibleService($deliveryId = null, User $user)
     {
         if (!isset($this->service))
         {
@@ -48,7 +51,7 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
                     throw new \common_exception_NoImplementation('Handler should be instance of DelegatorServiceHandler.');
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
-                if ($handler->isSuitable()) {
+                if ($handler->isSuitable($deliveryId, $user)) {
                     $this->service = $handler;
                     break;
                 }
