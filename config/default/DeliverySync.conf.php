@@ -15,12 +15,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Copyright (c) 2017  (original work) Open Assessment Technologies SA;
- *
- * @author Alexander Zagovorichev <zagovorichev@1pt.com>
  */
 
-namespace oat\taoProctoring\model;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 
-
-interface ProctorServiceHandler extends ProctorServiceInterface, DelegatedServiceHandler
-{ }
+return new DeliverySyncService([DeliverySyncService::PROCTORED_BY_DEFAULT => false]);

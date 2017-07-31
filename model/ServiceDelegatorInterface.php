@@ -22,5 +22,27 @@
 namespace oat\taoProctoring\model;
 
 
-interface ProctorServiceHandler extends ProctorServiceInterface, DelegatedServiceHandler
-{ }
+use oat\oatbox\user\User;
+
+interface ServiceDelegatorInterface
+{
+    /**
+     * Services which could handle the request
+     */
+    const SERVICE_HANDLERS = 'handlers';
+
+    /**
+     * Returns applicable service
+     *
+     * @throws \common_exception_NoImplementation
+     * @param $user
+     * @param $deliveryId
+     * @return DelegatedServiceHandler
+     */
+    public function getResponsibleService(User $user, $deliveryId = null);
+
+    /**
+     * @param $handler
+     */
+    public function registerHandler(DelegatedServiceHandler $handler);
+}

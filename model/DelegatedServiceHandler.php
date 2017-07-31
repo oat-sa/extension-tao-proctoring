@@ -22,5 +22,18 @@
 namespace oat\taoProctoring\model;
 
 
-interface ProctorServiceHandler extends ProctorServiceInterface, DelegatedServiceHandler
-{ }
+use oat\oatbox\PhpSerializable;
+use oat\oatbox\user\User;
+
+interface DelegatedServiceHandler extends PhpSerializable
+{
+    /**
+     * By default used only one Delegated Service
+     * But when delegated Service extended and has many implementations
+     * then delegated Service will determine which Service should be used in the current context
+     * @param $user
+     * @param $deliveryId
+     * @return bool
+     */
+    public function isSuitable(User $user, $deliveryId = null);
+}
