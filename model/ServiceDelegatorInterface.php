@@ -35,11 +35,11 @@ interface ServiceDelegatorInterface
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
-     * @param $deliveryId
      * @param $user
+     * @param $deliveryId
      * @return DelegatedServiceHandler
      */
-    public function getResponsibleService($deliveryId = null, User $user);
+    public function getResponsibleService(User $user, $deliveryId = null);
 
     /**
      * @param $handler

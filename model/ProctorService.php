@@ -102,7 +102,7 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorServiceHandler::isSuitable()
      */
-    public function isSuitable($deliveryId = null, User $user)
+    public function isSuitable(User $user, $deliveryId = null)
     {
         return true;
     }

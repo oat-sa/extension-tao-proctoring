@@ -31,9 +31,9 @@ interface DelegatedServiceHandler extends PhpSerializable
      * By default used only one Delegated Service
      * But when delegated Service extended and has many implementations
      * then delegated Service will determine which Service should be used in the current context
-     * @param $deliveryId
      * @param $user
+     * @param $deliveryId
      * @return bool
      */
-    public function isSuitable($deliveryId = null, User $user);
+    public function isSuitable(User $user, $deliveryId = null);
 }

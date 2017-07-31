@@ -24,8 +24,6 @@ namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
-use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoProctoring\model\ServiceDelegator;
 
 class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTakerAuthorizationInterface
@@ -38,7 +36,7 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
      */
     public function verifyStartAuthorization($deliveryId, User $user)
     {
-        return $this->getResponsibleService($deliveryId, $user)->verifyStartAuthorization($deliveryId, $user);
+        return $this->getResponsibleService($user, $deliveryId)->verifyStartAuthorization($deliveryId, $user);
     }
 
     /**
@@ -51,7 +49,7 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         $deliveryId = $deliveryExecution->getDelivery()->getUri();
-        return $this->getResponsibleService($deliveryId, $user)->verifyResumeAuthorization($deliveryExecution, $user);
+        return $this->getResponsibleService($user, $deliveryId)->verifyResumeAuthorization($deliveryExecution, $user);
     }
 
     /**
@@ -64,7 +62,6 @@ class TestTakerAuthorizationDelegator extends ServiceDelegator implements TestTa
      */
     public function isProctored($deliveryId, User $user)
     {
-        return $this->getResponsibleService($deliveryId, $user)->isProctored($deliveryId, $user);
+        return $this->getResponsibleService($user, $deliveryId)->isProctored($deliveryId, $user);
     }
-
 }

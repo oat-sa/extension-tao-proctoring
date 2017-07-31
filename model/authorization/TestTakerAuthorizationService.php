@@ -124,7 +124,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
     }
 
-    public function isSuitable($deliveryId = null, User $user)
+    public function isSuitable(User $user, $deliveryId = null)
     {
         return true;
     }

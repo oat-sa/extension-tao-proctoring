@@ -37,11 +37,11 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
      * Returns applicable service
      *
      * @throws \common_exception_NoImplementation
-     * @param $deliveryId
      * @param $user
+     * @param $deliveryId
      * @return DelegatedServiceHandler
      */
-    public function getResponsibleService($deliveryId = null, User $user)
+    public function getResponsibleService(User $user, $deliveryId = null)
     {
         if (!isset($this->service))
         {
@@ -51,7 +51,7 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
                     throw new \common_exception_NoImplementation('Handler should be instance of DelegatorServiceHandler.');
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
-                if ($handler->isSuitable($deliveryId, $user)) {
+                if ($handler->isSuitable($user, $deliveryId)) {
                     $this->service = $handler;
                     break;
                 }
