@@ -30,63 +30,10 @@ use oat\oatbox\user\User;
  * Class ProctorServiceDelegator
  * @package oat\taoProctoring\model
  */
-class ProctorServiceDelegator extends ConfigurableService implements ProctorServiceInterface
+class ProctorServiceDelegator extends ServiceDelegator
 {
-    /**
-     * Services which could handle the request
-     */
-    const PROCTOR_SERVICE_HANDLERS = 'handlers';
-
-    /**
-     * @var ProctorService
-     */
-    private $extendedService;
-
-    /**
-     * Returns applicable ProctorServices
-     *
-     * @throws \common_exception_NoImplementation
-     * @return \oat\taoProctoring\model\ProctorService
-     */
-    public function getResponsibleService()
-    {
-        if (!isset($this->extendedService))
-        {
-            foreach ($this->getOption(self::PROCTOR_SERVICE_HANDLERS) as $handler) {
-                if (!is_a($handler, ProctorServiceHandler::class)) {
-                    throw new \common_exception_NoImplementation('Handler should be instance of ProctorServiceHandler.');
-                }
-                $handler->setServiceLocator($this->getServiceLocator());
-                if ($handler->isSuitable()) {
-                    $this->extendedService = $handler;
-                    break;
-                }
-            }
-        }
-        return $this->extendedService;
-    }
-
-    public function registerHandler($handler)
-    {
-        $handlers = $this->getOption(self::PROCTOR_SERVICE_HANDLERS);
-        $exists = false;
-
-        // change options on the existing handlers
-        foreach ($handlers as $key => $_handler) {
-            if ($_handler instanceof $handler) {
-                $handlers[$key] = $handler;
-                $exists = true;
-                break;
-            }
-        }
-
-        // new handler should be added to the top of the list
-        if (!$exists) {
-            $handlers = array_merge([$handler], $handlers);
-        }
-
-        $this->setOption(self::PROCTOR_SERVICE_HANDLERS, $handlers);
-    }
+    /** @deprecated need to be used SERVICE_HANDLERS */
+    const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;
 
     /**
      * (non-PHPdoc)
@@ -94,7 +41,7 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     public function getProctorableDeliveries(User $proctor, $context = null)
     {
-        return $this->getResponsibleService()->getProctorableDeliveries($proctor, $context);
+        return $this->getResponsibleService($proctor)->getProctorableDeliveries($proctor, $context);
     }
 
     /**
@@ -103,7 +50,8 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
-        return $this->getResponsibleService()->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+        $deliveryId = $delivery ? $delivery->getUri() : null;
+        return $this->getResponsibleService($proctor, $deliveryId)->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 
     /**
@@ -112,6 +60,7 @@ class ProctorServiceDelegator extends ConfigurableService implements ProctorServ
      */
     public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
-        return $this->getResponsibleService()->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+        $deliveryId = $delivery ? $delivery->getUri() : null;
+        return $this->getResponsibleService($proctor, $deliveryId)->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 }

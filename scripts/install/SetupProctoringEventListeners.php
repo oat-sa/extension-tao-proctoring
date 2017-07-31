@@ -25,6 +25,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoTests\models\event\TestChangedEvent;
@@ -68,8 +69,11 @@ class SetupProctoringEventListeners extends InstallAction
 
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
 
-        $this->registerEvent(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
-        $this->registerEvent(DeliveryUpdatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryUpdated']);
+        /**
+         * Need to check http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible for every action and setting correct value.
+         */
+        $this->registerEvent(DeliveryCreatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryCreated']);
+        $this->registerEvent(DeliveryUpdatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryUpdated']);
     }
 }
 
