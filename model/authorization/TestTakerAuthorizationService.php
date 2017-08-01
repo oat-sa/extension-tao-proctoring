@@ -43,6 +43,11 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     use OntologyAwareTrait;
 
     /**
+     * @deprecated moved to \oat\taoProctoring\model\delivery\DeliverySyncService::PROCTORED_BY_DEFAULT
+     */
+    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+
+    /**
      * (non-PHPdoc)
      * @see \oat\taoDelivery\model\authorization\AuthorizationProvider::verifyStartAuthorization()
      * @param $deliveryId
