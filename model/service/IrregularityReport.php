@@ -62,12 +62,9 @@ class IrregularityReport extends AbstractIrregularityReport
             foreach ($logs as $data) {
                 $exportable = array();
                 if ((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)) {
-                    $testTaker = UserHelper::getUser($res['testTakerIdentifier']);
-                    $author = UserHelper::getUser($data['created_by']);
-
                     $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
-                    $exportable[] = $this->getUserName($author);
-                    $exportable[] = $this->getUserName($testTaker);
+                    $exportable[] = $this->getUserName($data['created_by']);
+                    $exportable[] = $this->getUserName($res['testTakerIdentifier']);
                     $exportable[] = $data['data']['reason']['reasons']['category'];
                     $exportable[] = (isset($data['data']['reason']['reasons']['subCategory'])) ? $data['data']['reason']['reasons']['subCategory'] : '';
                     $exportable[] = $data['data']['reason']['comment'];
@@ -80,11 +77,12 @@ class IrregularityReport extends AbstractIrregularityReport
     }
 
     /**
-     * @param User $user
+     * @param string $userId
      * @return string
      */
-    private function getUserName(User $user)
+    private function getUserName($userId)
     {
+        $user = UserHelper::getUser($userId);
         if (!isset($this->userNames[$user->getIdentifier()])) {
             $userName = UserHelper::getUserName($user);
             if (empty($userName)) {
