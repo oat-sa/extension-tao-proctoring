@@ -83,13 +83,13 @@ class IrregularityReport extends AbstractIrregularityReport
     private function getUserName($userId)
     {
         $user = UserHelper::getUser($userId);
-        if (!isset($this->userNames[$user->getIdentifier()])) {
+        if (!isset($this->userNames[$userId])) {
             $userName = UserHelper::getUserName($user);
             if (empty($userName)) {
-                $userName = $user->getIdentifier();
+                $userName = $userId;
             }
-            $this->userNames[$user->getIdentifier()] = $userName;
+            $this->userNames[$userId] = $userName;
         }
-        return $this->userNames[$user->getIdentifier()];
+        return $this->userNames[$userId];
     }
 }
