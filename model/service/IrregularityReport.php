@@ -24,6 +24,8 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\tao\helpers\UserHelper;
+use oat\oatbox\user\User;
 
 class IrregularityReport extends AbstractIrregularityReport
 {
@@ -60,8 +62,8 @@ class IrregularityReport extends AbstractIrregularityReport
             foreach ($logs as $data) {
                 $exportable = array();
                 if ((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)) {
-                    $testTaker = new \core_kernel_classes_Resource($res['testTakerIdentifier']);
-                    $author = new \core_kernel_classes_Resource($data['created_by']);
+                    $testTaker = UserHelper::getUser($res['testTakerIdentifier']);
+                    $author = UserHelper::getUser($data['created_by']);
 
                     $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
                     $exportable[] = $this->getUserName($author);
@@ -78,22 +80,18 @@ class IrregularityReport extends AbstractIrregularityReport
     }
 
     /**
-     * @param \core_kernel_classes_Resource $user
+     * @param User $user
      * @return string
      */
-    private function getUserName(\core_kernel_classes_Resource $user)
+    private function getUserName(User $user)
     {
-        if (!isset($this->userNames[$user->getUri()])) {
-            $userName = $user->getLabel();
+        if (!isset($this->userNames[$user->getIdentifier()])) {
+            $userName = UserHelper::getUserName($user);
             if (empty($userName)) {
-                $userName = $user->getOnePropertyValue($this->getProperty(PROPERTY_USER_FIRSTNAME)) . ' ' .
-                          $user->getOnePropertyValue($this->getProperty(PROPERTY_USER_LASTNAME));
+                $userName = $user->getIdentifier();
             }
-            if (empty(trim($userName))) {
-                $userName = $user->getUri();
-            }
-            $this->userNames[$user->getUri()] = $userName;
+            $this->userNames[$user->getIdentifier()] = $userName;
         }
-        return $this->userNames[$user->getUri()];
+        return $this->userNames[$user->getIdentifier()];
     }
 }
