@@ -26,6 +26,7 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
@@ -256,38 +257,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
             $timer->load();
         }
-        $maxTimeSeconds = null;
-
-        if ($timeLimits = $testSession->getAssessmentTest()->getTimeLimits()) {
-            $timeLimits = $testSession->getAssessmentTest()->getTimeLimits();
-            $maxTimeSeconds = $timeLimits->hasMaxTime()
-                ? $timeLimits->getMaxTime()->getSeconds(true)
-                : null;
-        }
-
-        if ($testPart = $testSession->getCurrentTestPart()) {
-            if ($testSessionLimits = $testPart->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
-
-        if ($section = $testSession->getCurrentAssessmentSection()) {
-            if ($testSessionLimits = $section->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
-
-        if ($test = $testSession->getCurrentAssessmentItemSession()) {
-            if ($testSessionLimits = $test->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
+        /** @var QtiRunnerService $qtiRunnerService */
+        $qtiRunnerService = $this->getServiceLocator()->get(QtiRunnerService::SERVICE_ID);
+        $maxTimeSeconds = $qtiRunnerService->getTimeLimitsFromSession($testSession);
 
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
