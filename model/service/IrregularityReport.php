@@ -28,6 +28,8 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 class IrregularityReport extends AbstractIrregularityReport
 {
 
+    private $userNames = [];
+
     /**
      * @param \core_kernel_classes_Resource $delivery
      * @param string $from
@@ -58,12 +60,12 @@ class IrregularityReport extends AbstractIrregularityReport
             foreach ($logs as $data) {
                 $exportable = array();
                 if ((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)) {
-
                     $testTaker = new \core_kernel_classes_Resource($res['testTakerIdentifier']);
                     $author = new \core_kernel_classes_Resource($data['created_by']);
+
                     $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
-                    $exportable[] = $author->getLabel();
-                    $exportable[] = $testTaker->getLabel();
+                    $exportable[] = $this->getUserName($author);
+                    $exportable[] = $this->getUserName($testTaker);
                     $exportable[] = $data['data']['reason']['reasons']['category'];
                     $exportable[] = (isset($data['data']['reason']['reasons']['subCategory'])) ? $data['data']['reason']['reasons']['subCategory'] : '';
                     $exportable[] = $data['data']['reason']['comment'];
@@ -75,4 +77,23 @@ class IrregularityReport extends AbstractIrregularityReport
         return $export;
     }
 
+    /**
+     * @param \core_kernel_classes_Resource $user
+     * @return string
+     */
+    private function getUserName(\core_kernel_classes_Resource $user)
+    {
+        if (!isset($this->userNames[$user->getUri()])) {
+            $userName = $user->getLabel();
+            if (empty($userName)) {
+                $userName = $user->getOnePropertyValue($this->getProperty(PROPERTY_USER_FIRSTNAME)) . ' ' .
+                          $user->getOnePropertyValue($this->getProperty(PROPERTY_USER_LASTNAME));
+            }
+            if (empty(trim($userName))) {
+                $userName = $user->getUri();
+            }
+            $this->userNames[$user->getUri()] = $userName;
+        }
+        return $this->userNames[$user->getUri()];
+    }
 }
