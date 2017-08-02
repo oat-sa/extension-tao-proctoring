@@ -24,8 +24,6 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
-use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
@@ -104,7 +102,7 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\ProctorServiceHandler::isSuitable()
      */
-    public function isSuitable()
+    public function isSuitable(User $user, $deliveryId = null)
     {
         return true;
     }
