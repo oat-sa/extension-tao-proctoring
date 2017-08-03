@@ -258,11 +258,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
         $maxTimeSeconds = null;
 
-        if ($timeLimits = $testSession->getAssessmentTest()->getTimeLimits()) {
-            $timeLimits = $testSession->getAssessmentTest()->getTimeLimits();
-            $maxTimeSeconds = $timeLimits->hasMaxTime()
-                ? $timeLimits->getMaxTime()->getSeconds(true)
-                : null;
+        if ($assessmentTest = $testSession->getAssessmentTest()) {
+            if ($assessmentTestLimits = $assessmentTest->getTimeLimits()) {
+                $maxTimeSeconds = $assessmentTestLimits->hasMaxTime()
+                    ? $assessmentTestLimits->getMaxTime()->getSeconds(true)
+                    : null;
+            }
         }
 
         if ($testPart = $testSession->getCurrentTestPart()) {
