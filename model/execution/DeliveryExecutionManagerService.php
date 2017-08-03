@@ -106,7 +106,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
                 $deliveryExecutionArray[] = $deliveryExecution;
                 $extraTime = null;
-                if ($maxTime = $testDefinition->getTimeLimits()->getMaxTime()) {
+                if ($testDefinition->getTimeLimits()->hasMaxTime()) {
+                    $maxTime =$testDefinition->getTimeLimits()->getMaxTime();
                     $seconds = $maxTime->getSeconds(true);
                     $secondsNew = $seconds * $extendedTime;
                     $extraTime = floor(($secondsNew - $seconds) / 60) * 60;
