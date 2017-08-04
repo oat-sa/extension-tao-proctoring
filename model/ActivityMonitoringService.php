@@ -129,7 +129,6 @@ class ActivityMonitoringService extends ConfigurableService
         ];
 
         $deliveryStates = $this->getStatesByDelivery();
-        $deliveryStates[self::FIELD_RETIRED_DELIVERIES] = $this->getRetiredDeliveries($assessments, $deliveryStates);
         $assessments[self::FIELD_DELIVERIES_STATISTICS] = $deliveryStates;
         return $assessments;
     }
@@ -240,66 +239,25 @@ class ActivityMonitoringService extends ConfigurableService
     protected function getStatesByDelivery()
     {
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveries = DeliveryAssemblyService::singleton()->getAllAssemblies();
-        $result = [];
-        foreach ($deliveries as $delivery) {
-            $deliveryData = [];
-            foreach ($this->deliveryStatuses as $deliveryStatus) {
-                $deliveryData[$deliveryStatus->getLabel()] = $deliveryMonitoringService->count([
-                    [DeliveryMonitoringService::STATUS => $deliveryStatus->getUri()],
-                    'AND',
-                    ['delivery_id' => $delivery->getUri()]
-                ]);
-            }
-            $deliveryData['label'] = $delivery->getLabel();
-            $result[$delivery->getUri()] = $deliveryData;
 
-        }
-        return $result;
-    }
-
-    /**
-     * Get statistic for retired deliveries
-     * @param array $assessments
-     * @param array $deliveryStates
-     * @return array
-     */
-    protected function getRetiredDeliveries($assessments, $deliveryStates)
-    {
-        $assessmentsDeliveryStatusesMaps = [
-            DeliveryExecution::STATE_AWAITING   => self::STATE_AWAITING_ASSESSMENT,
-            DeliveryExecution::STATE_AUTHORIZED => self::STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS,
-            DeliveryExecution::STATE_PAUSED     => self::STATE_PAUSED_ASSESSMENTS,
-            DeliveryExecution::STATE_ACTIVE     => self::STATE_IN_PROGRESS_ASSESSMENTS
-        ];
-
-        $retiredDeliveries = [];
-
+        $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
-            $label = $deliveryStatus->getLabel();
-            $uri = $deliveryStatus->getUri();
-            $assessmentNumber = 0;
-
-            $assessmentKey = isset($assessmentsDeliveryStatusesMaps[$uri])
-                ? $assessmentsDeliveryStatusesMaps[$uri]
-                : null;
-
-            if (isset($assessments[$assessmentKey])) {
-                $assessmentNumber = $assessments[$assessmentKey];
-            }
-
-            $deliveryNumber = 0;
-            foreach ($deliveryStates as $deliveryState) {
-                if (isset($deliveryState[$label])) {
-                    $deliveryNumber += $deliveryState[$label];
-                }
-            }
-
-            $count = $assessmentNumber - $deliveryNumber;
-
-            $retiredDeliveries[$label] = ($count < 0) ? 0 : $count;
+            $statusesArray[$deliveryStatus->getUri()] = 0;
         }
-        $retiredDeliveries['label'] = self::LABEL_RETIRED_DELIVERIES;
-        return $retiredDeliveries;
+
+        $newResult = [];
+        $newResult[self::FIELD_RETIRED_DELIVERIES] = $statusesArray;
+        $newResult[self::FIELD_RETIRED_DELIVERIES]['label'] = self::LABEL_RETIRED_DELIVERIES;
+
+        $deliveries = DeliveryAssemblyService::singleton()->getAllAssemblies();
+        foreach ($deliveries as $delivery) {
+            $newResult[$delivery->getUri()] = $statusesArray;
+            $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
+        }
+        foreach ($deliveryMonitoringService->find([], ['asArray'=>true], true) as $sessionData) {
+            $deliveryId = isset($newResult[$sessionData['delivery_id']]) ? $sessionData['delivery_id'] : self::FIELD_RETIRED_DELIVERIES;
+            $newResult[$deliveryId][$sessionData['status']]++;
+        }
+        return $newResult;
     }
 }

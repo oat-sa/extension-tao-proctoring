@@ -24,9 +24,13 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\tao\helpers\UserHelper;
+use oat\oatbox\user\User;
 
 class IrregularityReport extends AbstractIrregularityReport
 {
+
+    private $userNames = [];
 
     /**
      * @param \core_kernel_classes_Resource $delivery
@@ -58,12 +62,9 @@ class IrregularityReport extends AbstractIrregularityReport
             foreach ($logs as $data) {
                 $exportable = array();
                 if ((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)) {
-
-                    $testTaker = new \core_kernel_classes_Resource($res['testTakerIdentifier']);
-                    $author = new \core_kernel_classes_Resource($data['created_by']);
                     $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
-                    $exportable[] = $author->getLabel();
-                    $exportable[] = $testTaker->getLabel();
+                    $exportable[] = $this->getUserName($data['created_by']);
+                    $exportable[] = $this->getUserName($res['testTakerIdentifier']);
                     $exportable[] = $data['data']['reason']['reasons']['category'];
                     $exportable[] = (isset($data['data']['reason']['reasons']['subCategory'])) ? $data['data']['reason']['reasons']['subCategory'] : '';
                     $exportable[] = $data['data']['reason']['comment'];
@@ -75,4 +76,20 @@ class IrregularityReport extends AbstractIrregularityReport
         return $export;
     }
 
+    /**
+     * @param string $userId
+     * @return string
+     */
+    private function getUserName($userId)
+    {
+        if (!isset($this->userNames[$userId])) {
+            $user = UserHelper::getUser($userId);
+            $userName = UserHelper::getUserName($user);
+            if (empty($userName)) {
+                $userName = $userId;
+            }
+            $this->userNames[$userId] = $userName;
+        }
+        return $this->userNames[$userId];
+    }
 }
