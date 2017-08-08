@@ -84,7 +84,7 @@ class IrregularityReport extends AbstractIrregularityReport
     {
         if (!isset($this->userNames[$userId])) {
             $user = UserHelper::getUser($userId);
-            $userName = UserHelper::getUserName($user);
+            $userName = UserHelper::getUserName($user, true);
             if (empty($userName)) {
                 $userName = $userId;
             }
