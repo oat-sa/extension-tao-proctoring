@@ -98,6 +98,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
             }
 
+            /** @var DeliveryMonitoringData $data */
+            $data = $deliveryMonitoringService->getData($deliveryExecution);
+
             if ($extendedTime) {
                 /** @var TestSessionService $testSessionService */
                 $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
@@ -106,12 +109,44 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
                 $deliveryExecutionArray[] = $deliveryExecution;
                 $extraTime = null;
+                $seconds = null;
+
                 if ($testDefinition->getTimeLimits() && $testDefinition->getTimeLimits()->hasMaxTime()) {
                     $maxTime = $testDefinition->getTimeLimits()->getMaxTime();
                     $seconds = $maxTime->getSeconds(true);
+                }
+
+                /** @var TestSession $testSession */
+                if ($testSession = $testSessionService->getTestSession($deliveryExecution)) {
+                    if ($testPart = $testSession->getCurrentTestPart()) {
+                        if ($testSessionLimits = $testPart->getTimeLimits()) {
+                            $seconds = $testSessionLimits->hasMaxTime()
+                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                                : $seconds;
+                        }
+                    }
+
+                    if ($section = $testSession->getCurrentAssessmentSection()) {
+                        if ($testSessionLimits = $section->getTimeLimits()) {
+                            $seconds = $testSessionLimits->hasMaxTime()
+                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                                : $seconds;
+                        }
+                    }
+
+                    if ($item = $testSession->getCurrentAssessmentItemRef()) {
+                        if ($testSessionLimits = $item->getTimeLimits()) {
+                            $seconds = $testSessionLimits->hasMaxTime()
+                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                                : $seconds;
+                        }
+                    }
+                }
+
+                if ($seconds) {
                     $secondsNew = $seconds * $extendedTime;
-                    $extraTime = floor(($secondsNew - $seconds) / 60) * 60;
-                    $data = $deliveryMonitoringService->getData($deliveryExecution);
+                    $extraTime = $secondsNew - $seconds;
+
                     $dataArray = $data->get();
                     if (!isset($dataArray[DeliveryMonitoringService::REMAINING_TIME])) {
                         $data->update(DeliveryMonitoringService::REMAINING_TIME, $seconds);
@@ -162,8 +197,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 ->setExtendedTime($extendedTime)
                 ->save();
 
-            /** @var DeliveryMonitoringData $data */
-            $data = $deliveryMonitoringService->getData($deliveryExecution);
+
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
             $data->update(DeliveryMonitoringService::EXTENDED_TIME, $extendedTime);
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
