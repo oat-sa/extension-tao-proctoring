@@ -36,6 +36,15 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
 
     const SERVICE_ID = 'taoProctoring/irregularity';
 
+    /**
+     * return formated string for export file name
+     * @param $time
+     * @return false|string
+     */
+    protected function getFormatedDateForFileName($time) {
+        return date('Y-m-d.H.i.s' , $time);
+    }
+
     public function getIrregularities(\core_kernel_classes_Resource $delivery, $from = '', $to = ''){
 
         /**
@@ -48,7 +57,7 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
             'from'       => $from,
             'to'         => $to
         ];
-        $label = $delivery->getLabel() . ' from ' . $from . ' to ' . $to;
+        $label = $delivery->getLabel() . ' from ' . $this->getFormatedDateForFileName($from ). ' to ' . $this->getFormatedDateForFileName( $to );
         $taskName  = 'export/irregularity';
         $task = $taskQueue->createTask($action , $parameters , false , $label , $taskName);
         return $task;
@@ -75,7 +84,7 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
          */
         $fileSystemService = ServiceManager::getServiceManager()->get(FileSystemService::SERVICE_ID);
         $fileSystem        = $fileSystemService->getFileSystem(Queue::FILE_SYSTEM_ID);
-        $fileName          = 'irregularities/' . \tao_helpers_File::getSafeFileName($delivery->getLabel() . ' ' . $from . ' ' . $to . '.csv' );
+        $fileName          = 'irregularities/' . \tao_helpers_File::getSafeFileName($delivery->getLabel() . ' ' . $this->getFormatedDateForFileName($from) . ' ' . $this->getFormatedDateForFileName($to) . '.csv' );
         $return            = $fileSystem->put($fileName , $csv);
         if($return === false) {
             $report = new \common_report_Report(\common_report_Report::TYPE_ERROR , __('unable to create irregularities export for %s' , $delivery->getLabel()));
