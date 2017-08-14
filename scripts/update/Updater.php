@@ -483,5 +483,6 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('7.0.0', '7.0.6');
+
     }
 }
