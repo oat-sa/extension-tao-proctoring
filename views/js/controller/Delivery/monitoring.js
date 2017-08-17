@@ -849,7 +849,7 @@ define([
                                 } else {
                                     refinedValue = '';
                                 }
-                                refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, __('%s min'), extraTimeUnit);
+                                refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, 'HH:mm:ss', extraTimeUnit);
                             }
 
                             return refinedValue;
