@@ -118,15 +118,17 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 /** @var TestSession $testSession */
                 if ($testSession = $testSessionService->getTestSession($deliveryExecution)) {
-                    if ($testPart = $testSession->getCurrentTestPart()) {
-                        if ($testSessionLimits = $testPart->getTimeLimits()) {
+                    $seconds = null;
+
+                    if ($item = $testSession->getCurrentAssessmentItemRef()) {
+                        if ($testSessionLimits = $item->getTimeLimits()) {
                             $seconds = $testSessionLimits->hasMaxTime()
                                 ? $testSessionLimits->getMaxTime()->getSeconds(true)
                                 : $seconds;
                         }
                     }
 
-                    if ($section = $testSession->getCurrentAssessmentSection()) {
+                    if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
                         if ($testSessionLimits = $section->getTimeLimits()) {
                             $seconds = $testSessionLimits->hasMaxTime()
                                 ? $testSessionLimits->getMaxTime()->getSeconds(true)
@@ -134,8 +136,16 @@ class DeliveryExecutionManagerService extends ConfigurableService
                         }
                     }
 
-                    if ($item = $testSession->getCurrentAssessmentItemRef()) {
-                        if ($testSessionLimits = $item->getTimeLimits()) {
+                    if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
+                        if ($testSessionLimits = $testPart->getTimeLimits()) {
+                            $seconds = $testSessionLimits->hasMaxTime()
+                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
+                                : $seconds;
+                        }
+                    }
+
+                    if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
+                        if ($testSessionLimits = $assessmentTest->getTimeLimits()) {
                             $seconds = $testSessionLimits->hasMaxTime()
                                 ? $testSessionLimits->getMaxTime()->getSeconds(true)
                                 : $seconds;
