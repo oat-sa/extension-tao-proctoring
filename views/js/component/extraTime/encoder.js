@@ -41,6 +41,8 @@ define([
         if (extraTime) {
             if (consumedTime) {
                 encoded = timeEncoder.encode(Math.min(consumedTime, extraTime)) + '/' + timeEncoder.encode(extraTime);
+            } else if (pattern === 'HH:mm:ss') {
+                encoded = timeEncoder.encode(extraTime);
             } else {
                 encoded = format(pattern, extraTime / unit);
             }
