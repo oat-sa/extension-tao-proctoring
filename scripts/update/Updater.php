@@ -32,6 +32,7 @@ use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
+use oat\tao\test\plugins\PluginRegistry;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
@@ -47,6 +48,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\delivery\DeliveryContainerService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
@@ -70,6 +72,7 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\LoggerService;
+use oat\taoTests\models\runner\plugins\TestPlugin;
 
 
 /**
@@ -484,5 +487,67 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('7.0.0', '7.0.7');
 
+        if ($this->isVersion('7.0.7')) {
+
+            $serviceManager = $this->getServiceManager();
+
+            $deliveryContainerService = new DeliveryContainerService();
+            $deliveryContainerService->setServiceManager($serviceManager);
+            $serviceManager->register(DeliveryContainerService::SERVICE_ID, $deliveryContainerService);
+
+            $registry = PluginRegistry::getRegistry();
+            $registry->register(
+                TestPlugin::fromArray([
+                    'id' => 'blurPause',
+                    'name' => 'Blur Pause',
+                    'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurPause',
+                    'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                    'description' => 'Pause the test when leaving the test window',
+                    'category' => 'security',
+                    'active' => true,
+                    'tags' => []
+                ])
+            );
+
+            $registry->register(
+                TestPlugin::fromArray([
+                    'id' => 'blurWarning',
+                    'name' => 'Blur Warning',
+                    'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurWarning',
+                    'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                    'description' => 'Warning message when leaving the test window',
+                    'category' => 'security',
+                    'active' => true,
+                    'tags' => ['only_warning']
+                ])
+            );
+
+            $registry->register(
+                TestPlugin::fromArray([
+                    'id' => 'preventScreenshot',
+                    'name' => 'Prevent Screenshot',
+                    'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshot',
+                    'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                    'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
+                    'category' => 'security',
+                    'active' => true,
+                    'tags' => []
+                ])
+            );
+
+            $registry->register(
+                TestPlugin::fromArray([
+                    'id' => 'preventScreenshotWarning',
+                    'name' => 'Prevent Screenshot',
+                    'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshotWarning',
+                    'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                    'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
+                    'category' => 'security',
+                    'active' => true,
+                    'tags' => ['only_warning']
+                ])
+            );
+            $this->setVersion('7.1.0');
+        }
     }
 }
