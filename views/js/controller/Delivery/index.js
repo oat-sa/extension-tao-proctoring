@@ -289,7 +289,7 @@ define([
                     e.preventDefault();
 
                     //get list of all test taker for the selected delivery
-                    proxySessions.read({delivery: deliveryId}).then(function(sessions) {
+                    proxySessions.read({delivery: deliveryId, context: context}).then(function(sessions) {
                         var deliveryExecutions = {};
                         var inProgressExecs;
                         inProgressExecs = _.filter(sessions, function (session) {
