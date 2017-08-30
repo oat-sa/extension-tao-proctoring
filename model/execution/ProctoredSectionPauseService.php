@@ -23,7 +23,6 @@ namespace oat\taoProctoring\model\execution;
 
 
 use oat\generis\model\OntologyAwareTrait;
-use oat\tao\helpers\UserHelper;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoQtiTest\models\SectionPauseService;
@@ -46,7 +45,7 @@ class ProctoredSectionPauseService extends SectionPauseService
         if ($session->getState() === AssessmentTestSessionState::INTERACTING) {
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
-            $user = UserHelper::getUser($session->getUserUri());
+            $user = \common_session_SessionManager::getSession()->getUser();
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
             $isPausable = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user)
                 && $itemRef->getCategories()->contains('x-tao-proctored-auto-pause');

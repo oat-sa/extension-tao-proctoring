@@ -91,7 +91,7 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
             ];
         }
 
-        if (isset($options['filters']) && $options['filters']) {
+        if (!empty($options['filters']) && is_array($options['filters'])) {
             $criteria = array_merge($options['filters'], $criteria);
         }
 
