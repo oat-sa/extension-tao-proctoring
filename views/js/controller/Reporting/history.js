@@ -72,6 +72,7 @@ define([
         start : function start() {
             var container = containerFactory().changeScope(cssScope).write(indexTpl());
             var currentRoute = urlHelper.parse(window.location.href);
+            var context = currentRoute.query.context && decodeURIComponent(currentRoute.query.context);
             var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
             var sessions = decodeURIComponent(currentRoute.query.session).split(',');
             var monitoringUrl = currentRoute.query.monitoring && decodeURIComponent(currentRoute.query.monitoring);
@@ -90,7 +91,7 @@ define([
                     read: serviceUrl
                 }
             }).then(function(proxyService) {
-                return proxyService.read({delivery : deliveryId, session: sessions}).then(function(data) {
+                return proxyService.read({delivery : deliveryId, context: context, session: sessions}).then(function(data) {
                     var detailedHistory = data.detailedHistory;
                     var historyTable = historyTableFactory({
                         tools: [{
@@ -106,7 +107,7 @@ define([
                                 historyTable.refresh();
                             }
                         }],
-                        params: {detailed: detailedHistory, delivery : deliveryId, session: sessions},
+                        params: {detailed: detailedHistory, delivery : deliveryId, context: context, session: sessions},
                         service: sessionsUrl,
                         sortBy: data.sortBy,
                         sortOrder: data.sortOrder
