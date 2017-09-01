@@ -89,14 +89,22 @@ define([
 
             appController
                 .on('change.breadcrumbs', function (route) {
+                    var parsedRoute = urlHelper.parse(route);
                     var routes = getRoutes(route);
-                    request(breadcrumbsUrl, {route: routes}, 'POST')
-                        .then(function (data) {
-                            breadcrumbs.update(data);
-                        })
-                        .catch(function(err) {
-                            appController.onError(err);
-                        });
+
+                    if (parsedRoute.query['link-type'] !== undefined && parsedRoute.query['link-type'] === 'direct') {
+                        delete parsedRoute.query['link-type'];
+                        window.location.replace(decodeURIComponent(urlHelper.build(parsedRoute.path, parsedRoute.query)));
+                    }
+                    else {
+                        request(breadcrumbsUrl, {route: routes}, 'POST')
+                            .then(function (data) {
+                                breadcrumbs.update(data);
+                            })
+                            .catch(function (err) {
+                                appController.onError(err);
+                            });
+                    }
                 })
                 .apply('a', toolbox.getElement())
                 .start();

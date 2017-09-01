@@ -51,6 +51,9 @@ class Reporting extends SimplePageModule
         $delivery       = $this->hasRequestParameter('delivery')
             ? $this->getResource($this->getRequestParameter('delivery'))
             : null;
+        $testCenter     = $this->hasRequestParameter('context')
+            ? $this->getResource($this->getRequestParameter('context'))
+            : null;
         $sessions       = $this->getRequestParameter('session');
         $requestOptions = $this->getRequestOptions([
             'sortby'      => 'timestamp',
@@ -83,6 +86,12 @@ class Reporting extends SimplePageModule
             'periodEnd'   => $requestOptions['periodEnd'],
             'monitoringUrl' => $historyService->getBackUrl($delivery),
         ];
+
+        if ($testCenter) {
+            $viewData['monitoringUrl'] .= (strpos($viewData['monitoringUrl'], '?') === false) ? '?' : '&';
+            $viewData['monitoringUrl'] .= 'context=' . urlencode($testCenter->getUri());
+            $viewData['context'] = $testCenter->getUri();
+        }
 
         if ($delivery) {
             $viewData['delivery'] = $delivery->getUri();
