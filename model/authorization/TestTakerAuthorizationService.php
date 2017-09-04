@@ -19,6 +19,7 @@
  */
 namespace oat\taoProctoring\model\authorization;
 
+use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
@@ -32,6 +33,7 @@ use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
+use oat\taoTestRunnerPlugins\model\event\DeliveryTypeEvent;
 
 /**
  * Manage the Delivery authorization.
