@@ -59,6 +59,7 @@ use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ProctorServiceDelegator;
 use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\model\runner\ProctoringRunnerService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\model\ServiceDelegatorInterface;
@@ -486,9 +487,16 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('7.0.0', '7.1.1');
 
         if ($this->isVersion('7.1.1')) {
-            $this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
+           // $this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
             $this->setVersion('7.2.0');
         }
         $this->skip('7.2.0', '7.2.1');
+
+        if ($this->isVersion('7.2.1')) {
+            $runnerService = new ProctoringRunnerService();
+            $runnerService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(ProctoringRunnerService::SERVICE_ID, $runnerService);
+            $this->setVersion('7.3.0');
+        }
     }
 }
