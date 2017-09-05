@@ -19,15 +19,19 @@
 namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
+use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\delivery\DeliveryPluginService;
+use oat\taoProctoring\model\runner\ProctoringRunnerService;
 
 /**
  * Installation action that registers the test runner container
  */
-class RegisterDeliveryPluginService extends InstallAction
+class RegisterProctoringRunnerService extends InstallAction
 {
     public function __invoke($params)
     {
-        $this->registerService(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
+        $runnerService = new ProctoringRunnerService();
+        $runnerService->setServiceManager(ServiceManager::getServiceManager());
+        $this->registerService(ProctoringRunnerService::SERVICE_ID, $runnerService);
     }
 }
