@@ -96,7 +96,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AWAITING);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AWAITING_AUTHORISATION', [
                 'timestamp' => microtime(true),
-                'context' => $this->getProgress($deliveryExecution),
+                'context' => $this->getContext($deliveryExecution),
             ]);
             return true;
         }
@@ -468,26 +468,13 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @return null|string
-     */
-    protected function getProgress(DeliveryExecution $deliveryExecution)
-    {
-        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        $this->getTestSessionService()->getProgress($session);
-    }
-
-    /**
-     * @param DeliveryExecution $deliveryExecution
      * @return string
      */
     protected function getContext(DeliveryExecution $deliveryExecution)
     {
-        $result = $this->getProgress($deliveryExecution);
-        if (!$result) {
-            $result = 'cli' === php_sapi_name()
-                ? $_SERVER['PHP_SELF']
-                : \Context::getInstance()->getRequest()->getRequestURI();
-        }
+        $result = 'cli' === php_sapi_name()
+            ? $_SERVER['PHP_SELF']
+            : \Context::getInstance()->getRequest()->getRequestURI();
         return $result;
     }
 }
