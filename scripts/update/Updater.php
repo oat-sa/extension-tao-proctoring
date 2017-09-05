@@ -489,6 +489,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
             $this->setVersion('7.2.0');
         }
-
+        $this->skip('7.2.0', '7.2.1');
     }
 }
