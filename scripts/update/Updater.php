@@ -487,7 +487,8 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('7.0.0', '7.1.1');
 
         if ($this->isVersion('7.1.1')) {
-           // $this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
+            // Delete unused service after refactoring
+            //$this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
             $this->setVersion('7.2.0');
         }
         $this->skip('7.2.0', '7.2.1');
