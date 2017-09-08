@@ -291,7 +291,8 @@ define([
                 function showHistory(selection) {
                     var monitoringRoute = window.location + '';
                     var urlParams = {
-                        session: selection
+                        session: selection,
+                        context: context
                     };
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;

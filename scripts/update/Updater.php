@@ -47,6 +47,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\delivery\DeliveryPluginService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
@@ -58,6 +59,7 @@ use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ProctorServiceDelegator;
 use oat\taoProctoring\model\ProctorServiceInterface;
 use oat\taoProctoring\model\ReasonCategoryService;
+use oat\taoProctoring\model\runner\ProctoringRunnerService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\model\ServiceDelegatorInterface;
@@ -482,7 +484,22 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('7.0.0');
         }
 
-        $this->skip('7.0.0', '7.0.8');
+        $this->skip('7.0.0', '7.1.1');
 
+        if ($this->isVersion('7.1.1')) {
+            // Delete unused service after refactoring
+            //$this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
+            $this->setVersion('7.2.0');
+        }
+        $this->skip('7.2.0', '7.2.1');
+
+        if ($this->isVersion('7.2.1')) {
+            $runnerService = new ProctoringRunnerService();
+            $runnerService->setServiceManager($this->getServiceManager());
+            $this->getServiceManager()->register(ProctoringRunnerService::SERVICE_ID, $runnerService);
+            $this->setVersion('7.3.0');
+        }
+
+        $this->skip('7.3.0', '7.3.1');
     }
 }
