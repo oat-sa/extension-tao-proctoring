@@ -60,6 +60,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     private $testSessionService;
 
     /**
+     * Computes the state of the delivery and returns one of the extended state code
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return null|string
+     * @throws \common_Exception
+     */
+    public function getState(DeliveryExecution $deliveryExecution)
+    {
+        return $deliveryExecution->getState()->getUri();
+    }
+
+    /**
      * @return array
      */
     public function getDeliveriesStates()

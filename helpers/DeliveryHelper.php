@@ -344,7 +344,30 @@ class DeliveryHelper
             foreach(self::_getUserExtraFields() as $field){
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
+            $now = microtime(true);
+            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+                $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
+                $elapsed = $now - $lastActivity;
+            } else {
+                $lastActivity = null;
+                $elapsed = 0;
+            }
 
+            if (isset($cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP])) {
+                $lastPauseTimestamp = $cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP];
+            } else {
+                $lastPauseTimestamp = null;
+            }
+
+            $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
+            if (DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) {
+                $elapsedApprox = $lastPauseTimestamp - $lastActivity;
+            } else {
+                $elapsedApprox = $elapsed;
+            }
+
+            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '';
             $execution = array(
                 'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                 'delivery' => array(
@@ -354,7 +377,10 @@ class DeliveryHelper
                 'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
                 'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
                 'timer' => [
-                    'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '',
+                    'lastActivity' => $lastActivity,
+                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState) ? true : false,
+                    'approximatedRemaining' => round(floatval($remaining) - $elapsedApprox),
+                    'remaining_time' => $remaining,
                     'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '',
                     'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
                     'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''

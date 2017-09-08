@@ -42,6 +42,7 @@ define([
     'tpl!taoProctoring/templates/delivery/statusFilter',
     'moment',
     'util/locale',
+    'tpl!taoProctoring/templates/delivery/approximatedTimer',
     'ui/datatable',
     'jqueryui',
     'select2'
@@ -68,7 +69,8 @@ define([
     deliveryLinkTpl,
     statusFilterTpl,
     moment,
-    locale
+    locale,
+    approximatedTimerTpl
 ) {
     'use strict';
 
@@ -86,6 +88,7 @@ define([
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+
 
     /**
      * The extra time unit: by default in minutes
@@ -136,7 +139,13 @@ define([
             var actionList;
             var serviceParams = {};
             var sessionsHistoryUrl = historyUrl;
-
+            var timerIds = [];
+            var $timers;
+            var currentTimes;
+            var timerIndex;
+            var timeDiffs;
+            var lastDates;
+            var $controls;
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -509,6 +518,96 @@ define([
                 }
 
                 /**
+                 * Formats a timer
+                 * @param {Number} totalSeconds
+                 * @returns {String}
+                 */
+                function formatTime(totalSeconds) {
+                    var sec_num = totalSeconds;
+                    var hours = Math.floor(sec_num / 3600);
+                    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+                    var seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
+
+                    if (hours < 10) {
+                        hours = "0" + hours;
+                    }
+                    if (minutes < 10) {
+                        minutes = "0" + minutes;
+                    }
+                    if (seconds < 10) {
+                        seconds = "0" + seconds;
+                    }
+
+                    return hours + ':' + minutes + ':' + seconds;
+                }
+
+                function updateTimer(rows) {
+                    var i;
+                    var self = this;
+                    var cst;
+                    var data = [];
+                    if (rows.data) {
+                        for (i = 0; i < timerIds.length; i++) {
+                            clearTimeout(timerIds[i]);
+                        }
+                        _.forEach(rows.data, function (item) {
+                            data.push({
+                                "source": item.id,
+                                "seconds": item.timer.approximatedRemaining,
+                            });
+                        });
+
+                        timerIds = [];
+                        currentTimes = [];
+                        lastDates = [];
+                        timeDiffs = [];
+                        for (i = 0; i < data.length; i++) {
+
+                            cst = data[i];
+                            // Set up a timer and update it with setInterval.
+                            currentTimes[i] = cst.seconds;
+                            lastDates[i] = new Date();
+                            timeDiffs[i] = 0;
+                            timerIndex = i;
+
+                            (function (timerIndex, cst) {
+                                var seconds;
+
+                                timerIds[timerIndex] = setInterval(function () {
+                                    timeDiffs[timerIndex] += (new Date()).getTime() - lastDates[timerIndex].getTime();
+
+                                    if (timeDiffs[timerIndex] >= 1000) {
+                                        seconds = timeDiffs[timerIndex] / 1000;
+                                        currentTimes[timerIndex] -= seconds;
+                                        timeDiffs[timerIndex] = 0;
+                                    }
+
+                                    $timers.eq(timerIndex)
+                                        .html(formatTime(Math.round(currentTimes[timerIndex])));
+
+                                    if (currentTimes[timerIndex] <= 0) {
+                                        // The timer expired...
+                                        currentTimes[timerIndex] = 0;
+                                        clearInterval(timerIds[timerIndex]);
+
+                                        // Hide item to prevent any further interaction with the candidate.
+                                        //$controls.$itemFrame.hide();
+                                        self.timeout();
+                                    } else {
+                                        lastDates[timerIndex] = new Date();
+                                    }
+
+                                }, 1000);
+
+                            }(timerIndex, cst));
+                        }
+
+                        $timers = $('.qti-timer .qti-timer_time.countDown');
+                    }
+
+                }
+
+                /**
                  * Additional action perfomed with filter element
                  * @param {jQueryElement} $el
                  */
@@ -527,7 +626,6 @@ define([
                 if (context) {
                     serviceParams.context = context;
                 }
-
                 return proxyExecutions.read(serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
@@ -841,16 +939,25 @@ define([
                         label: __('Remaining'),
                         transform: function(value, row) {
                             var timer = _.isObject(row.timer) ? row.timer : {};
-                            var refinedValue = timer.remaining_time;
+                            var refinedValue = timer.approximatedRemaining;
                             var remaining = parseInt(refinedValue, 10);
-
                             if (remaining || _.isFinite(remaining) ) {
+                                if (remaining < 0) {
+                                    if (timer.extraTime) {
+                                        timer.consumedExtraTime += -remaining;
+                                    }
+                                    remaining = 0;
+                                }
                                 if (remaining) {
                                     refinedValue = timeEncoder.encode(remaining);
                                 } else {
                                     refinedValue = '';
                                 }
                                 refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, 'HH:mm:ss', extraTimeUnit);
+                                refinedValue = approximatedTimerTpl({
+                                    timer: refinedValue,
+                                    countDown: timer.countDown
+                                });
                             }
 
                             return refinedValue;
@@ -974,6 +1081,7 @@ define([
                             }
 
                             loadingBar.stop();
+                            updateTimer(newDataset);
                         })
                         .on('select.datatable', function() {
                             //hide all controls then display each required one individually

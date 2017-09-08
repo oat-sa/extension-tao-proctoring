@@ -21,7 +21,9 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
@@ -177,6 +179,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     {
         if ($keys === null) {
             $keys = [
+                DeliveryMonitoringService::STATUS,
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME,
                 DeliveryMonitoringService::EXTENDED_TIME
@@ -188,6 +191,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
                 $this->{$methodName}();
             }
         }
+    }
+
+    /**
+     * Update extra time allowed for the delivery execution
+     */
+    private function updateLastTestTakerActivity()
+    {
+        $this->addValue(DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY, microtime(true), true);
     }
 
     /**
@@ -207,6 +218,20 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
+    }
+
+    /**
+     * Update test session state
+     */
+    private function updateStatus()
+    {
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
+        $this->addValue(DeliveryMonitoringService::LAST_TEST_STATE_CHANGE, microtime(true), true);
+        if ($status == ProctoredDeliveryExecution::STATE_PAUSED) {
+            $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
+        }
     }
 
     /**
