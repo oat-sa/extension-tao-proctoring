@@ -999,7 +999,7 @@ msgid "The assessment has been suspended by an authorized proctor. If you wish t
 msgstr ""
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
-msgstr "La evaluacion ha sido suspendida. Para reanudar su evaluacion, por favor reinicie y pongase en contacto con su supervisor si es necesario."
+msgstr "La evaluación ha sido suspendida. Para reanudar su evaluación, por favor reinicie y póngase en contacto con su supervisor si es necesario."
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it."
 msgstr ""
@@ -1011,7 +1011,7 @@ msgid "The assessment has been terminated. You cannot interact with it anymore."
 msgstr ""
 
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
-msgstr "La evaluacion se ha terminado. Ya no puedes interactuar con el. Pongase en contacto con su supervisor si es necesario."
+msgstr "La evaluación se ha terminado. Ya no puede interactuar con él. Póngase en contacto con su supervisor si es necesario."
 
 msgid "The extra time must be a number"
 msgstr ""
