@@ -499,5 +499,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(ProctoringRunnerService::SERVICE_ID, $runnerService);
             $this->setVersion('7.3.0');
         }
+        $this->skip('7.3.0', '7.3.1');
     }
 }
