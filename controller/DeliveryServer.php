@@ -86,7 +86,10 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
-            $deliveryExecutionStateService->pauseExecution($deliveryExecution);
+            $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
+                'reasons' => ['category' => 'System'],
+                'comment' => __('System generated pause.'),
+            ]);
         }
 
         // we need to change the state of the delivery execution
