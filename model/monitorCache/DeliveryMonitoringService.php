@@ -60,6 +60,8 @@ interface DeliveryMonitoringService
     const LAST_TEST_STATE_CHANGE = 'last_test_state_change';
     const LAST_PAUSE_TIMESTAMP = 'last_pause_timestamp';
 
+    const DIFF_TIMESTAMP = 'diff_timestamp';
+
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
     const DELIVERY_ID = 'delivery_id';

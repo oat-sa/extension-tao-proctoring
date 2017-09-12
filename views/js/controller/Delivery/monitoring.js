@@ -145,7 +145,7 @@ define([
             var timerIndex;
             var timeDiffs;
             var lastDates;
-            var $controls;
+
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -551,12 +551,13 @@ define([
                             clearTimeout(timerIds[i]);
                         }
                         _.forEach(rows.data, function (item) {
-                            data.push({
-                                "source": item.id,
-                                "seconds": item.timer.approximatedRemaining,
-                            });
+                            if (item.timer.countDown) {
+                                data.push({
+                                    "source": item.id,
+                                    "seconds": item.timer.approximatedRemaining ? item.timer.approximatedRemaining : item.timer.remaining_time,
+                                });
+                            }
                         });
-
                         timerIds = [];
                         currentTimes = [];
                         lastDates = [];
@@ -570,12 +571,11 @@ define([
                             timeDiffs[i] = 0;
                             timerIndex = i;
 
-                            (function (timerIndex, cst) {
+                            (function () {
                                 var seconds;
 
                                 timerIds[timerIndex] = setInterval(function () {
                                     timeDiffs[timerIndex] += (new Date()).getTime() - lastDates[timerIndex].getTime();
-
                                     if (timeDiffs[timerIndex] >= 1000) {
                                         seconds = timeDiffs[timerIndex] / 1000;
                                         currentTimes[timerIndex] -= seconds;
@@ -939,7 +939,7 @@ define([
                         label: __('Remaining'),
                         transform: function(value, row) {
                             var timer = _.isObject(row.timer) ? row.timer : {};
-                            var refinedValue = timer.approximatedRemaining;
+                            var refinedValue = timer.approximatedRemaining ? timer.approximatedRemaining : timer.remaining_time;
                             var remaining = parseInt(refinedValue, 10);
                             if (remaining || _.isFinite(remaining) ) {
                                 if (remaining < 0) {
@@ -953,7 +953,6 @@ define([
                                 } else {
                                     refinedValue = '';
                                 }
-                                refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, 'HH:mm:ss', extraTimeUnit);
                                 refinedValue = approximatedTimerTpl({
                                     timer: refinedValue,
                                     countDown: timer.countDown

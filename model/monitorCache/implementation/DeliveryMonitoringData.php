@@ -228,7 +228,6 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
-        $this->addValue(DeliveryMonitoringService::LAST_TEST_STATE_CHANGE, microtime(true), true);
         if ($status == ProctoredDeliveryExecution::STATE_PAUSED) {
             $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
         }
@@ -267,7 +266,31 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
         $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
     }
-    
+
+    /**
+     * Update diff between last_pause_timestamp and last_test_taker_activity
+     */
+    private function updateDiffTimestamp()
+    {
+        $diffTimestamp = 0;
+        $lastTimeStamp = 0;
+        $lastActivity = 0;
+        if (isset($this->data[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP])) {
+            $lastTimeStamp = $this->data[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP];
+        }
+
+        if (isset($this->data[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+            $lastActivity = $this->data[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
+        }
+
+        if ($lastTimeStamp - $lastActivity > 0) {
+            $diffTimestamp = isset($this->data[DeliveryMonitoringService::DIFF_TIMESTAMP]) ? $this->data[DeliveryMonitoringService::DIFF_TIMESTAMP] : 0;
+            $diffTimestamp += $lastTimeStamp - $lastActivity;
+        }
+
+        $this->addValue(DeliveryMonitoringService::DIFF_TIMESTAMP, $diffTimestamp, true);
+    }
+
     /**
      * Update extra time allowed for the delivery execution
      */

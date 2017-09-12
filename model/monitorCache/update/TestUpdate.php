@@ -37,24 +37,20 @@ class TestUpdate
 
     public static function testStateChange(QtiTestChangeEvent $event)
     {
+        /** @var DeliveryMonitoringService $service */
+        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $data = $service->getData($deliveryExecution, false);
+
         $dataKeys = [
             DeliveryMonitoringService::STATUS,
-            DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM,
-            DeliveryMonitoringService::START_TIME,
-            DeliveryMonitoringService::END_TIME,
-            DeliveryMonitoringService::REMAINING_TIME,
-            DeliveryMonitoringService::EXTRA_TIME,
         ];
 
         $session = $event->getSession();
         if ($session->getState() == AssessmentTestSessionState::INTERACTING) {
+            $dataKeys[] = DeliveryMonitoringService::DIFF_TIMESTAMP;
             $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
         }
-
-        /** @var DeliveryMonitoringService $service */
-        $service = ServiceManager::getServiceManager()->get('taoProctoring/DeliveryMonitoring');
-        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution, false);
         $data->setTestSession($session);
         $data->updateData($dataKeys);
         $success = $service->save($data);

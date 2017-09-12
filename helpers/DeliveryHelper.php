@@ -367,7 +367,13 @@ class DeliveryHelper
                 $elapsedApprox = $elapsed;
             }
 
+            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '';
             $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '';
+            $diffTime = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
+
+            $remaining = $remaining - $diffTime;
+            $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
+
             $execution = array(
                 'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
                 'delivery' => array(
@@ -379,9 +385,9 @@ class DeliveryHelper
                 'timer' => [
                     'lastActivity' => $lastActivity,
                     'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState) ? true : false,
-                    'approximatedRemaining' => round(floatval($remaining) - $elapsedApprox),
+                    'approximatedRemaining' => $approximatedRemaining,
                     'remaining_time' => $remaining,
-                    'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '',
+                    'extraTime' => $extraTime,
                     'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
                     'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''
                 ],
