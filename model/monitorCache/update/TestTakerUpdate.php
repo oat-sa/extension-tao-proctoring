@@ -26,6 +26,7 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
 use oat\tao\helpers\UserHelper;
+use oat\taoTestTaker\models\TestTakerService;
 
 /**
  *
@@ -45,7 +46,7 @@ class TestTakerUpdate
         }, DeliveryHelper::getExtraFieldsProperties()));
 
 
-        if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TAO_CLASS_SUBJECT))) {
+        if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::TAO_CLASS_SUBJECT))) {
 
             $deliveryExecutionsData = $service->find([
                 DeliveryMonitoringService::TEST_TAKER => $resource->getUri(),
