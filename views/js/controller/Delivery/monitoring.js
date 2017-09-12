@@ -99,7 +99,10 @@ define([
      * @returns {boolean}
      */
     function validateParams(params) {
-        return _.isPlainObject(params) && (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) && !_.isEmpty(params.execution);
+        return _.isPlainObject(params) &&
+            (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
+            (_.isUndefined(params.testCenter) || !_.isEmpty(params.testCenter)) &&
+            !_.isEmpty(params.execution);
     }
 
     // the page is always loading data when starting
@@ -179,6 +182,10 @@ define([
 
                         if (deliveryId) {
                             params.delivery = deliveryId;
+                        }
+
+                        if (context) {
+                            params.testCenter = context;
                         }
 
                         proxyExecutions.action(action, params)
