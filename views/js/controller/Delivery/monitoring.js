@@ -24,6 +24,8 @@ define([
     'i18n',
     'module',
     'controller/app',
+    'core/polling',
+    'core/timer',
     'util/url',
     'layout/loading-bar',
     'core/encoder/time',
@@ -52,6 +54,8 @@ define([
     __,
     module,
     appController,
+    pollingFactory,
+    timerFactory,
     urlHelper,
     loadingBar,
     timeEncoder,
@@ -142,13 +146,26 @@ define([
             var actionList;
             var serviceParams = {};
             var sessionsHistoryUrl = historyUrl;
-            var timerIds = [];
-            var $timers;
-            var currentTimes;
-            var timerIndex;
-            var timeDiffs;
-            var lastDates;
+            var timer = timerFactory({
+                autoStart: false
+            });
 
+            var polling = pollingFactory({
+                action: function() {
+                    var elapsed = timer.tick() / 1000;
+                    var timers = $('.procotor-timer_time.countDown');
+                    _.forEach(timers, function (timerItem) {
+                        var remaining = $(timerItem).data('remaining');
+                        if (remaining > 0) {
+                            remaining -= elapsed;
+                            $(timerItem).html(timeEncoder.encode(Math.round(remaining)));
+                            $(timerItem).data('remaining', remaining);
+                        }
+                    });
+                },
+                interval: 1000,
+                autoStart: false
+             });
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -525,96 +542,6 @@ define([
                 }
 
                 /**
-                 * Formats a timer
-                 * @param {Number} totalSeconds
-                 * @returns {String}
-                 */
-                function formatTime(totalSeconds) {
-                    var sec_num = totalSeconds;
-                    var hours = Math.floor(sec_num / 3600);
-                    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-                    var seconds = Math.floor(sec_num - (hours * 3600) - (minutes * 60));
-
-                    if (hours < 10) {
-                        hours = "0" + hours;
-                    }
-                    if (minutes < 10) {
-                        minutes = "0" + minutes;
-                    }
-                    if (seconds < 10) {
-                        seconds = "0" + seconds;
-                    }
-
-                    return hours + ':' + minutes + ':' + seconds;
-                }
-
-                function updateTimer(rows) {
-                    var i;
-                    var self = this;
-                    var cst;
-                    var data = [];
-                    if (rows.data) {
-                        for (i = 0; i < timerIds.length; i++) {
-                            clearTimeout(timerIds[i]);
-                        }
-                        _.forEach(rows.data, function (item) {
-                            if (item.timer.countDown) {
-                                data.push({
-                                    "source": item.id,
-                                    "seconds": item.timer.approximatedRemaining ? item.timer.approximatedRemaining : item.timer.remaining_time,
-                                });
-                            }
-                        });
-                        timerIds = [];
-                        currentTimes = [];
-                        lastDates = [];
-                        timeDiffs = [];
-                        for (i = 0; i < data.length; i++) {
-
-                            cst = data[i];
-                            // Set up a timer and update it with setInterval.
-                            currentTimes[i] = cst.seconds;
-                            lastDates[i] = new Date();
-                            timeDiffs[i] = 0;
-                            timerIndex = i;
-
-                            (function (timerIndex, cst) {
-                                var seconds;
-
-                                timerIds[timerIndex] = setInterval(function () {
-                                    timeDiffs[timerIndex] += (new Date()).getTime() - lastDates[timerIndex].getTime();
-                                    if (timeDiffs[timerIndex] >= 1000) {
-                                        seconds = timeDiffs[timerIndex] / 1000;
-                                        currentTimes[timerIndex] -= seconds;
-                                        timeDiffs[timerIndex] = 0;
-                                    }
-
-                                    $timers.eq(timerIndex)
-                                        .html(formatTime(Math.round(currentTimes[timerIndex])));
-
-                                    if (currentTimes[timerIndex] <= 0) {
-                                        // The timer expired...
-                                        currentTimes[timerIndex] = 0;
-                                        clearInterval(timerIds[timerIndex]);
-
-                                        // Hide item to prevent any further interaction with the candidate.
-                                        //$controls.$itemFrame.hide();
-                                        self.timeout();
-                                    } else {
-                                        lastDates[timerIndex] = new Date();
-                                    }
-
-                                }, 1000);
-
-                            }(timerIndex, cst));
-                        }
-
-                        $timers = $('.qti-timer .qti-timer_time.countDown');
-                    }
-
-                }
-
-                /**
                  * Additional action perfomed with filter element
                  * @param {jQueryElement} $el
                  */
@@ -945,13 +872,13 @@ define([
                         sorttype: 'numeric',
                         label: __('Remaining'),
                         transform: function(value, row) {
-                            var timer = _.isObject(row.timer) ? row.timer : {};
-                            var refinedValue = timer.approximatedRemaining ? timer.approximatedRemaining : timer.remaining_time;
+                            var rowTimer = _.isObject(row.timer) ? row.timer : {};
+                            var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
                             var remaining = parseInt(refinedValue, 10);
                             if (remaining || _.isFinite(remaining) ) {
                                 if (remaining < 0) {
-                                    if (timer.extraTime) {
-                                        timer.consumedExtraTime += -remaining;
+                                    if (rowTimer.extraTime) {
+                                        rowTimer.consumedExtraTime += -remaining;
                                     }
                                     remaining = 0;
                                 }
@@ -960,9 +887,15 @@ define([
                                 } else {
                                     refinedValue = '';
                                 }
+
+                                if ((!remaining && !rowTimer.extraTime) || (rowTimer.extraTime && rowTimer.extraTime <= rowTimer.consumedExtraTime)) {
+                                    refinedValue = __('Timed out');
+                                }
+
                                 refinedValue = approximatedTimerTpl({
                                     timer: refinedValue,
-                                    countDown: timer.countDown
+                                    remaining: remaining,
+                                    countDown: rowTimer.countDown
                                 });
                             }
 
@@ -1085,9 +1018,9 @@ define([
                                     $list.datatable('highlightRow', v);
                                 });
                             }
-
                             loadingBar.stop();
-                            updateTimer(newDataset);
+                            polling.start();
+                            timer.resume();
                         })
                         .on('select.datatable', function() {
                             //hide all controls then display each required one individually
