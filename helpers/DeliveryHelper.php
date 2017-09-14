@@ -367,10 +367,9 @@ class DeliveryHelper
                 $elapsedApprox = $elapsed;
             }
 
-            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '';
-            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '';
+            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
+            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : 0;
             $diffTime = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
-
             $remaining = $remaining - $diffTime;
             $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
 
@@ -389,7 +388,7 @@ class DeliveryHelper
                     'remaining_time' => $remaining,
                     'extraTime' => $extraTime,
                     'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
-                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''
+                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : 0
                 ],
                 'testTaker' => $testTaker,
                 'extraFields' => $extraFields,
