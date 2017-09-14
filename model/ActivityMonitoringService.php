@@ -21,11 +21,12 @@
 
 namespace oat\taoProctoring\model;
 
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 /**
  * Service to manage and monitor assessment activity
@@ -34,6 +35,7 @@ use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
  */
 class ActivityMonitoringService extends ConfigurableService
 {
+    use OntologyAwareTrait;
     const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
 
     /** Threshold in seconds */
@@ -238,26 +240,64 @@ class ActivityMonitoringService extends ConfigurableService
      */
     protected function getStatesByDelivery()
     {
-        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-
         $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
             $statusesArray[$deliveryStatus->getUri()] = 0;
         }
 
-        $newResult = [];
-        $newResult[self::FIELD_RETIRED_DELIVERIES] = $statusesArray;
-        $newResult[self::FIELD_RETIRED_DELIVERIES]['label'] = self::LABEL_RETIRED_DELIVERIES;
+        $retiredTitle = __('Retired Deliveries');
 
-        $deliveries = DeliveryAssemblyService::singleton()->getAllAssemblies();
-        foreach ($deliveries as $delivery) {
-            $newResult[$delivery->getUri()] = $statusesArray;
-            $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
+        $newResult = [];
+        $sql = "select kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " as delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " as status,
+                count(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") as cnt
+                    from " . MonitoringStorage::TABLE_NAME . " dm
+                    left join " . MonitoringStorage::KV_TABLE_NAME . " kvdm
+                     on dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . " and kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
+                    group by kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
+        $stmt = $this->getPersistence()->query($sql);
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($data as $row) {
+            $delivery_id = $row['delivery_id'] ?: self::FIELD_RETIRED_DELIVERIES;
+            if (!isset($newResult[$delivery_id])) {
+                $newResult[$delivery_id] = $statusesArray;
+                $delivery = $this->getResource($delivery_id);
+                if (!$delivery->exists()) {
+                    $newResult[$delivery_id]['label'] = $retiredTitle;
+                } else {
+                    $label = $delivery->getLabel();
+                    $newResult[$delivery_id]['label'] = $label ?: $delivery_id;
+                }
+            }
+
+            $newResult[$delivery_id][$row['status']] += $row['cnt'];
         }
-        foreach ($deliveryMonitoringService->find([], ['asArray'=>true], true) as $sessionData) {
-            $deliveryId = isset($newResult[$sessionData['delivery_id']]) ? $sessionData['delivery_id'] : self::FIELD_RETIRED_DELIVERIES;
-            $newResult[$deliveryId][$sessionData['status']]++;
+
+        $list = [];
+        foreach ($newResult as $key => $row) {
+            if ($row['label'] != $retiredTitle) {
+                $list[$key] = $row;
+            } else {
+                if (!isset($list[self::FIELD_RETIRED_DELIVERIES])) {
+                    $list[self::FIELD_RETIRED_DELIVERIES] = $row;
+                } else {
+                    foreach ($row as $status => $val) {
+                        if ($status == 'label') {
+                            continue;
+                        }
+                        $list[self::FIELD_RETIRED_DELIVERIES][$status] = (int)$list[self::FIELD_RETIRED_DELIVERIES][$status] + (int)$val;
+                    }
+                }
+            }
         }
-        return $newResult;
+
+        return $list;
+    }
+
+    protected function getPersistence()
+    {
+        $monitoringStorageService = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
+        return $this->getServiceManager()
+            ->get(\common_persistence_Manager::SERVICE_ID)
+            ->getPersistenceById($monitoringStorageService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
     }
 }
