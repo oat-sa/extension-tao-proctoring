@@ -27,7 +27,6 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 /**
  * Service to manage and monitor assessment activity
