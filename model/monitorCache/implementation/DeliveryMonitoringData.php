@@ -225,8 +225,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     private function updateStatus()
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $status = $deliveryExecutionStateService->getState($this->deliveryExecution);
+        $status = $this->deliveryExecution->getState()->getUri();
         $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
         if ($status == ProctoredDeliveryExecution::STATE_PAUSED) {
             $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
