@@ -26,6 +26,8 @@ use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\generis\model\OntologyAwareTrait;
+use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 /**
  * Service to manage and monitor assessment activity
@@ -34,6 +36,8 @@ use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
  */
 class ActivityMonitoringService extends ConfigurableService
 {
+    use OntologyAwareTrait;
+
     const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
 
     /** Threshold in seconds */
@@ -236,7 +240,7 @@ class ActivityMonitoringService extends ConfigurableService
      * Result indexed by delivery Uri
      * @return array
      */
-    protected function getStatesByDelivery()
+    public function getStatesByDelivery()
     {
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
@@ -254,6 +258,7 @@ class ActivityMonitoringService extends ConfigurableService
             $newResult[$delivery->getUri()] = $statusesArray;
             $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
         }
+
         foreach ($deliveryMonitoringService->find([], ['asArray'=>true], true) as $sessionData) {
             $deliveryId = isset($newResult[$sessionData['delivery_id']]) ? $sessionData['delivery_id'] : self::FIELD_RETIRED_DELIVERIES;
             $newResult[$deliveryId][$sessionData['status']]++;
