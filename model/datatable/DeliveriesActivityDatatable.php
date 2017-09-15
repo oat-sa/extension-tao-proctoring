@@ -52,8 +52,9 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
 
     public function getPayload()
     {
+        /** @var ActivityMonitoringService $service */
         $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-        $data = $service->getData()['deliveries_statistics'];
+        $data = $service->getStatesByDelivery();
 
         $this->doSorting($data);
         $result = $this->doPostProcessing($data);
