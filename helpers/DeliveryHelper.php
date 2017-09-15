@@ -344,6 +344,34 @@ class DeliveryHelper
             foreach(self::_getUserExtraFields() as $field){
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
+            $now = microtime(true);
+            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+                $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
+                $elapsed = $now - $lastActivity;
+            } else {
+                $lastActivity = null;
+                $elapsed = 0;
+            }
+
+            if (isset($cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP])) {
+                $lastPauseTimestamp = $cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP];
+            } else {
+                $lastPauseTimestamp = null;
+            }
+
+            $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
+            if (DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) {
+                $elapsedApprox = $lastPauseTimestamp - $lastActivity;
+            } else {
+                $elapsedApprox = $elapsed;
+            }
+
+            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
+            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : 0;
+            $diffTime = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
+            $remaining = $remaining - $diffTime;
+            $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
 
             $execution = array(
                 'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
@@ -354,10 +382,13 @@ class DeliveryHelper
                 'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
                 'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
                 'timer' => [
-                    'remaining_time' => (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : '',
-                    'extraTime' => (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : '',
+                    'lastActivity' => $lastActivity,
+                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState) ? true : false,
+                    'approximatedRemaining' => $approximatedRemaining,
+                    'remaining_time' => $remaining,
+                    'extraTime' => $extraTime,
                     'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
-                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : ''
+                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : 0
                 ],
                 'testTaker' => $testTaker,
                 'extraFields' => $extraFields,
