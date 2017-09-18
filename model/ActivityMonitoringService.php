@@ -123,7 +123,7 @@ class ActivityMonitoringService extends ConfigurableService
         $current = $awaiting + $authorized + $paused + $active;
         $assessments = [
             self::FIELD_ACTIVE_PROCTORS => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
-            self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(TaoOntology::INSTANCE_ROLE_DELIVERY),
+            self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(TaoOntology::PROPERTY_INSTANCE_ROLE_DELIVERY),
             self::FIELD_TOTAL_ASSESSMENTS => $this->getNumberOfAssessments(),
             self::FIELD_TOTAL_CURRENT_ASSESSMENTS => $current,
             self::STATE_AWAITING_ASSESSMENT => $awaiting,
