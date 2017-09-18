@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -658,5 +659,40 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             }, DeliveryHelper::getExtraFields())));
 
         return array_key_exists(strtolower($sortBy), $map) ? $map[strtolower($sortBy)] : self::DEFAULT_SORT_COLUMN;
+    }
+
+    /**
+     * @param $deliveriesUri
+     * @return array
+     */
+    public function getDeliveriesCountedStatuses(array $deliveriesUri)
+    {
+        $sql = "SELECT kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " AS delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " AS status,
+                COUNT(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") AS cnt
+                    FROM " . MonitoringStorage::TABLE_NAME . " dm
+                    LEFT JOIN " . MonitoringStorage::KV_TABLE_NAME . " kvdm
+                     ON dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . "
+                      AND kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
+                    WHERE kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " IN ('" . implode("','", $deliveriesUri) . "')
+                    GROUP BY kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
+        $stmt = $this->getPersistence()->query($sql);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getRetiredDeliveriesCountedStatuses()
+    {
+        $sql = "SELECT kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " AS delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " AS status,
+                COUNT(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") AS cnt
+                    FROM " . MonitoringStorage::TABLE_NAME . " dm
+                    LEFT JOIN " . MonitoringStorage::KV_TABLE_NAME . " kvdm
+                        ON dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . "
+                          AND kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
+                    LEFT JOIN statements s ON s.predicate='" . DeliveryAssemblyService::PROPERTY_ORIGIN . "'
+                        AND s.subject=kvdm." . MonitoringStorage::KV_COLUMN_VALUE . "
+                    WHERE s.subject IS NULL
+                    GROUP BY kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
+
+        $stmt = $this->getPersistence()->query($sql);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

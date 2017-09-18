@@ -23,10 +23,10 @@ namespace oat\taoProctoring\model;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
-use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 /**
  * Service to manage and monitor assessment activity
@@ -130,8 +130,6 @@ class ActivityMonitoringService extends ConfigurableService
             self::STATE_IN_PROGRESS_ASSESSMENTS => $active
         ];
 
-        $deliveryStates = $this->getStatesByDelivery();
-        $assessments[self::FIELD_DELIVERIES_STATISTICS] = $deliveryStates;
         return $assessments;
     }
 
@@ -236,26 +234,44 @@ class ActivityMonitoringService extends ConfigurableService
     /**
      * Get list of all the deliveries and number of it's executions in each status
      * Result indexed by delivery Uri
+     * @param $params
      * @return array
      */
-    protected function getStatesByDelivery()
+    public function getStatesByDelivery(array $params = [])
     {
         $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
             $statusesArray[$deliveryStatus->getUri()] = 0;
         }
 
-        $retiredTitle = __('Retired Deliveries');
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryService = DeliveryAssemblyService::singleton();
+
+        $limit = isset($params['rows']) ? $params['rows'] : 10;
+        $offset = isset($params['page']) ? ($params['page']-1) * $limit : 0;
+        $deliveries = $deliveryService->getRootClass()->getInstances(true, [
+            'order' => RDFS_LABEL,
+            'offset' => $offset,
+            'limit' => $limit
+        ]);
+
+        // deliveries count + retired deliveries row
+        $total = $deliveryService->getRootClass()->countInstances([], ['recursive' => true]) + 1;
 
         $newResult = [];
-        $sql = "select kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " as delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " as status,
-                count(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") as cnt
-                    from " . MonitoringStorage::TABLE_NAME . " dm
-                    left join " . MonitoringStorage::KV_TABLE_NAME . " kvdm
-                     on dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . " and kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
-                    group by kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
-        $stmt = $this->getPersistence()->query($sql);
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($deliveries as $delivery) {
+            $newResult[$delivery->getUri()] = $statusesArray;
+            $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
+        }
+
+        $data = $deliveryMonitoringService->getDeliveriesCountedStatuses(array_keys($deliveries));
+
+        if (count($deliveries) < $limit) {
+            $data = array_merge($data, $deliveryMonitoringService->getRetiredDeliveriesCountedStatuses());
+        }
+
+        $retiredTitle = __('Retired Deliveries');
         foreach ($data as $row) {
             $delivery_id = $row['delivery_id'] ?: self::FIELD_RETIRED_DELIVERIES;
             if (!isset($newResult[$delivery_id])) {
@@ -263,9 +279,6 @@ class ActivityMonitoringService extends ConfigurableService
                 $delivery = $this->getResource($delivery_id);
                 if (!$delivery->exists()) {
                     $newResult[$delivery_id]['label'] = $retiredTitle;
-                } else {
-                    $label = $delivery->getLabel();
-                    $newResult[$delivery_id]['label'] = $label ?: $delivery_id;
                 }
             }
 
@@ -290,14 +303,6 @@ class ActivityMonitoringService extends ConfigurableService
             }
         }
 
-        return $list;
-    }
-
-    protected function getPersistence()
-    {
-        $monitoringStorageService = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
-        return $this->getServiceManager()
-            ->get(\common_persistence_Manager::SERVICE_ID)
-            ->getPersistenceById($monitoringStorageService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+        return ['data' => $list, 'total' => $total];
     }
 }

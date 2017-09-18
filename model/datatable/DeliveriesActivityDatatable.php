@@ -52,10 +52,17 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
 
     public function getPayload()
     {
+        /** @var ActivityMonitoringService $service */
         $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-        $data = $service->getData()['deliveries_statistics'];
+        $params = ['page' => $this->request->getPage(),
+            'rows' => $this->request->getRows(),
+            'sort_by' => $this->request->getSortBy(),
+            'sort_order' => $this->request->getSortOrder(),
+            'filters' => $this->request->getFilters()];
 
-        $this->doSorting($data);
+        $data = $service->getStatesByDelivery($params);
+
+        $this->doSorting($data['data']);
         $result = $this->doPostProcessing($data);
 
         return $result;
@@ -67,11 +74,13 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doPostProcessing(array $result)
     {
+        $rows = $this->request->getRows();
+        $rows = $rows?:1;
         $payload = [
-            'data' => $result,
+            'data' => $result['data'],
             'page' => (integer) $this->request->getPage(),
-            'records' => (integer) count($result),
-            'total' => (integer) count($result)
+            'records' => (integer) count($result['data']),
+            'total' => ceil($result['total'] / $rows)
         ];
         return $payload;
     }

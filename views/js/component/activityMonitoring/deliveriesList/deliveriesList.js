@@ -78,7 +78,7 @@ define([
                 label: __('Finished'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
-            },
+            }
         ]
     };
 
@@ -106,13 +106,12 @@ define([
                 filter:                   false,
                 model:                    this.config.model,
                 paginationStrategyTop:    'none',
-                paginationStrategyBottom: 'none',
+                paginationStrategyBottom: 'pages',
                 selectable:               true,
                 sortorder:                'asc',
                 sortby:                   'label'
             }, this.config.model);
         })
-
         .init(config);
     }
 
