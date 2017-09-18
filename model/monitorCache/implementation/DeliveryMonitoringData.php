@@ -21,7 +21,9 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
@@ -177,6 +179,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     {
         if ($keys === null) {
             $keys = [
+                DeliveryMonitoringService::STATUS,
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME,
                 DeliveryMonitoringService::EXTENDED_TIME
@@ -188,6 +191,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
                 $this->{$methodName}();
             }
         }
+    }
+
+    /**
+     * Update extra time allowed for the delivery execution
+     */
+    private function updateLastTestTakerActivity()
+    {
+        $this->addValue(DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY, microtime(true), true);
     }
 
     /**
@@ -207,6 +218,18 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         $this->addValue(DeliveryMonitoringService::CONNECTIVITY, $lastConnectivity, true);
+    }
+
+    /**
+     * Update test session state
+     */
+    private function updateStatus()
+    {
+        $status = $this->deliveryExecution->getState()->getUri();
+        $this->addValue(DeliveryMonitoringService::STATUS, $status, true);
+        if ($status == ProctoredDeliveryExecution::STATE_PAUSED) {
+            $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
+        }
     }
 
     /**
@@ -242,7 +265,31 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
         $this->addValue(DeliveryMonitoringService::REMAINING_TIME, $result, true);
     }
-    
+
+    /**
+     * Update diff between last_pause_timestamp and last_test_taker_activity
+     */
+    private function updateDiffTimestamp()
+    {
+        $diffTimestamp = 0;
+        $lastTimeStamp = 0;
+        $lastActivity = 0;
+        if (isset($this->data[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP])) {
+            $lastTimeStamp = $this->data[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP];
+        }
+
+        if (isset($this->data[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+            $lastActivity = $this->data[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
+        }
+
+        if ($lastTimeStamp - $lastActivity > 0) {
+            $diffTimestamp = isset($this->data[DeliveryMonitoringService::DIFF_TIMESTAMP]) ? $this->data[DeliveryMonitoringService::DIFF_TIMESTAMP] : 0;
+            $diffTimestamp += $lastTimeStamp - $lastActivity;
+        }
+
+        $this->addValue(DeliveryMonitoringService::DIFF_TIMESTAMP, $diffTimestamp, true);
+    }
+
     /**
      * Update extra time allowed for the delivery execution
      */

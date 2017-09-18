@@ -24,6 +24,8 @@ define([
     'i18n',
     'module',
     'controller/app',
+    'core/polling',
+    'core/timer',
     'util/url',
     'layout/loading-bar',
     'core/encoder/time',
@@ -42,6 +44,7 @@ define([
     'tpl!taoProctoring/templates/delivery/statusFilter',
     'moment',
     'util/locale',
+    'tpl!taoProctoring/templates/delivery/approximatedTimer',
     'ui/datatable',
     'jqueryui',
     'select2'
@@ -51,6 +54,8 @@ define([
     __,
     module,
     appController,
+    pollingFactory,
+    timerFactory,
     urlHelper,
     loadingBar,
     timeEncoder,
@@ -68,7 +73,8 @@ define([
     deliveryLinkTpl,
     statusFilterTpl,
     moment,
-    locale
+    locale,
+    approximatedTimerTpl
 ) {
     'use strict';
 
@@ -86,6 +92,7 @@ define([
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+
 
     /**
      * The extra time unit: by default in minutes
@@ -139,7 +146,26 @@ define([
             var actionList;
             var serviceParams = {};
             var sessionsHistoryUrl = historyUrl;
+            var timer = timerFactory({
+                autoStart: false
+            });
 
+            var polling = pollingFactory({
+                action: function() {
+                    var elapsed = timer.tick() / 1000;
+                    var timers = $('.procotor-timer_time.countDown');
+                    _.forEach(timers, function (timerItem) {
+                        var remaining = $(timerItem).data('remaining');
+                        if (remaining > 0) {
+                            remaining -= elapsed;
+                            $(timerItem).html(timeEncoder.encode(Math.round(remaining)));
+                            $(timerItem).data('remaining', remaining);
+                        }
+                    });
+                },
+                interval: 1000,
+                autoStart: false
+             });
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -534,7 +560,6 @@ define([
                 if (context) {
                     serviceParams.context = context;
                 }
-
                 return proxyExecutions.read(serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
@@ -847,17 +872,31 @@ define([
                         sorttype: 'numeric',
                         label: __('Remaining'),
                         transform: function(value, row) {
-                            var timer = _.isObject(row.timer) ? row.timer : {};
-                            var refinedValue = timer.remaining_time;
+                            var rowTimer = _.isObject(row.timer) ? row.timer : {};
+                            var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
                             var remaining = parseInt(refinedValue, 10);
-
                             if (remaining || _.isFinite(remaining) ) {
+                                if (remaining < 0) {
+                                    if (rowTimer.extraTime) {
+                                        rowTimer.consumedExtraTime += -remaining;
+                                    }
+                                    remaining = 0;
+                                }
                                 if (remaining) {
                                     refinedValue = timeEncoder.encode(remaining);
                                 } else {
                                     refinedValue = '';
                                 }
-                                refinedValue += encodeExtraTime(timer.extraTime, timer.consumedExtraTime, 'HH:mm:ss', extraTimeUnit);
+
+                                if ((!remaining && !rowTimer.extraTime) || (rowTimer.extraTime && rowTimer.extraTime <= rowTimer.consumedExtraTime)) {
+                                    refinedValue = __('Timed out');
+                                }
+
+                                refinedValue = approximatedTimerTpl({
+                                    timer: refinedValue,
+                                    remaining: remaining,
+                                    countDown: rowTimer.countDown
+                                });
                             }
 
                             return refinedValue;
@@ -979,8 +1018,9 @@ define([
                                     $list.datatable('highlightRow', v);
                                 });
                             }
-
                             loadingBar.stop();
+                            polling.start();
+                            timer.resume();
                         })
                         .on('select.datatable', function() {
                             //hide all controls then display each required one individually
