@@ -23,7 +23,6 @@ namespace oat\taoProctoring\model;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
@@ -234,10 +233,11 @@ class ActivityMonitoringService extends ConfigurableService
     /**
      * Get list of all the deliveries and number of it's executions in each status
      * Result indexed by delivery Uri
-     * @param $params
+     * @param $deliveries
+     * @param $limit
      * @return array
      */
-    public function getStatesByDelivery(array $params = [])
+    public function getStatesByDelivery(array $deliveries = [], $limit = 10)
     {
         $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
@@ -246,18 +246,6 @@ class ActivityMonitoringService extends ConfigurableService
 
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveryService = DeliveryAssemblyService::singleton();
-
-        $limit = isset($params['rows']) ? $params['rows'] : 10;
-        $offset = isset($params['page']) ? ($params['page']-1) * $limit : 0;
-        $deliveries = $deliveryService->getRootClass()->getInstances(true, [
-            'order' => RDFS_LABEL,
-            'offset' => $offset,
-            'limit' => $limit
-        ]);
-
-        // deliveries count + retired deliveries row
-        $total = $deliveryService->getRootClass()->countInstances([], ['recursive' => true]) + 1;
 
         $newResult = [];
         foreach ($deliveries as $delivery) {
@@ -303,6 +291,6 @@ class ActivityMonitoringService extends ConfigurableService
             }
         }
 
-        return ['data' => $list, 'total' => $total];
+        return $list;
     }
 }

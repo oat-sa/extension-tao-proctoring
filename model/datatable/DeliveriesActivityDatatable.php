@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\datatable;
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
 use oat\oatbox\service\ServiceManager;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -42,12 +43,18 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     protected $request;
 
     /**
+     * @var DeliveryAssemblyService
+     */
+    protected $deliveryService;
+
+    /**
      * DeliveriesActivityDatatable constructor.
      */
     public function __construct()
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
         $this->request = DatatableRequest::fromGlobals();
+        $this->deliveryService = DeliveryAssemblyService::singleton();
     }
 
     public function getPayload()
@@ -60,9 +67,17 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
             'sort_order' => $this->request->getSortOrder(),
             'filters' => $this->request->getFilters()];
 
-        $data = $service->getStatesByDelivery($params);
+        $limit = isset($params['rows']) ? $params['rows'] : 10;
+        $offset = isset($params['page']) ? ($params['page']-1) * $limit : 0;
+        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, [
+            'order' => RDFS_LABEL,
+            'offset' => $offset,
+            'limit' => $limit
+        ]);
 
-        $this->doSorting($data['data']);
+        $data = $service->getStatesByDelivery($deliveries, $limit);
+
+        $this->doSorting($data);
         $result = $this->doPostProcessing($data);
 
         return $result;
@@ -76,11 +91,13 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     {
         $rows = $this->request->getRows();
         $rows = $rows?:1;
+        // deliveries count + retired deliveries row
+        $total = $this->deliveryService->getRootClass()->countInstances([], ['recursive' => true]) + 1;
         $payload = [
-            'data' => $result['data'],
+            'data' => $result,
             'page' => (integer) $this->request->getPage(),
-            'records' => (integer) count($result['data']),
-            'total' => ceil($result['total'] / $rows)
+            'records' => (integer) count($result),
+            'total' => ceil($total / $rows),
         ];
         return $payload;
     }
