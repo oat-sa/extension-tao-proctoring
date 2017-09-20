@@ -112,7 +112,7 @@ class TestSessionService extends QtiTestSessionService
                 $route = $session->getRoute();
                 $currentItem = $route->current();
 
-                $catService = ServiceManager::getServiceManager()->get(CatService::SERVICE_ID);
+                $catService = $this->getServiceManager()->get(CatService::SERVICE_ID);
                 $isAdaptive = $catService->isAdaptive($session, $currentItem->getAssessmentItemRef());
 
                 if ($displaySubsectionTitle || $isAdaptive) {
