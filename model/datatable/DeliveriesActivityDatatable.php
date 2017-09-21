@@ -61,21 +61,9 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     {
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-        $params = ['page' => $this->request->getPage(),
-            'rows' => $this->request->getRows(),
-            'sort_by' => $this->request->getSortBy(),
-            'sort_order' => $this->request->getSortOrder(),
-            'filters' => $this->request->getFilters()];
 
-        $limit = isset($params['rows']) ? $params['rows'] : 10;
-        $offset = isset($params['page']) ? ($params['page']-1) * $limit : 0;
-        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, [
-            'order' => RDFS_LABEL,
-            'offset' => $offset,
-            'limit' => $limit
-        ]);
-
-        $data = $service->getStatesByDelivery($deliveries, $limit);
+        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, ['order' => RDFS_LABEL]);
+        $data = $service->getStatesByDelivery($deliveries);
 
         $this->doSorting($data);
         $result = $this->doPostProcessing($data);

@@ -234,10 +234,10 @@ class ActivityMonitoringService extends ConfigurableService
      * Get list of all the deliveries and number of it's executions in each status
      * Result indexed by delivery Uri
      * @param $deliveries
-     * @param $limit
+     * @param $limit 0 - all of them
      * @return array
      */
-    public function getStatesByDelivery(array $deliveries = [], $limit = 10)
+    public function getStatesByDelivery(array $deliveries = [], $limit = 0)
     {
         $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
@@ -255,7 +255,7 @@ class ActivityMonitoringService extends ConfigurableService
 
         $data = $deliveryMonitoringService->getDeliveriesCountedStatuses(array_keys($deliveries));
 
-        if (count($deliveries) < $limit) {
+        if (!$limit || count($deliveries) < $limit) {
             $data = array_merge($data, $deliveryMonitoringService->getRetiredDeliveriesCountedStatuses());
         }
 

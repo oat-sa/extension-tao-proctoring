@@ -106,7 +106,7 @@ define([
                 filter:                   false,
                 model:                    this.config.model,
                 paginationStrategyTop:    'none',
-                paginationStrategyBottom: 'pages',
+                paginationStrategyBottom: 'none',
                 selectable:               true,
                 sortorder:                'asc',
                 sortby:                   'label'
