@@ -21,12 +21,11 @@
 
 namespace oat\taoProctoring\model;
 
+use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\requestLog\RequestLogStorage;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Service to manage and monitor assessment activity
@@ -36,7 +35,6 @@ use oat\generis\model\OntologyAwareTrait;
 class ActivityMonitoringService extends ConfigurableService
 {
     use OntologyAwareTrait;
-
     const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
 
     /** Threshold in seconds */
@@ -131,8 +129,6 @@ class ActivityMonitoringService extends ConfigurableService
             self::STATE_IN_PROGRESS_ASSESSMENTS => $active
         ];
 
-        $deliveryStates = $this->getStatesByDelivery();
-        $assessments[self::FIELD_DELIVERIES_STATISTICS] = $deliveryStates;
         return $assessments;
     }
 
@@ -237,31 +233,64 @@ class ActivityMonitoringService extends ConfigurableService
     /**
      * Get list of all the deliveries and number of it's executions in each status
      * Result indexed by delivery Uri
+     * @param $deliveries
+     * @param $limit 0 - all of them
      * @return array
      */
-    public function getStatesByDelivery()
+    public function getStatesByDelivery(array $deliveries = [], $limit = 0)
     {
-        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-
         $statusesArray = [];
         foreach ($this->deliveryStatuses as $deliveryStatus) {
             $statusesArray[$deliveryStatus->getUri()] = 0;
         }
 
-        $newResult = [];
-        $newResult[self::FIELD_RETIRED_DELIVERIES] = $statusesArray;
-        $newResult[self::FIELD_RETIRED_DELIVERIES]['label'] = self::LABEL_RETIRED_DELIVERIES;
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $deliveries = DeliveryAssemblyService::singleton()->getAllAssemblies();
+        $newResult = [];
         foreach ($deliveries as $delivery) {
             $newResult[$delivery->getUri()] = $statusesArray;
             $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
         }
 
-        foreach ($deliveryMonitoringService->find([], ['asArray'=>true], true) as $sessionData) {
-            $deliveryId = isset($newResult[$sessionData['delivery_id']]) ? $sessionData['delivery_id'] : self::FIELD_RETIRED_DELIVERIES;
-            $newResult[$deliveryId][$sessionData['status']]++;
+        $data = $deliveryMonitoringService->getDeliveriesCountedStatuses(array_keys($deliveries));
+
+        if (!$limit || count($deliveries) < $limit) {
+            $data = array_merge($data, $deliveryMonitoringService->getRetiredDeliveriesCountedStatuses());
         }
-        return $newResult;
+
+        $retiredTitle = __('Retired Deliveries');
+        foreach ($data as $row) {
+            $delivery_id = $row['delivery_id'] ?: self::FIELD_RETIRED_DELIVERIES;
+            if (!isset($newResult[$delivery_id])) {
+                $newResult[$delivery_id] = $statusesArray;
+                $delivery = $this->getResource($delivery_id);
+                if (!$delivery->exists()) {
+                    $newResult[$delivery_id]['label'] = $retiredTitle;
+                }
+            }
+
+            $newResult[$delivery_id][$row['status']] += $row['cnt'];
+        }
+
+        $list = [];
+        foreach ($newResult as $key => $row) {
+            if ($row['label'] != $retiredTitle) {
+                $list[$key] = $row;
+            } else {
+                if (!isset($list[self::FIELD_RETIRED_DELIVERIES])) {
+                    $list[self::FIELD_RETIRED_DELIVERIES] = $row;
+                } else {
+                    foreach ($row as $status => $val) {
+                        if ($status == 'label') {
+                            continue;
+                        }
+                        $list[self::FIELD_RETIRED_DELIVERIES][$status] = (int)$list[self::FIELD_RETIRED_DELIVERIES][$status] + (int)$val;
+                    }
+                }
+            }
+        }
+
+        return $list;
     }
 }
