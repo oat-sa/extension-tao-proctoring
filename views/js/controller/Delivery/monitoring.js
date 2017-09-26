@@ -888,10 +888,6 @@ define([
                                     refinedValue = '';
                                 }
 
-                                if ((!remaining && !rowTimer.extraTime) || (rowTimer.extraTime && rowTimer.extraTime <= rowTimer.consumedExtraTime)) {
-                                    refinedValue = __('Timed out');
-                                }
-
                                 refinedValue = approximatedTimerTpl({
                                     timer: refinedValue,
                                     remaining: remaining,
