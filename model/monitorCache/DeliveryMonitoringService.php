@@ -97,4 +97,17 @@ interface DeliveryMonitoringService
      * @return integer
      */
     public function count();
+
+    /**
+     * Get counted statuses by deliveries
+     * @param $deliveriesUri
+     * @return array
+     */
+    public function getDeliveriesCountedStatuses(array $deliveriesUri);
+
+    /**
+     * Get statuses for the data about deliveries which can't be found
+     * @return mixed
+     */
+    public function getRetiredDeliveriesCountedStatuses();
 }

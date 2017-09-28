@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\datatable;
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
 use oat\oatbox\service\ServiceManager;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -42,19 +43,27 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     protected $request;
 
     /**
+     * @var DeliveryAssemblyService
+     */
+    protected $deliveryService;
+
+    /**
      * DeliveriesActivityDatatable constructor.
      */
     public function __construct()
     {
         $this->setServiceLocator(ServiceManager::getServiceManager());
         $this->request = DatatableRequest::fromGlobals();
+        $this->deliveryService = DeliveryAssemblyService::singleton();
     }
 
     public function getPayload()
     {
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
-        $data = $service->getStatesByDelivery();
+
+        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, ['order' => RDFS_LABEL]);
+        $data = $service->getStatesByDelivery($deliveries);
 
         $this->doSorting($data);
         $result = $this->doPostProcessing($data);
@@ -68,11 +77,15 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doPostProcessing(array $result)
     {
+        $rows = $this->request->getRows();
+        $rows = $rows?:1;
+        // deliveries count + retired deliveries row
+        $total = $this->deliveryService->getRootClass()->countInstances([], ['recursive' => true]) + 1;
         $payload = [
             'data' => $result,
             'page' => (integer) $this->request->getPage(),
             'records' => (integer) count($result),
-            'total' => (integer) count($result)
+            'total' => ceil($total / $rows),
         ];
         return $payload;
     }
