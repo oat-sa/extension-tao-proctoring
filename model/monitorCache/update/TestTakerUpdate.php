@@ -46,7 +46,7 @@ class TestTakerUpdate
         }, DeliveryHelper::getExtraFieldsProperties()));
 
 
-        if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::PROPERTY_TAO_CLASS_SUBJECT))) {
+        if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::CLASS_URI_SUBJECT))) {
 
             $deliveryExecutionsData = $service->find([
                 DeliveryMonitoringService::TEST_TAKER => $resource->getUri(),

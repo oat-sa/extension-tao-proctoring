@@ -108,12 +108,12 @@ class DeliveryHelper
         }
         
         $deliveryProps = array(
-            new \core_kernel_classes_Property(DeliveryContainerService::START_PROP),
-            new \core_kernel_classes_Property(DeliveryContainerService::END_PROP),
+            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_START),
+            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_END),
         );
         $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
-        $propStartExec = current($deliveryProperties[DeliveryContainerService::START_PROP]);
-        $propEndExec = current($deliveryProperties[DeliveryContainerService::END_PROP]);
+        $propStartExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_START]);
+        $propEndExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_END]);
         
         $properties = array();
         if (!is_null($propStartExec) && !empty((string)$propStartExec)) {
