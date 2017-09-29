@@ -78,7 +78,7 @@ define([
                 label: __('Finished'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
-            },
+            }
         ]
     };
 
@@ -112,7 +112,6 @@ define([
                 sortby:                   'label'
             }, this.config.model);
         })
-
         .init(config);
     }
 

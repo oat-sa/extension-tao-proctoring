@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
 use qtism\runtime\tests\AssessmentTestSession;
@@ -67,8 +68,10 @@ class TestSessionService extends QtiTestSessionService
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-            if (($executionState === DeliveryExecutionState::STATE_AUTHORIZED ||
-                  $executionState === DeliveryExecutionState::STATE_AWAITING)) {
+            if (
+                ($executionState === DeliveryExecutionState::STATE_AUTHORIZED || $executionState === DeliveryExecutionState::STATE_AWAITING)
+                && $deliveryExecutionStateService->isCancelable($deliveryExecution)
+            ) {
                 $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
                 $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
                 $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
@@ -110,13 +113,22 @@ class TestSessionService extends QtiTestSessionService
             if ($session->isRunning()) {
                 $route = $session->getRoute();
                 $currentItem = $route->current();
-                if ($displaySubsectionTitle) {
-                    $currentSection = $session->getCurrentAssessmentSection();
-                    $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection);
-                    $positionInSection = array_search($currentItem, $sectionItems->getArrayCopy(true));
 
-                    $result = __('%1$s - Item %2$s/%3$s', $currentSection->getTitle(), $positionInSection + 1,
-                        count($sectionItems));
+                $catService = $this->getServiceManager()->get(CatService::SERVICE_ID);
+                $isAdaptive = $catService->isAdaptive($session, $currentItem->getAssessmentItemRef());
+
+                if ($displaySubsectionTitle || $isAdaptive) {
+                    $currentSection = $session->getCurrentAssessmentSection();
+                    if ($isAdaptive) {
+                        $testSessionData = $this->getTestSessionDataById($session->getSessionId());
+                        $sectionItems = $catService->getShadowTest($session, $testSessionData['compilation']['private'], $currentItem);
+                        $currentItem = $catService->getCurrentCatItemId($session, $testSessionData['compilation']['private'], $currentItem);
+                    } else {
+                        $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection)->getArrayCopy(true);
+                    }
+                    $positionInSection = array_search($currentItem, $sectionItems);
+
+                    $result = $this->getProgressText($currentSection->getTitle(), $positionInSection, count($sectionItems));
                 } else {
                     // we need only top section and items from there
                     $parts = $this->getMappedItems($session);
@@ -124,8 +136,7 @@ class TestSessionService extends QtiTestSessionService
                         foreach ($part['sections'] as $section) {
                             foreach ($section['items'] as $key => $item) {
                                 if ($currentItem->getAssessmentItemRef()->getIdentifier() == $key) {
-                                    $result = __('%1$s - Item %2$s/%3$s', $section['label'], $item['positionInSection'] + 1,
-                                    count($section['items']));
+                                    $result = $this->getProgressText($section['label'], $item['positionInSection'], count($section['items']));
                                     break 3;
                                  }
                              }
@@ -137,6 +148,17 @@ class TestSessionService extends QtiTestSessionService
             }
         }
         return $result;
+    }
+
+    /**
+     * @param string $sectionTitle
+     * @param int $positionInSection
+     * @param int $sectionCount
+     * @return string
+     */
+    private function getProgressText($sectionTitle, $positionInSection, $sectionCount)
+    {
+        return __('%1$s - Item %2$s/%3$s', $sectionTitle, $positionInSection + 1, $sectionCount);
     }
 
     /**

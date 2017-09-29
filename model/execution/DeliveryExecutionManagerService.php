@@ -81,11 +81,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
     /**
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
-     * @param null $extraTime
+     * @param int $extraTime
      * @param null $extendedTime
      * @return array
      */
-    public function setExtraTime($deliveryExecutions, $extraTime = null, $extendedTime = null)
+    public function setExtraTime($deliveryExecutions, $extraTime = 0, $extendedTime = null)
     {
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);

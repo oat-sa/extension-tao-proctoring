@@ -996,22 +996,25 @@ msgid "the already granted time will be replaced by the new value"
 msgstr ""
 
 msgid "The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required."
-msgstr ""
+msgstr "La evaluación fue suspendida por un coordinador autorizado. Si desea retomar su evaluación, vuelva a iniciarla y contacte a su coordinador si es necesario."
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
 msgstr "La evaluación ha sido suspendida. Para reanudar su evaluación, por favor reinicie y póngase en contacto con su supervisor si es necesario."
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it."
-msgstr ""
+msgstr "La evaluación se suspendió. Para retomar su evaluación, vuelva a iniciarla."
 
 msgid "The assessment has been terminated."
-msgstr ""
+msgstr "La evaluación finalizó."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
-msgstr ""
+msgstr "La evaluación finalizó. Ya no puede interactuar con ella."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
 msgstr "La evaluación se ha terminado. Ya no puede interactuar con él. Póngase en contacto con su supervisor si es necesario."
+
+msgid "The assessment has been terminated by an authorized proctor. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr "Un supervisor autorizado finalizó la evaluación. Ya no puede interactuar con ella. Contacte a su supervisor si lo considera necesario."
 
 msgid "The extra time must be a number"
 msgstr ""
