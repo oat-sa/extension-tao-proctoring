@@ -21,9 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
-use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
