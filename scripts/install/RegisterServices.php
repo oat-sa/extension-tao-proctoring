@@ -41,7 +41,7 @@ class RegisterServices extends InstallAction
         $deliveryExecutionStateService = new DeliveryExecutionStateService([
             DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE => 'PT1H',
             DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY => 'PT30M',
-            DeliveryExecutionStateService::OPTION_TIME_HANDLING => false,
+            DeliveryExecutionStateService::OPTION_TIME_HANDLING => true,
         ]);
         $this->registerService(StateServiceInterface::SERVICE_ID, $deliveryExecutionStateService);
 
