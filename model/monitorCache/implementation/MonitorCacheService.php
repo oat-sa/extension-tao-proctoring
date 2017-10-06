@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdfs;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
@@ -54,11 +56,11 @@ class MonitorCacheService extends MonitoringStorage
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
         // need to add user to event
-        $firstNames = $event->getUser()->getPropertyValues(PROPERTY_USER_FIRSTNAME);
+        $firstNames = $event->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_FIRSTNAME);
         if (!empty($firstNames)) {
             $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
         }
-        $lastNames = $event->getUser()->getPropertyValues(PROPERTY_USER_LASTNAME);
+        $lastNames = $event->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_LASTNAME);
         if (!empty($lastNames)) {
             $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
         }
@@ -156,7 +158,7 @@ class MonitorCacheService extends MonitoringStorage
     public function deliverylabelChanged(MetadataModified $event)
     {
         $resource = $event->getResource();
-        if ($event->getMetadataUri() === RDFS_LABEL) {
+        if ($event->getMetadataUri() === OntologyRdfs::RDFS_LABEL) {
             $assemblyClass = DeliveryAssemblyService::singleton()->getRootClass();
             if ($resource->isInstanceOf($assemblyClass)) {
                 $update = new DeliveryUpdater();

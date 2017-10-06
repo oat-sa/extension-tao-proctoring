@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\datatable;
 
+use oat\generis\model\OntologyRdfs;
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
 use oat\oatbox\service\ServiceManager;
@@ -62,7 +63,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
         /** @var ActivityMonitoringService $service */
         $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
 
-        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, ['order' => RDFS_LABEL]);
+        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, ['order' => OntologyRdfs::RDFS_LABEL]);
         $data = $service->getStatesByDelivery($deliveries);
 
         $this->doSorting($data);

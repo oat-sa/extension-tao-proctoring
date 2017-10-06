@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
+use oat\generis\model\GenerisRdf;
 use oat\tao\model\event\MetadataModified;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -40,7 +41,7 @@ class TestTakerUpdate
         $resource = $event->getResource();
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $tracked = array_merge([PROPERTY_USER_FIRSTNAME, PROPERTY_USER_LASTNAME], array_map(function ($field) {
+        $tracked = array_merge([GenerisRdf::PROPERTY_USER_FIRSTNAME, GenerisRdf::PROPERTY_USER_LASTNAME], array_map(function ($field) {
             return $field['property']->getUri();
         }, DeliveryHelper::getExtraFieldsProperties()));
 

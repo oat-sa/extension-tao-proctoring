@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model;
 
+use oat\generis\model\OntologyRdfs;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
@@ -69,7 +70,7 @@ class AssessmentResultsService extends ConfigurableService
         $testUri = $resultService->getTestsFromDeliveryResult($deliveryExecution->getIdentifier());
         $testResource = new \core_kernel_classes_Resource($testUri[0]);
         $propValues = $testResource->getPropertiesValues(array(
-            RDFS_LABEL,
+            OntologyRdfs::RDFS_LABEL,
         ));
         $result = $this->propertiesToArray($propValues);
 
