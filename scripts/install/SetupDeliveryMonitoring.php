@@ -24,7 +24,6 @@ namespace oat\taoProctoring\scripts\install;
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 
 /**
  * Setup the tables and the service to cache
@@ -37,13 +36,23 @@ class SetupDeliveryMonitoring extends InstallAction
      */
     public function __invoke($params)
     {
-        $pm = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID);
-        $persistence = $pm->getPersistenceById('default');
+        try {
+            $service = $this->getServiceManager()->get(MonitorCacheService::SERVICE_ID);
+        } catch (\Exception $exception) {
+            $service = new MonitorCacheService(array(
+                MonitorCacheService::OPTION_PERSISTENCE => 'default',
+                MonitorCacheService::OPTION_PRIMARY_COLUMNS => DbSetup::getPrimaryColumns()
+            ));
+            $service->setServiceManager($this->getServiceManager());
+        }
+        $method = new \ReflectionMethod(get_class($service), 'getPersistence');
+        $method->setAccessible(true);
+        $persistence = $method->invoke($service);
+
         DbSetup::generateTable($persistence);
-        $this->registerService(DeliveryMonitoringService::SERVICE_ID, new MonitorCacheService(array(
-            MonitorCacheService::OPTION_PERSISTENCE => 'default',
-            MonitorCacheService::OPTION_PRIMARY_COLUMNS => DbSetup::getPrimaryColumns()
-        )));
+
+        $service->setOption(MonitorCacheService::OPTION_PRIMARY_COLUMNS, DbSetup::getPrimaryColumns());
+        $this->registerService(MonitorCacheService::SERVICE_ID, $service);
     }
 }
 
