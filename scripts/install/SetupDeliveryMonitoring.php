@@ -45,9 +45,7 @@ class SetupDeliveryMonitoring extends InstallAction
             ));
             $service->setServiceManager($this->getServiceManager());
         }
-        $method = new \ReflectionMethod(get_class($service), 'getPersistence');
-        $method->setAccessible(true);
-        $persistence = $method->invoke($service);
+        $persistence = $service->getPersistence();
 
         DbSetup::generateTable($persistence);
 

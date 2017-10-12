@@ -478,7 +478,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     /**
      * @return \common_persistence_SqlPersistence
      */
-    protected function getPersistence()
+    public function getPersistence()
     {
         return $this->getServiceManager()
             ->get(\common_persistence_Manager::SERVICE_ID)
