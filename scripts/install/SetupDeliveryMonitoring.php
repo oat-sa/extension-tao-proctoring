@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
+use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 
@@ -38,7 +39,7 @@ class SetupDeliveryMonitoring extends InstallAction
     {
         try {
             $service = $this->getServiceManager()->get(MonitorCacheService::SERVICE_ID);
-        } catch (\Exception $exception) {
+        } catch (ServiceNotFoundException $exception) {
             $service = new MonitorCacheService(array(
                 MonitorCacheService::OPTION_PERSISTENCE => 'default',
                 MonitorCacheService::OPTION_PRIMARY_COLUMNS => DbSetup::getPrimaryColumns()
