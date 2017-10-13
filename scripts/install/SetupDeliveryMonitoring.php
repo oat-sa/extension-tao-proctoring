@@ -41,8 +41,7 @@ class SetupDeliveryMonitoring extends InstallAction
             $service = $this->getServiceManager()->get(MonitorCacheService::SERVICE_ID);
         } catch (ServiceNotFoundException $exception) {
             $service = new MonitorCacheService(array(
-                MonitorCacheService::OPTION_PERSISTENCE => 'default',
-                MonitorCacheService::OPTION_PRIMARY_COLUMNS => DbSetup::getPrimaryColumns()
+                MonitorCacheService::OPTION_PERSISTENCE => 'default'
             ));
             $service->setServiceManager($this->getServiceManager());
         }
