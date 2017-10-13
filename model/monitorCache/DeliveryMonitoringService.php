@@ -61,6 +61,7 @@ interface DeliveryMonitoringService
     const LAST_PAUSE_TIMESTAMP = 'last_pause_timestamp';
 
     const DIFF_TIMESTAMP = 'diff_timestamp';
+    const ITEM_DURATION = 'item_duration';
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
