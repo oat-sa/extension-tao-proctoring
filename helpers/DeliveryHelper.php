@@ -24,6 +24,7 @@ use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -107,12 +108,12 @@ class DeliveryHelper
         }
         
         $deliveryProps = array(
-            new \core_kernel_classes_Property(TAO_DELIVERY_START_PROP),
-            new \core_kernel_classes_Property(TAO_DELIVERY_END_PROP),
+            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_START),
+            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_END),
         );
         $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
-        $propStartExec = current($deliveryProperties[TAO_DELIVERY_START_PROP]);
-        $propEndExec = current($deliveryProperties[TAO_DELIVERY_END_PROP]);
+        $propStartExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_START]);
+        $propEndExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_END]);
         
         $properties = array();
         if (!is_null($propStartExec) && !empty((string)$propStartExec)) {

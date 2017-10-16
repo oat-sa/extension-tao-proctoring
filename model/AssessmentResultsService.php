@@ -28,6 +28,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterf
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use qtism\data\View;
+use taoQtiTest_models_classes_QtiTestService;
 
 /**
  * Class AssessmentResultsService
@@ -152,15 +153,15 @@ class AssessmentResultsService extends ConfigurableService
 
         // -- variables used in the included rubric block templates.
         // base path (base URI to be used for resource inclusion).
-        $basePathVarName = TAOQTITEST_BASE_PATH_NAME;
+        $basePathVarName = taoQtiTest_models_classes_QtiTestService::TEST_BASE_PATH_NAME;
         $$basePathVarName = $compilationDirs['public']->getPublicAccessUrl();
 
         // state name (the variable to access to get the state of the assessmentTestSession).
-        $stateName = TAOQTITEST_RENDERING_STATE_NAME;
+        $stateName = taoQtiTest_models_classes_QtiTestService::TEST_RENDERING_STATE_NAME;
         $$stateName = $session;
 
         // views name (the variable to be accessed for the visibility of rubric blocks).
-        $viewsName = TAOQTITEST_VIEWS_NAME;
+        $viewsName = taoQtiTest_models_classes_QtiTestService::TEST_VIEWS_NAME;
         $$viewsName = array(View::CANDIDATE);
 
         foreach ($sections as $section) {
