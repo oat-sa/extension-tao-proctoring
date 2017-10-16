@@ -28,7 +28,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -55,7 +55,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
      *
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return QtiTimer
-     * @throws \oat\oatbox\service\ServiceNotFoundException
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
      */
     public function getDeliveryTimer($deliveryExecution)
     {
@@ -70,9 +72,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
         } else {
-            $timer = new QtiTimer();
-            $timer->setStorage(new QtiTimeStorage($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier()));
-            $timer->load();
+            $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
+            $timer = $qtiTimerFactory->getTimer($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier());
         }
 
         return $timer;
