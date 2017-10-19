@@ -22,14 +22,13 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\runner\session\TestSession;
-use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -301,39 +300,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
             $timer = $qtiTimerFactory->getTimer($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier());
         }
-        $maxTimeSeconds = null;
 
-        if ($item = $testSession->getCurrentAssessmentItemRef()) {
-            $maxTimeSeconds = $this->getTimeLimits($item);
-        }
-
-        if (!$maxTimeSeconds && $section = $testSession->getCurrentAssessmentSection()) {
-            $maxTimeSeconds = $this->getTimeLimits($section);
-        }
-
-        if (!$maxTimeSeconds && $testPart = $testSession->getCurrentTestPart()) {
-            $maxTimeSeconds = $this->getTimeLimits($testPart);
-        }
-
-        if (!$maxTimeSeconds && $assessmentTest = $testSession->getAssessmentTest()) {
-            $maxTimeSeconds = $this->getTimeLimits($assessmentTest);
-        }
+        $deliveryExecutionManager = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        $maxTimeSeconds = $deliveryExecutionManager->getTimeLimits($testSession);
 
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
-    }
-
-    /**
-     * @param $part
-     * @return int|null
-     */
-    private function getTimeLimits($part)
-    {
-        $timeLimits = $part->getTimeLimits();
-        if ($timeLimits && $timeLimits->hasMaxTime()) {
-            return $timeLimits->getMaxTime()->getSeconds(true);
-        }
-        return null;
     }
 
     /**

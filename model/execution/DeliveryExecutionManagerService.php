@@ -83,7 +83,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param $part
      * @return int|null
      */
-    protected function getTimeLimits($part)
+    protected function getPartTimeLimits($part)
     {
         $timeLimits = $part->getTimeLimits();
         if ($timeLimits && $timeLimits->hasMaxTime()) {
@@ -92,6 +92,34 @@ class DeliveryExecutionManagerService extends ConfigurableService
         return null;
     }
 
+    /**
+     * Gets the actual time limits for a test session
+     * @param TestSession $testSession
+     * @return int|null
+     */
+    public function getTimeLimits($testSession)
+    {
+        $seconds = null;
+
+        if ($item = $testSession->getCurrentAssessmentItemRef()) {
+            $seconds = $this->getPartTimeLimits($item);
+        }
+
+        if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
+            $seconds = $this->getPartTimeLimits($section);
+        }
+
+        if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
+            $seconds = $this->getPartTimeLimits($testPart);
+        }
+
+        if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
+            $seconds = $this->getPartTimeLimits($assessmentTest);
+        }
+        
+        return $seconds;
+    }
+    
     /**
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
@@ -132,25 +160,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 /* @var TestSession $testSession */
                 $testSession = $testSessionService->getTestSession($deliveryExecution);
                 if ($testSession) {
-                    $seconds = null;
-
-                    if ($item = $testSession->getCurrentAssessmentItemRef()) {
-                        $seconds = $this->getTimeLimits($item);
-                    }
-
-                    if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
-                        $seconds = $this->getTimeLimits($section);
-                    }
-
-                    if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
-                        $seconds = $this->getTimeLimits($testPart);
-                    }
-
-                    if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
-                        $seconds = $this->getTimeLimits($assessmentTest);
-                    }
+                    $seconds = $this->getTimeLimits($testSession);
                 } else {
-                    $seconds = $this->getTimeLimits($testDefinition);
+                    $seconds = $this->getPartTimeLimits($testDefinition);
                 }
 
                 if ($seconds) {
