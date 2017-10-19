@@ -165,7 +165,7 @@ define([
                 },
                 interval: 1000,
                 autoStart: false
-             });
+            });
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -1035,7 +1035,7 @@ define([
                                 });
                             });
                         }).on('error.datatable', function(e, err){
-                                appController.onError(err);
+                            appController.onError(err);
                         }).datatable({
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
