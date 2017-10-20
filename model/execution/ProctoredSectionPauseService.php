@@ -52,7 +52,6 @@ class ProctoredSectionPauseService extends SectionPauseService
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
 
-            \common_Logger::i(' > CURRENT item ref is ' . $itemRef->getIdentifier());
             return $this->isProctored($session) && $this->isItemPausable($itemRef);
         }
         return false;
@@ -68,17 +67,11 @@ class ProctoredSectionPauseService extends SectionPauseService
     public function canMoveBackward(TestSession $session = null)
     {
         if ($session->getState() === AssessmentTestSessionState::INTERACTING && $this->isProctored($session)) {
-
-
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
 
                 if ($this->isItemPausable($itemRef)) {
-                    \common_Logger::i(' > item pauseable');
                     return false;
-                } else {
-                    
-                    \common_Logger::i(' > PREVIOUS item not pauseable');
                 }
         }
         return true;
@@ -116,19 +109,8 @@ class ProctoredSectionPauseService extends SectionPauseService
     private function isItemPausable(AssessmentItemRef $itemRef)
     {
         if (!is_null($itemRef)) {
-            $pauseable = $itemRef->getCategories()->contains(self::PAUSE_CATEGORY);
-            if($pauseable){
-                \common_Logger::i(' >  ITEM REF has category  ' . $itemRef->getIdentifier() . ' -> ' . self::PAUSE_CATEGORY);
-
-            } else  {
-                \common_Logger::i(' >  ITEM REF not  category ' . $itemRef->getIdentifier() . ' -> ' . self::PAUSE_CATEGORY);
-
-            } 
-            return $pauseable;
+            return $itemRef->getCategories()->contains(self::PAUSE_CATEGORY);
         }
-             else {
-                \common_Logger::i(' >  ITEM REF IS NULL');
-            }
         return false;
     }
 }
