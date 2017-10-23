@@ -35,21 +35,77 @@ class ProctoredSectionPauseService extends SectionPauseService
     use OntologyAwareTrait;
 
     /**
+     * This category triggers the section pause
+     */
+    const PAUSE_CATEGORY = 'x-tao-proctored-auto-pause';
+
+    private $isProctored = null;
+
+    /**
      * Checked that section can be paused
      * @param TestSession $session
      * @return bool
      */
     public function isPausable(TestSession $session = null)
     {
-        $isPausable = false;
         if ($session->getState() === AssessmentTestSessionState::INTERACTING) {
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
-            $user = \common_session_SessionManager::getSession()->getUser();
-            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
-            $isPausable = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user)
-                && $itemRef->getCategories()->contains('x-tao-proctored-auto-pause');
+
+            return $this->isProctored($session) && $this->isItemPausable($itemRef);
         }
-        return $isPausable;
+        return false;
+    }
+
+    /**
+     * Check if we can move backward : when leaving a pausable section,
+     * we can't move backward.
+     *
+     * @param TestSession $session
+     * @return bool
+     */
+    public function canMoveBackward(TestSession $session = null)
+    {
+        if ($session->getState() === AssessmentTestSessionState::INTERACTING && $this->isProctored($session)) {
+            return ! $this->isItemPausable($session->getCurrentAssessmentItemRef());
+        }
+        return true;
+    }
+
+    /**
+     * Is the given section proctored
+     *
+     * @param TestSession $session
+     * @return bool false by default
+     */
+    private function isProctored(TestSession $session)
+    {
+        //check only once
+        if (is_null($this->isProctored)) {
+            $this->isProctored = false;
+
+            if (!is_null($session)) {
+                $user = \common_session_SessionManager::getSession()->getUser();
+                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
+                $this->isProctored = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user);
+            }
+
+        }
+        return $this->isProctored;
+    }
+
+
+    /**
+     * Is the given itemRef pauseable (ie. has the given category)
+     *
+     * @param AssessmentItemRef $itemRef
+     * @return bool false by default
+     */
+    private function isItemPausable(AssessmentItemRef $itemRef)
+    {
+        if (!is_null($itemRef)) {
+            return $itemRef->getCategories()->contains(self::PAUSE_CATEGORY);
+        }
+        return false;
     }
 }
