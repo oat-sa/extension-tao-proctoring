@@ -324,9 +324,11 @@ define([
                 function showHistory(selection) {
                     var monitoringRoute = window.location + '';
                     var urlParams = {
-                        session: selection,
-                        context: context
+                        session: selection
                     };
+                    if (context) {
+                        urlParams.context = context;
+                    }
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;
                     }
