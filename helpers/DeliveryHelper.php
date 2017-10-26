@@ -378,8 +378,8 @@ class DeliveryHelper
             $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : 0;
             $diffTimestamp = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
             $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
-            if (isset($cachedData[DeliveryMonitoringService::TIME_LINE_DURATION]) && $cachedData[DeliveryMonitoringService::TIME_LINE_DURATION]) {
-                $duration = $cachedData[DeliveryMonitoringService::TIME_LINE_DURATION];
+            if (isset($cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION]) && $cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION]) {
+                $duration = $cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION];
             }
             $diffTime = $duration ? $duration : $diffTimestamp;
             $remaining = $remaining - $diffTime;

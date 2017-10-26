@@ -27,11 +27,17 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimeLine;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
+use oat\taoTests\models\runner\time\TimePoint;
+use qtism\common\datatypes\QtiDuration;
+use qtism\runtime\tests\AssessmentTestPlace;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use qtism\runtime\tests\TimeConstraint;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
@@ -229,6 +235,27 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $this->addValue(DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP, microtime(true), true);
         }
     }
+
+    /** Update time line duration */
+    private function updateConstraintsDuration()
+    {
+        /** @var TestSession $session */
+        $session = $this->getTestSession();
+        $duration = 0;
+        $catService = $this->getServiceLocator()->get(CatService::SERVICE_ID);
+        if ($catService->isAdaptive($session, $session->getCurrentAssessmentItemRef())) {
+            $constraints = $session->getTimeConstraints(AssessmentTestPlace::ASSESSMENT_ITEM);
+            /** @var TimeConstraint $constraint */
+            foreach ($constraints as $constraint) {
+                /** @var QtiDuration $constraintDuration */
+                $constraintDuration = $constraint->getDuration();
+                $duration += $constraintDuration->getSeconds(true);
+            }
+        }
+
+        $this->addValue(DeliveryMonitoringService::CONSTRAINTS_DURATION, $duration, true);
+    }
+
 
     /**
      * Update remaining time of delivery execution

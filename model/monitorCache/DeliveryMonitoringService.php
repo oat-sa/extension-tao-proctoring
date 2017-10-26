@@ -62,7 +62,7 @@ interface DeliveryMonitoringService
 
     const DIFF_TIMESTAMP = 'diff_timestamp';
     const ITEM_DURATION = 'item_duration';
-    const TIME_LINE_DURATION = 'time_line_duration';
+    const CONSTRAINTS_DURATION = 'constraints_duration';
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
