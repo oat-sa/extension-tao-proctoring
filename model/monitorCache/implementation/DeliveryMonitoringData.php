@@ -243,7 +243,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $session = $this->getTestSession();
         $duration = 0;
         $catService = $this->getServiceLocator()->get(CatService::SERVICE_ID);
-        if ($catService->isAdaptive($session, $session->getCurrentAssessmentItemRef())) {
+        if ($session->getCurrentAssessmentItemRef() && $catService->isAdaptive($session, $session->getCurrentAssessmentItemRef())) {
             $constraints = $session->getTimeConstraints(AssessmentTestPlace::ASSESSMENT_ITEM);
             /** @var TimeConstraint $constraint */
             foreach ($constraints as $constraint) {
