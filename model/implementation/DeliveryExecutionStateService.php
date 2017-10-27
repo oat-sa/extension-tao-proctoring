@@ -27,6 +27,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
+use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
@@ -212,6 +213,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
+                $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
@@ -258,6 +260,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->suspend();
                     $this->getTestSessionService()->persist($session);
                 }
+                $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;

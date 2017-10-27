@@ -165,7 +165,7 @@ define([
                 },
                 interval: 1000,
                 autoStart: false
-             });
+            });
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -324,9 +324,11 @@ define([
                 function showHistory(selection) {
                     var monitoringRoute = window.location + '';
                     var urlParams = {
-                        session: selection,
-                        context: context
+                        session: selection
                     };
+                    if (context) {
+                        urlParams.context = context;
+                    }
                     if (deliveryId) {
                         urlParams.delivery = deliveryId;
                     }
@@ -1035,7 +1037,7 @@ define([
                                 });
                             });
                         }).on('error.datatable', function(e, err){
-                                appController.onError(err);
+                            appController.onError(err);
                         }).datatable({
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {

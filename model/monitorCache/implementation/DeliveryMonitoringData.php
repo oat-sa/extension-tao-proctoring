@@ -22,16 +22,22 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\runner\session\TestSession;
-use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use oat\taoQtiTest\models\runner\time\QtiTimeLine;
+use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
+use oat\taoTests\models\runner\time\TimePoint;
+use qtism\common\datatypes\QtiDuration;
+use qtism\runtime\tests\AssessmentTestPlace;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use qtism\runtime\tests\TimeConstraint;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 
@@ -230,6 +236,27 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
     }
 
+    /** Update time line duration */
+    private function updateConstraintsDuration()
+    {
+        /** @var TestSession $session */
+        $session = $this->getTestSession();
+        $duration = 0;
+        $catService = $this->getServiceLocator()->get(CatService::SERVICE_ID);
+        if ($session->getCurrentAssessmentItemRef() && $catService->isAdaptive($session, $session->getCurrentAssessmentItemRef())) {
+            $constraints = $session->getTimeConstraints(AssessmentTestPlace::ASSESSMENT_ITEM);
+            /** @var TimeConstraint $constraint */
+            foreach ($constraints as $constraint) {
+                /** @var QtiDuration $constraintDuration */
+                $constraintDuration = $constraint->getDuration();
+                $duration += $constraintDuration->getSeconds(true);
+            }
+        }
+
+        $this->addValue(DeliveryMonitoringService::CONSTRAINTS_DURATION, $duration, true);
+    }
+
+
     /**
      * Update remaining time of delivery execution
      */
@@ -297,43 +324,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
         } else {
-            $timer = new QtiTimer();
-            $timer->setStorage(new QtiTimeStorage($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier()));
-            $timer->load();
-        }
-        $maxTimeSeconds = null;
-
-        if ($item = $testSession->getCurrentAssessmentItemRef()) {
-            if ($testSessionLimits = $item->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
+            $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
+            $timer = $qtiTimerFactory->getTimer($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier());
         }
 
-        if (!$maxTimeSeconds && $section = $testSession->getCurrentAssessmentSection()) {
-            if ($testSessionLimits = $section->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
-
-        if (!$maxTimeSeconds && $testPart = $testSession->getCurrentTestPart()) {
-            if ($testSessionLimits = $testPart->getTimeLimits()) {
-                $maxTimeSeconds = $testSessionLimits->hasMaxTime()
-                    ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
-
-        if (!$maxTimeSeconds && $assessmentTest = $testSession->getAssessmentTest()) {
-            if ($assessmentTestLimits = $assessmentTest->getTimeLimits()) {
-                $maxTimeSeconds = $assessmentTestLimits->hasMaxTime()
-                    ? $assessmentTestLimits->getMaxTime()->getSeconds(true)
-                    : $maxTimeSeconds;
-            }
-        }
+        $deliveryExecutionManager = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        $maxTimeSeconds = $deliveryExecutionManager->getTimeLimits($testSession);
 
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);

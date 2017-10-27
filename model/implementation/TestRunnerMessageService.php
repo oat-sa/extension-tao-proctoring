@@ -36,6 +36,9 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
+    const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.';
+    const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.';
+
     protected function isProctorAction(AssessmentTestSession $testSession)
     {
         $userRoles = \common_session_SessionManager::getSession()->getUserRoles();
@@ -49,7 +52,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorPausedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+        return static::PROCTOR_PAUSED_STATE_MESSAGE;
     }
 
     /**
@@ -59,7 +62,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorTerminatedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+        return static::PROCTOR_TERMINATED_STATE_MESSAGE;
     }
 
     /**
@@ -73,7 +76,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorPausedStateMessage($testSession);
         }
 
-        return __('The assessment has been suspended. To resume your assessment, please relaunch it.');
+        return static::PAUSED_STATE_MESSAGE;
     }
 
     /**
@@ -87,6 +90,6 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorTerminatedStateMessage($testSession);
         }
 
-        return __('The assessment has been terminated. You cannot interact with it anymore.');
+        return static::TERMINATED_STATE_MESSAGE;
     }
 }

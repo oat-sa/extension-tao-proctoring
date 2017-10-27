@@ -345,7 +345,14 @@ class DeliveryHelper
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
             $now = microtime(true);
-            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+
+            $online = null;
+            if($testSessionConnectivityStatusService->hasOnlineMode()){
+                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+            }
+
+            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) && $online) {
                 $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
                 $elapsed = $now - $lastActivity;
             } else {
@@ -361,16 +368,19 @@ class DeliveryHelper
 
             $executionState = $cachedData[DeliveryMonitoringService::STATUS];
 
-            if (DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) {
+            if ((DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) || !$online) {
                 $elapsedApprox = $lastPauseTimestamp - $lastActivity;
             } else {
                 $elapsedApprox = $elapsed;
             }
 
-            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
+            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
             $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : 0;
             $diffTimestamp = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
             $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
+            if (isset($cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION]) && $cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION]) {
+                $duration = $cachedData[DeliveryMonitoringService::CONSTRAINTS_DURATION];
+            }
             $diffTime = $duration ? $duration : $diffTimestamp;
             $remaining = $remaining - $diffTime;
             $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
@@ -385,7 +395,7 @@ class DeliveryHelper
                 'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
                 'timer' => [
                     'lastActivity' => $lastActivity,
-                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState) ? true : false,
+                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState && $online) ? true : false,
                     'approximatedRemaining' => $approximatedRemaining,
                     'remaining_time' => $remaining,
                     'extraTime' => $extraTime,
@@ -397,10 +407,10 @@ class DeliveryHelper
                 'state' => $state,
             );
 
-            if($testSessionConnectivityStatusService->hasOnlineMode()){
-                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
-                $execution['online'] = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+            if ($online) {
+                $execution['online'] = $online;
             }
+
             $executions[] = $execution;
         }
 
