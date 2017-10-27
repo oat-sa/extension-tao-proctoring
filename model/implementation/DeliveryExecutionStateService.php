@@ -213,8 +213,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
+                $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
-            $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
