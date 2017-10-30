@@ -27,6 +27,7 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use qtism\common\datatypes\QtiDuration;
@@ -215,6 +216,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 ->setExtraTime($extraTime)
                 ->setExtendedTime($extendedTime)
                 ->save();
+            $this->getServiceLocator()->get(StorageManager::SERVICE_ID)->persist();
 
 
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
