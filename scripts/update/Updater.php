@@ -41,6 +41,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
+use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
@@ -511,5 +512,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
       
         $this->skip('7.4.0', '7.8.4');
+
+        if ($this->isVersion('7.8.4')) {
+            OntologyUpdater::syncModels();
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class));
+
+            $this->setVersion('7.9.0');
+        }
     }
 }
