@@ -36,6 +36,7 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : true,
                 report : true,
                 print : __('not finished'),
+                reactivate : __('not terminated'),
                 time : true
             },
             warning : {
@@ -56,6 +57,15 @@ define(['lodash', 'i18n'], function(_, __){
                     } else {
                         return __('Test had not been finished.');
                     }
+                },
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s must be terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test must be terminated.', username);
+                    } else {
+                        return __('Test  must be terminated.');
+                    }
                 }
             }
         },
@@ -68,6 +78,7 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 pause : __('not started'), //not in progress
                 print : __('not finished'),
+                reactivate : __('not terminated'),
                 time : true
             },
             warning : {
@@ -97,6 +108,15 @@ define(['lodash', 'i18n'], function(_, __){
                     } else {
                         return __('Test had not been finished.');
                     }
+                },
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s must be terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test must be terminated.', username);
+                    } else {
+                        return __('Test  must be terminated.');
+                    }
                 }
             }
         },
@@ -107,6 +127,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : true,
                 pause : __('not in progress'),
                 terminate : true,
+                reactivate : __('not terminated'),
                 report : true,
                 print : __('not finished'),
                 time : true
@@ -129,6 +150,15 @@ define(['lodash', 'i18n'], function(_, __){
                     } else {
                         return __('Test had not been finished.');
                     }
+                },
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s must be terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test must be terminated.', username);
+                    } else {
+                        return __('Test  must be terminated.');
+                    }
                 }
             }
         },
@@ -139,6 +169,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('canceled'),
                 pause : __('canceled'),
                 terminate : __('canceled'),
+                reactivate : __('not terminated'),
                 report : true,
                 print: __('canceled'),
                 time : true
@@ -171,6 +202,15 @@ define(['lodash', 'i18n'], function(_, __){
                         return __('Test had been canceled.');
                     }
                 },
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s had been canceled.', testId);
+                    } else if (username) {
+                        return __('%s\'s test had been canceled.', username);
+                    } else {
+                        return __('Test had been canceled.');
+                    }
+                },
                 print : function (username, testId) {
                     if (testId) {
                         return __('Test %s had been canceled.', testId);
@@ -189,6 +229,7 @@ define(['lodash', 'i18n'], function(_, __){
                 authorize : __('completed'),
                 pause : __('completed'),
                 terminate : __('completed'),
+                reactivate : __('not terminated'),
                 report : true,
                 print: true,
                 time : true
@@ -221,6 +262,16 @@ define(['lodash', 'i18n'], function(_, __){
                         return __('Test had been completed.');
                     }
                 }
+                ,
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s must be terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test must be terminated.', username);
+                    } else {
+                        return __('Test  must be terminated.');
+                    }
+                }
             }
         },
         paused : {
@@ -229,6 +280,7 @@ define(['lodash', 'i18n'], function(_, __){
             can : {
                 authorize : __('paused'),
                 pause : __('already paused'),
+                reactivate : __('not terminated'),
                 terminate : true,
                 report : true,
                 print : __('not finished'),
@@ -261,6 +313,15 @@ define(['lodash', 'i18n'], function(_, __){
                     } else {
                         return __('Test had not been finished.');
                     }
+                },
+                reactivate : function (username, testId) {
+                    if (testId) {
+                        return __('Test %s must be terminated.', testId);
+                    } else if (username) {
+                        return __('%s\'s test must be terminated.', username);
+                    } else {
+                        return __('Test  must be terminated.');
+                    }
                 }
             }
         },
@@ -272,6 +333,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('terminated'),
                 terminate : __('already terminated'),
                 report : true,
+                reactivate : true,
                 print: true,
                 time : true
             },
@@ -387,6 +449,11 @@ define(['lodash', 'i18n'], function(_, __){
                 warningAction = isPlural ?
                     __('Cannot terminate test sessions.') :
                     __('Cannot terminate test session.');
+                break;
+            case 'reactivate':
+                warningAction = isPlural ?
+                    __('Cannot reactivate test sessions.') :
+                    __('Cannot reactivate test session.');
                 break;
             case 'report':
                 warningAction = isPlural ?
