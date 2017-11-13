@@ -1002,7 +1002,7 @@ msgid "The assessment has been suspended. To resume your assessment, please rela
 msgstr "La evaluación ha sido suspendida. Para reanudar su evaluación, por favor reinicie y póngase en contacto con su supervisor si es necesario."
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it."
-msgstr "La evaluación se suspendió. Para retomar su evaluación, vuelva a iniciarla."
+msgstr "La evaluación ha sido suspendida. Para reanudar su evaluación, por favor reinicie."
 
 msgid "The assessment has been terminated."
 msgstr "La evaluación finalizó."
