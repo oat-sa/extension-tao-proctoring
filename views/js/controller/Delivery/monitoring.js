@@ -318,7 +318,7 @@ define([
                             id: 'reactivate',
                             type: 'error',
                             label: __('Reactivate session'),
-                            icon: 'stop',
+                            icon: 'play',
                             close: true,
                             action: function() {reactivate(selection);}
                         });
