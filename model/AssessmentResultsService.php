@@ -24,6 +24,7 @@ namespace oat\taoProctoring\model;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use qtism\data\View;
@@ -62,20 +63,19 @@ class AssessmentResultsService extends ConfigurableService
      * Get test data as associative array
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
+     * @throws \common_Exception
      * @throws \common_exception_InvalidArgumentType
      * @throws \common_exception_NotFound
+     * @throws \core_kernel_classes_EmptyProperty
      */
     public function getTestData(DeliveryExecutionInterface $deliveryExecution)
     {
-        $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
-        $testResource = $resultService->getVariableFromTest($deliveryExecution->getIdentifier());
-        if ($testResource instanceof \core_kernel_classes_Resource) {
-            $propValues = $testResource->getPropertiesValues(array(
-                RDFS_LABEL,
-            ));
-            $result = $this->propertiesToArray($propValues);
-        }
+        $testResource = DeliveryAssemblyService::singleton()->getOrigin($deliveryExecution->getDelivery());
+        $propValues = $testResource->getPropertiesValues(array(
+            RDFS_LABEL,
+        ));
+        $result = $this->propertiesToArray($propValues);
 
         $deliveryVariables = $resultService->getVariableDataFromDeliveryResult($deliveryExecution->getIdentifier());
         $result = array_merge($result, $this->variablesToArray($deliveryVariables));
