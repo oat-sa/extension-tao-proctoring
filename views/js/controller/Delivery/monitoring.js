@@ -311,9 +311,9 @@ define([
                 }
 
                 function terminateOrReactivateAndIrregularity(selection) {
+                    var delivery = getExecutionData(selection);
                     var buttons = [];
-                    var width = 500;
-                    if (hasAccessToReactivate) {
+                    if (hasAccessToReactivate && canDo('reactivate', delivery.state)) {
                         buttons.push({
                             id: 'reactivate',
                             type: 'error',
@@ -322,16 +322,17 @@ define([
                             close: true,
                             action: function() {reactivate(selection);}
                         });
-                        width = 700;
+                    }else if (canDo('terminate', delivery.state)) {
+                        buttons.push({
+                            id: 'terminate',
+                            type: 'error',
+                            label: __('Terminate session'),
+                            icon: 'stop',
+                            close: true,
+                            action: function() {terminate(selection);}
+                        });
                     }
-                    buttons.push({
-                        id: 'terminate',
-                        type: 'error',
-                        label: __('Terminate session'),
-                        icon: 'stop',
-                        close: true,
-                        action: function() {terminate(selection);}
-                    });
+
                     buttons.push({
                         id: 'irregularity',
                         type: 'info',
@@ -345,8 +346,7 @@ define([
                         message: __('Please, make your selection'),
                         autoRender: true,
                         autoDestroy: true,
-                        buttons: buttons,
-                        width : width
+                        buttons: buttons
                     });
                 }
 
