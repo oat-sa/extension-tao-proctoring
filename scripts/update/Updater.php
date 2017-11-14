@@ -511,9 +511,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('7.4.0');
         }
       
-        $this->skip('7.4.0', '7.8.5');
+        $this->skip('7.4.0', '7.8.6');
 
-        if ($this->isVersion('7.8.5')) {
+        if ($this->isVersion('7.8.6')) {
             OntologyUpdater::syncModels();
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class));
 
