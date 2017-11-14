@@ -62,16 +62,20 @@ class AssessmentResultsService extends ConfigurableService
      * Get test data as associative array
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return array
+     * @throws \common_exception_InvalidArgumentType
+     * @throws \common_exception_NotFound
      */
     public function getTestData(DeliveryExecutionInterface $deliveryExecution)
     {
+        $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
-        $testUri = $resultService->getTestsFromDeliveryResult($deliveryExecution->getIdentifier());
-        $testResource = new \core_kernel_classes_Resource($testUri[0]);
-        $propValues = $testResource->getPropertiesValues(array(
-            RDFS_LABEL,
-        ));
-        $result = $this->propertiesToArray($propValues);
+        $testResource = $resultService->getVariableFromTest($deliveryExecution->getIdentifier());
+        if ($testResource instanceof \core_kernel_classes_Resource) {
+            $propValues = $testResource->getPropertiesValues(array(
+                RDFS_LABEL,
+            ));
+            $result = $this->propertiesToArray($propValues);
+        }
 
         $deliveryVariables = $resultService->getVariableDataFromDeliveryResult($deliveryExecution->getIdentifier());
         $result = array_merge($result, $this->variablesToArray($deliveryVariables));
