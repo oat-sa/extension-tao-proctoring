@@ -49,7 +49,7 @@ return array(
     'requires' => array(
         'tao' => '>=10.28.0',
         'taoDelivery' => '>=7.1.0',
-        'taoDeliveryRdf' => '>=1.0',
+        'taoDeliveryRdf' => '>=3.17.1',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=17.10.1',
         'taoOutcomeUi' => '>=2.6.6',
