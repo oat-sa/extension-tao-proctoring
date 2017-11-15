@@ -21,6 +21,7 @@
 use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
+use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\scripts\install\RegisterAuthProvider;
@@ -44,7 +45,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '7.8.6',
+    'version' => '7.9.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=10.28.0',
@@ -67,6 +68,7 @@ return array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
         array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
         array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools')),
+        array('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class),
     ),
     'install' => array(
         'php' => array(

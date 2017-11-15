@@ -70,6 +70,8 @@ interface DeliveryMonitoringService
     const DELIVERY_NAME = 'delivery_name';
     const CONNECTIVITY = 'last_connect';
 
+    const REACTIVATE_AUTHORIZED_BY = 'reactivate_authorized_by';
+
     /**
      * Retrieve the currently cached delivery data
      * 
