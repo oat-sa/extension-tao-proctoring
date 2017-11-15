@@ -498,10 +498,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         if (ProctoredDeliveryExecution::STATE_TERMINATED === $executionState) {
             $proctor = \common_session_SessionManager::getSession()->getUser();
 
-            /** @var EventManager $eventManager */
-            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            $eventManager->trigger(new DeliveryExecutionReactivated($deliveryExecution, $proctor, $reason));
-
             /** @var TestSessionService $testSessionService */
             $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
             $session = $testSessionService->getTestSession($deliveryExecution);
@@ -509,8 +505,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 $session->setState(AssessmentTestSessionState::INTERACTING);
                 $testSessionService->persist($session);
             }
-
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
+
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->trigger(new DeliveryExecutionReactivated($deliveryExecution, $proctor, $reason));
 
             $logData = [
                 'reason' => $reason,
@@ -520,7 +519,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
             $result = true;
-
         }
 
         return $result;
