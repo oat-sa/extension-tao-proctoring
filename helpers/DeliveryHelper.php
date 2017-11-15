@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2017 (original work) Open Assessment Technologies SA ;
  *
  */
 
@@ -163,6 +163,7 @@ class DeliveryHelper
      */
     public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
+        /** @var  DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
@@ -191,6 +192,7 @@ class DeliveryHelper
      */
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
@@ -200,6 +202,33 @@ class DeliveryHelper
             }
 
             if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $deliveryExecutions
+     * @param null $reason
+     * @return array
+     */
+    public static function reactivateExecution($deliveryExecutions, $reason = null)
+    {
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
+        foreach ($deliveryExecutions as $deliveryExecution) {
+
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
+
+            if ($deliveryExecutionStateService->reactivateExecution($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
@@ -517,18 +546,24 @@ class DeliveryHelper
     /**
      * Get the list of all available categories, sorted by action names
      *
+     * @param bool $hasAccessToReactivate
      * @return array
      */
-    public static function getAllReasonsCategories(){
+    public static function getAllReasonsCategories($hasAccessToReactivate = false){
         /** @var ReasonCategoryService $categoryService */
         $categoryService = ServiceManager::getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
 
-        return array(
+        $response = array(
             'authorize' => array(),
             'pause' => $categoryService->getIrregularities(),
             'terminate' => $categoryService->getIrregularities(),
             'report' => $categoryService->getIrregularities(),
             'print' => [],
         );
+        if ($hasAccessToReactivate) {
+            $response['reactivate'] = $categoryService->getIrregularities();
+        }
+
+        return $response;
     }
 }

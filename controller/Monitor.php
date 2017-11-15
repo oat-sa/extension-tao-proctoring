@@ -22,6 +22,7 @@ namespace oat\taoProctoring\controller;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ServiceNotFoundException;
+use oat\tao\model\accessControl\AclProxy;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\AssessmentResultsService;
@@ -73,15 +74,18 @@ class Monitor extends SimplePageModule
     /**
      * Gets the view parameters and data to display
      * @return array
+     * @throws \common_exception_Error
      */
     protected function getViewData()
     {
+        $user = \common_session_SessionManager::getSession()->getUser();
+        $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
         $delivery = $this->getCurrentDelivery();
         $data = [
             'ismanageable' => false,
             'set' => [],
             'extrafields' => DeliveryHelper::getExtraFields(),
-            'categories' => DeliveryHelper::getAllReasonsCategories(),
+            'categories' => DeliveryHelper::getAllReasonsCategories($hasAccessToReactivate),
             'printReportButton' => $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID)->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
             'timeHandling' => $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
             'historyUrl' => $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
@@ -89,6 +93,7 @@ class Monitor extends SimplePageModule
             'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
             'canPause' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE),
             'onlineStatus' => $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
+            'hasAccessToReactivate' => $hasAccessToReactivate
         ];
 
         if (!is_null($delivery)) {

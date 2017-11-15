@@ -85,6 +85,7 @@ define([
     var cssScope = '.delivery-monitoring';
 
     var terminateUrl = urlHelper.route('terminateExecutions', 'Monitor', 'taoProctoring');
+    var reactivateUrl = urlHelper.route('reactivateExecutions', 'MonitorProctorAdministrator', 'taoProctoring');
     var pauseUrl = urlHelper.route('pauseExecutions', 'Monitor', 'taoProctoring');
     var authorizeUrl = urlHelper.route('authoriseExecutions', 'Monitor', 'taoProctoring');
     var extraTimeUrl = urlHelper.route('extraTime', 'Monitor', 'taoProctoring');
@@ -139,6 +140,7 @@ define([
             var timeHandlingButton;
             var allowedConnectivity;
             var printReportButton;
+            var hasAccessToReactivate;
             var tools = [];
             var model = [];
             var actionButtons;
@@ -184,6 +186,10 @@ define([
                     },
                     terminate: {
                         url: terminateUrl,
+                        validate: validateParams
+                    },
+                    reactivate: {
+                        url: reactivateUrl,
                         validate: validateParams
                     },
                     report: {
@@ -284,6 +290,13 @@ define([
                     });
                 }
 
+                // request the reactivate to reactivate the selected delivery executions
+                function reactivate(selection) {
+                    execBulkAction('reactivate', __('Reactivate Session'), selection, function(sel, reason){
+                        request('reactivate', sel, {reason: reason}, __('Sessions reactivated'));
+                    });
+                }
+
                 // report irregularities on the selected delivery executions
                 function report(selection) {
                     execBulkAction( 'report', __('Report Irregularity'), selection, function(sel, reason){
@@ -297,26 +310,43 @@ define([
                     });
                 }
 
-                function terminateAndIrregularity(selection) {
-                    dialog({
-                        message: __('Please, make your selection'),
-                        autoRender: true,
-                        autoDestroy: true,
-                        buttons: [{
+                function terminateOrReactivateAndIrregularity(selection) {
+                    var delivery = getExecutionData(selection);
+                    var buttons = [];
+                    if (hasAccessToReactivate && canDo('reactivate', delivery.state)) {
+                        buttons.push({
+                            id: 'reactivate',
+                            type: 'error',
+                            label: __('Reactivate session'),
+                            icon: 'play',
+                            close: true,
+                            action: function() {reactivate(selection);}
+                        });
+                    }else if (canDo('terminate', delivery.state)) {
+                        buttons.push({
                             id: 'terminate',
                             type: 'error',
                             label: __('Terminate session'),
                             icon: 'stop',
                             close: true,
                             action: function() {terminate(selection);}
-                        },{
-                            id: 'irregularity',
-                            type: 'info',
-                            label: __('Report irregularity'),
-                            icon: 'delivery-small',
-                            close: true,
-                            action: function(){report(selection);}
-                        }]
+                        });
+                    }
+
+                    buttons.push({
+                        id: 'irregularity',
+                        type: 'info',
+                        label: __('Report irregularity'),
+                        icon: 'delivery-small',
+                        close: true,
+                        action: function(){report(selection);}
+                    });
+
+                    dialog({
+                        message: __('Please, make your selection'),
+                        autoRender: true,
+                        autoDestroy: true,
+                        buttons: buttons
                     });
                 }
 
@@ -571,6 +601,7 @@ define([
                     timeHandlingButton = data.timeHandling;
                     allowedConnectivity = data.onlineStatus || false;
                     printReportButton = data.printReportButton;
+                    hasAccessToReactivate = data.hasAccessToReactivate;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
 
                     if (deliveryId) {
@@ -951,12 +982,17 @@ define([
                         }
                     });
 
+                    var label = 'Terminate and irregularity';
+                    if (hasAccessToReactivate) {
+                        label = 'Terminate/Reactivate and irregularity';
+                    }
+
                     // column: proctoring actions
                     actionList = [{
-                        id: 'terminateAndIrregularity',
+                        id: 'terminateOrReactivateAndIrregularity',
                         icon: 'delivery-small',
-                        title: __('Terminate and irregularity'),
-                        action: terminateAndIrregularity
+                        title: __(label),
+                        action: terminateOrReactivateAndIrregularity
                     }, {
                         id: 'history',
                         icon: 'history',
