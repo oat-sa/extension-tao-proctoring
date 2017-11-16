@@ -78,7 +78,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         ) {
             throw new UnAuthorizedException(
                 _url('index', 'DeliveryServer', 'taoProctoring'),
-                'Terminated/Finished delivery cannot be resumed'
+                'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
             );
         }
         if ($this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
