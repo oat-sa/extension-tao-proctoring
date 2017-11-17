@@ -35,27 +35,17 @@ use oat\taoProctoring\model\execution\DeliveryExecution;
 class DeliveryServerService extends \oat\taoDelivery\model\execution\DeliveryServerService
 {
     /**
-     * Get resumable (active) deliveries.
-     * @param User $user User instance. If not given then all deliveries will be returned regardless of user URI.
-     * @return DeliveryExecutionInterface[]
+     * (non-PHPdoc)
+     * @see \oat\taoDelivery\model\execution\DeliveryServerService::getResumableStates()
      */
-    public function getResumableDeliveries(User $user)
+    public function getResumableStates()
     {
-        $deliveryExecutionService = ServiceProxy::singleton();
-        $userUri = $user->getIdentifier();
-        $started = array_merge(
-            $deliveryExecutionService->getActiveDeliveryExecutions($userUri),
-            $deliveryExecutionService->getPausedDeliveryExecutions($userUri),
-            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AWAITING),
-            $deliveryExecutionService->getDeliveryExecutionsByStatus($userUri, DeliveryExecution::STATE_AUTHORIZED)
+        return array_merge(
+            parent::getResumableStates(),
+            [
+                DeliveryExecution::STATE_AWAITING
+                ,DeliveryExecution::STATE_AUTHORIZED
+            ]
         );
-        $resumable = array();
-        foreach ($started as $deliveryExecution) {
-            $delivery = $deliveryExecution->getDelivery();
-            if ($delivery->exists()) {
-                $resumable[] = $deliveryExecution;
-            }
-        }
-        return $resumable;
     }
 }
