@@ -26,6 +26,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use qtism\data\View;
 
@@ -191,7 +192,12 @@ class AssessmentResultsService extends ConfigurableService
      */
     protected function getResultService(\core_kernel_classes_Resource $delivery)
     {
-        $resultsService = ResultsService::singleton();
+        /**
+         * @var $ResultServiceWrapper ResultServiceWrapper
+         */
+        $ResultServiceWrapper = $this->getServiceManager()->get(ResultServiceWrapper::SERVICE_ID);
+
+        $resultsService = $ResultServiceWrapper->getService();
         $implementation = $resultsService->getReadableImplementation($delivery);
         $resultsService->setImplementation($implementation);
         return $resultsService;

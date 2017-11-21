@@ -375,9 +375,9 @@ define([
                 }
 
                 // print the results of the session
-                function printResults(selection) {
+                /*function printResults(selection) {
                     print(selection, 'printRubric');
-                }
+                }*/
 
                 // display the time handling popup
                 function timeHandling(selection) {
@@ -998,12 +998,14 @@ define([
                         icon: 'history',
                         title: __('Show the detailed session history'),
                         action: showHistory
-                    }, {
+                    },
+                    /*{
                         id : 'printRubric',
                         title : __('Print the Score Report'),
                         icon : 'print',
                         action : printResults
-                    }];
+                    }*/
+                    ];
                     if (printReportButton) {
                         actionList.push({
                             id : 'printReport',
