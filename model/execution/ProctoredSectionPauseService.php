@@ -42,17 +42,29 @@ class ProctoredSectionPauseService extends SectionPauseService
     private $isProctored = null;
 
     /**
+     * Checked the given session could be paused at some point
+     * (in other words : is section pause enabled)
+     * @param $session
+     * @return bool
+     */
+    public function couldBePaused(TestSession $session = null)
+    {
+        return ($session->getState() === AssessmentTestSessionState::INTERACTING && $this->isProctored($session));
+    }
+
+    /**
      * Checked that section can be paused
      * @param TestSession $session
      * @return bool
      */
     public function isPausable(TestSession $session = null)
     {
-        if ($session->getState() === AssessmentTestSessionState::INTERACTING) {
+        if ($this->couldBePaused($session)) {
+
             /** @var AssessmentItemRef $itemRef */
             $itemRef = $session->getCurrentAssessmentItemRef();
 
-            return $this->isProctored($session) && $this->isItemPausable($itemRef);
+            return $this->isItemPausable($itemRef);
         }
         return false;
     }
@@ -66,7 +78,7 @@ class ProctoredSectionPauseService extends SectionPauseService
      */
     public function canMoveBackward(TestSession $session = null)
     {
-        if ($session->getState() === AssessmentTestSessionState::INTERACTING && $this->isProctored($session)) {
+        if ($this->couldBePaused($session)) {
             return ! $this->isItemPausable($session->getCurrentAssessmentItemRef());
         }
         return true;
