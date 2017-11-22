@@ -63,7 +63,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
                 self::DELIVERY_EXECUTION_ID => $deliveryExecutionId,
                 self::EVENT_ID => $eventId,
                 self::DATA => $data,
-                self::CREATED_AT => time(),
+                self::CREATED_AT => microtime(true),
                 self::CREATED_BY => $user,
             )
         );
