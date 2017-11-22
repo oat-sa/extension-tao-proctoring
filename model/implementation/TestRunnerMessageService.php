@@ -36,13 +36,33 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
+    /** Proctored roles option in options. */
+    const PROCTOR_ROLES_OPTION = 'proctoredRoles';
+
     const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.';
     const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.';
 
+    /**
+     * Returns TRUE when the current role is proctor like.
+     *
+     * @param AssessmentTestSession $testSession
+     *
+     * @return bool
+     *
+     * @throws \common_exception_Error
+     */
     protected function isProctorAction(AssessmentTestSession $testSession)
     {
         $userRoles = \common_session_SessionManager::getSession()->getUserRoles();
-        return in_array(ProctorService::ROLE_PROCTOR, $userRoles);
+        $proctorRoles = $this->getOption(static::PROCTOR_ROLES_OPTION);
+
+        foreach ($proctorRoles as $proctorRole) {
+            if (in_array($proctorRole, $userRoles)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -86,9 +106,12 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getTerminatedStateMessage(AssessmentTestSession $testSession)
     {
+\common_Logger::w('Stop this shit');
+\common_Logger::i(var_export($this->isProctorAction($testSession), true));
         if ($this->isProctorAction($testSession)) {
             return $this->getProctorTerminatedStateMessage($testSession);
         }
+\common_Logger::e(static::TERMINATED_STATE_MESSAGE);
 
         return static::TERMINATED_STATE_MESSAGE;
     }
