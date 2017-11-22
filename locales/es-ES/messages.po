@@ -1008,7 +1008,7 @@ msgid "The assessment has been terminated."
 msgstr "La evaluación finalizó."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
-msgstr "La evaluación finalizó. Ya no puede interactuar con ella."
+msgstr "La evaluación se ha terminado. Ya no puede interactuar con él."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
 msgstr "La evaluación se ha terminado. Ya no puede interactuar con él. Póngase en contacto con su supervisor si es necesario."
