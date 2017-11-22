@@ -106,12 +106,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getTerminatedStateMessage(AssessmentTestSession $testSession)
     {
-\common_Logger::w('Stop this shit');
-\common_Logger::i(var_export($this->isProctorAction($testSession), true));
         if ($this->isProctorAction($testSession)) {
             return $this->getProctorTerminatedStateMessage($testSession);
         }
-\common_Logger::e(static::TERMINATED_STATE_MESSAGE);
 
         return static::TERMINATED_STATE_MESSAGE;
     }
