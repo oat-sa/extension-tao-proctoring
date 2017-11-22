@@ -36,8 +36,8 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
-    /** Proctored roles option in options. */
-    const PROCTOR_ROLES_OPTION = 'proctoredRoles';
+    /** Proctor roles option in options. */
+    const PROCTOR_ROLES_OPTION = 'proctorRoles';
 
     const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.';
     const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.';
