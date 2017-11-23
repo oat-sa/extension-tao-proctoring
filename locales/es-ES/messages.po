@@ -1014,7 +1014,7 @@ msgid "The assessment has been terminated. You cannot interact with it anymore. 
 msgstr "La evaluación se ha terminado. Ya no puede interactuar con él. Póngase en contacto con su supervisor si es necesario."
 
 msgid "The assessment has been terminated by an authorized proctor. You cannot interact with it anymore. Please contact your proctor if required."
-msgstr "Un supervisor autorizado finalizó la evaluación. Ya no puede interactuar con ella. Contacte a su supervisor si lo considera necesario."
+msgstr "Un supervisor autorizado terminado la evaluación. Ya no puede interactuar con ella. Contacte a su supervisor si lo considera necesario."
 
 msgid "The extra time must be a number"
 msgstr ""
