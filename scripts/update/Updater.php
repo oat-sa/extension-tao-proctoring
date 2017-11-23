@@ -522,5 +522,20 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('7.9.0', '7.11.0');
+
+        if ($this->isVersion('7.11.0')) {
+            /** @var TestRunnerMessageService $testRunnerMessageService */
+            $testRunnerMessageService = $this->getServiceManager()->get(TestRunnerMessageService::SERVICE_ID);
+            $testRunnerMessageService->setOption(
+                TestRunnerMessageService::PROCTOR_ROLES_OPTION,
+                [
+                    ProctorService::ROLE_PROCTOR,
+                ]
+            );
+            $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
+
+            $this->setVersion('7.11.1');
+        }
+      
     }
 }

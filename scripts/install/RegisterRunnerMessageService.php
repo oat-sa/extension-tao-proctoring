@@ -22,6 +22,7 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
+use oat\taoProctoring\model\ProctorService;
 
 /**
  * Class RegisterRunnerMessageService
@@ -33,6 +34,12 @@ class RegisterRunnerMessageService extends InstallAction
     public function __invoke($params)
     {
         $service = new TestRunnerMessageService();
+        $service->setOption(
+            TestRunnerMessageService::PROCTOR_ROLES_OPTION,
+            [
+                ProctorService::ROLE_PROCTOR,
+            ]
+        );
         $this->registerService(TestRunnerMessageService::SERVICE_ID, $service);
     }
 }
