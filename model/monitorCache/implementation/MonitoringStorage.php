@@ -28,6 +28,10 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoring\DeliveryMonitoringFactory;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoring\DeliveryMonitoringRepository;
+use oat\taoProctoring\model\monitorCache\implementation\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletCollection;
+use oat\taoProctoring\model\monitorCache\implementation\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletRepository;
 
 /**
  * Class DeliveryMonitoringService
@@ -79,7 +83,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
     const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
-    
+
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';
     const KV_COLUMN_PARENT_ID = 'parent_id';
@@ -170,7 +174,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      *    [['error_code' => ['0', '1']],
      * ]);
      * ```
-     * 
+     *
      * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
@@ -280,6 +284,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
+     * @throws \Doctrine\DBAL\ConnectionException
      */
     public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
@@ -323,22 +328,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $setClause = '';
-        $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
+        $deliveryMonitoringFactory = new DeliveryMonitoringFactory($this->getPrimaryColumns());
+        $deliveryMonitoringRepo    = new DeliveryMonitoringRepository($this->getPersistence(), $deliveryMonitoringFactory);
+        $monitoringEntity          = $deliveryMonitoringRepo->find($deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]);
+        $possibleUpdatedEntity     = $deliveryMonitoringFactory->buildEntityFromRawArray($deliveryMonitoring->get());
 
-        $data = $deliveryMonitoring->get();
-        $primaryTableData = $this->extractPrimaryData($data);
-
-        unset($primaryTableData['delivery_execution_id']);
-        foreach ($primaryTableData as $dataKey => $dataValue) {
-            $setClause .= ($setClause === '') ? "$dataKey = :$dataKey" : ", $dataKey = :$dataKey";
-            $params[":$dataKey"] = $dataValue;
+        if (!$monitoringEntity->equals($possibleUpdatedEntity)) {
+            $deliveryMonitoringRepo->update($possibleUpdatedEntity);
         }
-
-        $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
-        WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
-
-        $this->getPersistence()->exec($sql, $params);
 
         $this->saveKvData($deliveryMonitoring);
 
@@ -352,11 +349,28 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
+
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
+
 
         if (!$isNewRecord) {
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
+
+            $newCollection = DeliveryMonitoringKeyValueTripletCollection::buildCollection($id, $kvTableData);
+
+            if ($newCollection->isEmpty()) {
+                return;
+            }
+
+            $kvRepo = new DeliveryMonitoringKeyValueTripletRepository($this->getPersistence(), array_keys($kvTableData));
+            $existedCollection = $kvRepo->findDeliveryCollection($id);
+
+            $tobeInserted = $newCollection->diffToGetNewTriplets($existedCollection);
+            $tobeUpdated  = $existedCollection->diffToGetUpdatedTriplets($newCollection);
+
+            $kvRepo->insertCollection($tobeInserted);
+            $kvRepo->updateCollection($tobeUpdated);
 
             if (empty($kvTableData)) {
                 return;
