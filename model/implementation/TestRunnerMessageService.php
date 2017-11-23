@@ -39,8 +39,8 @@ class TestRunnerMessageService extends QtiRunnerMessageService
     /** Proctored roles option in options. */
     const PROCTOR_ROLES_OPTION = 'proctoredRoles';
 
-    const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.';
-    const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.';
+    const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.';
+    const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated by an authorized proctor. You cannot interact with it anymore. Please contact your proctor if required.';
 
     /**
      * Returns TRUE when the current role is proctor like.
