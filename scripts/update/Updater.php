@@ -534,7 +534,7 @@ class Updater extends common_ext_ExtensionUpdater
             );
             $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
 
-            $this->setVersion('7.11.1');
+            $this->setVersion('7.11.2');
         }
       
     }
