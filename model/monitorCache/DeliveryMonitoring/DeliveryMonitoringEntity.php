@@ -1,6 +1,6 @@
 <?php
 
-namespace oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoring;
+namespace oat\taoProctoring\model\monitorCache\DeliveryMonitoring;
 
 class DeliveryMonitoringEntity
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace oat\taoProctoring\model\monitorCache\implementation\KeyValueDeliveryMonitoring;
+namespace oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring;
 
 class DeliveryMonitoringKeyValueTriplet
 {
@@ -12,6 +12,9 @@ class DeliveryMonitoringKeyValueTriplet
 
     /** @var string */
     private $value;
+
+    /** @var bool */
+    private $saved = false;
 
     /**
      * @param string $deliveryId
@@ -59,10 +62,30 @@ class DeliveryMonitoringKeyValueTriplet
             && $this->key === $triplet->getKey();
     }
 
+    /**
+     * @param DeliveryMonitoringKeyValueTriplet $triplet
+     * @return bool
+     */
     public function equals(DeliveryMonitoringKeyValueTriplet $triplet)
     {
         return $this->deliveryId === $triplet->getDeliveryId()
                 && $this->key === $triplet->getKey()
                 && $this->value === $triplet->getValue();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSaved()
+    {
+        return $this->saved;
+    }
+
+    /**
+     * @param bool $saved
+     */
+    public function setSaved($saved)
+    {
+        $this->saved = $saved;
     }
 }

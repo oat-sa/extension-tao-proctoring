@@ -1,6 +1,6 @@
 <?php
 
-namespace oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoring;
+namespace oat\taoProctoring\model\monitorCache\DeliveryMonitoring;
 
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
@@ -9,6 +9,10 @@ class DeliveryMonitoringFactory
     /** @var array */
     private $primaryColumns = [];
 
+    /**
+     * DeliveryMonitoringFactory constructor.
+     * @param array $primaryColumns
+     */
     public function __construct(array $primaryColumns)
     {
         $this->primaryColumns = $primaryColumns;
@@ -28,16 +32,28 @@ class DeliveryMonitoringFactory
      */
     public function buildEntityFromRawArray($array)
     {
+        $dataAttributes = [];
+
+        foreach ($this->primaryColumns as $column) {
+            $dataAttributes[$column] =  $this->issetColumnValue($array, $column);
+        }
+
         return new DeliveryMonitoringEntity(
-            $array[$this->primaryColumns[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID]],
-            [
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_STATUS]],
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_CURRENT_ASSESSMENT_ITEM]],
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_TEST_TAKER]],
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_AUTHORIZED_BY]],
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_START_TIME]],
-                $array[$this->primaryColumns[MonitoringStorage::COLUMN_END_TIME]]
-            ]
+            $array[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            $dataAttributes
         );
+    }
+
+    /**
+     * @param array $data
+     * @param $key
+     * @return mixed|null
+     */
+    protected function issetColumnValue(array $data, $key) {
+        if (isset($data[$key])) {
+            return $data[$key];
+        }
+
+        return null;
     }
 }

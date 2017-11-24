@@ -1,70 +1,49 @@
 <?php
 
-namespace oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoring;
+namespace oat\taoProctoring\model\monitorCache\DeliveryMonitoring;
 
-use common_persistence_SqlPersistence;
-use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
+use common_persistence_Persistence;
 
-class DeliveryMonitoringRepository
+interface DeliveryMonitoringRepository
 {
-    const TABLE_NAME = MonitoringStorage::TABLE_NAME;
-
-    /** @var common_persistence_SqlPersistence */
-    private $persistence;
-
-    /** @var DeliveryMonitoringFactory */
-    private $monitoringFactory;
+    const SERVICE_ID = 'taoProctoring/DeliveryMonitoringRepository';
 
     /**
-     * @param common_persistence_SqlPersistence $persistence
      * @param DeliveryMonitoringFactory $monitoringFactory
      */
-    public function __construct(
-        common_persistence_SqlPersistence $persistence,
-        DeliveryMonitoringFactory $monitoringFactory
-    ) {
-        $this->persistence = $persistence;
-        $this->monitoringFactory = $monitoringFactory;
-    }
+    public function setMonitoringFactory(DeliveryMonitoringFactory $monitoringFactory);
+
+    /**
+     * @return DeliveryMonitoringFactory
+     */
+    public function getMonitoringFactory();
+
+    /**
+     * @return common_persistence_Persistence
+     */
+    public function getPersistence();
 
     /**
      * @param string $deliveryId
      * @return DeliveryMonitoringEntity
      */
-    public function find($deliveryId)
-    {
-        $queryBuilder = $this->persistence->getPlatform()->getQueryBuilder();
-        $columns = $this->monitoringFactory->getColumns();
-
-        $qb = $queryBuilder
-            ->select(implode(',', $columns))
-            ->from(static::TABLE_NAME)
-            ->where($columns[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID] . ' = :' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID)
-            ->setParameter(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID, $deliveryId);
-
-        $delivery = $qb->execute()->fetchColumn();
-
-        return $this->monitoringFactory->buildEntityFromRawArray($delivery);
-    }
+    public function find($deliveryId);
 
     /**
      * @param DeliveryMonitoringEntity $entity
      * @return bool
      */
-    public function update(DeliveryMonitoringEntity $entity)
-    {
-        $dataAttributes = $entity->getDataAttributes();
-        $queryBuilder = $this->persistence->getPlatform()->getQueryBuilder();
-        $qb = $queryBuilder->update(static::TABLE_NAME);
+    public function update(DeliveryMonitoringEntity $entity);
 
-        foreach ($this->monitoringFactory->getColumns() as $column) {
-            $qb->set($column, ':' . $column);
-            $qb->setParameter($column, $dataAttributes[$column]);
-        }
-        $qb->where(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ' = :' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID);
-        $qb->setParameter(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID, $entity->getId());
-        $qb->execute();
+    /**
+     * @param DeliveryMonitoringEntity $entity
+     * @return bool
+     */
+    public function insert(DeliveryMonitoringEntity $entity);
 
-        return true;
-    }
+    /**
+     * @param $deliveryId
+     * @return bool
+     */
+    public function exists($deliveryId);
 }
