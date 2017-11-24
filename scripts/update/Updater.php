@@ -54,6 +54,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\TestRunnerMessageService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
@@ -519,5 +520,22 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('7.9.0');
         }
+
+        $this->skip('7.9.0', '7.11.0');
+
+        if ($this->isVersion('7.11.0')) {
+            /** @var TestRunnerMessageService $testRunnerMessageService */
+            $testRunnerMessageService = $this->getServiceManager()->get(TestRunnerMessageService::SERVICE_ID);
+            $testRunnerMessageService->setOption(
+                TestRunnerMessageService::PROCTOR_ROLES_OPTION,
+                [
+                    ProctorService::ROLE_PROCTOR,
+                ]
+            );
+            $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
+
+            $this->setVersion('7.11.2');
+        }
+      
     }
 }

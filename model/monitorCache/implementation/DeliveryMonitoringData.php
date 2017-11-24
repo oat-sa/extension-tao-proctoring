@@ -113,7 +113,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     public function addValue($key, $value, $overwrite = false)
     {
         if (!isset($this->data[$key]) || $overwrite) {
-            $this->data[$key] = $value;
+            $this->data[$key] = (string) $value;
         }
     }
 

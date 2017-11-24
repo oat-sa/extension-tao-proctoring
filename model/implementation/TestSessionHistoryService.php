@@ -137,7 +137,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
                     continue;
                 }
-                $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
+                $exportable['date'] = DateHelper::displayeDate($exportable['timestamp'], DateHelper::FORMAT_LONG_MICROSECONDS);
                 $exportable['role'] = $role;
                 $exportable['actor'] = _dh(UserHelper::getUserName($user, true));
                 $exportable['event'] = $eventId;
