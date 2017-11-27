@@ -85,7 +85,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
     const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
-
+    
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';
     const KV_COLUMN_PARENT_ID = 'parent_id';
@@ -122,7 +122,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $data = empty($results) ? [] : $results[0];
             $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
             $this->getServiceManager()->propagate($dataObject);
-
             $this->data[$id] = $dataObject;
         }
         return $this->data[$id];
@@ -177,7 +176,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      *    [['error_code' => ['0', '1']],
      * ]);
      * ```
-     *
+     * 
      * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
