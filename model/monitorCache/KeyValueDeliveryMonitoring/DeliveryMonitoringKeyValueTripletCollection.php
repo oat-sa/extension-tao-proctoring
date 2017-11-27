@@ -51,20 +51,22 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
             return new static($this->getIterator()->getArrayCopy());
         }
 
+        $copyArray = $this->getIterator()->getArrayCopy();
+
         /** @var DeliveryMonitoringKeyValueTriplet $item */
-        foreach ($this as $key => $item){
+        foreach ($copyArray as $key => $item){
 
             /** @var DeliveryMonitoringKeyValueTriplet $compareItem */
-            foreach ($existedCollection as  $key2 => $compareItem) {
+            foreach ($existedCollection as $key2 => $compareItem) {
                 if ($item->hasSameKey($compareItem)) {
-                    $this->remove($key);
+                    unset($copyArray[$key]);
                     $existedCollection->removeElement($key2);
                     continue 2;
                 }
             }
         }
 
-        return new static($this->getIterator()->getArrayCopy());
+        return new static($copyArray);
     }
 
     /**
@@ -74,12 +76,18 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
      */
     public function diffToGetUpdatedTriplets(DeliveryMonitoringKeyValueTripletCollection $existedCollection)
     {
+        if ($existedCollection->isEmpty()) {
+            return new static($this->getIterator()->getArrayCopy());
+        }
+
+        $copyArray = $this->getIterator()->getArrayCopy();
+
         /** @var DeliveryMonitoringKeyValueTriplet $item */
-        foreach ($this as $key => $item){
+        foreach ($copyArray as $key => $item){
             /** @var DeliveryMonitoringKeyValueTriplet $compareItem */
             foreach ($existedCollection as $key2 => $compareItem) {
                 if ($item->equals($compareItem) || $compareItem->isSaved()) {
-                    $this->remove($key);
+                    unset($copyArray[$key]);
                     $existedCollection->remove($key2);
                     break;
                 }
@@ -92,7 +100,7 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
             }
         }
 
-        return new static($this->getIterator()->getArrayCopy());
+        return new static($copyArray);
     }
 
     /**
