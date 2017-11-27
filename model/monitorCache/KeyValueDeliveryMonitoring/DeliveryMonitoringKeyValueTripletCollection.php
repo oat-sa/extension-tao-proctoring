@@ -52,15 +52,16 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
         }
 
         $copyArray = $this->getIterator()->getArrayCopy();
+        $copyArrayToCompare = $existedCollection->getIterator()->getArrayCopy();
 
         /** @var DeliveryMonitoringKeyValueTriplet $item */
         foreach ($copyArray as $key => $item){
 
             /** @var DeliveryMonitoringKeyValueTriplet $compareItem */
-            foreach ($existedCollection as $key2 => $compareItem) {
+            foreach ($copyArrayToCompare as $key2 => $compareItem) {
                 if ($item->hasSameKey($compareItem)) {
                     unset($copyArray[$key]);
-                    $existedCollection->removeElement($key2);
+                    unset($copyArrayToCompare[$key2]);
                     continue 2;
                 }
             }
@@ -81,19 +82,20 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
         }
 
         $copyArray = $this->getIterator()->getArrayCopy();
+        $copyArrayToCompare = $existedCollection->getIterator()->getArrayCopy();
 
         /** @var DeliveryMonitoringKeyValueTriplet $item */
         foreach ($copyArray as $key => $item){
             /** @var DeliveryMonitoringKeyValueTriplet $compareItem */
-            foreach ($existedCollection as $key2 => $compareItem) {
+            foreach ($copyArrayToCompare as $key2 => $compareItem) {
                 if ($item->equals($compareItem) || $compareItem->isSaved()) {
                     unset($copyArray[$key]);
-                    $existedCollection->remove($key2);
+                    unset($copyArrayToCompare[$key2]);
                     break;
                 }
 
                 if ($item->hasSameKey($compareItem)) {
-                    $existedCollection->remove($key2);
+                    unset($copyArrayToCompare[$key2]);
                     continue 2;
                 }
 
