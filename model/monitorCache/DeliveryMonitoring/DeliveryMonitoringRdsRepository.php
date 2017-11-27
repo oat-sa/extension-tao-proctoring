@@ -6,7 +6,7 @@ use common_persistence_SqlPersistence;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
-class DeliveryMonitoringSqlRepository extends ConfigurableService implements DeliveryMonitoringRepository
+class DeliveryMonitoringRdsRepository extends ConfigurableService implements DeliveryMonitoringRepository
 {
     const TABLE_NAME = MonitoringStorage::TABLE_NAME;
 

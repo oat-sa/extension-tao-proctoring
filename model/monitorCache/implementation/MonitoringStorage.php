@@ -30,7 +30,6 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringFactory;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringSqlRepository;
 use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletCollection;
 use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletRepository;
 
@@ -312,7 +311,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        /** @var DeliveryMonitoringSqlRepository $deliveryMonitoringRepo */
+        /** @var DeliveryMonitoringRepository $deliveryMonitoringRepo */
         $deliveryMonitoringRepo = $this->getDeliveryMonitoringRepository();
         $data = $deliveryMonitoring->get();
         $primaryTableData = $this->extractPrimaryData($data);
@@ -335,7 +334,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        /** @var DeliveryMonitoringSqlRepository $deliveryMonitoringRepo */
+        /** @var DeliveryMonitoringRepository $deliveryMonitoringRepo */
         $deliveryMonitoringRepo = $this->getDeliveryMonitoringRepository();
 
         $monitoringEntity      = $deliveryMonitoringRepo->find($deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]);

@@ -6,7 +6,7 @@ use common_persistence_SqlPersistence;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
-class DeliveryMonitoringKeyValueTripletSqlRepository extends ConfigurableService implements DeliveryMonitoringKeyValueTripletRepository
+class DeliveryMonitoringKeyValueTripletRdsRepository extends ConfigurableService implements DeliveryMonitoringKeyValueTripletRepository
 {
     const OPTION_PERSISTENCE = 'persistence';
 

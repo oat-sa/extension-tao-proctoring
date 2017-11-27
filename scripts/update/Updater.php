@@ -55,11 +55,10 @@ use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringRepository;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringSqlRepository;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringRdsRepository;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
-use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletSqlRepository;
+use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletRdsRepository;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoProctoring\model\ProctorServiceDelegator;
@@ -541,15 +540,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         if ($this->isVersion('7.11.1')) {
-            $deliveryMonitoringSqlRepository = new DeliveryMonitoringSqlRepository([
-                DeliveryMonitoringSqlRepository::OPTION_PERSISTENCE => 'default'
+            $deliveryMonitoringSqlRepository = new DeliveryMonitoringRdsRepository([
+                DeliveryMonitoringRdsRepository::OPTION_PERSISTENCE => 'default'
             ]);
-            $this->getServiceManager()->register(DeliveryMonitoringSqlRepository::SERVICE_ID, $deliveryMonitoringSqlRepository);
+            $this->getServiceManager()->register(DeliveryMonitoringRdsRepository::SERVICE_ID, $deliveryMonitoringSqlRepository);
 
-            $kvDeliveryMonitoringSqlRepository = new DeliveryMonitoringKeyValueTripletSqlRepository([
-                DeliveryMonitoringSqlRepository::OPTION_PERSISTENCE => 'default'
+            $kvDeliveryMonitoringSqlRepository = new DeliveryMonitoringKeyValueTripletRdsRepository([
+                DeliveryMonitoringRdsRepository::OPTION_PERSISTENCE => 'default'
             ]);
-            $this->getServiceManager()->register(DeliveryMonitoringKeyValueTripletSqlRepository::SERVICE_ID, $kvDeliveryMonitoringSqlRepository);
+            $this->getServiceManager()->register(DeliveryMonitoringKeyValueTripletRdsRepository::SERVICE_ID, $kvDeliveryMonitoringSqlRepository);
 
             $monitoringStorage = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
             $monitoringStorage->setOption(
