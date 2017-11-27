@@ -10,7 +10,7 @@ class DeliveryMonitoringKeyValueTripletCollection extends ArrayCollection
     /**
      * @param string $deliveryId
      * @param array $rawData
-     * @return static
+     * @return DeliveryMonitoringKeyValueTripletCollection
      */
     public static function buildCollection($deliveryId, array $rawData)
     {
