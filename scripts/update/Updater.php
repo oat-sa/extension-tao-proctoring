@@ -536,10 +536,12 @@ class Updater extends common_ext_ExtensionUpdater
             );
             $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
 
-            $this->setVersion('7.11.2');
+            $this->setVersion('7.11.1');
         }
 
-        if ($this->isVersion('7.11.1')) {
+        $this->skip('7.11.1', '7.11.2');
+
+        if ($this->isVersion('7.11.2')) {
             $deliveryMonitoringSqlRepository = new DeliveryMonitoringRdsRepository([
                 DeliveryMonitoringRdsRepository::OPTION_PERSISTENCE => 'default'
             ]);
