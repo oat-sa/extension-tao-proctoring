@@ -280,7 +280,11 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         }
         if ($sortBy == 'timestamp' || $sortBy == 'id') {
             usort($history, function($a, $b) use($sortOrder) {
-                return $sortOrder * ($a['timestamp'] - $b['timestamp']);
+                $result = $sortOrder * (floatval($a['timestamp']) - floatval($b['timestamp']));
+                if ($result === 0) {
+                    return $result;
+                }
+                return $result > 0 ? 1 : -1;
             });
         } else {
             usort($history, function($a, $b) use($sortBy, $sortOrder) {
