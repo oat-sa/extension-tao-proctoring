@@ -115,7 +115,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isBetween('3.14.0', '3.16.1')) {
             // ignore eligibility service
-
+            
             try {
                 // drop unused columns
                 $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -135,7 +135,7 @@ class Updater extends common_ext_ExtensionUpdater
             } catch (SchemaException $e) {
                         \common_Logger::i('Database Schema already up to date.');
             }
-
+            
             // update model
             OntologyUpdater::syncModels();
 
@@ -230,12 +230,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('4.8.0', '4.8.1');
-
+        
         if ($this->isVersion('4.8.1')) {
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class));
-
+            
             $this->runExtensionScript(RegisterBreadcrumbsServices::class);
-
+            
             $this->setVersion('4.9.0');
         }
 
@@ -250,12 +250,12 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('4.9.1', '4.10.9');
 
        if ($this->isVersion('4.10.9')) {
-
+            
             $this->runExtensionScript(RegisterRunnerMessageService::class);
 
             $this->setVersion('4.11.0');
        }
-
+      
         if ($this->isVersion('4.11.0')) {
 
             $action = new SetUpProctoringUrlService();
@@ -388,7 +388,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('5.13.1');
         }
-
+      
         $this->skip('5.13.1', '5.15.1');
 
         if ($this->isVersion('5.15.1')) {
@@ -429,7 +429,7 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('5.17.0', '5.18.1');
 
         if ($this->isVersion('5.18.1')) {
-
+            
             $proctorService = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
             $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
             if ($proctorService->hasOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT)) {
@@ -439,14 +439,14 @@ class Updater extends common_ext_ExtensionUpdater
                 );
                 $this->getServiceManager()->register(TestTakerAuthorizationService::SERVICE_ID, $authService);
             }
-
+            
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->detach(DeliveryCreatedEvent::class, [ProctorService::SERVICE_ID, 'listenCreateDeliveryEvent']);
             $eventManager->detach(DeliveryUpdatedEvent::class, [ProctorService::SERVICE_ID, 'listenUpdateDeliveryEvent']);
             $eventManager->attach(DeliveryCreatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryCreated']);
             $eventManager->attach(DeliveryUpdatedEvent::class, [TestTakerAuthorizationService::SERVICE_ID, 'onDeliveryUpdated']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
-
+            
             $service = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
             if (!is_a($service, ProctorServiceDelegator::class)) {
                 $delegator = new ProctorServiceDelegator([ProctorServiceDelegator::PROCTOR_SERVICE_HANDLERS => [$service]]);
@@ -511,7 +511,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('7.4.0');
         }
-
+      
         $this->skip('7.4.0', '7.8.6');
 
         if ($this->isVersion('7.8.6')) {
@@ -534,10 +534,9 @@ class Updater extends common_ext_ExtensionUpdater
             );
             $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
 
-            $this->setVersion('7.11.2');
+            $this->setVersion('7.11.1');
         }
-
-        $this->skip('7.11.2', '7.11.3');
-
+      
+        $this->skip('7.11.1', '7.11.5');
     }
 }
