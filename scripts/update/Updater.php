@@ -538,5 +538,6 @@ class Updater extends common_ext_ExtensionUpdater
         }
       
         $this->skip('7.11.1', '7.12.0');
+
     }
 }
