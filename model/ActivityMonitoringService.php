@@ -81,6 +81,7 @@ class ActivityMonitoringService extends ConfigurableService
 
     const LABEL_RETIRED_DELIVERIES = 'Retired Deliveries';
 
+    const GROUPFIELD_USER_ACTIVITY = 'group_user_activity';
 
     /**
      * @var array list of all the statuses uris
