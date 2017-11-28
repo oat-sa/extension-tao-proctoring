@@ -117,10 +117,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
         if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
             $seconds = $this->getPartTimeLimits($assessmentTest);
         }
-        
+
         return $seconds;
     }
-    
+
     /**
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
@@ -209,15 +209,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     $testSessionService->persist($testSession);
                 }
             }
-            
+
             /** @var QtiTimer $timer */
             $timer = $this->getDeliveryTimer($deliveryExecution);
             $timer
                 ->setExtraTime($extraTime)
                 ->setExtendedTime($extendedTime)
                 ->save();
-            $this->getServiceLocator()->get(StorageManager::SERVICE_ID)->persist();
-
 
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
             $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
@@ -228,6 +226,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = false;
             }
         }
+
+        $this->getServiceLocator()->get(StorageManager::SERVICE_ID)->persist();
 
         return $result;
     }

@@ -539,9 +539,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('7.11.1');
         }
 
-        $this->skip('7.11.1', '7.11.4');
+        $this->skip('7.11.1', '7.11.5');
 
-        if ($this->isVersion('7.11.4')) {
+        if ($this->isVersion('7.11.5')) {
             $deliveryMonitoringSqlRepository = new DeliveryMonitoringRdsRepository([
                 DeliveryMonitoringRdsRepository::OPTION_PERSISTENCE => 'default'
             ]);
