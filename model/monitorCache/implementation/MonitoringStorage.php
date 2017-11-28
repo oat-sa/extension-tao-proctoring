@@ -25,9 +25,13 @@ use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\helpers\DeliveryHelper;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringRepository;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoring\DeliveryMonitoringFactory;
+use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletCollection;
+use oat\taoProctoring\model\monitorCache\KeyValueDeliveryMonitoring\DeliveryMonitoringKeyValueTripletRepository;
 
 /**
  * Class DeliveryMonitoringService
@@ -63,6 +67,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const OPTION_PERSISTENCE = 'persistence';
 
     const OPTION_PRIMARY_COLUMNS = 'primary_columns';
+    const OPTION_DELIVERY_MONITORING_REPOSITORY = 'delivery_monitoring_repository';
+    const OPTION_KV_DELIVERY_MONITORING_REPOSITORY = 'kv_delivery_monitoring_repository';
 
     const TABLE_NAME = 'delivery_monitoring';
 
@@ -280,6 +286,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
+     * @throws \Doctrine\DBAL\ConnectionException
      */
     public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
@@ -303,11 +310,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
+        /** @var DeliveryMonitoringRepository $deliveryMonitoringRepo */
+        $deliveryMonitoringRepo = $this->getDeliveryMonitoringRepository();
         $data = $deliveryMonitoring->get();
-
         $primaryTableData = $this->extractPrimaryData($data);
 
-        $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
+        $result = $deliveryMonitoringRepo->insert(
+            $deliveryMonitoringRepo->getMonitoringFactory()->buildEntityFromRawArray($primaryTableData)
+        );
 
         if ($result) {
             $this->saveKvData($deliveryMonitoring);
@@ -323,22 +333,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $setClause = '';
-        $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
+        /** @var DeliveryMonitoringRepository $deliveryMonitoringRepo */
+        $deliveryMonitoringRepo = $this->getDeliveryMonitoringRepository();
 
-        $data = $deliveryMonitoring->get();
-        $primaryTableData = $this->extractPrimaryData($data);
+        $monitoringEntity      = $deliveryMonitoringRepo->find($deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]);
+        $possibleUpdatedEntity = $deliveryMonitoringRepo->getMonitoringFactory()->buildEntityFromRawArray($deliveryMonitoring->get());
 
-        unset($primaryTableData['delivery_execution_id']);
-        foreach ($primaryTableData as $dataKey => $dataValue) {
-            $setClause .= ($setClause === '') ? "$dataKey = :$dataKey" : ", $dataKey = :$dataKey";
-            $params[":$dataKey"] = $dataValue;
+        if (!$monitoringEntity->equals($possibleUpdatedEntity)) {
+            $deliveryMonitoringRepo->update($possibleUpdatedEntity);
         }
-
-        $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
-        WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
-
-        $this->getPersistence()->exec($sql, $params);
 
         $this->saveKvData($deliveryMonitoring);
 
@@ -358,48 +361,18 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
 
-            if (empty($kvTableData)) {
+            $newCollection = DeliveryMonitoringKeyValueTripletCollection::buildCollection($id, $kvTableData);
+            if ($newCollection->isEmpty()) {
                 return;
             }
 
-            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
-            FROM ' . self::KV_TABLE_NAME . '
-            WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
-            $keys = array_fill(0, count($kvTableData), '?');
-            $query .= implode(',', $keys);
-            $query .= ')';
+            $kvRepo = $this->getKvDeliveryMonitoringRepository();
+            $existedCollection = $kvRepo->findDeliveryKVCollection($id, array_keys($kvTableData));
+            $tobeInserted = $newCollection->diffToGetNewTriplets($existedCollection);
+            $tobeUpdated  = $newCollection->diffToGetUpdatedTriplets($existedCollection);
 
-            $params = array_merge([$id], array_keys($kvTableData));
-
-            $stmt = $this->getPersistence()->query($query, $params);
-            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
-            $dataToBeInserted = [];
-            foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
-                    continue;
-                }
-
-                if (array_key_exists($kvDataKey, $existent)) {
-                    $this->getPersistence()->exec(
-                        'UPDATE ' . self::KV_TABLE_NAME . '
-                          SET '  . self::KV_COLUMN_VALUE . ' = ?
-                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
-                          AND ' . self::KV_COLUMN_KEY . ' = ?;',
-                        [$kvDataValue, $id, $kvDataKey]
-                    );
-                } else {
-                    $dataToBeInserted[] = [
-                        self::KV_COLUMN_PARENT_ID => $id,
-                        self::KV_COLUMN_KEY => $kvDataKey,
-                        self::KV_COLUMN_VALUE => $kvDataValue,
-                    ];
-                }
-            }
-
-            if (!empty($dataToBeInserted)) {
-                $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
-            }
+            $kvRepo->insertCollection($tobeInserted);
+            $kvRepo->updateCollection($tobeUpdated);
         }
     }
 
@@ -617,12 +590,33 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
+     * @return DeliveryMonitoringRepository
+     */
+    protected function getDeliveryMonitoringRepository()
+    {
+        /** @var DeliveryMonitoringRepository $service */
+        $service = $this->getServiceManager()->get($this->getOption(self::OPTION_DELIVERY_MONITORING_REPOSITORY));
+        $service->setMonitoringFactory(new DeliveryMonitoringFactory($this->getPrimaryColumns()));
+
+        return $service;
+    }
+
+    /**
+     * @return DeliveryMonitoringKeyValueTripletRepository
+     */
+    protected function getKvDeliveryMonitoringRepository()
+    {
+        /** @var DeliveryMonitoringKeyValueTripletRepository $service */
+        $service = $this->getServiceManager()->get($this->getOption(self::OPTION_KV_DELIVERY_MONITORING_REPOSITORY));
+        return $service;
+    }
+
+    /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
     /**
      * Check if record for delivery execution already exists in the storage.
-     * @todo add isNewRecord property to DeliveryMonitoringDataInterface to prevent repeated queries to DB.
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean
      */
@@ -631,13 +625,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $data = $deliveryMonitoring->get();
         $deliveryExecutionId = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
 
-        $sql = "SELECT EXISTS( " . PHP_EOL .
-            "SELECT " . self::COLUMN_DELIVERY_EXECUTION_ID . PHP_EOL .
-            "FROM " . self::TABLE_NAME . PHP_EOL .
-            "WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . "=?)";
-        $exists = $this->getPersistence()->query($sql, [$deliveryExecutionId])->fetch(\PDO::FETCH_COLUMN);
-
-        return !((boolean) $exists);
+        $service = $this->getDeliveryMonitoringRepository();
+        return !$service->exists($deliveryExecutionId);
     }
 
     /**
