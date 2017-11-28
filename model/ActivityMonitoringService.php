@@ -46,6 +46,9 @@ class ActivityMonitoringService extends ConfigurableService
     /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
     const OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH = 'assessment_activity_auto_refresh';
 
+    /** Allow to specify custom  activity widgets to be rendered */
+    const OPTION_USER_ACTIVITY_WIDGETS = 'userActivityWidgets';
+
     /** State of awaiting assessment */
     const STATE_AWAITING_ASSESSMENT = 'awaiting_assessments';
 

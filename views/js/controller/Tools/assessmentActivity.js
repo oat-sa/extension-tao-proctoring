@@ -90,7 +90,7 @@ define([
             completedAssessmentsAutoRefreshInterval = parseInt(config.completed_assessments_auto_refresh) * 1000;
 
             // User Activity
-            userActivity = userActivityFactory()
+            userActivity = userActivityFactory(config.userActivityWidgets)
             .render($('.user-activity', $container));
 
             // Current Assessment Activity
@@ -166,7 +166,8 @@ define([
                     .then(function (data) {
                         userActivity.update({
                             activeProctors : {value : data && data.active_proctors},
-                            activeTestTakers : {value : data && data.active_test_takers}
+                            activeTestTakers : {value : data && data.active_test_takers},
+                            queueTestTakers : {value : data && data.login_queue}
                         });
                         currentAssessmentActivity.update({
                             awaiting   : { value: data && data.awaiting_assessments },

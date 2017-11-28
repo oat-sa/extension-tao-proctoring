@@ -50,12 +50,14 @@ class Tools extends SimplePageModule
         $this->setData('reason_categories', DeliveryHelper::getAllReasonsCategories());
 
         // Config
-        $this->setData('config', [
+        $config = [ActivityMonitoringService::OPTION_USER_ACTIVITY_WIDGETS =>
+            $service->getOption(ActivityMonitoringService::OPTION_USER_ACTIVITY_WIDGETS),
             ActivityMonitoringService::OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH =>
                 $service->getOption(ActivityMonitoringService::OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH),
             ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH =>
                 $service->getOption(ActivityMonitoringService::OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH),
-        ]);
+        ];
+        $this->setData('config', $config);
 
         $this->setView('Tools/assessment_activity.tpl');
     }

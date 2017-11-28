@@ -21,8 +21,10 @@ define([
     'lodash',
     'i18n',
     'ui/component',
+    'handlebars',
+    'tpl!taoProctoring/component/activityMonitoring/userActivity/userActivityBlock',
     'tpl!taoProctoring/component/activityMonitoring/userActivity/userActivity'
-], function ($, _, __, component, tpl) {
+], function ($, _, __, component, Handlebars, groupTpl, componentTpl) {
     'use strict';
 
     /**
@@ -34,28 +36,33 @@ define([
         activeProctors: {
             container: 'active-proctors',
             label: __('Active proctors'),
-            value: 0,
+            size: 4,
+            icon: 'taker',
+            value: 0
         },
         activeTestTakers: {
             container: 'active-test-takers',
             label: __('Active test-takers'),
+            size: 4,
+            icon: 'takers',
             value: 0
         }
     };
+
+    Handlebars.registerPartial('ui-activity-widget-group', groupTpl);
 
     /**
      * Factory for component
      *
      * @param {Object} config
-     * @param {String} [config.activeProctors.container]
-     * @param {String} [config.activeProctors.label]
-     * @param {Number} [config.activeProctors.value]
-     * @param {String} [config.activeTestTakers.container]
-     * @param {String} [config.activeTestTakers.label]
-     * @param {Number} [config.activeTestTakers.value]
+     * @param {String} [config.<WidgetName>.container]
+     * @param {String} [config.<WidgetName>.label]
+     * @param {Number} [config.<WidgetName>.value]
+     * @param {Number} [config.<WidgetName>.size]
+     * @param {String} [config.<WidgetName>.icon]
      * @param {jQuery} [config.renderTo] - Container of component
      */
-    function userActivityFactory($container, config) {
+    function userActivityFactory(config) {
         config = config || {};
 
         return component({
@@ -67,17 +74,19 @@ define([
              * @param {Number} [data.activeTestTakers.value]
              */
             update: function update(data) {
+                var metricsWidget;
                 _.merge(this.config, data);
 
-                $('.'+this.config.activeProctors.container, this.getElement())
-                .text(this.config.activeProctors.value);
-
-                $('.'+this.config.activeTestTakers.container, this.getElement())
-                .text(this.config.activeTestTakers.value);
+                for (metricsWidget in this.config) {
+                    if (this.config.hasOwnProperty(metricsWidget)) {
+                        $('.'+this.config[metricsWidget].container, this.getElement())
+                            .text(this.config[metricsWidget].value);
+                    }
+                }
             }
         }, _defaults)
 
-        .setTemplate(tpl)
+        .setTemplate(componentTpl)
 
         .init(config);
     }
