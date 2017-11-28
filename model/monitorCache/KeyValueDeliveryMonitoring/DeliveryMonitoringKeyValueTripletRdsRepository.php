@@ -46,6 +46,7 @@ class DeliveryMonitoringKeyValueTripletRdsRepository extends ConfigurableService
         }
         $keys = [];
 
+        //@TODO move this as a general method for update multiple
         $query = "UPDATE ". MonitoringStorage::KV_TABLE_NAME ." SET ". MonitoringStorage::KV_COLUMN_VALUE ." = CASE";
         /** @var DeliveryMonitoringKeyValueTriplet $item */
         foreach ($collection as $item) {
