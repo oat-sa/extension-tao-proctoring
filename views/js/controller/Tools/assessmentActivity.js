@@ -90,7 +90,7 @@ define([
             completedAssessmentsAutoRefreshInterval = parseInt(config.completed_assessments_auto_refresh) * 1000;
 
             // User Activity
-            userActivity = userActivityFactory()
+            userActivity = userActivityFactory(config.userActivityWidgets)
             .render($('.user-activity', $container));
 
             // Current Assessment Activity
@@ -164,10 +164,15 @@ define([
                 action: function () {
                     request(url.route('assessmentActivityData', 'Tools', 'taoProctoring'))
                     .then(function (data) {
-                        userActivity.update({
-                            activeProctors : {value : data && data.active_proctors},
-                            activeTestTakers : {value : data && data.active_test_takers}
-                        });
+                        var uaData = {};
+                        if (data && data.group_user_activity) {
+                            _.forEach(data.group_user_activity, function (v, k) {
+                                    uaData[$.camelCase(k.replace('_', '-'))] = {value: v};
+                                }
+                            );
+                        }
+                        userActivity.update(uaData);
+
                         currentAssessmentActivity.update({
                             awaiting   : { value: data && data.awaiting_assessments },
                             authorized : { value: data && data.authorized_but_not_started_assessments },

@@ -538,5 +538,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
       
         $this->skip('7.11.1', '7.11.6');
+
+        if ($this->isVersion('7.11.6')) {
+            /** @var ActivityMonitoringService $service */
+            $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+            $options = array_merge($service->getOptions(), [ActivityMonitoringService::OPTION_USER_ACTIVITY_WIDGETS => [],]);
+            $service->setOptions($options);
+            $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
+            $this->setVersion('7.12.0');
+        }
+
     }
 }
