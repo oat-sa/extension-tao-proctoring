@@ -119,8 +119,7 @@ class MonitorCacheService extends MonitoringStorage
             $data->updateData([
                 DeliveryMonitoringService::REMAINING_TIME,
                 DeliveryMonitoringService::EXTRA_TIME,
-                DeliveryMonitoringService::CONNECTIVITY,
-                DeliveryMonitoringService::CONSTRAINTS_DURATION
+                DeliveryMonitoringService::CONNECTIVITY
             ]);
         }
         $success = $this->save($data);
