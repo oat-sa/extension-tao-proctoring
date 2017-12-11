@@ -41,6 +41,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\Monitor;
+use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
@@ -53,6 +54,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\TestRunnerMessageService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
@@ -510,6 +512,43 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('7.4.0');
         }
 
-        $this->skip('7.4.0', '7.5.2');
+        $this->skip('7.4.0', '7.8.6');
+
+        if ($this->isVersion('7.8.6')) {
+            OntologyUpdater::syncModels();
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class));
+
+            $this->setVersion('7.9.0');
+        }
+
+        $this->skip('7.9.0', '7.11.0');
+
+        if ($this->isVersion('7.11.0')) {
+            /** @var TestRunnerMessageService $testRunnerMessageService */
+            $testRunnerMessageService = $this->getServiceManager()->get(TestRunnerMessageService::SERVICE_ID);
+            $testRunnerMessageService->setOption(
+                TestRunnerMessageService::PROCTOR_ROLES_OPTION,
+                [
+                    ProctorService::ROLE_PROCTOR,
+                ]
+            );
+            $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, $testRunnerMessageService);
+
+            $this->setVersion('7.11.1');
+        }
+
+        $this->skip('7.11.1', '7.11.6');
+
+        if ($this->isVersion('7.11.6')) {
+            /** @var ActivityMonitoringService $service */
+            $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+            $options = array_merge($service->getOptions(), [ActivityMonitoringService::OPTION_USER_ACTIVITY_WIDGETS => [],]);
+            $service->setOptions($options);
+            $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $service);
+            $this->setVersion('7.12.0');
+        }
+
+        $this->skip('7.12.0', '7.12.2');
+
     }
 }

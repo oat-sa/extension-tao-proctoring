@@ -374,9 +374,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $stmt = $this->getPersistence()->query($query, $params);
             $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
-
+            $dataToBeInserted = [];
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] === $kvDataValue) {
+                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
                     continue;
                 }
 
@@ -389,15 +389,16 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                         [$kvDataValue, $id, $kvDataKey]
                     );
                 } else {
-                    $this->getPersistence()->insert(
-                        self::KV_TABLE_NAME,
-                        array(
-                            self::KV_COLUMN_PARENT_ID => $id,
-                            self::KV_COLUMN_KEY => $kvDataKey,
-                            self::KV_COLUMN_VALUE => $kvDataValue,
-                        )
-                    );
+                    $dataToBeInserted[] = [
+                        self::KV_COLUMN_PARENT_ID => $id,
+                        self::KV_COLUMN_KEY => $kvDataKey,
+                        self::KV_COLUMN_VALUE => $kvDataValue,
+                    ];
                 }
+            }
+
+            if (!empty($dataToBeInserted)) {
+                $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
             }
         }
     }
@@ -478,7 +479,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     /**
      * @return \common_persistence_SqlPersistence
      */
-    protected function getPersistence()
+    public function getPersistence()
     {
         return $this->getServiceManager()
             ->get(\common_persistence_Manager::SERVICE_ID)

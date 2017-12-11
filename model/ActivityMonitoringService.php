@@ -47,6 +47,9 @@ class ActivityMonitoringService extends ConfigurableService
     /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
     const OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH = 'assessment_activity_auto_refresh';
 
+    /** Allow to specify custom  activity widgets to be rendered */
+    const OPTION_USER_ACTIVITY_WIDGETS = 'userActivityWidgets';
+
     /** State of awaiting assessment */
     const STATE_AWAITING_ASSESSMENT = 'awaiting_assessments';
 
@@ -79,6 +82,7 @@ class ActivityMonitoringService extends ConfigurableService
 
     const LABEL_RETIRED_DELIVERIES = 'Retired Deliveries';
 
+    const GROUPFIELD_USER_ACTIVITY = 'group_user_activity';
 
     /**
      * @var array list of all the statuses uris

@@ -137,7 +137,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
                     continue;
                 }
-                $exportable['date'] = DateHelper::displayeDate($exportable['timestamp']);
+                $exportable['date'] = DateHelper::displayeDate($exportable['timestamp'], DateHelper::FORMAT_LONG_MICROSECONDS);
                 $exportable['role'] = $role;
                 $exportable['actor'] = _dh(UserHelper::getUserName($user, true));
                 $exportable['event'] = $eventId;
@@ -280,7 +280,11 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         }
         if ($sortBy == 'timestamp' || $sortBy == 'id') {
             usort($history, function($a, $b) use($sortOrder) {
-                return $sortOrder * ($a['timestamp'] - $b['timestamp']);
+                $result = $sortOrder * (floatval($a['timestamp']) - floatval($b['timestamp']));
+                if ($result === 0) {
+                    return $result;
+                }
+                return $result > 0 ? 1 : -1;
             });
         } else {
             usort($history, function($a, $b) use($sortBy, $sortOrder) {

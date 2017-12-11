@@ -15,9 +15,19 @@ msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor"
 msgstr ""
 
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr ""
+
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
+msgstr ""
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator role"
 msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager

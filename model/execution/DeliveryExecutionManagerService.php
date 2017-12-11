@@ -27,8 +27,9 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\runner\time\QtiTimeStorage;
+use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -55,7 +56,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
      *
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return QtiTimer
-     * @throws \oat\oatbox\service\ServiceNotFoundException
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
      */
     public function getDeliveryTimer($deliveryExecution)
     {
@@ -64,18 +67,58 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         /** @var TestSessionService $testSessionService */
-        $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+        $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
 
         $testSession = $testSessionService->getTestSession($deliveryExecution);
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
         } else {
-            $timer = new QtiTimer();
-            $timer->setStorage(new QtiTimeStorage($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier()));
-            $timer->load();
+            $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
+            $timer = $qtiTimerFactory->getTimer($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier());
         }
 
         return $timer;
+    }
+
+    /**
+     * @param $part
+     * @return int|null
+     */
+    protected function getPartTimeLimits($part)
+    {
+        $timeLimits = $part->getTimeLimits();
+        if ($timeLimits && $timeLimits->hasMaxTime()) {
+            return $timeLimits->getMaxTime()->getSeconds(true);
+        }
+        return null;
+    }
+
+    /**
+     * Gets the actual time limits for a test session
+     * @param TestSession $testSession
+     * @return int|null
+     */
+    public function getTimeLimits($testSession)
+    {
+        $seconds = null;
+
+        if ($item = $testSession->getCurrentAssessmentItemRef()) {
+            $seconds = $this->getPartTimeLimits($item);
+        }
+
+        if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
+            $seconds = $this->getPartTimeLimits($section);
+        }
+
+        if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
+            $seconds = $this->getPartTimeLimits($testPart);
+        }
+
+        if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
+            $seconds = $this->getPartTimeLimits($assessmentTest);
+        }
+
+        return $seconds;
     }
 
     /**
@@ -84,11 +127,18 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param int $extraTime
      * @param null $extendedTime
      * @return array
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
     public function setExtraTime($deliveryExecutions, $extraTime = 0, $extendedTime = null)
     {
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+
+        /** @var TestSessionService $testSessionService */
+        $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
 
         $result = ['processed' => [], 'unprocessed' => []];
 
@@ -102,55 +152,18 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $data = $deliveryMonitoringService->getData($deliveryExecution);
 
             if ($extendedTime) {
-                /** @var TestSessionService $testSessionService */
-                $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
                 $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
                 /** @var AssessmentTest $testDefinition */
                 $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
                 $deliveryExecutionArray[] = $deliveryExecution;
                 $extraTime = null;
-                $seconds = null;
 
-                if ($testDefinition->getTimeLimits() && $testDefinition->getTimeLimits()->hasMaxTime()) {
-                    $maxTime = $testDefinition->getTimeLimits()->getMaxTime();
-                    $seconds = $maxTime->getSeconds(true);
-                }
-
-                /** @var TestSession $testSession */
-                if ($testSession = $testSessionService->getTestSession($deliveryExecution)) {
-                    $seconds = null;
-
-                    if ($item = $testSession->getCurrentAssessmentItemRef()) {
-                        if ($testSessionLimits = $item->getTimeLimits()) {
-                            $seconds = $testSessionLimits->hasMaxTime()
-                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                                : $seconds;
-                        }
-                    }
-
-                    if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
-                        if ($testSessionLimits = $section->getTimeLimits()) {
-                            $seconds = $testSessionLimits->hasMaxTime()
-                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                                : $seconds;
-                        }
-                    }
-
-                    if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
-                        if ($testSessionLimits = $testPart->getTimeLimits()) {
-                            $seconds = $testSessionLimits->hasMaxTime()
-                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                                : $seconds;
-                        }
-                    }
-
-                    if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
-                        if ($testSessionLimits = $assessmentTest->getTimeLimits()) {
-                            $seconds = $testSessionLimits->hasMaxTime()
-                                ? $testSessionLimits->getMaxTime()->getSeconds(true)
-                                : $seconds;
-                        }
-                    }
+                /* @var TestSession $testSession */
+                $testSession = $testSessionService->getTestSession($deliveryExecution);
+                if ($testSession) {
+                    $seconds = $this->getTimeLimits($testSession);
+                } else {
+                    $seconds = $this->getPartTimeLimits($testDefinition);
                 }
 
                 if ($seconds) {
@@ -167,9 +180,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
             // reopen the execution if already closed
             if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHIED) {
                 $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
-
-                /** @var TestSessionService $testSessionService */
-                $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
 
                 /* @var TestSession $testSession */
                 $testSession = $testSessionService->getTestSession($deliveryExecution);
@@ -207,9 +217,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 ->setExtendedTime($extendedTime)
                 ->save();
 
-
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
-            $data->update(DeliveryMonitoringService::EXTENDED_TIME, $extendedTime);
+            $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
@@ -217,6 +226,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = false;
             }
         }
+
+        $this->getServiceLocator()->get(StorageManager::SERVICE_ID)->persist();
 
         return $result;
     }

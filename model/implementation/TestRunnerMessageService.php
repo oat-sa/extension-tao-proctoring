@@ -36,10 +36,33 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
+    /** Proctor roles option in options. */
+    const PROCTOR_ROLES_OPTION = 'proctorRoles';
+
+    const PROCTOR_PAUSED_STATE_MESSAGE = 'The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.';
+    const PROCTOR_TERMINATED_STATE_MESSAGE = 'The assessment has been terminated by an authorized proctor. You cannot interact with it anymore. Please contact your proctor if required.';
+
+    /**
+     * Returns TRUE when the current role is proctor like.
+     *
+     * @param AssessmentTestSession $testSession
+     *
+     * @return bool
+     *
+     * @throws \common_exception_Error
+     */
     protected function isProctorAction(AssessmentTestSession $testSession)
     {
         $userRoles = \common_session_SessionManager::getSession()->getUserRoles();
-        return in_array(ProctorService::ROLE_PROCTOR, $userRoles);
+        $proctorRoles = $this->getOption(static::PROCTOR_ROLES_OPTION);
+
+        foreach ($proctorRoles as $proctorRole) {
+            if (in_array($proctorRole, $userRoles)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -49,7 +72,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorPausedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+        return static::PROCTOR_PAUSED_STATE_MESSAGE;
     }
 
     /**
@@ -59,7 +82,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorTerminatedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+        return static::PROCTOR_TERMINATED_STATE_MESSAGE;
     }
 
     /**
@@ -73,7 +96,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorPausedStateMessage($testSession);
         }
 
-        return __('The assessment has been suspended. To resume your assessment, please relaunch it.');
+        return static::PAUSED_STATE_MESSAGE;
     }
 
     /**
@@ -87,6 +110,6 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorTerminatedStateMessage($testSession);
         }
 
-        return __('The assessment has been terminated. You cannot interact with it anymore.');
+        return static::TERMINATED_STATE_MESSAGE;
     }
 }

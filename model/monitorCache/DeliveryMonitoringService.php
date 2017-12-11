@@ -61,12 +61,15 @@ interface DeliveryMonitoringService
     const LAST_PAUSE_TIMESTAMP = 'last_pause_timestamp';
 
     const DIFF_TIMESTAMP = 'diff_timestamp';
+    const ITEM_DURATION = 'item_duration';
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
     const DELIVERY_ID = 'delivery_id';
     const DELIVERY_NAME = 'delivery_name';
     const CONNECTIVITY = 'last_connect';
+
+    const REACTIVATE_AUTHORIZED_BY = 'reactivate_authorized_by';
 
     /**
      * Retrieve the currently cached delivery data

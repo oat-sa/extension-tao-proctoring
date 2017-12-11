@@ -23,10 +23,12 @@ namespace oat\taoProctoring\model\implementation;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
+use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
 use oat\taoClientDiagnostic\model\browserDetector\OSService;
@@ -212,6 +214,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
+                $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
@@ -258,6 +261,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                     $session->suspend();
                     $this->getTestSessionService()->persist($session);
                 }
+                $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
@@ -475,6 +479,48 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $result = 'cli' === php_sapi_name()
             ? $_SERVER['PHP_SELF']
             : \Context::getInstance()->getRequest()->getRequestURI();
+        return $result;
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @param null $reason
+     * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     * @throws \common_exception_MissingParameter
+     */
+    public function reactivateExecution(DeliveryExecution $deliveryExecution, $reason = null)
+    {
+        $executionState = $deliveryExecution->getState()->getUri();
+        $result = false;
+
+        if (ProctoredDeliveryExecution::STATE_TERMINATED === $executionState) {
+            $proctor = \common_session_SessionManager::getSession()->getUser();
+
+            /** @var TestSessionService $testSessionService */
+            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
+            $session = $testSessionService->getTestSession($deliveryExecution);
+            if ($session) {
+                $session->setState(AssessmentTestSessionState::INTERACTING);
+                $testSessionService->persist($session);
+            }
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
+
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->trigger(new DeliveryExecutionReactivated($deliveryExecution, $proctor, $reason));
+
+            $logData = [
+                'reason' => $reason,
+                'timestamp' => microtime(true),
+                'context' => $this->getContext($deliveryExecution),
+            ];
+
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
+            $result = true;
+        }
+
         return $result;
     }
 }

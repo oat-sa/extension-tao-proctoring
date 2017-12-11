@@ -37,7 +37,8 @@ define([
     'taoProctoring/component/proxy',
     'tpl!taoProctoring/templates/delivery/index',
     'tpl!taoProctoring/templates/delivery/listBoxActions',
-    'tpl!taoProctoring/templates/delivery/listBoxStats'
+    'tpl!taoProctoring/templates/delivery/listBoxStats',
+    'util/locale'
 ], function (
     $,
     _,
@@ -57,7 +58,8 @@ define([
     proxyFactory,
     indexTpl,
     actionsTpl,
-    statsTpl
+    statsTpl,
+    locale
 ) {
     'use strict';
 
@@ -78,10 +80,9 @@ define([
      */
     function getSessionsNames(sessions) {
         return _.map(sessions, function (session) {
-            var testTaker = session.testTaker;
             return {
                 id: session.id,
-                label: testTaker.firstName + ' ' + testTaker.lastName
+                label: session.delivery.label + ' [' + locale.formatDateTime(session.start_time) + ']'
             };
         });
     }
@@ -251,7 +252,7 @@ define([
                             renderTo: container.getElement(),
                             actionName: __('Pause Session'),
                             reason: true,
-                            resourceType: 'test taker',
+                            resourceType: 'session',
                             categoriesSelector: cascadingComboBox({
                                 categoriesDefinitions: categories.pause.categoriesDefinitions,
                                 categories: categories.pause.categories

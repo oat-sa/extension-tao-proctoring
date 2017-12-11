@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2017 (original work) Open Assessment Technologies SA ;
  *
  */
 
@@ -164,6 +164,7 @@ class DeliveryHelper
      */
     public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
+        /** @var  DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
@@ -192,6 +193,7 @@ class DeliveryHelper
      */
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
@@ -201,6 +203,33 @@ class DeliveryHelper
             }
 
             if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $deliveryExecutions
+     * @param null $reason
+     * @return array
+     */
+    public static function reactivateExecution($deliveryExecutions, $reason = null)
+    {
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+        $result = [ 'processed' => [], 'unprocessed' => [] ];
+        foreach ($deliveryExecutions as $deliveryExecution) {
+
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
+            }
+
+            if ($deliveryExecutionStateService->reactivateExecution($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
@@ -346,7 +375,14 @@ class DeliveryHelper
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
             $now = microtime(true);
-            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
+
+            $online = null;
+            if($testSessionConnectivityStatusService->hasOnlineMode()){
+                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
+                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+            }
+
+            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) && $online) {
                 $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
                 $elapsed = $now - $lastActivity;
             } else {
@@ -362,15 +398,17 @@ class DeliveryHelper
 
             $executionState = $cachedData[DeliveryMonitoringService::STATUS];
 
-            if (DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) {
+            if ((DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) || !$online) {
                 $elapsedApprox = $lastPauseTimestamp - $lastActivity;
             } else {
                 $elapsedApprox = $elapsed;
             }
 
-            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
-            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? $cachedData[DeliveryMonitoringService::REMAINING_TIME] : 0;
-            $diffTime = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
+            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
+            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? intval($cachedData[DeliveryMonitoringService::REMAINING_TIME]) : 0;
+            $diffTimestamp = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
+            $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
+            $diffTime = $duration ? $duration : $diffTimestamp;
             $remaining = $remaining - $diffTime;
             $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
 
@@ -384,7 +422,7 @@ class DeliveryHelper
                 'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
                 'timer' => [
                     'lastActivity' => $lastActivity,
-                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState) ? true : false,
+                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState && $online) ? true : false,
                     'approximatedRemaining' => $approximatedRemaining,
                     'remaining_time' => $remaining,
                     'extraTime' => $extraTime,
@@ -396,10 +434,10 @@ class DeliveryHelper
                 'state' => $state,
             );
 
-            if($testSessionConnectivityStatusService->hasOnlineMode()){
-                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
-                $execution['online'] = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
+            if ($online) {
+                $execution['online'] = $online;
             }
+
             $executions[] = $execution;
         }
 
@@ -506,18 +544,24 @@ class DeliveryHelper
     /**
      * Get the list of all available categories, sorted by action names
      *
+     * @param bool $hasAccessToReactivate
      * @return array
      */
-    public static function getAllReasonsCategories(){
+    public static function getAllReasonsCategories($hasAccessToReactivate = false){
         /** @var ReasonCategoryService $categoryService */
         $categoryService = ServiceManager::getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
 
-        return array(
+        $response = array(
             'authorize' => array(),
             'pause' => $categoryService->getIrregularities(),
             'terminate' => $categoryService->getIrregularities(),
             'report' => $categoryService->getIrregularities(),
             'print' => [],
         );
+        if ($hasAccessToReactivate) {
+            $response['reactivate'] = $categoryService->getIrregularities();
+        }
+
+        return $response;
     }
 }

@@ -29,6 +29,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
@@ -177,6 +178,22 @@ class MonitorCacheService extends MonitoringStorage
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
         if (!$this->save($data)) {
             \common_Logger::w('monitor cache for authorization could not be updated');
+        }
+    }
+
+
+    /**
+     * @param DeliveryExecutionReactivated $event
+     */
+    public function catchTestReactivatedEvent(DeliveryExecutionReactivated $event)
+    {
+        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
+
+        $success = $this->save($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
     }
 }
