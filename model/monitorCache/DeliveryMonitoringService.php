@@ -102,15 +102,13 @@ interface DeliveryMonitoringService
     public function count();
 
     /**
-     * Get counted statuses by deliveries
-     * @param $deliveriesUri
-     * @return array
-     */
-    public function getDeliveriesCountedStatuses(array $deliveriesUri);
-
-    /**
-     * Get statuses for the data about deliveries which can't be found
+     * Get statistic by statuses groped by deliveries.
+     * Result is an array of deliveries with amount of delivery executions in each status
+     * @param integer $limit
+     * @param integer $offset
+     * @param string $orderby - status uri to order
+     * @param string $orderdir - status uri to order
      * @return mixed
      */
-    public function getRetiredDeliveriesCountedStatuses();
+    public function getStatusesStatistic($limit = 0, $offset = 0, $orderby = 'delivery_name', $orderdir = 'asc');
 }

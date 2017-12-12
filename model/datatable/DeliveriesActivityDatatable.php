@@ -60,12 +60,17 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
     public function getPayload()
     {
         /** @var ActivityMonitoringService $service */
-        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
+        //$service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
+        /** @var \oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage $service */
+        $service = $this->getServiceLocator()->get(\oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage::SERVICE_ID);
 
-        $deliveries = $this->deliveryService->getRootClass()->getInstances(true, ['order' => RDFS_LABEL]);
-        $data = $service->getStatesByDelivery($deliveries);
+        $offset = ($this->request->getPage() - 1) * $this->request->getRows() ? : 0;
+        $limit = $this->request->getRows() ? : 0;
 
-        $this->doSorting($data);
+        $sortBy = $this->request->getSortBy();
+        $sortOrder = strcasecmp($this->request->getSortOrder(), 'asc') === 0 ? 'asc' : 'desc';
+
+        $data = $service->getStatusesStatistic($limit, $offset, $sortBy, $sortOrder);
         $result = $this->doPostProcessing($data);
 
         return $result;
@@ -77,10 +82,12 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doPostProcessing(array $result)
     {
+        /** @var \oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage $service */
+        $service = $this->getServiceLocator()->get(\oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage::SERVICE_ID);
         $rows = $this->request->getRows();
         $rows = $rows?:1;
         // deliveries count + retired deliveries row
-        $total = $this->deliveryService->getRootClass()->countInstances([], ['recursive' => true]) + 1;
+        $total = count($service->getStatusesStatistic(0, 0));
         $payload = [
             'data' => $result,
             'page' => (integer) $this->request->getPage(),

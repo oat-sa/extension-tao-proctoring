@@ -23,11 +23,12 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
+use oat\generis\model\OntologyAwareTrait;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
 /**
  * Class DeliveryMonitoringService
@@ -60,6 +61,8 @@ use oat\oatbox\service\ConfigurableService;
  */
 class MonitoringStorage extends ConfigurableService implements DeliveryMonitoringService
 {
+    use OntologyAwareTrait;
+
     const OPTION_PERSISTENCE = 'persistence';
 
     const OPTION_PRIMARY_COLUMNS = 'primary_columns';
@@ -663,37 +666,59 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
-     * @param $deliveriesUri
-     * @return array
+     * @param int $limit
+     * @param int $offset
+     * @param string $orderby
+     * @param string $orderdir
+     * @return mixed|void
      */
-    public function getDeliveriesCountedStatuses(array $deliveriesUri)
+    public function getStatusesStatistic($limit = 10, $offset = 0, $orderby = 'label', $orderdir = 'asc')
     {
-        $sql = "SELECT kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " AS delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " AS status,
-                COUNT(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") AS cnt
-                    FROM " . MonitoringStorage::TABLE_NAME . " dm
-                    LEFT JOIN " . MonitoringStorage::KV_TABLE_NAME . " kvdm
-                     ON dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . "
-                      AND kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
-                    WHERE kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " IN ('" . implode("','", $deliveriesUri) . "')
-                    GROUP BY kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
-        $stmt = $this->getPersistence()->query($sql);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
+        $statuses = [
+            $this->getResource(ProctoredDeliveryExecution::STATE_ACTIVE),
+            $this->getResource(ProctoredDeliveryExecution::STATE_AUTHORIZED),
+            $this->getResource(ProctoredDeliveryExecution::STATE_AWAITING),
+            $this->getResource(ProctoredDeliveryExecution::STATE_CANCELED),
+            $this->getResource(ProctoredDeliveryExecution::STATE_FINISHED),
+            $this->getResource(ProctoredDeliveryExecution::STATE_PAUSED),
+            $this->getResource(ProctoredDeliveryExecution::STATE_TERMINATED)
+        ];
 
-    public function getRetiredDeliveriesCountedStatuses()
-    {
-        $sql = "SELECT kvdm." . MonitoringStorage::KV_COLUMN_VALUE . " AS delivery_id, dm." . MonitoringStorage::COLUMN_STATUS . " AS status,
-                COUNT(dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . ") AS cnt
-                    FROM " . MonitoringStorage::TABLE_NAME . " dm
-                    LEFT JOIN " . MonitoringStorage::KV_TABLE_NAME . " kvdm
-                        ON dm." . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . "=kvdm." . MonitoringStorage::KV_COLUMN_PARENT_ID . "
-                          AND kvdm." . MonitoringStorage::KV_COLUMN_KEY . "='delivery_id'
-                    LEFT JOIN statements s ON s.predicate='" . DeliveryAssemblyService::PROPERTY_ORIGIN . "'
-                        AND s.subject=kvdm." . MonitoringStorage::KV_COLUMN_VALUE . "
-                    WHERE s.subject IS NULL
-                    GROUP BY kvdm." . MonitoringStorage::KV_COLUMN_VALUE . ", dm." . MonitoringStorage::COLUMN_STATUS;
+        $sql = 'select delivery_name as label, delivery_id ';
+        foreach ($statuses as $status) {
+            $sql .= ', sum("'.$status->getLabel().'") as "' . $status->getLabel() . '"';
+        }
+        $sql .= ' from(' . PHP_EOL;
+        $sql .= 'select '.self::KV_TABLE_NAME .'.monitoring_value as delivery_id, delivery_name.monitoring_value as delivery_name' . PHP_EOL;
+        foreach ($statuses as $status) {
+            $sql .= ', count("s_'.$status->getLabel().'".status) as "' . $status->getLabel() . '"' . PHP_EOL;
+        }
+        $sql .= 'from ' . self::KV_TABLE_NAME.PHP_EOL;
+        $sql .= 'left join '.self::KV_TABLE_NAME.' as delivery_name ON '.self::KV_TABLE_NAME.'.parent_id=delivery_name.parent_id and delivery_name.monitoring_key = \'delivery_name\'' . PHP_EOL;
+        foreach ($statuses as $status) {
+            $sql .= 'left join delivery_monitoring as "s_'.$status->getLabel().'" ON kv_delivery_monitoring.parent_id="s_'.$status->getLabel().'".delivery_execution_id and "s_'.$status->getLabel().'".status = \''.$status->getUri().'\''.PHP_EOL;
+        }
 
-        $stmt = $this->getPersistence()->query($sql);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $sql .= 'where kv_delivery_monitoring.monitoring_key=\'delivery_id\''.PHP_EOL;
+        $sql .= 'GROUP BY kv_delivery_monitoring.monitoring_value, delivery_name.monitoring_value'.PHP_EOL;
+        foreach ($statuses as $status) {
+            $sql .= ', "s_'.$status->getLabel().'".status' . PHP_EOL;
+        }
+        $sql .= ') as delivery_statuses' . PHP_EOL;
+        $sql .= 'group by delivery_id, label' . PHP_EOL;
+        if (\common_Utils::isUri($orderby)) {
+            $orderby = $this->getResource($orderby)->getLabel();
+        }
+        $sql .= 'ORDER BY "'.$orderby.'" '.$orderdir . ' ' . PHP_EOL;
+        if ($limit) {
+            $sql .= 'LIMIT '.$limit. PHP_EOL;
+        }
+        $sql .= 'OFFSET '.$offset. PHP_EOL;
+
+        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $data;
     }
 }
