@@ -684,41 +684,66 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $this->getResource(ProctoredDeliveryExecution::STATE_TERMINATED)
         ];
 
-        $sql = 'select delivery_name as label, delivery_id ';
+
+        $queryBuilder = $this->getQueryBuilder();
+        $conn = $queryBuilder->getConnection();
+        $queryBuilder->select('kv_d_m.monitoring_value as delivery_id, delivery_name.monitoring_value as delivery_name');
+
         foreach ($statuses as $status) {
-            $sql .= ', sum("'.$status->getLabel().'") as "' . $status->getLabel() . '"';
-        }
-        $sql .= ' from(' . PHP_EOL;
-        $sql .= 'select '.self::KV_TABLE_NAME .'.monitoring_value as delivery_id, delivery_name.monitoring_value as delivery_name' . PHP_EOL;
-        foreach ($statuses as $status) {
-            $sql .= ', count("s_'.$status->getLabel().'".status) as "' . $status->getLabel() . '"' . PHP_EOL;
-        }
-        $sql .= 'from ' . self::KV_TABLE_NAME.PHP_EOL;
-        $sql .= 'left join '.self::KV_TABLE_NAME.' as delivery_name ON '.self::KV_TABLE_NAME.'.parent_id=delivery_name.parent_id and delivery_name.monitoring_key = \'delivery_name\'' . PHP_EOL;
-        foreach ($statuses as $status) {
-            $sql .= 'left join delivery_monitoring as "s_'.$status->getLabel().'" ON kv_delivery_monitoring.parent_id="s_'.$status->getLabel().'".delivery_execution_id and "s_'.$status->getLabel().'".status = \''.$status->getUri().'\''.PHP_EOL;
+            $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status) as ' . $conn->quoteIdentifier($status->getLabel()));
         }
 
+        $queryBuilder->from(self::KV_TABLE_NAME, 'kv_d_m');
+        $queryBuilder->leftJoin(
+            'kv_d_m',
+            self::KV_TABLE_NAME,
+            'delivery_name',
+            'kv_d_m.parent_id=delivery_name.parent_id and delivery_name.monitoring_key = \'delivery_name\''
+        );
 
-        $sql .= 'where kv_delivery_monitoring.monitoring_key=\'delivery_id\''.PHP_EOL;
-        $sql .= 'GROUP BY kv_delivery_monitoring.monitoring_value, delivery_name.monitoring_value'.PHP_EOL;
         foreach ($statuses as $status) {
-            $sql .= ', "s_'.$status->getLabel().'".status' . PHP_EOL;
+            $queryBuilder->leftJoin(
+                'kv_d_m',
+                self::TABLE_NAME,
+                $conn->quoteIdentifier('s_'.$status->getLabel()),
+                'kv_d_m.parent_id='.$conn->quoteIdentifier('s_'.$status->getLabel()).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status = \''.$status->getUri().'\''
+            );
         }
-        $sql .= ') as delivery_statuses' . PHP_EOL;
-        $sql .= 'group by delivery_id, label' . PHP_EOL;
-        if (\common_Utils::isUri($orderby)) {
-            $orderby = $this->getResource($orderby)->getLabel();
+        $queryBuilder->where('kv_d_m.monitoring_key=\'delivery_id\'');
+        $queryBuilder->groupBy('kv_d_m.monitoring_value, delivery_name.monitoring_value');
+
+        foreach ($statuses as $status) {
+            $queryBuilder->addGroupBy($conn->quoteIdentifier('s_'.$status->getLabel()).'.status');
         }
-        $sql .= 'ORDER BY "'.$orderby.'" '.$orderdir . ' ' . PHP_EOL;
+
+        $outerQueryBuilder = $this->getQueryBuilder();
+
+        $outerQueryBuilder->select('delivery_name as label, delivery_id');
+
+        foreach ($statuses as $status) {
+            $outerQueryBuilder->addSelect('sum('.$conn->quoteIdentifier($status->getLabel()).') as ' . $conn->quoteIdentifier($status->getLabel()));
+        }
+        $outerQueryBuilder->from('('.$queryBuilder->getSQL().')', 'delivery_statuses');
+        $outerQueryBuilder->groupBy('delivery_id, label');
+        $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);
+
         if ($limit) {
-            $sql .= 'LIMIT '.$limit. PHP_EOL;
+            $outerQueryBuilder->setMaxResults($limit);
         }
-        $sql .= 'OFFSET '.$offset. PHP_EOL;
+        $outerQueryBuilder->setFirstResult($offset);
+        $sql = $outerQueryBuilder->getSQL();
 
         $stmt = $this->getPersistence()->query($sql, $this->queryParams);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    private function getQueryBuilder()
+    {
+        return $this->getPersistence()->getPlatForm()->getQueryBuilder();
     }
 }
