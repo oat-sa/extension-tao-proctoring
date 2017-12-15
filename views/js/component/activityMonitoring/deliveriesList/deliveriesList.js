@@ -38,43 +38,43 @@ define([
                 sortable : true
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting',
+                id: __('Awaiting'),
                 label: __('Awaiting'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+                id: __('Authorized'),
                 label: __('Authorized'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusPaused',
+                id: __('Paused'),
                 label: __('Paused'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                id: __('Active'),
                 label: __('Active'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
+                id: __('Terminated'),
                 label: __('Terminated'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled',
+                id: __('Canceled'),
                 label: __('Canceled'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
             },
             {
-                id: 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
+                id: __('Finished'),
                 label: __('Finished'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
@@ -106,7 +106,8 @@ define([
                 filter:                   false,
                 model:                    this.config.model,
                 paginationStrategyTop:    'none',
-                paginationStrategyBottom: 'none',
+                paginationStrategyBottom: 'simple',
+                rows:                     25,
                 selectable:               true,
                 sortorder:                'asc',
                 sortby:                   'label'
