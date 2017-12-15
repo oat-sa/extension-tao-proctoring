@@ -21,8 +21,9 @@ define([
     'i18n',
     'util/url',
     'ui/component',
+    'util/locale',
     'ui/datatable'
-], function ($, __, url, component) {
+], function ($, __, url, component, locale) {
     'use strict';
 
     /**
@@ -78,6 +79,14 @@ define([
                 label: __('Finished'),
                 sortable : true,
                 transform: function(value) {return value.toString();}
+            },
+            {
+                id: __('Last launch'),
+                label: __('Last launch'),
+                sortable : true,
+                transform: function(value) {
+                    return locale.formatDateTime(value);
+                }
             }
         ]
     };
