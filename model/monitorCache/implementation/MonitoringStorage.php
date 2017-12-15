@@ -692,6 +692,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         foreach ($statuses as $status) {
             $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status) as ' . $conn->quoteIdentifier($status->getLabel()));
         }
+        $queryBuilder->addSelect('max('.$conn->quoteIdentifier('last_launch').'.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
 
         $queryBuilder->from(self::KV_TABLE_NAME, 'kv_d_m');
         $queryBuilder->leftJoin(
@@ -709,6 +710,12 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 'kv_d_m.parent_id='.$conn->quoteIdentifier('s_'.$status->getLabel()).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status = \''.$status->getUri().'\''
             );
         }
+        $queryBuilder->leftJoin(
+            'kv_d_m',
+            self::TABLE_NAME,
+            $conn->quoteIdentifier('last_launch'),
+            'kv_d_m.parent_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
+        );
         $queryBuilder->where('kv_d_m.monitoring_key=\'delivery_id\'');
         $queryBuilder->groupBy('kv_d_m.monitoring_value, delivery_name.monitoring_value');
 
@@ -723,6 +730,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         foreach ($statuses as $status) {
             $outerQueryBuilder->addSelect('sum('.$conn->quoteIdentifier($status->getLabel()).') as ' . $conn->quoteIdentifier($status->getLabel()));
         }
+        $outerQueryBuilder->addSelect('max('.$conn->quoteIdentifier(__('Last launch')).') as ' .  $conn->quoteIdentifier(__('Last launch')));
         $outerQueryBuilder->from('('.$queryBuilder->getSQL().')', 'delivery_statuses');
         $outerQueryBuilder->groupBy('delivery_id, label');
         $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);
