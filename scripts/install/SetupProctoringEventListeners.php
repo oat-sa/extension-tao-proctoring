@@ -37,7 +37,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\update\TestTakerUpdate;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoEventLog\model\LoggerService;
+use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;

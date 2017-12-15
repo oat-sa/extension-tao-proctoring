@@ -83,7 +83,7 @@ class Tools extends SimplePageModule
     {
         $timePeriod = $this->getRequestParameter('interval');
 
-        $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\LoggerService::SERVICE_ID);
+        $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\eventLog\LoggerService::SERVICE_ID);
 
         $tz = new \DateTimeZone(\common_session_SessionManager::getSession()->getTimeZone());
         $timeKeys = $this->getTimeKeys($timePeriod);
