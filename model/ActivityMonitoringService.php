@@ -25,7 +25,7 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoEventLog\model\requestLog\RequestLogStorage;
+use oat\taoEventLog\model\userLastActivityLog\UserLastActivityLog;
 
 /**
  * Service to manage and monitor assessment activity
@@ -224,16 +224,16 @@ class ActivityMonitoringService extends ConfigurableService
      */
     protected function getNumberOfActiveUsers($role = null)
     {
-        /** @var  RequestLogStorage $requestLogService */
-        $requestLogService = $this->getServiceManager()->get(RequestLogStorage::SERVICE_ID);
+        /** @var  UserLastActivityLog $userActivityService */
+        $userActivityService = $this->getServiceManager()->get(UserLastActivityLog::SERVICE_ID);
         $now = microtime(true);
         $filter = [
-            [RequestLogStorage::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
+            [UserLastActivityLog::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
         ];
         if ($role !== null) {
-            $filter[] = [RequestLogStorage::USER_ROLES, 'like', '%,' . $role . ',%'];
+            $filter[] = [UserLastActivityLog::USER_ROLES, 'like', '%,' . $role . ',%'];
         }
-        return $requestLogService->count($filter, ['group'=>RequestLogStorage::USER_ID]);
+        return $userActivityService->count($filter, ['group'=>UserLastActivityLog::USER_ID]);
     }
 
 }
