@@ -95,7 +95,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
             }
         }
 
-        $wetInfo = ($this->wetRun === false) ? 'dry' . 'wet';
+        $wetInfo = ($this->wetRun === false) ? 'dry' : 'wet';
         $this->report = new Report(
             Report::TYPE_INFO,
             "Automatic termination of expired executions (${wetInfo} run)..."
