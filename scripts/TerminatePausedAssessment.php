@@ -85,9 +85,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         // Should we make a wet run?
         if (isset($this->params[0])) {
             
-            if (boolval($this->params[0]) === 0) {
-                $this->wetRun = false;
-            }
+            $this->wetRun = (boolval($this->params[0]) === true);
             
             // Should we limit the number of tests being terminated?
             if (isset($this->params[1])) {
