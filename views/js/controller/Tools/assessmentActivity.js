@@ -167,7 +167,7 @@ define([
                         var uaData = {};
                         if (data && data.group_user_activity) {
                             _.forEach(data.group_user_activity, function (v, k) {
-                                    uaData[$.camelCase(k.replace('_', '-'))] = {value: v};
+                                    uaData[$.camelCase(k.replace(/_/g, '-'))] = {value: v};
                                 }
                             );
                         }

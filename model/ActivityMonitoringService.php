@@ -25,7 +25,7 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoEventLog\model\requestLog\RequestLogStorage;
+use oat\taoEventLog\model\userLastActivityLog\UserLastActivityLog;
 
 /**
  * Service to manage and monitor assessment activity
@@ -123,8 +123,10 @@ class ActivityMonitoringService extends ConfigurableService
         $active = $this->getNumberOfAssessments(DeliveryExecution::STATE_ACTIVE);
         $current = $awaiting + $authorized + $paused + $active;
         $assessments = [
-            self::FIELD_ACTIVE_PROCTORS => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
-            self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
+            self::GROUPFIELD_USER_ACTIVITY => [
+                self::FIELD_ACTIVE_PROCTORS => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
+                self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
+            ],
             self::FIELD_TOTAL_ASSESSMENTS => $this->getNumberOfAssessments(),
             self::FIELD_TOTAL_CURRENT_ASSESSMENTS => $current,
             self::STATE_AWAITING_ASSESSMENT => $awaiting,
@@ -222,79 +224,16 @@ class ActivityMonitoringService extends ConfigurableService
      */
     protected function getNumberOfActiveUsers($role = null)
     {
-        /** @var  RequestLogStorage $requestLogService */
-        $requestLogService = $this->getServiceManager()->get(RequestLogStorage::SERVICE_ID);
+        /** @var  UserLastActivityLog $userActivityService */
+        $userActivityService = $this->getServiceManager()->get(UserLastActivityLog::SERVICE_ID);
         $now = microtime(true);
         $filter = [
-            [RequestLogStorage::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
+            [UserLastActivityLog::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
         ];
         if ($role !== null) {
-            $filter[] = [RequestLogStorage::USER_ROLES, 'like', '%,' . $role . ',%'];
+            $filter[] = [UserLastActivityLog::USER_ROLES, 'like', '%,' . $role . ',%'];
         }
-        return $requestLogService->count($filter, ['group'=>RequestLogStorage::USER_ID]);
+        return $userActivityService->count($filter, ['group'=>UserLastActivityLog::USER_ID]);
     }
 
-    /**
-     * Get list of all the deliveries and number of it's executions in each status
-     * Result indexed by delivery Uri
-     * @param $deliveries
-     * @param $limit 0 - all of them
-     * @return array
-     */
-    public function getStatesByDelivery(array $deliveries = [], $limit = 0)
-    {
-        $statusesArray = [];
-        foreach ($this->deliveryStatuses as $deliveryStatus) {
-            $statusesArray[$deliveryStatus->getUri()] = 0;
-        }
-
-        /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-
-        $newResult = [];
-        foreach ($deliveries as $delivery) {
-            $newResult[$delivery->getUri()] = $statusesArray;
-            $newResult[$delivery->getUri()]['label'] = $delivery->getLabel();
-        }
-
-        $data = $deliveryMonitoringService->getDeliveriesCountedStatuses(array_keys($deliveries));
-
-        if (!$limit || count($deliveries) < $limit) {
-            $data = array_merge($data, $deliveryMonitoringService->getRetiredDeliveriesCountedStatuses());
-        }
-
-        $retiredTitle = __('Retired Deliveries');
-        foreach ($data as $row) {
-            $delivery_id = $row['delivery_id'] ?: self::FIELD_RETIRED_DELIVERIES;
-            if (!isset($newResult[$delivery_id])) {
-                $newResult[$delivery_id] = $statusesArray;
-                $delivery = $this->getResource($delivery_id);
-                if (!$delivery->exists()) {
-                    $newResult[$delivery_id]['label'] = $retiredTitle;
-                }
-            }
-
-            $newResult[$delivery_id][$row['status']] += $row['cnt'];
-        }
-
-        $list = [];
-        foreach ($newResult as $key => $row) {
-            if ($row['label'] != $retiredTitle) {
-                $list[$key] = $row;
-            } else {
-                if (!isset($list[self::FIELD_RETIRED_DELIVERIES])) {
-                    $list[self::FIELD_RETIRED_DELIVERIES] = $row;
-                } else {
-                    foreach ($row as $status => $val) {
-                        if ($status == 'label') {
-                            continue;
-                        }
-                        $list[self::FIELD_RETIRED_DELIVERIES][$status] = (int)$list[self::FIELD_RETIRED_DELIVERIES][$status] + (int)$val;
-                    }
-                }
-            }
-        }
-
-        return $list;
-    }
 }
