@@ -198,9 +198,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
-
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             $logData = [
@@ -216,6 +213,12 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 $this->getTestSessionService()->persist($session);
                 $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
+            
+            // Delivery execution state changes after test session ends, in the same way as it happens
+            // when a human test taker takes the test.
+            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
+            
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }

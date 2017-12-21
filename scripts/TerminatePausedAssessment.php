@@ -113,7 +113,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryExecutionStateService->terminateExecution(
             $deliveryExecution,
             [
-                'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
+                'reasons' => $this->getTerminationReasons(),
                 'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
             ]
         );
@@ -130,5 +130,19 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
             $type,
             $message
         ));
+    }
+    
+    /**
+     * Return Termination Reasons.
+     * 
+     * Provides the 'reasons' information array with keys 'category' and 'subCategory'.
+     * This method may be overriden by subclasses to provide customer specific information.
+     * 
+     * @return arrray.
+     */
+    protected function getTerminationReasons()
+    {
+        // @fixme remove customer specific information.
+        return ['category' => 'Technical', 'subCategory' => 'ACT'];
     }
 }
