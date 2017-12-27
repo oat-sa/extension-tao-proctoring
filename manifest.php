@@ -55,7 +55,7 @@ return array(
         'taoQtiTest' => '>=17.17.0',
         'taoOutcomeUi' => '>=2.6.6',
         'taoEventLog' => '>=0.8.0',
-        'generis' => '>=5.10.0',
+        'generis' => '>=5.9.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
