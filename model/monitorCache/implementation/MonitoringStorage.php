@@ -82,7 +82,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
     const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
-    
+
     const KV_TABLE_NAME = 'kv_delivery_monitoring';
     const KV_COLUMN_ID = 'id';
     const KV_COLUMN_PARENT_ID = 'parent_id';
@@ -173,7 +173,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      *    [['error_code' => ['0', '1']],
      * ]);
      * ```
-     * 
+     *
      * @param array $criteria - criteria to find data.
      * The comparison operator is determined based on the first few
      * characters in the given value. It recognizes the following operators
@@ -379,22 +379,19 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
             $dataToBeInserted = [];
-            $dataToBeUpdated  = [];
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
                     continue;
                 }
 
                 if (array_key_exists($kvDataKey, $existent)) {
-                    $dataToBeUpdated[] = [
-                        'conditions' => [
-                            self::KV_COLUMN_PARENT_ID => $id,
-                            self::KV_COLUMN_KEY => $kvDataKey,
-                        ],
-                        'updateValues' => [
-                            self::KV_COLUMN_VALUE => $kvDataValue
-                        ]
-                    ];
+                    $this->getPersistence()->exec(
+                        'UPDATE ' . self::KV_TABLE_NAME . '
+                          SET '  . self::KV_COLUMN_VALUE . ' = ?
+                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
+                          AND ' . self::KV_COLUMN_KEY . ' = ?;',
+                        [$kvDataValue, $id, $kvDataKey]
+                    );
                 } else {
                     $dataToBeInserted[] = [
                         self::KV_COLUMN_PARENT_ID => $id,
@@ -402,10 +399,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                         self::KV_COLUMN_VALUE => $kvDataValue,
                     ];
                 }
-            }
-
-            if (!empty($dataToBeUpdated)) {
-                $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
             }
 
             if (!empty($dataToBeInserted)) {
@@ -575,7 +568,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $whereClause = '';
 
-        //if condition is [ [ key => val ] ] then flatten to [ key => val ] 
+        //if condition is [ [ key => val ] ] then flatten to [ key => val ]
         if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
              $condition = current($condition);
         }
