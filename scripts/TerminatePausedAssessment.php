@@ -34,8 +34,21 @@ use common_report_Report as Report;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
- * Script that terminates assessments, paused longer than XXX
- * Run example: `sudo php index.php 'oat\taoProctoring\scripts\TerminatePausedAssessment'`
+ * Script that terminates assessments, paused longer than XXX.
+ * 
+ * Parameter 1 - Wet Run (optional) - A boolean value (0|1) to indicate wheter or not making a dry run. Default is 1 for backward compatibility reasons.
+ * Parameter 2 - Max Terminations (optional) - An integer value to indicate the maximum number of assessments to be terminated. Default is 0, meaning no limit.
+ * 
+ * Run examples: 
+ * 
+ * # Wet run with no max terminations.
+ * sudo php index.php 'oat\taoProctoring\scripts\TerminatePausedAssessment'
+ * 
+ * # Wet run with 5 terminations maximum.
+ * sudo php index.php 'oat\taoProctoring\scripts\TerminatePausedAssessment' 1 5
+ * 
+ * # Dry run with no max terminations.
+ * sudo php index.php 'oat\taoProctoring\scripts\TerminatePausedAssessment' 0
  */
 class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
 {
@@ -50,6 +63,16 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
      * @var array
      */
     protected $params;
+    
+    /**
+     * @var boolean
+     */
+    protected $wetRun = true;
+    
+    /**
+     * @var integer
+     */
+    protected $maxTerminate = 0;
 
     /**
      * @param array $params
@@ -58,10 +81,22 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
     public function __invoke($params)
     {
         $this->params = $params;
+        
+        // Should we make a wet run?
+        if (isset($this->params[0])) {
+            
+            $this->wetRun = (boolval($this->params[0]) === true);
+            
+            // Should we limit the number of tests being terminated?
+            if (isset($this->params[1])) {
+                $this->maxTerminate = intval($this->params[1]);
+            }
+        }
 
+        $wetInfo = ($this->wetRun === false) ? 'dry' : 'wet';
         $this->report = new Report(
             Report::TYPE_INFO,
-            'Termination expired paused executions...'
+            "Automatic termination of expired executions (${wetInfo} run)..."
         );
         common_Logger::d('Termination expired paused execution started at ' . date(DATE_RFC3339));
 
@@ -94,6 +129,11 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
                     $this->addReport(Report::TYPE_ERROR,$e->getMessage());
                 }
             }
+            
+            // Should we stop terminating assessments?
+            if ($this->maxTerminate > 0 && $count >= $this->maxTerminate) {
+                break;
+            }
         }
 
         $msg = $count > 0 ? "{$count} executions has been terminated." : "Expired executions not found.";
@@ -109,15 +149,19 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
      * @param DeliveryExecution $deliveryExecution
      */
     protected function terminateExecution(DeliveryExecution $deliveryExecution) {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-        $deliveryExecutionStateService->terminateExecution(
-            $deliveryExecution,
-            [
-                'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
-                'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
-            ]
-        );
-        $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated.");
+        if ($this->wetRun === true) {
+            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService->terminateExecution(
+                $deliveryExecution,
+                [
+                    'reasons' => $this->getTerminationReasons(),
+                    'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
+                ]
+            );
+            $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated.");
+        } else {
+            $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} should be terminated.");
+        }
     }
 
     /**
@@ -130,5 +174,19 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
             $type,
             $message
         ));
+    }
+    
+    /**
+     * Return Termination Reasons.
+     * 
+     * Provides the 'reasons' information array with keys 'category' and 'subCategory'.
+     * This method may be overriden by subclasses to provide customer specific information.
+     * 
+     * @return arrray.
+     */
+    protected function getTerminationReasons()
+    {
+        // @fixme remove customer specific information.
+        return ['category' => 'Technical', 'subCategory' => 'ACT'];
     }
 }
