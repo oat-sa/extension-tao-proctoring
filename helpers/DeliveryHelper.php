@@ -24,7 +24,7 @@ use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
-use oat\taoDeliveryRdf\model\DeliveryContainerService;
+use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -84,7 +84,7 @@ class DeliveryHelper
 
         return $errorMsg;
     }
-    
+
     public static function buildDeliveryData($delivery, $executions)
     {
         $inprogress = 0;
@@ -106,15 +106,15 @@ class DeliveryHelper
                     continue;
             }
         }
-        
+
         $deliveryProps = array(
-            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_START),
-            new \core_kernel_classes_Property(DeliveryContainerService::PROPERTY_END),
+            new \core_kernel_classes_Property(DeliveryAssemblyService::PROPERTY_START),
+            new \core_kernel_classes_Property(DeliveryAssemblyService::PROPERTY_END),
         );
         $deliveryProperties = $delivery->getPropertiesValues($deliveryProps);
-        $propStartExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_START]);
-        $propEndExec = current($deliveryProperties[DeliveryContainerService::PROPERTY_END]);
-        
+        $propStartExec = current($deliveryProperties[DeliveryAssemblyService::PROPERTY_START]);
+        $propEndExec = current($deliveryProperties[DeliveryAssemblyService::PROPERTY_END]);
+
         $properties = array();
         if (!is_null($propStartExec) && !empty((string)$propStartExec)) {
             $properties['periodStart'] = DateHelper::displayeDate((string)$propStartExec);
@@ -122,7 +122,7 @@ class DeliveryHelper
         if (!is_null($propStartExec) && !empty((string)$propEndExec)) {
             $properties['periodEnd'] = DateHelper::displayeDate((string)$propEndExec);
         }
-        
+
         $entry = array(
             'id' => $delivery->getUri(),
             'url' => _url('monitoring', 'Delivery', null, array('delivery' => $delivery->getUri())),
@@ -134,7 +134,7 @@ class DeliveryHelper
             ),
             'properties' => $properties
         );
-        
+
         return $entry;
     }
 
@@ -306,7 +306,7 @@ class DeliveryHelper
     {
         return self::getDeliveryExecutionManagerService()->getDeliveryTimer($deliveryExecution);
     }
-    
+
     /**
      * Sets the extra time to a list of delivery executions
      *
@@ -331,7 +331,7 @@ class DeliveryHelper
     }
 
     /**
-     * Converts a frontend column name into database column name. 
+     * Converts a frontend column name into database column name.
      * Useful to translate the name of a column to sort.
      * @param string $column
      * @return string
@@ -446,7 +446,7 @@ class DeliveryHelper
 
     /**
      * Get array of user specific extra fields to be displayed in the monitoring data table
-     * 
+     *
      * @return array
      */
     private static function _getUserExtraFields(){
@@ -470,7 +470,7 @@ class DeliveryHelper
 
     /**
      * Return array of extra fields to be displayed in the monitoring data table
-     * 
+     *
      * @return array
      */
     public static function getExtraFields(){
