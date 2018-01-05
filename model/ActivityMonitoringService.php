@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model;
 
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\user\TaoRoles;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoEventLog\model\userLastActivityLog\UserLastActivityLog;
@@ -125,7 +126,7 @@ class ActivityMonitoringService extends ConfigurableService
         $assessments = [
             self::GROUPFIELD_USER_ACTIVITY => [
                 self::FIELD_ACTIVE_PROCTORS => $this->getNumberOfActiveUsers(ProctorService::ROLE_PROCTOR),
-                self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(INSTANCE_ROLE_DELIVERY),
+                self::FIELD_ACTIVE_TEST_TAKERS => $this->getNumberOfActiveUsers(TaoRoles::DELIVERY),
             ],
             self::FIELD_TOTAL_ASSESSMENTS => $this->getNumberOfAssessments(),
             self::FIELD_TOTAL_CURRENT_ASSESSMENTS => $current,

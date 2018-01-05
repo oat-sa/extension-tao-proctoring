@@ -22,7 +22,7 @@
 namespace oat\taoProctoring\test\monitorCache;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\scripts\install\db\DbSetup;
@@ -373,7 +373,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
                 MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
                 MonitoringStorage::COLUMN_STATUS => 'active_test',
-                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
+                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
                 'error_code' => 1,
                 'session_id' => 'i1450191587554175',
             ],
@@ -381,7 +381,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
                 MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
                 MonitoringStorage::COLUMN_STATUS => 'paused_test',
-                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
+                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
                 'error_code' => 2,
                 'session_id' => 'i1450191587554176',
             ],
@@ -389,7 +389,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
                 MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
                 MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
+                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
                 'error_code' => 3,
                 'session_id' => 'i1450191587554177',
             ],
@@ -397,7 +397,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
                 MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
                 MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                PROPERTY_DELVIERYEXECUTION_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
+                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
                 'error_code' => 0,
                 'session_id' => 'i1450191587554178',
             ],
