@@ -216,9 +216,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             
             // Delivery execution state changes after test session ends, in the same way as it happens
             // when a human test taker takes the test.
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
-            
+            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
