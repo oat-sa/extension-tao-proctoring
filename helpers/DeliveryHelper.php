@@ -249,6 +249,7 @@ class DeliveryHelper
      */
     public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
+        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
@@ -257,10 +258,15 @@ class DeliveryHelper
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
 
-            if ($deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason)) {
-                $result['processed'][$deliveryExecution->getIdentifier()] = true;
-            } else {
-                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('paused'));
+            try {
+                $isPaused = $deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason);
+                if ($isPaused) {
+                    $result['processed'][$deliveryExecution->getIdentifier()] = true;
+                } else {
+                    $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('paused'));
+                }
+            } catch (\Exception $exception) {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = $exception->getMessage();
             }
         }
 

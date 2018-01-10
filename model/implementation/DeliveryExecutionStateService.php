@@ -232,6 +232,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -244,6 +248,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
+     * @throws \common_exception_NotFound
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -428,6 +436,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Gets test session service
      *
      * @return TestSessionService
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     private function getTestSessionService()
     {
