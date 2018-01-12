@@ -44,7 +44,7 @@ class Tools extends SimplePageModule
      */
     public function assessmentActivity()
     {
-        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
 
         // Reason categories
         $this->setData('reason_categories', DeliveryHelper::getAllReasonsCategories());
@@ -67,7 +67,7 @@ class Tools extends SimplePageModule
      */
     public function assessmentActivityData()
     {
-        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
         $data = $service->getData();
 
         $this->returnJson([
@@ -83,7 +83,7 @@ class Tools extends SimplePageModule
     {
         $timePeriod = $this->getRequestParameter('interval');
 
-        $eventLog = $this->getServiceManager()->get(\oat\taoEventLog\model\eventLog\LoggerService::SERVICE_ID);
+        $eventLog = $this->getServiceLocator()->get(\oat\taoEventLog\model\eventLog\LoggerService::SERVICE_ID);
 
         $tz = new \DateTimeZone(\common_session_SessionManager::getSession()->getTimeZone());
         $timeKeys = $this->getTimeKeys($timePeriod);
@@ -125,7 +125,8 @@ class Tools extends SimplePageModule
             'reasons' => ['category' => 'Technical', 'subCategory' => 'ACT'],
             'comment' => __('Pause due to server maintenance'),
         ];
-        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        /** @var DeliveryMonitoringService $monitoringService */
+        $monitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecutions = $monitoringService->find(
             [DeliveryMonitoringService::STATUS => DeliveryExecution::STATE_ACTIVE],
             ['asArray' => true]
@@ -133,11 +134,12 @@ class Tools extends SimplePageModule
         $ids = array_map(function ($deliveryExecution) {
             return $deliveryExecution['delivery_execution_id'];
         }, $deliveryExecutions);
-        $paused = DeliveryHelper::pauseExecutions($ids, $reason);
-        $notPaused = array_diff($ids, $paused);
+        $stats = DeliveryHelper::pauseExecutions($ids, $reason);
+        $paused = $stats['processed'];
+        $notPaused = $stats['unprocessed'];
 
         $this->returnJson([
-            'success' => !count($notPaused),
+            'success' => true,
             'data' => [
                 'message' => count($paused) . ' ' . __('sessions paused'),
                 'processed' => $paused,
@@ -182,7 +184,7 @@ class Tools extends SimplePageModule
     private function getTimeKeys($timePeriod)
     {
         /** @var ActivityMonitoringService $service */
-        $service = $this->getServiceManager()->get(ActivityMonitoringService::SERVICE_ID);
+        $service = $this->getServiceLocator()->get(ActivityMonitoringService::SERVICE_ID);
 
         $amount = null;
         $startDate = null;

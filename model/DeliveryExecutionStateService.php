@@ -73,6 +73,7 @@ interface DeliveryExecutionStateService extends StateServiceInterface
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
+     * @throws \Exception
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null);
 
