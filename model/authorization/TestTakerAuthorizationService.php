@@ -96,27 +96,13 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      */
     public function isProctored($deliveryId, User $user)
     {
-        $propertyUri = null;
-
-        /** @var DeliverySyncService $deliverySyncService */
+        $delivery = $this->getResource($deliveryId);
+        $proctored = $delivery->getOnePropertyValue($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR));
         $deliverySyncService = $this->getServiceManager()->get(DeliverySyncService::SERVICE_ID);
-        $proctoredByDefault = $deliverySyncService->isProctoredByDefault();
 
-        if ($deliveryId) {
-            $delivery = $this->getResource($deliveryId);
-            $accessibleProperty = $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR);
-            $accessiblePropertyValue = $delivery->getOnePropertyValue($accessibleProperty);
-            $propertyUri = $accessiblePropertyValue ? $accessiblePropertyValue->getUri() : null;
-        }
-
-        if (
-            ($proctoredByDefault && !$propertyUri)
-            || ($propertyUri == ProctorService::ACCESSIBLE_PROCTOR_ENABLED && !($user instanceof GuestTestUser))
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+        return $proctored instanceof \core_kernel_classes_Resource
+            ? $proctored->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+            : $deliverySyncService->isProctoredByDefault();
     }
 
     /**
