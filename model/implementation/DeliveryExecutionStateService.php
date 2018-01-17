@@ -216,9 +216,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             
             // Delivery execution state changes after test session ends, in the same way as it happens
             // when a human test taker takes the test.
-            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
-            
+            $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
+
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
@@ -232,6 +232,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -244,6 +248,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param array $reason
      * @return bool
+     * @throws \common_exception_NotFound
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -428,6 +436,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Gets test session service
      *
      * @return TestSessionService
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     private function getTestSessionService()
     {

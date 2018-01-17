@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\datatable;
 
+use oat\generis\model\OntologyRdfs;
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
 use oat\oatbox\service\ServiceManager;
