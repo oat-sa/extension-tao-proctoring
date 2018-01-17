@@ -45,7 +45,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '7.19.2',
+    'version' => '7.20.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=14.4.0',
@@ -55,7 +55,7 @@ return array(
         'taoQtiTest' => '>=17.17.0',
         'taoOutcomeUi' => '>=2.6.6',
         'taoEventLog' => '>=1.5.0',
-        'generis' => '>=5.12.0',
+        'generis' => '>=6.2.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
