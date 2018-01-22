@@ -764,10 +764,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
     {
         $data = $this->getData($request->getDeliveryExecution());
-        $this->delete($data);
+        $return = $this->delete($data);
         $this->deleteKvData($data);
 
-        return true;
+        return $return;
     }
 
     /**

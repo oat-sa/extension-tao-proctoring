@@ -122,7 +122,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         $sql = 'DELETE FROM ' . static::TABLE_NAME  . ' WHERE ' . self::DELIVERY_EXECUTION_ID . '= ? ';
         $parameters = [$request->getDeliveryExecution()->getIdentifier()];
 
-        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $stmt = $this->getPersistence()->exec($sql, $parameters);
 
         return $stmt;
     }
