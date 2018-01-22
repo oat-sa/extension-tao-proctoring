@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\deliveryLog\implementation;
 
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\oatbox\service\ConfigurableService;
 
@@ -111,6 +112,19 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             return false;
         }
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
+    {
+        $sql = 'DELETE FROM ' . static::TABLE_NAME  . ' WHERE ' . self::DELIVERY_EXECUTION_ID . '= ? ';
+        $parameters = [$request->getDeliveryExecution()->getIdentifier()];
+
+        $stmt = $this->getPersistence()->query($sql, $parameters);
+
+        return $stmt;
     }
 
     /**

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -746,6 +747,18 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
+    {
+        $data = $this->getData($request->getDeliveryExecution());
+        $this->delete($data);
+        $this->deleteKvData($data);
+
+        return true;
     }
 
     /**
