@@ -44,12 +44,17 @@ class ProctoringRunnerService extends QtiRunnerService
     {
         $response = parent::getTestContext($context);
 
-        if ($context->getTestExecutionUri()) {
-            $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($context->getTestExecutionUri());
-            if ($this->isProctoredDelivery($deliveryExecution->getDelivery())) {
-                $response['securePauseStateRequired'] = true;
+        if (isset($response['options']) && isset($response['options']['sectionPause'])) {
+            $response['securePauseStateRequired'] = $response['options']['sectionPause'];
+        } else {
+            if ($context->getTestExecutionUri()) {
+                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($context->getTestExecutionUri());
+                if ($this->isProctoredDelivery($deliveryExecution->getDelivery())) {
+                    $response['securePauseStateRequired'] = true;
+                }
             }
         }
+
         return $response;
     }
 
