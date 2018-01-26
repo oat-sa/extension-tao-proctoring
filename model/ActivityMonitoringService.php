@@ -141,6 +141,7 @@ class ActivityMonitoringService extends ConfigurableService
 
     /**
      * @see \tao_helpers_Date::getTimeKeys()
+     * @deprecated
      * @return array
      */
     public function getTimeKeys(\DateInterval $interval, \DateTime $date = null, $amount = null)
