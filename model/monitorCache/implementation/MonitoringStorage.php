@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
@@ -379,19 +380,23 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
             $dataToBeInserted = [];
+            $dataToBeUpdated = [];
             foreach($kvTableData as $kvDataKey => $kvDataValue) {
                 if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
                     continue;
                 }
 
                 if (array_key_exists($kvDataKey, $existent)) {
-                    $this->getPersistence()->exec(
-                        'UPDATE ' . self::KV_TABLE_NAME . '
-                          SET '  . self::KV_COLUMN_VALUE . ' = ?
-                        WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
-                          AND ' . self::KV_COLUMN_KEY . ' = ?;',
-                        [$kvDataValue, $id, $kvDataKey]
-                    );
+                    $dataToBeUpdated[] = [
+                        'conditions' => [
+                            self::KV_COLUMN_PARENT_ID => $id,
+                            self::KV_COLUMN_KEY => $kvDataKey,
+                        ],
+                        'updateValues' => [
+                            self::KV_COLUMN_VALUE => $kvDataValue
+                        ]
+                    ];
+
                 } else {
                     $dataToBeInserted[] = [
                         self::KV_COLUMN_PARENT_ID => $id,
@@ -399,6 +404,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                         self::KV_COLUMN_VALUE => $kvDataValue,
                     ];
                 }
+            }
+
+
+            if (!empty($dataToBeUpdated)) {
+                $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
             }
 
             if (!empty($dataToBeInserted)) {
@@ -746,6 +756,18 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
+    {
+        $data = $this->getData($request->getDeliveryExecution());
+        $return = $this->delete($data);
+        $this->deleteKvData($data);
+
+        return $return;
     }
 
     /**
