@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache;
 
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDelete;
 
 /**
  * Interface DeliveryMonitoringService
@@ -29,7 +30,7 @@ use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryMonitoringService
+interface DeliveryMonitoringService extends DeliveryExecutionDelete
 {
     /**
      * @deprecated

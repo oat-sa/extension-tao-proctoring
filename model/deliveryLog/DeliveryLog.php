@@ -20,13 +20,14 @@
 
 namespace oat\taoProctoring\model\deliveryLog;
 
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDelete;
 /**
  * Interface DeliveryLog
  *
  * @package oat\taoProctoring\model\deliveryLog
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-interface DeliveryLog
+interface DeliveryLog extends DeliveryExecutionDelete
 {
     const SERVICE_ID = 'taoProctoring/DeliveryLog';
 
