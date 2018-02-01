@@ -26,18 +26,17 @@ use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\oatbox\action\Action;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use common_Logger;
 use common_report_Report as Report;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 
 /**
  * Script that terminates assessments, which are in awaiting state longer than XXX
  * Run example: `sudo php index.php 'oat\taoProctoring\scripts\TerminateNotStartedAssessment'`
  */
-class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterface
+class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
 {
     use ServiceLocatorAwareTrait;
 
@@ -88,7 +87,7 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
                     $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
                 );
 
-                if ($testSessionService->isExpired($deliveryExecution)) {
+                if ($testSessionService->this($deliveryExecution)) {
                     if ($deliveryExecutionStateService->isCancelable($deliveryExecution)){
                         $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
@@ -120,14 +119,39 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
     }
 
     /**
-     * @param $type
-     * @param string $message
+     * Checks if delivery execution was abandoned after authorization
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     * @throws
      */
-    protected function addReport($type, $message)
+    public function isExpired(DeliveryExecution $deliveryExecution)
     {
-        $this->report->add(new Report(
-            $type,
-            $message
-        ));
+        $result = false;
+        $executionState = $deliveryExecution->getState()->getUri();
+        /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+        $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+        if (!in_array($executionState, [
+                DeliveryExecutionState::STATE_AWAITING,
+                DeliveryExecutionState::STATE_AUTHORIZED,
+            ]) ||
+            !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
+            $result = false;
+        }
+
+        if (
+            in_array($executionState, [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING])
+            && $deliveryExecutionStateService->isCancelable($deliveryExecution)
+        ) {
+            $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
+            $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
+            $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
+            if ($started->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
+                $result = true;
+            }
+        }
+
+        return $result;
     }
 }
