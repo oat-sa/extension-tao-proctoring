@@ -108,7 +108,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * Alias for self::run() (for backward capability).
      *
-     * @param DeliveryExecution $deliveryExecution
+     * @param DeliveryExecutionpreventDragDrop $deliveryExecution
      * @return bool
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)

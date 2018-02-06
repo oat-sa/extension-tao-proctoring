@@ -23,7 +23,7 @@ namespace oat\taoProctoring\scripts;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use common_Logger;

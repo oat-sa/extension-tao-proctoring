@@ -22,7 +22,6 @@
 namespace oat\taoProctoring\scripts;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -31,6 +30,8 @@ use common_Logger;
 use common_report_Report as Report;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use DateTimeImmutable;
+use DateInterval;
 
 /**
  * Script that terminates assessments, which are in awaiting state longer than XXX
@@ -71,11 +72,11 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
 
         $cancel = 0;
         $pause = 0;
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find([
-            DeliveryMonitoringService::STATUS => [DeliveryExecution::STATE_AUTHORIZED, DeliveryExecution::STATE_AWAITING],
+            DeliveryMonitoringService::STATUS => [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING],
         ]);
 
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
@@ -87,7 +88,7 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
                     $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
                 );
 
-                if ($testSessionService->this($deliveryExecution)) {
+                if ($this->isExpired($deliveryExecution)) {
                     if ($deliveryExecutionStateService->isCancelable($deliveryExecution)){
                         $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
@@ -131,23 +132,23 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
         $executionState = $deliveryExecution->getState()->getUri();
         /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
         $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
 
         if (!in_array($executionState, [
                 DeliveryExecutionState::STATE_AWAITING,
                 DeliveryExecutionState::STATE_AUTHORIZED,
             ]) ||
-            !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
+            !$lastTestTakersEvent) {
             $result = false;
         }
 
         if (
             in_array($executionState, [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING])
-            && $deliveryExecutionStateService->isCancelable($deliveryExecution)
         ) {
             $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
-            $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
-            $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
-            if ($started->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
+            //$startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
+            $lastTestEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
+            if ($lastTestEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
                 $result = true;
             }
         }
