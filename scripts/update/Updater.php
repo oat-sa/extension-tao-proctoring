@@ -549,5 +549,14 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('7.12.0', '8.1.0');
+
+        if ($this->isVersion('8.1.0')) {
+            $monitorService = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
+            $monitorService->setOption(MonitoringStorage::OPTION_USE_UPDATE_MULTIPLE, false);
+
+            $this->getServiceManager()->register(MonitoringStorage::SERVICE_ID, $monitorService);
+
+            $this->setVersion('8.2.0');
+        }
     }
 }
