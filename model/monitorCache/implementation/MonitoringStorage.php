@@ -66,6 +66,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     const OPTION_PERSISTENCE = 'persistence';
 
+    const OPTION_USE_UPDATE_MULTIPLE = 'use_update_multiple';
+
     const OPTION_PRIMARY_COLUMNS = 'primary_columns';
 
     const TABLE_NAME = 'delivery_monitoring';
@@ -387,16 +389,25 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 }
 
                 if (array_key_exists($kvDataKey, $existent)) {
-                    $dataToBeUpdated[] = [
-                        'conditions' => [
-                            self::KV_COLUMN_PARENT_ID => $id,
-                            self::KV_COLUMN_KEY => $kvDataKey,
-                        ],
-                        'updateValues' => [
-                            self::KV_COLUMN_VALUE => $kvDataValue
-                        ]
-                    ];
-
+                    if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true) {
+                        $dataToBeUpdated[] = [
+                            'conditions' => [
+                                self::KV_COLUMN_PARENT_ID => $id,
+                                self::KV_COLUMN_KEY => $kvDataKey,
+                            ],
+                            'updateValues' => [
+                                self::KV_COLUMN_VALUE => $kvDataValue
+                            ]
+                        ];
+                    } else {
+                        $this->getPersistence()->exec(
+                            'UPDATE ' . self::KV_TABLE_NAME . '
+                              SET '  . self::KV_COLUMN_VALUE . ' = ?
+                            WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
+                              AND ' . self::KV_COLUMN_KEY . ' = ?;',
+                                [$kvDataValue, $id, $kvDataKey]
+                        );
+                    }
                 } else {
                     $dataToBeInserted[] = [
                         self::KV_COLUMN_PARENT_ID => $id,
@@ -407,7 +418,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             }
 
 
-            if (!empty($dataToBeUpdated)) {
+            if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true && !empty($dataToBeUpdated)) {
                 $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
             }
 
