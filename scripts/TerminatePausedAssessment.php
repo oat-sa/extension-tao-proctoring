@@ -32,6 +32,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use DateTimeImmutable;
 use DateInterval;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * Script that terminates assessments, paused longer than XXX.
@@ -189,28 +190,41 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     {
         $result = false;
         $executionState = $deliveryExecution->getState()->getUri();
-        $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
-        /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        if (!in_array($executionState, [
+        if (in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
-            ]) ||
-            !$lastTestTakersEvent
+            ])
         ) {
-            $result = false;
-        }
+            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
-        $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
-        if ($wasPausedAt && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
-            $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
-            if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
-                $result = true;
+            if ($executionState === DeliveryExecutionState::STATE_ACTIVE) {
+                $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
+                $lastEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
+            } else {
+                $lastEventTime = $this->getLastPause($deliveryExecution);
+            }
+
+            if ($lastEventTime && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
+                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+                $result = ($lastEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable('now')));
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Get time of last pause
+     * @param DeliveryExecution $deliveryExecution
+     * @return \DateTimeImmutable|null
+     */
+    protected function getLastPause(DeliveryExecution $deliveryExecution)
+    {
+        $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
+        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
+        return isset($pauses[0]) ? (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']) : null;
     }
 
 }

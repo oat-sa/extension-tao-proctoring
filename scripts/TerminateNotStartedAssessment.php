@@ -130,27 +130,19 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
     {
         $result = false;
         $executionState = $deliveryExecution->getState()->getUri();
-        /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
         $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
 
-        if (!in_array($executionState, [
+        if (in_array($executionState, [
                 DeliveryExecutionState::STATE_AWAITING,
                 DeliveryExecutionState::STATE_AUTHORIZED,
-            ]) ||
-            !$lastTestTakersEvent) {
-            $result = false;
-        }
-
-        if (
-            in_array($executionState, [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING])
-        ) {
+            ]) &&
+            $lastTestTakersEvent)
+        {
+            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
             $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
-            //$startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
             $lastTestEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
-            if ($lastTestEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
-                $result = true;
-            }
+            $result = ($lastTestEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable()));
         }
 
         return $result;
