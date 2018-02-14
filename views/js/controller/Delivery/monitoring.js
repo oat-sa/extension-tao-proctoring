@@ -1049,7 +1049,9 @@ define([
                             }
                             loadingBar.stop();
 
-                            appController.on('change', function () {
+                            appController
+                                .off('change.polling')
+                                .on('change.polling', function () {
                                 polling.stop();
                             });
 
