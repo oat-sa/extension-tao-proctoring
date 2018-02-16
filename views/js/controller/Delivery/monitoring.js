@@ -998,14 +998,7 @@ define([
                         icon: 'history',
                         title: __('Show the detailed session history'),
                         action: showHistory
-                    },
-                    /*{
-                        id : 'printRubric',
-                        title : __('Print the Score Report'),
-                        icon : 'print',
-                        action : printResults
-                    }*/
-                    ];
+                    }];
                     if (printReportButton) {
                         actionList.push({
                             id : 'printReport',
@@ -1055,6 +1048,13 @@ define([
                                 });
                             }
                             loadingBar.stop();
+
+                            appController
+                                .off('change.polling')
+                                .on('change.polling', function () {
+                                polling.stop();
+                            });
+
                             polling.start();
                             timer.resume();
                         })
