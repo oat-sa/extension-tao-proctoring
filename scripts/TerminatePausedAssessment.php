@@ -22,16 +22,17 @@
 namespace oat\taoProctoring\scripts;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\oatbox\action\Action;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use common_Logger;
 use common_report_Report as Report;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use DateTimeImmutable;
+use DateInterval;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 
 /**
  * Script that terminates assessments, paused longer than XXX.
@@ -50,7 +51,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  * # Dry run with no max terminations.
  * sudo php index.php 'oat\taoProctoring\scripts\TerminatePausedAssessment' 0
  */
-class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
+class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 {
     use ServiceLocatorAwareTrait;
 
@@ -77,6 +78,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
     /**
      * @param array $params
      * @return Report
+     * @throws
      */
     public function __invoke($params)
     {
@@ -106,7 +108,6 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
         $deliveryExecutionService = ServiceProxy::singleton();
 
         $count = 0;
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find([
@@ -121,7 +122,7 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
             $deliveryExecution = $deliveryExecutionService->getDeliveryExecution(
                 $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
             );
-            if ($testSessionService->isExpired($deliveryExecution)) {
+            if ($this->isExpired($deliveryExecution)) {
                 try {
                     $this->terminateExecution($deliveryExecution);
                     $count++;
@@ -165,28 +166,65 @@ class TerminatePausedAssessment implements Action, ServiceLocatorAwareInterface
     }
 
     /**
-     * @param $type
-     * @param string $message
-     */
-    protected function addReport($type, $message)
-    {
-        $this->report->add(new Report(
-            $type,
-            $message
-        ));
-    }
-    
-    /**
      * Return Termination Reasons.
      * 
      * Provides the 'reasons' information array with keys 'category' and 'subCategory'.
      * This method may be overriden by subclasses to provide customer specific information.
      * 
-     * @return arrray.
+     * @return array.
      */
     protected function getTerminationReasons()
     {
         // @fixme remove customer specific information.
         return ['category' => 'Technical', 'subCategory' => 'ACT'];
     }
+
+    /**
+     * Checks if delivery execution was expired after pausing
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     * @throws
+     */
+    protected function isExpired(DeliveryExecution $deliveryExecution)
+    {
+        $result = false;
+        $executionState = $deliveryExecution->getState()->getUri();
+
+        if (in_array($executionState, [
+                DeliveryExecutionState::STATE_PAUSED,
+                DeliveryExecutionState::STATE_ACTIVE,
+            ])
+        ) {
+            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+
+            if ($executionState === DeliveryExecutionState::STATE_ACTIVE) {
+                $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
+                $lastEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
+            } else {
+                $lastEventTime = $this->getLastPause($deliveryExecution);
+            }
+
+            if ($lastEventTime && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
+                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+                $result = ($lastEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable('now')));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get time of last pause
+     * @param DeliveryExecution $deliveryExecution
+     * @return \DateTimeImmutable|null
+     */
+    protected function getLastPause(DeliveryExecution $deliveryExecution)
+    {
+        $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
+        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
+        return isset($pauses[0]) ? (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']) : null;
+    }
+
 }

@@ -22,22 +22,22 @@
 namespace oat\taoProctoring\scripts;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\oatbox\action\Action;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use common_Logger;
 use common_report_Report as Report;
-use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
+use DateTimeImmutable;
+use DateInterval;
 
 /**
  * Script that terminates assessments, which are in awaiting state longer than XXX
  * Run example: `sudo php index.php 'oat\taoProctoring\scripts\TerminateNotStartedAssessment'`
  */
-class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterface
+class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
 {
     use ServiceLocatorAwareTrait;
 
@@ -72,11 +72,11 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
 
         $cancel = 0;
         $pause = 0;
-        $testSessionService = ServiceManager::getServiceManager()->get(TestSessionService::SERVICE_ID);
+
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find([
-            DeliveryMonitoringService::STATUS => [DeliveryExecution::STATE_AUTHORIZED, DeliveryExecution::STATE_AWAITING],
+            DeliveryMonitoringService::STATUS => [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING],
         ]);
 
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
@@ -88,7 +88,7 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
                     $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
                 );
 
-                if ($testSessionService->isExpired($deliveryExecution)) {
+                if ($this->isExpired($deliveryExecution)) {
                     if ($deliveryExecutionStateService->isCancelable($deliveryExecution)){
                         $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
@@ -120,14 +120,31 @@ class TerminateNotStartedAssessment implements Action, ServiceLocatorAwareInterf
     }
 
     /**
-     * @param $type
-     * @param string $message
+     * Checks if delivery execution was abandoned after authorization
+     *
+     * @param DeliveryExecution $deliveryExecution
+     * @return bool
+     * @throws
      */
-    protected function addReport($type, $message)
+    public function isExpired(DeliveryExecution $deliveryExecution)
     {
-        $this->report->add(new Report(
-            $type,
-            $message
-        ));
+        $result = false;
+        $executionState = $deliveryExecution->getState()->getUri();
+        $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
+
+        if (in_array($executionState, [
+                DeliveryExecutionState::STATE_AWAITING,
+                DeliveryExecutionState::STATE_AUTHORIZED,
+            ]) &&
+            $lastTestTakersEvent)
+        {
+            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
+            $lastTestEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
+            $result = ($lastTestEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable()));
+        }
+
+        return $result;
     }
 }
