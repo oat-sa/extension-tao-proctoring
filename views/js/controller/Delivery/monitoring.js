@@ -769,6 +769,7 @@ define([
                         model.push({
                             id : extraField.id,
                             label: extraField.label,
+                            filterable: extraField.filterable,
                             sortable : true,
                             transform: function(value, row) {
                                 return row && row.extraFields && row.extraFields[extraField.id] || '';
