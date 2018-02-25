@@ -744,6 +744,7 @@ define([
                     model.push({
                         id: 'test_taker_first_name',
                         label: __('First name'),
+                        filterable: true,
                         sortable : true,
                         transform: function(value, row) {
                             return row && row.testTaker && row.testTaker.test_taker_first_name || '';
@@ -755,6 +756,7 @@ define([
                     model.push({
                         id: 'test_taker_last_name',
                         label: __('Last name'),
+                        filterable: true,
                         sortable : true,
                         transform: function(value, row) {
                             return row && row.testTaker && row.testTaker.test_taker_last_name || '';
