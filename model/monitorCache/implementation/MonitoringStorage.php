@@ -68,6 +68,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     const OPTION_USE_UPDATE_MULTIPLE = 'use_update_multiple';
 
+    const OPTION_CACHE_SIZE = 'cache_size';
+
     const OPTION_PRIMARY_COLUMNS = 'primary_columns';
 
     const TABLE_NAME = 'delivery_monitoring';
@@ -116,6 +118,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
+            $this->maintainCache();
             $results = $this->find([
                 [self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()],
             ], ['asArray' => true], true);
@@ -787,5 +790,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     private function getQueryBuilder()
     {
         return $this->getPersistence()->getPlatForm()->getQueryBuilder();
+    }
+
+    private function maintainCache()
+    {
+        $count = count($this->data);
+        if ($count >= $this->getOption(self::OPTION_CACHE_SIZE)) {
+            // cut ~30% of oldest elements
+            $this->data = array_slice($this->data, floor($count / 3), $count - floor($count / 3));
+        }
     }
 }
