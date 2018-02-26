@@ -48,6 +48,14 @@ class KvMonitoringMigration extends ScriptAction
                 'description' => 'Indicate whether or not changes in config should be recorded. Please note that applies to the current instance only and changes MUST be distributed across all of them'
             ],
 
+            'resume' => [
+                'flag' => true,
+                'prefix' => 'r',
+                'longPrefix' => 'resume',
+                'defaultValue' => 1,
+                'description' => 'Indicate whether or not changes processing should be resumed from the last processed frame'
+            ],
+
             'chunkSize' => [
                 'prefix' => 'c',
                 'defaultValue' => 100,
@@ -79,6 +87,7 @@ class KvMonitoringMigration extends ScriptAction
         $removeKV = $this->getOption('deleteKV');
         $persistConfig = $this->getOption('persistConfig');
         $chunkSize = $this->getOption('chunkSize');
+        $resume = $this->getOption('resume');
 
         /** @var MonitoringStorage $monitoringService */
         $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -92,10 +101,17 @@ class KvMonitoringMigration extends ScriptAction
 
         $total = $monitoringService->count([]);
         $offset = 0;
+
+        if ($resume) {
+            $offset = (int)$this->getCache()->get(__CLASS__ . 'offset');
+        }
+
         $executionProcessed = 0;
         $removed = 0;
 
         while ($offset < $total || $total < $chunkSize) {
+            $this->getCache()->set(__CLASS__ . 'offset', $offset);
+
             $options = [
                 'limit' => $chunkSize,
                 'offset' => $offset
@@ -133,6 +149,9 @@ class KvMonitoringMigration extends ScriptAction
             'Thanks for using migration tool!'
         );
         $result->add($subReport);
+
+        $this->getCache()->set(__CLASS__ . 'offset', 0);
+
         return $result;
     }
 
@@ -171,5 +190,13 @@ class KvMonitoringMigration extends ScriptAction
         }
         return Report::createSuccess(__('Column %s successfully created', $columnName));
 
+    }
+
+    /**
+     * @return common_persistence_KeyValuePersistence|\common_persistence_Persistence
+     */
+    private function getCache()
+    {
+        return \common_persistence_KeyValuePersistence::getPersistence('cache');
     }
 }
