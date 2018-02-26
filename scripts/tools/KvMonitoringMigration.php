@@ -72,7 +72,7 @@ class KvMonitoringMigration extends ScriptAction
                 'longPrefix' => 'chunk-size',
                 'cast' => 'integer',
                 'required' => false,
-                'description' => 'The cache ttl for the delivery theme provider'
+                'description' => 'Specifies delivery executions amount for processing (chunk size) per iteration for migration'
             ],
         ];
     }
