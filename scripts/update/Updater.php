@@ -559,12 +559,12 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.2.0');
         }
 
-        $this->skip('8.2.0', '8.3.0');
+        $this->skip('8.2.0', '8.4.0');
 
-        if ($this->isVersion('8.3.0')) {
+        if ($this->isVersion('8.4.0')) {
             $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
             $proctoringExtension->setConfig('monitoringUserExtraFieldsSettings', []);
-            $this->setVersion('8.4.0');
+            $this->setVersion('8.5.0');
         }
     }
 }
