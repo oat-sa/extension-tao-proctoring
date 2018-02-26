@@ -459,14 +459,17 @@ class DeliveryHelper
         if (!self::$extraFields){
             $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
             $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
+            $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
             if(!empty($userExtraFields) && is_array($userExtraFields)){
                 foreach($userExtraFields as $name => $uri){
                     $property = new \core_kernel_classes_Property($uri);
-                    self::$extraFields[] = array(
+                    $settings = array_key_exists($name, $userExtraFieldsSettings) ?
+                        $userExtraFieldsSettings[$name] : [];
+                    self::$extraFields[] = array_merge(array(
                         'id' => $name,
                         'property' => $property,
-                        'label' => $property->getLabel()
-                    );
+                        'label' => $property->getLabel(),
+                    ), $settings);
                 }
             }
         }
@@ -483,7 +486,8 @@ class DeliveryHelper
         return array_map(function($field){
             return array(
                 'id' => $field['id'],
-                'label' => $field['label']
+                'label' => $field['label'],
+                'filterable' => array_key_exists('filterable', $field) ? $field['filterable'] : false,
             );
         }, self::_getUserExtraFields());
     }
