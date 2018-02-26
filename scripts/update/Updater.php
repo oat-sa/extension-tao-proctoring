@@ -566,5 +566,28 @@ class Updater extends common_ext_ExtensionUpdater
             $proctoringExtension->setConfig('monitoringUserExtraFieldsSettings', []);
             $this->setVersion('8.5.0');
         }
+
+        if ($this->isVersion('8.5.0')) {
+            try {
+                // drop unused columns
+                $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+                $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
+                $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+                $schemaManager = $persistence->getDriver()->getSchemaManager();
+                $schema = $schemaManager->createSchema();
+                $fromSchema = clone $schema;
+                $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
+                $tableData->dropColumn(MonitoringStorage::DELIVERY_NAME);
+                $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+                foreach ($queries as $query) {
+                    $persistence->exec($query);
+                }
+            } catch (SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+
+            $this->setVersion('8.5.1');
+
+        }
     }
 }
