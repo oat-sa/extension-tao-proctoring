@@ -196,7 +196,7 @@ class KvMonitoringMigration extends ScriptAction
         $fromSchema = clone $schema;
         try {
             $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
-            $tableData->addColumn($columnName, 'string', ['notnull' => false]);
+            $tableData->addColumn($columnName, 'text', ['notnull' => false]);
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
             foreach ($queries as $query) {
                 $persistence->exec($query);
