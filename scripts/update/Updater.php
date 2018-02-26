@@ -586,6 +586,14 @@ class Updater extends common_ext_ExtensionUpdater
                 \common_Logger::i('Database Schema already up to date.');
             }
 
+
+            $monitorService = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
+            $monitorService->setOption(MonitoringStorage::OPTION_CACHE_SIZE, 2000);
+
+            $this->getServiceManager()->register(MonitoringStorage::SERVICE_ID, $monitorService);
+
+
+
             $this->setVersion('8.5.1');
 
         }
