@@ -712,37 +712,31 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
         $queryBuilder = $this->getQueryBuilder();
         $conn = $queryBuilder->getConnection();
-        $queryBuilder->select('kv_d_m.monitoring_value as delivery_id, delivery_name.monitoring_value as delivery_name');
+        $queryBuilder->select('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statuses as $status) {
             $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status) as ' . $conn->quoteIdentifier($status->getLabel()));
         }
         $queryBuilder->addSelect('max('.$conn->quoteIdentifier('last_launch').'.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
 
-        $queryBuilder->from(self::KV_TABLE_NAME, 'kv_d_m');
-        $queryBuilder->leftJoin(
-            'kv_d_m',
-            self::KV_TABLE_NAME,
-            'delivery_name',
-            'kv_d_m.parent_id=delivery_name.parent_id and delivery_name.monitoring_key = \'delivery_name\''
-        );
+        $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
         foreach ($statuses as $status) {
             $queryBuilder->leftJoin(
-                'kv_d_m',
+                'delivery_m',
                 self::TABLE_NAME,
                 $conn->quoteIdentifier('s_'.$status->getLabel()),
-                'kv_d_m.parent_id='.$conn->quoteIdentifier('s_'.$status->getLabel()).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status = \''.$status->getUri().'\''
+                'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$status->getLabel()).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status = \''.$status->getUri().'\''
             );
         }
         $queryBuilder->leftJoin(
-            'kv_d_m',
+            'delivery_m',
             self::TABLE_NAME,
             $conn->quoteIdentifier('last_launch'),
-            'kv_d_m.parent_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
+            'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
         );
-        $queryBuilder->where('kv_d_m.monitoring_key=\'delivery_id\'');
-        $queryBuilder->groupBy('kv_d_m.monitoring_value, delivery_name.monitoring_value');
+
+        $queryBuilder->groupBy('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statuses as $status) {
             $queryBuilder->addGroupBy($conn->quoteIdentifier('s_'.$status->getLabel()).'.status');
@@ -766,7 +760,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $outerQueryBuilder->setFirstResult($offset);
         $sql = $outerQueryBuilder->getSQL();
 
-        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
+        $stmt = $this->getPersistence()->query($sql);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;

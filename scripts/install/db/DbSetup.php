@@ -45,6 +45,8 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER_FIRST_NAME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER_LAST_NAME, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::DELIVERY_ID, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::DELIVERY_NAME, "string", array("notnull" => false, "length" => 255));
 
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
         
@@ -63,6 +65,10 @@ class DbSetup {
             $tableLog->addUniqueIndex(
                 array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
+            );
+            $tableLog->addUniqueIndex(
+                array(MonitoringStorage::DELIVERY_ID),
+                'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::DELIVERY_ID . '_UNIQUE'
             );
         
             $tableData = $schema->createTable(MonitoringStorage::KV_TABLE_NAME);
@@ -107,7 +113,9 @@ class DbSetup {
             MonitoringStorage::COLUMN_TEST_TAKER,
             MonitoringStorage::COLUMN_AUTHORIZED_BY,
             MonitoringStorage::COLUMN_START_TIME,
-            MonitoringStorage::COLUMN_END_TIME
+            MonitoringStorage::COLUMN_END_TIME,
+            MonitoringStorage::DELIVERY_ID,
+            MonitoringStorage::DELIVERY_NAME,
         ];
     }
 }
