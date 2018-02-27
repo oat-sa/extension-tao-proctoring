@@ -56,6 +56,7 @@ use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
 use oat\taoProctoring\model\ProctorService;
@@ -66,6 +67,7 @@ use oat\taoProctoring\model\runner\ProctoringRunnerService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\model\ServiceDelegatorInterface;
+use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
@@ -595,6 +597,34 @@ class Updater extends common_ext_ExtensionUpdater
 
 
             $this->setVersion('8.5.1');
+
+        }
+
+        if ($this->isVersion('8.5.1')) {
+            try {
+                // drop unused columns
+                $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+                $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
+                $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+                $schemaManager = $persistence->getDriver()->getSchemaManager();
+                $schema = $schemaManager->createSchema();
+                $fromSchema = clone $schema;
+                $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
+                $tableData->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false, "length" => 255));
+                $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+                foreach ($queries as $query) {
+                    $persistence->exec($query);
+                }
+
+
+            } catch (SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+            $service = $this->getServiceManager()->get(MonitorCacheService::SERVICE_ID);
+            $service->setOption(MonitorCacheService::OPTION_PRIMARY_COLUMNS, DbSetup::getPrimaryColumns());
+            $this->getServiceManager()->register(MonitorCacheService::SERVICE_ID, $service);
+            $this->setVersion('8.5.2');
 
         }
     }
