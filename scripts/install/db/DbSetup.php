@@ -45,7 +45,6 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER_FIRST_NAME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER_LAST_NAME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringStorage::DELIVERY_NAME, "string", array("notnull" => false, "length" => 255));
 
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
         
