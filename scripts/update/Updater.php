@@ -621,9 +621,7 @@ class Updater extends common_ext_ExtensionUpdater
             } catch (SchemaException $e) {
                 \common_Logger::i('Database Schema already up to date.');
             }
-            $service = $this->getServiceManager()->get(MonitorCacheService::SERVICE_ID);
-            $service->setOption(MonitorCacheService::OPTION_PRIMARY_COLUMNS, DbSetup::getPrimaryColumns());
-            $this->getServiceManager()->register(MonitorCacheService::SERVICE_ID, $service);
+
             $this->setVersion('8.5.2');
 
         }
