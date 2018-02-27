@@ -602,7 +602,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('8.5.1')) {
             try {
-                // drop unused columns
+
                 $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
                 $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
                 $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
@@ -610,8 +610,8 @@ class Updater extends common_ext_ExtensionUpdater
                 $schema = $schemaManager->createSchema();
                 $fromSchema = clone $schema;
                 $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
-                $tableData->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false, "length" => 255));
-                $tableData->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false, "length" => 255));
+                $tableData->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false));
+                $tableData->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false));
                 $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
                 foreach ($queries as $query) {
                     $persistence->exec($query);
