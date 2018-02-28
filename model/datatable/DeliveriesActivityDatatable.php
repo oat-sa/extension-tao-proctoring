@@ -85,7 +85,7 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
         $service = $this->getServiceLocator()->get(\oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage::SERVICE_ID);
         $rows = $this->request->getRows();
         $rows = $rows?:1;
-        $total = count($service->getStatusesStatistic(0, 0));
+        $total = $service->getCountOfStatistics();
         $payload = [
             'data' => $result,
             'page' => (integer) $this->request->getPage(),
