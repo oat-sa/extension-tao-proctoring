@@ -558,5 +558,33 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('8.2.0');
         }
+
+        if ($this->isVersion('8.2.0')) {
+            $monitorService = $this->getServiceManager()->get(MonitoringStorage::SERVICE_ID);
+            $monitorService->setOption(MonitoringStorage::OPTION_CACHE_SIZE, 2000);
+
+            $this->getServiceManager()->register(MonitoringStorage::SERVICE_ID, $monitorService);
+
+            try {
+                $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+                $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
+                $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+                $schemaManager = $persistence->getDriver()->getSchemaManager();
+                $schema = $schemaManager->createSchema();
+                $fromSchema = clone $schema;
+                $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
+                $tableData->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false));
+                $tableData->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false));
+                $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+                foreach ($queries as $query) {
+                    $persistence->exec($query);
+                }
+            } catch (SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+
+            $this->setVersion('8.2.1');
+        }
+
     }
 }
