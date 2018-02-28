@@ -691,6 +691,25 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
+     * @return mixed
+     */
+    public function getCountOfStatistics()
+    {
+        $groupedQueryBuilder = $this->getQueryBuilder();
+        $groupedQueryBuilder->select('delivery_monitoring.delivery_id');
+        $groupedQueryBuilder->from('delivery_monitoring');
+        $groupedQueryBuilder->groupBy('delivery_monitoring.delivery_id');
+        $groupedSql = $groupedQueryBuilder->getSQL();
+
+        $countQueryBuilder = $this->getQueryBuilder();
+        $countQueryBuilder->select('count(grouped.delivery_id)');
+        $countQueryBuilder->from('('.$groupedSql.')', 'grouped');
+        $stmt = $this->getPersistence()->query($countQueryBuilder->getSQL());
+        $count = $stmt->fetch(\PDO::FETCH_COLUMN);
+        return $count;
+    }
+
+    /**
      * @param int $limit
      * @param int $offset
      * @param string $orderby
@@ -699,7 +718,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     public function getStatusesStatistic($limit = 10, $offset = 0, $orderby = 'label', $orderdir = 'asc')
     {
-        $statuses = [
+        $statusesList = [
             $this->getResource(ProctoredDeliveryExecution::STATE_ACTIVE),
             $this->getResource(ProctoredDeliveryExecution::STATE_AUTHORIZED),
             $this->getResource(ProctoredDeliveryExecution::STATE_AWAITING),
@@ -708,65 +727,120 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $this->getResource(ProctoredDeliveryExecution::STATE_PAUSED),
             $this->getResource(ProctoredDeliveryExecution::STATE_TERMINATED)
         ];
+        $statusesMap = [];
+        foreach ($statusesList as $status) {
+            $statusesMap[$status->getLabel()] = $status->getUri();
+        }
+
+        $limitQueryBuilder = $this->getQueryBuilder();
+        $limitQueryBuilder->select('limit_q.delivery_id');
+        $limitQueryBuilder->groupBy('limit_q.delivery_id');
+
+        if (isset($statusesMap[$orderby])) {
+            $innerQueryBuilder = $this->getQueryBuilder();
+            $innerQueryBuilder->select('delivery_monitoring.delivery_id');
+            $innerQueryBuilder->addSelect('COALESCE( order_join.order_status, 0 ) as order_val');
+            $innerQueryBuilder->from('delivery_monitoring');
+
+            $statusBuilder = $this->getQueryBuilder();
+            $statusBuilder->select('status_d_m.delivery_id, count(status_d_m.status) order_status');
+            $statusBuilder->from('delivery_monitoring', 'status_d_m');
+            $statusBuilder->where('status_d_m.status = \''.$statusesMap[$orderby]. '\'');
+            $statusBuilder->groupBy('status_d_m.delivery_id');
+            $statusSql = $statusBuilder->getSQL();
+
+            $innerQueryBuilder->leftJoin(
+                'delivery_monitoring',
+                '('.$statusSql.')',
+                'order_join',
+                'order_join.delivery_id=delivery_monitoring.delivery_id'
+            );
+            $innerQueryBuilder->groupBy('delivery_monitoring.delivery_id, order_val');
+            $innerQueryBuilder->orderBy('order_val', $orderdir);
+
+            if ($limit) {
+                $innerQueryBuilder->setMaxResults($limit);
+            }
+            $innerQueryBuilder->setFirstResult($offset);
+
+            $innerSql = $innerQueryBuilder->getSQL();
+            $limitQueryBuilder->from('('.$innerSql.')', 'limit_q');
+            $limitQueryBuilder->addGroupBy('limit_q.order_val');
+            $limitQueryBuilder->orderBy('order_val', $orderdir);
+        } else if($orderby == 'label') {
+            $limitQueryBuilder->from('delivery_monitoring', 'limit_q');
+            $limitQueryBuilder->addSelect('limit_q.delivery_name');
+            $limitQueryBuilder->addGroupBy('limit_q.delivery_name');
+            $limitQueryBuilder->orderBy('limit_q.delivery_name', $orderdir);
+            if ($limit) {
+                $limitQueryBuilder->setMaxResults($limit);
+            }
+            $limitQueryBuilder->setFirstResult($offset);
+        } else {
+            $limitQueryBuilder->from('delivery_monitoring', 'limit_q');
+            $limitQueryBuilder->addSelect('max(limit_q.start_time) as max_start_time');
+            $limitQueryBuilder->orderBy('max_start_time', $orderdir);
+            if ($limit) {
+                $limitQueryBuilder->setMaxResults($limit);
+            }
+            $limitQueryBuilder->setFirstResult($offset);
+        }
+
+        $limitSql = $limitQueryBuilder->getSQL();
+        $stmtLimit = $this->getPersistence()->query($limitSql);
+        $dataLimit = $stmtLimit->fetchAll(\PDO::FETCH_COLUMN);
 
 
         $queryBuilder = $this->getQueryBuilder();
         $conn = $queryBuilder->getConnection();
-        $queryBuilder->select('kv_d_m.monitoring_value as delivery_id, delivery_name.monitoring_value as delivery_name');
+        $queryBuilder->select('delivery_m.delivery_id, delivery_m.delivery_name');
 
-        foreach ($statuses as $status) {
-            $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status) as ' . $conn->quoteIdentifier($status->getLabel()));
+        foreach ($statusesMap as $label => $statusUri) {
+            $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$label).'.status) as ' . $conn->quoteIdentifier($label));
         }
+
         $queryBuilder->addSelect('max('.$conn->quoteIdentifier('last_launch').'.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
 
-        $queryBuilder->from(self::KV_TABLE_NAME, 'kv_d_m');
-        $queryBuilder->leftJoin(
-            'kv_d_m',
-            self::KV_TABLE_NAME,
-            'delivery_name',
-            'kv_d_m.parent_id=delivery_name.parent_id and delivery_name.monitoring_key = \'delivery_name\''
-        );
+        $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
-        foreach ($statuses as $status) {
+        foreach ($statusesMap as $label => $statusUri) {
             $queryBuilder->leftJoin(
-                'kv_d_m',
+                'delivery_m',
                 self::TABLE_NAME,
-                $conn->quoteIdentifier('s_'.$status->getLabel()),
-                'kv_d_m.parent_id='.$conn->quoteIdentifier('s_'.$status->getLabel()).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$status->getLabel()).'.status = \''.$status->getUri().'\''
+                $conn->quoteIdentifier('s_'.$label),
+                'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$label).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$label).'.status = \''.$statusUri.'\''
             );
         }
         $queryBuilder->leftJoin(
-            'kv_d_m',
+            'delivery_m',
             self::TABLE_NAME,
             $conn->quoteIdentifier('last_launch'),
-            'kv_d_m.parent_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
+            'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
         );
-        $queryBuilder->where('kv_d_m.monitoring_key=\'delivery_id\'');
-        $queryBuilder->groupBy('kv_d_m.monitoring_value, delivery_name.monitoring_value');
 
-        foreach ($statuses as $status) {
-            $queryBuilder->addGroupBy($conn->quoteIdentifier('s_'.$status->getLabel()).'.status');
+        $queryBuilder->where('delivery_m.delivery_id IN (' . join(',', array_map(function($item){ return "'$item'"; }, $dataLimit)) . ')');
+
+        $queryBuilder->groupBy('delivery_m.delivery_id, delivery_m.delivery_name');
+
+        foreach ($statusesMap as $label => $statusUri) {
+            $queryBuilder->addGroupBy($conn->quoteIdentifier('s_'.$label).'.status');
         }
 
         $outerQueryBuilder = $this->getQueryBuilder();
 
         $outerQueryBuilder->select('delivery_name as label, delivery_id');
 
-        foreach ($statuses as $status) {
-            $outerQueryBuilder->addSelect('sum('.$conn->quoteIdentifier($status->getLabel()).') as ' . $conn->quoteIdentifier($status->getLabel()));
+        foreach ($statusesMap as $label => $statusUri) {
+            $outerQueryBuilder->addSelect('sum('.$conn->quoteIdentifier($label).') as ' . $conn->quoteIdentifier($label));
         }
         $outerQueryBuilder->addSelect('max('.$conn->quoteIdentifier(__('Last launch')).') as ' .  $conn->quoteIdentifier(__('Last launch')));
         $outerQueryBuilder->from('('.$queryBuilder->getSQL().')', 'delivery_statuses');
         $outerQueryBuilder->groupBy('delivery_id, label');
         $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);
 
-        if ($limit) {
-            $outerQueryBuilder->setMaxResults($limit);
-        }
-        $outerQueryBuilder->setFirstResult($offset);
         $sql = $outerQueryBuilder->getSQL();
 
-        $stmt = $this->getPersistence()->query($sql, $this->queryParams);
+        $stmt = $this->getPersistence()->query($sql);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;
