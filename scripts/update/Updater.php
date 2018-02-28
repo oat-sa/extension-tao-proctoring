@@ -597,5 +597,26 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.5.1');
 
         }
+
+        if ($this->isVersion('8.5.1')) {
+            try {
+                $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+                $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
+                $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+                $schemaManager = $persistence->getDriver()->getSchemaManager();
+                $schema = $schemaManager->createSchema();
+                $fromSchema = clone $schema;
+                $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
+                $tableData->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false));
+                $tableData->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false));
+                $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+                foreach ($queries as $query) {
+                    $persistence->exec($query);
+                }
+            } catch (SchemaException $e) {
+                \common_Logger::i('Database Schema already up to date.');
+            }
+            $this->setVersion('8.5.2');
+        }
     }
 }
