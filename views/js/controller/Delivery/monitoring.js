@@ -1084,7 +1084,7 @@ define([
                             status: {
                                 empty: __('No sessions'),
                                 available: function () {
-                                    return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
+                                    return getTagsUsage() ? __("Groups: %s. %s", defaultTag.replace('+', ' ').split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
                                 },
                                 loading: __('Loading')
                             },

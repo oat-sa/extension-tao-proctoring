@@ -616,7 +616,7 @@ class Updater extends common_ext_ExtensionUpdater
             } catch (SchemaException $e) {
                 \common_Logger::i('Database Schema already up to date.');
             }
-            $this->setVersion('8.5.2');
+            $this->setVersion('8.5.3');
         }
     }
 }
