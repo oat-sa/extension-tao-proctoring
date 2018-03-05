@@ -618,5 +618,7 @@ class Updater extends common_ext_ExtensionUpdater
             }
             $this->setVersion('8.5.2');
         }
+
+        $this->skip('8.5.2', '8.5.3');
     }
 }
