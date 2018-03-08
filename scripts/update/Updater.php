@@ -48,6 +48,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\Command\ProctorCommandManagerService;
 use oat\taoProctoring\model\delivery\DeliveryPluginService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -617,6 +618,16 @@ class Updater extends common_ext_ExtensionUpdater
                 \common_Logger::i('Database Schema already up to date.');
             }
             $this->setVersion('8.5.2');
+        }
+
+        if ($this->isVersion('8.5.2')){
+            $proctorCommandManager = new ProctorCommandManagerService([
+                ProctorCommandManagerService::OPTION_SHOULD_EXECUTE_LATER => false
+            ]);
+
+            $this->getServiceManager()->register(ProctorCommandManagerService::SERVICE_ID, $proctorCommandManager);
+
+            $this->setVersion('8.6.0');
         }
     }
 }
