@@ -208,7 +208,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = [];
         $this->joins = [];
         $this->queryParams = [];
-        $this->selectColumns = ['t.*'];
+        $this->selectColumns = $this->getPrimaryColumns();
         $this->groupColumns = ['t.delivery_execution_id'];
         $defaultOptions = [
             'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
