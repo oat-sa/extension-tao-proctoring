@@ -25,7 +25,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\Command\ProctorCommandManagerInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -164,16 +164,15 @@ class DeliveryHelper
      */
     public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
-        /** @var  DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-
+        /** @var $proctorCommandManager $proctorCommandManager */
+        $proctorCommandManager = static::getProctorCommandManagerService();
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
 
-            if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
+            if ($proctorCommandManager->authorise($deliveryExecution, $reason, $testCenter)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('authorized'));
@@ -193,8 +192,8 @@ class DeliveryHelper
      */
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
-        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        /** @var $proctorCommandManager $proctorCommandManager */
+        $proctorCommandManager = static::getProctorCommandManagerService();
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -202,7 +201,7 @@ class DeliveryHelper
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
 
-            if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
+            if ($proctorCommandManager->terminate($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
@@ -219,8 +218,8 @@ class DeliveryHelper
      */
     public static function reactivateExecution($deliveryExecutions, $reason = null)
     {
-        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        /** @var $proctorCommandManager $proctorCommandManager */
+        $proctorCommandManager = static::getProctorCommandManagerService();
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -229,7 +228,7 @@ class DeliveryHelper
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
 
-            if ($deliveryExecutionStateService->reactivateExecution($deliveryExecution, $reason)) {
+            if ($proctorCommandManager->reactivate($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
@@ -249,8 +248,8 @@ class DeliveryHelper
      */
     public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
-        /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        /** @var $proctorCommandManager $proctorCommandManager */
+        $proctorCommandManager = static::getProctorCommandManagerService();
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -259,7 +258,7 @@ class DeliveryHelper
             }
 
             try {
-                $isPaused = $deliveryExecutionStateService->pauseExecution($deliveryExecution, $reason);
+                $isPaused = $proctorCommandManager->pause($deliveryExecution, $reason);
                 if ($isPaused) {
                     $result['processed'][$deliveryExecution->getIdentifier()] = true;
                 } else {
@@ -283,7 +282,8 @@ class DeliveryHelper
      */
     public static function reportExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        /** @var $proctorCommandManager $proctorCommandManager */
+        $proctorCommandManager = static::getProctorCommandManagerService();
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach($deliveryExecutions as $deliveryExecution) {
@@ -291,7 +291,7 @@ class DeliveryHelper
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
 
-            if ($deliveryExecutionStateService->reportExecution($deliveryExecution, $reason)) {
+            if ($proctorCommandManager->report($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('reported for irregularity'));
@@ -573,5 +573,13 @@ class DeliveryHelper
         }
 
         return $response;
+    }
+
+    /**
+     * @return ProctorCommandManagerInterface
+     */
+    public static function getProctorCommandManagerService()
+    {
+        return ServiceManager::getServiceManager()->get(ProctorCommandManagerInterface::SERVICE_ID);
     }
 }
