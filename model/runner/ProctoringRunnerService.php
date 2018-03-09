@@ -42,14 +42,18 @@ class ProctoringRunnerService extends QtiRunnerService
 {
     use OntologyAwareTrait;
 
-    public function getTestContext(RunnerServiceContext $context)
+    public function initServiceContext(RunnerServiceContext $context)
     {
         /** @var ProctorCommandManagerInterface $proctorManager */
         $proctorManager = $this->getServiceLocator()->get(ProctorCommandManagerInterface::SERVICE_ID);
         if ($proctorManager->shouldExecuteLaterEnable()){
             $proctorManager->executeByDeliveryExecution($context->getTestExecutionUri());
         }
+        return parent::initServiceContext($context);
+    }
 
+    public function getTestContext(RunnerServiceContext $context)
+    {
         $response = parent::getTestContext($context);
 
         if (isset($response['options']) && isset($response['options']['sectionPause'])) {
