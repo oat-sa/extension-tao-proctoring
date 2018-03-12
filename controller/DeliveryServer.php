@@ -24,6 +24,7 @@ use common_Logger;
 use common_session_SessionManager;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
+use oat\taoProctoring\model\Command\ProctorCommandManagerInterface;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -35,7 +36,6 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 class DeliveryServer extends DefaultDeliveryServer
 {
-
     /**
      * constructor: initialize the service and the default data
      * @return DeliveryServer
@@ -127,6 +127,11 @@ class DeliveryServer extends DefaultDeliveryServer
     public function isAuthorized()
     {
         $deliveryExecution = $this->getCurrentDeliveryExecution();
+        /** @var ProctorCommandManagerInterface $proctorManager */
+        $proctorManager = $this->getServiceLocator()->get(ProctorCommandManagerInterface::SERVICE_ID);
+        if ($proctorManager->shouldExecuteLaterEnable()) {
+            $proctorManager->executeByDeliveryExecution($deliveryExecution->getIdentifier());
+        }
         $executionState = $deliveryExecution->getState()->getUri();
 
         $authorized = false;

@@ -56,22 +56,14 @@ class MonitorCacheService extends MonitoringStorage
         $data = $this->getData($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
-        // need to add user to event
-        $firstNames = $event->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_FIRSTNAME);
-        if (!empty($firstNames)) {
-            $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
-        }
-        $lastNames = $event->getUser()->getPropertyValues(GenerisRdf::PROPERTY_USER_LASTNAME);
-        if (!empty($lastNames)) {
-            $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
-        }
-
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
         $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
         $data->update(
             DeliveryMonitoringService::START_TIME,
             \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
         );
+        $data = $this->updateTestTakerInformation($data, $event->getUser());
+
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $success = $this->save($data);
         if (!$success) {
@@ -195,5 +187,26 @@ class MonitorCacheService extends MonitoringStorage
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
+    }
+
+    /**
+     * @param DeliveryMonitoringData $data
+     * @param \oat\oatbox\user\User $user
+     * @return DeliveryMonitoringData
+     */
+    protected function updateTestTakerInformation($data, $user)
+    {
+        // need to add user to event
+        $firstNames = $user->getPropertyValues(GenerisRdf::PROPERTY_USER_FIRSTNAME);
+        if (!empty($firstNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
+        }
+
+        $lastNames = $user->getPropertyValues(GenerisRdf::PROPERTY_USER_LASTNAME);
+        if (!empty($lastNames)) {
+            $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
+        }
+
+        return $data;
     }
 }

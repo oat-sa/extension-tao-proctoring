@@ -23,6 +23,8 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\event\EventManager;
 use oat\taoAct\model\event\HeartbeatStored;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoProctoring\model\Command\ProctorCommandFeatureStatus;
+use oat\taoProctoring\model\Command\ProctorCommandManagerInterface;
 use oat\taoProctoring\model\ProctorService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
@@ -39,6 +41,16 @@ use oat\taoQtiTest\models\TestSessionMetaData;
 class ProctoringRunnerService extends QtiRunnerService
 {
     use OntologyAwareTrait;
+
+    public function initServiceContext(RunnerServiceContext $context)
+    {
+        /** @var ProctorCommandManagerInterface $proctorManager */
+        $proctorManager = $this->getServiceLocator()->get(ProctorCommandManagerInterface::SERVICE_ID);
+        if ($proctorManager->shouldExecuteLaterEnable()){
+            $proctorManager->executeByDeliveryExecution($context->getTestExecutionUri());
+        }
+        return parent::initServiceContext($context);
+    }
 
     public function getTestContext(RunnerServiceContext $context)
     {
