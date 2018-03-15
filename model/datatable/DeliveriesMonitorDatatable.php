@@ -75,6 +75,8 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
                 if (isset($times[1])) {
                     $filters[] = ['start_time' => '<' . $times[1]];
                 }
+            } elseif ($filterKey === 'tag') {
+                $filters[] = [$filterKey => $filterValue];
             } else {
                 $filters[] = [$filterKey => 'LIKE %'.$filterValue.'%'];
             }
