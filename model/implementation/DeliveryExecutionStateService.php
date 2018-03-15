@@ -514,10 +514,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
             $session = $testSessionService->getTestSession($deliveryExecution);
             if ($session) {
-                $session->setState(AssessmentTestSessionState::INTERACTING);
+                $session->setState(AssessmentTestSessionState::SUSPENDED);
                 $testSessionService->persist($session);
             }
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
+            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
 
             /** @var EventManager $eventManager */
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
