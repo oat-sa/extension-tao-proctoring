@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\implementation;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
 use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -356,7 +357,14 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'itemId' => $this->getCurrentItemId($deliveryExecution),
             'context' => $this->getContext($deliveryExecution)
         ];
-        return $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
+        $returnValue = $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
+
+        // Trigger a report event.
+        /** @var EventManager $eventManager */
+        $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+        $eventManager->trigger(new DeliveryExecutionIrregularityReport($deliveryExecution));
+
+        return $returnValue;
     }
 
     /**
