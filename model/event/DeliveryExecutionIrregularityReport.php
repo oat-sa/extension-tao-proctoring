@@ -32,7 +32,7 @@ class DeliveryExecutionIrregularityReport implements Event
      */
     public function getName()
     {
-        return __CLASS__;
+        return static::class;
     }
 
     public function __construct(DeliveryExecution $deliveryExecution)
