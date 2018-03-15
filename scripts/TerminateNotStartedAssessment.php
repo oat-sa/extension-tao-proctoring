@@ -120,6 +120,16 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
     }
 
     /**
+     * @param array $params
+     * @return Report
+     * @throws
+     */
+    public static function staticInvoke($params = [])
+    {
+        return (new self())($params);
+    }
+
+    /**
      * Checks if delivery execution was abandoned after authorization
      *
      * @param DeliveryExecution $deliveryExecution
