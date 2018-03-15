@@ -146,6 +146,16 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     }
 
     /**
+     * @param array $params
+     * @return Report
+     * @throws
+     */
+    public static function staticInvoke($params = [])
+    {
+        return (new self())($params);
+    }
+
+    /**
      * $terminate delivery execution
      * @param DeliveryExecution $deliveryExecution
      */
