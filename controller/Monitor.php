@@ -51,14 +51,6 @@ class Monitor extends SimplePageModule
     const ERROR_REPORT_IRREGULARITIES = 4;
     const ERROR_SET_EXTRA_TIME = 5;
 
-    /** @var DeliveryExecutionManagerService */
-    protected $deliveryExecutionManagerService;
-
-    public function __construct()
-    {
-        $this->deliveryExecutionManagerService = $this->getServiceManager()->get(DeliveryExecutionManagerService::SERVICE_ID);
-    }
-
     /**
      * Returns the currently proctored delivery
      *
@@ -298,7 +290,8 @@ class Monitor extends SimplePageModule
         }
 
         try {
-            $data = $this->deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
+            $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+            $data = $deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
             $response = [
                 'success' => !count($data['unprocessed']),
