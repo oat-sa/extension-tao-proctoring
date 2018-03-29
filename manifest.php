@@ -86,7 +86,8 @@ return array(
             RegisterGuiSettingsService::class,
             RegisterDeliveryExecutionManagerService::class,
             \oat\taoProctoring\scripts\install\OverrideSectionPauseService::class,
-            \oat\taoProctoring\scripts\install\RegisterProctoringRunnerService::class
+            \oat\taoProctoring\scripts\install\RegisterProctoringRunnerService::class,
+            \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

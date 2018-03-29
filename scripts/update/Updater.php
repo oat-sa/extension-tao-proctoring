@@ -628,8 +628,8 @@ class Updater extends common_ext_ExtensionUpdater
             $importerFactory = $this->getServiceManager()->get(UserCsvImporterFactory::SERVICE_ID);
             $typeOptions = $importerFactory->getOption(UserCsvImporterFactory::OPTION_MAPPERS);
             $typeOptions[ProctorCsvImporter::USER_IMPORTER_TYPE] = array(
-                    UserCsvImporterFactory::OPTION_MAPPERS_IMPORTER => new ProctorCsvImporter()
-                    );
+                UserCsvImporterFactory::OPTION_MAPPERS_IMPORTER => new ProctorCsvImporter()
+            );
             $importerFactory->setOption(UserCsvImporterFactory::OPTION_MAPPERS, $typeOptions);
             $this->getServiceManager()->register(UserCsvImporterFactory::SERVICE_ID, $importerFactory);
 

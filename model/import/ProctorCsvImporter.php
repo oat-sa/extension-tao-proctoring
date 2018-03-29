@@ -17,10 +17,10 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 
-namespace oat\taoTestCenter\model\import;
+namespace oat\taoProctoring\model\import;
 
 use oat\generis\model\user\UserRdf;
-use oat\tao\model\user\Import\RdsUserImportService;
+use oat\tao\model\user\import\RdsUserImportService;
 use oat\taoProctoring\model\ProctorService;
 
 /**
@@ -34,6 +34,10 @@ $importer = $userImporter->getImporter(CsvProctorImporter::USER_IMPORTER_TYPE);
 $report = $importer->import($filePath);
 `
  *
+ * or by command line:
+`
+sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t proctor -f tao/test/user/import/example.csv
+`
  * @package oat\taoTestTaker\models
  */
 class ProctorCsvImporter extends RdsUserImportService
