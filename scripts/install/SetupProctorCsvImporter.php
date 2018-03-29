@@ -21,7 +21,7 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\tao\model\user\import\UserCsvImporterFactory;
-use oat\taoTestCenter\model\import\ProctorCsvImporter;
+use oat\taoProctoring\model\import\ProctorCsvImporter;
 
 class SetupProctorCsvImporter extends InstallAction
 {

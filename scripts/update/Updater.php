@@ -73,7 +73,7 @@ use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\taoTestCenter\model\import\ProctorCsvImporter;
+use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
