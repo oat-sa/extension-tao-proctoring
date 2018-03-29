@@ -24,9 +24,9 @@ use oat\tao\model\user\import\RdsUserImportService;
 use oat\taoProctoring\model\ProctorService;
 
 /**
- * Class TestTakerImporter
+ * Class ProctorCsvImporter
  *
- * Implementation of RdsUserImportService to import test-taker resource from a CSV
+ * Implementation of RdsUserImportService to import proctor resource from a CSV
  *
 `
 $userImporter = $this->getServiceLocator()->get(UserCsvImporterFactory::SERVICE_ID);
