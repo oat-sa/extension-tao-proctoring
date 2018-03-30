@@ -30,6 +30,7 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
+use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
@@ -72,6 +73,7 @@ use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
+use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
@@ -620,5 +622,18 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.5.2', '8.6.2');
+
+        if ($this->isVersion('8.6.2')) {
+            /** @var UserCsvImporterFactory $importerFactory */
+            $importerFactory = $this->getServiceManager()->get(UserCsvImporterFactory::SERVICE_ID);
+            $typeOptions = $importerFactory->getOption(UserCsvImporterFactory::OPTION_MAPPERS);
+            $typeOptions[ProctorCsvImporter::USER_IMPORTER_TYPE] = array(
+                UserCsvImporterFactory::OPTION_MAPPERS_IMPORTER => new ProctorCsvImporter()
+            );
+            $importerFactory->setOption(UserCsvImporterFactory::OPTION_MAPPERS, $typeOptions);
+            $this->getServiceManager()->register(UserCsvImporterFactory::SERVICE_ID, $importerFactory);
+
+            $this->setVersion('8.7.0');
+        }
     }
 }
