@@ -147,7 +147,7 @@ class DeliveryServer extends DefaultDeliveryServer
 
             case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
-                $message = __('The assessment has been suspended by an authorized proctor. If you wish to resume your assessment, please relaunch it and contact your proctor if required.');
+                $message = __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
                 break;
         }
 
