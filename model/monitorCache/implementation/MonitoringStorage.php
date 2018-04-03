@@ -818,7 +818,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
         );
 
-        $queryBuilder->where('delivery_m.delivery_id IN (' . join(',', array_map(function($item){ return "'$item'"; }, $dataLimit)) . ')');
+        if ($dataLimit) {
+            $queryBuilder->where('delivery_m.delivery_id IN (' . join(',', array_map(function($item){ return "'$item'"; }, $dataLimit)) . ')');
+        }
 
         $queryBuilder->groupBy('delivery_m.delivery_id, delivery_m.delivery_name');
 
