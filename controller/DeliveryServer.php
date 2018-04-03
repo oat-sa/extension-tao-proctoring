@@ -142,7 +142,7 @@ class DeliveryServer extends DefaultDeliveryServer
             case DeliveryExecutionState::STATE_TERMINATED:
             case DeliveryExecutionState::STATE_FINISHED:
                 $success = false;
-                $message = __('The assessment has been terminated.');
+                $message = __('The assessment has been terminated. You cannot interact with it anymore.');
                 break;
 
             case DeliveryExecutionState::STATE_PAUSED:
