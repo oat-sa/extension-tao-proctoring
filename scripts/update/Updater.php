@@ -77,7 +77,7 @@ use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
-
+use oat\taoProctoring\model\ProctorAssignment;
 
 /**
  *
@@ -637,5 +637,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.7.0', '8.7.1');
+
+        if ($this->isVersion('8.7.1')) {
+            $assignmentService = $this->getServiceManager()->get(ProctorAssignment::SERVICE_ID);
+            if (get_class($assignmentService) === GroupAssignment::class) {
+                $this->getServiceManager()->register(ProctorAssignment::SERVICE_ID, new ProctorAssignment([]));
+            }
+
+            $this->setVersion('8.8.0');
+        }
+
     }
 }
