@@ -57,4 +57,16 @@ class ProctorAssignment extends GroupAssignment
         }
         return true;
     }
+
+    /**
+     * @param \core_kernel_classes_Resource $delivery
+     * @param User $user
+     * @param boolean $startable
+     * @param boolean $displayAttempts
+     * @return AssignmentFactory
+     */
+    protected function getAssignmentFactory(\core_kernel_classes_Resource $delivery, User $user, $startable, $displayAttempts)
+    {
+        return new AssignmentFactory($delivery, $user, $startable, $displayAttempts);
+    }
 }
