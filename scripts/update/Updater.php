@@ -639,9 +639,9 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('8.7.0', '8.7.1');
 
         if ($this->isVersion('8.7.1')) {
-            $assignmentService = $this->getServiceManager()->get(ProctorAssignment::SERVICE_ID);
+            $assignmentService = $this->getServiceManager()->get(AssignmentService::SERVICE_ID);
             if (get_class($assignmentService) === GroupAssignment::class) {
-                $this->getServiceManager()->register(ProctorAssignment::SERVICE_ID, new ProctorAssignment([]));
+                $this->getServiceManager()->register(AssignmentService::SERVICE_ID, new ProctorAssignment([]));
             }
 
             $this->setVersion('8.8.0');
