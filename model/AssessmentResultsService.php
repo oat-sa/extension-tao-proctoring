@@ -194,7 +194,7 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getScoreReportUrlParts()
     {
-        return $this->hasOption(self::OPTION_SCORE_URL)
+        return $this->hasOption(self::OPTION_SCORE_URL) && is_array($this->getOption(self::OPTION_SCORE_URL))
             ? $this->getOption(self::OPTION_SCORE_URL)
             : array(
                 'extension' => 'taoProctoring',
