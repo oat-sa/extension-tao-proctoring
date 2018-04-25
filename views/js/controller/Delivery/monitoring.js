@@ -140,6 +140,7 @@ define([
             var timeHandlingButton;
             var allowedConnectivity;
             var printReportButton;
+            var printReportUrl;
             var hasAccessToReactivate;
             var tools = [];
             var model = [];
@@ -151,6 +152,7 @@ define([
             var timer = timerFactory({
                 autoStart: false
             });
+            var label;
 
             var polling = pollingFactory({
                 action: function() {
@@ -304,12 +306,6 @@ define([
                     });
                 }
 
-                function print(selection, type) {
-                    execBulkAction('print', __('Print Score'), selection, function(sel){
-                        window.open(urlHelper.route(type,  'Reporting', 'taoProctoring', {'id' : sel}), 'printReport' + JSON.stringify(sel));
-                    });
-                }
-
                 function terminateOrReactivateAndIrregularity(selection) {
                     var delivery = getExecutionData(selection);
                     var buttons = [];
@@ -371,13 +367,16 @@ define([
 
                 // print the score reports
                 function printReport(selection) {
-                    print(selection, 'printReport');
+                    execBulkAction('print', __('Print Score'), selection, function(sel) {
+                        var url = urlHelper.route(
+                            printReportUrl.action ||'printReport',
+                            printReportUrl.controller ||'Reporting',
+                            printReportUrl.extension ||'taoProctoring',
+                            {'id' : sel}
+                        );
+                        window.open(url, 'printReport' + JSON.stringify(sel));
+                    });
                 }
-
-                // print the results of the session
-                /*function printResults(selection) {
-                    print(selection, 'printRubric');
-                }*/
 
                 // display the time handling popup
                 function timeHandling(selection) {
@@ -601,6 +600,7 @@ define([
                     timeHandlingButton = data.timeHandling;
                     allowedConnectivity = data.onlineStatus || false;
                     printReportButton = data.printReportButton;
+                    printReportUrl = data.printReportUrl;
                     hasAccessToReactivate = data.hasAccessToReactivate;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
 
@@ -956,8 +956,8 @@ define([
                         id: 'extendedTime',
                         label: __('Extended Time'),
                         transform: function(value, row) {
-                            var timer = _.isObject(row.timer) ? row.timer : {};
-                            return (timer.extendedTime ? 'x' : '') + timer.extendedTime;
+                            var extendedTimer = _.isObject(row.timer) ? row.timer : {};
+                            return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
                         }
                     });
 
@@ -985,7 +985,7 @@ define([
                         }
                     });
 
-                    var label = 'Terminate and irregularity';
+                    label = 'Terminate and irregularity';
                     if (hasAccessToReactivate) {
                         label = 'Terminate/Reactivate and irregularity';
                     }
