@@ -369,9 +369,9 @@ define([
                 function printReport(selection) {
                     execBulkAction('print', __('Print Score'), selection, function(sel) {
                         var url = urlHelper.route(
-                            printReportUrl.action ||'printReport',
-                            printReportUrl.controller ||'Reporting',
-                            printReportUrl.extension ||'taoProctoring',
+                            printReportUrl.action,
+                            printReportUrl.controller,
+                            printReportUrl.extension,
                             {'id' : sel}
                         );
                         window.open(url, 'printReport' + JSON.stringify(sel));
