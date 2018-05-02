@@ -652,5 +652,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AssessmentResultsService::SERVICE_ID, $assessmentResultsService);
             $this->setVersion('8.8.0');
         }
+
+        $this->skip('8.8.0', '8.8.1');
     }
 }
