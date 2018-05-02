@@ -45,6 +45,7 @@ use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
@@ -637,5 +638,19 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.7.0', '8.7.1');
+
+        if ($this->isVersion('8.7.1')) {
+            $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
+            $assessmentResultsService->setOption(
+                AssessmentResultsService::OPTION_SCORE_URL,
+                array(
+                    'extension' => 'taoProctoring',
+                    'controller' => 'Reporting',
+                    'action' => 'printReport'
+                )
+            );
+            $this->getServiceManager()->register(AssessmentResultsService::SERVICE_ID, $assessmentResultsService);
+            $this->setVersion('8.8.0');
+        }
     }
 }
