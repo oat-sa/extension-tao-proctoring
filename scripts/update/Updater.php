@@ -662,7 +662,10 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('8.9.0', '8.9.2');
 
         if ($this->isVersion('8.9.2')) {
-            $attemptService = $this->getServiceManager()->get(AttemptServiceInterface::SERVICE_ID);
+            $attemptService = $this->safeLoadService(AttemptServiceInterface::SERVICE_ID);
+            if (!$attemptService instanceof AttemptServiceInterface) {
+                $attemptService = new AttemptService([]);
+            }
             $statesToExclude = $attemptService->getStatesToExclude();
             $statesToExclude[] = ProctoredDeliveryExecution::STATE_CANCELED;
             $attemptService->setStatesToExclude($statesToExclude);
