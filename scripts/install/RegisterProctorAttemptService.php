@@ -22,7 +22,6 @@
 namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
-use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
@@ -39,13 +38,10 @@ class RegisterProctorAttemptService extends InstallAction
      */
     public function __invoke($params)
     {
-        $this->getServiceManager()->register(
-            AttemptServiceInterface::SERVICE_ID,
-            new AttemptService([
-                AttemptService::OPTION_STATES_TO_EXCLUDE => [
-                    ProctoredDeliveryExecution::STATE_CANCELED
-                ]
-            ])
-        );
+        $this->getServiceManager()
+            ->get(AttemptServiceInterface::SERVICE_ID)
+            ->setStatesToExclude([
+                ProctoredDeliveryExecution::STATE_CANCELED
+            ]);
     }
 }

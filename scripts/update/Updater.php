@@ -662,14 +662,11 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('8.9.0', '8.9.2');
 
         if ($this->isVersion('8.9.2')) {
-            $this->getServiceManager()->register(
-                AttemptServiceInterface::SERVICE_ID,
-                new AttemptService([
-                    AttemptService::OPTION_STATES_TO_EXCLUDE => [
-                        ProctoredDeliveryExecution::STATE_CANCELED
-                    ]
-                ])
-            );
+            $this->getServiceManager()
+                ->get(AttemptServiceInterface::SERVICE_ID)
+                ->setStatesToExclude([
+                    ProctoredDeliveryExecution::STATE_CANCELED
+                ]);
             $this->setVersion('8.10.0');
         }
     }
