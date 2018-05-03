@@ -657,5 +657,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, new AttemptService([]));
             $this->setVersion('8.9.0');
         }
+      
+        $this->skip('8.9.0', '8.9.1');
     }
 }

@@ -368,11 +368,15 @@ define([
                 // print the score reports
                 function printReport(selection) {
                     execBulkAction('print', __('Print Score'), selection, function(sel) {
+                        var params = { id: sel };
+                        if (context){
+                            params.context = context;
+                        }
                         var url = urlHelper.route(
                             printReportUrl.action,
                             printReportUrl.controller,
                             printReportUrl.extension,
-                            {'id' : sel}
+                            params
                         );
                         window.open(url, 'printReport' + JSON.stringify(sel));
                     });
