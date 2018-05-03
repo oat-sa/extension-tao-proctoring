@@ -77,8 +77,9 @@ use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
-use oat\taoProctoring\model\AttemptService;
+use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
 /**
  *
@@ -656,6 +657,18 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('8.8.0')) {
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, new AttemptService([]));
             $this->setVersion('8.9.0');
+        }
+
+        if ($this->isVersion('8.9.0')) {
+            $this->getServiceManager()->register(
+                AttemptServiceInterface::SERVICE_ID,
+                new AttemptService([
+                    AttemptService::OPTION_STATES_TO_EXCLUDE => [
+                        ProctoredDeliveryExecution::STATE_CANCELED
+                    ]
+                ])
+            );
+            $this->setVersion('8.11.0');
         }
     }
 }
