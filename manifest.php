@@ -45,12 +45,12 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '8.8.0',
+    'version' => '8.9.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=17.14.0',
-        'taoDelivery' => '>=9.0.0',
-        'taoDeliveryRdf' => '>=3.17.1',
+        'taoDelivery' => '>=9.8.0',
+        'taoDeliveryRdf' => '>=4.13.0',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=17.17.0',
         'taoOutcomeUi' => '>=2.6.6',
@@ -88,6 +88,7 @@ return array(
             \oat\taoProctoring\scripts\install\OverrideSectionPauseService::class,
             \oat\taoProctoring\scripts\install\RegisterProctoringRunnerService::class,
             \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
+            \oat\taoProctoring\scripts\install\RegisterProctorAttemptService::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
