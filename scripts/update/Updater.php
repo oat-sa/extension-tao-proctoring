@@ -659,7 +659,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.9.0');
         }
 
-        if ($this->isVersion('8.9.0')) {
+        $this->skip('8.9.0', '8.9.2');
+
+        if ($this->isVersion('8.9.2')) {
             $this->getServiceManager()->register(
                 AttemptServiceInterface::SERVICE_ID,
                 new AttemptService([
@@ -668,7 +670,7 @@ class Updater extends common_ext_ExtensionUpdater
                     ]
                 ])
             );
-            $this->setVersion('8.11.0');
+            $this->setVersion('8.10.0');
         }
     }
 }
