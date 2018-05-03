@@ -45,7 +45,6 @@ use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
-use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
@@ -78,7 +77,8 @@ use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
-
+use oat\taoProctoring\model\AttemptService;
+use oat\taoDelivery\model\AttemptServiceInterface;
 
 /**
  *
@@ -653,6 +653,11 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.8.0');
         }
 
-        $this->skip('8.8.0', '8.8.1');
+        if ($this->isVersion('8.8.0')) {
+            $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, new AttemptService([]));
+            $this->setVersion('8.9.0');
+        }
+      
+        $this->skip('8.9.0', '8.9.1');
     }
 }
