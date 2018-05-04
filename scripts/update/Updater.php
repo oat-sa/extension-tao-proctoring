@@ -45,7 +45,6 @@ use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
-use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
@@ -78,8 +77,9 @@ use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
-use oat\taoProctoring\model\AttemptService;
+use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
 /**
  *
@@ -660,5 +660,17 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.9.0', '8.9.2');
+
+        if ($this->isVersion('8.9.2')) {
+            $attemptService = $this->safeLoadService(AttemptServiceInterface::SERVICE_ID);
+            if (!$attemptService instanceof AttemptServiceInterface) {
+                $attemptService = new AttemptService([]);
+            }
+            $statesToExclude = $attemptService->getStatesToExclude();
+            $statesToExclude[] = ProctoredDeliveryExecution::STATE_CANCELED;
+            $attemptService->setStatesToExclude($statesToExclude);
+            $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, $attemptService);
+            $this->setVersion('8.10.0');
+        }
     }
 }
