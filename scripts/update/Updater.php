@@ -80,6 +80,7 @@ use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
+use oat\taoProctoring\model\AssessmentResultsService;
 
 /**
  *
@@ -672,5 +673,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, $attemptService);
             $this->setVersion('8.10.0');
         }
+        $this->skip('8.10.0', '8.10.1');
     }
 }
