@@ -57,6 +57,7 @@ class ProctorCsvImporter extends RdsUserImportService
     public function import($filePath, $extraProperties = [], $options = [])
     {
         $extraProperties[UserRdf::PROPERTY_ROLES] = ProctorService::ROLE_PROCTOR;
+        $extraProperties['roles'] = ProctorService::ROLE_PROCTOR;
         return parent::import($filePath, $extraProperties, $options);
     }
 }
