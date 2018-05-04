@@ -80,6 +80,7 @@ use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
+use oat\taoProctoring\model\AssessmentResultsService;
 
 /**
  *
