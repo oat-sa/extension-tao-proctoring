@@ -50,6 +50,8 @@ class AssessmentResultsService extends ConfigurableService
     const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
     const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
 
+    const OPTION_SCORE_URL = 'score_report_url';
+
     /**
      * Get test taker data as associative array
      * @param DeliveryExecutionInterface $deliveryExecution
@@ -185,6 +187,14 @@ class AssessmentResultsService extends ConfigurableService
         }
 
         return $rubrics;
+    }
+
+    /**
+     * Get the configurable url parts or default url to proctoring
+     */
+    public function getScoreReportUrlParts()
+    {
+        return (array) $this->getOption(self::OPTION_SCORE_URL);
     }
 
     /**

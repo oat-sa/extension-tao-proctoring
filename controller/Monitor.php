@@ -73,18 +73,21 @@ class Monitor extends SimplePageModule
         $user = \common_session_SessionManager::getSession()->getUser();
         $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
         $delivery = $this->getCurrentDelivery();
+        $guiSettingsService = $this->getServiceLocator()->get(GuiSettingsService::SERVICE_ID);
+        $assessmentResultsService = $this->getServiceLocator()->get(AssessmentResultsService::SERVICE_ID);
         $data = [
             'ismanageable' => false,
             'set' => [],
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories($hasAccessToReactivate),
-            'printReportButton' => $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID)->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
-            'timeHandling' => $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
-            'historyUrl' => $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
-            'refreshBtn' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
-            'autoRefresh' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
-            'canPause' => $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID)->getOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE),
-            'onlineStatus' => $this->getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
+            'printReportButton' => $assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
+            'printReportUrl' => $assessmentResultsService->getScoreReportUrlParts(),
+            'timeHandling' => $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
+            'historyUrl' => $this->getServiceLocator()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
+            'refreshBtn' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
+            'autoRefresh' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
+            'canPause' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE),
+            'onlineStatus' => $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
             'hasAccessToReactivate' => $hasAccessToReactivate
         ];
 

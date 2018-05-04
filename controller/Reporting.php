@@ -164,6 +164,7 @@ class Reporting extends SimplePageModule
             throw new \common_exception_MissingParameter('id');
         }
         $idList = $this->getRequestParameter('id');
+        $context = $this->getRequestParameter('context');
         if (!is_array($idList)) {
             $idList = [$idList];
         }
@@ -172,7 +173,7 @@ class Reporting extends SimplePageModule
         /** @var ProctorService $deliveryService */
         $deliveryService = ServiceManager::getServiceManager()->get(ProctorService::SERVICE_ID);
         $currentUser = \common_session_SessionManager::getSession()->getUser();
-        $deliveries = $deliveryService->getProctorableDeliveries($currentUser);
+        $deliveries = $deliveryService->getProctorableDeliveries($currentUser, $context);
 
         /** @var $assessmentResultsService AssessmentResultsService */
         $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);

@@ -99,7 +99,7 @@ class DeliveryServer extends DefaultDeliveryServer
             }
 
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
-            $this->setData('deliveryLabel', $deliveryExecution->getLabel());
+            $this->setData('deliveryLabel', addslashes($deliveryExecution->getLabel()));
             $this->setData('returnUrl', $this->getReturnUrl());
             $this->setData('cancelUrl', _url('cancelExecution', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
             $this->setData('cancelable', $deliveryExecutionStateService->isCancelable($deliveryExecution));
