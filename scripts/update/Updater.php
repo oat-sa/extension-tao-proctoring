@@ -77,7 +77,9 @@ use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
-
+use oat\taoDelivery\model\AttemptService;
+use oat\taoDelivery\model\AttemptServiceInterface;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 
 /**
  *
@@ -636,6 +638,41 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.7.0');
         }
 
-        $this->skip('8.7.0', '8.8.0');
+        $this->skip('8.7.0', '8.7.1');
+
+        if ($this->isVersion('8.7.1')) {
+            $assessmentResultsService = $this->getServiceManager()->get(AssessmentResultsService::SERVICE_ID);
+            $assessmentResultsService->setOption(
+                AssessmentResultsService::OPTION_SCORE_URL,
+                array(
+                    'extension' => 'taoProctoring',
+                    'controller' => 'Reporting',
+                    'action' => 'printReport'
+                )
+            );
+            $this->getServiceManager()->register(AssessmentResultsService::SERVICE_ID, $assessmentResultsService);
+            $this->setVersion('8.8.0');
+        }
+
+        if ($this->isVersion('8.8.0')) {
+            $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, new AttemptService([]));
+            $this->setVersion('8.9.0');
+        }
+
+        $this->skip('8.9.0', '8.9.2');
+
+        if ($this->isVersion('8.9.2')) {
+            $attemptService = $this->safeLoadService(AttemptServiceInterface::SERVICE_ID);
+            if (!$attemptService instanceof AttemptServiceInterface) {
+                $attemptService = new AttemptService([]);
+            }
+            $statesToExclude = $attemptService->getStatesToExclude();
+            $statesToExclude[] = ProctoredDeliveryExecution::STATE_CANCELED;
+            $attemptService->setStatesToExclude($statesToExclude);
+            $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, $attemptService);
+            $this->setVersion('8.10.0');
+        }
+        
+        $this->skip('8.10.0', '8.11.0');
     }
 }
