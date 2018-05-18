@@ -732,6 +732,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $statusesMap[$status->getLabel()] = $status->getUri();
         }
 
+        $paramsValues = [];
         $limitQueryBuilder = $this->getQueryBuilder();
         $limitQueryBuilder->select('limit_q.delivery_id');
         $limitQueryBuilder->groupBy('limit_q.delivery_id');
@@ -745,7 +746,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $statusBuilder = $this->getQueryBuilder();
             $statusBuilder->select('status_d_m.delivery_id, count(status_d_m.status) order_status');
             $statusBuilder->from('delivery_monitoring', 'status_d_m');
-            $statusBuilder->where('status_d_m.status = \''.$statusesMap[$orderby]. '\'');
+            $statusBuilder->where('status_d_m.status = :status_order');
+            $paramsValues[':status_order'] =  $statusesMap[$orderby];
             $statusBuilder->groupBy('status_d_m.delivery_id');
             $statusSql = $statusBuilder->getSQL();
 
@@ -787,7 +789,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         }
 
         $limitSql = $limitQueryBuilder->getSQL();
-        $stmtLimit = $this->getPersistence()->query($limitSql);
+        $stmtLimit = $this->getPersistence()->query($limitSql, $paramsValues);
         $dataLimit = $stmtLimit->fetchAll(\PDO::FETCH_COLUMN);
 
 
@@ -803,13 +805,16 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
         $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
+        $paramsValues = [];
         foreach ($statusesMap as $label => $statusUri) {
             $queryBuilder->leftJoin(
                 'delivery_m',
                 self::TABLE_NAME,
                 $conn->quoteIdentifier('s_'.$label),
-                'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$label).'.delivery_execution_id and '.$conn->quoteIdentifier('s_'.$label).'.status = \''.$statusUri.'\''
+                'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$label).'.delivery_execution_id and '
+                .$conn->quoteIdentifier('s_'.$label).'.status = :status_uri'
             );
+            $paramsValues[':status_uri'] = $statusUri;
         }
         $queryBuilder->leftJoin(
             'delivery_m',
@@ -819,7 +824,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         );
 
         if ($dataLimit) {
-            $queryBuilder->where('delivery_m.delivery_id IN (' . join(',', array_map(function($item){ return "'$item'"; }, $dataLimit)) . ')');
+            $placeHolders = [];
+            foreach ($dataLimit as $index => $value) {
+                $key = ':in_condition_' . $index;
+                $placeHolders[] = $key;
+                $paramsValues[$key] = $value;
+            }
+            $placeHolders = implode(',', $placeHolders);
+            $queryBuilder->where("delivery_m.delivery_id IN ($placeHolders)");
         }
 
         $queryBuilder->groupBy('delivery_m.delivery_id, delivery_m.delivery_name');
@@ -842,7 +854,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
         $sql = $outerQueryBuilder->getSQL();
 
-        $stmt = $this->getPersistence()->query($sql);
+        $stmt = $this->getPersistence()->query($sql, $paramsValues);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $data;

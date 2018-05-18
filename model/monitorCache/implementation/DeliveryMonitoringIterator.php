@@ -30,7 +30,7 @@ class DeliveryMonitoringIterator implements \Iterator
 {
     use ServiceLocatorAwareTrait;
 
-    const CACHE_SIZE = 100;
+    const CACHE_SIZE = 10000;
 
     /**
      * Id of the current instance
@@ -123,6 +123,8 @@ class DeliveryMonitoringIterator implements \Iterator
      */
     protected function load($offset)
     {
+        \common_Logger::d(__CLASS__ . '::load offset = ' . $offset);
+
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
         $options = array(
