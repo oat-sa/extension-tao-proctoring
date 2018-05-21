@@ -50,6 +50,21 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
                 'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::DELIVERY_EXECUTION_ID
             );
 
+            $tableLog->addIndex(
+                array(RdsDeliveryLogService::EVENT_ID),
+                'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::EVENT_ID
+            );
+
+            $tableLog->addIndex(
+                array(RdsDeliveryLogService::CREATED_AT),
+                'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::CREATED_AT
+            );
+
+            $tableLog->addIndex(
+                array(RdsDeliveryLogService::CREATED_BY),
+                'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::CREATED_AT
+            );
+
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
             foreach ($queries as $query) {
                 $persistence->exec($query);

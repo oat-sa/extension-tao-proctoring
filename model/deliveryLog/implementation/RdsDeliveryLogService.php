@@ -128,6 +128,71 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     }
 
     /**
+     * @param array $params
+     *  [
+     *      'delivery_execution_id' => '',
+     *      'event_id' => '',
+     *      'from' => '',
+     *      'to' => '',
+     *      'created_by' => '',
+     *  ]
+     * @param array $options
+     *  [
+     *      'order' => 'created_at',
+     *      'dir' => 'asc',
+     *      'limit' => null, // to get all records
+     *      'offset' => 0,
+     *  ]
+     * @return mixed
+     */
+    public function search($params = [], $options = [])
+    {
+        $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
+        $fields = [self::EVENT_ID, self::CREATED_BY, self::DELIVERY_EXECUTION_ID];
+        $parameters = [];
+        $where = [];
+        foreach ($params as $key => $val) {
+            if (in_array($key, $fields)) {
+                $where[] = $key . '= ?';
+                $parameters[] = $val;
+            }
+        }
+
+        if (isset($params['from'])) {
+            $where[] = self::CREATED_AT . ' >= ?';
+            $parameters[] = $params['from'];
+        }
+
+        if (isset($params['to'])) {
+            $where[] = self::CREATED_AT . ' <= ?';
+            $parameters[] = $params['to'];
+        }
+
+        $sql .= implode(' AND ', $where);
+        $opts = [
+            'order' => 'ORDER BY ?',
+            'dir' => '?',
+            'limit' => 'LIMIT ?',
+            'offset' => 'OFFSET ?',
+        ];
+
+        foreach ($opts as $k => $v) {
+            if (isset($options[$k])) {
+                if ($k == 'dir') {
+                    $sql .= ' ' . (mb_strtolower($v) == 'desc' ? 'DESC' : 'ASC');
+                } else {
+                    $sql .= ' ' . $v;
+                    $parameters[] = $options[$k];
+                }
+            }
+        }
+        $stmt = $this->getPersistence()->query($sql, $parameters);
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $this->decodeValues($data);
+        return $result;
+    }
+
+    /**
      * @param $data
      * @return array
      */
