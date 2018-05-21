@@ -24,6 +24,8 @@ use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use \oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
+use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
 
 /**
  * Action to register necessary extension services
@@ -48,7 +50,10 @@ class RegisterServices extends InstallAction
         $activityMonitoringService = new ActivityMonitoringService([
             ActivityMonitoringService::OPTION_ACTIVE_USER_THRESHOLD => 300,
         ]);
+        $this->getServiceManager()->register(
+            DeliveryExecutionCounterInterface::SERVICE_ID,
+            new DeliveryExecutionCounterService()
+        );
         $this->getServiceManager()->register(ActivityMonitoringService::SERVICE_ID, $activityMonitoringService);
-
     }
 }
