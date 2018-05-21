@@ -126,8 +126,25 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                 try {
                     $this->terminateExecution($deliveryExecution);
                     $count++;
+                } catch (\common_exception_NotFound $e) {
+                    //Delivery execution entry missed.
+                    $deliveryExecutionData->update(
+                        DeliveryMonitoringService::STATUS,
+                        'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusDeleted'
+                    );
+                    $deliveryMonitoringService->save($deliveryExecutionData);
+                    common_Logger::w(
+                        'Delivery execution '.$deliveryExecution->getIdentifier().
+                        ' missed. Set it\'s state in delivery monitoring to Deleted'
+                    );
+                    $this->addReport(
+                        Report::TYPE_WARNING,
+                        "Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `deleted` ".
+                        "due to missed delivery execution entry."
+                    );
+                    continue;
                 } catch (\Exception $e) {
-                    $this->addReport(Report::TYPE_ERROR,$e->getMessage());
+                    $this->addReport(Report::TYPE_ERROR, $e->getMessage());
                 }
             }
             
