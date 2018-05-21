@@ -81,6 +81,8 @@ use oat\taoDelivery\model\AttemptService;
 use oat\taoDelivery\model\AttemptServiceInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\AssessmentResultsService;
+use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
+use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
 
 /**
  *
@@ -673,6 +675,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, $attemptService);
             $this->setVersion('8.10.0');
         }
-        $this->skip('8.10.0', '8.11.1');
+        $this->skip('8.10.0', '8.11.0');
+
+        if ($this->isVersion('8.11.0')) {
+            $this->getServiceManager()->register(
+                DeliveryExecutionCounterInterface::SERVICE_ID,
+                new DeliveryExecutionCounterService()
+            );
+            $this->setVersion('8.12.0');
+        }
+
+        $this->skip('8.12.0', '8.12.1');
     }
 }
