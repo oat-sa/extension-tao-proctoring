@@ -787,7 +787,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             }
             $limitQueryBuilder->setFirstResult($offset);
         }
-
+        $limitQueryBuilder->andWhere('limit_q.delivery_id IS NOT NULL');
         $limitSql = $limitQueryBuilder->getSQL();
         $stmtLimit = $this->getPersistence()->query($limitSql, $paramsValues);
         $dataLimit = $stmtLimit->fetchAll(\PDO::FETCH_COLUMN);
@@ -812,9 +812,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 self::TABLE_NAME,
                 $conn->quoteIdentifier('s_'.$label),
                 'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$label).'.delivery_execution_id and '
-                .$conn->quoteIdentifier('s_'.$label).'.status = :status_uri'
+                .$conn->quoteIdentifier('s_'.$label).'.status = :status_uri_'.$label
             );
-            $paramsValues[':status_uri'] = $statusUri;
+            $paramsValues[':status_uri_'.$label] = $statusUri;
         }
         $queryBuilder->leftJoin(
             'delivery_m',
