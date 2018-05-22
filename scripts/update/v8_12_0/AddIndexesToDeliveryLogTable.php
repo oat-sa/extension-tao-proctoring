@@ -22,19 +22,16 @@
 namespace oat\taoProctoring\scripts\update\v8_12_0;
 
 
-use oat\oatbox\action\Action;
-use oat\oatbox\service\ServiceManager;
+use oat\oatbox\extension\AbstractAction;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
-class AddIndexesToDeliveryLogTable implements Action
+class AddIndexesToDeliveryLogTable extends AbstractAction
 {
-    /**
-     * @param $params
-     */
+
     public function __invoke($params)
     {
-        $deliveryLogService = $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
-        $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
+        $deliveryLogService = $this->getServiceLocator()->get(RdsDeliveryLogService::SERVICE_ID);
+        $persistenceManager = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID);
         $persistence = $persistenceManager->getPersistenceById($deliveryLogService->getOption(RdsDeliveryLogService::OPTION_PERSISTENCE));
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
@@ -56,9 +53,5 @@ class AddIndexesToDeliveryLogTable implements Action
         foreach ($queries as $query) {
             $persistence->exec($query);
         }
-    }
-
-    public function getServiceManager() {
-        return ServiceManager::getServiceManager();
     }
 }

@@ -62,7 +62,7 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
 
             $tableLog->addIndex(
                 array(RdsDeliveryLogService::CREATED_BY),
-                'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::CREATED_AT
+                'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::CREATED_BY
             );
 
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
