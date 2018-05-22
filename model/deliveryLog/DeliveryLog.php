@@ -62,4 +62,24 @@ interface DeliveryLog extends DeliveryExecutionDelete
      * @return bool true if it correctly flush false otherwise
      */
     public function flush();
+
+    /**
+     * @param array $params
+     *  [
+     *      'delivery_execution_id' => '',
+     *      'event_id' => '',
+     *      'from' => '',
+     *      'to' => '',
+     *      'created_by' => '',
+     *  ]
+     * @param array $options
+     *  [
+     *      'order' => 'created_at',
+     *      'dir' => 'asc',
+     *      'limit' => null, // to get all records
+     *      'offset' => 0,
+     *  ]
+     * @return mixed
+     */
+    public function search($params = [], $options = []);
 }
