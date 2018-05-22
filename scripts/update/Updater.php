@@ -669,9 +669,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.10.0');
         }
 
-        $this->skip('8.10.0', '8.12.0');
+        $this->skip('8.10.0', '8.11.0');
 
-        if ($this->isVersion('8.12.0')) {
+        if ($this->isVersion('8.11.0')) {
             $this->getServiceManager()->register(
                 DeliveryExecutionCounterInterface::SERVICE_ID,
                 new DeliveryExecutionCounterService()
