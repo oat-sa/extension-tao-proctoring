@@ -122,15 +122,34 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
             $deliveryExecution = $deliveryExecutionService->getDeliveryExecution(
                 $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
             );
-            if ($this->isExpired($deliveryExecution)) {
-                try {
+            try {
+                if ($this->isExpired($deliveryExecution)) {
                     $this->terminateExecution($deliveryExecution);
                     $count++;
-                } catch (\Exception $e) {
-                    $this->addReport(Report::TYPE_ERROR,$e->getMessage());
                 }
+            } catch (\common_exception_NotFound $e) {
+                //Delivery execution entry missed.
+                if ($data[DeliveryMonitoringService::STATUS] !== DeliveryExecution::STATE_PAUSED) {
+                    $deliveryExecutionData->update(
+                        DeliveryMonitoringService::STATUS,
+                        DeliveryExecution::STATE_PAUSED
+                    );
+                    $deliveryMonitoringService->save($deliveryExecutionData);
+                    common_Logger::w(
+                        'Delivery execution ' . $deliveryExecution->getIdentifier() .
+                        ' is missed. Set it\'s state in delivery monitoring to Paused'
+                    );
+                    $this->addReport(
+                        Report::TYPE_WARNING,
+                        "Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `paused` ".
+                        "due to missed delivery execution entry."
+                    );
+                }
+                continue;
+            } catch (\Exception $e) {
+                $this->addReport(Report::TYPE_ERROR, $e->getMessage());
             }
-            
+
             // Should we stop terminating assessments?
             if ($this->maxTerminate > 0 && $count >= $this->maxTerminate) {
                 break;
