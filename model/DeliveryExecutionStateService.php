@@ -110,4 +110,11 @@ interface DeliveryExecutionStateService extends StateServiceInterface
      * @return mixed
      */
     public function reactivateExecution(DeliveryExecution $deliveryExecution, $reason = null);
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     * @param null $reason
+     * @return mixed
+     */
+    public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null);
 }

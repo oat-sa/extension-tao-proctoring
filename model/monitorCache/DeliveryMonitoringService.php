@@ -81,9 +81,12 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
     public function getData(DeliveryExecutionInterface $deliveryExecution);
 
     /**
+     * @param array $criteria
+     * @param array $options
+     * @param bool $together
      * @return DeliveryMonitoringData[]
      */
-    public function find();
+    public function find(array $criteria = [], array $options = [], $together = false);
 
     /**
      * @param DeliveryMonitoringData $deliveryMonitoring

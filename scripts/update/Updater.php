@@ -35,6 +35,7 @@ use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoProctoring\model\FinishDeliveryExecutionsService;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
@@ -94,6 +95,7 @@ class Updater extends common_ext_ExtensionUpdater
     /**
      * @param string $initialVersion
      * @return string string
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -680,5 +682,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.12.0', '8.13.0');
+
+        if ($this->isVersion('8.13.0')){
+            $finishDEService = new FinishDeliveryExecutionsService([
+                FinishDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H'
+            ]);
+
+            $this->getServiceManager()->register(FinishDeliveryExecutionsService::SERVICE_ID, $finishDEService);
+
+            $this->setVersion('9.0.0');
+        }
     }
 }
