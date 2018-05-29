@@ -20,9 +20,9 @@
 namespace oat\taoProctoring\scripts\tools;
 
 use oat\oatbox\extension\script\ScriptAction;
-use oat\taoProctoring\model\FinishDeliveryExecutionsService;
+use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 
-class FinishDeliveryExecutionsScript extends ScriptAction
+class TerminateDeliveryExecutionsScript extends ScriptAction
 {
     /**
      * @return array
@@ -37,7 +37,7 @@ class FinishDeliveryExecutionsScript extends ScriptAction
      */
     protected function provideDescription()
     {
-        return 'TAO Delivery - Finish Delivery Executions';
+        return 'TAO Delivery - Terminate Delivery Executions';
     }
 
     /**
@@ -51,9 +51,9 @@ class FinishDeliveryExecutionsScript extends ScriptAction
      */
     protected function run()
     {
-        /** @var FinishDeliveryExecutionsService $finishDeService */
-        $finishDeService = $this->getServiceLocator()->get(FinishDeliveryExecutionsService::SERVICE_ID);
+        /** @var TerminateDeliveryExecutionsService $terminateDeService */
+        $terminateDeService = $this->getServiceLocator()->get(TerminateDeliveryExecutionsService::SERVICE_ID);
 
-        return $finishDeService->execute();
+        return $terminateDeService->execute();
     }
 }

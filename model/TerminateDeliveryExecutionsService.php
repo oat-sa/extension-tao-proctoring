@@ -22,7 +22,6 @@ namespace oat\taoProctoring\model;
 use core_kernel_classes_Property;
 use DateInterval;
 use DateTimeImmutable;
-use DateTime;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
@@ -31,9 +30,9 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use common_report_Report as Report;
 
-class FinishDeliveryExecutionsService extends ConfigurableService
+class TerminateDeliveryExecutionsService extends ConfigurableService
 {
-    const SERVICE_ID = 'taoProctoring/FinishDeliveryExecutions';
+    const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
 
     const OPTION_TTL_AS_ACTIVE = 'ttlAsActive';
 
@@ -54,7 +53,7 @@ class FinishDeliveryExecutionsService extends ConfigurableService
                 DeliveryExecution::STATE_PAUSED,
             ]
         ]);
-        $this->report = Report::createInfo('Finishing executions...');
+        $this->report = Report::createInfo('Terminating executions...');
         $count  = 0;
 
         foreach ($executionsMonitoringData as $datum) {
@@ -64,10 +63,10 @@ class FinishDeliveryExecutionsService extends ConfigurableService
             if ($this->isBasedOnEndDateTime()){
                 $deliveryID  = $data[DeliveryMonitoringService::DELIVERY_ID];
                 $endDateTime = $this->getDeliveryEndDateTime($deliveryID);
-                //if no end date time found, fallback to normal finishing execution based on TTL.
+                //if no end date time found, fallback to normal terminating execution based on TTL.
                 if (!is_null($endDateTime)){
-                    $finished = $this->finishDeliveryBasedOnEndDate($endDateTime, $executionId);
-                    if($finished){
+                    $terminated = $this->terminateDeliveryBasedOnEndDate($endDateTime, $executionId);
+                    if($terminated){
                         $count++;
                     }
                     continue;
@@ -75,13 +74,13 @@ class FinishDeliveryExecutionsService extends ConfigurableService
 
             }
 
-            $finished = $this->finishExecutionsBasedOnTTL($executionId);
-            if($finished){
+            $terminated = $this->terminateExecutionsBasedOnTTL($executionId);
+            if($terminated){
                 $count++;
             }
         }
 
-        $this->report->add(Report::createInfo('Number of executions finished: '. $count));
+        $this->report->add(Report::createInfo('Number of executions terminated: '. $count));
 
         return $this->report;
     }
@@ -91,7 +90,7 @@ class FinishDeliveryExecutionsService extends ConfigurableService
      * @return bool
      * @throws \common_exception_Error
      */
-    protected function finishExecutionsBasedOnTTL($executionId)
+    protected function terminateExecutionsBasedOnTTL($executionId)
     {
         try {
             $deliveryExecution = $this->getServiceProxy()->getDeliveryExecution($executionId);
@@ -112,13 +111,13 @@ class FinishDeliveryExecutionsService extends ConfigurableService
             $timeUntilToLive = $timeUntilToLive->add(new DateInterval($ttl));
 
             if ((new DateTimeImmutable('now')) >= $timeUntilToLive) {
-                $this->getDeliveryStateService()->finishExecution($deliveryExecution,[
+                $this->getDeliveryStateService()->terminateExecution($deliveryExecution,[
                     'reasons' =>[
                         'category' => 'Technical'
                     ],
-                    'comment' => 'The assessment was automatically finished.'
+                    'comment' => 'The assessment was automatically terminated.'
                 ]);
-                $this->report->add(Report::createSuccess('Execution finished with success:'. $executionId ));
+                $this->report->add(Report::createSuccess('Execution terminated with success:'. $executionId ));
 
                 return true;
             } else {
@@ -143,7 +142,7 @@ class FinishDeliveryExecutionsService extends ConfigurableService
      * @return bool
      * @throws \common_exception_Error
      */
-    protected function finishDeliveryBasedOnEndDate(DateTimeImmutable $endDateTime, $executionId)
+    protected function terminateDeliveryBasedOnEndDate(DateTimeImmutable $endDateTime, $executionId)
     {
         try {
             $deliveryExecution = $this->getServiceProxy()->getDeliveryExecution($executionId);
@@ -155,13 +154,13 @@ class FinishDeliveryExecutionsService extends ConfigurableService
             }
 
             if ((new DateTimeImmutable('now')) >= $endDateTime) {
-                $this->getDeliveryStateService()->finishExecution($deliveryExecution,[
+                $this->getDeliveryStateService()->terminateExecution($deliveryExecution,[
                     'reasons' =>[
                         'category' => 'Technical'
                     ],
-                    'comment' => 'The assessment was automatically finished because end time expired.'
+                    'comment' => 'The assessment was automatically terminated because end time expired.'
                 ]);
-                $this->report->add(Report::createSuccess('Execution finished with success:'. $executionId ));
+                $this->report->add(Report::createSuccess('Execution terminated with success:'. $executionId ));
 
                 return true;
             } else {

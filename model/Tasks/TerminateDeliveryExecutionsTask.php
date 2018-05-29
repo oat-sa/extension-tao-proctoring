@@ -20,9 +20,9 @@
 namespace oat\taoProctoring\model\Tasks;
 
 use oat\oatbox\extension\AbstractAction;
-use oat\taoProctoring\model\FinishDeliveryExecutionsService;
+use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 
-class FinishDeliveryExecutionsTask extends AbstractAction implements \JsonSerializable
+class TerminateDeliveryExecutionsTask extends AbstractAction implements \JsonSerializable
 {
     /**
      * @param $params
@@ -31,8 +31,8 @@ class FinishDeliveryExecutionsTask extends AbstractAction implements \JsonSerial
      */
     public function __invoke($params)
     {
-        /** @var FinishDeliveryExecutionsService $finishDeService */
-        $finishDeService = $this->getServiceLocator()->get(FinishDeliveryExecutionsService::SERVICE_ID);
+        /** @var TerminateDeliveryExecutionsService $finishDeService */
+        $finishDeService = $this->getServiceLocator()->get(TerminateDeliveryExecutionsService::SERVICE_ID);
 
         return $finishDeService->execute();
     }
