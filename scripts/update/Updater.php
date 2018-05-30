@@ -49,10 +49,11 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
-use oat\taoProctoring\model\delivery\DeliveryPluginService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
+use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
@@ -94,6 +95,7 @@ class Updater extends common_ext_ExtensionUpdater
     /**
      * @param string $initialVersion
      * @return string string
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -494,14 +496,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('7.0.0');
         }
 
-        $this->skip('7.0.0', '7.1.1');
-
-        if ($this->isVersion('7.1.1')) {
-            // Delete unused service after refactoring
-            //$this->getServiceManager()->register(DeliveryPluginService::SERVICE_ID, new DeliveryPluginService(['plugin_type' => 'taoProctoring']));
-            $this->setVersion('7.2.0');
-        }
-        $this->skip('7.2.0', '7.2.1');
+        $this->skip('7.0.0', '7.2.1');
 
         if ($this->isVersion('7.2.1')) {
             $runnerService = new ProctoringRunnerService();
@@ -675,7 +670,21 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, $attemptService);
             $this->setVersion('8.10.0');
         }
-        $this->skip('8.10.0', '8.11.0');
+
+        $this->skip('8.10.0', '8.10.1');
+
+        if ($this->isVersion('8.10.1')) {
+            $terminateDEService = new TerminateDeliveryExecutionsService([
+                TerminateDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                TerminateDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+
+            $this->getServiceManager()->register(TerminateDeliveryExecutionsService::SERVICE_ID, $terminateDEService);
+
+            $this->setVersion('8.10.2');
+        }
+
+        $this->skip('8.10.2', '8.11.0');
 
         if ($this->isVersion('8.11.0')) {
             $this->getServiceManager()->register(
@@ -685,6 +694,17 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.12.0');
         }
 
-        $this->skip('8.12.0', '8.12.1');
+        $this->skip('8.12.0', '8.13.0');
+
+        if ($this->isVersion('8.13.0')) {
+            $terminateDEService = new TerminateDeliveryExecutionsService([
+                TerminateDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                TerminateDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+
+            $this->getServiceManager()->register(TerminateDeliveryExecutionsService::SERVICE_ID, $terminateDEService);
+
+            $this->setVersion('8.13.1');
+        }
     }
 }
