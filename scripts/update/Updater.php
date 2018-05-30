@@ -53,6 +53,7 @@ use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
+use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
@@ -94,6 +95,7 @@ class Updater extends common_ext_ExtensionUpdater
     /**
      * @param string $initialVersion
      * @return string string
+     * @throws \common_Exception
      */
     public function update($initialVersion)
     {
@@ -652,7 +654,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('8.8.0')) {
             $this->getServiceManager()->register(AttemptServiceInterface::SERVICE_ID, new AttemptService([]));
-            $this->setVersion('8.9.0'); 
+            $this->setVersion('8.9.0');
         }
 
         $this->skip('8.9.0', '8.9.2');
@@ -669,7 +671,20 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.10.0');
         }
 
-        $this->skip('8.10.0', '8.11.0');
+        $this->skip('8.10.0', '8.10.1');
+
+        if ($this->isVersion('8.10.1')) {
+            $terminateDEService = new TerminateDeliveryExecutionsService([
+                TerminateDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                TerminateDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+
+            $this->getServiceManager()->register(TerminateDeliveryExecutionsService::SERVICE_ID, $terminateDEService);
+
+            $this->setVersion('8.10.2');
+        }
+
+        $this->skip('8.10.2', '8.11.0');
 
         if ($this->isVersion('8.11.0')) {
             $this->getServiceManager()->register(
@@ -680,5 +695,16 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.12.0', '8.13.0');
+
+        if ($this->isVersion('8.13.0')) {
+            $terminateDEService = new TerminateDeliveryExecutionsService([
+                TerminateDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                TerminateDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+
+            $this->getServiceManager()->register(TerminateDeliveryExecutionsService::SERVICE_ID, $terminateDEService);
+
+            $this->setVersion('8.13.1');
+        }
     }
 }
