@@ -694,6 +694,17 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.12.0');
         }
 
-        $this->skip('8.12.0', '8.13.1');
+        $this->skip('8.12.0', '8.13.0');
+
+        if ($this->isVersion('8.13.0')) {
+            $terminateDEService = new TerminateDeliveryExecutionsService([
+                TerminateDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                TerminateDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+
+            $this->getServiceManager()->register(TerminateDeliveryExecutionsService::SERVICE_ID, $terminateDEService);
+
+            $this->setVersion('8.13.1');
+        }
     }
 }
