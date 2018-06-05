@@ -57,26 +57,29 @@ class TerminateDeliveryExecutionsService extends ConfigurableService
         $count  = 0;
 
         foreach ($executionsMonitoringData as $datum) {
-            $data        = $datum->get();
-            $executionId = $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
-
-            if ($this->isBasedOnEndDateTime()){
-                $deliveryID  = $data[DeliveryMonitoringService::DELIVERY_ID];
-                $endDateTime = $this->getDeliveryEndDateTime($deliveryID);
-                //if no end date time found, fallback to normal terminating execution based on TTL.
-                if (!is_null($endDateTime)){
-                    $terminated = $this->terminateDeliveryBasedOnEndDate($endDateTime, $executionId);
-                    if($terminated){
-                        $count++;
+            try{
+                $data        = $datum->get();
+                $executionId = $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
+                if ($this->isBasedOnEndDateTime()){
+                    $deliveryID  = $data[DeliveryMonitoringService::DELIVERY_ID];
+                    $endDateTime = $this->getDeliveryEndDateTime($deliveryID);
+                    //if no end date time found, fallback to normal terminating execution based on TTL.
+                    if (!is_null($endDateTime)){
+                        $terminated = $this->terminateDeliveryBasedOnEndDate($endDateTime, $executionId);
+                        if($terminated){
+                            $count++;
+                        }
+                        continue;
                     }
-                    continue;
+
                 }
 
-            }
-
-            $terminated = $this->terminateExecutionsBasedOnTTL($executionId);
-            if($terminated){
-                $count++;
+                $terminated = $this->terminateExecutionsBasedOnTTL($executionId);
+                if($terminated){
+                    $count++;
+                }
+            }catch (\Exception $exception){
+                $this->report->add(Report::createFailure($exception->getMessage()));
             }
         }
 
