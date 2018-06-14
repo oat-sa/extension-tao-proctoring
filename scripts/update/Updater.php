@@ -37,6 +37,7 @@ use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
+use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
@@ -54,6 +55,7 @@ use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
+use oat\taoProctoring\model\execution\ProctoringDeliveryDeleteService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
@@ -708,5 +710,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('8.13.1', '8.13.3');
+
+        if ($this->isVersion('8.13.3')){
+            /** @var DeliveryDeleteService $deleteDelivery */
+            $deleteDelivery        = $this->getServiceManager()->get(DeliveryDeleteService::SERVICE_ID);
+            $proctorDeleteDelivery = new ProctoringDeliveryDeleteService($deleteDelivery->getOptions());
+
+            $this->getServiceManager()->register(DeliveryDeleteService::SERVICE_ID, $proctorDeleteDelivery);
+
+            $this->setVersion('8.14.0');
+        }
     }
 }
