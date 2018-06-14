@@ -75,6 +75,8 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoEventLog\model\eventLog\LoggerService;
+use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
+use oat\taoProctoring\model\execution\ProctoringDeliveryDeleteService;
 
 
 /**
@@ -619,6 +621,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('8.5.2');
         }
 
-        $this->skip('8.5.2', '8.5.3.1');
+        $this->skip('8.5.2', '8.5.3');
+
+        if ($this->isVersion('8.5.3')) {
+            /** @var DeliveryDeleteService $deleteDelivery */
+            $deleteDelivery        = $this->getServiceManager()->get(DeliveryDeleteService::SERVICE_ID);
+            $proctorDeleteDelivery = new ProctoringDeliveryDeleteService($deleteDelivery->getOptions());
+
+            $this->getServiceManager()->register(DeliveryDeleteService::SERVICE_ID, $proctorDeleteDelivery);
+
+            $this->setVersion('8.5.3.1');
+        }
     }
 }
