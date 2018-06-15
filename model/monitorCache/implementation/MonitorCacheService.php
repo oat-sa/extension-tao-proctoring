@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdfs;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
@@ -48,22 +49,18 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
  */
 class MonitorCacheService extends MonitoringStorage
 {
-
+    /**
+     * @param DeliveryExecutionCreated $event
+     * @throws \common_exception_NotFound
+     */
     public function executionCreated(DeliveryExecutionCreated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
         $data = $this->getData($deliveryExecution);
-        $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
-        $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
+        $data = $this->updateDeliveryInformation($data, $deliveryExecution);
         $data = $this->updateTestTakerInformation($data, $event->getUser());
 
-        $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
-        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
-        $data->update(
-            DeliveryMonitoringService::START_TIME,
-            \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
-        );
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $success = $this->save($data);
         if (!$success) {
@@ -205,6 +202,26 @@ class MonitorCacheService extends MonitoringStorage
         if (!empty($lastNames)) {
             $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, reset($lastNames));
         }
+
+        return $data;
+    }
+
+    /**
+     * @param \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData $data
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @return \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData
+     * @throws \common_exception_NotFound
+     */
+    protected function updateDeliveryInformation($data, $deliveryExecution)
+    {
+        $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
+        $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
+        $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());
+        $data->update(DeliveryMonitoringService::DELIVERY_NAME, $deliveryExecution->getDelivery()->getLabel());
+        $data->update(
+            DeliveryMonitoringService::START_TIME,
+            \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true)
+        );
 
         return $data;
     }

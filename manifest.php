@@ -29,6 +29,7 @@ use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterDeliveryExecutionManagerService;
 use oat\taoProctoring\scripts\install\RegisterDeliveryServerService;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
+use oat\taoProctoring\scripts\install\RegisterProctoringDeliveryDeleteService;
 use oat\taoProctoring\scripts\install\RegisterProctoringEntryPoint;
 use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
@@ -45,12 +46,12 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '8.13.2',
+    'version' => '9.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=19.0.0',
         'taoDelivery' => '>=9.9.0',
-        'taoDeliveryRdf' => '>=4.13.0',
+        'taoDeliveryRdf' => '>=5.2.1',
         'taoTestTaker' => '>=2.6.0',
         'taoQtiTest' => '>=17.17.0',
         'taoOutcomeUi' => '>=2.6.6',
@@ -89,6 +90,7 @@ return array(
             \oat\taoProctoring\scripts\install\RegisterProctoringRunnerService::class,
             \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
             \oat\taoProctoring\scripts\install\RegisterProctorAttemptService::class,
+            RegisterProctoringDeliveryDeleteService::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
