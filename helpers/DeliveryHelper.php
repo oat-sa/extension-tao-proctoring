@@ -380,43 +380,23 @@ class DeliveryHelper
             foreach(self::_getUserExtraFields() as $field){
                 $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
             }
-            $now = microtime(true);
 
             $online = null;
-            if($testSessionConnectivityStatusService->hasOnlineMode()){
+            if ($testSessionConnectivityStatusService->hasOnlineMode()) {
                 $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
                 $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
             }
 
             if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) && $online) {
                 $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
-                $elapsed = $now - $lastActivity;
             } else {
                 $lastActivity = null;
-                $elapsed = 0;
-            }
-
-            if (isset($cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP])) {
-                $lastPauseTimestamp = $cachedData[DeliveryMonitoringService::LAST_PAUSE_TIMESTAMP];
-            } else {
-                $lastPauseTimestamp = null;
             }
 
             $executionState = $cachedData[DeliveryMonitoringService::STATUS];
-
-            if ((DeliveryExecution::STATE_ACTIVE != $executionState && $lastPauseTimestamp) || !$online) {
-                $elapsedApprox = $lastPauseTimestamp - $lastActivity;
-            } else {
-                $elapsedApprox = $elapsed;
-            }
-
             $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
-            $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? intval($cachedData[DeliveryMonitoringService::REMAINING_TIME]) : 0;
-            $diffTimestamp = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
-            $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
-            $diffTime = $duration ? $duration : $diffTimestamp;
-            $remaining = $remaining - $diffTime;
-            $approximatedRemaining = $extraTime ? round(floatval($remaining + $extraTime) - $elapsedApprox) : round(floatval($remaining) - $elapsedApprox);
+            $remaining = self::getRemainingTime($cachedData);
+            $approximatedRemaining = self::getApproximatedRemainingTime($cachedData, $online, $lastActivity);
 
             $execution = array(
                 'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
@@ -448,6 +428,35 @@ class DeliveryHelper
         }
 
         return $executions;
+    }
+
+    private static function getRemainingTime(array $cachedData)
+    {
+        $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? intval($cachedData[DeliveryMonitoringService::REMAINING_TIME]) : 0;
+        return $remaining;
+    }
+
+    private static function getApproximatedRemainingTime(array $cachedData, $online)
+    {
+        $now = microtime(true);
+        $remaining = self::getRemainingTime($cachedData);
+        $elapsedApprox = 0;
+        $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
+        if (
+            isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) &&
+            $executionState === DeliveryExecution::STATE_ACTIVE
+        ) {
+            $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
+            $elapsedApprox = $now - $lastActivity;
+        }
+
+        if (is_bool($online) && $online === false) {
+            $elapsedApprox = 0;
+        }
+
+        $approximatedRemaining = round(floatval($remaining) - $elapsedApprox);
+        return $approximatedRemaining;
     }
 
     /**
