@@ -433,10 +433,6 @@ class DeliveryHelper
     private static function getRemainingTime(array $cachedData)
     {
         $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? intval($cachedData[DeliveryMonitoringService::REMAINING_TIME]) : 0;
-//        $diffTimestamp = (isset($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP])) ? floatval($cachedData[DeliveryMonitoringService::DIFF_TIMESTAMP]) : 0;
-//        $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
-//        $diffTime = $duration ? $duration : $diffTimestamp;
-//        $remaining = $remaining - $diffTime;
         return $remaining;
     }
 
