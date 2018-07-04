@@ -128,6 +128,15 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     }
 
     /**
+     * @param array $data
+     * @return mixed
+     */
+    public function insertMultiple(array $data)
+    {
+        return $this->getPersistence()->insertMultiple(self::TABLE_NAME, $data);
+    }
+
+    /**
      * @param array $params
      *  [
      *      'delivery_execution_id' => '',
