@@ -38,6 +38,12 @@ interface DeliveryLog extends DeliveryExecutionDelete
     const CREATED_BY = 'created_by';
 
     /**
+     * @param array $data
+     * @return mixed
+     */
+    public function insertMultiple(array $data);
+
+    /**
      * Log data
      *
      * @param string $deliveryExecutionId
