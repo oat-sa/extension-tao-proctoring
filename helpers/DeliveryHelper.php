@@ -449,6 +449,8 @@ class DeliveryHelper
         ) {
             $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
             $elapsedApprox = $now - $lastActivity;
+            $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
+            $elapsedApprox += $duration;
         }
 
         if (is_bool($online) && $online === false) {
