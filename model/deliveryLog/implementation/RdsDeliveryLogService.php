@@ -36,6 +36,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     const TABLE_NAME = 'delivery_log';
     const ID = 'id';
 
+    const OPTION_FIELDS = 'fields';
     /**
      * Log delivery execution data.
      * Notice that `$data` parameter will be encoded to JSON before saving
@@ -157,7 +158,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     public function search($params = [], $options = [])
     {
         $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
-        $fields = [self::EVENT_ID, self::CREATED_BY, self::DELIVERY_EXECUTION_ID];
+        $fields = $this->getFields();
         $parameters = [];
         $where = [];
         foreach ($params as $key => $val) {
@@ -199,6 +200,16 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $result = $this->decodeValues($data);
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFields()
+    {
+        $fields = $this->getOption(static::OPTION_FIELDS);
+
+        return is_null($fields) ? [] : $fields;
     }
 
     /**
