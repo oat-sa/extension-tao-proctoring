@@ -29,6 +29,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
+use oat\taoTests\models\runner\time\TimePoint;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -243,16 +244,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
         if ($session !== null && $session->isRunning()) {
             $remaining = PHP_INT_MAX;
-            if ($session instanceof TestSession) {
-                $timeConstraints = $session->getRegularTimeConstraints();
-            } else {
-                $timeConstraints = $session->getTimeConstraints();
-            }
+            $timeConstraints = $session->getTimeConstraints();
             foreach ($timeConstraints as $tc) {
                 // Only consider time constraints in force.
-                if ($tc->getMaximumRemainingTime() !== false) {
+                $maximumRemainingTime = $tc->getMaximumRemainingTime();
+                if ($maximumRemainingTime !== false) {
                     $hasTimer = true;
-                    $remaining = min($remaining, $tc->getMaximumRemainingTime()->getSeconds(true));
+                    $remaining = min($remaining, $maximumRemainingTime->getSeconds(true));
                 }
             }
         }
@@ -296,7 +294,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $testSession = $this->getTestSession();
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
+            $timerTarget = $testSession->getTimerTarget();
         } else {
+            $timerTarget = TimePoint::TARGET_SERVER;
             $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
             $timer = $qtiTimerFactory->getTimer($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier());
         }
@@ -304,8 +304,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $deliveryExecutionManager = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $maxTimeSeconds = $deliveryExecutionManager->getTimeLimits($testSession);
 
+        $data = $this->get();
+        $oldConsumedExtraTime = isset($data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) ? $data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] : 0;
+        $consumedExtraTime = max($oldConsumedExtraTime, $timer->getConsumedExtraTime(null, $maxTimeSeconds, $timerTarget));
+
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
-        $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(), true);
+        $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $consumedExtraTime, true);
     }
 
     /**
