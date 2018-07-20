@@ -153,9 +153,10 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      *      'limit' => null, // to get all records
      *      'offset' => 0,
      *  ]
+     * @param bool $shouldDecodeData
      * @return mixed
      */
-    public function search($params = [], $options = [])
+    public function search($params = [], $options = [], $shouldDecodeData = true)
     {
         $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
         $fields = $this->getFields();
@@ -198,7 +199,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         }
         $stmt = $this->getPersistence()->query($sql, $parameters);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $result = $this->decodeValues($data);
+        if ($shouldDecodeData) {
+            $result = $this->decodeValues($data);
+        } else {
+            $result = $data;
+        }
         return $result;
     }
 

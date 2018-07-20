@@ -85,7 +85,8 @@ interface DeliveryLog extends DeliveryExecutionDelete
      *      'limit' => null, // to get all records
      *      'offset' => 0,
      *  ]
+     * @param bool $shouldDecodeData
      * @return mixed
      */
-    public function search($params = [], $options = []);
+    public function search($params = [], $options = [], $shouldDecodeData = true);
 }
