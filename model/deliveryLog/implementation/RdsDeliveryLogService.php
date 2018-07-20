@@ -49,7 +49,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function log($deliveryExecutionId, $eventId, $data, $user = null)
     {
-        $data = json_encode($data);
+        $data = $this->encodeData($data);
 
         if ($user === null) {
             $user = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
@@ -221,11 +221,29 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         $result = [];
         foreach ($data as $row) {
             if (isset($row[self::DATA])) {
-                $row[self::DATA] = json_decode($row[self::DATA], true);
+                $row[self::DATA] = $this->decodeData($row[self::DATA]);
             }
             $result[] = $row;
         }
         return $result;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function decodeData($data)
+    {
+        return json_decode($data, true);
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    protected function encodeData($data)
+    {
+        return json_encode($data);
     }
 
     /**
