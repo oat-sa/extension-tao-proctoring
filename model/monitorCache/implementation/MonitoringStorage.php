@@ -614,22 +614,34 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $primaryColumns = $this->getPrimaryColumns();
             $key = array_keys($condition)[0];
             $value = $condition[$key];
+            $toLower = false;
 
             if ($value === null) {
                 $op = 'IS NULL';
-            } else if(is_array($value)){
+            } elseif(is_array($value)){
                 $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
-            } else if (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
-                $value = $matches[2];
-                $op = $matches[1] ? $matches[1] : "=";
-                $op .= ' ?';
+            } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
+                if (preg_grep('/' . $matches[1] .'/i', ['like','ilike'])) {
+                    $toLower = true;
+                    $op = 'LIKE';
+                } elseif (preg_grep('/' . $matches[1] .'/i', ['not like','not ilike'])) {
+                    $toLower = true;
+                    $op = 'NOT LIKE';
+                } else {
+                    $op = $matches[1] ? $matches[1] : '=';
+                }
+                $op .= ' ? ';
+                $value = $toLower ? strtolower($matches[2]) : $matches[2];
             }
 
             if (in_array($key, $primaryColumns)) {
-                $whereClause .= " t.$key $op ";
+                $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
+                $whereClause .= $op;
             } else {
                 $joinNum = count($this->joins);
-                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND kv_t_$joinNum.monitoring_value $op) ";
+                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND ";
+                $whereClause .= $toLower ? "LOWER(kv_t_$joinNum.monitoring_value)" : "kv_t_$joinNum.monitoring_value";
+                $whereClause .= " $op) ";
 
                 $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
                 $parameters[] = trim($key);
