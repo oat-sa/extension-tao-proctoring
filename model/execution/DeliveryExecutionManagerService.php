@@ -30,6 +30,7 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
+use oat\taoTests\models\runner\time\TimePoint;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -150,7 +151,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             /** @var DeliveryMonitoringData $data */
             $data = $deliveryMonitoringService->getData($deliveryExecution);
-
+            $maxTime = 0;
+            $timerTarget = TimePoint::TARGET_SERVER;
             if ($extendedTime) {
                 $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
                 /** @var AssessmentTest $testDefinition */
@@ -185,6 +187,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $testSession = $testSessionService->getTestSession($deliveryExecution);
 
                 if ($testSession) {
+                    $timerTarget = $testSession->getTimerTarget();
                     $testSession->getRoute()->setPosition(0);
                     $testSession->setState(AssessmentTestSessionState::INTERACTING);
 
@@ -207,6 +210,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
 
                     $testSessionService->persist($testSession);
+                    $maxTime = $this->getPartTimeLimits($testSession);
                 }
             }
 
@@ -219,7 +223,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
             $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
-            $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime());
+            $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(null, $maxTime, $timerTarget));
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
