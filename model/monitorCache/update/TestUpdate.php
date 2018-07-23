@@ -47,7 +47,8 @@ class TestUpdate
         ];
 
         $session = $event->getSession();
-        if ($session->getState() == AssessmentTestSessionState::INTERACTING) {
+        $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+        if ($deliveryExecution->getUserIdentifier() === $userId) {
             $dataKeys[] = DeliveryMonitoringService::DIFF_TIMESTAMP;
             $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
         }
