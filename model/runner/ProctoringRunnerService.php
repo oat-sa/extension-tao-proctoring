@@ -93,7 +93,7 @@ class ProctoringRunnerService extends QtiRunnerService
     {
         parent::check($context);
 
-        $state = $context->getTestSession();
+        $state = $context->getTestSession()->getState();
 
         if ($state == AssessmentTestSessionState::SUSPENDED) {
             throw new QtiRunnerPausedException();
