@@ -20,14 +20,12 @@
 namespace oat\taoProctoring\model\runner;
 
 use oat\generis\model\OntologyAwareTrait;
-use oat\oatbox\event\EventManager;
-use oat\taoAct\model\event\HeartbeatStored;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\ProctorService;
+use oat\taoQtiTest\models\runner\QtiRunnerPausedException;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
-use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoQtiTest\models\runner\RunnerServiceContext;
-use oat\taoQtiTest\models\TestSessionMetaData;
+use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
  * Class ProctoringRunnerService
@@ -40,6 +38,15 @@ class ProctoringRunnerService extends QtiRunnerService
 {
     use OntologyAwareTrait;
 
+    /**
+     * Get Test Context.
+     *
+     * @param RunnerServiceContext $context
+     * @return array
+     * @throws \common_Exception
+     * @throws \common_exception_NotFound
+     * @throws \core_kernel_persistence_Exception
+     */
     public function getTestContext(RunnerServiceContext $context)
     {
         $response = parent::getTestContext($context);
@@ -60,8 +67,10 @@ class ProctoringRunnerService extends QtiRunnerService
 
     /**
      * Check whether secure plugins must be used.
+     *
      * @param \core_kernel_classes_Resource $delivery
      * @return bool
+     * @throws \core_kernel_persistence_Exception
      */
     private function isProctoredDelivery(\core_kernel_classes_Resource $delivery)
     {
@@ -69,5 +78,27 @@ class ProctoringRunnerService extends QtiRunnerService
         $result = $hasProctor instanceof \core_kernel_classes_Resource &&
             $hasProctor->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED;
         return $result;
+    }
+
+    /**
+     * Check whether the test is in a runnable state.
+     *
+     * @param RunnerServiceContext $context
+     * @return bool
+     * @throws \common_Exception
+     * @throws \oat\taoQtiTest\models\runner\QtiRunnerClosedException
+     * @throws QtiRunnerPausedException
+     */
+    public function check(RunnerServiceContext $context)
+    {
+        parent::check($context);
+
+        $state = $context->getTestSession();
+
+        if ($state == AssessmentTestSessionState::SUSPENDED) {
+            throw new QtiRunnerPausedException();
+        }
+
+        return true;
     }
 }
