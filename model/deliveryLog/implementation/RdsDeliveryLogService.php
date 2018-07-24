@@ -152,11 +152,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      *      'dir' => 'asc',
      *      'limit' => null, // to get all records
      *      'offset' => 0,
+     *      'shouldDecodeData' => true
      *  ]
-     * @param bool $shouldDecodeData
      * @return mixed
      */
-    public function search($params = [], $options = [], $shouldDecodeData = true)
+    public function search($params = [], $options = [])
     {
         $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
         $fields = $this->getFields();
@@ -187,6 +187,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             'offset' => 'OFFSET ?',
         ];
 
+        $shouldDecodeData = isset($options['shouldDecodeData']) ? (bool)$options['shouldDecodeData'] : true;
         foreach ($opts as $k => $v) {
             if (isset($options[$k])) {
                 if ($k == 'dir') {
