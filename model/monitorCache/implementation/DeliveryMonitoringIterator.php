@@ -18,6 +18,7 @@
  */
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use Iterator;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorInterface;
