@@ -185,6 +185,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
+     * {@inheritDoc}
+     * @see \oat\taoDelivery\model\execution\StateServiceInterface::terminate()
+     */
+    public function terminate(DeliveryExecution $deliveryExecution)
+    {
+        $this->terminateExecution($deliveryExecution);
+    }
+
+    /**
      * Terminates a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
