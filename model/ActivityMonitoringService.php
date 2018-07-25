@@ -94,7 +94,7 @@ class ActivityMonitoringService extends ConfigurableService
         DeliveryExecution::STATE_ACTIVE,
         DeliveryExecution::STATE_TERMINATED,
         DeliveryExecution::STATE_CANCELED,
-        DeliveryExecution::STATE_FINISHIED,
+        DeliveryExecution::STATE_FINISHED,
     ];
 
     /**
