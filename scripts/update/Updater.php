@@ -739,5 +739,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('9.3.0');
         }
 
+        $this->skip('9.3.0', '10.0.0');
     }
 }

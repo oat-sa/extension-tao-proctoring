@@ -39,7 +39,7 @@ interface TestSessionConnectivityStatusService
 
     /**
      * @param $sessionId
-     * @return null|timestamp
+     * @return int null|timestamp
      */
     public function getLastOnline($sessionId);
 

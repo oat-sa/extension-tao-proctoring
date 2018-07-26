@@ -68,7 +68,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     public function getDeliveriesStates()
     {
         return [
-            ProctoredDeliveryExecution::STATE_FINISHIED,
+            ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_ACTIVE,
             ProctoredDeliveryExecution::STATE_PAUSED,
             ProctoredDeliveryExecution::STATE_TERMINATED,
@@ -182,6 +182,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \oat\taoDelivery\model\execution\StateServiceInterface::terminate()
+     */
+    public function terminate(DeliveryExecution $deliveryExecution)
+    {
+        $this->terminateExecution($deliveryExecution);
     }
 
     /**
@@ -421,7 +430,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         if (
             $user instanceof GuestTestUser &&
             !in_array($stateUri, [
-                ProctoredDeliveryExecution::STATE_FINISHIED,
+                ProctoredDeliveryExecution::STATE_FINISHED,
                 ProctoredDeliveryExecution::STATE_TERMINATED,
                 ProctoredDeliveryExecution::STATE_CANCELED,
             ])

@@ -82,7 +82,7 @@ class MonitorCacheService extends MonitoringStorage
 
         }
 
-        if ($event->getState() == DeliveryExecution::STATE_FINISHIED) {
+        if ($event->getState() == DeliveryExecution::STATE_FINISHED) {
             $data->update(
                 DeliveryMonitoringService::END_TIME,
                 \tao_helpers_Date::getTimeStamp($event->getDeliveryExecution()->getFinishTime(), true)

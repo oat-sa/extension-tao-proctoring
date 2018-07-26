@@ -180,7 +180,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             }
 
             // reopen the execution if already closed
-            if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHIED) {
+            if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHED) {
                 $deliveryExecution->setState(DeliveryExecution::STATE_ACTIVE);
 
                 /* @var TestSession $testSession */
