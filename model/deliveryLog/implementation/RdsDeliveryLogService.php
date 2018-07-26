@@ -36,6 +36,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     const TABLE_NAME = 'delivery_log';
     const ID = 'id';
 
+    const OPTION_FIELDS = 'fields';
     /**
      * Log delivery execution data.
      * Notice that `$data` parameter will be encoded to JSON before saving
@@ -48,7 +49,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function log($deliveryExecutionId, $eventId, $data, $user = null)
     {
-        $data = json_encode($data);
+        $data = $this->encodeData($data);
 
         if ($user === null) {
             $user = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
@@ -151,13 +152,14 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      *      'dir' => 'asc',
      *      'limit' => null, // to get all records
      *      'offset' => 0,
+     *      'shouldDecodeData' => true
      *  ]
      * @return mixed
      */
     public function search($params = [], $options = [])
     {
         $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
-        $fields = [self::EVENT_ID, self::CREATED_BY, self::DELIVERY_EXECUTION_ID];
+        $fields = $this->getFields();
         $parameters = [];
         $where = [];
         foreach ($params as $key => $val) {
@@ -185,6 +187,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             'offset' => 'OFFSET ?',
         ];
 
+        $shouldDecodeData = isset($options['shouldDecodeData']) ? (bool)$options['shouldDecodeData'] : true;
         foreach ($opts as $k => $v) {
             if (isset($options[$k])) {
                 if ($k == 'dir') {
@@ -197,8 +200,22 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         }
         $stmt = $this->getPersistence()->query($sql, $parameters);
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $result = $this->decodeValues($data);
+        if ($shouldDecodeData) {
+            $result = $this->decodeValues($data);
+        } else {
+            $result = $data;
+        }
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFields()
+    {
+        $fields = $this->getOption(static::OPTION_FIELDS);
+
+        return is_null($fields) ? [] : $fields;
     }
 
     /**
@@ -210,11 +227,29 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         $result = [];
         foreach ($data as $row) {
             if (isset($row[self::DATA])) {
-                $row[self::DATA] = json_decode($row[self::DATA], true);
+                $row[self::DATA] = $this->decodeData($row[self::DATA]);
             }
             $result[] = $row;
         }
         return $result;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    protected function decodeData($data)
+    {
+        return json_decode($data, true);
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    protected function encodeData($data)
+    {
+        return json_encode($data);
     }
 
     /**

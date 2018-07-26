@@ -84,6 +84,7 @@ interface DeliveryLog extends DeliveryExecutionDelete
      *      'dir' => 'asc',
      *      'limit' => null, // to get all records
      *      'offset' => 0,
+     *      'shouldDecodeData' => true
      *  ]
      * @return mixed
      */

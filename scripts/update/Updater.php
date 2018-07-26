@@ -723,5 +723,21 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('8.14.0', '9.2.2');
 
+        if ($this->isVersion('9.2.2')) {
+
+            /** @var RdsDeliveryLogService $deliveryLog */
+            $deliveryLog = $this->getServiceManager()->get(RdsDeliveryLogService::SERVICE_ID);
+
+            $deliveryLog->setOption(RdsDeliveryLogService::OPTION_FIELDS, [
+                RdsDeliveryLogService::EVENT_ID,
+                RdsDeliveryLogService::CREATED_BY,
+                RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+            ]);
+
+            $this->getServiceManager()->register(RdsDeliveryLogService::SERVICE_ID, $deliveryLog);
+
+            $this->setVersion('9.3.0');
+        }
+
     }
 }
