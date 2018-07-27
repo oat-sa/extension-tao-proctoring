@@ -59,15 +59,6 @@ interface DeliveryExecutionStateService extends StateServiceInterface
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null);
 
     /**
-     * Terminates a delivery execution
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
-     * @return bool
-     */
-    public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null);
-
-    /**
      * Pauses a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution

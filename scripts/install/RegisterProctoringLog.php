@@ -76,7 +76,14 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
         
         $this->registerService(
             RdsDeliveryLogService::SERVICE_ID,
-            new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => $persistenceId))
+            new RdsDeliveryLogService(array(
+                RdsDeliveryLogService::OPTION_PERSISTENCE => $persistenceId,
+                RdsDeliveryLogService::OPTION_FIELDS => [
+                    RdsDeliveryLogService::EVENT_ID,
+                    RdsDeliveryLogService::CREATED_BY,
+                    RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+                ]
+            ))
         );
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Registered proctoring log'));
     }
