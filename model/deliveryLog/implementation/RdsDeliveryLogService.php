@@ -39,9 +39,6 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 
     const OPTION_FIELDS = 'fields';
 
-    /** @var \common_persistence_SqlPersistence */
-    protected $persistence;
-
     /**
      * Log delivery execution data.
      * Notice that `$data` parameter will be encoded to JSON before saving
