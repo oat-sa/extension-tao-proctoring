@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\deliveryLog\implementation;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\oatbox\service\ConfigurableService;
@@ -37,6 +38,10 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     const ID = 'id';
 
     const OPTION_FIELDS = 'fields';
+
+    /** @var \common_persistence_SqlPersistence */
+    protected $persistence;
+
     /**
      * Log delivery execution data.
      * Notice that `$data` parameter will be encoded to JSON before saving
@@ -82,20 +87,24 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function get($deliveryExecutionId, $eventId = null)
     {
-        $sql = "SELECT * FROM " . self::TABLE_NAME . " t " . PHP_EOL;
-        $sql .= "WHERE " . self::DELIVERY_EXECUTION_ID . "=? ";
-
-        $parameters = [$deliveryExecutionId];
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->select('*')
+            ->from(static::TABLE_NAME)
+            ->where(static::DELIVERY_EXECUTION_ID . '=:delivery_execution_id')
+            ->setParameter('delivery_execution_id', $deliveryExecutionId)
+        ;
 
         if ($eventId !== null) {
-            $sql .= "AND " . self::EVENT_ID . "=? ";
-            $parameters[] = $eventId;
+            $queryBuilder
+                ->andWhere(static::EVENT_ID . '=:event_id')
+                ->setParameter('event_id', $eventId);
+            ;
         }
 
-        $sql .= "ORDER BY " . self::ID . " ASC";
+        $queryBuilder->orderBy(static::ID, 'ASC');
 
-        $stmt = $this->getPersistence()->query($sql, $parameters);
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
 
         $result = $this->decodeValues($data);
 
@@ -120,12 +129,13 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function deleteDeliveryExecutionData(DeliveryExecutionDeleteRequest $request)
     {
-        $sql = 'DELETE FROM ' . static::TABLE_NAME  . ' WHERE ' . self::DELIVERY_EXECUTION_ID . '= ? ';
-        $parameters = [$request->getDeliveryExecution()->getIdentifier()];
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->delete(static::TABLE_NAME)
+            ->where(self::DELIVERY_EXECUTION_ID . '=:delivery_execution_id')
+            ->setParameter('delivery_execution_id', $request->getDeliveryExecution()->getIdentifier());
 
-        $stmt = $this->getPersistence()->exec($sql, $parameters);
-
-        return $stmt;
+        return ($queryBuilder->execute() > 0);
     }
 
     /**
@@ -158,48 +168,44 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     public function search($params = [], $options = [])
     {
-        $sql = 'SELECT * FROM ' . static::TABLE_NAME . ' WHERE ';
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder
+            ->select('*')
+            ->from(static::TABLE_NAME)
+        ;
+
         $fields = $this->getFields();
-        $parameters = [];
-        $where = [];
         foreach ($params as $key => $val) {
             if (in_array($key, $fields)) {
-                $where[] = $key . '= ?';
-                $parameters[] = $val;
+                $queryBuilder->andWhere($key . '= :'.$key);
+                $queryBuilder->setParameter($key, $val);
             }
         }
 
         if (isset($params['from'])) {
-            $where[] = self::CREATED_AT . ' >= ?';
-            $parameters[] = $params['from'];
+            $queryBuilder->andWhere(self::CREATED_AT . ' >=:createdAtMore');
+            $queryBuilder->setParameter('createdAtMore', $params['from']);
         }
 
         if (isset($params['to'])) {
-            $where[] = self::CREATED_AT . ' <= ?';
-            $parameters[] = $params['to'];
+            $queryBuilder->andWhere(self::CREATED_AT . ' <=:createdAtLess');
+            $queryBuilder->setParameter('createdAtLess', $params['to']);
         }
 
-        $sql .= implode(' AND ', $where);
-        $opts = [
-            'order' => 'ORDER BY ?',
-            'dir' => '?',
-            'limit' => 'LIMIT ?',
-            'offset' => 'OFFSET ?',
-        ];
+        if (isset($options['limit'])) {
+            $queryBuilder->setMaxResults($options['limit']);
+        }
+
+        if (isset($options['offset'])) {
+            $queryBuilder->setFirstResult($options['offset']);
+        }
+
+        if (isset($options['order']) && isset($options['dir'])) {
+            $queryBuilder->orderBy($options['order'], strtoupper($options['dir']));
+        }
 
         $shouldDecodeData = isset($options['shouldDecodeData']) ? (bool)$options['shouldDecodeData'] : true;
-        foreach ($opts as $k => $v) {
-            if (isset($options[$k])) {
-                if ($k == 'dir') {
-                    $sql .= ' ' . (mb_strtolower($v) == 'desc' ? 'DESC' : 'ASC');
-                } else {
-                    $sql .= ' ' . $v;
-                    $parameters[] = $options[$k];
-                }
-            }
-        }
-        $stmt = $this->getPersistence()->query($sql, $parameters);
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $data             = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
         if ($shouldDecodeData) {
             $result = $this->decodeValues($data);
         } else {
@@ -258,5 +264,13 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     private function getPersistence()
     {
         return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    private function getQueryBuilder()
+    {
+        return $this->getPersistence()->getPlatform()->getQueryBuilder();
     }
 }

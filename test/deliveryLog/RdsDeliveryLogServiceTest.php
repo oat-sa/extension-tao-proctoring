@@ -22,6 +22,8 @@
 namespace oat\taoProctoring\test\monitorCache;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
 /**
@@ -47,7 +49,12 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
     public function setUp()
     {
         TaoPhpUnitTestRunner::initTest();
-        $this->service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default'));
+        $this->service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default',
+            'fields' => array(
+                'event_id',
+                'created_by',
+                'delivery_execution_id'
+            )));
         $this->persistence = \common_persistence_Manager::getPersistence('default');
     }
 
@@ -69,6 +76,55 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
         $this->persistence->exec($sql);
     }
 
+    /**
+     * @dataProvider getLogData
+     * @param $deliveryExecutionId
+     */
+    public function testSearch($deliveryExecutionId)
+    {
+        $this->service->log($deliveryExecutionId, 'test_event_same_uniq_1', 'test_val_1');
+        $this->service->log($deliveryExecutionId, 'test_event_same_uniq_1', 'test_val_2');
+
+        $loggedData = $this->service->search([
+            'event_id' => 'test_event_same_uniq_1',
+        ], [
+            'order' => 'created_at',
+            'dir' => 'desc',
+        ]);
+
+        $this->assertEquals(2, count($loggedData));
+
+        $firstLog = $loggedData[0];
+        $this->assertEquals($deliveryExecutionId, $firstLog[RdsDeliveryLogService::DELIVERY_EXECUTION_ID]);
+        $this->assertEquals('test_event_same_uniq_1', $firstLog[RdsDeliveryLogService::EVENT_ID]);
+        $this->assertEquals('test_val_2', $firstLog[RdsDeliveryLogService::DATA]);
+
+        $secondLog = $loggedData[1];
+        $this->assertEquals($deliveryExecutionId, $secondLog[RdsDeliveryLogService::DELIVERY_EXECUTION_ID]);
+        $this->assertEquals('test_event_same_uniq_1', $secondLog[RdsDeliveryLogService::EVENT_ID]);
+        $this->assertEquals('test_val_1', $secondLog[RdsDeliveryLogService::DATA]);
+    }
+
+    /**
+     * @dataProvider getLogData
+     * @param $deliveryExecutionId
+     */
+    public function testDelete($deliveryExecutionId)
+    {
+        $this->service->log($deliveryExecutionId, 'test_event_same_uniq_2', 'test_val_1');
+
+        $executionMock = $this->getMockBuilder(DeliveryExecutionInterface::class)->getMock();
+        $executionMock
+            ->method('getIdentifier')
+            ->willReturn($deliveryExecutionId);
+
+        $request = $this->getMockBuilder(DeliveryExecutionDeleteRequest::class)->disableOriginalConstructor()->getMock();
+        $request
+            ->method('getDeliveryExecution')
+            ->willReturn($executionMock);
+
+        $this->assertTrue($this->service->deleteDeliveryExecutionData($request));
+    }
     /**
      * @dataProvider getLogData
      * @param $deliveryExecutionId

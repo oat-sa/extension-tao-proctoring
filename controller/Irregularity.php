@@ -98,7 +98,7 @@ class Irregularity extends \tao_actions_QueueAction
         /**
          * @var $IrregularityReport IrregularityReport
          */
-        $IrregularityReport = $this->getServiceManager()->get(IrregularityReport::SERVICE_ID);
+        $IrregularityReport = $this->getServiceLocator()->get(IrregularityReport::SERVICE_ID);
 
         return $IrregularityReport->getIrregularities($delivery, $from , $to );
 
