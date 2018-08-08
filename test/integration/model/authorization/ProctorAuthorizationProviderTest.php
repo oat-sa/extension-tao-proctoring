@@ -17,7 +17,9 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
-namespace oat\taoProctoring\test\model\authorization;
+namespace oat\taoProctoring\test\integration\model\authorization;
+
+require_once dirname(__FILE__).'/../../../../../tao/includes/raw_start.php';
 
 use core_kernel_classes_Resource;
 use oat\oatbox\user\User;
@@ -90,11 +92,11 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
         $authorizationProvider = new ProctorAuthorizationProvider();
         $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
         $user = $this->prophesize(User::class)->reveal();
-        
+
         $authorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_AUTHORIZED);
         $authorizationProvider->verifyResumeAuthorization($authorized, $user);
     }
-    
+
     /**
      * @expectedException \oat\taoDelivery\model\authorization\UnAuthorizedException
      */
