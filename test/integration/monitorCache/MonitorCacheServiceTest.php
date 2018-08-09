@@ -19,12 +19,16 @@
  *
  */
 
-namespace oat\taoProctoring\test\monitorCache;
+namespace oat\taoProctoring\test\integration\monitorCache;
+
+require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\test\monitorCache\helpers\MonitorCacheServiceThread;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
+
+// @todo fix "Service "taoProctoring/DeliveryMonitoring" not found"
 
 /**
  * class DeliveryMonitoringData

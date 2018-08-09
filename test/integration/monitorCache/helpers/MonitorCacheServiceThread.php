@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\taoProctoring\test\monitorCache\helpers;
+namespace oat\taoProctoring\test\integration\monitorCache\helpers;
 
 use oat\taoProctoring\test\monitorCache\mock\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
