@@ -19,7 +19,9 @@
  *
  */
 
-namespace oat\taoProctoring\test\monitorCache;
+namespace oat\taoProctoring\test\integration\monitorCache;
+
+require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -73,6 +75,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
         $sql = 'DELETE FROM ' . RdsDeliveryLogService::TABLE_NAME .
             ' WHERE ' . RdsDeliveryLogService::DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
 
+        // @todo fix "Base table or view not found: 1146 Table 'tao.delivery_log' doesn't exist"
         $this->persistence->exec($sql);
     }
 

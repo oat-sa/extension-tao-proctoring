@@ -19,7 +19,9 @@
  *
  */
 
-namespace oat\taoProctoring\test\monitorCache;
+namespace oat\taoProctoring\test\integration\monitorCache;
+
+require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
@@ -93,7 +95,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         $sql = 'DELETE FROM ' . $service::TABLE_NAME .
             ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
-        
+
         $this->persistence->exec($sql);
     }
 

@@ -19,7 +19,9 @@
  *
  */
 
-namespace oat\taoProctoring\test\monitorCache;
+namespace oat\taoProctoring\test\integration\monitorCache;
+
+require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
