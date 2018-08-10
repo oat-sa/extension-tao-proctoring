@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\taoProctoring\test\model;
+namespace oat\taoProctoring\test\unit\model;
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\model\ActivityMonitoringService;
