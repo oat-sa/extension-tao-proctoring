@@ -14,22 +14,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2018  (original work) Open Assessment Technologies SA;
  */
+
 namespace oat\taoProctoring\model;
 
 
 use oat\taoProctoring\model\execution\DeliveryExecutionsUpdater;
 use common_report_Report as Report;
 
-class TerminateDeliveryExecutionsService extends DeliveryExecutionsUpdater
+class FinishDeliveryExecutionsService extends DeliveryExecutionsUpdater
 {
-    const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
+    const SERVICE_ID = 'taoProctoring/FinishDeliveryExecutions';
 
     /**
-     * Terminate delivery execution
-     *
      * @param $deliveryExecution
      * @param $executionId
      * @param bool $isEndDate
@@ -38,7 +36,7 @@ class TerminateDeliveryExecutionsService extends DeliveryExecutionsUpdater
      */
     protected function action($deliveryExecution, $executionId, $isEndDate = false)
     {
-        $this->getDeliveryStateService()->terminateExecution($deliveryExecution, [
+        $this->getDeliveryStateService()->finishExecution($deliveryExecution, [
             'reasons' =>[
                 'category' => 'Technical'
             ],
