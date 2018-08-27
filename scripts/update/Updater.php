@@ -54,6 +54,7 @@ use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
+use oat\taoProctoring\model\FinishDeliveryExecutionsService;
 use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 use oat\taoProctoring\model\execution\ProctoringDeliveryDeleteService;
 use oat\taoProctoring\model\GuiSettingsService;
@@ -740,5 +741,15 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('9.3.0', '10.1.0');
+
+        if ($this->isVersion('10.1.0')) {
+            $finishDEService = new FinishDeliveryExecutionsService([
+                FinishDeliveryExecutionsService::OPTION_TTL_AS_ACTIVE => 'PT6H',
+                FinishDeliveryExecutionsService::OPTION_USE_DELIVERY_END_TIME => false,
+            ]);
+            $this->getServiceManager()->register(FinishDeliveryExecutionsService::SERVICE_ID, $finishDEService);
+            $this->setVersion('10.2.0');
+        }
+
     }
 }
