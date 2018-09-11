@@ -20,11 +20,7 @@
 namespace oat\taoProctoring\model\Tasks;
 
 use oat\oatbox\extension\AbstractAction;
-use oat\oatbox\service\ServiceManager;
-use oat\tao\model\event\MetadataModified;
-use oat\tao\model\taskQueue\QueueDispatcher;
-use oat\tao\model\taskQueue\Task\TaskInterface;
-use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use common_report_Report as Report;
 
 /**
@@ -35,15 +31,35 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
 {
     /**
      * @param $params
-     * @return \common_report_Report
+     * @return Report
      * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
      */
     public function __invoke($params)
     {
+        if (count($params) < 2) {
+            throw new \common_exception_MissingParameter();
+        }
+        $resourceUri = array_shift($params);
+        $metadataValue = array_shift($params);
+
         $report = Report::createSuccess();
-        $update = new DeliveryUpdater();
-        $service = $this->getServiceLocator()->get($params['service']);
-        $update->changeLabel($service, $params['resourceUri'], $params['metadataValue']);
+
+        /** @var DeliveryMonitoringService $service */
+        $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+
+        $deliveryExecutionsData = $service->find([
+            DeliveryMonitoringService::DELIVERY_ID => $resourceUri,
+        ], []);
+
+        foreach ($deliveryExecutionsData as $data) {
+            $data->update(DeliveryMonitoringService::DELIVERY_NAME, $metadataValue);
+            $success = $service->save($data);
+            if (!$success) {
+                \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
+                $report->add(Report::createFailure('Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed'));
+            }
+        }
         $report->add(Report::createSuccess(__('Resource update task is completed')));
         return $report;
     }
@@ -54,26 +70,5 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
     public function jsonSerialize()
     {
         return __CLASS__;
-    }
-
-    /**
-     * @param $service
-     * @param \core_kernel_classes_Resource $resource
-     * @param $metadataValue
-     * @return TaskInterface
-     */
-    public static function createTask($service, \core_kernel_classes_Resource $resource, $metadataValue)
-    {
-        $action = new self();
-        /** @var QueueDispatcher $queueDispatcher */
-        $queueDispatcher = ServiceManager::getServiceManager()->get(QueueDispatcher::SERVICE_ID);
-
-        $parameters = [
-            'service' => $service,
-            'resourceUri' => $resource->getUri(),
-            'metadataValue' => $metadataValue
-        ];
-
-        return $queueDispatcher->createTask($action, $parameters, __('Updating resource "%s"', $resource->getLabel()), null, true);
     }
 }
