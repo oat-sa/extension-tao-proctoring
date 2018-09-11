@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdfs;
+use oat\tao\model\taskQueue\QueueDispatcherInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
@@ -34,7 +35,6 @@ use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
-use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
@@ -152,7 +152,9 @@ class MonitorCacheService extends MonitoringStorage
         if ($event->getMetadataUri() === OntologyRdfs::RDFS_LABEL) {
             $assemblyClass = DeliveryAssemblyService::singleton()->getRootClass();
             if ($resource->isInstanceOf($assemblyClass)) {
-                DeliveryUpdaterTask::createTask(self::SERVICE_ID, $resource, $event->getMetadataValue());
+                /** @var $queueService QueueDispatcherInterface */
+                $queueService = $this->getServiceLocator()->get(QueueDispatcherInterface::SERVICE_ID);
+                $queueService->createTask(new DeliveryUpdaterTask(), [$resource->getUri(), $event->getMetadataValue()], 'Update delivery label');
             }
         }
     }
