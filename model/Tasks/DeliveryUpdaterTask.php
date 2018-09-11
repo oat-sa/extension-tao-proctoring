@@ -44,7 +44,18 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
         $metadataValue = array_shift($params);
 
         $report = Report::createSuccess();
+        $this->updateDeliveryLabels($resourceUri, $metadataValue);
+        $report->add(Report::createSuccess(__('Resource update task is completed')));
+        return $report;
+    }
 
+    /**
+     * @param $resourceUri
+     * @param $metadataValue
+     * @return bool
+     */
+    public function updateDeliveryLabels($resourceUri, $metadataValue)
+    {
         /** @var DeliveryMonitoringService $service */
         $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
 
@@ -56,14 +67,11 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
             $data->update(DeliveryMonitoringService::DELIVERY_NAME, $metadataValue);
             $success = $service->save($data);
             if (!$success) {
-                \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
-                $report->add(Report::createFailure('Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed'));
+                \common_Logger::w('Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
             }
         }
-        $report->add(Report::createSuccess(__('Resource update task is completed')));
-        return $report;
+        return true;
     }
-
     /**
      * @return mixed|string
      */
