@@ -32,6 +32,7 @@ use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\taoProctoring\model\monitorCache\update\DeliveryUpdater;
 use oat\taoProctoring\model\execution\DeliveryExecution;
@@ -145,14 +146,13 @@ class MonitorCacheService extends MonitoringStorage
      *
      * @param MetadataModified $event
      */
-    public function deliverylabelChanged(MetadataModified $event)
+    public function deliveryLabelChanged(MetadataModified $event)
     {
         $resource = $event->getResource();
         if ($event->getMetadataUri() === OntologyRdfs::RDFS_LABEL) {
             $assemblyClass = DeliveryAssemblyService::singleton()->getRootClass();
             if ($resource->isInstanceOf($assemblyClass)) {
-                $update = new DeliveryUpdater();
-                $update->changeLabel($this, $resource->getUri(), $event->getMetadataValue());
+                DeliveryUpdaterTask::createTask(self::SERVICE_ID, $resource, $event->getMetadataValue());
             }
         }
     }
