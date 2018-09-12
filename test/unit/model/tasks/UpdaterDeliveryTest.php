@@ -51,53 +51,13 @@ class UpdaterDeliveryTest extends TestCase
     /** @var string  */
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
 
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->service = new MonitoringStorage([
-            MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
-            MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
-                'delivery_execution_id',
-                'status',
-                'current_assessment_item',
-                'test_taker',
-                'authorized_by',
-                'start_time',
-                'end_time',
-                'delivery_name',
-                'delivery_id'
-            )
-        ]);
-
-        $pmMock = $this->getSqlMock('test_monitoring');
-        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
-        DbSetup::generateTable($this->persistence);
-
-        $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
-        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
-        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
-        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
-
-        $this->deliveryUpdaterTask = new DeliveryUpdaterTask();
-        $this->deliveryUpdaterTask->setServiceLocator($this->service->getServiceLocator());
-    }
-
-    /**
-     * Clear test data
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-        $this->deleteTestData();
-    }
-
     /**
      * Test the UpdateDelivery task for updating labels
      */
     public function testUpdateDeliveryLabels()
     {
         $this->loadFixture();
+
         $update = $this->deliveryUpdaterTask->updateDeliveryLabels('http://sample/first.rdf#i1450191587554180_test_record', 'Delivery test 2');
         $this->assertTrue($update);
         $result = $this->service->find([
@@ -113,7 +73,7 @@ class UpdaterDeliveryTest extends TestCase
      */
     protected function loadFixture()
     {
-        $this->setUp();
+        $this->getPersistence();
 
         $data = [
             [
@@ -123,8 +83,6 @@ class UpdaterDeliveryTest extends TestCase
                 OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
                 MonitoringStorage::DELIVERY_NAME => 'Delivery test 1',
                 MonitoringStorage::DELIVERY_ID => 'http://sample/first.rdf#i1450191587554180_test_record',
-
-
             ]
         ];
 
@@ -176,17 +134,36 @@ class UpdaterDeliveryTest extends TestCase
     }
 
     /**
-     * @after
-     * @before
+     * Get Persistence with mock.
      */
-    protected function deleteTestData()
+    protected function getPersistence()
     {
-        $service = $this->service;
+        $this->service = new MonitoringStorage([
+            MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
+            MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
+                'delivery_execution_id',
+                'status',
+                'current_assessment_item',
+                'test_taker',
+                'authorized_by',
+                'start_time',
+                'end_time',
+                'delivery_name',
+                'delivery_id'
+            )
+        ]);
 
-        $sql = 'DELETE FROM ' . $service::TABLE_NAME .
-            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
+        $pmMock = $this->getSqlMock('test_monitoring');
+        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
+        DbSetup::generateTable($this->persistence);
 
-        $this->persistence->exec($sql);
+        $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
+        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
+        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
+
+        $this->deliveryUpdaterTask = new DeliveryUpdaterTask();
+        $this->deliveryUpdaterTask->setServiceLocator($this->service->getServiceLocator());
     }
 
 }
