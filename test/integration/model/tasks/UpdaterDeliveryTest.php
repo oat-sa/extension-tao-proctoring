@@ -19,7 +19,6 @@
  */
 namespace oat\taoProctoring\test\integration\model\authorization;
 
-use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
 use Prophecy\Argument;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
@@ -27,7 +26,6 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoProctoring\scripts\install\db\DbSetup;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use oat\generis\test\TestCase;
 
 
@@ -71,10 +69,8 @@ class UpdaterDeliveryTest extends TestCase
                 'delivery_id'
             )
         ]);
-        $this->persistence = \common_persistence_Manager::getPersistence('default');
 
         $pmMock = $this->getSqlMock('test_monitoring');
-
         $this->persistence = $pmMock->getPersistenceById('test_monitoring');
         DbSetup::generateTable($this->persistence);
 
@@ -159,7 +155,7 @@ class UpdaterDeliveryTest extends TestCase
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
-    
+
     /**
      * Returns a persistence Manager with a mocked sql persistence
      *
