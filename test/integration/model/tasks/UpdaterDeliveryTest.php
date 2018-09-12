@@ -19,15 +19,16 @@
  */
 namespace oat\taoProctoring\test\integration\model\authorization;
 
-require_once dirname(__FILE__).'/../../../../../tao/includes/raw_start.php';
-
+use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceManager;
-use oat\tao\test\TaoPhpUnitTestRunner;
+use Prophecy\Argument;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoProctoring\scripts\install\db\DbSetup;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\generis\test\TestCase;
 
 
 /**
@@ -35,7 +36,7 @@ use oat\taoProctoring\scripts\install\db\DbSetup;
  *
  * @author Aleksej Tikhanovich <aleksej@taotesting.com>
  */
-class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
+class UpdaterDeliveryTest extends TestCase
 {
     /**
      * @var MonitoringStorage
@@ -49,14 +50,12 @@ class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
 
     protected $persistence;
 
+    /** @var string  */
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
 
     public function setUp()
     {
         parent::setUp();
-        TaoPhpUnitTestRunner::initTest();
-
-        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
 
         $this->service = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
@@ -89,6 +88,9 @@ class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
         $this->deliveryUpdaterTask->setServiceLocator($this->service->getServiceLocator());
     }
 
+    /**
+     * Clear test data
+     */
     public function tearDown()
     {
         parent::tearDown();
@@ -96,21 +98,7 @@ class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
     }
 
     /**
-     * @after
-     * @before
-     */
-    public function deleteTestData()
-    {
-        $service = $this->service;
-
-        $sql = 'DELETE FROM ' . $service::TABLE_NAME .
-            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
-
-        $this->persistence->exec($sql);
-    }
-
-    /**
-     * Test the ProctorAuthorizationProvider API
+     * Test the UpdateDelivery task for updating labels
      */
     public function testUpdateDeliveryLabels()
     {
@@ -125,6 +113,7 @@ class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
     }
 
     /**
+     * Load fixtures for delivery monitoring table
      * @return array
      */
     protected function loadFixture()
@@ -170,6 +159,60 @@ class UpdaterDeliveryTest extends TaoPhpUnitTestRunner
         $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
+    }
+
+    /**
+     * Return a prophecy of ServiceManager with get($id) calls  will return $service
+     * where $id is key of $options, and $service the associated value
+     * $service must be a ConfigurableService
+     *
+     * @param ConfigurableService[] $options
+     * @return ServiceLocatorInterface as Prophecy
+     */
+    protected function getServiceManagerProphecy(array $options = null)
+    {
+        if (empty($options)) {
+            return ServiceManager::getServiceManager();
+        }
+
+        $smProphecy = $this->prophesize(ServiceLocatorInterface::class);
+        foreach ($options as $key => $service) {
+            $smProphecy->get($key)->willReturn($service);
+        }
+        return $smProphecy->reveal();
+    }
+
+    /**
+     * Returns a persistence Manager with a mocked sql persistence
+     *
+     * @param string $key identifier of the persistence
+     * @return \common_persistence_Manager
+     */
+    protected function getSqlMock($key)
+    {
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped('sqlite not found, tests skipped.');
+        }
+        $driver = new \common_persistence_sql_dbal_Driver();
+        $persistence = $driver->connect($key, ['connection' => ['url' => 'sqlite:///:memory:']]);
+        $pmProphecy = $this->prophesize(\common_persistence_Manager::class);
+        $pmProphecy->setServiceLocator(Argument::any())->willReturn(null);
+        $pmProphecy->getPersistenceById($key)->willReturn($persistence);
+        return $pmProphecy->reveal();
+    }
+
+    /**
+     * @after
+     * @before
+     */
+    protected function deleteTestData()
+    {
+        $service = $this->service;
+
+        $sql = 'DELETE FROM ' . $service::TABLE_NAME .
+            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
+
+        $this->persistence->exec($sql);
     }
 
 }
