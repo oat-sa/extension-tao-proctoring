@@ -73,7 +73,6 @@ class UpdaterDeliveryTest extends TestCase
         ]);
         $this->persistence = \common_persistence_Manager::getPersistence('default');
 
-        $this->service->setServiceLocator($this->getServiceManagerProphecy());
         $pmMock = $this->getSqlMock('test_monitoring');
 
         $this->persistence = $pmMock->getPersistenceById('test_monitoring');
@@ -160,28 +159,7 @@ class UpdaterDeliveryTest extends TestCase
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
     }
-
-    /**
-     * Return a prophecy of ServiceManager with get($id) calls  will return $service
-     * where $id is key of $options, and $service the associated value
-     * $service must be a ConfigurableService
-     *
-     * @param ConfigurableService[] $options
-     * @return ServiceLocatorInterface as Prophecy
-     */
-    protected function getServiceManagerProphecy(array $options = null)
-    {
-        if (empty($options)) {
-            return ServiceManager::getServiceManager();
-        }
-
-        $smProphecy = $this->prophesize(ServiceLocatorInterface::class);
-        foreach ($options as $key => $service) {
-            $smProphecy->get($key)->willReturn($service);
-        }
-        return $smProphecy->reveal();
-    }
-
+    
     /**
      * Returns a persistence Manager with a mocked sql persistence
      *
