@@ -39,7 +39,7 @@ class UpdaterDeliveryTest extends TestCase
     /**
      * @var MonitoringStorage
      */
-    protected $service;
+    protected $deliveryMonitoringService;
 
     /**
      * @var DeliveryUpdaterTask
@@ -47,6 +47,8 @@ class UpdaterDeliveryTest extends TestCase
     protected $deliveryUpdaterTask;
 
     protected $persistence;
+
+    protected $pmMock;
 
     /** @var string  */
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
@@ -58,9 +60,10 @@ class UpdaterDeliveryTest extends TestCase
     {
         $this->loadFixture();
 
-        $update = $this->deliveryUpdaterTask->updateDeliveryLabels('http://sample/first.rdf#i1450191587554180_test_record', 'Delivery test 2');
+        $update = $this->getDeliveryUpdaterTask()->updateDeliveryLabels('http://sample/first.rdf#i1450191587554180_test_record', 'Delivery test 2');
         $this->assertTrue($update);
-        $result = $this->service->find([
+
+        $result = $this->getDeliveryMonitoringService()->find([
             [MonitoringStorage::DELIVERY_ID => 'http://sample/first.rdf#i1450191587554180_test_record'],
         ]);
         $this->assertEquals(count($result), 1);
@@ -73,8 +76,6 @@ class UpdaterDeliveryTest extends TestCase
      */
     protected function loadFixture()
     {
-        $this->getPersistence();
-
         $data = [
             [
                 MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
@@ -87,11 +88,11 @@ class UpdaterDeliveryTest extends TestCase
         ];
 
         foreach ($data as $item) {
-            $dataModel = $this->service->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
+            $dataModel = $this->getDeliveryMonitoringService()->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
-            $this->service->save($dataModel);
+            $this->getDeliveryMonitoringService()->save($dataModel);
         }
 
         return [
@@ -134,11 +135,22 @@ class UpdaterDeliveryTest extends TestCase
     }
 
     /**
-     * Get Persistence with mock.
+     * Init Persistence with mock.
      */
-    protected function getPersistence()
+    protected function initPersistence()
     {
-        $this->service = new MonitoringStorage([
+        $this->pmMock = $this->getSqlMock('test_monitoring');
+        $this->persistence = $this->pmMock->getPersistenceById('test_monitoring');
+        DbSetup::generateTable($this->persistence);
+
+    }
+
+    /**
+     * Init DeliveryMonitoring Service
+     */
+    protected function initDeliveryMonitoringService()
+    {
+        $this->deliveryMonitoringService = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
             MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
                 'delivery_execution_id',
@@ -153,17 +165,46 @@ class UpdaterDeliveryTest extends TestCase
             )
         ]);
 
-        $pmMock = $this->getSqlMock('test_monitoring');
-        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
-        DbSetup::generateTable($this->persistence);
-
+        $this->initPersistence();
         $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
-        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
-        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
-        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
+        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($this->pmMock);
+        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->deliveryMonitoringService);
+        $this->deliveryMonitoringService->setServiceLocator(new ServiceManager($config->reveal()));
+    }
 
+    /**
+     * Init DeliveryUpdater task object
+     */
+    protected function initDeliveryUpdaterTask()
+    {
         $this->deliveryUpdaterTask = new DeliveryUpdaterTask();
-        $this->deliveryUpdaterTask->setServiceLocator($this->service->getServiceLocator());
+        $this->deliveryUpdaterTask->setServiceLocator($this->getDeliveryMonitoringService()->getServiceLocator());
+    }
+
+    /**
+     * Get DeliveryMonitoringService object
+     *
+     * @return MonitoringStorage
+     */
+    protected function getDeliveryMonitoringService()
+    {
+        if (!$this->deliveryMonitoringService) {
+            $this->initDeliveryMonitoringService();
+        }
+        return $this->deliveryMonitoringService;
+    }
+
+    /**
+     * Get DeliveryUpdaterTask object
+     *
+     * @return DeliveryUpdaterTask
+     */
+    protected function getDeliveryUpdaterTask()
+    {
+        if (!$this->deliveryUpdaterTask) {
+            $this->initDeliveryUpdaterTask();
+        }
+        return $this->deliveryUpdaterTask;
     }
 
 }
