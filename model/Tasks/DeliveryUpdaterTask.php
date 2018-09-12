@@ -30,7 +30,7 @@ use common_report_Report as Report;
 class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
 {
     /**
-     * @param $params
+     * @param array $params
      * @return Report
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
@@ -50,8 +50,8 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
     }
 
     /**
-     * @param $resourceUri
-     * @param $metadataValue
+     * @param string $resourceUri
+     * @param string $metadataValue
      * @return bool
      */
     public function updateDeliveryLabels($resourceUri, $metadataValue)
