@@ -364,79 +364,69 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
-        if (!$isNewRecord) {
-            // Please follow this condition block.
-            // Why are there both inserting and updating inside this condition block???
-            // Shouldn't updating be outside the one???
-            // How can updating ever work then???
+        $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+        $kvTableData = $this->extractKvData($data);
 
-            // Let's first clear that, then I'll get rid of isNewRecord
+        if (empty($kvTableData)) {
+            return;
+        }
 
-            $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
-            $kvTableData = $this->extractKvData($data);
-
-            if (empty($kvTableData)) {
-                return;
-            }
-
-            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
+        $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
             FROM ' . self::KV_TABLE_NAME . '
             WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
-            $keys = array_fill(0, count($kvTableData), '?');
-            $query .= implode(',', $keys);
-            $query .= ')';
+        $keys = array_fill(0, count($kvTableData), '?');
+        $query .= implode(',', $keys);
+        $query .= ')';
 
-            $params = array_merge([$id], array_keys($kvTableData));
+        $params = array_merge([$id], array_keys($kvTableData));
 
-            $stmt = $this->getPersistence()->query($query, $params);
-            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
-            $dataToBeInserted = [];
-            $dataToBeUpdated = [];
-            foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
-                    continue;
-                }
+        $stmt = $this->getPersistence()->query($query, $params);
+        $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
+        $dataToBeInserted = [];
+        $dataToBeUpdated = [];
+        foreach ($kvTableData as $kvDataKey => $kvDataValue) {
+            if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
+                continue;
+            }
 
-                if (array_key_exists($kvDataKey, $existent)) {
-                    if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true) {
-                        $dataToBeUpdated[] = [
-                            'conditions' => [
-                                self::KV_COLUMN_PARENT_ID => $id,
-                                self::KV_COLUMN_KEY => $kvDataKey,
-                            ],
-                            'updateValues' => [
-                                self::KV_COLUMN_VALUE => $kvDataValue
-                            ]
-                        ];
-                    } else {
-                        $this->getPersistence()->exec(
-                            'UPDATE ' . self::KV_TABLE_NAME . '
-                              SET '  . self::KV_COLUMN_VALUE . ' = ?
+            if (array_key_exists($kvDataKey, $existent)) {
+                if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true) {
+                    $dataToBeUpdated[] = [
+                        'conditions' => [
+                            self::KV_COLUMN_PARENT_ID => $id,
+                            self::KV_COLUMN_KEY => $kvDataKey,
+                        ],
+                        'updateValues' => [
+                            self::KV_COLUMN_VALUE => $kvDataValue
+                        ]
+                    ];
+                } else {
+                    $this->getPersistence()->exec(
+                        'UPDATE ' . self::KV_TABLE_NAME . '
+                              SET ' . self::KV_COLUMN_VALUE . ' = ?
                             WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
                               AND ' . self::KV_COLUMN_KEY . ' = ?;',
-                                [$kvDataValue, $id, $kvDataKey]
-                        );
-                    }
-                } else {
-                    $dataToBeInserted[] = [
-                        self::KV_COLUMN_PARENT_ID => $id,
-                        self::KV_COLUMN_KEY => $kvDataKey,
-                        self::KV_COLUMN_VALUE => $kvDataValue,
-                    ];
+                        [$kvDataValue, $id, $kvDataKey]
+                    );
                 }
+            } else {
+                $dataToBeInserted[] = [
+                    self::KV_COLUMN_PARENT_ID => $id,
+                    self::KV_COLUMN_KEY => $kvDataKey,
+                    self::KV_COLUMN_VALUE => $kvDataValue,
+                ];
             }
+        }
 
 
-            if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true && !empty($dataToBeUpdated)) {
-                $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
-            }
+        if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true && !empty($dataToBeUpdated)) {
+            $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
+        }
 
-            if (!empty($dataToBeInserted)) {
-                $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
-            }
+        if (!empty($dataToBeInserted)) {
+            $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
         }
     }
 
