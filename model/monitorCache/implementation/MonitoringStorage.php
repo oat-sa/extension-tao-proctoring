@@ -288,18 +288,20 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @param bool $update when true: try to update, if fails try to create. when false: only try to create
      * @return boolean whether data is saved
      */
-    public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function save(DeliveryMonitoringDataInterface $deliveryMonitoring, $update = true)
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            $isNewRecord = $this->isNewRecord($deliveryMonitoring);
-
-            if ($isNewRecord) {
-                $result = $this->create($deliveryMonitoring);
-            } else {
+            if ($update) {
                 $result = $this->update($deliveryMonitoring);
+                if (!$result) {
+                    $result = $this->create($deliveryMonitoring);
+                }
+            } else {
+                $result = $this->create($deliveryMonitoring);
             }
         }
         return $result;
@@ -365,6 +367,13 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
         if (!$isNewRecord) {
+            // Please follow this condition block.
+            // Why are there both inserting and updating inside this condition block???
+            // Shouldn't updating be outside the one???
+            // How can updating ever work then???
+
+            // Let's first clear that, then I'll get rid of isNewRecord
+
             $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
             $kvTableData = $this->extractKvData($data);
 
@@ -455,14 +464,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $result = false;
         $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
-        if (!$isNewRecord) {
-            $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
-                    WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
-            $result = true;
-        }
+        $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
+                WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
+        $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
+        $result = true;
 
         return $result;
     }
