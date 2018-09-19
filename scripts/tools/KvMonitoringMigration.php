@@ -138,7 +138,7 @@ class KvMonitoringMigration extends ScriptAction
             $deliveryExecutionsData = $monitoringService->find([], $options, true);
             $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
             foreach ($deliveryExecutionsData as $dd) {
-                $monitoringService->save($dd);
+                $monitoringService->saveNew($dd);
                 $executionProcessed++;
 
                 if ($removeKV) {

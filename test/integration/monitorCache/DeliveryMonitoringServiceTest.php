@@ -116,7 +116,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $dataModel = $this->service->getData($deliveryExecution);
 
         //data is not valid
-        $this->assertFalse($this->service->save($dataModel, false));
+        $this->assertFalse($this->service->saveNew($dataModel));
         //$data->validate() has been called
         $this->assertNotEmpty($dataModel->getErrors());
 
@@ -128,7 +128,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $dataModel->addValue($secKey, $secVal);
         }
 
-        $this->assertTrue($this->service->save($dataModel, false));
+        $this->assertTrue($this->service->saveNew($dataModel));
         $this->assertEmpty($dataModel->getErrors());
 
 
@@ -156,7 +156,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
 
         $dataModel->addValue(MonitoringStorage::COLUMN_STATUS, 'finished', true);
-        $this->assertTrue($this->service->save($dataModel));
+        $this->assertTrue($this->service->saveExisting($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         //new row has not been inserted
         $this->assertEquals(count($insertedData), 1);
@@ -164,7 +164,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
         //update record in kv table
         $dataModel->addValue('secondary_data_key', 'new value', true);
-        $this->assertTrue($this->service->save($dataModel));
+        $this->assertTrue($this->service->saveExisting($dataModel));
         $insertedData = $this->getKvRecordsByParentId($this->deliveryExecutionId);
         $this->assertTrue(
             in_array([
@@ -191,7 +191,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $dataModel->addValue($key, $val);
         }
 
-        $this->assertTrue($this->service->save($dataModel, false));
+        $this->assertTrue($this->service->saveNew($dataModel));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
 
@@ -410,7 +410,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
-            $this->service->save($dataModel, false);
+            $this->service->saveNew($dataModel);
         }
 
         return [

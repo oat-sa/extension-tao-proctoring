@@ -224,7 +224,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
             $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(null, $maxTime, $timerTarget));
-            if ($deliveryMonitoringService->save($data)) {
+            if ($deliveryMonitoringService->saveNew($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = false;

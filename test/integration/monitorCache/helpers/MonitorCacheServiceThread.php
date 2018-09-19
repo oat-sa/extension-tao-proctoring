@@ -97,7 +97,7 @@ class MonitorCacheServiceThread extends \Thread
             $dataModel->addValue($key, $val);
         }
         usleep(rand(10000, 1500000));
-        $this->service->save($dataModel);
+        $this->service->saveNew($dataModel);
 
         foreach ($secondaryData as $secKey => $secVal) {
             $dataModel->addValue($secKey, $secVal);
@@ -107,7 +107,7 @@ class MonitorCacheServiceThread extends \Thread
             $this->service->save($dataModel);
             $dataModel->addValue('u', '20');
             $dataModel->addValue('a', '21', true);
-            $this->service->save($dataModel);
+            $this->service->saveNew($dataModel);
         } catch (\Exception $e) {
             var_dump($e->getMessage());
             $this->failed = true;

@@ -89,7 +89,13 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
      * @param DeliveryMonitoringData $deliveryMonitoring
      * @return mixed
      */
-    public function save(DeliveryMonitoringData $deliveryMonitoring);
+    public function saveNew(DeliveryMonitoringData $deliveryMonitoring);
+
+    /**
+     * @param DeliveryMonitoringData $deliveryMonitoring
+     * @return mixed
+     */
+    public function saveExisting(DeliveryMonitoringData $deliveryMonitoring);
 
     /**
      * @param DeliveryMonitoringData $deliveryMonitoring

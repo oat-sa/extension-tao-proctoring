@@ -73,7 +73,7 @@ class MonitorCacheService extends MonitoringStorage
         $data = $this->updateTestTakerInformation($data, $event->getUser());
 
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
-        $success = $this->save($data, false);
+        $success = $this->saveNew($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
@@ -99,7 +99,7 @@ class MonitorCacheService extends MonitoringStorage
                 \tao_helpers_Date::getTimeStamp($event->getDeliveryExecution()->getFinishTime(), true)
             );
         }
-        $success = $this->save($data, true);
+        $success = $this->saveExisting($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
@@ -124,7 +124,7 @@ class MonitorCacheService extends MonitoringStorage
                 DeliveryMonitoringService::CONNECTIVITY
             ]);
         }
-        $success = $this->save($data, true);
+        $success = $this->saveExisting($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }
@@ -145,7 +145,7 @@ class MonitorCacheService extends MonitoringStorage
         $data->updateData([
             DeliveryMonitoringService::CONNECTIVITY
         ]);
-        $success = $this->save($data, true);
+        $success = $this->saveExisting($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }
@@ -177,7 +177,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $data = $this->createPartialDeliveryMonitoringData($event->getDeliveryExecution());
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
-        if (!$this->save($data, true)) {
+        if (!$this->saveExisting($data)) {
             \common_Logger::w('monitor cache for authorization could not be updated');
         }
     }
@@ -192,7 +192,7 @@ class MonitorCacheService extends MonitoringStorage
         $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
         $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
 
-        $success = $this->save($data, true);
+        $success = $this->saveExisting($data);
         if (!$success) {
             \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }

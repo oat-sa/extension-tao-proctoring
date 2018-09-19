@@ -54,7 +54,7 @@ class TestUpdate
         }
         $data->setTestSession($session);
         $data->updateData($dataKeys);
-        $success = $service->save($data);
+        $success = $service->saveExisting($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }

@@ -36,13 +36,22 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
  *
  * Usage example:
  *
- * Save
+ * Save trying first to UPDATE, then INSERT if update fails
  * ----
  *
  * ```php
  * $data = new DeliveryMonitoringData($deliveryExecution);
  * $data->addValue('new_key', 'new_value');
- * $deliveryMonitoringService->save($data);
+ * $deliveryMonitoringService->saveExisting($data);
+ * ```
+ *
+ * Save new record using INSERT
+ * ----
+ *
+ * ```php
+ * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data->addValue('new_key', 'new_value');
+ * $deliveryMonitoringService->saveNew($data);
  * ```
  *
  * Find
@@ -288,19 +297,27 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @param bool $update when true: try to update, if fails try to create. when false: only try to create
      * @return boolean whether data is saved
      */
-    public function save(DeliveryMonitoringDataInterface $deliveryMonitoring, $update = true)
+    public function saveNew(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            if ($update) {
-                $result = $this->update($deliveryMonitoring);
-                if (!$result) {
-                    $result = $this->create($deliveryMonitoring);
-                }
-            } else {
+            $result = $this->create($deliveryMonitoring);
+        }
+        return $result;
+    }
+
+    /**
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean whether data is saved
+     */
+    public function saveExisting(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $result = false;
+        if ($deliveryMonitoring->validate()) {
+            $result = $this->update($deliveryMonitoring);
+            if (!$result) {
                 $result = $this->create($deliveryMonitoring);
             }
         }
