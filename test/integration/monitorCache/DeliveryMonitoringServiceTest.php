@@ -116,7 +116,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $dataModel = $this->service->getData($deliveryExecution);
 
         //data is not valid
-        $this->assertFalse($this->service->save($dataModel));
+        $this->assertFalse($this->service->save($dataModel, false));
         //$data->validate() has been called
         $this->assertNotEmpty($dataModel->getErrors());
 
@@ -128,7 +128,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $dataModel->addValue($secKey, $secVal);
         }
 
-        $this->assertTrue($this->service->save($dataModel));
+        $this->assertTrue($this->service->save($dataModel, false));
         $this->assertEmpty($dataModel->getErrors());
 
 
@@ -191,7 +191,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $dataModel->addValue($key, $val);
         }
 
-        $this->assertTrue($this->service->save($dataModel));
+        $this->assertTrue($this->service->save($dataModel, false));
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
 
@@ -410,7 +410,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
-            $this->service->save($dataModel);
+            $this->service->save($dataModel, false);
         }
 
         return [
