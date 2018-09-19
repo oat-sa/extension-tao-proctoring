@@ -54,11 +54,17 @@ class MonitorCacheService extends MonitoringStorage
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return DeliveryMonitoringData
      * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     private function createPartialDeliveryMonitoringData(DeliveryExecutionInterface $deliveryExecution)
     {
         // passing status right away just makes object valid
-        return new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::STATUS => $deliveryExecution->getState()]);
+        $dataObject = new DeliveryMonitoringData($deliveryExecution, [
+            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            DeliveryMonitoringService::STATUS => $deliveryExecution->getState(),
+        ]);
+        $this->getServiceManager()->propagate($dataObject);
+        return $dataObject;
     }
 
     /**
