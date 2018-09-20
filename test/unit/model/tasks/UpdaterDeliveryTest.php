@@ -92,7 +92,7 @@ class UpdaterDeliveryTest extends TestCase
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
-            $this->getDeliveryMonitoringService()->save($dataModel);
+            $this->getDeliveryMonitoringService()->saveNew($dataModel);
         }
 
         return [

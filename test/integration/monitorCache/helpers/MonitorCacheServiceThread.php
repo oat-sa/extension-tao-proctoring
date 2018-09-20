@@ -104,7 +104,7 @@ class MonitorCacheServiceThread extends \Thread
         }
 
         try {
-            $this->service->save($dataModel);
+            $this->service->saveNew($dataModel);
             $dataModel->addValue('u', '20');
             $dataModel->addValue('a', '21', true);
             $this->service->saveNew($dataModel);
