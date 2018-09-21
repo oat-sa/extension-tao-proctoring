@@ -50,22 +50,6 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
  */
 class MonitorCacheService extends MonitoringStorage
 {
-    /**
-     * @param DeliveryExecutionInterface $deliveryExecution
-     * @return DeliveryMonitoringData
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     */
-    private function createPartialDeliveryMonitoringData(DeliveryExecutionInterface $deliveryExecution)
-    {
-        // passing status right away just makes object valid
-        $dataObject = new DeliveryMonitoringData($deliveryExecution, [
-            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
-            DeliveryMonitoringService::STATUS => $deliveryExecution->getState(),
-        ]);
-        $this->getServiceManager()->propagate($dataObject);
-        return $dataObject;
-    }
 
     /**
      * @param DeliveryExecutionCreated $event
@@ -74,7 +58,7 @@ class MonitorCacheService extends MonitoringStorage
     public function executionCreated(DeliveryExecutionCreated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
-        $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
         $data = $this->updateDeliveryInformation($data, $deliveryExecution);
         $data = $this->updateTestTakerInformation($data, $event->getUser());
 
@@ -84,11 +68,16 @@ class MonitorCacheService extends MonitoringStorage
             \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
     }
-    
+
+    /**
+     * @param DeliveryExecutionState $event
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     */
     public function executionStateChanged(DeliveryExecutionState $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
-        $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = \common_session_SessionManager::getSession()->getUser();
@@ -116,11 +105,12 @@ class MonitorCacheService extends MonitoringStorage
      * (for example: the current item in the test)
      *
      * @param TestChangedEvent $event
+     * @throws \common_exception_NotFound
      */
     public function testStateChanged(TestChangedEvent $event)
     {
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         if ($event instanceof QtiTestChangeEvent) {
             $data->setTestSession($event->getSession());
@@ -141,12 +131,13 @@ class MonitorCacheService extends MonitoringStorage
      * (for example: from running to paused)
      *
      * @param QtiTestStateChangeEvent $event
+     * @throws \common_exception_NotFound
      */
     public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
     {
         // assumes test execution id = delivery execution id
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
         $data->setTestSession($event->getSession());
         $data->updateData([
             DeliveryMonitoringService::CONNECTIVITY
@@ -177,11 +168,13 @@ class MonitorCacheService extends MonitoringStorage
 
     /**
      * Sets the protor who authorized this delivery execution
+     *
      * @param AuthorizationGranted $event
+     * @throws \common_exception_NotFound
      */
     public function deliveryAuthorized(AuthorizationGranted $event)
     {
-        $data = $this->createPartialDeliveryMonitoringData($event->getDeliveryExecution());
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($event->getDeliveryExecution());
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
         if (!$this->saveExisting($data)) {
             \common_Logger::w('monitor cache for authorization could not be updated');
@@ -191,11 +184,12 @@ class MonitorCacheService extends MonitoringStorage
 
     /**
      * @param DeliveryExecutionReactivated $event
+     * @throws \common_exception_NotFound
      */
     public function catchTestReactivatedEvent(DeliveryExecutionReactivated $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
-        $data = $this->createPartialDeliveryMonitoringData($deliveryExecution);
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
         $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
 
         $success = $this->saveExisting($data);

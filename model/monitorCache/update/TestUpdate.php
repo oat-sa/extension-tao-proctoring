@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\update;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\oatbox\service\ServiceManager;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -35,12 +36,20 @@ use qtism\runtime\tests\AssessmentTestSessionState;
 class TestUpdate
 {
 
+    /**
+     * @param QtiTestChangeEvent $event
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     */
     public static function testStateChange(QtiTestChangeEvent $event)
     {
+        \common_Logger::i('testStateChange8');
+
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution, false);
+
+        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
 
         $dataKeys = [
             DeliveryMonitoringService::STATUS,

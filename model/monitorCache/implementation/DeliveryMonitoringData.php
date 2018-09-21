@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\implementation\TestSessionService;
@@ -88,6 +89,21 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         } else {
             $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
         }
+    }
+
+    /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
+     */
+    public static function createPartialFromDeliveryExecution(DeliveryExecutionInterface $deliveryExecution)
+    {
+        $dataObject = new self($deliveryExecution, [
+            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            DeliveryMonitoringService::STATUS => $deliveryExecution->getState(),
+        ]);
+        ServiceManager::getServiceManager()->propagate($dataObject);
+        return $dataObject;
     }
 
     /**
