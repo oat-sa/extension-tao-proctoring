@@ -119,15 +119,28 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $id = $deliveryExecution->getIdentifier();
         if (!isset($this->data[$id])) {
             $this->maintainCache();
-            $results = $this->find([
-                [self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()],
-            ], ['asArray' => true], true);
+            $results = $this->loadData($deliveryExecution->getIdentifier());
             $data = empty($results) ? [] : $results[0];
             $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
             $this->getServiceManager()->propagate($dataObject);
             $this->data[$id] = $dataObject;
         }
         return $this->data[$id];
+    }
+
+    /**
+     * Load data instead of searching
+     * @param string $deliveryExecutionId
+     * @return array
+     */
+    protected function loadData($deliveryExecutionId)
+    {
+        $qb = $this->getPersistence()->getPlatForm()->getQueryBuilder();
+        $qb->select('*')
+            ->from(self::TABLE_NAME)
+            ->where(self::DELIVERY_EXECUTION_ID.'= :deid')
+            ->setParameter('deid', $deliveryExecutionId);
+        return $qb->execute()->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
