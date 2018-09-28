@@ -20,7 +20,6 @@
 namespace oat\taoProctoring\test\integration\model\authorization;
 
 use oat\oatbox\service\ServiceManager;
-use Prophecy\Argument;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
@@ -113,25 +112,6 @@ class UpdaterDeliveryTest extends TestCase
         $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
         return $deliveryExecutionProphecy->reveal();
-    }
-
-    /**
-     * Returns a persistence Manager with a mocked sql persistence
-     *
-     * @param string $key identifier of the persistence
-     * @return \common_persistence_Manager
-     */
-    protected function getSqlMock($key)
-    {
-        if (!extension_loaded('pdo_sqlite')) {
-            $this->markTestSkipped('sqlite not found, tests skipped.');
-        }
-        $driver = new \common_persistence_sql_dbal_Driver();
-        $persistence = $driver->connect($key, ['connection' => ['url' => 'sqlite:///:memory:']]);
-        $pmProphecy = $this->prophesize(\common_persistence_Manager::class);
-        $pmProphecy->setServiceLocator(Argument::any())->willReturn(null);
-        $pmProphecy->getPersistenceById($key)->willReturn($persistence);
-        return $pmProphecy->reveal();
     }
 
     /**
