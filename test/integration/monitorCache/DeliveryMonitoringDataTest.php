@@ -61,6 +61,20 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
         }
     }
 
+    public function testConstructorTakesStateFromExecution()
+    {
+        $deliveryExecution = $this->getDeliveryExecution('active');
+        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $this->assertEquals($data->get()[DeliveryMonitoringService::STATUS], 'active');
+    }
+
+    public function testConstructorOverwritesExecutionState()
+    {
+        $deliveryExecution = $this->getDeliveryExecution('active');
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::STATUS => 'finished_test']);
+        $this->assertEquals($data->get()[DeliveryMonitoringService::STATUS], 'finished_test');
+    }
+
     public function testAddValue()
     {
         $deliveryExecution = $this->getDeliveryExecution();
@@ -99,12 +113,13 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
         $this->assertTrue(empty($errors));
     }
 
-    private function getDeliveryExecution()
+    private function getDeliveryExecution($state = null)
     {
         $id = 'http://sample/first.rdf#i1450190828500474_test_record';
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize(DeliveryExecution::class);
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        $deliveryExecutionProphecy->getState()->willReturn($state);
         return $deliveryExecutionProphecy->reveal();
     }
 }

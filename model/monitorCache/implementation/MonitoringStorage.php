@@ -40,18 +40,18 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data = new DeliveryMonitoringData($deliveryExecution, []);
  * $data->addValue('new_key', 'new_value');
- * $deliveryMonitoringService->saveExisting($data);
+ * $deliveryMonitoringService->partialSave($data);
  * ```
  *
  * Save new record using INSERT
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data = new DeliveryMonitoringData($deliveryExecution, []);
  * $data->addValue('new_key', 'new_value');
- * $deliveryMonitoringService->saveNew($data);
+ * $deliveryMonitoringService->save($data);
  * ```
  *
  * Find
@@ -297,30 +297,42 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean whether data is saved
+     * @return bool|mixed
+     * @throws \Exception
      */
-    public function saveNew(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
             $result = $this->create($deliveryMonitoring);
+            if (!$result) {
+                $result = $this->update($deliveryMonitoring);
+                $this->saveKvData($deliveryMonitoring);
+            }
         }
         return $result;
     }
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean whether data is saved
+     * @return bool|mixed
+     * @throws \Exception
      */
-    public function saveExisting(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    public function partialSave(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            $result = $this->update($deliveryMonitoring);
-            if (!$result) {
-                $result = $this->create($deliveryMonitoring);
+            $rowsUpdated = $this->update($deliveryMonitoring);
+            if ($rowsUpdated === 0) {
+                // doesn't mean an error for sure, cause persistence may return the number of rows actually changed,
+                // and not the number of rows matched by the where clause.
+                // So just in case try to create without fallback
+                $this->create($deliveryMonitoring);
             }
+            $this->saveKvData($deliveryMonitoring);
+            $result = true;
         }
+
         return $result;
     }
 
@@ -328,6 +340,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * Create new record
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
+     * @throws \Exception
      */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
@@ -366,11 +379,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
         WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
 
-        $this->getPersistence()->exec($sql, $params);
+        $rowsUpdated = $this->getPersistence()->exec($sql, $params);
 
-        $this->saveKvData($deliveryMonitoring);
-
-        return true;
+        return $rowsUpdated;
     }
 
     /**

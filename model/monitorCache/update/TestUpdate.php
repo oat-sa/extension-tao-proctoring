@@ -49,7 +49,8 @@ class TestUpdate
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = DeliveryMonitoringData::createPartialFromDeliveryExecution($deliveryExecution);
+        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        ServiceManager::getServiceManager()->propagate($data);
 
         $dataKeys = [
             DeliveryMonitoringService::STATUS,
@@ -63,7 +64,7 @@ class TestUpdate
         }
         $data->setTestSession($session);
         $data->updateData($dataKeys);
-        $success = $service->saveExisting($data);
+        $success = $service->partialSave($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
         }

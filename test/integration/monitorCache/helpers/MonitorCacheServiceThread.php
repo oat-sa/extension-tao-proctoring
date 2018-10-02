@@ -92,22 +92,22 @@ class MonitorCacheServiceThread extends \Thread
             's' => '18',
             't' => null,
         ];
-        $dataModel = new DeliveryMonitoringData($deliveryExecution);
+        $dataModel = new DeliveryMonitoringData($deliveryExecution, []);
         foreach ($data as $key => $val) {
             $dataModel->addValue($key, $val);
         }
         usleep(rand(10000, 1500000));
-        $this->service->saveNew($dataModel);
+        $this->service->save($dataModel);
 
         foreach ($secondaryData as $secKey => $secVal) {
             $dataModel->addValue($secKey, $secVal);
         }
 
         try {
-            $this->service->saveNew($dataModel);
+            $this->service->save($dataModel);
             $dataModel->addValue('u', '20');
             $dataModel->addValue('a', '21', true);
-            $this->service->saveNew($dataModel);
+            $this->service->save($dataModel);
         } catch (\Exception $e) {
             var_dump($e->getMessage());
             $this->failed = true;

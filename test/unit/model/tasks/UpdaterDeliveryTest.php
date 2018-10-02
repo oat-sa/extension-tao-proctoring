@@ -92,7 +92,7 @@ class UpdaterDeliveryTest extends TestCase
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
-            $this->getDeliveryMonitoringService()->saveNew($dataModel);
+            $this->getDeliveryMonitoringService()->save($dataModel);
         }
 
         return [
@@ -121,7 +121,7 @@ class UpdaterDeliveryTest extends TestCase
      * @param string $key identifier of the persistence
      * @return \common_persistence_Manager
      */
-    protected function getSqlMock($key)
+    public function getSqlMock($key)
     {
         if (!extension_loaded('pdo_sqlite')) {
             $this->markTestSkipped('sqlite not found, tests skipped.');

@@ -78,8 +78,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     ];
 
     /**
-     * DeliveryMonitoringData constructor.
      * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $data
+     * @throws \common_exception_NotFound
      */
     public function __construct(DeliveryExecutionInterface $deliveryExecution, $data)
     {
@@ -87,23 +88,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if (is_array($data) && !empty($data)) {
             $this->data = $data;
         } else {
-            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
+            $this->data = [
+                DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            ];
         }
-    }
 
-    /**
-     * @param DeliveryExecutionInterface $deliveryExecution
-     * @return DeliveryMonitoringData
-     * @throws \common_exception_NotFound
-     */
-    public static function createPartialFromDeliveryExecution(DeliveryExecutionInterface $deliveryExecution)
-    {
-        $dataObject = new self($deliveryExecution, [
-            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
-            DeliveryMonitoringService::STATUS => $deliveryExecution->getState(),
-        ]);
-        ServiceManager::getServiceManager()->propagate($dataObject);
-        return $dataObject;
+        if (!array_key_exists(DeliveryMonitoringService::STATUS, $this->data) && $deliveryExecution->getState()) {
+            $this->data[DeliveryMonitoringService::STATUS] = $deliveryExecution->getState();
+        }
     }
 
     /**
