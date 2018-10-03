@@ -70,7 +70,6 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         $state = $deliveryExecution->getState()->getUri();
-
         if (in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
@@ -98,7 +97,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     {
         $delivery = $this->getResource($deliveryId);
         $proctored = $delivery->getOnePropertyValue($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR));
-        $deliverySyncService = $this->getServiceManager()->get(DeliverySyncService::SERVICE_ID);
+        $deliverySyncService = $this->getServiceLocator()->get(DeliverySyncService::SERVICE_ID);
 
         return $proctored instanceof \core_kernel_classes_Resource
             ? $proctored->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED

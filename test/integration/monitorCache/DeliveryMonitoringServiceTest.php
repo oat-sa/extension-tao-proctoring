@@ -29,6 +29,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * class DeliveryMonitoringData
@@ -49,11 +50,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
 
     public function setUp()
     {
-        parent::setUp();
-        TaoPhpUnitTestRunner::initTest();
-
-        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
-
         $this->service = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
             MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
@@ -66,17 +62,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 'end_time'
             )
         ]);
-        $this->persistence = \common_persistence_Manager::getPersistence('default');
-        $this->service->setServiceLocator($this->getServiceManagerProphecy());
 
         $pmMock = $this->getSqlMock('test_monitoring');
         $this->persistence = $pmMock->getPersistenceById('test_monitoring');
         DbSetup::generateTable($this->persistence);
 
-        $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
-        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
-        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
-        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
+        $sl = $this->prophesize(ServiceLocatorInterface::class);
+        $sl->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $this->service->setServiceLocator($sl->reveal());
     }
 
     public function tearDown()
