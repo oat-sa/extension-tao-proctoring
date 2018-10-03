@@ -368,11 +368,29 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 }
             }
             $this->saveKvData($deliveryMonitoring);
-            $this->data[$deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]] = $deliveryMonitoring;
+            $this->updateInternalCacheWithPartialData($deliveryMonitoring);
             $result = true;
         }
 
         return $result;
+    }
+
+    /**
+     * Updates old regular cache record with fields of partial DeliveryMonitoringData
+     *
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     */
+    private function updateInternalCacheWithPartialData(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $executionId = $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID];
+
+        if (array_key_exists($executionId, $this->data)) {
+            foreach ($deliveryMonitoring->get() as $fieldName => $fieldValue) {
+                $this->data[$executionId]->update($fieldName, $fieldValue);
+            }
+        } else {
+            $this->data[$executionId] = $deliveryMonitoring;
+        }
     }
 
     /**
