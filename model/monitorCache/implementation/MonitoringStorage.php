@@ -327,9 +327,13 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 // doesn't mean an error for sure, cause persistence may return the number of rows actually changed,
                 // and not the number of rows matched by the where clause.
                 // So just in case try to create without fallback
-                $this->create($deliveryMonitoring);
+                try {
+                    $this->create($deliveryMonitoring);
+                } catch (\PDOException $e) {
+                }
             }
             $this->saveKvData($deliveryMonitoring);
+            $this->data[$deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]] = $deliveryMonitoring;
             $result = true;
         }
 
