@@ -72,5 +72,6 @@ class DeliveryMonitoringStorageTest extends TestCase
         $dataArray = $data3->get();
         $this->assertArrayHasKey('a', $dataArray);
         $this->assertEquals('3', $dataArray['a']);
+        $this->assertEquals('2', $dataArray['b']);
     }
 }
