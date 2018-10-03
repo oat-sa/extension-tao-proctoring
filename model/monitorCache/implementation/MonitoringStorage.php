@@ -133,7 +133,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             ], ['asArray' => true], true);
             $data = empty($results) ? [] : $results[0];
             $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
-            $this->getServiceManager()->propagate($dataObject);
+            $this->propagate($dataObject);
             $this->data[$id] = $dataObject;
         }
         return $this->data[$id];
@@ -533,7 +533,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     public function getPersistence()
     {
-        return $this->getServiceManager()
+        return $this->getServiceLocator()
             ->get(\common_persistence_Manager::SERVICE_ID)
             ->getPersistenceById($this->getOption(self::OPTION_PERSISTENCE));
     }

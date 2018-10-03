@@ -42,7 +42,7 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
     use ServiceLocatorAwareTrait;
 
     /**
-     * @var \Report
+     * @var \core_kernel_classes_Resource
      */
     protected $report;
 
