@@ -61,7 +61,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = $event->getDeliveryExecution();
 
         $data = new DeliveryMonitoringData($deliveryExecution, []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data = $this->updateDeliveryInformation($data, $deliveryExecution);
         $data = $this->updateTestTakerInformation($data, $event->getUser());
@@ -83,7 +83,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = $event->getDeliveryExecution();
 
         $data = new DeliveryMonitoringData($deliveryExecution, []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
@@ -119,7 +119,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
         $data = new DeliveryMonitoringData($deliveryExecution, []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         if ($event instanceof QtiTestChangeEvent) {
@@ -149,7 +149,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
         $data = new DeliveryMonitoringData($deliveryExecution, []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data->setTestSession($event->getSession());
         $data->updateData([
@@ -188,7 +188,7 @@ class MonitorCacheService extends MonitoringStorage
     public function deliveryAuthorized(AuthorizationGranted $event)
     {
         $data = new DeliveryMonitoringData($event->getDeliveryExecution(), []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
         if (!$this->partialSave($data)) {
@@ -206,7 +206,7 @@ class MonitorCacheService extends MonitoringStorage
         $deliveryExecution = $event->getDeliveryExecution();
 
         $data = new DeliveryMonitoringData($deliveryExecution, []);
-        ServiceManager::getServiceManager()->propagate($data);
+        $this->getServiceManager()->propagate($data);
 
         $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
 
