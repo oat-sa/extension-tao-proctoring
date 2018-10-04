@@ -115,24 +115,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected $groupColumns = [];
 
     /**
-     * @var DeliveryMonitoringData[]
-     */
-    protected $data = [];
-
-    /**
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringService::getData()
      */
     public function getData(DeliveryExecutionInterface $deliveryExecution)
     {
-        $id = $deliveryExecution->getIdentifier();
-        if (isset($this->data[$id])) {
-            return $this->data[$id];
-        } else {
-            $data = $this->loadData($deliveryExecution->getIdentifier());
-            $data = $data == false ? [] : $data;
-            return $this->buildData($deliveryExecution, $data);
-        }
+        $data = $this->loadData($deliveryExecution->getIdentifier());
+        $data = $data == false ? [] : $data;
+        return $this->buildData($deliveryExecution, $data);
     }
 
     /**
@@ -144,18 +134,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function buildData(DeliveryExecutionInterface $deliveryExecution, $data)
     {
-        $this->maintainCache();
-        $id = $deliveryExecution->getIdentifier();
-        if (isset($this->data[$id])) {
-            foreach ($data as $key => $value) {
-                $this->data[$id]->update($key, $value);
-            }
-        } else {
-            $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
-            $this->propagate($dataObject);
-            $this->data[$id] = $dataObject;
-        }
-        return $this->data[$id];
+        $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
+        $this->propagate($dataObject);
+
+        return $dataObject;
     }
 
     /**
@@ -373,29 +355,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 }
             }
             $this->saveKvData($deliveryMonitoring);
-            $this->updateInternalCacheWithPartialData($deliveryMonitoring);
             $result = true;
         }
 
         return $result;
-    }
-
-    /**
-     * Updates old regular cache record with fields of partial DeliveryMonitoringData
-     *
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     */
-    private function updateInternalCacheWithPartialData(DeliveryMonitoringDataInterface $deliveryMonitoring)
-    {
-        $executionId = $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID];
-
-        if (array_key_exists($executionId, $this->data)) {
-            foreach ($deliveryMonitoring->get() as $fieldName => $fieldValue) {
-                $this->data[$executionId]->update($fieldName, $fieldValue);
-            }
-        } else {
-            $this->data[$executionId] = $deliveryMonitoring;
-        }
     }
 
     /**
@@ -978,14 +941,5 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     private function getQueryBuilder()
     {
         return $this->getPersistence()->getPlatForm()->getQueryBuilder();
-    }
-
-    private function maintainCache()
-    {
-        $count = count($this->data);
-        if ($count >= $this->getOption(self::OPTION_CACHE_SIZE)) {
-            // cut ~30% of oldest elements
-            $this->data = array_slice($this->data, floor($count / 3), $count - floor($count / 3));
-        }
     }
 }
