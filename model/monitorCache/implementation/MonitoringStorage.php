@@ -339,7 +339,12 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            $result = $this->create($deliveryMonitoring);
+            try {
+                // we should be ready for unique violation error when the calling side calls
+                // save() instead of partialSave()
+                $result = $this->create($deliveryMonitoring);
+            } catch (\PDOException $e) {
+            }
             if (!$result) {
                 $result = $this->update($deliveryMonitoring);
                 $this->saveKvData($deliveryMonitoring);
