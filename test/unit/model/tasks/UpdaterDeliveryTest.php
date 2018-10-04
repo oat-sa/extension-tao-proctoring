@@ -112,6 +112,7 @@ class UpdaterDeliveryTest extends TestCase
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        $deliveryExecutionProphecy->getState()->willReturn('active');
         return $deliveryExecutionProphecy->reveal();
     }
 
