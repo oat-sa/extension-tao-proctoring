@@ -21,6 +21,7 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use Doctrine\DBAL\DBALException;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -326,6 +327,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 // save() instead of partialSave()
                 $result = $this->create($deliveryMonitoring);
             } catch (\PDOException $e) {
+            } catch (DBALException $e) {
             }
             if (!$result) {
                 $result = $this->update($deliveryMonitoring);
@@ -352,6 +354,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 try {
                     $this->create($deliveryMonitoring);
                 } catch (\PDOException $e) {
+                } catch (DBALException $e) {
                 }
             }
             $this->saveKvData($deliveryMonitoring);
