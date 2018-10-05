@@ -162,7 +162,12 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             ->from(self::TABLE_NAME)
             ->where(self::DELIVERY_EXECUTION_ID.'= :deid')
             ->setParameter('deid', $deliveryExecutionId);
-        return $qb->execute()->fetch(\PDO::FETCH_ASSOC);
+        $data = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
+        $kvData = $this->getKvData([$deliveryExecutionId]);
+        if (isset($kvData[$deliveryExecutionId])) {
+            $data =  array_merge($data, $kvData[$deliveryExecutionId]);
+        }
+        return $data;
     }
 
     /**
