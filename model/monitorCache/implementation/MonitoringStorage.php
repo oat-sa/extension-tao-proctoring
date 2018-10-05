@@ -117,17 +117,57 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function getData(DeliveryExecutionInterface $deliveryExecution)
     {
         $id = $deliveryExecution->getIdentifier();
-        if (!isset($this->data[$id])) {
-            $this->maintainCache();
-            $results = $this->find([
-                [self::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()],
-            ], ['asArray' => true], true);
-            $data = empty($results) ? [] : $results[0];
+        if (isset($this->data[$id])) {
+            return $this->data[$id];
+        } else {
+            $data = $this->loadData($deliveryExecution->getIdentifier());
+            $data = $data == false ? [] : $data;
+            return $this->buildData($deliveryExecution, $data);
+        }
+    }
+
+    /**
+     * Ensure that all DeliveryMonitoringData are unique
+     * per delivery execution id
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param array $data
+     * @return DeliveryMonitoringData
+     */
+    protected function buildData(DeliveryExecutionInterface $deliveryExecution, $data)
+    {
+        $this->maintainCache();
+        $id = $deliveryExecution->getIdentifier();
+        if (isset($this->data[$id])) {
+            foreach ($data as $key => $value) {
+                $this->data[$id]->update($key, $value);
+            }
+        } else {
             $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
-            $this->getServiceManager()->propagate($dataObject);
+            $this->propagate($dataObject);
             $this->data[$id] = $dataObject;
         }
         return $this->data[$id];
+    }
+
+    /**
+     * Load data instead of searching
+     * Returns false on failure
+     * @param string $deliveryExecutionId
+     * @return array
+     */
+    protected function loadData($deliveryExecutionId)
+    {
+        $qb = $this->getPersistence()->getPlatForm()->getQueryBuilder();
+        $qb->select('*')
+            ->from(self::TABLE_NAME)
+            ->where(self::DELIVERY_EXECUTION_ID.'= :deid')
+            ->setParameter('deid', $deliveryExecutionId);
+        $data = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
+        $kvData = $this->getKvData([$deliveryExecutionId]);
+        if (isset($kvData[$deliveryExecutionId])) {
+            $data =  array_merge($data, $kvData[$deliveryExecutionId]);
+        }
+        return $data;
     }
 
     /**
@@ -254,7 +294,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         } else {
             foreach($data as $row) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $result[] = $this->getData($deliveryExecution);
+                $result[] = $this->buildData($deliveryExecution, $row);
             }
         }
 
@@ -509,7 +549,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     public function getPersistence()
     {
-        return $this->getServiceManager()
+        return $this->getServiceLocator()
             ->get(\common_persistence_Manager::SERVICE_ID)
             ->getPersistenceById($this->getOption(self::OPTION_PERSISTENCE));
     }
