@@ -50,7 +50,6 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
  */
 class MonitorCacheService extends MonitoringStorage
 {
-
     /**
      * @param DeliveryExecutionCreated $event
      * @throws \common_exception_NotFound
@@ -59,7 +58,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data = $this->updateDeliveryInformation($data, $deliveryExecution);
@@ -81,7 +80,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
@@ -117,7 +116,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
@@ -147,7 +146,7 @@ class MonitorCacheService extends MonitoringStorage
         // assumes test execution id = delivery execution id
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data->setTestSession($event->getSession());
@@ -186,7 +185,8 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function deliveryAuthorized(AuthorizationGranted $event)
     {
-        $data = new DeliveryMonitoringData($event->getDeliveryExecution(), []);
+        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
@@ -204,7 +204,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $this->createMonitoringData($deliveryExecution, []);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());

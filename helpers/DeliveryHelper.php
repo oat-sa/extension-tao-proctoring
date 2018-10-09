@@ -560,7 +560,7 @@ class DeliveryHelper
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = $deliveryMonitoringService->createMonitoringData($deliveryExecution, []);
         ServiceManager::getServiceManager()->propagate($data);
 
         $data->update('hasBeenPaused', $paused);

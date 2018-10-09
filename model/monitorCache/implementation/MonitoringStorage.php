@@ -116,6 +116,17 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected $groupColumns = [];
 
     /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $data
+     * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
+     */
+    public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data)
+    {
+        return new DeliveryMonitoringData($deliveryExecution, $data);
+    }
+
+    /**
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringService::getData()
      */
@@ -132,10 +143,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * @param DeliveryExecutionInterface $deliveryExecution
      * @param array $data
      * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
      */
     protected function buildData(DeliveryExecutionInterface $deliveryExecution, $data)
     {
-        $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
+        $dataObject = $this->createMonitoringData($deliveryExecution, $data);
         $this->propagate($dataObject);
 
         return $dataObject;

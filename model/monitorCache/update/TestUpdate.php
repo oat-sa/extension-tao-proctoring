@@ -24,6 +24,7 @@ namespace oat\taoProctoring\model\monitorCache\update;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
+use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
 use oat\oatbox\service\ServiceManager;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -49,7 +50,9 @@ class TestUpdate
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        /** @var MonitorCacheService $monitorCacheService */
+        $monitorCacheService = ServiceManager::getServiceManager()->get(MonitorCacheService::CONFIG_ID);
+        $data = $monitorCacheService->createMonitoringData($deliveryExecution, []);
         ServiceManager::getServiceManager()->propagate($data);
 
         $dataKeys = [
