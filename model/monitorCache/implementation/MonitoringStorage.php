@@ -348,8 +348,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             }
             if (!$result) {
                 $result = $this->update($deliveryMonitoring);
-                $this->saveKvData($deliveryMonitoring);
             }
+            $this->saveKvData($deliveryMonitoring);
         }
         return $result;
     }
@@ -394,10 +394,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $primaryTableData = $this->extractPrimaryData($data);
 
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
-
-        if ($result) {
-            $this->saveKvData($deliveryMonitoring);
-        }
 
         return $result;
     }
