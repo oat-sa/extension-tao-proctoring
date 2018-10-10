@@ -182,7 +182,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     {
         $deliveryExecution = $this->getDeliveryExecution($this->deliveryExecutionId, 'active');
         if ($partialModel) {
-            $dataModel = new \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData($deliveryExecution, []);
+            $dataModel = $this->service->createPartialMonitoringData($deliveryExecution);
         } else {
             $dataModel = $this->service->getData($deliveryExecution);
         }

@@ -44,15 +44,13 @@ class TestUpdate
      */
     public static function testStateChange(QtiTestChangeEvent $event)
     {
-        \common_Logger::i('testStateChange8');
-
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
         /** @var MonitorCacheService $monitorCacheService */
         $monitorCacheService = ServiceManager::getServiceManager()->get(MonitorCacheService::CONFIG_ID);
-        $data = $monitorCacheService->createMonitoringData($deliveryExecution, []);
+        $data = $monitorCacheService->createPartialMonitoringData($deliveryExecution);
         ServiceManager::getServiceManager()->propagate($data);
 
         $dataKeys = [

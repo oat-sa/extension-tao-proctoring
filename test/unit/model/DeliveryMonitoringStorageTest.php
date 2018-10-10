@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\test\unit\model;
 
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\generis\test\TestCase;
 use oat\taoProctoring\scripts\install\db\DbSetup;
@@ -57,11 +58,12 @@ class DeliveryMonitoringStorageTest extends TestCase
         $this->assertInstanceOf(DeliveryMonitoringData::class, $data);
         $data->update('a', '1');
         $data->update('b', '2');
+        $data->update(DeliveryMonitoringService::STATUS, DeliveryExecution::STATE_PAUSED);
         $success = $storage->save($data);
         $this->assertTrue($success);
         
         // partial save
-        $data2 = new \oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData($de, false);
+        $data2 = $storage->createPartialMonitoringData($de);
         $data2->update('a', '3');
         $success = $storage->partialSave($data2);
         $this->assertTrue($success);

@@ -128,6 +128,21 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     }
 
     /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
+     */
+    public function createPartialMonitoringData(DeliveryExecutionInterface $deliveryExecution)
+    {
+        $data = [
+            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            DeliveryMonitoringService::STATUS => $deliveryExecution->getState(),
+        ];
+
+        return new DeliveryMonitoringData($deliveryExecution, $data);
+    }
+
+    /**
      * (non-PHPdoc)
      * @see \oat\taoProctoring\model\monitorCache\DeliveryMonitoringService::getData()
      */

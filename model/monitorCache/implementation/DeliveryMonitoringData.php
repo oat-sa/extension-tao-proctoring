@@ -88,13 +88,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         if (is_array($data) && !empty($data)) {
             $this->data = $data;
         } else {
-            $this->data = [
-                DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
-            ];
-        }
-
-        if (!array_key_exists(DeliveryMonitoringService::STATUS, $this->data) && $deliveryExecution->getState()) {
-            $this->data[DeliveryMonitoringService::STATUS] = $deliveryExecution->getState();
+            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
         }
     }
 

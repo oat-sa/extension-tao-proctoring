@@ -80,6 +80,12 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
     public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data);
 
     /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @return DeliveryMonitoringData
+     */
+    public function createPartialMonitoringData(DeliveryExecutionInterface $deliveryExecution);
+
+    /**
      * Retrieve the currently cached delivery data
      * 
      * @param DeliveryExecutionInterface $deliveryExecution

@@ -80,7 +80,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = $this->createMonitoringData($deliveryExecution, []);
+        $data = $this->createPartialMonitoringData($deliveryExecution);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
@@ -116,7 +116,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = $this->createMonitoringData($deliveryExecution, []);
+        $data = $this->createPartialMonitoringData($deliveryExecution);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
@@ -146,7 +146,7 @@ class MonitorCacheService extends MonitoringStorage
         // assumes test execution id = delivery execution id
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
 
-        $data = $this->createMonitoringData($deliveryExecution, []);
+        $data = $this->createPartialMonitoringData($deliveryExecution);
         $this->propagate($data);
 
         $data->setTestSession($event->getSession());
@@ -186,7 +186,7 @@ class MonitorCacheService extends MonitoringStorage
     public function deliveryAuthorized(AuthorizationGranted $event)
     {
         $deliveryExecution = $event->getDeliveryExecution();
-        $data = $this->createMonitoringData($deliveryExecution, []);
+        $data = $this->createPartialMonitoringData($deliveryExecution);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::AUTHORIZED_BY, $event->getAuthorizer()->getIdentifier());
@@ -204,7 +204,7 @@ class MonitorCacheService extends MonitoringStorage
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
-        $data = $this->createMonitoringData($deliveryExecution, []);
+        $data = $this->createPartialMonitoringData($deliveryExecution);
         $this->propagate($data);
 
         $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
