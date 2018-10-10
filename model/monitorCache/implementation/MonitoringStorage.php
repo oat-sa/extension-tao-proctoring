@@ -22,6 +22,7 @@
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -344,7 +345,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 // save() instead of partialSave()
                 $result = $this->create($deliveryMonitoring);
             } catch (\PDOException $e) {
-            } catch (DBALException $e) {
+                // when the PDO implementation of RDS is used as a persistence
+                // unfortunately the exception is very broad so it can cover more than intended cases
+            } catch (UniqueConstraintViolationException $e) {
+                // when the DBAL implementation of RDS is used as a persistence
             }
             if (!$result) {
                 $result = $this->update($deliveryMonitoring);
@@ -371,7 +375,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 try {
                     $this->create($deliveryMonitoring);
                 } catch (\PDOException $e) {
-                } catch (DBALException $e) {
+                    // when the PDO implementation of RDS is used as a persistence
+                } catch (UniqueConstraintViolationException $e) {
+                    // when the DBAL implementation of RDS is used as a persistence
                 }
             }
             $this->saveKvData($deliveryMonitoring);
