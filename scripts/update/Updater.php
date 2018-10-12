@@ -753,5 +753,32 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('10.2.0', '10.2.4');
 
+        if ($this->isVersion('10.2.1')) {
+            $extensionManager = \common_ext_ExtensionsManager::singleton();
+            if (!$extensionManager->isInstalled('taoTestCenter') || !$extensionManager->isEnabled('taoTestCenter')) {
+                /** @var DefaultUrlService $urlService */
+                $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+                $proctoringHomeRoute = $urlService->getRoute('ProctoringHome');
+
+                $dumbRoute = [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'TestCenter',
+                    'action' => 'index'
+                ];
+
+                if ($proctoringHomeRoute == $dumbRoute) {
+                    $urlService->setRoute('ProctoringHome', [
+                            'ext' => 'tao',
+                            'controller' => 'Main',
+                            'action' => 'entry',
+                        ]
+                    );
+                }
+                $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+            }
+
+            $this->setVersion('10.2.2');
+        }
+
     }
 }
