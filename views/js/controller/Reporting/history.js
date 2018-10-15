@@ -133,8 +133,8 @@ define([
                         renderTo: container.find('.panel')
                     }).on('change submit', function() {
                         historyTable.refresh({
-                            periodStart : this.getStart(),
-                            periodEnd : this.getEnd()
+                            periodStart : this.getStartTimestamp(),
+                            periodEnd : this.getEndTimestamp()
                         });
                     });
 
