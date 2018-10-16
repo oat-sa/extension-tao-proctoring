@@ -41,7 +41,7 @@ module.exports = function(grunt) {
                         include : ['taoProctoring/helper/**/*']
                     }, {
                         name : 'app',
-                        entrypoint: 'taoProctoring/controller/app',
+                        entryPoint: 'taoProctoring/controller/app',
                         bootstrap : true
                     }]
                 }
