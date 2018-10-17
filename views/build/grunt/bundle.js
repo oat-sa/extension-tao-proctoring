@@ -30,8 +30,6 @@ module.exports = function(grunt) {
                     extension : 'taoProctoring',
                     outputDir : 'loader',
                     dependencies : [
-                        'taoProctoring',
-                        'taoClientDiagnostic',
                         'taoQtiItem',
                         'taoItems',
                         'taoQtiTest'
@@ -39,6 +37,11 @@ module.exports = function(grunt) {
                     bundles : [{
                         name : 'taoProctoring',
                         default : true,
+                        bootstrap : true,
+                        include : ['taoProctoring/helper/**/*']
+                    }, {
+                        name : 'app',
+                        entryPoint: 'taoProctoring/controller/app',
                         bootstrap : true
                     }]
                 }
