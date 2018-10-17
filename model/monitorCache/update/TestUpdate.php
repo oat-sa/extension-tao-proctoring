@@ -33,6 +33,8 @@ use qtism\runtime\tests\AssessmentTestSessionState;
  *
  * @package oat\taoProctoring
  * @author Aleksej Tikhanovich <aleksej@taotesting.com>
+ * @deprecated since the event is already handled in MonitorCacheService for updating the cache
+ * and it's reasonable to make a 'unit of work', because the cache is costly
  */
 class TestUpdate
 {
@@ -44,6 +46,8 @@ class TestUpdate
      */
     public static function testStateChange(QtiTestChangeEvent $event)
     {
+        return;
+
         /** @var DeliveryMonitoringService $service */
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());

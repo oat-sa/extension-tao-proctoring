@@ -111,6 +111,7 @@ class MonitorCacheService extends MonitoringStorage
      *
      * @param TestChangedEvent $event
      * @throws \common_exception_NotFound
+     * @throws \common_exception_Error
      */
     public function testStateChanged(TestChangedEvent $event)
     {
@@ -128,6 +129,19 @@ class MonitorCacheService extends MonitoringStorage
                 DeliveryMonitoringService::CONNECTIVITY
             ]);
         }
+
+        $dataKeys = [
+            DeliveryMonitoringService::STATUS,
+        ];
+        $session = $event->getSession();
+        $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+        if ($deliveryExecution->getUserIdentifier() === $userId) {
+            $dataKeys[] = DeliveryMonitoringService::DIFF_TIMESTAMP;
+            $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
+        }
+        $data->setTestSession($session);
+        $data->updateData($dataKeys);
+
         $success = $this->partialSave($data);
         if (!$success) {
             \common_Logger::w('monitor cache for teststate could not be updated');
