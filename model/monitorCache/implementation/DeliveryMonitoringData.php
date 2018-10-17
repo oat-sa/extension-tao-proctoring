@@ -139,6 +139,11 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
                 $this->errors[$requiredField] = 'cannot be empty';
             }
         }
+        if (!array_key_exists(DeliveryMonitoringService::STATUS, $this->errors)
+            && !is_string($this->data[DeliveryMonitoringService::STATUS])) {
+            $this->errors[DeliveryMonitoringService::STATUS] = 'Delivery execution status should be passed as a URI';
+        }
+
         return $result;
     }
 

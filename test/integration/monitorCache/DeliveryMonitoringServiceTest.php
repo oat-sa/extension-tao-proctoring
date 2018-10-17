@@ -496,7 +496,11 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
-        $deliveryExecutionProphecy->getState()->willReturn($state);
+
+        $stateProphecy = $this->prophesize(\core_kernel_classes_Resource::class);
+        $stateProphecy->getUri()->willReturn($state);
+
+        $deliveryExecutionProphecy->getState()->willReturn($stateProphecy);
         return $deliveryExecutionProphecy->reveal();
     }
 }

@@ -44,7 +44,11 @@ class DeliveryMonitoringStorageTest extends TestCase
         $sl = $this->getServiceLocatorMock([\common_persistence_Manager::SERVICE_ID => $pm]);
         $deP = $this->prophesize(DeliveryExecution::class);
         $deP->getIdentifier()->willReturn('http://test/deliveryExecution');
-        $deP->getState()->willReturn(DeliveryExecution::STATE_PAUSED);
+
+        $stateProphecy = $this->prophesize(\core_kernel_classes_Resource::class);
+        $stateProphecy->getUri()->willReturn(DeliveryExecution::STATE_PAUSED);
+
+        $deP->getState()->willReturn($stateProphecy);
         $de = $deP->reveal();
         $storage = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'monitoring',
