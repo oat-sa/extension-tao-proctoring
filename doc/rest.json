@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/taoProctoring/executionRestService/unstop": {
+    "/taoProctoring/ExecutionRestService/unstop": {
       "post": {
         "produces": [
           "application/json"
