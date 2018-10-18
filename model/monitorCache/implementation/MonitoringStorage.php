@@ -132,7 +132,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $data[DeliveryMonitoringService::STATUS] = $deliveryExecution->getState()->getUri();
         }
 
-        return new DeliveryMonitoringData($deliveryExecution, $data);
+        $monitoringData = new DeliveryMonitoringData($deliveryExecution, $data);
+        $this->propagate($monitoringData);
+
+        return $monitoringData;
     }
 
     /**
