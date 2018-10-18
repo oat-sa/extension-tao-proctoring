@@ -124,7 +124,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data)
     {
-        return new DeliveryMonitoringData($deliveryExecution, $data);
+        $monitoringData = new DeliveryMonitoringData($deliveryExecution, $data);
+        $this->propagate($monitoringData);
+        return $monitoringData;
     }
 
     /**
@@ -139,7 +141,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             DeliveryMonitoringService::STATUS => $deliveryExecution->getState()->getUri(),
         ];
 
-        return new DeliveryMonitoringData($deliveryExecution, $data);
+        return $this->createMonitoringData($deliveryExecution, $data);
     }
 
     /**
@@ -164,7 +166,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected function buildData(DeliveryExecutionInterface $deliveryExecution, $data)
     {
         $dataObject = $this->createMonitoringData($deliveryExecution, $data);
-        $this->propagate($dataObject);
 
         return $dataObject;
     }

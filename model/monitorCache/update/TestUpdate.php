@@ -55,7 +55,6 @@ class TestUpdate
         /** @var MonitorCacheService $monitorCacheService */
         $monitorCacheService = ServiceManager::getServiceManager()->get(MonitorCacheService::CONFIG_ID);
         $data = $monitorCacheService->createPartialMonitoringData($deliveryExecution);
-        ServiceManager::getServiceManager()->propagate($data);
 
         $dataKeys = [
             DeliveryMonitoringService::STATUS,
