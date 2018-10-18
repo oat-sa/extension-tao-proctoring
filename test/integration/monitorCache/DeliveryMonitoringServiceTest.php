@@ -149,7 +149,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $secondaryDataToUpdate['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
         $secondaryDataToCheck['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
 
-        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck, 1);
+        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
     }
 
     public function testSaveFallbackAfterUpdateReturns0Rows()
@@ -178,7 +178,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      * @param array $secondaryDataToCheck
      * @throws \common_exception_NotFound
      */
-    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck, $a=0)
+    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck)
     {
         $deliveryExecution = $this->getDeliveryExecution($this->deliveryExecutionId, 'active');
         if ($partialModel) {
