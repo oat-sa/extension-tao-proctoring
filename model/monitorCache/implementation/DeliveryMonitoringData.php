@@ -82,14 +82,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      * @param $data
      * @throws \common_exception_NotFound
      */
-    public function __construct(DeliveryExecutionInterface $deliveryExecution, $data)
+    public function __construct(DeliveryExecutionInterface $deliveryExecution, array $data)
     {
         $this->deliveryExecution = $deliveryExecution;
-        if (is_array($data) && !empty($data)) {
-            $this->data = $data;
-        } else {
-            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
-        }
+        $this->data = $data;
     }
 
     /**

@@ -67,7 +67,7 @@ class DeliveryMonitoringStorageTest extends TestCase
         $this->assertTrue($success);
         
         // partial save
-        $data2 = $storage->createPartialMonitoringData($de);
+        $data2 = $storage->createMonitoringData($de);
         $data2->update('a', '3');
         $success = $storage->partialSave($data2);
         $this->assertTrue($success);

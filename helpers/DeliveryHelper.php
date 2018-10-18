@@ -560,7 +560,7 @@ class DeliveryHelper
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $data = $deliveryMonitoringService->createPartialMonitoringData($deliveryExecution);
+        $data = $deliveryMonitoringService->createMonitoringData($deliveryExecution);
 
         $data->update('hasBeenPaused', $paused);
         $deliveryMonitoringService->partialSave($data);

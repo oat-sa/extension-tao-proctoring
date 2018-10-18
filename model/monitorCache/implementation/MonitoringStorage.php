@@ -122,26 +122,17 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * @return DeliveryMonitoringData
      * @throws \common_exception_NotFound
      */
-    public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data)
+    public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data = [])
     {
-        $monitoringData = new DeliveryMonitoringData($deliveryExecution, $data);
-        $this->propagate($monitoringData);
-        return $monitoringData;
-    }
-
-    /**
-     * @param DeliveryExecutionInterface $deliveryExecution
-     * @return DeliveryMonitoringData
-     * @throws \common_exception_NotFound
-     */
-    public function createPartialMonitoringData(DeliveryExecutionInterface $deliveryExecution)
-    {
-        $data = [
+        $data = array_merge([
             DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
-            DeliveryMonitoringService::STATUS => $deliveryExecution->getState()->getUri(),
-        ];
+        ], $data);
 
-        return $this->createMonitoringData($deliveryExecution, $data);
+        if (!array_key_exists(DeliveryMonitoringService::STATUS, $data)) {
+            $data[DeliveryMonitoringService::STATUS] = $deliveryExecution->getState()->getUri();
+        }
+
+        return new DeliveryMonitoringData($deliveryExecution, $data);
     }
 
     /**
