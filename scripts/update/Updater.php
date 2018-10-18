@@ -752,7 +752,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('10.2.0');
         }
 
-        $this->skip('10.2.0', '10.2.5');
+        $this->skip('10.2.0', '10.2.4');
 
         if ($this->isVersion('10.2.4')){
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, ExecutionRestService::class));
