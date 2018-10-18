@@ -149,7 +149,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $secondaryDataToUpdate['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
         $secondaryDataToCheck['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
 
-        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
+        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck, 1);
     }
 
     public function testSaveFallbackAfterUpdateReturns0Rows()
@@ -178,7 +178,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      * @param array $secondaryDataToCheck
      * @throws \common_exception_NotFound
      */
-    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck)
+    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck, $a=0)
     {
         $deliveryExecution = $this->getDeliveryExecution($this->deliveryExecutionId, 'active');
         if ($partialModel) {
@@ -218,13 +218,24 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][$service::COLUMN_ID]);
 
         $this->assertNotEmpty($insertedKvData);
-        $this->assertEquals(count($secondaryDataToCheck), count($insertedKvData));
+
+        $insertedKvDataNotEmptyFieldCount = 0;
+        foreach ($insertedKvData as $fieldData) {
+            $fieldValue = $fieldData[MonitoringStorage::KV_COLUMN_VALUE];
+            if ($fieldValue !== null) {
+                $insertedKvDataNotEmptyFieldCount++;
+            }
+        }
+
+        $this->assertEquals(count($secondaryDataToCheck), $insertedKvDataNotEmptyFieldCount);
 
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[MonitoringStorage::KV_COLUMN_KEY];
             $val = $kvData[MonitoringStorage::KV_COLUMN_VALUE];
-            $this->assertTrue(isset($secondaryDataToCheck[$key]));
-            $this->assertEquals($secondaryDataToCheck[$key], $val);
+            if ($val !== null) {
+                $this->assertTrue(isset($secondaryDataToCheck[$key]));
+                $this->assertEquals($secondaryDataToCheck[$key], $val);
+            }
         }
     }
 
