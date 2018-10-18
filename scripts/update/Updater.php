@@ -42,6 +42,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
+use oat\taoProctoring\controller\ExecutionRestService;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
@@ -751,7 +752,12 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('10.2.0');
         }
 
-        $this->skip('10.2.0', '10.3.0');
+        $this->skip('10.2.0', '10.2.4');
+
+        if ($this->isVersion('10.2.4')){
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, ExecutionRestService::class));
+            $this->setVersion('10.3.0');
+        }
 
     }
 }

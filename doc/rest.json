@@ -66,13 +66,13 @@
             "examples": {
               "application/json": {
                 "success": true,
-                "data": "http://tao.local/ltiDeliveryProvider/DeliveryTool/launch/eyJkZWxpdmVyeSI6Imh0dHA6XC9cL3Rhby5jaHJpcy5sb2NhbFwvdGFvY2hyaXMucmRmI2kxNDY3MDM2OTQzNTA1OTcxIn0=",
+                "data": "Unstop successful",
                 "version": "3.1.0"
               }
             }
           },
           "400": {
-            "description": "Bad request if you send invalid parameters. Delivery uri is mandatory.",
+            "description": "Bad request if you send invalid parameters. deliveryExecution is mandatory.",
             "examples": {
               "application/json": {
                 "success": false,
@@ -97,7 +97,7 @@
               "application/json": {
                 "success": false,
                 "errorCode": 0,
-                "errorMsg": "Delivery not found",
+                "errorMsg": "Delivery Execution not found",
                 "version": "3.1.0"
               }
             },
