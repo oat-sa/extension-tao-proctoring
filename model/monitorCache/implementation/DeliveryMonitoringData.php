@@ -141,7 +141,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         foreach ($data as $fieldName => $fieldValue) {
-            if (!array_key_exists($fieldName, $this->errors) && !is_string($fieldValue)) {
+            if (!array_key_exists($fieldName, $this->errors) && $fieldValue !== null && !is_string($fieldValue)) {
                 $this->errors[$fieldName] = 'should be a string';
             }
         }
