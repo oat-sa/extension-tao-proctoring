@@ -512,9 +512,9 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('7.3.0', '7.3.4');
 
         if ($this->isVersion('7.3.4')) {
-            //$eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            //$eventManager->attach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
-            //$this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->attach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('7.4.0');
         }
 
@@ -759,7 +759,12 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('10.3.0');
         }
 
-        $this->skip('10.3.0', '10.3.1');
+        if ($this->isVersion('10.3.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('10.3.1');
+        }
 
     }
 }
