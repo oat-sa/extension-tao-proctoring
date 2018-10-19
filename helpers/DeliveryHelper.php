@@ -29,6 +29,7 @@ use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
@@ -549,6 +550,7 @@ class DeliveryHelper
     /**
      * @param $deliveryExecution
      * @param boolean $paused
+     * @throws \common_exception_NotFound
      */
     public static function setHasBeenPaused($deliveryExecution, $paused)
     {
@@ -557,9 +559,11 @@ class DeliveryHelper
         }
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $data = $deliveryMonitoringService->getData($deliveryExecution);
+
+        $data = $deliveryMonitoringService->createMonitoringData($deliveryExecution);
+
         $data->update('hasBeenPaused', $paused);
-        $deliveryMonitoringService->save($data);
+        $deliveryMonitoringService->partialSave($data);
     }
 
     /**

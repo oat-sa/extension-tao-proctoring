@@ -79,7 +79,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      * Get logged data by delivery execution id
      *
      * @param string $deliveryExecutionId
-     * @param sting|null $eventId - filter data by event id
+     * @param string|null $eventId - filter data by event id
      * @return mixed
      */
     public function get($deliveryExecutionId, $eventId = null)
