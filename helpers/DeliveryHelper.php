@@ -549,7 +549,7 @@ class DeliveryHelper
 
     /**
      * @param $deliveryExecution
-     * @param $paused
+     * @param boolean $paused
      * @throws \common_exception_NotFound
      */
     public static function setHasBeenPaused($deliveryExecution, $paused)
