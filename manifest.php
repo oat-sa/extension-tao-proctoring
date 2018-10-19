@@ -46,7 +46,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '10.3.0',
+    'version' => '10.3.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=19.0.0',
@@ -67,7 +67,7 @@ return array(
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'ExecutionRestService')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
+        array('grant', TaoRoles::DELIVERY, array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
         array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
         array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools')),
         array('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class),

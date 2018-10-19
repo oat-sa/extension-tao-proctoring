@@ -211,7 +211,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
 
     /**
      * Get logged data from database
-     * @param $id delivery execution id
+     * @param string $id delivery execution id
      * @return array
      */
     private function getRecordByDeliveryExecutionId($id)

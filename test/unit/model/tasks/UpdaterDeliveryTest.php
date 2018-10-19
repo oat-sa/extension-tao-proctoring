@@ -20,6 +20,8 @@
 namespace oat\taoProctoring\test\integration\model\authorization;
 
 use oat\oatbox\service\ServiceManager;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use Prophecy\Argument;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
@@ -109,8 +111,13 @@ class UpdaterDeliveryTest extends TestCase
             $id = $this->deliveryExecutionId;
         }
         $prophet = new \Prophecy\Prophet();
-        $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
+        $deliveryExecutionProphecy = $prophet->prophesize(DeliveryExecution::class);
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+
+        $stateProphecy = $this->prophesize(\core_kernel_classes_Resource::class);
+        $stateProphecy->getUri()->willReturn(DeliveryExecution::STATE_PAUSED);
+        $deliveryExecutionProphecy->getState()->willReturn($stateProphecy);
+
         return $deliveryExecutionProphecy->reveal();
     }
 
