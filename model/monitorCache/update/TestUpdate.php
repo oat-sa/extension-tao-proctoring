@@ -21,14 +21,6 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
-use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
-use oat\taoQtiTest\models\event\QtiTestChangeEvent;
-use oat\oatbox\service\ServiceManager;
-use qtism\runtime\tests\AssessmentTestSessionState;
-
 /**
  *
  * @package oat\taoProctoring
