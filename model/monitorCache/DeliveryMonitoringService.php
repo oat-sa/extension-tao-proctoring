@@ -73,6 +73,13 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
     const REACTIVATE_AUTHORIZED_BY = 'reactivate_authorized_by';
 
     /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $data
+     * @return DeliveryMonitoringData
+     */
+    public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data);
+
+    /**
      * Retrieve the currently cached delivery data
      * 
      * @param DeliveryExecutionInterface $deliveryExecution
@@ -90,6 +97,12 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
      * @return mixed
      */
     public function save(DeliveryMonitoringData $deliveryMonitoring);
+
+    /**
+     * @param DeliveryMonitoringData $deliveryMonitoring
+     * @return mixed
+     */
+    public function partialSave(DeliveryMonitoringData $deliveryMonitoring);
 
     /**
      * @param DeliveryMonitoringData $deliveryMonitoring

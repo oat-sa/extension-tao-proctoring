@@ -70,7 +70,7 @@ class UpdateMonitoringCache implements Action, ServiceLocatorAwareInterface
                 foreach ($deliveryExecutions as $deliveryExecution) {
                     $data = $deliveryMonitoringService->getData($deliveryExecution);
                     $data->updateData();
-                    if ($deliveryMonitoringService->save($data)) {
+                    if ($deliveryMonitoringService->partialSave($data)) {
                         $this->report->add(
                             new Report(
                                 Report::TYPE_SUCCESS,

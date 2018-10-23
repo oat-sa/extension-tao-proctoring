@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -36,11 +38,20 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
  *
  * Usage example:
  *
- * Save
+ * Save trying first to UPDATE, then INSERT if update fails
  * ----
  *
  * ```php
- * $data = new DeliveryMonitoringData($deliveryExecution);
+ * $data = new DeliveryMonitoringData($deliveryExecution, []);
+ * $data->addValue('new_key', 'new_value');
+ * $deliveryMonitoringService->partialSave($data);
+ * ```
+ *
+ * Save new record using INSERT
+ * ----
+ *
+ * ```php
+ * $data = new DeliveryMonitoringData($deliveryExecution, []);
  * $data->addValue('new_key', 'new_value');
  * $deliveryMonitoringService->save($data);
  * ```
@@ -106,9 +117,26 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected $groupColumns = [];
 
     /**
-     * @var DeliveryMonitoringData[]
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $data
+     * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
      */
-    protected $data = [];
+    public function createMonitoringData(DeliveryExecutionInterface $deliveryExecution, $data = [])
+    {
+        $data = array_merge([
+            DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+        ], $data);
+
+        if (!array_key_exists(DeliveryMonitoringService::STATUS, $data)) {
+            $data[DeliveryMonitoringService::STATUS] = $deliveryExecution->getState()->getUri();
+        }
+
+        $monitoringData = new DeliveryMonitoringData($deliveryExecution, $data);
+        $this->propagate($monitoringData);
+
+        return $monitoringData;
+    }
 
     /**
      * (non-PHPdoc)
@@ -116,14 +144,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     public function getData(DeliveryExecutionInterface $deliveryExecution)
     {
-        $id = $deliveryExecution->getIdentifier();
-        if (isset($this->data[$id])) {
-            return $this->data[$id];
-        } else {
-            $data = $this->loadData($deliveryExecution->getIdentifier());
-            $data = $data == false ? [] : $data;
-            return $this->buildData($deliveryExecution, $data);
-        }
+        $data = $this->loadData($deliveryExecution->getIdentifier());
+        $data = $data == false ? [] : $data;
+        return $this->buildData($deliveryExecution, $data);
     }
 
     /**
@@ -132,21 +155,13 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * @param DeliveryExecutionInterface $deliveryExecution
      * @param array $data
      * @return DeliveryMonitoringData
+     * @throws \common_exception_NotFound
      */
     protected function buildData(DeliveryExecutionInterface $deliveryExecution, $data)
     {
-        $this->maintainCache();
-        $id = $deliveryExecution->getIdentifier();
-        if (isset($this->data[$id])) {
-            foreach ($data as $key => $value) {
-                $this->data[$id]->update($key, $value);
-            }
-        } else {
-            $dataObject = new DeliveryMonitoringData($deliveryExecution, $data);
-            $this->propagate($dataObject);
-            $this->data[$id] = $dataObject;
-        }
-        return $this->data[$id];
+        $dataObject = $this->createMonitoringData($deliveryExecution, $data);
+
+        return $dataObject;
     }
 
     /**
@@ -328,20 +343,57 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
     /**
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean whether data is saved
+     * @return bool|mixed
+     * @throws \Exception
      */
     public function save(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $result = false;
         if ($deliveryMonitoring->validate()) {
-            $isNewRecord = $this->isNewRecord($deliveryMonitoring);
-
-            if ($isNewRecord) {
+            try {
+                // we should be ready for unique violation error when the calling side calls
+                // save() instead of partialSave()
                 $result = $this->create($deliveryMonitoring);
-            } else {
+            } catch (\PDOException $e) {
+                // when the PDO implementation of RDS is used as a persistence
+                // unfortunately the exception is very broad so it can cover more than intended cases
+            } catch (UniqueConstraintViolationException $e) {
+                // when the DBAL implementation of RDS is used as a persistence
+            }
+            if (!$result) {
                 $result = $this->update($deliveryMonitoring);
             }
+            $this->saveKvData($deliveryMonitoring);
         }
+        return $result;
+    }
+
+    /**
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return bool|mixed
+     * @throws \Exception
+     */
+    public function partialSave(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $result = false;
+        if ($deliveryMonitoring->validate()) {
+            $rowsUpdated = $this->update($deliveryMonitoring);
+            if ($rowsUpdated === 0) {
+                // doesn't mean an error for sure, cause persistence may return the number of rows actually changed,
+                // and not the number of rows matched by the where clause.
+                // So just in case try to create without fallback
+                try {
+                    $this->create($deliveryMonitoring);
+                } catch (\PDOException $e) {
+                    // when the PDO implementation of RDS is used as a persistence
+                } catch (UniqueConstraintViolationException $e) {
+                    // when the DBAL implementation of RDS is used as a persistence
+                }
+            }
+            $this->saveKvData($deliveryMonitoring);
+            $result = true;
+        }
+
         return $result;
     }
 
@@ -349,6 +401,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      * Create new record
      * @param DeliveryMonitoringDataInterface $deliveryMonitoring
      * @return boolean whether data is saved
+     * @throws \Exception
      */
     protected function create(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
@@ -357,10 +410,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $primaryTableData = $this->extractPrimaryData($data);
 
         $result = $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData) === 1;
-
-        if ($result) {
-            $this->saveKvData($deliveryMonitoring);
-        }
 
         return $result;
     }
@@ -387,11 +436,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
         WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . '=:delivery_execution_id';
 
-        $this->getPersistence()->exec($sql, $params);
+        $rowsUpdated = $this->getPersistence()->exec($sql, $params);
 
-        $this->saveKvData($deliveryMonitoring);
-
-        return true;
+        return $rowsUpdated;
     }
 
     /**
@@ -402,72 +449,69 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     protected function saveKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
         $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
-        if (!$isNewRecord) {
-            $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
-            $kvTableData = $this->extractKvData($data);
+        $id = $data[self::COLUMN_DELIVERY_EXECUTION_ID];
+        $kvTableData = $this->extractKvData($data);
 
-            if (empty($kvTableData)) {
-                return;
-            }
+        if (empty($kvTableData)) {
+            return;
+        }
 
-            $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
+        $query = 'SELECT ' . self::KV_COLUMN_KEY . ',' . self::KV_COLUMN_VALUE . '
             FROM ' . self::KV_TABLE_NAME . '
             WHERE ' . self::KV_COLUMN_PARENT_ID . ' =? AND ' . self::KV_COLUMN_KEY . ' IN(';
-            $keys = array_fill(0, count($kvTableData), '?');
-            $query .= implode(',', $keys);
-            $query .= ')';
+        $keys = array_fill(0, count($kvTableData), '?');
+        $query .= implode(',', $keys);
+        $query .= ')';
 
-            $params = array_merge([$id], array_keys($kvTableData));
+        $params = array_merge([$id], array_keys($kvTableData));
 
-            $stmt = $this->getPersistence()->query($query, $params);
-            $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
-            $dataToBeInserted = [];
-            $dataToBeUpdated = [];
-            foreach($kvTableData as $kvDataKey => $kvDataValue) {
-                if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
-                    continue;
-                }
+        $stmt = $this->getPersistence()->query($query, $params);
+        $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
+        $dataToBeInserted = [];
+        $dataToBeUpdated = [];
+        foreach ($kvTableData as $kvDataKey => $kvDataValue) {
+            if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
+                continue;
+            }
 
-                if (array_key_exists($kvDataKey, $existent)) {
-                    if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true) {
-                        $dataToBeUpdated[] = [
-                            'conditions' => [
-                                self::KV_COLUMN_PARENT_ID => $id,
-                                self::KV_COLUMN_KEY => $kvDataKey,
-                            ],
-                            'updateValues' => [
-                                self::KV_COLUMN_VALUE => $kvDataValue
-                            ]
-                        ];
-                    } else {
-                        $this->getPersistence()->exec(
-                            'UPDATE ' . self::KV_TABLE_NAME . '
-                              SET '  . self::KV_COLUMN_VALUE . ' = ?
+            if (array_key_exists($kvDataKey, $existent)) {
+                if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true) {
+                    $dataToBeUpdated[] = [
+                        'conditions' => [
+                            self::KV_COLUMN_PARENT_ID => $id,
+                            self::KV_COLUMN_KEY => $kvDataKey,
+                        ],
+                        'updateValues' => [
+                            self::KV_COLUMN_VALUE => $kvDataValue
+                        ]
+                    ];
+                } else {
+                    $this->getPersistence()->exec(
+                        'UPDATE ' . self::KV_TABLE_NAME . '
+                              SET ' . self::KV_COLUMN_VALUE . ' = ?
                             WHERE ' . self::KV_COLUMN_PARENT_ID . ' = ?
                               AND ' . self::KV_COLUMN_KEY . ' = ?;',
-                                [$kvDataValue, $id, $kvDataKey]
-                        );
-                    }
-                } else {
-                    $dataToBeInserted[] = [
-                        self::KV_COLUMN_PARENT_ID => $id,
-                        self::KV_COLUMN_KEY => $kvDataKey,
-                        self::KV_COLUMN_VALUE => $kvDataValue,
-                    ];
+                        [$kvDataValue, $id, $kvDataKey]
+                    );
                 }
+            } else {
+                $dataToBeInserted[] = [
+                    self::KV_COLUMN_PARENT_ID => $id,
+                    self::KV_COLUMN_KEY => $kvDataKey,
+                    self::KV_COLUMN_VALUE => $kvDataValue,
+                ];
             }
+        }
 
 
-            if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true && !empty($dataToBeUpdated)) {
-                $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
-            }
+        if ($this->getOption(static::OPTION_USE_UPDATE_MULTIPLE) === true && !empty($dataToBeUpdated)) {
+            $this->getPersistence()->updateMultiple(self::KV_TABLE_NAME, $dataToBeUpdated);
+        }
 
-            if (!empty($dataToBeInserted)) {
-                $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
-            }
+        if (!empty($dataToBeInserted)) {
+            $this->getPersistence()->insertMultiple(self::KV_TABLE_NAME, $dataToBeInserted);
         }
     }
 
@@ -495,14 +539,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     {
         $result = false;
         $data = $deliveryMonitoring->get();
-        $isNewRecord = $this->isNewRecord($deliveryMonitoring);
 
-        if (!$isNewRecord) {
-            $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
-                    WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
-            $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
-            $result = true;
-        }
+        $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
+                WHERE ' . self::KV_COLUMN_PARENT_ID . '=?';
+        $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]);
+        $result = true;
 
         return $result;
     }
@@ -932,14 +973,5 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     private function getQueryBuilder()
     {
         return $this->getPersistence()->getPlatForm()->getQueryBuilder();
-    }
-
-    private function maintainCache()
-    {
-        $count = count($this->data);
-        if ($count >= $this->getOption(self::OPTION_CACHE_SIZE)) {
-            // cut ~30% of oldest elements
-            $this->data = array_slice($this->data, floor($count / 3), $count - floor($count / 3));
-        }
     }
 }

@@ -60,7 +60,7 @@ class UpdateMonitoringTimeValues implements Action
                         \tao_helpers_Date::getTimeStamp($endTime, true)
                     );
                 }
-                $monitoring->save($deliveryData);
+                $monitoring->partialSave($deliveryData);
                 $executions++;
             } catch (\common_exception_NotFound $e) {
                 //Delivery execution not found; Skip
