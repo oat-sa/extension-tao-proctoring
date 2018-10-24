@@ -27,11 +27,11 @@ use oat\tao\model\taskQueue\QueueDispatcherInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
-use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoQtiTest\models\event\QtiTestChangeEvent;
@@ -215,11 +215,11 @@ class MonitorCacheService extends MonitoringStorage
 
         $data = $this->createMonitoringData($deliveryExecution);
 
-        $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getProctor()->getIdentifier());
+        $data->update(DeliveryMonitoringService::REACTIVATE_AUTHORIZED_BY, $event->getUser()->getIdentifier());
 
         $success = $this->partialSave($data);
         if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
+            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
         }
     }
 

@@ -22,9 +22,9 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
-use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
@@ -513,32 +513,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param null|string $reason
      * @return bool
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
-     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function reactivateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $executionState = $deliveryExecution->getState()->getUri();
-        $result = false;
+
+        $result = parent::reactivateExecution($deliveryExecution, $reason);
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED === $executionState) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
-
-            /** @var TestSessionService $testSessionService */
-            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
-            $session = $testSessionService->getTestSession($deliveryExecution);
-            if ($session) {
-                $session->setState(AssessmentTestSessionState::SUSPENDED);
-                $testSessionService->persist($session);
-            }
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
-
-            /** @var EventManager $eventManager */
-            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            $eventManager->trigger(new DeliveryExecutionReactivated($deliveryExecution, $proctor, $reason));
 
             $logData = [
                 'reason' => $reason,
@@ -547,7 +534,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             ];
 
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
-            $result = true;
         }
 
         return $result;
