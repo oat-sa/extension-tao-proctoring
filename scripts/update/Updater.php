@@ -36,6 +36,7 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
@@ -755,7 +756,7 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('10.2.0', '10.2.4');
 
         if ($this->isVersion('10.2.4')){
-            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, ExecutionRestService::class));
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
             $this->setVersion('10.3.0');
         }
 
@@ -764,6 +765,23 @@ class Updater extends common_ext_ExtensionUpdater
             $eventManager->detach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('10.3.1');
+        }
+
+        if ($this->isVersion('10.3.1')) {
+            AclProxy::revokeRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
+
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            foreach ($eventManager->getOptions() as $e => $listeners) {
+                if ($e === 'oat\\taoProctoring\\model\\event\\DeliveryExecutionReactivated') {
+                    foreach ($listeners as $listener) {
+                        $eventManager->attach(DeliveryExecutionReactivated::class, $listener);
+                        $eventManager->detach($e, $listener);
+                    }
+                }
+            }
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('11.0.0');
         }
 
     }
