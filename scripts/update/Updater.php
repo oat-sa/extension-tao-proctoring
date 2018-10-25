@@ -771,18 +771,6 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('11.0.0')) {
             AclProxy::revokeRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
-
-            /** @var EventManager $eventManager */
-            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            foreach ($eventManager->getOption('listeners') as $e => $listeners) {
-                if ($e === 'oat\\taoProctoring\\model\\event\\DeliveryExecutionReactivated') {
-                    foreach ($listeners as $listener) {
-                        $eventManager->attach(DeliveryExecutionReactivated::class, $listener);
-                        $eventManager->detach($e, $listener);
-                    }
-                }
-            }
-            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('12.0.0');
         }
 
