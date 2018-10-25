@@ -774,7 +774,7 @@ class Updater extends common_ext_ExtensionUpdater
 
             /** @var EventManager $eventManager */
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            foreach ($eventManager->getOptions() as $e => $listeners) {
+            foreach ($eventManager->getOption('listeners') as $e => $listeners) {
                 if ($e === 'oat\\taoProctoring\\model\\event\\DeliveryExecutionReactivated') {
                     foreach ($listeners as $listener) {
                         $eventManager->attach(DeliveryExecutionReactivated::class, $listener);
