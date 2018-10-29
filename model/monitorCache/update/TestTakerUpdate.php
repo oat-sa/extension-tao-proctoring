@@ -57,7 +57,7 @@ class TestTakerUpdate
             foreach ($deliveryExecutionsData as $data) {
                 $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, UserHelper::getUserFirstName($user));
                 $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, UserHelper::getUserLastName($user));
-                $success = $service->save($data);
+                $success = $service->partialSave($data);
                 if (!$success) {
                     \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. TestTaker data has not been changed');
                 }

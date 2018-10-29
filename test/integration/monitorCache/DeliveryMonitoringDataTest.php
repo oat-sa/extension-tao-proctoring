@@ -49,7 +49,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
         $deliveryExecution = $this->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
         foreach ($columns as $columnKey => $columnVal) {
             $data->addValue($columnKey, $columnVal);
@@ -64,7 +64,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testAddValue()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution,[]);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
 
         $this->assertEquals($data->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $deliveryExecution->getIdentifier());
@@ -84,7 +84,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testValidate()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();
@@ -99,12 +99,13 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
         $this->assertTrue(empty($errors));
     }
 
-    private function getDeliveryExecution()
+    private function getDeliveryExecution($state = null)
     {
         $id = 'http://sample/first.rdf#i1450190828500474_test_record';
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize(DeliveryExecution::class);
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        $deliveryExecutionProphecy->getState()->willReturn($state);
         return $deliveryExecutionProphecy->reveal();
     }
 }

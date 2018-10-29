@@ -36,12 +36,14 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
+use oat\taoProctoring\controller\ExecutionRestService;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
@@ -751,6 +753,27 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('10.2.0');
         }
 
-        $this->skip('10.2.0', '10.2.1');
+        $this->skip('10.2.0', '11.0.0');
+
+        if ($this->isVersion('10.2.4')){
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
+            $this->setVersion('10.3.0');
+        }
+
+        if ($this->isVersion('10.3.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('10.3.1');
+        }
+
+        $this->skip('10.3.1', '11.0.0');
+
+        if ($this->isVersion('11.0.0')) {
+            AclProxy::revokeRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
+            $this->setVersion('12.0.0');
+        }
+
+        $this->skip('12.0.0', '12.0.1');
     }
 }
