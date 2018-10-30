@@ -923,6 +923,9 @@ define([
                                     remaining = 0;
                                 }
                                 if (remaining) {
+                                    if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
+                                        remaining -= rowTimer.consumedExtraTime;
+                                    }
                                     refinedValue = timeEncoder.encode(remaining);
                                 } else {
                                     refinedValue = '';
