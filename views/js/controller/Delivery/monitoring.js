@@ -917,12 +917,15 @@ define([
                             var remaining = parseInt(refinedValue, 10);
                             if (remaining || _.isFinite(remaining) ) {
                                 if (remaining < 0) {
-                                    if (rowTimer.extraTime) {
+                                    if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
                                         rowTimer.consumedExtraTime += -remaining;
                                     }
                                     remaining = 0;
                                 }
                                 if (remaining) {
+                                    if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
+                                        remaining -= rowTimer.consumedExtraTime;
+                                    }
                                     refinedValue = timeEncoder.encode(remaining);
                                 } else {
                                     refinedValue = '';
