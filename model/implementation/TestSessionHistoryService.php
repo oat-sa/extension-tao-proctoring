@@ -138,7 +138,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 }
                 $exportable['date'] = DateHelper::displayeDate($exportable['timestamp'], DateHelper::FORMAT_LONG_MICROSECONDS);
                 $exportable['role'] = $role;
-                $exportable['actor'] = _dh($this->getActor($author->getUri()));
+                $exportable['actor'] = _dh($this->getActorName($author->getUri()));
                 $exportable['event'] = $eventId;
                 $exportable['details'] = $details;
                 $exportable['context'] = $context;
@@ -308,7 +308,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
      * @param $userId
      * @return string
      */
-    protected function getActor($userId)
+    protected function getActorName($userId)
     {
         $user = UserHelper::getUser($userId);
 
