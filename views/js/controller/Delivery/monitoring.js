@@ -775,7 +775,7 @@ define([
                             label: extraField.label,
                             filterable: extraField.filterable,
                             sortable : true,
-                            order: extraField.order,
+                            order: extraField.columnPosition,
                             transform: function(value, row) {
                                 return row && row.extraFields && row.extraFields[extraField.id] || '';
                             }

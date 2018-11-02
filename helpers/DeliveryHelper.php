@@ -500,7 +500,7 @@ class DeliveryHelper
                 'id' => $field['id'],
                 'label' => $field['label'],
                 'filterable' => array_key_exists('filterable', $field) ? $field['filterable'] : false,
-                'order' => array_key_exists('order', $field) ? $field['order'] : false,
+                'columnPosition' => array_key_exists('columnPosition', $field) ? $field['columnPosition'] : 0,
             );
         }, self::_getUserExtraFields());
     }
