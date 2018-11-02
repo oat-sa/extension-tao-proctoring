@@ -496,11 +496,15 @@ class DeliveryHelper
      */
     public static function getExtraFields(){
         return array_map(function($field){
-            return array(
+            $extra = [
                 'id' => $field['id'],
                 'label' => $field['label'],
                 'filterable' => array_key_exists('filterable', $field) ? $field['filterable'] : false,
-            );
+            ];
+            if (array_key_exists('columnPosition', $field)) {
+                $extra['columnPosition'] = $field['columnPosition'];
+            }
+            return $extra;
         }, self::_getUserExtraFields());
     }
 
