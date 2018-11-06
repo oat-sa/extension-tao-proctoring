@@ -39,7 +39,7 @@ class ProctoringRunnerService extends QtiRunnerService
     use OntologyAwareTrait;
 
     /**
-     * Get Test Context.
+     * Get Test Data.
      *
      * @param RunnerServiceContext $context
      * @return array
@@ -47,22 +47,23 @@ class ProctoringRunnerService extends QtiRunnerService
      * @throws \common_exception_NotFound
      * @throws \core_kernel_persistence_Exception
      */
-    public function getTestContext(RunnerServiceContext $context)
+    public function getTestData(RunnerServiceContext $context)
     {
-        $response = parent::getTestContext($context);
+        $testContext = parent::getTestContext($context);
+        $testData = parent::getTestData($context);
 
-        if (isset($response['options']) && isset($response['options']['sectionPause'])) {
-            $response['securePauseStateRequired'] = $response['options']['sectionPause'];
+        if (isset($testContext['options']) && isset($testContext['options']['sectionPause'])) {
+            $testData['securePauseStateRequired'] = $testContext['options']['sectionPause'];
         } else {
             if ($context->getTestExecutionUri()) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($context->getTestExecutionUri());
                 if ($this->isProctoredDelivery($deliveryExecution->getDelivery())) {
-                    $response['securePauseStateRequired'] = true;
+                    $testData['securePauseStateRequired'] = true;
                 }
             }
         }
 
-        return $response;
+        return $testData;
     }
 
     /**
