@@ -38,6 +38,7 @@ use oat\taoProctoring\scripts\install\RegisterServices;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\install\SetUpQueueTasks;
 use oat\taoProctoring\scripts\uninstall\RestoreServices;
 use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
@@ -46,10 +47,10 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '12.2.0',
+    'version' => '12.3.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao'            => '>=21.0.0',
+        'tao'            => '>=21.8.0',
         'taoDelivery'    => '>=12.0.0',
         'taoDeliveryRdf' => '>=7.0.0',
         'taoTestTaker'   => '>=4.0.0',
@@ -91,6 +92,7 @@ return array(
             \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
             \oat\taoProctoring\scripts\install\RegisterProctorAttemptService::class,
             RegisterProctoringDeliveryDeleteService::class,
+            SetUpQueueTasks::class
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

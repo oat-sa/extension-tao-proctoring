@@ -25,11 +25,14 @@ use common_ext_ExtensionUpdater;
 use common_persistence_Manager;
 use Doctrine\DBAL\Schema\SchemaException;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
+use oat\tao\model\taskQueue\Event\TaskLogArchivedEvent;
+use oat\tao\model\taskQueue\TaskLogInterface;
 use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
 use oat\tao\scripts\update\OntologyUpdater;
@@ -775,5 +778,14 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('12.0.0', '12.2.0');
+
+        if ($this->isVersion('12.2.0')) {
+            /** @var TaskLogInterface|ConfigurableService $taskLogService */
+            $taskLogService = $this->getServiceManager()->get(TaskLogInterface::SERVICE_ID);
+            $taskLogService->linkTaskToCategory(AbstractIrregularityReport::class, TaskLogInterface::CATEGORY_EXPORT);
+            $this->getServiceManager()->register(TaskLogInterface::SERVICE_ID, $taskLogService);
+
+            $this->setVersion('12.3.0');
+        }
     }
 }
