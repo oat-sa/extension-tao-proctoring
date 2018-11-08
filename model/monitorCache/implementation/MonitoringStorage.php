@@ -621,10 +621,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             } elseif(is_array($value)){
                 $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
             } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
-                if (preg_grep('/' . $matches[1] .'/i', ['like','ilike'])) {
+                if (!empty($matches[1]) && preg_grep('/' . $matches[1] .'/i', ['like','ilike'])) {
                     $toLower = true;
                     $op = 'LIKE';
-                } elseif (preg_grep('/' . $matches[1] .'/i', ['not like','not ilike'])) {
+                } elseif (!empty($matches[1]) && preg_grep('/' . $matches[1] .'/i', ['not like','not ilike'])) {
                     $toLower = true;
                     $op = 'NOT LIKE';
                 } else {
