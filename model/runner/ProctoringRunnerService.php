@@ -26,6 +26,7 @@ use oat\taoQtiTest\models\runner\QtiRunnerPausedException;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\RunnerServiceContext;
 use qtism\runtime\tests\AssessmentTestSessionState;
+use oat\taoQtiTest\models\SectionPauseService;
 
 /**
  * Class ProctoringRunnerService
@@ -49,11 +50,11 @@ class ProctoringRunnerService extends QtiRunnerService
      */
     public function getTestData(RunnerServiceContext $context)
     {
-        $testContext = parent::getTestContext($context);
+        $couldBePaused = $this->getServiceManager()->get(SectionPauseService::SERVICE_ID)->couldBePaused($context->getTestSession());
         $testData = parent::getTestData($context);
 
-        if (isset($testContext['options']) && isset($testContext['options']['sectionPause'])) {
-            $testData['securePauseStateRequired'] = $testContext['options']['sectionPause'];
+        if ($couldBePaused !== null) {
+            $testData['securePauseStateRequired'] = $couldBePaused;
         } else {
             if ($context->getTestExecutionUri()) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($context->getTestExecutionUri());
