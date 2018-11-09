@@ -167,7 +167,14 @@ class Monitor extends SimplePageModule
 
             $this->returnJson($response);
         } catch (QtiTestExtractionFailedException $e) {
-            $this->returnError('Decryption failed because wrong app key.');
+            $response = [
+                'success' => false,
+                'data' => [],
+                'errorCode' => self::ERROR_AUTHORIZE_EXECUTIONS,
+                'errorMsg' => __('Decryption failed because of using the wrong customer app key.'),
+            ];
+
+            $this->returnJson($response);
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
