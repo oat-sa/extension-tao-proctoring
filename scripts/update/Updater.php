@@ -775,15 +775,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.0.0');
         }
 
-        $this->skip('12.0.0', '12.2.1');
-
-        if ($this->isVersion('12.2.1')) {
+        $this->skip('12.0.0', '12.3.0');
+      
+        if ($this->isVersion('12.3.0')) {
 
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->detach(DeliveryExecutionFinished::class, ['oat\\taoEventLog\\model\\LoggerService', 'logEvent']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
 
-            $this->setVersion('12.2.2');
+            $this->setVersion('12.3.1');
         }
+
     }
 }
