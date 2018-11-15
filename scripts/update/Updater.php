@@ -775,6 +775,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.0.0');
         }
 
+
         $this->skip('12.0.0', '12.3.0');
       
         if ($this->isVersion('12.3.0')) {
@@ -786,5 +787,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.3.1');
         }
 
+        $this->skip('12.3.1', '12.3.2');
     }
 }
