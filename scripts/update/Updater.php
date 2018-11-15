@@ -54,6 +54,7 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\FinishDeliveryExecutionsService;
@@ -774,6 +775,18 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.0.0');
         }
 
-        $this->skip('12.0.0', '12.3.1');
+
+        $this->skip('12.0.0', '12.3.0');
+      
+        if ($this->isVersion('12.3.0')) {
+
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryExecutionFinished::class, ['oat\\taoEventLog\\model\\LoggerService', 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('12.3.1');
+        }
+
+        $this->skip('12.3.1', '12.3.2');
     }
 }
