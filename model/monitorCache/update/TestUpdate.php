@@ -21,43 +21,15 @@
 
 namespace oat\taoProctoring\model\monitorCache\update;
 
-use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoQtiTest\models\event\QtiTestChangeEvent;
-use oat\oatbox\service\ServiceManager;
-use qtism\runtime\tests\AssessmentTestSessionState;
-
 /**
  *
  * @package oat\taoProctoring
  * @author Aleksej Tikhanovich <aleksej@taotesting.com>
+ * @deprecated since the event is already handled in MonitorCacheService for updating the cache
+ * and it's reasonable to make a 'unit of work', because the cache is costly.
+ * The logic of former self::testStateChange is can now be found at MonitorCacheService
  */
 class TestUpdate
 {
-
-    public static function testStateChange(QtiTestChangeEvent $event)
-    {
-        /** @var DeliveryMonitoringService $service */
-        $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
-        $data = $service->getData($deliveryExecution, false);
-
-        $dataKeys = [
-            DeliveryMonitoringService::STATUS,
-        ];
-
-        $session = $event->getSession();
-        $userId = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
-        if ($deliveryExecution->getUserIdentifier() === $userId) {
-            $dataKeys[] = DeliveryMonitoringService::DIFF_TIMESTAMP;
-            $dataKeys[] = DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY;
-        }
-        $data->setTestSession($session);
-        $data->updateData($dataKeys);
-        $success = $service->save($data);
-        if (!$success) {
-            \common_Logger::w('monitor cache for teststate could not be updated');
-        }
-    }
 
 }

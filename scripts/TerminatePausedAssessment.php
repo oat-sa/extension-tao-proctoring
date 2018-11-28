@@ -134,7 +134,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                         DeliveryMonitoringService::STATUS,
                         DeliveryExecution::STATE_PAUSED
                     );
-                    $deliveryMonitoringService->save($deliveryExecutionData);
+                    $deliveryMonitoringService->partialSave($deliveryExecutionData);
                     common_Logger::w(
                         'Delivery execution ' . $deliveryExecution->getIdentifier() .
                         ' is missed. Set it\'s state in delivery monitoring to Paused'
