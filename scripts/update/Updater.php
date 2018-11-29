@@ -787,6 +787,35 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.3.1');
         }
 
-        $this->skip('12.3.1', '12.3.3');
+        $this->skip('12.3.1', '12.3.2');
+
+        if ($this->isVersion('12.3.2')) {
+            $extensionManager = \common_ext_ExtensionsManager::singleton();
+            if (!$extensionManager->isInstalled('taoTestCenter') || !$extensionManager->isEnabled('taoTestCenter')) {
+                /** @var DefaultUrlService $urlService */
+                $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+                $proctoringHomeRoute = $urlService->getRoute('ProctoringHome');
+
+                $dumbRoute = [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'TestCenter',
+                    'action' => 'index'
+                ];
+
+                if ($proctoringHomeRoute == $dumbRoute) {
+                    $urlService->setRoute('ProctoringHome', [
+                            'ext' => 'tao',
+                            'controller' => 'Main',
+                            'action' => 'entry',
+                        ]
+                    );
+                }
+                $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+            }
+
+            $this->setVersion('12.3.3');
+        }
+
+        $this->skip('12.3.3', '12.3.4');
     }
 }
