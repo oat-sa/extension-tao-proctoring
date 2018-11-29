@@ -99,7 +99,7 @@ define([
 
             // Completed Assessment Activity
             activityGraph = activityGraphFactory({
-                autoRefresh: completedAssessmentsAutoRefreshInterval,
+                autoRefresh: Math.max(completedAssessmentsAutoRefreshInterval, assessmentActivityAutoRefreshInterval),
                 autoRefreshBar: true,
                 graphConfig: {
                     bindto: $('.js-completed-assessments', $container).selector,
