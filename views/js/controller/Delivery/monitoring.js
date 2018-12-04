@@ -813,28 +813,35 @@ define([
                             callback : function ($el) {
                                 var dateFormat = locale.getDateTimeFormat().split(" ");
                                 var dateFormatStr = dateFormat[0];
+                                var comparisonDateFormat = "MM/DD/YYYY";
                                 dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
                                 dateFormatStr = dateFormatStr.replace('MM', 'mm');
                                 dateFormatStr = dateFormatStr.replace('DD', 'dd');
                                 $el.datepicker({
                                     dateFormat: dateFormatStr,
                                     onSelect: function( selectedDate ) {
-                                        if(!$(this).data().datepicker.first){
-                                            $(this).data().datepicker.inline = true;
-                                            $(this).data().datepicker.first = selectedDate;
+                                        var datePickerData = $(this).data().datepicker;
+                                        var firstDate, selDate;
+                                        if (!datePickerData.first) {
+                                            datePickerData.inline = true;
+                                            datePickerData.first = selectedDate;
                                         } else {
-                                            if(selectedDate > $(this).data().datepicker.first){
-                                                $(this).val($(this).data().datepicker.first+" - "+selectedDate);
+                                            firstDate = moment(datePickerData.first, comparisonDateFormat).format('X');
+                                            selDate = moment(selectedDate, comparisonDateFormat).format('X');
+                                            if (selDate > firstDate) {
+                                                $(this).val(datePickerData.first+" - "+selectedDate);
                                             } else {
-                                                $(this).val(selectedDate+" - "+$(this).data().datepicker.first);
+                                                $(this).val(selectedDate+" - "+datePickerData.first);
                                             }
-                                            $(this).data().datepicker.inline = false;
+                                            datePickerData.inline = false;
                                             $('.js-start_time_filter_button').trigger('click');
                                         }
                                     },
-                                    onClose:function(){
-                                        delete $(this).data().datepicker.first;
-                                        $(this).data().datepicker.inline = false;
+                                    onClose:function(event){
+                                        if (event.which === $.ui.keyCode.ENTER) {
+                                            event.preventDefault();
+                                            $el.datepicker("hide");
+                                        }
                                     }
                                 });
                             }

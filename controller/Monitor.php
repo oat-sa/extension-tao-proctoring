@@ -32,6 +32,7 @@ use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoProctoring\model\TestSessionHistoryService;
+use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 
 /**
  * Monitoring Delivery controller
@@ -165,7 +166,15 @@ class Monitor extends SimplePageModule
             }
 
             $this->returnJson($response);
+        } catch (QtiTestExtractionFailedException $e) {
+            $response = [
+                'success' => false,
+                'data' => [],
+                'errorCode' => self::ERROR_AUTHORIZE_EXECUTIONS,
+                'errorMsg' => __('Decryption failed because of using the wrong customer app key.'),
+            ];
 
+            $this->returnJson($response);
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
