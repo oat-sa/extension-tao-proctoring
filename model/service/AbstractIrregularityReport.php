@@ -20,90 +20,119 @@
 
 namespace oat\taoProctoring\model\service;
 
-
+use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\action\Action;
-use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\filesystem\FileSystemService;
-use oat\oatbox\service\ServiceManager;
-use oat\oatbox\task\Queue;
+use oat\oatbox\service\ConfigurableService;
 use oat\tao\model\export\implementation\CsvExporter;
+use oat\tao\model\taskQueue\QueueDispatcher;
+use oat\tao\model\taskQueue\Task\FilesystemAwareTrait;
+use oat\tao\model\taskQueue\Task\TaskInterface;
 
 abstract class AbstractIrregularityReport extends ConfigurableService implements Action
 {
-
     use OntologyAwareTrait;
+    use FilesystemAwareTrait;
 
     const SERVICE_ID = 'taoProctoring/irregularity';
 
     /**
      * return formated string for export file name
+     *
      * @param $time
      * @return false|string
      */
-    protected function getFormatedDateForFileName($time) {
-        return date('Y-m-d.H.i.s' , $time);
+    protected function getFormatedDateForFileName($time)
+    {
+        return date('Y-m-d.H.i.s', $time);
     }
-
-    public function getIrregularities(\core_kernel_classes_Resource $delivery, $from = '', $to = ''){
-
-        /**
-         * @var $taskQueue Queue
-         */
-        $taskQueue = $this->getServiceManager()->get(Queue::SERVICE_ID);
-        $action = self::SERVICE_ID ;
-        $parameters = [
-            'deliveryId' => $delivery->getUri(),
-            'from'       => $from,
-            'to'         => $to
-        ];
-        $label = $delivery->getLabel() . ' from ' . $this->getFormatedDateForFileName($from ). ' to ' . $this->getFormatedDateForFileName( $to );
-        $taskName  = 'export/irregularity';
-        $task = $taskQueue->createTask($action , $parameters , false , $label , $taskName);
-        return $task;
-    }
-
-
-    public function __invoke($params) {
-        /**
-         * @var $extload \common_ext_ExtensionsManager
-         */
-        $extload = $this->getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID);
-        $extload->getExtensionById('taoResultServer');
-
-        $deliveryId = $params['deliveryId'];
-        $from       = $params['from'];
-        $to         = $params['to'];
-
-        $delivery = new \core_kernel_classes_Resource($deliveryId);
-        $data = $this->getIrregularitiesTable( $delivery ,  $from , $to );
-        $exporter = new CsvExporter($data);
-        $csv      = $exporter->export();
-        /**
-         * @var FileSystemService $fileSystemService
-         */
-        $fileSystemService = ServiceManager::getServiceManager()->get(FileSystemService::SERVICE_ID);
-        $fileSystem        = $fileSystemService->getFileSystem(Queue::FILE_SYSTEM_ID);
-        $fileName          = 'irregularities/' . \tao_helpers_File::getSafeFileName($delivery->getLabel() . ' ' . $this->getFormatedDateForFileName($from) . ' ' . $this->getFormatedDateForFileName($to) . '.csv' );
-        $return            = $fileSystem->put($fileName , $csv);
-        if($return === false) {
-            $report = new \common_report_Report(\common_report_Report::TYPE_ERROR , __('unable to create irregularities export for %s' , $delivery->getLabel()));
-        } else {
-            $report = new \common_report_Report(\common_report_Report::TYPE_SUCCESS , __('successfully create export for %s' , $delivery->getLabel()) , $fileName);
-            $report->add(new \common_report_Report(\common_report_Report::TYPE_INFO , $return));
-        }
-
-        return $report;
-
-    }
-
 
     /**
      * @param \core_kernel_classes_Resource $delivery
-     * @param string $from
-     * @param string $to
+     * @param string                        $from
+     * @param string                        $to
+     * @return TaskInterface
+     */
+    public function getIrregularities(\core_kernel_classes_Resource $delivery, $from = '', $to = '')
+    {
+        /** @var QueueDispatcher $queueDispatcher */
+        $queueDispatcher = $this->getServiceLocator()->get(QueueDispatcher::SERVICE_ID);
+
+        $action = $this->getServiceLocator()->get(self::SERVICE_ID);
+        $parameters = [
+            'deliveryId' => $delivery->getUri(),
+            'from'       => $from,
+            'to'         => $to,
+        ];
+
+        return $queueDispatcher->createTask(
+            $action,
+            $parameters,
+            __(
+                'CSV irregularities export for delivery "%s" from %s to %s',
+                $delivery->getLabel(),
+                $this->getFormatedDateForFileName($from),
+                $this->getFormatedDateForFileName($to)
+            )
+        );
+    }
+
+    public function __invoke($params)
+    {
+        $this->getServiceLocator()
+            ->get(\common_ext_ExtensionsManager::SERVICE_ID)
+            ->getExtensionById('taoResultServer');
+
+        if (!isset($params['deliveryId'])) {
+            throw new \InvalidArgumentException('Delivery uri is missing for irregularity export');
+        }
+
+        if (!isset($params['from'])) {
+            throw new \InvalidArgumentException('From date is missing for irregularity export');
+        }
+
+        if (!isset($params['to'])) {
+            throw new \InvalidArgumentException('To date is missing for irregularity export');
+        }
+
+        $delivery = $this->getResource($params['deliveryId']);
+        $data = $this->getIrregularitiesTable($delivery, $params['from'], $params['to']);
+        $exporter = new CsvExporter($data);
+
+        $filePrefix = $this->saveStringToStorage($exporter->export(), $this->getFileName($delivery, $params));
+
+        return $filePrefix === false
+            ? Report::createFailure(__('Unable to create irregularities export for %s', $delivery->getLabel()))
+            : Report::createSuccess(__('Irregularities for "%s" successfully exported', $delivery->getLabel()), $filePrefix);
+    }
+
+    protected function getFileName(\core_kernel_classes_Resource $delivery, array $params)
+    {
+        return strtolower(
+            'irregularities_'
+            .\tao_helpers_File::getSafeFileName($delivery->getLabel()).'_'
+            .$this->getFormatedDateForFileName($params['from']).'_'
+            .$this->getFormatedDateForFileName($params['to']).'_'
+            .date('YmdHis') . rand(10, 99) //more unique name
+            .'.csv'
+        );
+    }
+
+    /**
+     * @param \core_kernel_classes_Resource $delivery
+     * @param string                        $from
+     * @param string                        $to
      * @return array
      */
     abstract public function getIrregularitiesTable(\core_kernel_classes_Resource $delivery, $from = '', $to = '');
 
+    /**
+     * @see FilesystemAwareTrait::getFileSystemService()
+     */
+    protected function getFileSystemService()
+    {
+        return $this->getServiceLocator()
+            ->get(FileSystemService::SERVICE_ID);
+    }
 }

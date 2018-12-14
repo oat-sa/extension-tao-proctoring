@@ -19,12 +19,13 @@
 define([
     'jquery',
     'lodash',
+    'i18n',
     'ui/hider',
     'util/url',
-    'report',
-    'ui/taskQueue/table',
-    'jquery.fileDownload'
-], function ($, _, hider, urlHelper, report, taskQueueTableFactory) {
+    'ui/feedback',
+    'core/taskQueue/taskQueue',
+    'ui/taskQueueButton/standardButton'
+], function ($, _, __, hider, urlHelper, feedback, taskQueue, taskCreationButtonFactory) {
     'use strict';
 
     /**
@@ -32,7 +33,7 @@ define([
      *
      * @type {Object}
      */
-    var IrregularityCtlr = {
+    return {
         /**
          * Entry point of the page
          */
@@ -43,9 +44,8 @@ define([
             var $reportContainer = $('.print-report');
             var $form = $('form', $formContainer);
             var $submitter = $('.form-submitter', $form);
-            var $sent = $(":input[name='" + $form.attr('name') + "_sent']", $form);
-            var asyncQueue = $header.data('async-queue');
             var $containers = $('.main-container');
+            var taskCreationButton;
 
             function switchContainer(purpose) {
                 hider.hide($containers);
@@ -58,76 +58,43 @@ define([
                 }]);
             }
 
-            function displayReport(response) {
-                switchContainer('report');
-                $reportContainer.append(response);
-
-                // Fold action (show detailed report)
-                hider.toggle($('#fold', $reportContainer), response.nested);
-                $('#fold > input[type="checkbox"]', $reportContainer).on('click', function() {
-                    report.fold();
-                });
-
-                // Continue button
-                $('#import-continue', $reportContainer).on('click', refreshTree);
-            }
-
             switchContainer('form');
 
-            //overwrite the submit behaviour
-            $submitter.off('click').on('click', function (e) {
-                var params = {};
-                var instances = [];
-                var classes = [];
-
-                e.preventDefault();
-                if (parseInt($sent.val(), 10)) {
-                    // prepare download params
-                    _.forEach($form.serializeArray(), function (param) {
-                        if (param.name.indexOf('instances_') === 0) {
-                            instances.push(param.value);
-                        } else if (param.name.indexOf('classes_') === 0) {
-                            classes.push(param.value);
-                        } else {
-                            params[param.name] = param.value;
-                        }
-                    });
-
-                    if (asyncQueue) {
-                        // display report after form submit
-                        $.ajax({
-                            url: $form.attr('action'),
-                            data: params,
-                            type: 'POST',
-                            dataType: "text"
-                        }).done(displayReport);
-                    } else {
-                        // download file after form submit
-                        $.fileDownload($form.attr('action'), {
-                            httpMethod: 'POST',
-                            data: params,
-                            failCallback: displayReport,
-                            successCallback: refreshTree
-                        });
+            taskCreationButton = taskCreationButtonFactory({
+                type : 'info',
+                icon : 'export',
+                title : __('Export Irregularities'),
+                label : __('Export'),
+                taskQueue : taskQueue,
+                taskCreationUrl : $form.prop('action'),
+                taskCreationData : function getTaskCreationData(){
+                    return $form.serializeArray();
+                },
+                taskReportContainer : $reportContainer
+            }).on('finished', function(result){
+                if (result.task
+                    && result.task.report
+                    && _.isArray(result.task.report.children)
+                    && result.task.report.children.length
+                    && result.task.report.children[0]) {
+                    if(result.task.report.children[0].data
+                        && result.task.report.children[0].data.uriResource){
+                        feedback().info(__('%s completed', result.task.taskLabel));
+                        refreshTree(result.task.report.children[0].data.uriResource);
+                    }else{
+                        this.displayReport(result.task.report.children[0], __('Error'));
                     }
                 }
-            });
+            }).on('continue', function(){
+                refreshTree();
+            }).on('error', function(err){
+                //format and display error message to user
+                feedback().error(err);
+            }).render($submitter.closest('.form-toolbar'));
 
-            if (asyncQueue) {
-                taskQueueTableFactory({
-                    rows: 10,
-                    context: $header.data('queue'),
-                    dataUrl: urlHelper.route('getTasks', 'TaskQueueData', 'tao'),
-                    statusUrl: urlHelper.route('getStatus', 'TaskQueueData', 'tao'),
-                    removeUrl: urlHelper.route('archiveTask', 'TaskQueueData', 'tao'),
-                    downloadUrl: urlHelper.route('downloadTask', 'TaskQueueData', 'tao')
-                })
-                    .init()
-                    .render($containers.filter('.print-tasks'));
-            }
+            //replace the old submitter with the new one and apply its style
+            $submitter.replaceWith(taskCreationButton.getElement().css({float: 'right'}));
         }
 
     };
-
-    return IrregularityCtlr;
 });

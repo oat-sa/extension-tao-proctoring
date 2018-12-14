@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint86\n"
-"PO-Revision-Date: 2018-09-26T12:04:44\n"
+"Project-Id-Version: TAO 3.3.0-sprint91\n"
+"PO-Revision-Date: 2018-12-14T13:51:06\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -18,6 +18,9 @@ msgstr ""
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessies van levering %s zijn niet gepauzeerd"
+
+msgid "%s completed"
+msgstr ""
 
 msgid "%s could not be %s because it is finished. Please refresh your data."
 msgstr "%s kon niet worden %s omdat het is geeindigd. Vernieuw a.u.b. uw data."
@@ -152,10 +155,10 @@ msgstr "auteur"
 msgid "Authorize"
 msgstr "Autoriseer"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriseer sessie"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriseer sessie"
 
 msgid "Authorize sessions"
@@ -314,14 +317,17 @@ msgstr "Huidige toets activiteit"
 msgid "Current sessions"
 msgstr "Huidige sessies"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "date"
 msgstr "datum"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Days"
 msgstr "Dagen"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr ""
 
 msgid "Define sub-centers"
 msgstr "Definieer sub-centra"
@@ -381,10 +387,10 @@ msgstr "Onregelmatigheden bij export"
 msgid "Extended Time"
 msgstr ""
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Extra tijd"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Extra tijd"
 
 msgid "Extra time granted"
@@ -393,11 +399,11 @@ msgstr "Extra tijd gegeven"
 msgid "Filter"
 msgstr "Filter"
 
-msgid "finished"
-msgstr "voltooid"
-
 msgid "Finished"
 msgstr "Voltooid"
+
+msgid "finished"
+msgstr "voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
@@ -431,6 +437,9 @@ msgstr "Ziekte"
 
 msgid "In Progress"
 msgstr "In behandeling"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr ""
 
 msgid "Issue Category"
 msgstr "kwestie categorie"
@@ -571,11 +580,11 @@ msgstr "Sessie pauzeren"
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
-msgid "paused"
-msgstr "gepauzeerd"
-
 msgid "Paused"
 msgstr "Gepauzeerd"
+
+msgid "paused"
+msgstr "gepauzeerd"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
@@ -637,10 +646,10 @@ msgstr "Toezichthouders ingetrokken"
 msgid "Progress"
 msgstr "Voortgang"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
@@ -797,9 +806,6 @@ msgstr "Subcategorie"
 msgid "subcategory"
 msgstr "subcategorie"
 
-msgid "successfully create export for %s"
-msgstr ""
-
 msgid "System generated pause."
 msgstr ""
 
@@ -812,10 +818,10 @@ msgstr "Technisch"
 msgid "Terminate"
 msgstr "Beeindigen"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Beëindig sessie"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Beëindig sessie"
 
 msgid "Terminate sessions"
@@ -899,11 +905,11 @@ msgstr ""
 msgid "Test site %s"
 msgstr "Toetslocatie %s"
 
-msgid "test taker"
-msgstr "kandidaat"
-
 msgid "Test taker"
 msgstr "Kandidaat"
+
+msgid "test taker"
+msgstr "kandidaat"
 
 msgid "Test takers have been added"
 msgstr "Kandidaten zijn toegevoegd"
@@ -975,7 +981,7 @@ msgstr "Totaal aantal huidige examens"
 msgid "Total time"
 msgstr "Totale tijd"
 
-msgid "unable to create irregularities export for %s"
+msgid "Unable to create irregularities export for %s"
 msgstr ""
 
 msgid "Unable to perform action on test %s."
