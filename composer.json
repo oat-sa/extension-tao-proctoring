@@ -21,11 +21,12 @@
     },
     "minimum-stability" : "dev",
     "require": {
-        "oat-sa/oatbox-extension-installer": "~1.1||dev-master"
+        "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
+        "sinergi/browser-detector": "^6.0.2"
     },
     "autoload" : {
         "psr-4" : {
             "oat\\taoProctoring\\" : ""
         }
-    } 
+    }
 }
