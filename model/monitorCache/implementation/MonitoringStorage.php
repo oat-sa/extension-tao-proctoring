@@ -361,9 +361,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 // when the DBAL implementation of RDS is used as a persistence
             }
             if (!$result) {
-                $result = $this->update($deliveryMonitoring);
+                $this->update($deliveryMonitoring);
             }
             $this->saveKvData($deliveryMonitoring);
+            $result = true;
         }
         return $result;
     }
