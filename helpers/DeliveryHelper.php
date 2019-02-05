@@ -103,8 +103,6 @@ class DeliveryHelper
                 case DeliveryExecution::STATE_PAUSED:
                     $paused++;
                     break;
-                default:
-                    continue;
             }
         }
 
