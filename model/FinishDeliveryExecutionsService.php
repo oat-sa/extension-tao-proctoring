@@ -43,7 +43,7 @@ class FinishDeliveryExecutionsService extends DeliveryExecutionsUpdater
         $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
         $testSession = $testSessionService->getTestSession($deliveryExecution);
         // To calculate all TestVariables
-        if ($testSession->isRunning()) {
+        if ($testSession && $testSession->isRunning()) {
             $testSession->endTestSession();
         }
 
