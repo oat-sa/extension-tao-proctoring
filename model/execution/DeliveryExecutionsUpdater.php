@@ -138,15 +138,15 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
                 return false;
             }
 
-            if ((new DateTimeImmutable('now')) >= $endDateTime) {
+            if (new DateTimeImmutable('now') >= $endDateTime) {
                 $this->action($deliveryExecution, $executionId, true);
                 return true;
-            } else {
-                $this->report->add(Report::createInfo('Execution not expired yet:'. $executionId .
-                    ' Last Interaction:'.$lastInteraction->format('Y-m-d H:i:s') .
-                    ' Time when will expire:'.$endDateTime->format('Y-m-d H:i:s')
-                ));
             }
+
+            $this->report->add(Report::createInfo('Execution not expired yet:'. $executionId .
+                ' Last Interaction:'.$lastInteraction->format('Y-m-d H:i:s') .
+                ' Time when will expire:'.$endDateTime->format('Y-m-d H:i:s')
+            ));
 
         } catch (\common_exception_NotFound $e) {
             $this->report->add(Report::createFailure('Execution cannot be found: '. $executionId));
