@@ -20,53 +20,27 @@
 
 namespace oat\taoProctoring\model\execution\Counter;
 
-use oat\oatbox\service\ConfigurableService;
-use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
+use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterService;
 
 /**
  * Class DeliveryExecutionCounterService
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class DeliveryExecutionCounterService extends ConfigurableService implements DeliveryExecutionCounterInterface
+class KVDeliveryExecutionCounterService extends DeliveryExecutionCounterService
 {
-
     /**
      * @param $statusUri
-     * @return int
      * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     */
-    public function count($statusUri)
-    {
-        /** @var DeliveryMonitoringService $deliveryMonitoring */
-        $deliveryMonitoring = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        return $deliveryMonitoring->count([
-            [DeliveryMonitoringService::STATUS => $statusUri],
-        ]);
-    }
-
-    /**
-     * @param DeliveryExecutionState $event
-     * @return mixed
-     */
-    public function executionStateChanged(DeliveryExecutionState $event)
-    {
-    }
-
-    /**
-     * @param DeliveryExecutionCreated $event
-     * @return mixed
-     */
-    public function executionCreated(DeliveryExecutionCreated $event)
-    {
-    }
-
-    /**
-     * @param $statusUri
      */
     public function refresh($statusUri)
     {
+        $persistence = $this->getPersistence();
+        /** @var DeliveryMonitoringService $deliveryMonitoring */
+        $deliveryMonitoring = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
+        $newValue = $deliveryMonitoring->count([
+            [DeliveryMonitoringService::STATUS => $statusUri],
+        ]);
+        $persistence->set($this->getStatusKey($statusUri), $newValue);
     }
 }
