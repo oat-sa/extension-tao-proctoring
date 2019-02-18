@@ -27,7 +27,8 @@ define([
     'util/url',
     'c3',
     'tpl!taoProctoring/component/activityMonitoring/progressbar',
-    'core/polling'
+    'core/polling',
+    'd3'
 ], function ($, _, __, component, url, c3, progressbarTpl, pollingFactory) {
     'use strict';
 
