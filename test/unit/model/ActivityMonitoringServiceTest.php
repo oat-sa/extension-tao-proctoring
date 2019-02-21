@@ -19,9 +19,9 @@
  *
  */
 
-namespace oat\taoProctoring\test\integration\model;
+namespace oat\taoProctoring\test\unit\model;
 
-use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\generis\test\TestCase;
 use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
@@ -29,7 +29,7 @@ use oat\taoProctoring\model\ActivityMonitoringService;
  * @package oat\taoProctoring\test\model
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class ActivityMonitoringServiceTest extends TaoPhpUnitTestRunner
+class ActivityMonitoringServiceTest extends TestCase
 {
 
     public function testGetTimeKeys()
