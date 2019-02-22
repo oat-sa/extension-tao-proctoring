@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\test\unit\model;
 
-use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\generis\test\TestCase;
 use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
@@ -29,13 +29,13 @@ use oat\taoProctoring\model\ActivityMonitoringService;
  * @package oat\taoProctoring\test\model
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class ActivityMonitoringServiceTest extends TaoPhpUnitTestRunner
+class ActivityMonitoringServiceTest extends TestCase
 {
-
     public function testGetTimeKeys()
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $service = $this->createService();
+        $service = new ActivityMonitoringService();
+
         $timeKeys = $service->getTimeKeys(new \DateInterval('PT1M'), clone($date));
         $this->assertEquals(60, count($timeKeys));
         $this->assertEquals($date->format('i')+1, $timeKeys[0]->format('i'));
@@ -60,11 +60,4 @@ class ActivityMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals(0, $timeKeys[0]->format('H'));
         $this->assertEquals('01', $timeKeys[0]->format('d'));
     }
-
-    protected function createService()
-    {
-        $service = new ActivityMonitoringService([]);
-        return $service;
-    }
-
 }
