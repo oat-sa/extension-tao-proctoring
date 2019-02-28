@@ -167,14 +167,18 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     {
         $result = $this->object->getDeliveryExecutionContext();
 
-        $this->assertFalse($result, 'Method must return false if context does not exist.');
+        $this->assertNull($result, 'Method must return false if context does not exist.');
     }
 
-    public function testDetDeliveryExecutionContext()
+    public function testGetDeliveryExecutionContext()
     {
+        $contextData = [
+            'execution_id' => 'http://test-execution-uri.dev',
+            'context_id' => 'test_context_id',
+        ];
         $this->deliveryExecutionContextMock->expects($this->once())
             ->method('jsonSerialize')
-            ->willReturn([]);
+            ->willReturn($contextData);
 
         $this->object->setDeliveryExecutionContext($this->deliveryExecutionContextMock);
 

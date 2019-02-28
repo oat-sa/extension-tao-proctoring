@@ -129,7 +129,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function setDeliveryExecutionContext(DeliveryExecutionContextInterface $context)
     {
@@ -141,11 +141,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     public function getDeliveryExecutionContext()
     {
-        if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
-            return DeliveryExecutionContext::createFromArray(json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true));
-        }
+        try {
+            if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
+                return DeliveryExecutionContext::createFromArray(json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true));
+            }
+        } catch (\Exception $e) {}
 
-        return false;
+        return null;
     }
 
     /**

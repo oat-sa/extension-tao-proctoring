@@ -145,7 +145,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
             return DeliveryExecutionContext::createFromArray($this->data[self::PARAM_EXECUTION_CONTEXT]);
         }
 
-        return false;
+        return null;
     }
 
     /**

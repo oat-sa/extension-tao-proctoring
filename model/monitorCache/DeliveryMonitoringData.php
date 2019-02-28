@@ -55,7 +55,7 @@ interface DeliveryMonitoringData
     public function setDeliveryExecutionContext(DeliveryExecutionContextInterface $context);
 
     /**
-     * @return DeliveryExecutionContextInterface
+     * @return DeliveryExecutionContextInterface|null
      */
     public function getDeliveryExecutionContext();
 
