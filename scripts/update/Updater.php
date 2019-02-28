@@ -31,7 +31,6 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
-use oat\tao\model\taskQueue\Event\TaskLogArchivedEvent;
 use oat\tao\model\taskQueue\TaskLogInterface;
 use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
@@ -39,7 +38,6 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
@@ -842,6 +840,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.5.3');
         }
 
-        $this->skip('12.5.3', '12.6.2');
+        $this->skip('12.5.3', '12.7.0');
     }
 }
