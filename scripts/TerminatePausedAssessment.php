@@ -129,25 +129,24 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                 }
             } catch (\common_exception_NotFound $e) {
                 //Delivery execution entry missed.
-                if ($data[DeliveryMonitoringService::STATUS] !== DeliveryExecution::STATE_PAUSED) {
-                    $deliveryExecutionData->update(
-                        DeliveryMonitoringService::STATUS,
-                        DeliveryExecution::STATE_PAUSED
-                    );
-                    $deliveryMonitoringService->partialSave($deliveryExecutionData);
-                    common_Logger::w(
-                        'Delivery execution ' . $deliveryExecution->getIdentifier() .
-                        ' is missed. Set it\'s state in delivery monitoring to Paused'
-                    );
-                    $this->addReport(
-                        Report::TYPE_WARNING,
-                        "Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `paused` ".
-                        "due to missed delivery execution entry."
-                    );
-                }
-                continue;
+                $deliveryExecutionData->update(
+                    DeliveryMonitoringService::STATUS,
+                    DeliveryExecution::STATE_TERMINATED
+                );
+                $deliveryMonitoringService->partialSave($deliveryExecutionData);
+                common_Logger::w(
+                    'Delivery execution ' . $deliveryExecution->getIdentifier() .
+                    ' is missed. Set it\'s state in delivery monitoring to Terminated'
+                );
+                $this->addReport(
+                    Report::TYPE_WARNING,
+                    'Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `terminated` ' .
+                    'due to missed delivery execution entry.'
+                );
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
+            } catch (\Throwable $e) {
+                common_Logger::f($e->getMessage());
             }
 
             // Should we stop terminating assessments?
