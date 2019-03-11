@@ -31,7 +31,6 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
-use oat\tao\model\taskQueue\Event\TaskLogArchivedEvent;
 use oat\tao\model\taskQueue\TaskLogInterface;
 use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
@@ -39,7 +38,6 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
-use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
@@ -830,6 +828,18 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.4.0');
         }
 
-        $this->skip('12.4.0', '12.4.1');
+        $this->skip('12.4.0', '12.5.2');
+
+        if ($this->isVersion('12.5.2')) {
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $eventManager->attach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('12.5.3');
+        }
+
+        $this->skip('12.5.3', '12.7.1');
     }
 }

@@ -21,6 +21,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache\mock;
 
+use oat\taoDelivery\model\execution\DeliveryExecutionContext;
+use oat\taoDelivery\model\execution\DeliveryExecutionContextInterface;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\service\ServiceManager;
@@ -43,7 +46,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     private $data = [];
 
     /**
-     * @var DeliveryExecution
+     * @var DeliveryExecutionInterface
      */
     private $deliveryExecution;
 
@@ -115,6 +118,34 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface
     public function setDeliveryExecution(DeliveryExecution $deliveryExecution)
     {
         $this->deliveryExecution = $deliveryExecution;
+    }
+
+    /**
+     * @return DeliveryExecutionInterface
+     */
+    public function getDeliveryExecution()
+    {
+        return $this->deliveryExecution;
+    }
+
+    /**
+     * {@inheritdoc
+     */
+    public function setDeliveryExecutionContext(DeliveryExecutionContextInterface $context)
+    {
+        $this->data->update(self::PARAM_EXECUTION_CONTEXT, json_encode($context));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeliveryExecutionContext()
+    {
+        if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
+            return DeliveryExecutionContext::createFromArray($this->data[self::PARAM_EXECUTION_CONTEXT]);
+        }
+
+        return null;
     }
 
     /**

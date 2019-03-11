@@ -31,8 +31,6 @@ use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
-use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
@@ -40,6 +38,8 @@ use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\oatbox\user\User;
+use Sinergi\BrowserDetector\Browser;
+use Sinergi\BrowserDetector\Os;
 
 /**
  * Class DeliveryExecutionStateService
@@ -125,10 +125,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     {
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $logData = [
-            'web_browser_name' => WebBrowserService::singleton()->getClientName(),
-            'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
-            'os_name' => OSService::singleton()->getClientName(),
-            'os_version' => OSService::singleton()->getClientVersion(),
+            'web_browser_name' => $this->getBrowserDetector()->getName(),
+            'web_browser_version' => $this->getBrowserDetector()->getVersion(),
+            'os_name' => $this->getOsDetector()->getName(),
+            'os_version' => $this->getOsDetector()->getVersion(),
             'context' => $this->getContext($deliveryExecution),
         ];
 
@@ -223,7 +223,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 $this->getTestSessionService()->persist($session);
                 $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
-            
+
             // Delivery execution state changes after test session ends, in the same way as it happens
             // when a human test taker takes the test.
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
@@ -537,5 +537,25 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         }
 
         return $result;
+    }
+
+    /**
+     * Get the browser detector
+     *
+     * @return Browser
+     */
+    protected function getBrowserDetector()
+    {
+        return new Browser();
+    }
+
+    /**
+     * Get the operating system detector
+     *
+     * @return Os
+     */
+    protected function getOsDetector()
+    {
+        return new Os();
     }
 }

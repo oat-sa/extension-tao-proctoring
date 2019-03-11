@@ -813,10 +813,11 @@ define([
                             callback : function ($el) {
                                 var dateFormat = locale.getDateTimeFormat().split(" ");
                                 var dateFormatStr = dateFormat[0];
-                                var comparisonDateFormat = "MM/DD/YYYY";
+                                var comparisonDateFormat;
                                 dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
                                 dateFormatStr = dateFormatStr.replace('MM', 'mm');
                                 dateFormatStr = dateFormatStr.replace('DD', 'dd');
+                                comparisonDateFormat = dateFormat[0];
                                 $el.datepicker({
                                     dateFormat: dateFormatStr,
                                     onSelect: function( selectedDate ) {

@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache;
 
+use oat\taoDelivery\model\execution\DeliveryExecutionContextInterface;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use qtism\runtime\tests\AssessmentTestSession;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
@@ -34,11 +36,28 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 interface DeliveryMonitoringData
 {
+    const PARAM_EXECUTION_CONTEXT = 'execution_context';
+
     /**
      * Set delivery execution
      * @param DeliveryExecution $deliveryExecution
      */
     public function setDeliveryExecution(DeliveryExecution $deliveryExecution);
+
+    /**
+     * @return DeliveryExecutionInterface
+     */
+    public function getDeliveryExecution();
+
+    /**
+     * @param DeliveryExecutionContextInterface $context
+     */
+    public function setDeliveryExecutionContext(DeliveryExecutionContextInterface $context);
+
+    /**
+     * @return DeliveryExecutionContextInterface|null
+     */
+    public function getDeliveryExecutionContext();
 
     /**
      * Set test session
