@@ -35,16 +35,6 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 class DeliveryServer extends DefaultDeliveryServer
 {
-
-    /**
-     * constructor: initialize the service and the default data
-     * @return DeliveryServer
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Overrides the content extension data
      * @see {@link \taoDelivery_actions_DeliveryServer}
