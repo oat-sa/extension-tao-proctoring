@@ -17,14 +17,18 @@
  *
  */
 
-define(['jquery', '/taoProctoring/views/js/component/activityMonitoring/activityGraph.js'], function ($, activityGraph) {
+define([
+    'jquery',
+    'd3',
+    '/taoProctoring/views/js/component/activityMonitoring/activityGraph.js'
+], function($, d3, activityGraph) {
     'use strict';
 
     var c3options = {
-        autoRefresh : 0,
-        autoRefreshBar : true,
-        graphConfig : {
-            bindto : '.js-graph',
+        autoRefresh: 0,
+        autoRefreshBar: true,
+        graphConfig: {
+            bindto: '.js-graph',
             data: {
                 x: 'data1',
                 columns: [
@@ -38,16 +42,16 @@ define(['jquery', '/taoProctoring/views/js/component/activityMonitoring/activity
 
     QUnit.module('API');
 
-    QUnit.test('factory', function (assert) {
-        QUnit.expect(3);
+    QUnit.test('factory', function(assert) {
+        assert.expect(3);
 
         assert.ok(typeof activityGraph === 'function', 'the module exposes a function');
         assert.ok(typeof activityGraph(c3options) === 'object', 'the factory creates an object');
         assert.notEqual(activityGraph(c3options), activityGraph(c3options), 'the factory creates new objects');
     });
 
-    QUnit.test('component', function (assert) {
-        QUnit.expect(2);
+    QUnit.test('component', function(assert) {
+        assert.expect(2);
 
         graph = activityGraph(c3options);
 
@@ -55,8 +59,8 @@ define(['jquery', '/taoProctoring/views/js/component/activityMonitoring/activity
         assert.ok(typeof graph.destroy === 'function', 'the component has a destroy method');
     });
 
-    QUnit.test('eventifier', function (assert) {
-        QUnit.expect(3);
+    QUnit.test('eventifier', function(assert) {
+        assert.expect(3);
 
         graph = activityGraph(c3options);
 
@@ -67,8 +71,8 @@ define(['jquery', '/taoProctoring/views/js/component/activityMonitoring/activity
 
     QUnit.module('Component');
 
-    QUnit.test('render', function (assert) {
-        QUnit.expect(2);
+    QUnit.test('render', function(assert) {
+        assert.expect(2);
 
         $container = $('#qunit-fixture');
         assert.equal($container.length, 1, 'The container exists');
