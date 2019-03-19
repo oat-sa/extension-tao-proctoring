@@ -1111,7 +1111,8 @@ define([
                             model: model,
                             selectable: true,
                             sortorder: 'desc',
-                            sortby : 'start_time'
+                            sortby : 'start_time',
+                            pageSizeSelector: true,
                         }, dataset);
 
                     setInitialFilters();
