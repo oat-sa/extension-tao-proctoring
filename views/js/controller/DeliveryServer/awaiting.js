@@ -48,6 +48,44 @@ define([
     var cssScope = '.awaiting-authorization';
 
     /**
+     * Nothing needs to be taken to system clipboard on proceed action
+     */
+    var cleanClipboard = function cleanClipboard () {
+        var textToClipboard = ' ';
+        var selected;
+        var success;
+        var el;
+        if (window.clipboardData) { // Internet Explorer
+            window.clipboardData.setData ("Text", textToClipboard);
+        } else {
+            el = document.createElement('textarea');  // Create a <textarea> element
+            loadingBar.stop();
+            el.setAttribute("id", "clipboardCleanerPlugin");
+            el.value = textToClipboard;                                 // Set its value to the string that you want copied
+            el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+            document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+            selected =
+                document.getSelection().rangeCount > 0        // Check if there is any content selected previously
+                    ? document.getSelection().getRangeAt(0)     // Store selection if found
+                    : false;                               // Mark as false to know no selection existed before
+            el.select();                                   // Select the <textarea> content
+            success = document.execCommand('copy');   // Copy - only works as a result of a user action (e.g. click events)
+
+            if (!success) {
+                throw new Error('Clipboard can not be cleaned');
+            }
+
+            document.body.removeChild(el);                  // Remove the <textarea> element
+            if (selected) {                                 // If a selection existed before copying
+                document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
+                document.getSelection().addRange(selected);   // Restore the original selection
+            }
+        }
+    };
+
+    /**
      * Controls the ProctorDelivery index page
      *
      * @type {Object}
@@ -82,6 +120,7 @@ define([
             var deliveryStarted = false;
             var runDelivery = function runDelivery () {
                 loadingBar.start();
+                cleanClipboard();
                 deliveryStarted = true;
                 window.location.href = runDeliveryUrl;
             };
