@@ -54,30 +54,29 @@ define([
         var textToClipboard = ' ';
         var selected;
         var success;
-        var el;
+        var textAreaToSelContent;
         if (window.clipboardData) { // Internet Explorer
             window.clipboardData.setData ("Text", textToClipboard);
         } else {
-            el = document.createElement('textarea');  // Create a <textarea> element
-            loadingBar.stop();
-            el.setAttribute("id", "clipboardCleanerPlugin");
-            el.value = textToClipboard;                                 // Set its value to the string that you want copied
-            el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';                      // Move outside the screen to make it invisible
-            document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+            textAreaToSelContent = document.createElement('textarea');  // Create a <textarea> element
+            textAreaToSelContent.setAttribute("id", "clipboardCleanerPlugin");
+            textAreaToSelContent.value = textToClipboard;                                 // Set its value to the string that you want copied
+            textAreaToSelContent.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+            textAreaToSelContent.style.position = 'absolute';
+            textAreaToSelContent.style.left = '-9999px';                      // Move outside the screen to make it invisible
+            document.body.appendChild(textAreaToSelContent);                  // Append the <textarea> element to the HTML document
             selected =
                 document.getSelection().rangeCount > 0        // Check if there is any content selected previously
                     ? document.getSelection().getRangeAt(0)     // Store selection if found
                     : false;                               // Mark as false to know no selection existed before
-            el.select();                                   // Select the <textarea> content
+            textAreaToSelContent.select();                                   // Select the <textarea> content
             success = document.execCommand('copy');   // Copy - only works as a result of a user action (e.g. click events)
 
             if (!success) {
                 throw new Error('Clipboard can not be cleaned');
             }
 
-            document.body.removeChild(el);                  // Remove the <textarea> element
+            document.body.removeChild(textAreaToSelContent);                  // Remove the <textarea> element
             if (selected) {                                 // If a selection existed before copying
                 document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
                 document.getSelection().addRange(selected);   // Restore the original selection
