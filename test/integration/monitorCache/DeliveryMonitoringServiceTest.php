@@ -47,6 +47,46 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     protected $service;
     protected $persistence;
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
+    protected $fixtureData = [
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
+            MonitoringStorage::COLUMN_STATUS => 'active_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
+            'error_code' => 1,
+            'session_id' => 'i1450191587554175',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
+            MonitoringStorage::COLUMN_STATUS => 'paused_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
+            'error_code' => 2,
+            'session_id' => 'i1450191587554176',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
+            MonitoringStorage::COLUMN_STATUS => 'finished_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
+            'error_code' => 3,
+            'session_id' => 'i1450191587554177',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
+            MonitoringStorage::COLUMN_STATUS => 'finished_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
+            'error_code' => 0,
+            'session_id' => 'i1450191587554178',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554179_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_5',
+            MonitoringStorage::COLUMN_STATUS => 'terminated_test',
+        ],
+    ];
+
 
     public function setUp()
     {
@@ -341,7 +381,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertEquals($rowKey, $resultRow->get()['error_code']);
         }
 
-
         $result = $this->service->find([
             [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => [
                 'http://sample/first.rdf#i1450191587554175_test_record',
@@ -353,6 +392,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
         $this->assertEquals($result[1]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554176_test_record');
         $this->assertEquals($result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
+
     }
 
     public function testCount()
@@ -360,7 +400,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->loadFixture();
 
         $result = $this->service->count();
-        $this->assertEquals(4, $result);
+        $this->assertEquals(count($this->fixtureData), $result);
 
 
         $result = $this->service->count([
@@ -433,42 +473,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     {
         $this->setUp();
 
-        $data = [
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
-                MonitoringStorage::COLUMN_STATUS => 'active_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
-                'error_code' => 1,
-                'session_id' => 'i1450191587554175',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
-                MonitoringStorage::COLUMN_STATUS => 'paused_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
-                'error_code' => 2,
-                'session_id' => 'i1450191587554176',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
-                MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
-                'error_code' => 3,
-                'session_id' => 'i1450191587554177',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
-                MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
-                'error_code' => 0,
-                'session_id' => 'i1450191587554178',
-            ],
-        ];
-
-        foreach ($data as $item) {
+        foreach ($this->fixtureData as $item) {
             $dataModel = $this->service->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
@@ -477,7 +482,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         }
 
         return [
-            [$data],
+            [$this->fixtureData],
         ];
     }
 

@@ -299,7 +299,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $ids = array_column($data, static::COLUMN_ID);
             $kvData = $this->getKvData($ids);
             foreach ($data as &$row) {
-                $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
+                if (isset($kvData[$row[static::COLUMN_ID]])) {
+                    $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
+                }
             }
             unset($row);
         }
