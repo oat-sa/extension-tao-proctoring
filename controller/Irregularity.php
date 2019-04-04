@@ -45,8 +45,10 @@ class Irregularity extends \tao_actions_CommonModule
     {
         $formContainer = new IrregularitiesExportForm($this->getRequestParameter('uri'));
         $myForm = $formContainer->getForm();
+        $myForm->addCsrfTokenProtection();
 
         if ($myForm->isValid() && $myForm->isSubmited()) {
+            $this->validateCsrf();
             $delivery = $this->getResource(\tao_helpers_Uri::decode($this->getRequestParameter('uri')));
 
             $from = $this->hasRequestParameter('from')
