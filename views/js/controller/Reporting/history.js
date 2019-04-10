@@ -26,9 +26,10 @@ define([
     'layout/loading-bar',
     'ui/container',
     'ui/button',
+    'ui/dateRange/dateRange',
     'util/encode',
+    'util/locale',
     'taoProctoring/component/proxy',
-    'taoProctoring/component/dateRange',
     'taoProctoring/component/history/historyTable',
     'tpl!taoProctoring/templates/reporting/index',
     'ui/datatable'
@@ -40,9 +41,10 @@ define([
     loadingBar,
     containerFactory,
     buttonFactory,
-    encode,
-    proxyFactory,
     dateRangeFactory,
+    encode,
+    locale,
+    proxyFactory,
     historyTableFactory,
     indexTpl
 ) {
@@ -76,6 +78,7 @@ define([
             var deliveryId = currentRoute.query.delivery && decodeURIComponent(currentRoute.query.delivery);
             var sessions = decodeURIComponent(currentRoute.query.session).split(',');
             var monitoringUrl = currentRoute.query.monitoring && decodeURIComponent(currentRoute.query.monitoring);
+            var dateFormat = locale.getDateTimeFormat().split(" ")[0];
 
             appController
                 .on('set-referrer.history', function(route) {
@@ -127,29 +130,58 @@ define([
                         monitoringUrl = data.monitoringUrl;
                     }
 
-                    dateRangeFactory({
-                        start : data.periodStart,
-                        end : data.periodEnd,
-                        renderTo: container.find('.panel')
-                    }).on('change submit', function() {
-                        historyTable.refresh({
-                            periodStart : this.getStart(),
-                            periodEnd : this.getEnd()
-                        });
-                    });
+                    return new Promise(function(resolve, reject){
+                        dateRangeFactory(container.find('.panel'), {
+                            resetButton : {
+                                enable : false
+                            },
+                            applyButton : {
+                                enable : true,
+                                label  : __('Filter'),
+                                title  : __('Filter by the selected dates')
+                            },
+                            startPicker : {
+                                setup: 'date',
+                                format :  dateFormat,
+                                field : {
+                                    value : data.periodStart,
+                                    name : 'periodStart',
+                                }
+                            },
+                            endPicker : {
+                                setup: 'date',
+                                format : dateFormat,
+                                field : {
+                                    value : data.periodEnd,
+                                    name : 'periodEnd',
+                                }
+                            }
+                        })
+                        .on('ready', resolve)
+                        .on('error', reject)
+                        .on('submit reset', function() {
 
-                    buttonFactory({
-                        id: 'back',
-                        type: 'info',
-                        label: __('Back to sessions'),
-                        cls: 'back-button',
-                        renderTo: container.find('.panel')
-                    }).on('click', function () {
-                        if (monitoringUrl) {
-                            appController.getRouter().redirect(monitoringUrl);
-                        } else {
-                            history.go(-1);
-                        }
+                            historyTable.refresh({
+                                periodStart : this.getStart(),
+                                periodEnd : this.getEnd()
+                            });
+                        });
+                    })
+                    .then(function(){
+
+                        buttonFactory({
+                            id: 'back',
+                            type: 'info',
+                            label: __('Back to sessions'),
+                            cls: 'back-button',
+                            renderTo: container.find('.panel')
+                        }).on('click', function () {
+                            if (monitoringUrl) {
+                                appController.getRouter().redirect(monitoringUrl);
+                            } else {
+                                history.go(-1);
+                            }
+                        });
                     });
                 });
             }).catch(function(err) {
