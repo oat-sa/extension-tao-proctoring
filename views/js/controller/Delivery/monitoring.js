@@ -824,8 +824,9 @@ define([
                                     }
                                 })
                                 .on('change', function(value){
+                                    var selection = this.getSelectedDates();
                                     if ( (value === '' && lastValue !== value) ||
-                                         (this.getSelectedValues() && this.getSelectedValues().length === 2)){
+                                         (selection && selection.length === 2)) {
                                         $list.datatable('filter');
                                     }
                                     lastValue = value;
