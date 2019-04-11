@@ -785,7 +785,7 @@ define([
                         filterTransform: function filterTransform(value) {
                             var first;
                             var last;
-                            var dateFormat = locale.getDateTimeFormat().split(" ")[0];
+                            var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
 
@@ -804,7 +804,7 @@ define([
                             template : '<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="' + __('Filter') + '"/>',
                             callback : function callback($elt) {
                                 var $filterContainer = $elt.closest('.filter');
-                                var dateFormat = locale.getDateTimeFormat().split(" ");
+                                var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
                                 var lastValue;
                                 var initialValue = !startDatePicker;
@@ -825,7 +825,7 @@ define([
                                 })
                                 .on('change', function(value){
                                     if ( (value === '' && lastValue !== value) ||
-                                         (this.getRangeValues() && this.getRangeValues().length === 2)){
+                                         (this.getSelectedValues() && this.getSelectedValues().length === 2)){
                                         $list.datatable('filter');
                                     }
                                     lastValue = value;
