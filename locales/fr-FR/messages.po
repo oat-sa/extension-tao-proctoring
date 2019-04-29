@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint96\n"
-"PO-Revision-Date: 2019-04-25T01:11:22\n"
+"PO-Revision-Date: 2019-04-25T01:08:52\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: es-ES\n"
+"Language: fr-FR\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: es-ES\n"
+"targetLanguage: fr-FR\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
@@ -17,22 +17,22 @@ msgid "%1$s - Item %2$s/%3$s"
 msgstr ""
 
 msgid "%d sessions of the delivery %s have not been paused"
-msgstr ""
+msgstr "%d sessions pour la passation %s n'ont pas été mises en pause."
 
 msgid "%s completed"
 msgstr ""
 
 msgid "%s could not be %s because it is finished. Please refresh your data."
-msgstr ""
+msgstr "%s ne peut être %s parce qu'il est terminé. Veuillez rafraichir vos données."
 
 msgid "%s could not be %s because it is terminated. Please refresh your data."
-msgstr ""
+msgstr "%s ne peut être %s parce qu'il est terminé. Veuillez rafraichir vos données."
 
 msgid "%s could not be %s."
-msgstr ""
+msgstr "%s ne peut être %s."
 
 msgid "%s minutes more"
-msgstr ""
+msgstr "%s minutes en plus"
 
 msgid "%s\'s test had already been authorized."
 msgstr ""
@@ -71,37 +71,37 @@ msgid "..."
 msgstr ""
 
 msgid "A session of the delivery %s have not been paused"
-msgstr ""
+msgstr "Une session de la passation %s n'a pas été interrompue."
 
 msgid "Action"
-msgstr ""
+msgstr "Action"
 
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 msgid "Active proctors"
-msgstr ""
+msgstr "Surveillants actifs"
 
 msgid "Active test-takers"
-msgstr ""
+msgstr "Participants actifs"
 
 msgid "Actor"
-msgstr ""
+msgstr "Acteur"
 
 msgid "Add test takers"
-msgstr ""
+msgstr "Ajouter des participants"
 
 msgid "Administer deliveries"
-msgstr ""
+msgstr "Administrer des passations"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 msgid "already authorized"
-msgstr "Ya autorizado"
+msgstr "déjà autorisé"
 
 msgid "already paused"
 msgstr ""
@@ -110,119 +110,119 @@ msgid "already terminated"
 msgstr ""
 
 msgid "Apply default tag"
-msgstr ""
+msgstr "Appliquer le tag par défaut"
 
 msgid "Are you sure you want to end the test?"
-msgstr ""
+msgstr "Êtes-vous certain de vouloir terminer le test ?"
 
 #, tao-public
 msgid "Assessment Activity"
-msgstr ""
+msgstr "Activité de l'évaluation"
 
 msgid "Assessment has been paused due to attempt to switch to another window/tab."
-msgstr "La prueba se ha detenido debido a un intento de cambiar a otra ventana/pestaña."
+msgstr "L'évaluation a été interrompue à cause d'une tentative de basculer vers une autre fenêtre ou onglet."
 
 msgid "Assign administrator"
-msgstr ""
+msgstr "Assigner un administrateur"
 
 msgid "Assign more test takers to this session"
-msgstr ""
+msgstr "Assigner davantage de participants à cette session"
 
 msgid "Assign proctors"
-msgstr ""
+msgstr "Assigner des surveillants"
 
 msgid "Assign the selected test takers"
-msgstr ""
+msgstr "Assigner les participants sélectionnés"
 
 msgid "Assign the selected test takers to the session"
-msgstr ""
+msgstr "Assigner les participants sélectionnés à la session"
 
 msgid "Assign the test taker to the session"
-msgstr ""
+msgstr "Assigner le participant à la session"
 
 msgid "Assigned proctors"
-msgstr ""
+msgstr "Surveillants assignés"
 
 msgid "Assigned test takers"
-msgstr ""
+msgstr "Participants assignés"
 
 msgid "Attempts"
-msgstr ""
+msgstr "Tentatives"
 
 msgid "author"
-msgstr ""
+msgstr "auteur"
 
 msgid "Authorize"
-msgstr ""
+msgstr "Autoriser"
 
 msgid "Authorize session"
-msgstr ""
+msgstr "Autoriser la session"
 
 msgid "Authorize Session"
-msgstr ""
+msgstr "Autoriser cette session "
 
 msgid "Authorize sessions"
-msgstr ""
+msgstr "Autoriser les sessions"
 
 msgid "Authorize the proctor"
-msgstr ""
+msgstr "Autoriser le surveillant"
 
 msgid "Authorize the selected proctors"
-msgstr ""
+msgstr "Autoriser les surveillants sélectionnés"
 
 msgid "authorized"
-msgstr ""
+msgstr "autorisé"
 
 msgid "Authorized"
-msgstr ""
+msgstr "Autorisé"
 
 msgid "Authorized but not started"
-msgstr "Autorizado, pero no empezado"
+msgstr "Autorisé mais non démarré"
 
 msgid "Authorized proctors"
-msgstr ""
+msgstr "Surveillants autorisés"
 
 msgid "Authorized, you may proceed"
-msgstr "Autorizado, Ud. puede proceder"
+msgstr "Autorisé, vous pouvez poursuivre"
 
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
-msgstr ""
+msgstr "Remis par défaut automatiquement par le système dû à la requête d'autorisation annulée par le participant."
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
-msgstr ""
+msgstr "Remis par défaut automatiquement par le système dû au choix du participant de ne pas continuer avec le test autorisé."
 
 msgid "Available"
 msgstr "Disponible"
 
 msgid "Available history"
-msgstr ""
+msgstr "Historique disponible"
 
 msgid "Available test takers"
-msgstr ""
+msgstr "Participants disponibles"
 
 msgid "Awaiting"
-msgstr "Esperando"
+msgstr "En attente"
 
 msgid "Back"
-msgstr "Atrás"
+msgstr "Précédent"
 
 msgid "Back to sessions"
-msgstr ""
+msgstr "Retour aux sessions"
 
 msgid "Behaviour"
-msgstr ""
+msgstr "Comportement"
 
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "Annuler"
 
 msgid "cancel"
-msgstr "cancelar"
+msgstr "annuler"
 
 msgid "cancel the action"
-msgstr ""
+msgstr "annuler l'action"
 
 msgid "Canceled"
-msgstr ""
+msgstr "Annulé"
 
 msgid "canceled"
 msgstr ""
@@ -273,378 +273,378 @@ msgid "Cannot terminate test sessions."
 msgstr ""
 
 msgid "category"
-msgstr ""
+msgstr "catégorie"
 
 msgid "Comfort"
-msgstr ""
+msgstr "confort"
 
 msgid "comment"
-msgstr ""
+msgstr "commentaire"
 
 msgid "Complaint"
 msgstr ""
 
 msgid "Completed"
-msgstr ""
+msgstr "Terminé"
 
 msgid "completed"
 msgstr ""
 
 msgid "Completed tests"
-msgstr ""
+msgstr "Tests terminés"
 
 msgid "Compliance"
-msgstr ""
+msgstr "Conformité"
 
 msgid "Connectivity"
-msgstr ""
+msgstr "Connectivité"
 
 msgid "Context"
-msgstr ""
+msgstr "Contexte"
 
 msgid "Create and authorize a proctor to the selected test sites"
-msgstr ""
+msgstr "Crée et autorise l'accès d'un surveillant de test aux sites de test sélectionnés."
 
 msgid "Create Proctor"
-msgstr ""
+msgstr "Crée un surveillant de test"
 
 msgid "Creates and authorizes proctor"
 msgstr ""
 
 msgid "Current Assessment Activity"
-msgstr ""
+msgstr "Activité de l'évaluation en cours"
 
 msgid "Current sessions"
-msgstr ""
+msgstr "Sessions courantes"
 
 msgid "date"
-msgstr "fecha"
+msgstr "date"
 
 msgid "Date"
-msgstr "Fecha"
+msgstr "Date"
 
 msgid "Days"
-msgstr ""
+msgstr "Jours"
 
 msgid "Decryption failed because of using the wrong customer app key."
 msgstr ""
 
 msgid "Define sub-centers"
-msgstr ""
+msgstr "Définir des sous-centres"
 
 msgid "Deliveries"
-msgstr ""
+msgstr "Passations"
 
 msgid "Delivery"
-msgstr ""
+msgstr "Passation"
 
 msgid "Detailed Session History of %s"
-msgstr ""
+msgstr "Historique de session détaillé de %s"
 
 msgid "Detailed Session History of a selection"
-msgstr ""
+msgstr "Historique de session détaillé d'une sélection"
 
 msgid "Details"
-msgstr ""
+msgstr "Détails"
 
 msgid "Disturbance"
-msgstr ""
+msgstr "Perturbation"
 
 msgid "Duration"
-msgstr ""
+msgstr "Durée"
 
 msgid "Edit test center"
-msgstr ""
+msgstr "Éditer le centre de test"
 
 msgid "Elapsed time"
-msgstr ""
+msgstr "Temps écoulé"
 
 msgid "End"
-msgstr ""
+msgstr "Fin"
 
 msgid "End date of the export"
-msgstr ""
+msgstr "Date de fin de l'export"
 
 msgid "Environment"
-msgstr ""
+msgstr "Environnement"
 
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 msgid "Event"
-msgstr ""
+msgstr "Événement"
 
 msgid "Examinee"
-msgstr ""
+msgstr "Examiné"
 
 msgid "Export"
-msgstr ""
+msgstr "Exporter"
 
 #, tao-public
 msgid "Export Irregularities"
-msgstr ""
+msgstr "Exporter les irrégularités"
 
 msgid "Extended Time"
 msgstr ""
 
 msgid "Extra Time"
-msgstr ""
+msgstr "Temps supplémentaire"
 
 msgid "Extra time"
-msgstr ""
+msgstr "Temps supplémentaire"
 
 msgid "Extra time granted"
-msgstr ""
+msgstr "Temps supplémentaire accordé"
 
 msgid "Filter"
-msgstr ""
+msgstr "Filtrer"
 
 msgid "Finished"
-msgstr ""
+msgstr "Terminé"
 
 msgid "finished"
-msgstr ""
+msgstr "terminé"
 
 msgid "First name"
-msgstr ""
+msgstr "Prénom"
 
 msgid "Freezing"
-msgstr ""
+msgstr "Gelé"
 
 msgid "From"
-msgstr ""
+msgstr "De"
 
 msgid "Grant Extra Time"
-msgstr ""
+msgstr "Accorder du temps supplémentaire"
 
 msgid "Groups: %s. %s"
-msgstr ""
+msgstr "Groupes : %s. %s"
 
 msgid "Hours"
-msgstr ""
+msgstr "Heures"
 
 msgid "However, the action will not be applied to the following sessions"
-msgstr ""
+msgstr "Cependant, l'action ne sera pas appliquée aux sessions suivantes."
 
 msgid "ID/Authorization"
-msgstr ""
+msgstr "ID/Autorisation"
 
 msgid "Identifier"
-msgstr ""
+msgstr "Identifiant"
 
 msgid "Illness"
-msgstr ""
+msgstr "Maladie"
 
 msgid "In Progress"
-msgstr ""
+msgstr "En cours"
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr ""
 
 msgid "Issue Category"
-msgstr ""
+msgstr "Catégorie de problème (ou question ?)"
 
 msgid "item"
-msgstr ""
+msgstr "item"
 
 msgid "Item Variables"
-msgstr ""
+msgstr "Variables d'item"
 
 msgid "Label"
-msgstr ""
+msgstr "Étiquette"
 
 msgid "Last Day"
-msgstr ""
+msgstr "Dernier jour"
 
 msgid "Last launch"
 msgstr ""
 
 msgid "Last Month"
-msgstr ""
+msgstr "Le mois dernier"
 
 msgid "Last name"
-msgstr ""
+msgstr "Nom"
 
 msgid "Last Week"
-msgstr ""
+msgstr "Semaine dernière"
 
 msgid "Late"
-msgstr ""
+msgstr "Tard"
 
 msgid "Launching"
-msgstr ""
+msgstr "Lancement"
 
 msgid "Loading"
-msgstr "Cargando"
+msgstr "Chargement"
 
 msgid "Logout"
-msgstr "Cierre de sesión"
+msgstr "Déconnexion"
 
 msgid "Manage Proctors"
-msgstr ""
+msgstr "Gestion des surveillants d'examen"
 
 #, tao-public
 msgid "Manage Results"
-msgstr ""
+msgstr "Gestion des résultats"
 
 msgid "minutes"
-msgstr "minutos"
+msgstr "minutes"
 
 msgid "Monitor"
-msgstr ""
+msgstr "Outil de surveillance"
 
 msgid "Monitoring"
-msgstr ""
+msgstr "Surveillance"
 
 msgid "Navigation"
-msgstr ""
+msgstr "Navigation"
 
 msgid "Network"
-msgstr ""
+msgstr "Réseau"
 
 msgid "No assigned proctors"
-msgstr ""
+msgstr "Aucun surveillant assigné"
 
 msgid "No assigned test takers"
-msgstr ""
+msgstr "Aucun participant assigné"
 
 msgid "No available test takers to assign"
-msgstr ""
+msgstr "Aucun participant disponible pour l'assignation."
 
 msgid "No history to display!"
-msgstr ""
+msgstr "Historique vide !"
 
 msgid "No proctors in request param"
-msgstr ""
+msgstr "Aucun surveillant dans le paramètre de la requête."
 
 msgid "No sessions"
-msgstr ""
+msgstr "Aucune session"
 
 msgid "No sessions available"
-msgstr ""
+msgstr "Aucune session disponible"
 
 msgid "No Show"
-msgstr ""
+msgstr "Pas d'affichage"
 
 msgid "Noise"
-msgstr ""
+msgstr "Bruit"
 
 msgid "not finished"
-msgstr ""
+msgstr "non terminé"
 
 msgid "not in progress"
-msgstr ""
+msgstr "pas en cours"
 
 msgid "not started"
-msgstr ""
+msgstr "non démarré"
 
 msgid "not terminated"
 msgstr ""
 
 msgid "Note"
-msgstr ""
+msgstr "Note"
 
 msgid "offline"
-msgstr ""
+msgstr "non connecté"
 
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 msgid "online"
-msgstr ""
+msgstr "en ligne"
 
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
 msgid "Outcome"
-msgstr ""
+msgstr "Résultat"
 
 msgid "Partially authorized proctors"
-msgstr ""
+msgstr "Surveillants d'examen partiellement autorisés"
 
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 msgid "Pause Active Test Sessions"
-msgstr ""
+msgstr "Mettre en pause les sessions de test actives"
 
 msgid "Pause due to server maintenance"
-msgstr ""
+msgstr "Pause due à une maintenance serveur"
 
 msgid "Pause Session"
-msgstr ""
+msgstr "Mettre en pause la session"
 
 msgid "Pause session"
-msgstr ""
+msgstr "Mettre en pause la session"
 
 msgid "Pause sessions"
-msgstr ""
+msgstr "Suspendre les sessions"
 
 msgid "Paused"
-msgstr ""
+msgstr "Suspendu"
 
 msgid "paused"
-msgstr ""
+msgstr "suspendu"
 
 msgid "Please select one or more test site to manage proctors"
-msgstr ""
+msgstr "Veuillez choisir un ou plusieurs tests pour gérer les surveillants d'examen."
 
 msgid "Please wait, authorization in process ..."
-msgstr "Espere por favor autorización en proceso ..."
+msgstr "Veuillez patienter, autorisation en cours..."
 
 msgid "Please, make your selection"
-msgstr "Por favor, haga su selección"
+msgstr "Veuillez effectuer un choix"
 
 msgid "Power Outage"
-msgstr ""
+msgstr "Panne de courant"
 
 msgid "Previous Month"
-msgstr ""
+msgstr "Mois précédent"
 
 msgid "Print Results"
-msgstr ""
+msgstr "Imprimer les résultats"
 
 msgid "Print Score"
-msgstr ""
+msgstr "Imprimer le score"
 
 msgid "Print the assessment results"
-msgstr ""
+msgstr "Imprimer les résultats de l'évaluation"
 
 msgid "Printing"
-msgstr ""
+msgstr "En cours d'impression"
 
 msgid "Proceed"
-msgstr "Proceda"
+msgstr "Continuer"
 
 msgid "Proctor"
-msgstr ""
+msgstr "Surveillant d'examen"
 
 msgid "Proctor created"
-msgstr ""
+msgstr "Surveillant d'examen créé"
 
 msgid "Proctor/Staff"
-msgstr ""
+msgstr "Surveillant d'examen/équipe"
 
 msgid "Proctored Delivery Server"
-msgstr ""
+msgstr "Serveur de passation surveillé"
 
 msgid "Proctored Test-Takers"
-msgstr ""
+msgstr "Participants surveillés"
 
 msgid "Proctoring interface"
-msgstr ""
+msgstr "Interface de surveillance d'examen"
 
 msgid "Proctors"
-msgstr ""
+msgstr "Surveillants d'examen"
 
 msgid "Proctors authorized"
-msgstr ""
+msgstr "Surveillants d'examen autorisés"
 
 msgid "Proctors revoked"
-msgstr ""
+msgstr "Surveillants d'examen révoqués"
 
 msgid "Progress"
-msgstr ""
+msgstr "Progression"
 
 msgid "Reactivate session"
 msgstr ""
@@ -653,185 +653,185 @@ msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
-msgstr "Recargue"
+msgstr "Actualiser"
 
 msgid "Refresh the page"
-msgstr "Recargue la página"
+msgstr "Actualiser la page"
 
 msgid "Remaining"
-msgstr ""
+msgstr "Restant"
 
 msgid "Remove"
-msgstr ""
+msgstr "Supprimer"
 
 msgid "Remove default tag filtering"
-msgstr ""
+msgstr "Supprimer le filtrage de balise par défaut"
 
 msgid "Remove the selected test takers from the session"
-msgstr ""
+msgstr "Supprimer les participants sélectionnés de la session."
 
 msgid "Remove the test taker from the session"
-msgstr ""
+msgstr "Supprimer le participant de la session."
 
 msgid "Report"
-msgstr ""
+msgstr "Rapport"
 
 msgid "Report irregularities"
-msgstr ""
+msgstr "Rapporter des irrégularités"
 
 msgid "Report Irregularity"
-msgstr ""
+msgstr "Rapporter une irrégularité"
 
 msgid "Report irregularity"
-msgstr ""
+msgstr "Rapporter une irrégularité"
 
 msgid "reported for irregularity"
-msgstr ""
+msgstr "rapporté pour irrégularité"
 
 msgid "Resource update task is completed"
 msgstr ""
 
 #, tao-public
 msgid "Results"
-msgstr ""
+msgstr "Résultats"
 
 msgid "results"
-msgstr ""
+msgstr "résultats"
 
 msgid "Return to the session manager"
-msgstr ""
+msgstr "Retour au gestionnaire de session"
 
 msgid "Return to the session monitoring"
-msgstr ""
+msgstr "Retour à la surveillance de session"
 
 msgid "Revoke authorization for the selected proctor"
-msgstr ""
+msgstr "Révoquer l'autorisation pour le surveillant d'examen sélectionné"
 
 msgid "Revoke the proctor"
-msgstr ""
+msgstr "Révoquer le surveillant d'examen"
 
 msgid "Role"
-msgstr ""
+msgstr "Rôle"
 
 msgid "Score"
-msgstr ""
+msgstr "Score"
 
 msgid "Score Report"
-msgstr ""
+msgstr "Rapport de notation"
 
 msgid "section"
-msgstr ""
+msgstr "section"
 
 msgid "Session"
-msgstr ""
+msgstr "Session"
 
 msgid "Session %s - %s has not been processed"
-msgstr ""
+msgstr "La session %s - %s n'a pas été traitée."
 
 msgid "Session history"
-msgstr ""
+msgstr "Historique de session"
 
 msgid "Session time handling"
-msgstr ""
+msgstr "Durée de vie de la session"
 
 msgid "Sessions"
-msgstr ""
+msgstr "Sessions"
 
 msgid "Sessions authorized"
-msgstr ""
+msgstr "Sessions autorisées"
 
 msgid "Sessions paused"
-msgstr ""
+msgstr "Sessions en pause"
 
 msgid "sessions paused"
-msgstr ""
+msgstr "sessions en pause"
 
 msgid "Sessions reactivated"
 msgstr ""
 
 msgid "Sessions reported"
-msgstr ""
+msgstr "Sessions signalées"
 
 msgid "Sessions terminated"
-msgstr ""
+msgstr "Sessions terminées"
 
 msgid "Show brief report"
-msgstr ""
+msgstr "Afficher un rapport bref"
 
 msgid "Show detailed report"
-msgstr ""
+msgstr "Afficher le rapport détaillé"
 
 msgid "Show detailed session history messages"
-msgstr ""
+msgstr "Montrer les messages détaillés d'historique de session"
 
 msgid "Show the detailed session history"
-msgstr ""
+msgstr "Montrer l'historique détaillé de la session"
 
 msgid "Some delivery executions have not been authorized"
-msgstr ""
+msgstr "Certaines exécutions de passation n'ont pas été autorisés."
 
 msgid "Some delivery executions have not been paused"
-msgstr ""
+msgstr "Certaines exécutions de passation n'ont pas été mises en pause."
 
 msgid "Some delivery executions have not been reactivated"
 msgstr ""
 
 msgid "Some delivery executions have not been reported"
-msgstr ""
+msgstr "Certaines exécutions de passation n'ont pas été rapportées."
 
 msgid "Some delivery executions have not been terminated"
-msgstr ""
+msgstr "Certaines exécutions de passation n'ont pas été terminées."
 
 msgid "Some delivery executions have not been updated"
-msgstr ""
+msgstr "Certaines exécutions de passation n'ont pas été mises à jour."
 
 msgid "Something went wrong ..."
-msgstr "Algo salió mal ..."
+msgstr "Quelque chose s'est mal passé..."
 
 msgid "Start"
-msgstr "Inicio"
+msgstr "Démarrer"
 
 msgid "Start date of the export"
-msgstr ""
+msgstr "Date de démarrage de l'export"
 
 msgid "Started at"
-msgstr ""
+msgstr "Démarré à"
 
 msgid "Status"
-msgstr ""
+msgstr "État"
 
 msgid "Subcategory"
-msgstr ""
+msgstr "Sous-catégorie"
 
 msgid "subcategory"
-msgstr ""
+msgstr "sous-catégorie"
 
 msgid "System generated pause."
 msgstr ""
 
 msgid "Take or continue a test controlled by a proctor"
-msgstr ""
+msgstr "Prendre ou continuer un test contrôlé par un surveillant d'examen"
 
 msgid "Technical"
-msgstr ""
+msgstr "Technique"
 
 msgid "Terminate"
-msgstr ""
+msgstr "Terminer"
 
 msgid "Terminate session"
-msgstr ""
+msgstr "Terminer la session"
 
 msgid "Terminate Session"
-msgstr ""
+msgstr "Terminer la session"
 
 msgid "Terminate sessions"
-msgstr ""
+msgstr "Terminer les sessions"
 
 msgid "Terminated"
-msgstr ""
+msgstr "Terminé"
 
 msgid "terminated"
-msgstr ""
+msgstr "terminé"
 
 msgid "Test  must be terminated."
 msgstr ""
@@ -870,7 +870,7 @@ msgid "Test %s must be terminated."
 msgstr ""
 
 msgid "Test center saved"
-msgstr ""
+msgstr "Centre de test enregistré"
 
 msgid "Test had already been authorized."
 msgstr ""
@@ -903,83 +903,83 @@ msgid "Test had not been started."
 msgstr ""
 
 msgid "Test site %s"
-msgstr ""
+msgstr "Site de test %s"
 
 msgid "Test taker"
-msgstr ""
+msgstr "Participant"
 
 msgid "test taker"
-msgstr ""
+msgstr "participant"
 
 msgid "Test takers have been added"
-msgstr ""
+msgstr "Des participants ont été ajoutés."
 
 msgid "Test takers have been removed"
-msgstr ""
+msgstr "Des participants ont été supprimés."
 
 msgid "Test Variables"
-msgstr ""
+msgstr "Variables de test"
 
 msgid "Test-Taker"
-msgstr ""
+msgstr "Participant"
 
 msgid "Testing Workstation"
-msgstr ""
+msgstr "Test en cours de la station de travail"
 
 msgid "The action cannot be applied, no eligible sessions found"
-msgstr ""
+msgstr "L'action ne peut être appliquée, pas de session éligible trouvée."
 
 msgid "The action will be applied to the following session"
-msgstr ""
+msgstr "L'action sera appliquée à la session suivante."
 
 msgid "the already granted time will be replaced by the new value"
-msgstr ""
+msgstr "le temps déjà accordé sera remplacé par la nouvelle valeur"
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
-msgstr ""
+msgstr "L'évaluation a été suspendue. Pour poursuivre votre évaluation, veuillez la relancer et contacter votre surveillant d'examen si nécessaire."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
-msgstr ""
+msgstr "L'évaluation vient de se terminer. Vous ne pouvez plus interagir avec elle."
 
 msgid "The extra time must be a number"
-msgstr ""
+msgstr "Le temps additionnel doit être un nombre."
 
 msgid "The proctor will be authorized. Continue ?"
-msgstr ""
+msgstr "Le surveillant d'examen va obtenir une autorisation. Continuer ?"
 
 msgid "The proctor will be revoked. Continue ?"
-msgstr ""
+msgstr "Le surveillant d'examen sera révoqué. Continuer ?"
 
 msgid "The proctors will be authorized. Continue ?"
-msgstr ""
+msgstr "Le surveillant d'examen sera autorisé. Continuer ?"
 
 msgid "The proctors will be revoked. Continue ?"
-msgstr ""
+msgstr "Les surveillants d'examen seront révoqués. Continuer ?"
 
 msgid "The test taker will be removed from this session. Continue ?"
-msgstr ""
+msgstr "Le participant sera supprimé de cette session. Continuer ?"
 
 msgid "The test takers will be removed from this session. Continue ?"
-msgstr ""
+msgstr "Le participant sera supprimé de cette session. Continuer ?"
 
 msgid "There is no delivery in progress"
-msgstr ""
+msgstr "Il n'y a pas de passation en cours."
 
 msgid "Time"
-msgstr ""
+msgstr "Durée"
 
 msgid "to"
-msgstr ""
+msgstr "à "
 
 #, tao-public
 msgid "Tools"
-msgstr ""
+msgstr "Outils"
 
 msgid "Total Current Assessments"
-msgstr ""
+msgstr "Total des évaluations en cours"
 
 msgid "Total time"
-msgstr ""
+msgstr "Durée totale"
 
 msgid "Unable to create irregularities export for %s"
 msgstr ""
@@ -988,11 +988,11 @@ msgid "Unable to perform action on test %s."
 msgstr ""
 
 msgid "User Activity"
-msgstr ""
+msgstr "Activité de l'utilisateur"
 
 msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
-msgstr ""
+msgstr "Avertissement : vous allez mettre en pause tous les tests en cours. Tous les participants seront mis en pause sur ou avant le prochain battement. Veuillez justifier la raison de cette action."
 
 msgid "Weather"
-msgstr ""
+msgstr "Temps"
 

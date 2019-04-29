@@ -1,12 +1,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint96\n"
-"PO-Revision-Date: 2019-04-25T01:11:22\n"
+"PO-Revision-Date: 2019-04-25T01:10:31\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: es-ES\n"
+"Language: zh-CN\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: es-ES\n"
+"targetLanguage: zh-CN\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
@@ -101,7 +101,7 @@ msgid "Administration"
 msgstr ""
 
 msgid "already authorized"
-msgstr "Ya autorizado"
+msgstr ""
 
 msgid "already paused"
 msgstr ""
@@ -120,7 +120,7 @@ msgid "Assessment Activity"
 msgstr ""
 
 msgid "Assessment has been paused due to attempt to switch to another window/tab."
-msgstr "La prueba se ha detenido debido a un intento de cambiar a otra ventana/pestaña."
+msgstr ""
 
 msgid "Assign administrator"
 msgstr ""
@@ -177,13 +177,13 @@ msgid "Authorized"
 msgstr ""
 
 msgid "Authorized but not started"
-msgstr "Autorizado, pero no empezado"
+msgstr ""
 
 msgid "Authorized proctors"
 msgstr ""
 
 msgid "Authorized, you may proceed"
-msgstr "Autorizado, Ud. puede proceder"
+msgstr ""
 
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
 msgstr ""
@@ -192,7 +192,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr ""
 
 msgid "Available"
-msgstr "Disponible"
+msgstr ""
 
 msgid "Available history"
 msgstr ""
@@ -201,10 +201,10 @@ msgid "Available test takers"
 msgstr ""
 
 msgid "Awaiting"
-msgstr "Esperando"
+msgstr ""
 
 msgid "Back"
-msgstr "Atrás"
+msgstr ""
 
 msgid "Back to sessions"
 msgstr ""
@@ -213,10 +213,10 @@ msgid "Behaviour"
 msgstr ""
 
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr ""
 
 msgid "cancel"
-msgstr "cancelar"
+msgstr ""
 
 msgid "cancel the action"
 msgstr ""
@@ -318,10 +318,10 @@ msgid "Current sessions"
 msgstr ""
 
 msgid "date"
-msgstr "fecha"
+msgstr ""
 
 msgid "Date"
-msgstr "Fecha"
+msgstr ""
 
 msgid "Days"
 msgstr ""
@@ -475,10 +475,10 @@ msgid "Launching"
 msgstr ""
 
 msgid "Loading"
-msgstr "Cargando"
+msgstr ""
 
 msgid "Logout"
-msgstr "Cierre de sesión"
+msgstr ""
 
 msgid "Manage Proctors"
 msgstr ""
@@ -488,7 +488,7 @@ msgid "Manage Results"
 msgstr ""
 
 msgid "minutes"
-msgstr "minutos"
+msgstr ""
 
 msgid "Monitor"
 msgstr ""
@@ -590,10 +590,10 @@ msgid "Please select one or more test site to manage proctors"
 msgstr ""
 
 msgid "Please wait, authorization in process ..."
-msgstr "Espere por favor autorización en proceso ..."
+msgstr ""
 
 msgid "Please, make your selection"
-msgstr "Por favor, haga su selección"
+msgstr ""
 
 msgid "Power Outage"
 msgstr ""
@@ -614,7 +614,7 @@ msgid "Printing"
 msgstr ""
 
 msgid "Proceed"
-msgstr "Proceda"
+msgstr ""
 
 msgid "Proctor"
 msgstr ""
@@ -653,10 +653,10 @@ msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
-msgstr "Recargue"
+msgstr ""
 
 msgid "Refresh the page"
-msgstr "Recargue la página"
+msgstr ""
 
 msgid "Remaining"
 msgstr ""
@@ -786,10 +786,10 @@ msgid "Some delivery executions have not been updated"
 msgstr ""
 
 msgid "Something went wrong ..."
-msgstr "Algo salió mal ..."
+msgstr ""
 
 msgid "Start"
-msgstr "Inicio"
+msgstr ""
 
 msgid "Start date of the export"
 msgstr ""

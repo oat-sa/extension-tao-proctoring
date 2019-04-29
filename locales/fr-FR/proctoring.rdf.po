@@ -1,34 +1,34 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint96\n"
-"PO-Revision-Date: 2019-04-25T01:11:22\n"
+"PO-Revision-Date: 2019-04-25T01:08:52\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: es-ES\n"
+"Language: fr-FR\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: es-ES\n"
+"targetLanguage: fr-FR\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor"
-msgstr ""
+msgstr "Surveillant d'examen"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
-msgstr ""
+msgstr "Le rôle de surveillant d'examen"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Manager"
-msgstr ""
+msgstr "Gestionnaire de surveillant d'examen"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Manager Role"
-msgstr ""
+msgstr "Le rôle de gestionnaire de surveillant d'examen"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
@@ -43,42 +43,42 @@ msgstr ""
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Awaiting"
-msgstr ""
+msgstr "En attente"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Awaiting of authorization status of a delivery execution"
-msgstr ""
+msgstr "En attente d'autorisation de l'exécution d'une passation"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Authorized"
-msgstr ""
+msgstr "Autorisé"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Authorized status of a delivery execution"
-msgstr ""
+msgstr "État autorisé de l'exécution d'une passation"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Terminated"
-msgstr ""
+msgstr "Terminé"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Terminated status of a delivery execution"
-msgstr ""
+msgstr "État terminé de l'exécution d'une passation"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Canceled"
-msgstr ""
+msgstr "Annulé"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Canceled status of a delivery execution"
-msgstr ""
+msgstr "État annulé de l'exécution d'une passation"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
