@@ -214,9 +214,12 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'reason' => $reason,
                 'timestamp' => microtime(true),
                 'context' => $this->getContext($deliveryExecution),
+                'itemId' => $session ? $this->getCurrentItemId($deliveryExecution) : null,
             ];
+
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
+
             if ($session) {
-                $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
                 if ($session->isRunning()) {
                     $session->endTestSession();
                 }
@@ -228,8 +231,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             // when a human test taker takes the test.
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
-
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
 

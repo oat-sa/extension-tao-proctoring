@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint96\n"
-"PO-Revision-Date: 2019-03-01T12:19:30\n"
+"Project-Id-Version: TAO 3.3.0-sprint100\n"
+"PO-Revision-Date: 2019-04-26T11:31:45\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: es-ES\n"
@@ -221,10 +221,10 @@ msgstr "cancelar"
 msgid "cancel the action"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -399,19 +399,19 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-msgid "Finished"
+msgid "Filter by the selected dates"
 msgstr ""
 
 msgid "finished"
+msgstr ""
+
+msgid "Finished"
 msgstr ""
 
 msgid "First name"
 msgstr ""
 
 msgid "Freezing"
-msgstr ""
-
-msgid "From"
 msgstr ""
 
 msgid "Grant Extra Time"
@@ -580,10 +580,10 @@ msgstr ""
 msgid "Pause sessions"
 msgstr ""
 
-msgid "Paused"
+msgid "paused"
 msgstr ""
 
-msgid "paused"
+msgid "Paused"
 msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
@@ -691,11 +691,11 @@ msgstr ""
 msgid "Resource update task is completed"
 msgstr ""
 
-#, tao-public
-msgid "Results"
+msgid "results"
 msgstr ""
 
-msgid "results"
+#, tao-public
+msgid "Results"
 msgstr ""
 
 msgid "Return to the session manager"
@@ -740,10 +740,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -827,10 +827,10 @@ msgstr ""
 msgid "Terminate sessions"
 msgstr ""
 
-msgid "Terminated"
+msgid "terminated"
 msgstr ""
 
-msgid "terminated"
+msgid "Terminated"
 msgstr ""
 
 msgid "Test  must be terminated."
@@ -966,9 +966,6 @@ msgid "There is no delivery in progress"
 msgstr ""
 
 msgid "Time"
-msgstr ""
-
-msgid "to"
 msgstr ""
 
 #, tao-public

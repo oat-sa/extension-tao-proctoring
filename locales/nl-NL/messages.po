@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint96\n"
-"PO-Revision-Date: 2019-03-01T12:19:30\n"
+"Project-Id-Version: TAO 3.3.0-sprint100\n"
+"PO-Revision-Date: 2019-04-26T11:31:45\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -221,11 +221,11 @@ msgstr "annuleren"
 msgid "cancel the action"
 msgstr "Actie annuleren"
 
-msgid "Canceled"
-msgstr "Geannuleerd"
-
 msgid "canceled"
 msgstr ""
+
+msgid "Canceled"
+msgstr "Geannuleerd"
 
 msgid "Cannot authorize test session."
 msgstr ""
@@ -399,20 +399,20 @@ msgstr "Extra tijd gegeven"
 msgid "Filter"
 msgstr "Filter"
 
-msgid "Finished"
-msgstr "Voltooid"
+msgid "Filter by the selected dates"
+msgstr ""
 
 msgid "finished"
 msgstr "voltooid"
+
+msgid "Finished"
+msgstr "Voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
 
 msgid "Freezing"
 msgstr "Bevriezend"
-
-msgid "From"
-msgstr "Van"
 
 msgid "Grant Extra Time"
 msgstr "Geef extra tijd"
@@ -580,11 +580,11 @@ msgstr "Sessie pauzeren"
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
-msgid "Paused"
-msgstr "Gepauzeerd"
-
 msgid "paused"
 msgstr "gepauzeerd"
+
+msgid "Paused"
+msgstr "Gepauzeerd"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
@@ -691,12 +691,12 @@ msgstr "Gerapporteerd wegens onregelmatigheden"
 msgid "Resource update task is completed"
 msgstr ""
 
+msgid "results"
+msgstr "resultaten"
+
 #, tao-public
 msgid "Results"
 msgstr "Resultaten"
-
-msgid "results"
-msgstr "resultaten"
 
 msgid "Return to the session manager"
 msgstr "Geef terug aan de sessie beheerder"
@@ -740,11 +740,11 @@ msgstr "Sessies"
 msgid "Sessions authorized"
 msgstr "Geautoriseerde sessies"
 
-msgid "Sessions paused"
-msgstr "Gepauzeerde sessies"
-
 msgid "sessions paused"
 msgstr "gepauzeerde sessies"
+
+msgid "Sessions paused"
+msgstr "Gepauzeerde sessies"
 
 msgid "Sessions reactivated"
 msgstr ""
@@ -827,11 +827,11 @@ msgstr "Beëindig sessie"
 msgid "Terminate sessions"
 msgstr "Beëindig sessies"
 
-msgid "Terminated"
-msgstr "Beëindigd"
-
 msgid "terminated"
 msgstr "beëindigd"
+
+msgid "Terminated"
+msgstr "Beëindigd"
 
 msgid "Test  must be terminated."
 msgstr ""
@@ -967,9 +967,6 @@ msgstr "Er is geen levering in bewerking"
 
 msgid "Time"
 msgstr "Tijd"
-
-msgid "to"
-msgstr "naar"
 
 #, tao-public
 msgid "Tools"

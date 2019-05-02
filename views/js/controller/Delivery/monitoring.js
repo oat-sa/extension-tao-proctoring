@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -35,6 +35,7 @@ define([
     'ui/bulkActionPopup',
     'ui/cascadingComboBox',
     'ui/container',
+    'ui/datetime/picker',
     'taoProctoring/component/proxy',
     'taoProctoring/component/extraTime/extraTime',
     'taoProctoring/component/extraTime/encoder',
@@ -46,7 +47,6 @@ define([
     'util/locale',
     'tpl!taoProctoring/templates/delivery/approximatedTimer',
     'ui/datatable',
-    'jqueryui',
     'select2'
 ], function (
     $,
@@ -65,6 +65,7 @@ define([
     bulkActionPopup,
     cascadingComboBox,
     containerFactory,
+    dateTimePicker,
     proxyFactory,
     extraTimePopup,
     encodeExtraTime,
@@ -153,6 +154,7 @@ define([
                 autoStart: false
             });
             var label;
+            var startDatePicker;
 
             var polling = pollingFactory({
                 action: function() {
@@ -560,20 +562,9 @@ define([
                  */
                 function setInitialFilters()
                 {
-                    var now = new Date();
-                    var dateFormat = locale.getDateTimeFormat().split(" ");
-                    var nowStr = dateFormat[0];
-
-                    nowStr = nowStr.replace("YYYY", now.getFullYear());
-                    nowStr = nowStr.replace("MM", ("0" + (now.getMonth() + 1)).slice(-2));
-                    nowStr = nowStr.replace("DD", ("0" + (now.getDate())).slice(-2));
-                    $('#start_time_filter').val(nowStr + ' - ' + nowStr);
-
                     if (defaultTag) {
                         setTagUsage(true);
                     }
-
-                    $list.datatable('filter');
                 }
 
                 /**
@@ -587,6 +578,14 @@ define([
                         minimumResultsForSearch: Infinity,
                         allowClear: true
                     });
+                }
+
+                /**
+                 * Return the default date range of one day
+                 * @returns {string}
+                 */
+                function getDefaultStartTimeFilter() {
+                    return moment().format('L') + ' to ' + moment().add('1', 'd').format('L');
                 }
 
                 if (deliveryId) {
@@ -791,60 +790,53 @@ define([
                         transform: function(value) {
                             return locale.formatDateTime(value);
                         },
-                        filterTransform: function (value) {
-                            var values = value.split(" - ");
+                        filterTransform: function filterTransform(value) {
+                            var first;
+                            var last;
+                            var dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                            var values = value.split(' ');
                             var result = '';
-                            var dateFormat = locale.getDateTimeFormat();
-                            if (values[0]) {
-                                result = moment(values[0], dateFormat).format('X');
+
+                            if (values.length >= 2) {
+                                first = values[0];
+                                last  = values[values.length - 1];
+
+                                result += moment(first, dateFormat).format('X');
+                                result += ' - ';
+                                result += moment(last, dateFormat).add(1, 'd').format('X');
                             }
-                            if (values[1]) {
-                                values[1] = moment(values[1], dateFormat).add(1, 'd').format('X');
-                                if (result !== '') {
-                                    result += ' - ';
-                                }
-                                result += values[1];
-                            }
+
                             return result;
                         },
                         customFilter : {
-                            template : '<input type="text" id="start_time_filter" name="filter[start_time]"/>' +
-                            '<button class="icon-find js-start_time_filter_button" type="button"></button>',
-                            callback : function ($el) {
-                                var dateFormat = locale.getDateTimeFormat().split(" ");
+                            template : '<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="' + __('Filter') + '"/>',
+                            callback : function callback($elt) {
+                                var $filterContainer = $elt.closest('.filter');
+                                var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
-                                var comparisonDateFormat;
-                                dateFormatStr = dateFormatStr.replace('YYYY', 'yy');
-                                dateFormatStr = dateFormatStr.replace('MM', 'mm');
-                                dateFormatStr = dateFormatStr.replace('DD', 'dd');
-                                comparisonDateFormat = dateFormat[0];
-                                $el.datepicker({
-                                    dateFormat: dateFormatStr,
-                                    onSelect: function( selectedDate ) {
-                                        var datePickerData = $(this).data().datepicker;
-                                        var firstDate, selDate;
-                                        if (!datePickerData.first) {
-                                            datePickerData.inline = true;
-                                            datePickerData.first = selectedDate;
-                                        } else {
-                                            firstDate = moment(datePickerData.first, comparisonDateFormat).format('X');
-                                            selDate = moment(selectedDate, comparisonDateFormat).format('X');
-                                            if (selDate > firstDate) {
-                                                $(this).val(datePickerData.first+" - "+selectedDate);
-                                            } else {
-                                                $(this).val(selectedDate+" - "+datePickerData.first);
-                                            }
-                                            datePickerData.inline = false;
-                                            $('.js-start_time_filter_button').trigger('click');
+                                var lastValue;
+                                var initialValue = !startDatePicker;
+
+                                // the date time picker won't display otherwise
+                                $filterContainer.css('position', 'static');
+
+                                if(startDatePicker){
+                                    startDatePicker.destroy();
+                                }
+
+                                startDatePicker = dateTimePicker($filterContainer, {
+                                    setup : 'date-range',
+                                    format : dateFormatStr,
+                                    replaceField : $elt[0]
+                                })
+                                    .on('change', function(value){
+                                        var selection = this.getSelectedDates();
+                                        if ( (value === '' && lastValue !== value) ||
+                                            (selection && selection.length === 2)) {
+                                            $list.datatable('filter');
                                         }
-                                    },
-                                    onClose:function(event){
-                                        if (event.which === $.ui.keyCode.ENTER) {
-                                            event.preventDefault();
-                                            $el.datepicker("hide");
-                                        }
-                                    }
-                                });
+                                        lastValue = value;
+                                    });
                             }
                         },
                     });
@@ -1106,6 +1098,7 @@ define([
                             },
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                            filtercolumns: {start_time: getDefaultStartTimeFilter()},
                             filter: true,
                             tools: tools,
                             model: model,
