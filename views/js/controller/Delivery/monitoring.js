@@ -580,6 +580,14 @@ define([
                     });
                 }
 
+                /**
+                 * Return the default date range of one day
+                 * @returns {string}
+                 */
+                function getDefaultStartTimeFilter() {
+                    return moment().format('L') + ' to ' + moment().add('1', 'd').format('L');
+                }
+
                 if (deliveryId) {
                     serviceParams.delivery = deliveryId;
                 }
@@ -812,25 +820,23 @@ define([
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
 
+                                if(startDatePicker){
+                                    startDatePicker.destroy();
+                                }
+
                                 startDatePicker = dateTimePicker($filterContainer, {
                                     setup : 'date-range',
                                     format : dateFormatStr,
                                     replaceField : $elt[0]
                                 })
-                                .on('ready', function(){
-                                    if(initialValue){
-                                        this.setValue([new Date(), moment().add('1', 'd').toDate()]);
-                                        $list.datatable('filter');
-                                    }
-                                })
-                                .on('change', function(value){
-                                    var selection = this.getSelectedDates();
-                                    if ( (value === '' && lastValue !== value) ||
-                                         (selection && selection.length === 2)) {
-                                        $list.datatable('filter');
-                                    }
-                                    lastValue = value;
-                                });
+                                    .on('change', function(value){
+                                        var selection = this.getSelectedDates();
+                                        if ( (value === '' && lastValue !== value) ||
+                                            (selection && selection.length === 2)) {
+                                            $list.datatable('filter');
+                                        }
+                                        lastValue = value;
+                                    });
                             }
                         },
                     });
@@ -1092,6 +1098,7 @@ define([
                             },
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                            filtercolumns: {start_time: getDefaultStartTimeFilter()},
                             filter: true,
                             tools: tools,
                             model: model,
