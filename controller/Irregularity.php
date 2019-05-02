@@ -24,6 +24,7 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\taskQueue\TaskLogActionTrait;
 use oat\taoProctoring\controller\form\IrregularitiesExportForm;
 use oat\taoProctoring\model\service\IrregularityReport;
+use tao_helpers_form_FormContainer as FormContainer;
 
 /**
  * Irregularity controller
@@ -43,7 +44,11 @@ class Irregularity extends \tao_actions_CommonModule
      */
     public function index()
     {
-        $formContainer = new IrregularitiesExportForm($this->getRequestParameter('uri'));
+        $formContainer = new IrregularitiesExportForm(
+            $this->getRequestParameter('uri'),
+            [],
+            [FormContainer::CSRF_PROTECTION_OPTION => true]
+        );
         $myForm = $formContainer->getForm();
 
         if ($myForm->isValid() && $myForm->isSubmited()) {
