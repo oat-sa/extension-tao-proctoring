@@ -91,6 +91,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
 use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteService;
 
 /**
  *
@@ -841,5 +842,25 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('12.5.3', '13.0.0');
+
+        if ($this->isVersion('13.0.0')) {
+            /** @var DeliveryExecutionDeleteService $executionDeleteService */
+            $executionDeleteService = $this->getServiceManager()->get(DeliveryExecutionDeleteService::SERVICE_ID);
+            $previousServices       = $executionDeleteService->getOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES);
+
+            $executionDeleteService->setOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
+                array_merge($previousServices, [
+                    'taoProctoring/DeliveryLog',
+                    'taoProctoring/DeliveryMonitoring',
+                ])
+            );
+
+            $this->getServiceManager()->register(DeliveryExecutionDeleteService::SERVICE_ID, $executionDeleteService);
+
+            $this->setVersion('13.1.0');
+        }
+
+        $this->skip('13.1.0', '13.2.0');
+
     }
 }
