@@ -47,17 +47,17 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '13.1.0',
+    'version' => '14.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao'            => '>=34.3.0',
+        'tao'            => '>=36.0.0',
         'taoDelivery'    => '>=12.5.0',
         'taoDeliveryRdf' => '>=7.0.0',
         'taoTestTaker'   => '>=4.0.0',
         'taoQtiTest'     => '>=29.2.0',
         'taoOutcomeUi'   => '>=7.0.0',
         'taoEventLog'    => '>=2.0.0',
-        'generis'        => '>=7.11.0',
+        'generis'        => '>=11.2.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
@@ -92,7 +92,8 @@ return array(
             \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
             \oat\taoProctoring\scripts\install\RegisterProctorAttemptService::class,
             RegisterProctoringDeliveryDeleteService::class,
-            SetUpQueueTasks::class
+            SetUpQueueTasks::class,
+            \oat\taoProctoring\scripts\install\RegisterDeleteDeliveryExecution::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
