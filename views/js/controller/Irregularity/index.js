@@ -23,7 +23,7 @@ define([
     'ui/hider',
     'util/url',
     'ui/feedback',
-    'core/taskQueue/taskQueue',
+    'ui/taskQueue/taskQueue',
     'ui/taskQueueButton/standardButton'
 ], function ($, _, __, hider, urlHelper, feedback, taskQueue, taskCreationButtonFactory) {
     'use strict';
