@@ -212,7 +212,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         if (in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
-            ])
+            ], true)
         ) {
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -234,15 +234,29 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     }
 
     /**
-     * Get time of last pause
+     * Get time of the last pause
+     *
      * @param DeliveryExecution $deliveryExecution
-     * @return \DateTimeImmutable|null
+     * @return DateTimeImmutable|null
+     * @throws \common_exception_NotFound
      */
     protected function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
         $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
-        return isset($pauses[0]) ? (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']) : null;
+
+        $result = null;
+
+        if (!isset($pauses[0]) && $deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_PAUSED) {
+            //'paused' is initial state of delivery execution. So there may no be pause event in delivery log.
+            $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
+            $result = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
+        } else {
+            $result = (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']);
+        }
+
+        return $result;
     }
+
 
 }
