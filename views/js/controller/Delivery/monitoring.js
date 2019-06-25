@@ -505,9 +505,12 @@ define([
                         renderTo : $content,
                         actionName : actionTitle,
                         reason : askForReason,
-                        reasonRequired: true,
-                        categoriesSelector: cascadingComboBox(categories[actionName] || {})
+                        reasonRequired: true
                     });
+
+                    if (!_.isEmpty(categories[actionName])) {
+                        config.categoriesSelector = cascadingComboBox(categories[actionName]);
+                    }
 
                     if (!config.allowedResources.length) {
                         feedback().warning(_status.buildWarningMessage(actionName, _selection, config.deniedResources));
