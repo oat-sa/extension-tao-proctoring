@@ -588,7 +588,8 @@ define([
                  * @returns {string}
                  */
                 function getDefaultStartTimeFilter() {
-                    return moment().format('L') + ' to ' + moment().add('1', 'd').format('L');
+                    var dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                    return `${moment().format(dateFormat)} to ${moment().add('1', 'd').format(dateFormat)}`;
                 }
 
                 if (deliveryId) {
