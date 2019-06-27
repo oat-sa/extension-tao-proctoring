@@ -43,7 +43,8 @@ module.exports = function(grunt) {
                     }, {
                         name : 'app',
                         entryPoint: 'taoProctoring/controller/app',
-                        bootstrap : true
+                        bootstrap : true,
+                        babel: true
                     }]
                 }
             }

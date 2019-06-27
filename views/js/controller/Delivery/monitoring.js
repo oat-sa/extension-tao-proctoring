@@ -104,14 +104,14 @@ define([
 
     /**
      * Validates the params to be sent along the provider's requests
-     * @param params
+     * @param {object} params
      * @returns {boolean}
      */
     function validateParams(params) {
         return _.isPlainObject(params) &&
-            (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
-            (_.isUndefined(params.testCenter) || !_.isEmpty(params.testCenter)) &&
-            !_.isEmpty(params.execution);
+                (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
+                (_.isUndefined(params.testCenter) || !_.isEmpty(params.testCenter)) &&
+                !_.isEmpty(params.execution);
     }
 
     // the page is always loading data when starting
@@ -126,7 +126,7 @@ define([
         /**
          * Entry point of the page
          */
-        start : function start() {
+        start() {
             var container = containerFactory().changeScope(cssScope).write(monitoringTpl());
             var $content = container.find('.content');
             var $list = container.find('.list');
@@ -157,7 +157,7 @@ define([
             var startDatePicker;
 
             var polling = pollingFactory({
-                action: function() {
+                action() {
                     var elapsed = timer.tick() / 1000;
                     var timers = $('.procotor-timer_time.countDown');
                     _.forEach(timers, function (timerItem) {
@@ -225,51 +225,51 @@ define([
                         }
 
                         proxyExecutions.action(action, params)
-                            .then(function() {
-                                if (message) {
-                                    feedback().success(message);
-                                }
-                                $list.datatable('refresh');
-                            })
-                            .catch(function(err) {
-                                var messageContext = '',
-                                    responseData,
-                                    unprocessed;
+                                .then(function() {
+                                    if (message) {
+                                        feedback().success(message);
+                                    }
+                                    $list.datatable('refresh');
+                                })
+                                .catch(function(err) {
+                                    var messageContext = '',
+                                        responseData,
+                                        unprocessed;
 
-                                if (err.response) {
-                                    responseData = err.response.data;
-                                    unprocessed = _.map(responseData.unprocessed, function (msg, id) {
-                                        var execution;
+                                    if (err.response) {
+                                        responseData = err.response.data;
+                                        unprocessed = _.map(responseData.unprocessed, function (msg, id) {
+                                            var execution;
 
-                                        if (!id) {
-                                            id = msg;
-                                            msg = null;
-                                        }
-
-                                        if (msg) {
-                                            return msg;
-                                        } else {
-                                            execution = getExecutionData(id);
-
-                                            if (execution) {
-                                                return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
+                                            if (!id) {
+                                                id = msg;
+                                                msg = null;
                                             }
-                                        }
-                                    });
 
-                                    if (unprocessed.length) {
-                                        messageContext += '<br>' + unprocessed.join('<br>');
+                                            if (msg) {
+                                                return msg;
+                                            } else {
+                                                execution = getExecutionData(id);
+
+                                                if (execution) {
+                                                    return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
+                                                }
+                                            }
+                                        });
+
+                                        if (unprocessed.length) {
+                                            messageContext += `<br>${unprocessed.join('<br>')}`;
+                                        }
+                                        if (responseData.error) {
+                                            messageContext += `<br>${encode.html(responseData.error)}`;
+                                        }
                                     }
-                                    if (responseData.error) {
-                                        messageContext += '<br>' + encode.html(responseData.error);
-                                    }
-                                }
-                                appController.onError(err);
-                                feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
-                            })
-                            .then(function() {
-                                loadingBar.stop();
-                            });
+                                    appController.onError(err);
+                                    feedback().error(`${__('Something went wrong ...')}<br>${messageContext}`, {encodeHtml: false});
+                                })
+                                .then(function() {
+                                    loadingBar.stop();
+                                });
                     }
                 }
 
@@ -318,7 +318,9 @@ define([
                             label: __('Reactivate session'),
                             icon: 'play',
                             close: true,
-                            action: function() {reactivate(selection);}
+                            action() {
+                                reactivate(selection);
+                            }
                         });
                     }else if (canDo('terminate', delivery.state)) {
                         buttons.push({
@@ -327,7 +329,9 @@ define([
                             label: __('Terminate session'),
                             icon: 'stop',
                             close: true,
-                            action: function() {terminate(selection);}
+                            action() {
+                                terminate(selection);
+                            }
                         });
                     }
 
@@ -337,7 +341,9 @@ define([
                         label: __('Report irregularity'),
                         icon: 'delivery-small',
                         close: true,
-                        action: function(){report(selection);}
+                        action(){
+                            report(selection);
+                        }
                     });
 
                     dialog({
@@ -350,7 +356,7 @@ define([
 
                 // display the session history
                 function showHistory(selection) {
-                    var monitoringRoute = window.location + '';
+                    var monitoringRoute = window.location.toString();
                     var urlParams = {
                         session: selection
                     };
@@ -374,13 +380,13 @@ define([
                         if (context){
                             params.context = context;
                         }
-                        var url = urlHelper.route(
+                        const url = urlHelper.route(
                             printReportUrl.action,
                             printReportUrl.controller,
                             printReportUrl.extension,
                             params
                         );
-                        window.open(url, 'printReport' + JSON.stringify(sel));
+                        window.open(url, `printReport${JSON.stringify(sel)}`);
                     });
                 }
 
@@ -429,7 +435,7 @@ define([
                     }
                     formatted = {
                         id : testTakerData.id,
-                        label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.test_taker_first_name + ' ' + testTakerData.test_taker_last_name
+                        label: `${deliveryName} [${testTakerData.start_time}] ${testTakerData.test_taker_first_name} ${testTakerData.test_taker_last_name}`
                     };
                     status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -541,7 +547,7 @@ define([
                     if (defaultTag) {
 
                         if (!$list.find('.tag').length) {
-                            $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                            $filter = $(`<span class="filter"><input type="hidden" name="tag" class="tag" value="${applyTags}"/></span>`);
                             $filter.appendTo($list);
                         }
 
@@ -563,8 +569,7 @@ define([
                 /**
                  * Set initial datatable filters
                  */
-                function setInitialFilters()
-                {
+                function setInitialFilters() {
                     if (defaultTag) {
                         setTagUsage(true);
                     }
@@ -619,8 +624,8 @@ define([
                     }
 
                     /**
-                     * configurable parameter to show button
-                     */
+                         * configurable parameter to show button
+                         */
                     if (data.refreshBtn) {
                         // tool: page refresh
                         tools.push({
@@ -628,15 +633,15 @@ define([
                             icon: 'reset',
                             title: __('Refresh the page'),
                             label: __('Refresh'),
-                            action: function () {
+                            action() {
                                 $list.datatable('refresh');
                             }
                         });
                     }
 
                     /**
-                     * Configurable parameter to auto renew datatable
-                     */
+                         * Configurable parameter to auto renew datatable
+                         */
                     if (data.autoRefresh) {
                         setInterval(function () {
                             $list.datatable('refresh');
@@ -650,7 +655,7 @@ define([
                             css: 'btn-warning',
                             label: __('Remove default tag filtering'),
                             title: __('Remove default tag filtering'),
-                            action: function () {
+                            action() {
                                 setTagUsage(false);
                                 $list.datatable('filter');
                             }
@@ -660,7 +665,7 @@ define([
                             icon: 'filter',
                             title: __('Apply default tag'),
                             label: __('Apply default tag'),
-                            action: function () {
+                            action() {
                                 setTagUsage(true);
                                 $list.datatable('filter');
                             }
@@ -738,7 +743,7 @@ define([
                         id: 'deliveryLabel',
                         label: __('Session'),
                         sortable : true,
-                        transform: function(value, row) {
+                        transform(value, row) {
                             var delivery = row && row.delivery;
                             if (delivery) {
                                 value = deliveryLinkTpl(delivery);
@@ -753,7 +758,7 @@ define([
                         label: __('First name'),
                         filterable: true,
                         sortable : true,
-                        transform: function(value, row) {
+                        transform(value, row) {
                             return row && row.testTaker && row.testTaker.test_taker_first_name || '';
 
                         }
@@ -765,7 +770,7 @@ define([
                         label: __('Last name'),
                         filterable: true,
                         sortable : true,
-                        transform: function(value, row) {
+                        transform(value, row) {
                             return row && row.testTaker && row.testTaker.test_taker_last_name || '';
 
                         }
@@ -779,7 +784,7 @@ define([
                             filterable: extraField.filterable,
                             sortable : true,
                             order: extraField.columnPosition,
-                            transform: function(value, row) {
+                            transform(value, row) {
                                 return row && row.extraFields && row.extraFields[extraField.id] || '';
                             }
                         });
@@ -791,10 +796,10 @@ define([
                         sortable : true,
                         label: __('Started at'),
                         filterable : true,
-                        transform: function(value) {
+                        transform(value) {
                             return locale.formatDateTime(value);
                         },
-                        filterTransform: function filterTransform(value) {
+                        filterTransform(value) {
                             var first;
                             var last;
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
@@ -813,13 +818,12 @@ define([
                             return result;
                         },
                         customFilter : {
-                            template : '<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="' + __('Filter') + '"/>',
-                            callback : function callback($elt) {
+                            template : `<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="${__('Filter')}"/>`,
+                            callback($elt) {
                                 var $filterContainer = $elt.closest('.filter');
                                 var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
                                 var lastValue;
-                                var initialValue = !startDatePicker;
 
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
@@ -833,14 +837,14 @@ define([
                                     format : dateFormatStr,
                                     replaceField : $elt[0]
                                 })
-                                    .on('change', function(value){
-                                        var selection = this.getSelectedDates();
-                                        if ( (value === '' && lastValue !== value) ||
-                                            (selection && selection.length === 2)) {
-                                            $list.datatable('filter');
-                                        }
-                                        lastValue = value;
-                                    });
+                                        .on('change', function(value){
+                                            var selection = this.getSelectedDates();
+                                            if ( (value === '' && lastValue !== value) ||
+                                                (selection && selection.length === 2)) {
+                                                $list.datatable('filter');
+                                            }
+                                            lastValue = value;
+                                        });
                             }
                         },
                     });
@@ -856,7 +860,7 @@ define([
                             callback : statusFilterHandler
                         },
 
-                        transform: function(value, row) {
+                        transform(value, row) {
                             var result = '',
                                 status;
 
@@ -885,7 +889,7 @@ define([
                             id: 'authorize',
                             icon: 'play',
                             title: __('Authorize session'),
-                            disabled: function() {
+                            disabled() {
                                 return !canDo('authorize', this.state);
                             },
                             action: authorize
@@ -902,7 +906,7 @@ define([
                                 id: 'pause',
                                 icon: 'pause',
                                 title: __('Pause session'),
-                                disabled: function() {
+                                disabled() {
                                     return !canDo('pause', this.state);
                                 },
                                 action: pause
@@ -916,7 +920,7 @@ define([
                         sortable : true,
                         sorttype: 'numeric',
                         label: __('Remaining'),
-                        transform: function(value, row) {
+                        transform(value, row) {
                             var rowTimer = _.isObject(row.timer) ? row.timer : {};
                             var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
                             var remaining = parseInt(refinedValue, 10);
@@ -956,7 +960,7 @@ define([
                                 title : __('Session time handling'),
                                 icon : 'time',
                                 action : timeHandling,
-                                hidden: function() {
+                                hidden() {
                                     var allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
                                     return !canDo('time', this.state) || !allowExtraTime;
                                 }
@@ -967,7 +971,7 @@ define([
                     model.push({
                         id: 'extendedTime',
                         label: __('Extended Time'),
-                        transform: function(value, row) {
+                        transform(value, row) {
                             var extendedTimer = _.isObject(row.timer) ? row.timer : {};
                             return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
                         }
@@ -979,7 +983,7 @@ define([
                             id: 'last_connect',
                             sortable: true,
                             label: __('Connectivity'),
-                            transform: function(value, row) {
+                            transform(value, row) {
                                 if (row.state.status === _status.STATUS_INPROGRESS) {
                                     return row.online ? __('online') : __('offline');
                                 }
@@ -992,7 +996,7 @@ define([
                     model.push({
                         id: 'progress',
                         label: __('Progress'),
-                        transform: function(value, row) {
+                        transform(value, row) {
                             return row && row.state && row.state.progress || '' ;
                         }
                     });
@@ -1032,85 +1036,85 @@ define([
 
                     // renders the datatable
                     $list
-                        .on('query.datatable', function() {
-                            loadingBar.start();
-                            highlightRows = [];
-                        })
-                        .on('load.datatable', function(e, newDataset) {
-                            var applyTags;
+                            .on('query.datatable', function() {
+                                loadingBar.start();
+                                highlightRows = [];
+                            })
+                            .on('load.datatable', function(e, newDataset) {
+                                var applyTags;
 
-                            //update dateset in memory
-                            dataset = newDataset;
+                                //update dateset in memory
+                                dataset = newDataset;
 
-                            //update the buttons, which have been reconstructed
-                            actionButtons = _({
-                                authorize : $list.find('.action-bar').children('.tool-authorise'),
-                                pause : $list.find('.action-bar').children('.tool-pause'),
-                                terminate : $list.find('.action-bar').children('.tool-terminate'),
-                                report : $list.find('.action-bar').children('.tool-irregularity')
-                            });
-
-                            if (defaultTag) {
-                                applyTags = $list.data('applytags');
-                                applyTags = !_.isUndefined(applyTags) ? applyTags : true;
-                                setTagUsage(applyTags);
-                            }
-
-                            // highlight rows
-                            if (highlightRows.length) {
-                                _.forEach(highlightRows, function (v) {
-                                    $list.datatable('highlightRow', v);
+                                //update the buttons, which have been reconstructed
+                                actionButtons = _({
+                                    authorize : $list.find('.action-bar').children('.tool-authorise'),
+                                    pause : $list.find('.action-bar').children('.tool-pause'),
+                                    terminate : $list.find('.action-bar').children('.tool-terminate'),
+                                    report : $list.find('.action-bar').children('.tool-irregularity')
                                 });
-                            }
-                            loadingBar.stop();
 
-                            appController
-                                .off('change.polling')
-                                .on('change.polling', function () {
-                                polling.stop();
-                            });
+                                if (defaultTag) {
+                                    applyTags = $list.data('applytags');
+                                    applyTags = !_.isUndefined(applyTags) ? applyTags : true;
+                                    setTagUsage(applyTags);
+                                }
 
-                            polling.start();
-                            timer.resume();
-                        })
-                        .on('select.datatable', function() {
-                            //hide all controls then display each required one individually
-                            actionButtons.each(function($btn){
-                                $btn.hide();
-                            });
-                            _($list.datatable('selection')).map(function(uri){
-                                var row = getExecutionData(uri);
-                                return row.state.status;
-                            }).uniq().each(function(statusCode){
-                                var status = _status.getStatusByCode(statusCode);
-                                actionButtons.forIn(function($btn, action){
-                                    if(status && status.can[action] === true){
-                                        $btn.show();
-                                    }
+                                // highlight rows
+                                if (highlightRows.length) {
+                                    _.forEach(highlightRows, function (v) {
+                                        $list.datatable('highlightRow', v);
+                                    });
+                                }
+                                loadingBar.stop();
+
+                                appController
+                                    .off('change.polling')
+                                    .on('change.polling', function () {
+                                        polling.stop();
+                                    });
+
+                                polling.start();
+                                timer.resume();
+                            })
+                            .on('select.datatable', function() {
+                                //hide all controls then display each required one individually
+                                actionButtons.each(function($btn){
+                                    $btn.hide();
                                 });
-                            });
-                        }).on('error.datatable', function(e, err){
-                            appController.onError(err);
-                        }).datatable({
-                            url: urlHelper.build(executionsUrl, serviceParams),
-                            status: {
-                                empty: __('No sessions'),
-                                available: function () {
-                                    return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
+                                _($list.datatable('selection')).map(function(uri){
+                                    var row = getExecutionData(uri);
+                                    return row.state.status;
+                                }).uniq().each(function(statusCode){
+                                    var status = _status.getStatusByCode(statusCode);
+                                    actionButtons.forIn(function($btn, action){
+                                        if(status && status.can[action] === true){
+                                            $btn.show();
+                                        }
+                                    });
+                                });
+                            }).on('error.datatable', function(e, err){
+                                appController.onError(err);
+                            }).datatable({
+                                url: urlHelper.build(executionsUrl, serviceParams),
+                                status: {
+                                    empty: __('No sessions'),
+                                    available() {
+                                        return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
+                                    },
+                                    loading: __('Loading')
                                 },
-                                loading: __('Loading')
-                            },
-                            filterStrategy: 'multiple',
-                            filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
-                            filtercolumns: {start_time: getDefaultStartTimeFilter()},
-                            filter: true,
-                            tools: tools,
-                            model: model,
-                            selectable: true,
-                            sortorder: 'desc',
-                            sortby : 'start_time',
-                            pageSizeSelector: true,
-                        }, dataset);
+                                filterStrategy: 'multiple',
+                                filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                                filtercolumns: {start_time: getDefaultStartTimeFilter()},
+                                filter: true,
+                                tools: tools,
+                                model: model,
+                                selectable: true,
+                                sortorder: 'desc',
+                                sortby : 'start_time',
+                                pageSizeSelector: true,
+                            }, dataset);
 
                     setInitialFilters();
                 });
