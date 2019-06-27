@@ -109,9 +109,9 @@ define([
      */
     function validateParams(params) {
         return _.isPlainObject(params) &&
-                (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
-                (_.isUndefined(params.testCenter) || !_.isEmpty(params.testCenter)) &&
-                !_.isEmpty(params.execution);
+            (_.isUndefined(params.delivery) || !_.isEmpty(params.delivery)) &&
+            (_.isUndefined(params.testCenter) || !_.isEmpty(params.testCenter)) &&
+            !_.isEmpty(params.execution);
     }
 
     // the page is always loading data when starting
@@ -225,51 +225,51 @@ define([
                         }
 
                         proxyExecutions.action(action, params)
-                                .then(function() {
-                                    if (message) {
-                                        feedback().success(message);
-                                    }
-                                    $list.datatable('refresh');
-                                })
-                                .catch(function(err) {
-                                    var messageContext = '',
-                                        responseData,
-                                        unprocessed;
+                            .then(function() {
+                                if (message) {
+                                    feedback().success(message);
+                                }
+                                $list.datatable('refresh');
+                            })
+                            .catch(function(err) {
+                                var messageContext = '',
+                                    responseData,
+                                    unprocessed;
 
-                                    if (err.response) {
-                                        responseData = err.response.data;
-                                        unprocessed = _.map(responseData.unprocessed, function (msg, id) {
-                                            var execution;
+                                if (err.response) {
+                                    responseData = err.response.data;
+                                    unprocessed = _.map(responseData.unprocessed, function (msg, id) {
+                                        var execution;
 
-                                            if (!id) {
-                                                id = msg;
-                                                msg = null;
-                                            }
-
-                                            if (msg) {
-                                                return msg;
-                                            } else {
-                                                execution = getExecutionData(id);
-
-                                                if (execution) {
-                                                    return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
-                                                }
-                                            }
-                                        });
-
-                                        if (unprocessed.length) {
-                                            messageContext += `<br>${unprocessed.join('<br>')}`;
+                                        if (!id) {
+                                            id = msg;
+                                            msg = null;
                                         }
-                                        if (responseData.error) {
-                                            messageContext += `<br>${encode.html(responseData.error)}`;
+
+                                        if (msg) {
+                                            return msg;
+                                        } else {
+                                            execution = getExecutionData(id);
+
+                                            if (execution) {
+                                                return __('Session %s - %s has not been processed', execution.delivery.label, execution.start_time);
+                                            }
                                         }
+                                    });
+
+                                    if (unprocessed.length) {
+                                        messageContext += `<br>${unprocessed.join('<br>')}`;
                                     }
-                                    appController.onError(err);
-                                    feedback().error(`${__('Something went wrong ...')}<br>${messageContext}`, {encodeHtml: false});
-                                })
-                                .then(function() {
-                                    loadingBar.stop();
-                                });
+                                    if (responseData.error) {
+                                        messageContext += `<br>${encode.html(responseData.error)}`;
+                                    }
+                                }
+                                appController.onError(err);
+                                feedback().error(`${__('Something went wrong ...')}<br>${messageContext}`, {encodeHtml: false});
+                            })
+                            .then(function() {
+                                loadingBar.stop();
+                            });
                     }
                 }
 
@@ -624,8 +624,8 @@ define([
                     }
 
                     /**
-                         * configurable parameter to show button
-                         */
+                     * configurable parameter to show button
+                     */
                     if (data.refreshBtn) {
                         // tool: page refresh
                         tools.push({
@@ -640,8 +640,8 @@ define([
                     }
 
                     /**
-                         * Configurable parameter to auto renew datatable
-                         */
+                     * Configurable parameter to auto renew datatable
+                     */
                     if (data.autoRefresh) {
                         setInterval(function () {
                             $list.datatable('refresh');
@@ -837,14 +837,14 @@ define([
                                     format : dateFormatStr,
                                     replaceField : $elt[0]
                                 })
-                                        .on('change', function(value){
-                                            var selection = this.getSelectedDates();
-                                            if ( (value === '' && lastValue !== value) ||
-                                                (selection && selection.length === 2)) {
-                                                $list.datatable('filter');
-                                            }
-                                            lastValue = value;
-                                        });
+                                    .on('change', function(value){
+                                        var selection = this.getSelectedDates();
+                                        if ( (value === '' && lastValue !== value) ||
+                                            (selection && selection.length === 2)) {
+                                            $list.datatable('filter');
+                                        }
+                                        lastValue = value;
+                                    });
                             }
                         },
                     });
@@ -1036,85 +1036,85 @@ define([
 
                     // renders the datatable
                     $list
-                            .on('query.datatable', function() {
-                                loadingBar.start();
-                                highlightRows = [];
-                            })
-                            .on('load.datatable', function(e, newDataset) {
-                                var applyTags;
+                        .on('query.datatable', function() {
+                            loadingBar.start();
+                            highlightRows = [];
+                        })
+                        .on('load.datatable', function(e, newDataset) {
+                            var applyTags;
 
-                                //update dateset in memory
-                                dataset = newDataset;
+                            //update dateset in memory
+                            dataset = newDataset;
 
-                                //update the buttons, which have been reconstructed
-                                actionButtons = _({
-                                    authorize : $list.find('.action-bar').children('.tool-authorise'),
-                                    pause : $list.find('.action-bar').children('.tool-pause'),
-                                    terminate : $list.find('.action-bar').children('.tool-terminate'),
-                                    report : $list.find('.action-bar').children('.tool-irregularity')
+                            //update the buttons, which have been reconstructed
+                            actionButtons = _({
+                                authorize : $list.find('.action-bar').children('.tool-authorise'),
+                                pause : $list.find('.action-bar').children('.tool-pause'),
+                                terminate : $list.find('.action-bar').children('.tool-terminate'),
+                                report : $list.find('.action-bar').children('.tool-irregularity')
+                            });
+
+                            if (defaultTag) {
+                                applyTags = $list.data('applytags');
+                                applyTags = !_.isUndefined(applyTags) ? applyTags : true;
+                                setTagUsage(applyTags);
+                            }
+
+                            // highlight rows
+                            if (highlightRows.length) {
+                                _.forEach(highlightRows, function (v) {
+                                    $list.datatable('highlightRow', v);
+                                });
+                            }
+                            loadingBar.stop();
+
+                            appController
+                                .off('change.polling')
+                                .on('change.polling', function () {
+                                    polling.stop();
                                 });
 
-                                if (defaultTag) {
-                                    applyTags = $list.data('applytags');
-                                    applyTags = !_.isUndefined(applyTags) ? applyTags : true;
-                                    setTagUsage(applyTags);
-                                }
-
-                                // highlight rows
-                                if (highlightRows.length) {
-                                    _.forEach(highlightRows, function (v) {
-                                        $list.datatable('highlightRow', v);
-                                    });
-                                }
-                                loadingBar.stop();
-
-                                appController
-                                    .off('change.polling')
-                                    .on('change.polling', function () {
-                                        polling.stop();
-                                    });
-
-                                polling.start();
-                                timer.resume();
-                            })
-                            .on('select.datatable', function() {
-                                //hide all controls then display each required one individually
-                                actionButtons.each(function($btn){
-                                    $btn.hide();
+                            polling.start();
+                            timer.resume();
+                        })
+                        .on('select.datatable', function() {
+                            //hide all controls then display each required one individually
+                            actionButtons.each(function($btn){
+                                $btn.hide();
+                            });
+                            _($list.datatable('selection')).map(function(uri){
+                                var row = getExecutionData(uri);
+                                return row.state.status;
+                            }).uniq().each(function(statusCode){
+                                var status = _status.getStatusByCode(statusCode);
+                                actionButtons.forIn(function($btn, action){
+                                    if(status && status.can[action] === true){
+                                        $btn.show();
+                                    }
                                 });
-                                _($list.datatable('selection')).map(function(uri){
-                                    var row = getExecutionData(uri);
-                                    return row.state.status;
-                                }).uniq().each(function(statusCode){
-                                    var status = _status.getStatusByCode(statusCode);
-                                    actionButtons.forIn(function($btn, action){
-                                        if(status && status.can[action] === true){
-                                            $btn.show();
-                                        }
-                                    });
-                                });
-                            }).on('error.datatable', function(e, err){
-                                appController.onError(err);
-                            }).datatable({
-                                url: urlHelper.build(executionsUrl, serviceParams),
-                                status: {
-                                    empty: __('No sessions'),
-                                    available() {
-                                        return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
-                                    },
-                                    loading: __('Loading')
+                            });
+                        }).on('error.datatable', function(e, err){
+                            appController.onError(err);
+                        }).datatable({
+                            url: urlHelper.build(executionsUrl, serviceParams),
+                            status: {
+                                empty: __('No sessions'),
+                                available() {
+                                    return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
                                 },
-                                filterStrategy: 'multiple',
-                                filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
-                                filtercolumns: {start_time: getDefaultStartTimeFilter()},
-                                filter: true,
-                                tools: tools,
-                                model: model,
-                                selectable: true,
-                                sortorder: 'desc',
-                                sortby : 'start_time',
-                                pageSizeSelector: true,
-                            }, dataset);
+                                loading: __('Loading')
+                            },
+                            filterStrategy: 'multiple',
+                            filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                            filtercolumns: {start_time: getDefaultStartTimeFilter()},
+                            filter: true,
+                            tools: tools,
+                            model: model,
+                            selectable: true,
+                            sortorder: 'desc',
+                            sortby : 'start_time',
+                            pageSizeSelector: true,
+                        }, dataset);
 
                     setInitialFilters();
                 });
