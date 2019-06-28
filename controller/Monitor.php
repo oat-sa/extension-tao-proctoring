@@ -74,6 +74,7 @@ class Monitor extends SimplePageModule
         $user = \common_session_SessionManager::getSession()->getUser();
         $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
         $delivery = $this->getCurrentDelivery();
+        /** @var GuiSettingsService $guiSettingsService */
         $guiSettingsService = $this->getServiceLocator()->get(GuiSettingsService::SERVICE_ID);
         $assessmentResultsService = $this->getServiceLocator()->get(AssessmentResultsService::SERVICE_ID);
         $data = [
@@ -85,12 +86,11 @@ class Monitor extends SimplePageModule
             'printReportUrl' => $assessmentResultsService->getScoreReportUrlParts(),
             'timeHandling' => $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
             'historyUrl' => $this->getServiceLocator()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
-            'refreshBtn' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_REFRESH_BUTTON),
-            'autoRefresh' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_AUTO_REFRESH),
-            'canPause' => $guiSettingsService->getOption(GuiSettingsService::PROCTORING_ALLOW_PAUSE),
             'onlineStatus' => $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
             'hasAccessToReactivate' => $hasAccessToReactivate
         ];
+
+        $data = array_merge($data, $guiSettingsService->asArray());
 
         if (!is_null($delivery)) {
             $data['delivery'] = $delivery->getUri();
