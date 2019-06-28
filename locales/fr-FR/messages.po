@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint105\n"
-"PO-Revision-Date: 2019-03-01T12:19:30\n"
+"PO-Revision-Date: 2019-06-28T11:52:01\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -170,11 +170,11 @@ msgstr "Autoriser le surveillant"
 msgid "Authorize the selected proctors"
 msgstr "Autoriser les surveillants sélectionnés"
 
-msgid "authorized"
-msgstr "autorisé"
-
 msgid "Authorized"
 msgstr "Autorisé"
+
+msgid "authorized"
+msgstr "autorisé"
 
 msgid "Authorized but not started"
 msgstr "Autorisé mais pas démarré"
@@ -212,11 +212,11 @@ msgstr "Retour aux sessions"
 msgid "Behaviour"
 msgstr "Comportement"
 
-msgid "Cancel"
-msgstr "Annuler"
-
 msgid "cancel"
 msgstr "annuler"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "cancel the action"
 msgstr "annuler l'action"
@@ -317,11 +317,11 @@ msgstr "Activité d'évaluation actuelle"
 msgid "Current sessions"
 msgstr "Sessions actuelles"
 
-msgid "date"
-msgstr "date"
-
 msgid "Date"
 msgstr "Date"
+
+msgid "date"
+msgstr "date"
 
 msgid "Days"
 msgstr "Jours"
@@ -387,10 +387,10 @@ msgstr "Exporter des irrégularités"
 msgid "Extended Time"
 msgstr "Temps prolongé"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Temps supplémentaire"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Temps supplémentaire"
 
 msgid "Extra time granted"
@@ -399,20 +399,20 @@ msgstr "Temps supplémentaire accordé"
 msgid "Filter"
 msgstr "Filtrer"
 
-msgid "Finished"
-msgstr "Terminé"
+msgid "Filter by the selected dates"
+msgstr ""
 
 msgid "finished"
 msgstr "terminé"
+
+msgid "Finished"
+msgstr "Terminé"
 
 msgid "First name"
 msgstr "Prénom"
 
 msgid "Freezing"
 msgstr "Gel"
-
-msgid "From"
-msgstr "Depuis"
 
 msgid "Grant Extra Time"
 msgstr "Accorder du temps supplémentaire"
@@ -571,20 +571,20 @@ msgstr "Mettre en pause des sessions de test actives"
 msgid "Pause due to server maintenance"
 msgstr "Pause due à la maintenance du serveur"
 
-msgid "Pause Session"
-msgstr "Suspendre une session"
-
 msgid "Pause session"
 msgstr "Suspendre la session"
+
+msgid "Pause Session"
+msgstr "Suspendre une session"
 
 msgid "Pause sessions"
 msgstr "Suspendre des sessions"
 
-msgid "Paused"
-msgstr "En pause"
-
 msgid "paused"
 msgstr "en pause"
+
+msgid "Paused"
+msgstr "En pause"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Veuillez sélectionner ou moins un site de test pour gérer les surveillants"
@@ -646,11 +646,11 @@ msgstr "Surveillants révoqués"
 msgid "Progress"
 msgstr "Progression"
 
-msgid "Reactivate session"
-msgstr "Réactiver la session"
-
 msgid "Reactivate Session"
 msgstr "Réactiver une session"
+
+msgid "Reactivate session"
+msgstr "Réactiver la session"
 
 msgid "Refresh"
 msgstr "Actualiser"
@@ -691,12 +691,12 @@ msgstr "signalé pour irrégularité"
 msgid "Resource update task is completed"
 msgstr "La tâche de mise à jour de ressource est terminée"
 
+msgid "results"
+msgstr "résultats"
+
 #, tao-public
 msgid "Results"
 msgstr "Résultats"
-
-msgid "results"
-msgstr "résultats"
 
 msgid "Return to the session manager"
 msgstr "Retour à la gestion de session"
@@ -818,20 +818,20 @@ msgstr "Technique"
 msgid "Terminate"
 msgstr "Mettre fin"
 
-msgid "Terminate session"
-msgstr "Mettre fin à la session"
-
 msgid "Terminate Session"
 msgstr "Mettre fin à une session"
+
+msgid "Terminate session"
+msgstr "Mettre fin à la session"
 
 msgid "Terminate sessions"
 msgstr "Mettre fin aux sessions"
 
-msgid "Terminated"
-msgstr "Interrompu"
-
 msgid "terminated"
 msgstr "interrompu"
+
+msgid "Terminated"
+msgstr "Interrompu"
 
 msgid "Test  must be terminated."
 msgstr "Le test doit être interrompu."
@@ -941,6 +941,9 @@ msgstr "L'évaluation a été suspendue. Pour la reprendre, relancez-la et conta
 msgid "The assessment has been terminated. You cannot interact with it anymore."
 msgstr "L'évaluation a été arrêtée. Toute interaction est désormais impossible."
 
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr "L'évaluation a été terminée. Vous ne pouvez plus interagir avec elle. S'il vous plaît contacter votre surveillant si nécessaire."
+
 msgid "The extra time must be a number"
 msgstr "Le temps supplémentaire doit être un nombre"
 
@@ -968,9 +971,6 @@ msgstr "Il n'y a pas de prestation en cours d'exécution"
 msgid "Time"
 msgstr "Temps"
 
-msgid "to"
-msgstr "à"
-
 #, tao-public
 msgid "Tools"
 msgstr "Outils"
@@ -995,3 +995,4 @@ msgstr "Attention, vous êtes sur le point de mettre en pause tous les tests en 
 
 msgid "Weather"
 msgstr "Intempéries"
+

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint105\n"
-"PO-Revision-Date: 2019-03-01T12:19:30\n"
+"PO-Revision-Date: 2019-06-28T11:52:01\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ru-RU\n"
@@ -170,11 +170,11 @@ msgstr "Предоставить полномочия наблюдателю"
 msgid "Authorize the selected proctors"
 msgstr "Предоставить полномочия по выбранным протоколам"
 
-msgid "authorized"
-msgstr "полномочия предоставлены"
-
 msgid "Authorized"
 msgstr "Полномочия предоставлены"
+
+msgid "authorized"
+msgstr "полномочия предоставлены"
 
 msgid "Authorized but not started"
 msgstr "Полномочия предоставлены, но не начато"
@@ -212,11 +212,11 @@ msgstr "Назад к сеансам"
 msgid "Behaviour"
 msgstr "Поведение"
 
-msgid "Cancel"
-msgstr "Отмена"
-
 msgid "cancel"
 msgstr "отмена"
+
+msgid "Cancel"
+msgstr "Отмена"
 
 msgid "cancel the action"
 msgstr "отмена действия"
@@ -317,11 +317,11 @@ msgstr "Текущее оценивание"
 msgid "Current sessions"
 msgstr "Текущие сеансы"
 
-msgid "date"
-msgstr "дата"
-
 msgid "Date"
 msgstr "Дата"
+
+msgid "date"
+msgstr "дата"
 
 msgid "Days"
 msgstr "Дни"
@@ -387,10 +387,10 @@ msgstr "Экспорт нестандартных ситуаций"
 msgid "Extended Time"
 msgstr "Продленное время"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Дополнительное время"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Дополнительное время"
 
 msgid "Extra time granted"
@@ -399,20 +399,20 @@ msgstr "Предоставленное дополнительное время"
 msgid "Filter"
 msgstr "Фильтр"
 
-msgid "Finished"
-msgstr "Завершено"
+msgid "Filter by the selected dates"
+msgstr ""
 
 msgid "finished"
 msgstr "завершено"
+
+msgid "Finished"
+msgstr "Завершено"
 
 msgid "First name"
 msgstr "Имя"
 
 msgid "Freezing"
 msgstr "Зависание"
-
-msgid "From"
-msgstr "От"
 
 msgid "Grant Extra Time"
 msgstr "Предоставить дополнительное время"
@@ -571,20 +571,20 @@ msgstr "Приостановить активные сеансы тестиро�
 msgid "Pause due to server maintenance"
 msgstr "Приостановить из-за обслуживания сервера"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Приостановить сеанс"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Приостановить сеанс"
 
 msgid "Pause sessions"
 msgstr "Приостановить сеансы"
 
-msgid "Paused"
-msgstr "Приостановлено"
-
 msgid "paused"
 msgstr "приостановлено"
+
+msgid "Paused"
+msgstr "Приостановлено"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Выберите один или несколько объектов для проведения тестирования, чтобы управлять протоколами"
@@ -646,10 +646,10 @@ msgstr "Отозванные наблюдатели"
 msgid "Progress"
 msgstr "Ход выполнения"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "Повторно активировать сеанс"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "Повторно активировать сеанс"
 
 msgid "Refresh"
@@ -691,12 +691,12 @@ msgstr "сообщено о нестандартной ситуации"
 msgid "Resource update task is completed"
 msgstr "Задание по обновлению ресурса выполнено"
 
+msgid "results"
+msgstr "результаты"
+
 #, tao-public
 msgid "Results"
 msgstr "Результаты"
-
-msgid "results"
-msgstr "результаты"
 
 msgid "Return to the session manager"
 msgstr "Вернуться к диспетчеру сеансов"
@@ -818,20 +818,20 @@ msgstr "Техническ."
 msgid "Terminate"
 msgstr "Прекратить"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Прекратить сеанс"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Прекратить сеанс"
 
 msgid "Terminate sessions"
 msgstr "Прекратить сеансы"
 
-msgid "Terminated"
-msgstr "Прекращено"
-
 msgid "terminated"
 msgstr "прекращено"
+
+msgid "Terminated"
+msgstr "Прекращено"
 
 msgid "Test  must be terminated."
 msgstr "Тест необходимо прекратить."
@@ -941,6 +941,9 @@ msgstr "Оценка приостановлена. Чтобы возобнови
 msgid "The assessment has been terminated. You cannot interact with it anymore."
 msgstr "Оценка прекращена. Вы больше не можете взаимодействовать с ней."
 
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr "Оценка была прекращена. Вы не можете больше продолжать с оценкой. Пожалуйста, обратитесь к наблюдателю."
+
 msgid "The extra time must be a number"
 msgstr "Значение дополнительного времени должно быть числом"
 
@@ -968,9 +971,6 @@ msgstr "Нет выдач в процессе выполнения"
 msgid "Time"
 msgstr "Время"
 
-msgid "to"
-msgstr "до"
-
 #, tao-public
 msgid "Tools"
 msgstr "Средства"
@@ -995,3 +995,4 @@ msgstr "Предупреждение! Вы собираетесь приоста
 
 msgid "Weather"
 msgstr "Погода"
+

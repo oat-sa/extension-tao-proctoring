@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint103\n"
-"PO-Revision-Date: 2019-06-07T09:10:41\n"
+"Project-Id-Version: TAO 3.3.0-sprint105\n"
+"PO-Revision-Date: 2019-06-28T11:52:01\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -170,10 +170,10 @@ msgstr ""
 msgid "Authorize the selected proctors"
 msgstr ""
 
-msgid "authorized"
+msgid "Authorized"
 msgstr ""
 
-msgid "Authorized"
+msgid "authorized"
 msgstr ""
 
 msgid "Authorized but not started"
@@ -212,19 +212,19 @@ msgstr ""
 msgid "Behaviour"
 msgstr ""
 
-msgid "Cancel"
+msgid "cancel"
 msgstr ""
 
-msgid "cancel"
+msgid "Cancel"
 msgstr ""
 
 msgid "cancel the action"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -317,10 +317,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
 msgid "Days"
@@ -387,10 +387,10 @@ msgstr ""
 msgid "Extended Time"
 msgstr ""
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr ""
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr ""
 
 msgid "Extra time granted"
@@ -571,10 +571,10 @@ msgstr ""
 msgid "Pause due to server maintenance"
 msgstr ""
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr ""
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr ""
 
 msgid "Pause sessions"
@@ -646,10 +646,10 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
 msgid "Refresh"
@@ -740,10 +740,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -818,10 +818,10 @@ msgstr ""
 msgid "Terminate"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
 msgid "Terminate sessions"
@@ -939,6 +939,9 @@ msgid "The assessment has been suspended. To resume your assessment, please rela
 msgstr ""
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr ""
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
 msgstr ""
 
 msgid "The extra time must be a number"
