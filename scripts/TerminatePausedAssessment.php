@@ -212,7 +212,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         if (in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
-            ])
+            ], true)
         ) {
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -234,15 +234,23 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     }
 
     /**
-     * Get time of last pause
+     * Get time of the last pause
      * @param DeliveryExecution $deliveryExecution
-     * @return \DateTimeImmutable|null
+     * @return DateTimeImmutable
+     * @throws \Exception
      */
-    protected function getLastPause(DeliveryExecution $deliveryExecution)
+    private function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
         $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
-        return isset($pauses[0]) ? (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']) : null;
+
+        if (!empty($pauses)) {
+            $lastPause = $pauses[0]['created_at'];
+        } else {
+            $lastPause = $this->getLastTestTakersEvent($deliveryExecution)['created_at'];
+        }
+
+        return (new DateTimeImmutable())->setTimestamp($lastPause);
     }
 
 }

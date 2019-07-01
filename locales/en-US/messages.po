@@ -170,10 +170,10 @@ msgstr ""
 msgid "Authorize the selected proctors"
 msgstr ""
 
-msgid "Authorized"
+msgid "authorized"
 msgstr ""
 
-msgid "authorized"
+msgid "Authorized"
 msgstr ""
 
 msgid "Authorized but not started"
@@ -212,19 +212,19 @@ msgstr ""
 msgid "Behaviour"
 msgstr ""
 
-msgid "cancel"
+msgid "Cancel"
 msgstr ""
 
-msgid "Cancel"
+msgid "cancel"
 msgstr ""
 
 msgid "cancel the action"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -317,10 +317,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
 msgid "Days"
@@ -387,10 +387,10 @@ msgstr ""
 msgid "Extended Time"
 msgstr ""
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr ""
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr ""
 
 msgid "Extra time granted"
@@ -571,10 +571,10 @@ msgstr ""
 msgid "Pause due to server maintenance"
 msgstr ""
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr ""
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr ""
 
 msgid "Pause sessions"
@@ -646,10 +646,10 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
@@ -740,10 +740,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -818,10 +818,10 @@ msgstr ""
 msgid "Terminate"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
 msgid "Terminate sessions"

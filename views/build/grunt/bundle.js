@@ -38,11 +38,13 @@ module.exports = function(grunt) {
                         name : 'taoProctoring',
                         default : true,
                         bootstrap : true,
-                        include : ['taoProctoring/helper/**/*']
+                        include : ['taoProctoring/helper/**/*'],
+                        babel: true
                     }, {
                         name : 'app',
                         entryPoint: 'taoProctoring/controller/app',
-                        bootstrap : true
+                        bootstrap : true,
+                        babel: true
                     }]
                 }
             }
