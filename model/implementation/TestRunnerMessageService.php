@@ -93,7 +93,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorPausedStateMessage($testSession);
         }
 
-        return parent::getPausedStateMessage();
+        return parent::getPausedStateMessage($testSession);
     }
 
     /**
@@ -107,7 +107,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
             return $this->getProctorTerminatedStateMessage($testSession);
         }
 
-        return parent::getTerminatedStateMessage();
+        return parent::getTerminatedStateMessage($testSession);
     }
 
 }
