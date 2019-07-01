@@ -996,3 +996,8 @@ msgstr ""
 msgid "Weather"
 msgstr ""
 
+msgid "Terminate and irregularity"
+msgstr ""
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr ""

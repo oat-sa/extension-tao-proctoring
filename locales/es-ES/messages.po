@@ -999,3 +999,9 @@ msgstr "Advertencia: Está a punto de pausar todas las pruebas en curso. Todos l
 msgid "Weather"
 msgstr "Condiciones meteorológicas"
 
+msgid "Terminate and irregularity"
+msgstr "Terminación e irregularidad"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Terminar/Reactivar e irregularidad"
+

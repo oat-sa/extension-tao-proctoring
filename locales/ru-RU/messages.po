@@ -996,3 +996,9 @@ msgstr "Предупреждение! Вы собираетесь приоста
 msgid "Weather"
 msgstr "Погода"
 
+msgid "Terminate and irregularity"
+msgstr "Прекращение и нестандартная ситуация"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Завершить/Реактивировать и нестандартная ситуация"
+

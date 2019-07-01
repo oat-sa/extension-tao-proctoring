@@ -996,3 +996,9 @@ msgstr "Attention, vous êtes sur le point de mettre en pause tous les tests en 
 msgid "Weather"
 msgstr "Intempéries"
 
+msgid "Terminate and irregularity"
+msgstr "Résiliation et irrégularité"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Terminer/Réactiver et irrégularité"
+
