@@ -155,6 +155,7 @@ define([
             });
             var label;
             var startDatePicker;
+            var dialogSettings;
 
             var polling = pollingFactory({
                 action() {
@@ -514,6 +515,11 @@ define([
                         reasonRequired: true
                     });
 
+                    if (dialogSettings && dialogSettings[actionName]) {
+                        config.message = dialogSettings[actionName].message;
+                        config.icon = dialogSettings[actionName].icon;
+                    }
+
                     if (!_.isEmpty(categories[actionName])) {
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
@@ -615,6 +621,7 @@ define([
                     printReportUrl = data.printReportUrl;
                     hasAccessToReactivate = data.hasAccessToReactivate;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
+                    dialogSettings = data.dialogSettings;
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
