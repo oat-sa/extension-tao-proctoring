@@ -49,6 +49,22 @@ class GuiSettingsService extends ConfigurableService
      */
     const PROCTORING_ALLOW_PAUSE = 'canPause';
 
+    /**
+     * Settings: message and icon for different actions will be displayed in dialog (bulkActionPopup)
+     * !!!only for one languge
+     * TODO: add translation for message
+     * example:
+     * [
+     *   'terminate' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'danger'
+     *   ],
+     *   'authorize' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'warning'
+     *   ],
+     * ]
+     */
     const OPTION_DIALOG_SETTINGS = 'dialogSettings';
 
     /**
