@@ -21,9 +21,11 @@
 namespace oat\taoProctoring\model\deliveryLog\implementation;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use oat\oatbox\event\EventManager;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 
 /**
  * Interface DeliveryLog
@@ -61,16 +63,20 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             $user = 'cli';
         }
 
+        $createdAt = microtime(true);
         $result = $this->getPersistence()->insert(
             self::TABLE_NAME,
             array(
                 self::DELIVERY_EXECUTION_ID => $deliveryExecutionId,
                 self::EVENT_ID => $eventId,
                 self::DATA => $data,
-                self::CREATED_AT => microtime(true),
+                self::CREATED_AT => $createdAt,
                 self::CREATED_BY => $user,
             )
         );
+
+        $id = $this->getPersistence()->lastInsertId();
+        $this->getServiceLocator()->get(EventManager::SERVICE_ID)->trigger(new DeliveryLogEvent($id));
 
         return $result === 1;
     }
