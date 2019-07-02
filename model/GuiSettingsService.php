@@ -51,7 +51,7 @@ class GuiSettingsService extends ConfigurableService
 
     /**
      * Settings: message and icon for different actions will be displayed in dialog (bulkActionPopup)
-     * !!!only for one languge
+     * !!!only for one language
      * TODO: add translation for message
      * example:
      * [
