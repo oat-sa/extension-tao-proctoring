@@ -478,7 +478,7 @@ class DeliveryHelper
                     self::$extraFields[] = array_merge(array(
                         'id' => $name,
                         'property' => $property,
-                        'label' => $property->getLabel(),
+                        'label' => __($property->getLabel()),
                     ), $settings);
                 }
             }

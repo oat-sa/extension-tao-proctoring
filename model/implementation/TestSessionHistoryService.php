@@ -323,7 +323,13 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     {
         $userService = \tao_models_classes_UserService::singleton();
         if (!isset($this->authorRoles[$user->getUri()])) {
-            $this->authorRoles[$user->getUri()] = ($userService->userHasRoles($user, $this->proctorRoles)) ? __('Proctor') : __('Test-Taker');
+            $userRole = '';
+            $allUserRoles = $userService->getUserRoles($user);
+            if (!empty($allUserRoles)) {
+                $userRole = $userService->userHasRoles($user, $this->proctorRoles) ? __('Proctor') : __('Test-Taker');
+            }
+
+            $this->authorRoles[$user->getUri()] = $userRole;
         }
         return $this->authorRoles[$user->getUri()];
     }

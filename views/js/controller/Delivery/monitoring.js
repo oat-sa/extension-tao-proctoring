@@ -104,7 +104,7 @@ define([
 
     /**
      * Validates the params to be sent along the provider's requests
-     * @param params
+     * @param {object} params
      * @returns {boolean}
      */
     function validateParams(params) {
@@ -126,7 +126,7 @@ define([
         /**
          * Entry point of the page
          */
-        start : function start() {
+        start() {
             var container = containerFactory().changeScope(cssScope).write(monitoringTpl());
             var $content = container.find('.content');
             var $list = container.find('.list');
@@ -157,7 +157,7 @@ define([
             var startDatePicker;
 
             var polling = pollingFactory({
-                action: function() {
+                action() {
                     var elapsed = timer.tick() / 1000;
                     var timers = $('.procotor-timer_time.countDown');
                     _.forEach(timers, function (timerItem) {
@@ -258,14 +258,14 @@ define([
                                     });
 
                                     if (unprocessed.length) {
-                                        messageContext += '<br>' + unprocessed.join('<br>');
+                                        messageContext += `<br>${unprocessed.join('<br>')}`;
                                     }
                                     if (responseData.error) {
-                                        messageContext += '<br>' + encode.html(responseData.error);
+                                        messageContext += `<br>${encode.html(responseData.error)}`;
                                     }
                                 }
                                 appController.onError(err);
-                                feedback().error(__('Something went wrong ...') + '<br>' + messageContext, {encodeHtml: false});
+                                feedback().error(`${__('Something went wrong ...')}<br>${messageContext}`, {encodeHtml: false});
                             })
                             .then(function() {
                                 loadingBar.stop();
@@ -318,7 +318,9 @@ define([
                             label: __('Reactivate session'),
                             icon: 'play',
                             close: true,
-                            action: function() {reactivate(selection);}
+                            action() {
+                                reactivate(selection);
+                            }
                         });
                     }else if (canDo('terminate', delivery.state)) {
                         buttons.push({
@@ -327,7 +329,9 @@ define([
                             label: __('Terminate session'),
                             icon: 'stop',
                             close: true,
-                            action: function() {terminate(selection);}
+                            action() {
+                                terminate(selection);
+                            }
                         });
                     }
 
@@ -337,7 +341,9 @@ define([
                         label: __('Report irregularity'),
                         icon: 'delivery-small',
                         close: true,
-                        action: function(){report(selection);}
+                        action(){
+                            report(selection);
+                        }
                     });
 
                     dialog({
@@ -350,7 +356,7 @@ define([
 
                 // display the session history
                 function showHistory(selection) {
-                    var monitoringRoute = window.location + '';
+                    var monitoringRoute = window.location.toString();
                     var urlParams = {
                         session: selection
                     };
@@ -374,13 +380,13 @@ define([
                         if (context){
                             params.context = context;
                         }
-                        var url = urlHelper.route(
+                        const url = urlHelper.route(
                             printReportUrl.action,
                             printReportUrl.controller,
                             printReportUrl.extension,
                             params
                         );
-                        window.open(url, 'printReport' + JSON.stringify(sel));
+                        window.open(url, `printReport${JSON.stringify(sel)}`);
                     });
                 }
 
@@ -429,7 +435,7 @@ define([
                     }
                     formatted = {
                         id : testTakerData.id,
-                        label: deliveryName + ' [' + testTakerData.start_time + '] ' + testTakerData.test_taker_first_name + ' ' + testTakerData.test_taker_last_name
+                        label: `${deliveryName} [${testTakerData.start_time}] ${testTakerData.test_taker_first_name} ${testTakerData.test_taker_last_name}`
                     };
                     status = _status.getStatusByCode(testTakerData.state.status);
 
@@ -541,7 +547,7 @@ define([
                     if (defaultTag) {
 
                         if (!$list.find('.tag').length) {
-                            $filter = $('<span class="filter"><input type="hidden" name="tag" class="tag" value="' + applyTags + '"/></span>');
+                            $filter = $(`<span class="filter"><input type="hidden" name="tag" class="tag" value="${applyTags}"/></span>`);
                             $filter.appendTo($list);
                         }
 
@@ -563,8 +569,7 @@ define([
                 /**
                  * Set initial datatable filters
                  */
-                function setInitialFilters()
-                {
+                function setInitialFilters() {
                     if (defaultTag) {
                         setTagUsage(true);
                     }
@@ -588,7 +593,8 @@ define([
                  * @returns {string}
                  */
                 function getDefaultStartTimeFilter() {
-                    return moment().format('L') + ' to ' + moment().add('1', 'd').format('L');
+                    var dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                    return `${moment().format(dateFormat)} to ${moment().add('1', 'd').format(dateFormat)}`;
                 }
 
                 function extractOption(object, option, defaultValue) {
@@ -639,7 +645,7 @@ define([
                             icon: 'reset',
                             title: __('Refresh the page'),
                             label: __('Refresh'),
-                            action: function () {
+                            action() {
                                 $list.datatable('refresh');
                             }
                         });
@@ -661,7 +667,7 @@ define([
                             css: 'btn-warning',
                             label: __('Remove default tag filtering'),
                             title: __('Remove default tag filtering'),
-                            action: function () {
+                            action() {
                                 setTagUsage(false);
                                 $list.datatable('filter');
                             }
@@ -671,7 +677,7 @@ define([
                             icon: 'filter',
                             title: __('Apply default tag'),
                             label: __('Apply default tag'),
-                            action: function () {
+                            action() {
                                 setTagUsage(true);
                                 $list.datatable('filter');
                             }
@@ -749,7 +755,7 @@ define([
                         id: 'deliveryLabel',
                         label: __('Session'),
                         sortable : true,
-                        transform: function(value, row) {
+                        transform(value, row) {
                             var delivery = row && row.delivery;
                             if (delivery) {
                                 value = deliveryLinkTpl(delivery);
@@ -765,9 +771,8 @@ define([
                             label: __('First name'),
                             filterable: true,
                             sortable: true,
-                            transform: function (value, row) {
+                            transform(value, row) {
                                 return row && row.testTaker && row.testTaker.test_taker_first_name || '';
-
                             }
                         });
                     }
@@ -779,9 +784,8 @@ define([
                             label: __('Last name'),
                             filterable: true,
                             sortable: true,
-                            transform: function (value, row) {
+                            transform(value, row) {
                                 return row && row.testTaker && row.testTaker.test_taker_last_name || '';
-
                             }
                         });
                     }
@@ -794,7 +798,7 @@ define([
                             filterable: extraField.filterable,
                             sortable : true,
                             order: extraField.columnPosition,
-                            transform: function(value, row) {
+                            transform(value, row) {
                                 return row && row.extraFields && row.extraFields[extraField.id] || '';
                             }
                         });
@@ -805,11 +809,11 @@ define([
                         id: 'start_time',
                         sortable: true,
                         label: __('Started at'),
-                        filterable: true,
-                        transform: function (value) {
+                        filterable : true,
+                        transform(value) {
                             return locale.formatDateTime(value);
                         },
-                        filterTransform: function filterTransform(value) {
+                        filterTransform(value) {
                             var first;
                             var last;
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
@@ -827,14 +831,13 @@ define([
 
                             return result;
                         },
-                        customFilter: {
-                            template: '<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="' + __('Filter') + '"/>',
-                            callback: function callback($elt) {
+                        customFilter : {
+                            template : `<input type="text" id="start_time_filter" name="filter[start_time]" placeholder="${__('Filter')}"/>`,
+                            callback($elt) {
                                 var $filterContainer = $elt.closest('.filter');
                                 var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
                                 var lastValue;
-                                var initialValue = !startDatePicker;
 
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
@@ -871,7 +874,7 @@ define([
                             callback: statusFilterHandler
                         },
 
-                        transform: function (value, row) {
+                        transform(value, row) {
                             var result = '',
                                 status;
 
@@ -901,7 +904,7 @@ define([
                                 id: 'authorize',
                                 icon: 'play',
                                 title: __('Authorize session'),
-                                disabled: function () {
+                                disabled() {
                                     return !canDo('authorize', this.state);
                                 },
                                 action: authorize
@@ -919,7 +922,7 @@ define([
                                 id: 'pause',
                                 icon: 'pause',
                                 title: __('Pause session'),
-                                disabled: function() {
+                                disabled() {
                                     return !canDo('pause', this.state);
                                 },
                                 action: pause
@@ -934,7 +937,7 @@ define([
                             sortable: true,
                             sorttype: 'numeric',
                             label: __('Remaining'),
-                            transform: function (value, row) {
+                            transform(value, row) {
                                 var rowTimer = _.isObject(row.timer) ? row.timer : {};
                                 var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
                                 var remaining = parseInt(refinedValue, 10);
@@ -965,7 +968,6 @@ define([
                             }
                         });
                     }
-
                     if (timeHandlingButton) {
                         model.push({
                             id: 'extraTime',
@@ -976,19 +978,18 @@ define([
                                 title : __('Session time handling'),
                                 icon : 'time',
                                 action : timeHandling,
-                                hidden: function() {
+                                hidden() {
                                     var allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
                                     return !canDo('time', this.state) || !allowExtraTime;
                                 }
                             }]
                         });
                     }
-
                     if (showColumnExtendedTime) {
                         model.push({
                             id: 'extendedTime',
                             label: __('Extended Time'),
-                            transform: function (value, row) {
+                            transform(value, row) {
                                 var extendedTimer = _.isObject(row.timer) ? row.timer : {};
                                 return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
                             }
@@ -1001,7 +1002,7 @@ define([
                             id: 'last_connect',
                             sortable: true,
                             label: __('Connectivity'),
-                            transform: function(value, row) {
+                            transform(value, row) {
                                 if (row.state.status === _status.STATUS_INPROGRESS) {
                                     return row.online ? __('online') : __('offline');
                                 }
@@ -1014,21 +1015,21 @@ define([
                     model.push({
                         id: 'progress',
                         label: __('Progress'),
-                        transform: function (value, row) {
-                            return row && row.state && row.state.progress || '';
+                        transform(value, row) {
+                            return row && row.state && row.state.progress || '' ;
                         }
                     });
 
-                    label = 'Terminate and irregularity';
+                    label = __('Terminate and irregularity');
                     if (hasAccessToReactivate) {
-                        label = 'Terminate/Reactivate and irregularity';
+                        label = __('Terminate/Reactivate and irregularity');
                     }
 
                     // column: proctoring actions
                     actionList = [{
                         id: 'terminateOrReactivateAndIrregularity',
                         icon: 'delivery-small',
-                        title: __(label),
+                        title: label,
                         action: terminateOrReactivateAndIrregularity
                     }];
 
@@ -1095,8 +1096,8 @@ define([
                             appController
                                 .off('change.polling')
                                 .on('change.polling', function () {
-                                polling.stop();
-                            });
+                                    polling.stop();
+                                });
 
                             polling.start();
                             timer.resume();
@@ -1123,7 +1124,7 @@ define([
                             url: urlHelper.build(executionsUrl, serviceParams),
                             status: {
                                 empty: __('No sessions'),
-                                available: function () {
+                                available() {
                                     return getTagsUsage() ? __("Groups: %s. %s", defaultTag.split(',').join(', '), defaultAvailableLabel) : defaultAvailableLabel;
                                 },
                                 loading: __('Loading')
