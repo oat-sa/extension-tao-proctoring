@@ -72,7 +72,7 @@ class GuiSettingsService extends ConfigurableService
             self::OPTION_SHOW_COLUMN_AUTHORIZE      => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) : true,
             self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) : true,
             self::OPTION_SHOW_COLUMN_EXTENDED_TIME  => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) : true,
-            self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : true,
+            self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : false,
             self::OPTION_SHOW_ACTION_SHOW_HISTORY   => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) : true,
         ];
     }
