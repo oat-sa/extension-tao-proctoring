@@ -603,12 +603,17 @@ define([
                     return `${moment().format(dateFormat)} to ${moment().add('1', 'd').format(dateFormat)}`;
                 }
 
+                function extractOption(object, option, defaultValue) {
+                    return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
+                }
+
                 if (deliveryId) {
                     serviceParams.delivery = deliveryId;
                 }
                 if (context) {
                     serviceParams.context = context;
                 }
+
                 return proxyExecutions.read(serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
@@ -622,6 +627,13 @@ define([
                     hasAccessToReactivate = data.hasAccessToReactivate;
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
                     dialogSettings = data.dialogSettings;
+
+                    var showColumnFirstName = extractOption(data, 'showColumnFirstName', true);
+                    var showColumnLastName = extractOption(data, 'showColumnLastName', true);
+                    var showColumnAuthorize = extractOption(data, 'showColumnAuthorize', true);
+                    var showColumnRemainingTime = extractOption(data, 'showColumnRemainingTime', true);
+                    var showColumnExtendedTime = extractOption(data, 'showColumnExtendedTime', true);
+                    var showActionShowHistory = extractOption(data, 'showActionShowHistory', true);
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
@@ -760,28 +772,30 @@ define([
                     });
 
                     // column: test taker first name
-                    model.push({
-                        id: 'test_taker_first_name',
-                        label: __('First name'),
-                        filterable: true,
-                        sortable : true,
-                        transform(value, row) {
-                            return row && row.testTaker && row.testTaker.test_taker_first_name || '';
-
-                        }
-                    });
+                    if (showColumnFirstName) {
+                        model.push({
+                            id: 'test_taker_first_name',
+                            label: __('First name'),
+                            filterable: true,
+                            sortable: true,
+                            transform(value, row) {
+                                return row && row.testTaker && row.testTaker.test_taker_first_name || '';
+                            }
+                        });
+                    }
 
                     // column: test taker last name
-                    model.push({
-                        id: 'test_taker_last_name',
-                        label: __('Last name'),
-                        filterable: true,
-                        sortable : true,
-                        transform(value, row) {
-                            return row && row.testTaker && row.testTaker.test_taker_last_name || '';
-
-                        }
-                    });
+                    if (showColumnLastName) {
+                        model.push({
+                            id: 'test_taker_last_name',
+                            label: __('Last name'),
+                            filterable: true,
+                            sortable: true,
+                            transform(value, row) {
+                                return row && row.testTaker && row.testTaker.test_taker_last_name || '';
+                            }
+                        });
+                    }
 
                     //extra fields
                     _.each(extraFields, function(extraField){
@@ -800,7 +814,7 @@ define([
                     // column: start time
                     model.push({
                         id: 'start_time',
-                        sortable : true,
+                        sortable: true,
                         label: __('Started at'),
                         filterable : true,
                         transform(value) {
@@ -815,7 +829,7 @@ define([
 
                             if (values.length >= 2) {
                                 first = values[0];
-                                last  = values[values.length - 1];
+                                last = values[values.length - 1];
 
                                 result += moment(first, dateFormat).format('X');
                                 result += ' - ';
@@ -835,18 +849,18 @@ define([
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
 
-                                if(startDatePicker){
+                                if (startDatePicker) {
                                     startDatePicker.destroy();
                                 }
 
                                 startDatePicker = dateTimePicker($filterContainer, {
-                                    setup : 'date-range',
-                                    format : dateFormatStr,
-                                    replaceField : $elt[0]
+                                    setup: 'date-range',
+                                    format: dateFormatStr,
+                                    replaceField: $elt[0]
                                 })
-                                    .on('change', function(value){
+                                    .on('change', function (value) {
                                         var selection = this.getSelectedDates();
-                                        if ( (value === '' && lastValue !== value) ||
+                                        if ((value === '' && lastValue !== value) ||
                                             (selection && selection.length === 2)) {
                                             $list.datatable('filter');
                                         }
@@ -860,11 +874,11 @@ define([
                     model.push({
                         id: 'status',
                         label: __('Status'),
-                        sortable : true,
-                        filterable : true,
-                        customFilter : {
-                            template : buildStatusFilter(),
-                            callback : statusFilterHandler
+                        sortable: true,
+                        filterable: true,
+                        customFilter: {
+                            template: buildStatusFilter(),
+                            callback: statusFilterHandler
                         },
 
                         transform(value, row) {
@@ -888,22 +902,24 @@ define([
                     });
 
                     // action: authorize the execution
-                    model.push({
-                        id: 'authorizeCl',
-                        label: __('Authorize'),
-                        type: 'actions',
-                        actions: [{
-                            id: 'authorize',
-                            icon: 'play',
-                            title: __('Authorize session'),
-                            disabled() {
-                                return !canDo('authorize', this.state);
-                            },
-                            action: authorize
-                        }]
-                    });
+                    if (showColumnAuthorize) {
+                        model.push({
+                            id: 'authorizeCl',
+                            label: __('Authorize'),
+                            type: 'actions',
+                            actions: [{
+                                id: 'authorize',
+                                icon: 'play',
+                                title: __('Authorize session'),
+                                disabled() {
+                                    return !canDo('authorize', this.state);
+                                },
+                                action: authorize
+                            }]
+                        });
+                    }
 
-                    if(data.canPause === null || data.canPause){
+                    if(data.canPause === null || data.canPause) {
                         // action: pause the execution
                         model.push({
                             id: 'pauseCl',
@@ -922,41 +938,43 @@ define([
                     }
 
                     // column: remaining time
-                    model.push({
-                        id: 'remaining_time',
-                        sortable : true,
-                        sorttype: 'numeric',
-                        label: __('Remaining'),
-                        transform(value, row) {
-                            var rowTimer = _.isObject(row.timer) ? row.timer : {};
-                            var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
-                            var remaining = parseInt(refinedValue, 10);
-                            if (remaining || _.isFinite(remaining) ) {
-                                if (remaining < 0) {
-                                    if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
-                                        rowTimer.consumedExtraTime += -remaining;
+                    if (showColumnRemainingTime) {
+                        model.push({
+                            id: 'remaining_time',
+                            sortable: true,
+                            sorttype: 'numeric',
+                            label: __('Remaining'),
+                            transform(value, row) {
+                                var rowTimer = _.isObject(row.timer) ? row.timer : {};
+                                var refinedValue = rowTimer.approximatedRemaining ? rowTimer.approximatedRemaining : rowTimer.remaining_time;
+                                var remaining = parseInt(refinedValue, 10);
+                                if (remaining || _.isFinite(remaining)) {
+                                    if (remaining < 0) {
+                                        if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
+                                            rowTimer.consumedExtraTime += -remaining;
+                                        }
+                                        remaining = 0;
                                     }
-                                    remaining = 0;
-                                }
-                                if (remaining) {
-                                    if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
-                                        remaining -= rowTimer.consumedExtraTime;
+                                    if (remaining) {
+                                        if (rowTimer.extraTime && rowTimer.consumedExtraTime) {
+                                            remaining -= rowTimer.consumedExtraTime;
+                                        }
+                                        refinedValue = timeEncoder.encode(remaining);
+                                    } else {
+                                        refinedValue = '';
                                     }
-                                    refinedValue = timeEncoder.encode(remaining);
-                                } else {
-                                    refinedValue = '';
+
+                                    refinedValue = approximatedTimerTpl({
+                                        timer: refinedValue,
+                                        remaining: remaining,
+                                        countDown: rowTimer.countDown
+                                    });
                                 }
 
-                                refinedValue = approximatedTimerTpl({
-                                    timer: refinedValue,
-                                    remaining: remaining,
-                                    countDown: rowTimer.countDown
-                                });
+                                return refinedValue;
                             }
-
-                            return refinedValue;
-                        }
-                    });
+                        });
+                    }
                     if (timeHandlingButton) {
                         model.push({
                             id: 'extraTime',
@@ -974,15 +992,16 @@ define([
                             }]
                         });
                     }
-
-                    model.push({
-                        id: 'extendedTime',
-                        label: __('Extended Time'),
-                        transform(value, row) {
-                            var extendedTimer = _.isObject(row.timer) ? row.timer : {};
-                            return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
-                        }
-                    });
+                    if (showColumnExtendedTime) {
+                        model.push({
+                            id: 'extendedTime',
+                            label: __('Extended Time'),
+                            transform(value, row) {
+                                var extendedTimer = _.isObject(row.timer) ? row.timer : {};
+                                return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
+                            }
+                        });
+                    }
 
                     if (allowedConnectivity) {
                         // column: connectivity status of execution progress
@@ -1019,12 +1038,18 @@ define([
                         icon: 'delivery-small',
                         title: label,
                         action: terminateOrReactivateAndIrregularity
-                    }, {
-                        id: 'history',
-                        icon: 'history',
-                        title: __('Show the detailed session history'),
-                        action: showHistory
                     }];
+
+
+                    if (showActionShowHistory) {
+                        actionList.push({
+                            id: 'history',
+                            icon: 'history',
+                            title: __('Show the detailed session history'),
+                            action: showHistory
+                        });
+                    }
+
                     if (printReportButton) {
                         actionList.push({
                             id : 'printReport',

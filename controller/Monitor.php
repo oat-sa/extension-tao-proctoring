@@ -74,6 +74,7 @@ class Monitor extends SimplePageModule
         $user = \common_session_SessionManager::getSession()->getUser();
         $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
         $delivery = $this->getCurrentDelivery();
+        /** @var GuiSettingsService $guiSettingsService */
         $guiSettingsService = $this->getServiceLocator()->get(GuiSettingsService::SERVICE_ID);
         $assessmentResultsService = $this->getServiceLocator()->get(AssessmentResultsService::SERVICE_ID);
         $data = [
