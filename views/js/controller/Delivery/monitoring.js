@@ -1008,16 +1008,16 @@ define([
                         }
                     });
 
-                    label = 'Terminate and irregularity';
+                    label = __('Terminate and irregularity');
                     if (hasAccessToReactivate) {
-                        label = 'Terminate/Reactivate and irregularity';
+                        label = __('Terminate/Reactivate and irregularity');
                     }
 
                     // column: proctoring actions
                     actionList = [{
                         id: 'terminateOrReactivateAndIrregularity',
                         icon: 'delivery-small',
-                        title: __(label),
+                        title: label,
                         action: terminateOrReactivateAndIrregularity
                     }, {
                         id: 'history',
