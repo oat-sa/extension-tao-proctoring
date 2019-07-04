@@ -49,8 +49,34 @@ class GuiSettingsService extends ConfigurableService
      */
     const PROCTORING_ALLOW_PAUSE = 'canPause';
 
-    public function __construct(array $options = array())
+    /**
+     * Settings: message and icon for different actions will be displayed in dialog (bulkActionPopup)
+     * !!!only for one language
+     * TODO: add translation for message
+     * example:
+     * [
+     *   'terminate' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'danger'
+     *   ],
+     *   'authorize' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'warning'
+     *   ],
+     * ]
+     */
+    const OPTION_DIALOG_SETTINGS = 'dialogSettings';
+
+    /**
+     * @return array
+     */
+    public function asArray()
     {
-        parent::__construct($options);
+        return [
+            self::PROCTORING_REFRESH_BUTTON         => $this->hasOption(self::PROCTORING_REFRESH_BUTTON) ? $this->getOption(self::PROCTORING_REFRESH_BUTTON) : true,
+            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : 0,
+            self::PROCTORING_ALLOW_PAUSE            => $this->hasOption(self::PROCTORING_ALLOW_PAUSE) ? $this->getOption(self::PROCTORING_ALLOW_PAUSE) : true,
+            self::OPTION_DIALOG_SETTINGS            => $this->hasOption(self::OPTION_DIALOG_SETTINGS) ? $this->getOption(self::OPTION_DIALOG_SETTINGS) : [],
+        ];
     }
 }
