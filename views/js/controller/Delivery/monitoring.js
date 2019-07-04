@@ -604,7 +604,7 @@ define([
                 }
 
                 function extractOption(object, option, defaultValue) {
-                    return Object.is(object[option], undefined) ? defaultValue : object[option];
+                    return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
 
                 if (deliveryId) {
@@ -628,12 +628,12 @@ define([
                     sessionsHistoryUrl = data.historyUrl || historyUrl;
                     dialogSettings = data.dialogSettings;
 
-                    let showColumnFirstName = extractOption(data, 'showColumnFirstName', true);
-                    let showColumnLastName = extractOption(data, 'showColumnLastName', true);
-                    let showColumnAuthorize = extractOption(data, 'showColumnAuthorize', true);
-                    let showColumnRemainingTime = extractOption(data, 'showColumnRemainingTime', true);
-                    let showColumnExtendedTime = extractOption(data, 'showColumnExtendedTime', true);
-                    let showActionShowHistory = extractOption(data, 'showActionShowHistory', true);
+                    var showColumnFirstName = extractOption(data, 'showColumnFirstName', true);
+                    var showColumnLastName = extractOption(data, 'showColumnLastName', true);
+                    var showColumnAuthorize = extractOption(data, 'showColumnAuthorize', true);
+                    var showColumnRemainingTime = extractOption(data, 'showColumnRemainingTime', true);
+                    var showColumnExtendedTime = extractOption(data, 'showColumnExtendedTime', true);
+                    var showActionShowHistory = extractOption(data, 'showActionShowHistory', true);
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
