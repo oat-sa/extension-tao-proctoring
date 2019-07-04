@@ -65,7 +65,7 @@ class GuiSettingsService extends ConfigurableService
     {
         return [
             self::PROCTORING_REFRESH_BUTTON         => $this->hasOption(self::PROCTORING_REFRESH_BUTTON) ? $this->getOption(self::PROCTORING_REFRESH_BUTTON) : true,
-            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : true,
+            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : 0,
             self::PROCTORING_ALLOW_PAUSE            => $this->hasOption(self::PROCTORING_ALLOW_PAUSE) ? $this->getOption(self::PROCTORING_ALLOW_PAUSE) : true,
             self::OPTION_SHOW_COLUMN_FIRST_NAME     => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) : true,
             self::OPTION_SHOW_COLUMN_LAST_NAME      => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME) : true,
