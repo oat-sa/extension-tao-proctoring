@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint105\n"
-"PO-Revision-Date: 2019-06-28T11:52:01\n"
+"PO-Revision-Date: 2019-07-05T08:50:40\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ru-RU\n"
@@ -212,11 +212,11 @@ msgstr "Назад к сеансам"
 msgid "Behaviour"
 msgstr "Поведение"
 
-msgid "cancel"
-msgstr "отмена"
-
 msgid "Cancel"
 msgstr "Отмена"
+
+msgid "cancel"
+msgstr "отмена"
 
 msgid "cancel the action"
 msgstr "отмена действия"
@@ -284,11 +284,11 @@ msgstr "комментарий"
 msgid "Complaint"
 msgstr "Жалоба"
 
-msgid "Completed"
-msgstr "Завершено"
-
 msgid "completed"
 msgstr "завершено"
+
+msgid "Completed"
+msgstr "Завершено"
 
 msgid "Completed tests"
 msgstr "Завершенные тесты"
@@ -387,10 +387,10 @@ msgstr "Экспорт нестандартных ситуаций"
 msgid "Extended Time"
 msgstr "Продленное время"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Дополнительное время"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Дополнительное время"
 
 msgid "Extra time granted"
@@ -402,11 +402,11 @@ msgstr "Фильтр"
 msgid "Filter by the selected dates"
 msgstr "Фтльтровать по выбранным датам"
 
-msgid "finished"
-msgstr "завершено"
-
 msgid "Finished"
 msgstr "Завершено"
+
+msgid "finished"
+msgstr "завершено"
 
 msgid "First name"
 msgstr "Имя"
@@ -646,10 +646,10 @@ msgstr "Отозванные наблюдатели"
 msgid "Progress"
 msgstr "Ход выполнения"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "Повторно активировать сеанс"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "Повторно активировать сеанс"
 
 msgid "Refresh"
@@ -679,10 +679,10 @@ msgstr "Отчет"
 msgid "Report irregularities"
 msgstr "Сообщить о нестандартных ситуациях"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Сообщить о нестандартной ситуации"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Сообщить о нестандартной ситуации"
 
 msgid "reported for irregularity"
@@ -818,6 +818,9 @@ msgstr "Техническ."
 msgid "Terminate"
 msgstr "Прекратить"
 
+msgid "Terminate and irregularity"
+msgstr "Прекращение и нестандартная ситуация"
+
 msgid "Terminate Session"
 msgstr "Прекратить сеанс"
 
@@ -826,6 +829,9 @@ msgstr "Прекратить сеанс"
 
 msgid "Terminate sessions"
 msgstr "Прекратить сеансы"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Завершить/Реактивировать и нестандартная ситуация"
 
 msgid "terminated"
 msgstr "прекращено"
@@ -995,10 +1001,4 @@ msgstr "Предупреждение! Вы собираетесь приоста
 
 msgid "Weather"
 msgstr "Погода"
-
-msgid "Terminate and irregularity"
-msgstr "Прекращение и нестандартная ситуация"
-
-msgid "Terminate/Reactivate and irregularity"
-msgstr "Завершить/Реактивировать и нестандартная ситуация"
 

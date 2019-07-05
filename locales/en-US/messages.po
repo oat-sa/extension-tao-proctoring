@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint105\n"
-"PO-Revision-Date: 2019-06-28T11:52:01\n"
+"PO-Revision-Date: 2019-07-05T08:50:39\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -170,10 +170,10 @@ msgstr ""
 msgid "Authorize the selected proctors"
 msgstr ""
 
-msgid "authorized"
+msgid "Authorized"
 msgstr ""
 
-msgid "Authorized"
+msgid "authorized"
 msgstr ""
 
 msgid "Authorized but not started"
@@ -221,10 +221,10 @@ msgstr ""
 msgid "cancel the action"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -284,10 +284,10 @@ msgstr ""
 msgid "Complaint"
 msgstr ""
 
-msgid "Completed"
+msgid "completed"
 msgstr ""
 
-msgid "completed"
+msgid "Completed"
 msgstr ""
 
 msgid "Completed tests"
@@ -317,10 +317,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
 msgid "Days"
@@ -402,10 +402,10 @@ msgstr ""
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
+msgid "Finished"
 msgstr ""
 
-msgid "Finished"
+msgid "finished"
 msgstr ""
 
 msgid "First name"
@@ -571,10 +571,10 @@ msgstr ""
 msgid "Pause due to server maintenance"
 msgstr ""
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr ""
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr ""
 
 msgid "Pause sessions"
@@ -679,10 +679,10 @@ msgstr ""
 msgid "Report irregularities"
 msgstr ""
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr ""
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr ""
 
 msgid "reported for irregularity"
@@ -740,10 +740,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -818,13 +818,19 @@ msgstr ""
 msgid "Terminate"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate and irregularity"
 msgstr ""
 
 msgid "Terminate Session"
 msgstr ""
 
+msgid "Terminate session"
+msgstr ""
+
 msgid "Terminate sessions"
+msgstr ""
+
+msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
 msgid "terminated"
@@ -996,8 +1002,3 @@ msgstr ""
 msgid "Weather"
 msgstr ""
 
-msgid "Terminate and irregularity"
-msgstr ""
-
-msgid "Terminate/Reactivate and irregularity"
-msgstr ""

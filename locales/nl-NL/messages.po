@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint104\n"
-"PO-Revision-Date: 2019-06-21T11:24:00\n"
+"Project-Id-Version: TAO 3.3.0-sprint105\n"
+"PO-Revision-Date: 2019-07-05T08:50:40\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -170,10 +170,10 @@ msgstr "Autoriseer de toezichthouder"
 msgid "Authorize the selected proctors"
 msgstr "Autoriseer de geselecteerde toezichthouders"
 
-msgid "authorized"
+msgid "Authorized"
 msgstr "Geautoriseerd"
 
-msgid "Authorized"
+msgid "authorized"
 msgstr "Geautoriseerd"
 
 msgid "Authorized but not started"
@@ -221,11 +221,11 @@ msgstr "annuleren"
 msgid "cancel the action"
 msgstr "Actie annuleren"
 
-msgid "canceled"
-msgstr ""
-
 msgid "Canceled"
 msgstr "Geannuleerd"
+
+msgid "canceled"
+msgstr ""
 
 msgid "Cannot authorize test session."
 msgstr ""
@@ -284,11 +284,11 @@ msgstr "opmerking"
 msgid "Complaint"
 msgstr "Klacht"
 
-msgid "Completed"
-msgstr "Voltooid"
-
 msgid "completed"
 msgstr ""
+
+msgid "Completed"
+msgstr "Voltooid"
 
 msgid "Completed tests"
 msgstr "Voltooide examens"
@@ -317,11 +317,11 @@ msgstr "Huidige toets activiteit"
 msgid "Current sessions"
 msgstr "Huidige sessies"
 
-msgid "date"
-msgstr "datum"
-
 msgid "Date"
 msgstr "Datum"
+
+msgid "date"
+msgstr "datum"
 
 msgid "Days"
 msgstr "Dagen"
@@ -402,11 +402,11 @@ msgstr "Filter"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
-msgstr "voltooid"
-
 msgid "Finished"
 msgstr "Voltooid"
+
+msgid "finished"
+msgstr "voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
@@ -571,10 +571,10 @@ msgstr "Pauzeer actieve toets sessies"
 msgid "Pause due to server maintenance"
 msgstr "Gepauzeerd wegens server onderhoud"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Sessie pauzeren"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Sessie pauzeren"
 
 msgid "Pause sessions"
@@ -679,10 +679,10 @@ msgstr "Rapporteren"
 msgid "Report irregularities"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
 msgid "reported for irregularity"
@@ -740,11 +740,11 @@ msgstr "Sessies"
 msgid "Sessions authorized"
 msgstr "Geautoriseerde sessies"
 
-msgid "sessions paused"
-msgstr "gepauzeerde sessies"
-
 msgid "Sessions paused"
 msgstr "Gepauzeerde sessies"
+
+msgid "sessions paused"
+msgstr "gepauzeerde sessies"
 
 msgid "Sessions reactivated"
 msgstr ""
@@ -818,14 +818,20 @@ msgstr "Technisch"
 msgid "Terminate"
 msgstr "Beeindigen"
 
-msgid "Terminate session"
-msgstr "Beëindig sessie"
+msgid "Terminate and irregularity"
+msgstr ""
 
 msgid "Terminate Session"
 msgstr "Beëindig sessie"
 
+msgid "Terminate session"
+msgstr "Beëindig sessie"
+
 msgid "Terminate sessions"
 msgstr "Beëindig sessies"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr ""
 
 msgid "terminated"
 msgstr "beëindigd"
@@ -940,6 +946,9 @@ msgstr "Het examen is geschorst. Herstart a.u.b. het examen en neem indien nodig
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
 msgstr "Het examen is beëindigd.U kunt er niet meer aan werken."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr ""
 
 msgid "The extra time must be a number"
 msgstr "De extra tijd moet numeriek zijn"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TAO 3.3.0-sprint105\n"
-"PO-Revision-Date: 2019-06-28T11:52:01\n"
+"PO-Revision-Date: 2019-07-05T08:50:39\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: es-MX\n"
@@ -212,11 +212,11 @@ msgstr "Volver a sesiones"
 msgid "Behaviour"
 msgstr "Comportamiento"
 
-msgid "cancel"
-msgstr "cancelar"
-
 msgid "Cancel"
 msgstr "Cancelar"
+
+msgid "cancel"
+msgstr "cancelar"
 
 msgid "cancel the action"
 msgstr "cancelar la acción"
@@ -284,11 +284,11 @@ msgstr "comentario"
 msgid "Complaint"
 msgstr "Queja"
 
-msgid "Completed"
-msgstr "Completado"
-
 msgid "completed"
 msgstr "completado"
+
+msgid "Completed"
+msgstr "Completado"
 
 msgid "Completed tests"
 msgstr "Pruebas completadas"
@@ -387,10 +387,10 @@ msgstr "Exportar irregularidades"
 msgid "Extended Time"
 msgstr "Tiempo extendido"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Tiempo adicional"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Tiempo adicional"
 
 msgid "Extra time granted"
@@ -402,11 +402,11 @@ msgstr "Filtro"
 msgid "Filter by the selected dates"
 msgstr "Filtrar por las fechas seleccionadas"
 
-msgid "finished"
-msgstr "finalizado"
-
 msgid "Finished"
 msgstr "Finalizado"
+
+msgid "finished"
+msgstr "finalizado"
 
 msgid "First name"
 msgstr "Nombre"
@@ -646,10 +646,10 @@ msgstr "Supervisores revocados"
 msgid "Progress"
 msgstr "Progreso"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "Reactivar sesión"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "Reactivar sesión"
 
 msgid "Refresh"
@@ -679,10 +679,10 @@ msgstr "Reporte"
 msgid "Report irregularities"
 msgstr "Reportar irregularidades"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Reportar irregularidad"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Reportar irregularidad"
 
 msgid "reported for irregularity"
@@ -818,6 +818,9 @@ msgstr "Técnico"
 msgid "Terminate"
 msgstr "Terminar"
 
+msgid "Terminate and irregularity"
+msgstr "Terminación e irregularidad"
+
 msgid "Terminate Session"
 msgstr "Terminar sesión"
 
@@ -826,6 +829,9 @@ msgstr "Terminar sesión"
 
 msgid "Terminate sessions"
 msgstr "Terminar sesiones"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Terminar/Reactivar e irregularidad"
 
 msgid "terminated"
 msgstr "terminada"
@@ -971,9 +977,6 @@ msgstr "No hay ninguna entrega en curso"
 msgid "Time"
 msgstr "Tiempo"
 
-msgid "to"
-msgstr "a"
-
 #, tao-public
 msgid "Tools"
 msgstr "Herramientas"
@@ -998,10 +1001,4 @@ msgstr "Advertencia: Está a punto de pausar todas las pruebas en curso. Todos l
 
 msgid "Weather"
 msgstr "Condiciones meteorológicas"
-
-msgid "Terminate and irregularity"
-msgstr "Terminación e irregularidad"
-
-msgid "Terminate/Reactivate and irregularity"
-msgstr "Terminar/Reactivar e irregularidad"
 
