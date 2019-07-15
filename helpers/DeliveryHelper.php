@@ -44,7 +44,7 @@ use tao_helpers_Date as DateHelper;
  */
 class DeliveryHelper
 {
-    use OntologyAwareTrait;
+
     /**
      * Cached value for prepopulated fields
      * @var array
