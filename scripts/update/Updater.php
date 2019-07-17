@@ -787,6 +787,17 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.3.1');
         }
 
-        $this->skip('12.3.1', '12.3.2');
+        $this->skip('12.3.1', '12.3.2.2');
+
+        if ($this->isVersion('12.3.2.2')) {
+
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $eventManager->attach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('12.3.2.3');
+        }
     }
 }
