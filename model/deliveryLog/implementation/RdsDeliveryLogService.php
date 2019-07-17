@@ -180,7 +180,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             if (in_array($key, $fields, false)) {
                 if (is_array($val)) {
                     $queryBuilder->andWhere($key . ' IN (:'.$key.')');
-                    $queryBuilder->setParameter($key, $val, Connection::PARAM_INT_ARRAY);
+                    $queryBuilder->setParameter($key, $val, Connection::PARAM_STR_ARRAY);
                 } else {
                     $queryBuilder->andWhere($key . '= :'.$key);
                     $queryBuilder->setParameter($key, $val);
