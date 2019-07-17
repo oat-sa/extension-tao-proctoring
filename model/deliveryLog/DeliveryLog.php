@@ -31,11 +31,14 @@ interface DeliveryLog extends DeliveryExecutionDelete
 {
     const SERVICE_ID = 'taoProctoring/DeliveryLog';
 
+    const OPTION_FIELDS = 'fields';
+
     const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
     const EVENT_ID = 'event_id';
     const DATA = 'data';
     const CREATED_AT = 'created_at';
     const CREATED_BY = 'created_by';
+    const ID = 'id';
 
     /**
      * @param array $data
