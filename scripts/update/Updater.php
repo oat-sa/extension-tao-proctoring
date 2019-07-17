@@ -790,9 +790,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.3.1');
         }
 
-        $this->skip('12.3.1', '12.3.2');
+        $this->skip('12.3.1', '12.3.2.3');
 
-        if ($this->isVersion('12.3.2')) {
+        if ($this->isVersion('12.3.2.3')) {
             $extensionManager = \common_ext_ExtensionsManager::singleton();
             if (!$extensionManager->isInstalled('taoTestCenter') || !$extensionManager->isEnabled('taoTestCenter')) {
                 /** @var DefaultUrlService $urlService */
@@ -868,9 +868,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('16.0.0');
         }
 
-        $this->skip('16.0.0', '16.3.0');
+        $this->skip('16.0.0', '16.3.1');
 
-        if ($this->isVersion('16.3.0')) {
+        if ($this->isVersion('16.3.1')) {
 
             /** @var RdsDeliveryLogService $deliveryLog */
             $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
