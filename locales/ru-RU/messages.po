@@ -400,7 +400,7 @@ msgid "Filter"
 msgstr "Фильтр"
 
 msgid "Filter by the selected dates"
-msgstr "Фтльтровать по выбранным датам"
+msgstr "Фильтровать по выбранным датам"
 
 msgid "Finished"
 msgstr "Завершено"
