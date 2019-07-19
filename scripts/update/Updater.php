@@ -54,6 +54,7 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -789,9 +790,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('12.3.1');
         }
 
-        $this->skip('12.3.1', '12.3.2');
+        $this->skip('12.3.1', '12.3.2.3');
 
-        if ($this->isVersion('12.3.2')) {
+        if ($this->isVersion('12.3.2.3')) {
             $extensionManager = \common_ext_ExtensionsManager::singleton();
             if (!$extensionManager->isInstalled('taoTestCenter') || !$extensionManager->isEnabled('taoTestCenter')) {
                 /** @var DefaultUrlService $urlService */
@@ -867,6 +868,23 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('16.0.0');
         }
 
-        $this->skip('16.0.0', '16.3.0');
+        $this->skip('16.0.0', '16.3.1');
+
+        if ($this->isVersion('16.3.1')) {
+
+            /** @var RdsDeliveryLogService $deliveryLog */
+            $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
+
+            $deliveryLog->setOption(DeliveryLog::OPTION_FIELDS, [
+                DeliveryLog::EVENT_ID,
+                DeliveryLog::CREATED_BY,
+                DeliveryLog::DELIVERY_EXECUTION_ID,
+                DeliveryLog::ID
+            ]);
+
+            $this->getServiceManager()->register(DeliveryLog::SERVICE_ID, $deliveryLog);
+
+            $this->setVersion('16.4.0');
+        }
     }
 }

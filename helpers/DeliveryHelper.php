@@ -44,6 +44,7 @@ use tao_helpers_Date as DateHelper;
  */
 class DeliveryHelper
 {
+
     /**
      * Cached value for prepopulated fields
      * @var array
@@ -377,7 +378,11 @@ class DeliveryHelper
             $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
 
             foreach(self::_getUserExtraFields() as $field){
-                $extraFields[$field['id']] = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
+                $value = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
+                if (\common_Utils::isUri($value)) {
+                    $value = (new \core_kernel_classes_Resource($value))->getLabel();
+                }
+                $extraFields[$field['id']] = $value;
             }
 
             $online = null;

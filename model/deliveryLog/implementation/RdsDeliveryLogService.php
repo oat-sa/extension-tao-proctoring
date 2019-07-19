@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\deliveryLog\implementation;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use oat\oatbox\event\EventManager;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -37,9 +38,6 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 {
     const OPTION_PERSISTENCE = 'persistence';
     const TABLE_NAME = 'delivery_log';
-    const ID = 'id';
-
-    const OPTION_FIELDS = 'fields';
 
     /**
      * Log delivery execution data.
@@ -179,9 +177,14 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 
         $fields = $this->getFields();
         foreach ($params as $key => $val) {
-            if (in_array($key, $fields)) {
-                $queryBuilder->andWhere($key . '= :'.$key);
-                $queryBuilder->setParameter($key, $val);
+            if (in_array($key, $fields, false)) {
+                if (is_array($val)) {
+                    $queryBuilder->andWhere($key . ' IN (:'.$key.')');
+                    $queryBuilder->setParameter($key, $val, Connection::PARAM_STR_ARRAY);
+                } else {
+                    $queryBuilder->andWhere($key . '= :'.$key);
+                    $queryBuilder->setParameter($key, $val);
+                }
             }
         }
 
