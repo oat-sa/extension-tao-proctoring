@@ -718,5 +718,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(FinishDeliveryExecutionsService::SERVICE_ID, $finishDEService);
             $this->setVersion('8.13.3');
         }
+
+        $this->skip('8.13.3', '8.13.3.1');
     }
 }
