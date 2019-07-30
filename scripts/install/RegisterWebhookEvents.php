@@ -35,7 +35,7 @@ class RegisterWebhookEvents extends InstallAction
     public function __invoke($params)
     {
         $this->registerEvents([
-            DeliveryExecutionFinished::NAME
+            DeliveryExecutionFinished::EVENT_NAME
         ]);
     }
 

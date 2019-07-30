@@ -29,7 +29,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 class DeliveryExecutionFinished implements Event, WebhookSerializableInterface
 {
-    const NAME = self::class;
+    const EVENT_NAME = self::class;
 
     /**
      * @var DeliveryExecution
@@ -41,7 +41,7 @@ class DeliveryExecutionFinished implements Event, WebhookSerializableInterface
      */
     public function getName()
     {
-        return self::NAME;
+        return self::EVENT_NAME;
     }
 
     /**

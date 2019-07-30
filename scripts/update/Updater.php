@@ -893,7 +893,7 @@ class Updater extends common_ext_ExtensionUpdater
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             /** @var EventWebhooksServiceInterface $webhooksService */
             $webhooksService = $this->getServiceManager()->get(EventWebhooksServiceInterface::SERVICE_ID);
-            $webhooksService->registerEvent(DeliveryExecutionFinished::NAME, $eventManager);
+            $webhooksService->registerEvent(DeliveryExecutionFinished::EVENT_NAME, $eventManager);
             /** @noinspection PhpParamsInspection */
             $this->getServiceManager()->register(EventWebhooksServiceInterface::SERVICE_ID, $webhooksService);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
