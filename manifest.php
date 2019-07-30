@@ -35,6 +35,7 @@ use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\RegisterServices;
+use oat\taoProctoring\scripts\install\RegisterWebhookEvents;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
@@ -47,10 +48,10 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '16.4.0',
+    'version' => '16.4.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao'            => '>=36.0.0',
+        'tao'            => '>=38.3.0',
         'taoDelivery'    => '>=13.1.2',
         'taoDeliveryRdf' => '>=7.0.0',
         'taoTestTaker'   => '>=4.0.0',
@@ -94,6 +95,7 @@ return array(
             RegisterProctoringDeliveryDeleteService::class,
             SetUpQueueTasks::class,
             \oat\taoProctoring\scripts\install\RegisterDeleteDeliveryExecution::class,
+            RegisterWebhookEvents::class
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

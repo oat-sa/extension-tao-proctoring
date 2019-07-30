@@ -21,13 +21,16 @@
 namespace oat\taoProctoring\model\event;
 
 use oat\oatbox\event\Event;
+use oat\tao\model\webhooks\WebhookSerializableInterface;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * This event is fired whenever a delivery execution goes to the `finished` state
  */
-class DeliveryExecutionFinished implements Event
+class DeliveryExecutionFinished implements Event, WebhookSerializableInterface
 {
+    const NAME = self::class;
+
     /**
      * @var DeliveryExecution
      */
@@ -38,11 +41,10 @@ class DeliveryExecutionFinished implements Event
      */
     public function getName()
     {
-        return __CLASS__;
+        return self::NAME;
     }
 
     /**
-     * DeliveryExecutionFinished constructor.
      * @param DeliveryExecution $deliveryExecution
      */
     public function __construct(DeliveryExecution $deliveryExecution)
@@ -58,5 +60,15 @@ class DeliveryExecutionFinished implements Event
     public function getDeliveryExecution()
     {
         return $this->deliveryExecution;
+    }
+
+    /**
+     * @return array
+     */
+    public function serializeForWebhook()
+    {
+        return [
+            'delivery_execution_id' => $this->deliveryExecution->getIdentifier()
+        ];
     }
 }
