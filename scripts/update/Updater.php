@@ -898,7 +898,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(WebhookEventsServiceInterface::SERVICE_ID, $webhooksService);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
 
-            $this->setVersion('16.4.1');
+            $this->setVersion('17.0.0');
         }
     }
 }

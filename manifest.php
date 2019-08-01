@@ -48,7 +48,7 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '16.5.0',
+    'version' => '17.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao'            => '>=38.3.1',
