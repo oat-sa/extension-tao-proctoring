@@ -22,7 +22,7 @@ namespace oat\taoProctoring\scripts\install;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
-use oat\tao\model\webhooks\EventWebhooksServiceInterface;
+use oat\tao\model\webhooks\WebhookEventsServiceInterface;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 
 class RegisterWebhookEvents extends InstallAction
@@ -47,15 +47,15 @@ class RegisterWebhookEvents extends InstallAction
     protected function registerEvents(array $eventNames) {
         /** @var EventManager $eventManager */
         $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
-        /** @var EventWebhooksServiceInterface $webhooksService */
-        $webhooksService = $this->getServiceLocator()->get(EventWebhooksServiceInterface::SERVICE_ID);
+        /** @var WebhookEventsServiceInterface $webhooksService */
+        $webhooksService = $this->getServiceLocator()->get(WebhookEventsServiceInterface::SERVICE_ID);
 
         foreach ($eventNames as $eventName) {
-            $webhooksService->registerEvent($eventName, $eventManager);
+            $webhooksService->registerEvent($eventName);
         }
 
         /** @noinspection PhpParamsInspection */
-        $this->getServiceManager()->register(EventWebhooksServiceInterface::SERVICE_ID, $webhooksService);
+        $this->getServiceManager()->register(WebhookEventsServiceInterface::SERVICE_ID, $webhooksService);
         $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
     }
 }

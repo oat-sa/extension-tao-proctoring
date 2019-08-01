@@ -20,14 +20,13 @@
 
 namespace oat\taoProctoring\model\event;
 
-use oat\oatbox\event\Event;
-use oat\tao\model\webhooks\WebhookSerializableInterface;
+use oat\tao\model\webhooks\WebhookSerializableEventInterface;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * This event is fired whenever a delivery execution goes to the `finished` state
  */
-class DeliveryExecutionFinished implements Event, WebhookSerializableInterface
+class DeliveryExecutionFinished implements WebhookSerializableEventInterface
 {
     const EVENT_NAME = self::class;
 
