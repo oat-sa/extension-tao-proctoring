@@ -30,8 +30,8 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
-use oat\taoQtiTest\models\runner\time\TimerStrategyService;
 use oat\taoTests\models\runner\time\TimePoint;
+use oat\taoTests\models\runner\time\TimerStrategyInterface;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
 use qtism\runtime\tests\AssessmentTestSessionState;
@@ -171,7 +171,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 if ($seconds) {
                     $extraTime = $this->getServiceLocator()
-                        ->get(TimerStrategyService::SERVICE_ID)
+                        ->get(TimerStrategyInterface::SERVICE_ID)
                         ->getExtraTime($seconds, $extendedTime);
 
                     $dataArray = $data->get();
