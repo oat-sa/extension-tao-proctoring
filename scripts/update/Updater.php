@@ -34,6 +34,7 @@ use oat\tao\model\mvc\DefaultUrlService;
 use oat\tao\model\taskQueue\TaskLogInterface;
 use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
+use oat\tao\model\webhooks\WebhookEventsServiceInterface;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
@@ -885,6 +886,19 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(DeliveryLog::SERVICE_ID, $deliveryLog);
 
             $this->setVersion('16.4.0');
+        }
+
+        if ($this->isVersion('16.4.0')) {
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            /** @var WebhookEventsServiceInterface $webhooksService */
+            $webhooksService = $this->getServiceManager()->get(WebhookEventsServiceInterface::SERVICE_ID);
+            $webhooksService->registerEvent(DeliveryExecutionFinished::EVENT_NAME);
+            /** @noinspection PhpParamsInspection */
+            $this->getServiceManager()->register(WebhookEventsServiceInterface::SERVICE_ID, $webhooksService);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('17.0.0');
         }
     }
 }
