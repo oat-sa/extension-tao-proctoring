@@ -43,7 +43,7 @@ class ActivityMonitoringServiceTest extends TestCase
 
         $timeKeys = $service->getTimeKeys(new \DateInterval('PT1H'), clone($date));
         $this->assertEquals(24, count($timeKeys));
-        $this->assertEquals(((int)$date->format('h') + 1) % 24, $timeKeys[0]->format('h'));
+        $this->assertEquals(((int)$date->format('H') + 1) % 24, $timeKeys[0]->format('H'));
         $this->assertEquals(0, $timeKeys[0]->format('i'));
 
         $timeKeys = $service->getTimeKeys(new \DateInterval('P1D'), clone($date));
@@ -54,7 +54,7 @@ class ActivityMonitoringServiceTest extends TestCase
 
         $timeKeys = $service->getTimeKeys(new \DateInterval('P1M'), clone($date));
         $this->assertEquals(12, count($timeKeys));
-        $this->assertEquals(((int)$date->format('m') + 1) % 12, $timeKeys[0]->format('m'));
+        $this->assertEquals((int)$date->format('m') % 12 + 1, $timeKeys[0]->format('m'));
         $this->assertEquals(0, $timeKeys[0]->format('H'));
         $this->assertEquals('01', $timeKeys[0]->format('d'));
     }
