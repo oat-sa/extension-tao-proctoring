@@ -364,9 +364,19 @@ class DeliveryHelper
         $executions = [];
         foreach ($deliveryExecutions as $cachedData) {
 
+            $progressPatern = "/(?<=\- )(.*?)(?= \d)/";
+            if (preg_match($progressPatern, $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]))
+            {
+                $progressStr = preg_replace_callback($progressPatern, function ($text) {
+                    return __($text[0]);
+                }, $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]);
+            } else {
+                $progressStr = __($cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]);
+            }
+
             $state = [
                 'status' => $cachedData[DeliveryMonitoringService::STATUS],
-                'progress' => $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]
+                'progress' => $progressStr
             ];
 
             $testTaker = [];
