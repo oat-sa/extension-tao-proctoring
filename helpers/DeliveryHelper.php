@@ -34,6 +34,7 @@ use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
+use oat\taoQtiTest\models\SessionStateService;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use tao_helpers_Date as DateHelper;
 
@@ -364,19 +365,23 @@ class DeliveryHelper
         $executions = [];
         foreach ($deliveryExecutions as $cachedData) {
 
-            $progressPatern = "/(?<=\- )(.*?)(?= \d)/";
-            if (preg_match($progressPatern, $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]))
-            {
-                $progressStr = preg_replace_callback($progressPatern, function ($text) {
-                    return __($text[0]);
-                }, $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]);
-            } else {
-                $progressStr = __($cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM]);
+            $progressStr = $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM];
+            if (($progress = json_decode($progressStr, true)) !== null) {
+                $sessionStateService = ServiceManager::getServiceManager()->get(SessionStateService::SERVICE_ID);
+                $format = $sessionStateService->hasOption(SessionStateService::OPTION_STATE_FORMAT)
+                    ? $sessionStateService->getOption(SessionStateService::OPTION_STATE_FORMAT)
+                    : __('%s - item %p/%c');
+                $map = array(
+                    '%s' => $progress['title'] ?? '',
+                    '%p' => $progress['itemPosition'] ?? '',
+                    '%c' => $progress['itemCount'] ?? ''
+                );
+                $progressStr = strtr($format, $map);
             }
 
             $state = [
                 'status' => $cachedData[DeliveryMonitoringService::STATUS],
-                'progress' => $progressStr
+                'progress' => __($progressStr)
             ];
 
             $testTaker = [];
