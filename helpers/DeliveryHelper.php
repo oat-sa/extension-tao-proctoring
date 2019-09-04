@@ -38,7 +38,8 @@ use qtism\runtime\tests\AssessmentTestSessionState;
 use tao_helpers_Date as DateHelper;
 
 /**
- * @deprecated
+ * @deprecated please use configurable service \oat\taoProctoring\helpers\DeliveryHelperService
+ *
  * This temporary helpers is a temporary way to return data to the controller.
  * This helps isolating the mock code from the real controller one.
  * It will be replaced by a real service afterward.
