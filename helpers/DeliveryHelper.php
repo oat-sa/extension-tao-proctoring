@@ -29,7 +29,6 @@ use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\ReasonCategoryService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
@@ -39,6 +38,7 @@ use qtism\runtime\tests\AssessmentTestSessionState;
 use tao_helpers_Date as DateHelper;
 
 /**
+ * @deprecated
  * This temporary helpers is a temporary way to return data to the controller.
  * This helps isolating the mock code from the real controller one.
  * It will be replaced by a real service afterward.
