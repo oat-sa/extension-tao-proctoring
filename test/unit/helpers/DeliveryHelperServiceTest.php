@@ -69,6 +69,11 @@ class DeliveryHelperServiceTest extends TestCase
      */
     private $propertyMock;
 
+    /**
+     * @var array
+     */
+    private $deliveryExecution;
+
     public function setUp()
     {
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
@@ -78,7 +83,13 @@ class DeliveryHelperServiceTest extends TestCase
         $this->proctoringExtensionMock = $this->createMock(common_ext_Extension::class);
         $this->modelMock = $this->createMock(Ontology::class);
         $this->propertyMock = $this->createMock(\core_kernel_classes_Property::class);
-
+        $this->deliveryExecution = [
+            'test_taker' => 'some test taker',
+            'delivery_execution_id' => 'delivery_id_string',
+            'delivery_id' => 'delivery_id_string',
+            'delivery_name' => 'delivery_name_string',
+            'start_time' => '1567508223.829546',
+        ];
 
         $this->serviceLocatorMock = $this->getServiceLocatorMock([
             SessionStateService::SERVICE_ID => $this->sessionStateServiceMock,
@@ -101,13 +112,13 @@ class DeliveryHelperServiceTest extends TestCase
 
     public function testAdjustDeliveryExecutionsFinished()
     {
-        $deliveryExecutions[] = [
-            'status' => "http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished",
-            'current_assessment_item' => '{"title":"finished","itemPosition":"1","itemCount":"2"}',
-        ];
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+        $deliveryExecutions[] = $this->deliveryExecution;
 
         $deliveryHelperService = new DeliveryHelperService();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
@@ -135,9 +146,11 @@ class DeliveryHelperServiceTest extends TestCase
 
     public function testAdjustDeliveryExecutionsOnline()
     {
-        $deliveryExecutions[] = [
-            'last_test_taker_activity' => "1567508648.2458",
-        ];
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['last_test_taker_activity'] = '1567508648.2458';
+
+        $deliveryExecutions[] = $this->deliveryExecution;
 
         $deliveryHelperService = new DeliveryHelperService();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
@@ -154,10 +167,13 @@ class DeliveryHelperServiceTest extends TestCase
 
     public function testAdjustDeliveryExecutionsUserExtraFields()
     {
-        $deliveryExecutions[] = [
-            'test_category' => "http://www.nccer.org/testmodel#category_01",
-            'test_taker' => "12345",
-        ];
+        $this->deliveryExecution['test_category'] = 'http://www.nccer.org/testmodel#category_01';
+        $this->deliveryExecution['test_taker'] = '12345';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+
+
+        $deliveryExecutions[] = $this->deliveryExecution;
 
 
         $this->proctoringExtensionMock->method('getConfig')->willReturnOnConsecutiveCalls(
@@ -191,9 +207,10 @@ class DeliveryHelperServiceTest extends TestCase
 
     public function testAdjustDeliveryExecutionsProgressStringWithNoOption()
     {
-        $deliveryExecutions[] = [
-            'current_assessment_item' => '{"title":"in progress","itemPosition":"1","itemCount":"2"}',
-        ];
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"in progress","itemPosition":"1","itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive';
+        $deliveryExecutions[] = $this->deliveryExecution;
+
         $this->sessionStateServiceMock->method('hasOption')->willReturn(false);
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
         $modelMock = $this->createMock(Model::class);
@@ -211,9 +228,9 @@ class DeliveryHelperServiceTest extends TestCase
     public function testAdjustDeliveryExecutionsProgressStringWithCustomOption()
     {
         //Prepare
-        $deliveryExecutions[] = [
-            'current_assessment_item' => '{"title":"finished"}',
-        ];
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $deliveryExecutions[] = $this->deliveryExecution;
         $this->sessionStateServiceMock->method('hasOption')->willReturn(true);
         $this->sessionStateServiceMock->method('getOption')->willReturn('%s');
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
