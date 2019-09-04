@@ -23,6 +23,7 @@ use common_ext_ExtensionsManager;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
@@ -88,7 +89,7 @@ class DeliveryHelperService extends ConfigurableService
 
             $executionState = $cachedData[DeliveryMonitoringService::STATUS];
             $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
-                ? (float) $cachedData[DeliveryMonitoringService::EXTRA_TIME]
+                ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
                 : 0;
             $remaining = $this->getRemainingTime($cachedData);
             $approximatedRemaining = $this->getApproximatedRemainingTime($cachedData, $online);
@@ -101,7 +102,7 @@ class DeliveryHelperService extends ConfigurableService
                 ),
                 'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
                 'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
-                    ? (bool) $cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
+                    ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                     : null,
                 'timer' => [
                     'lastActivity' => $lastActivity,
@@ -110,10 +111,10 @@ class DeliveryHelperService extends ConfigurableService
                     'remaining_time' => $remaining,
                     'extraTime' => $extraTime,
                     'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
-                        ? (float) $cachedData[DeliveryMonitoringService::EXTENDED_TIME]
+                        ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                         : '',
                     'consumedExtraTime' => isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])
-                        ? (float) $cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
+                        ? (float)$cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
                         : 0
                 ],
                 'testTaker' => $testTaker,
@@ -150,7 +151,7 @@ class DeliveryHelperService extends ConfigurableService
             $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
             $elapsedApprox = $now - $lastActivity;
             $duration = isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])
-                ? (float) $cachedData[DeliveryMonitoringService::ITEM_DURATION]
+                ? (float)$cachedData[DeliveryMonitoringService::ITEM_DURATION]
                 : 0;
             $elapsedApprox += $duration;
         }
@@ -159,7 +160,7 @@ class DeliveryHelperService extends ConfigurableService
             $elapsedApprox = 0;
         }
 
-        return round((float) $remaining - $elapsedApprox);
+        return round((float)$remaining - $elapsedApprox);
     }
 
     /**
@@ -168,8 +169,8 @@ class DeliveryHelperService extends ConfigurableService
      */
     private function getRemainingTime(array $cachedData)
     {
-        $remaining  = isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])
-            ? (int) $cachedData[DeliveryMonitoringService::REMAINING_TIME]
+        $remaining = isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])
+            ? (int)$cachedData[DeliveryMonitoringService::REMAINING_TIME]
             : 0;
         return $remaining;
     }
@@ -237,7 +238,11 @@ class DeliveryHelperService extends ConfigurableService
     private function getProgressString(array $cachedData)
     {
         $progressStr = $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM];
+
         if (($progress = json_decode($progressStr, true)) !== null) {
+            if (in_array($cachedData[DeliveryMonitoringService::STATUS], [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED], true)) {
+                return $progress['title'];
+            }
             $format = $this->getSessionStateService()->hasOption(SessionStateService::OPTION_STATE_FORMAT)
                 ? $this->getSessionStateService()->getOption(SessionStateService::OPTION_STATE_FORMAT)
                 : __('%s - item %p/%c');
