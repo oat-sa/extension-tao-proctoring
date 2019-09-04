@@ -20,9 +20,7 @@
 
 namespace oat\taoProctoring\helpers;
 
-use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
-use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterface;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
@@ -30,10 +28,8 @@ use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\ReasonCategoryService;
-use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
-use oat\taoQtiTest\models\SessionStateService;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use tao_helpers_Date as DateHelper;
 
@@ -138,21 +134,6 @@ class DeliveryHelper
         );
 
         return $entry;
-    }
-
-    /**
-     * Gets the aggregated data for a filtered set of delivery executions of a given delivery
-     * This is performance critical, would need to find a way to optimize to obtain such information
-     *
-     * @param core_kernel_classes_Resource $delivery
-     * @param core_kernel_classes_Resource $testCenter
-     * @param array $options
-     * @return array
-     */
-    public static function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
-    {
-        $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
     }
 
     /**
@@ -334,10 +315,6 @@ class DeliveryHelper
         return self::getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
     }
 
-    public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
-        return self::adjustDeliveryExecutions($deliveryExecutions, $sortOptions);
-    }
-
     /**
      * Converts a frontend column name into database column name.
      * Useful to translate the name of a column to sort.
@@ -350,135 +327,6 @@ class DeliveryHelper
             $column = self::$columnsMap[$column];
         }
         return $column;
-    }
-
-    /**
-     * Adjusts a list of delivery executions: add information, format the result
-     * @param DeliveryExecution[] $deliveryExecutions
-     * @return array
-     * @internal param array $options
-     */
-    private static function adjustDeliveryExecutions($deliveryExecutions) {
-
-        /** @var TestSessionConnectivityStatusService $testSessionConnectivityStatusService */
-        $testSessionConnectivityStatusService = ServiceManager::getServiceManager()->get(TestSessionConnectivityStatusService::SERVICE_ID);
-
-        $executions = [];
-        foreach ($deliveryExecutions as $cachedData) {
-
-            $progressStr = $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM];
-            if (($progress = json_decode($progressStr, true)) !== null) {
-                $sessionStateService = ServiceManager::getServiceManager()->get(SessionStateService::SERVICE_ID);
-                $format = $sessionStateService->hasOption(SessionStateService::OPTION_STATE_FORMAT)
-                    ? $sessionStateService->getOption(SessionStateService::OPTION_STATE_FORMAT)
-                    : __('%s - item %p/%c');
-                $map = array(
-                    '%s' => $progress['title'] ?? '',
-                    '%p' => $progress['itemPosition'] ?? '',
-                    '%c' => $progress['itemCount'] ?? ''
-                );
-                $progressStr = strtr($format, $map);
-            }
-
-            $state = [
-                'status' => $cachedData[DeliveryMonitoringService::STATUS],
-                'progress' => __($progressStr)
-            ];
-
-            $testTaker = [];
-            $extraFields = [];
-
-            /* @var $user User */
-            $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-            $testTaker['test_taker_last_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME]):'';
-            $testTaker['test_taker_first_name'] = (isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]))?_dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME]):'';
-
-            foreach(self::_getUserExtraFields() as $field){
-                $value = isset($cachedData[$field['id']]) ? _dh($cachedData[$field['id']]) : '';
-                if (\common_Utils::isUri($value)) {
-                    $value = (new \core_kernel_classes_Resource($value))->getLabel();
-                }
-                $extraFields[$field['id']] = $value;
-            }
-
-            $online = null;
-            if ($testSessionConnectivityStatusService->hasOnlineMode()) {
-                $rawConnectivity = isset($cachedData[DeliveryMonitoringService::CONNECTIVITY]) ? $cachedData[DeliveryMonitoringService::CONNECTIVITY] : false;
-                $online = $testSessionConnectivityStatusService->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $rawConnectivity);
-            }
-
-            if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) && $online) {
-                $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
-            } else {
-                $lastActivity = null;
-            }
-
-            $executionState = $cachedData[DeliveryMonitoringService::STATUS];
-            $extraTime = (isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::EXTRA_TIME]) : 0;
-            $remaining = self::getRemainingTime($cachedData);
-            $approximatedRemaining = self::getApproximatedRemainingTime($cachedData, $online, $lastActivity);
-
-            $execution = array(
-                'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
-                'delivery' => array(
-                    'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                    'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
-                ),
-                'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
-                'allowExtraTime' => (isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])) ? boolval($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]) : null,
-                'timer' => [
-                    'lastActivity' => $lastActivity,
-                    'countDown' => (DeliveryExecution::STATE_ACTIVE == $executionState && $online) ? true : false,
-                    'approximatedRemaining' => $approximatedRemaining,
-                    'remaining_time' => $remaining,
-                    'extraTime' => $extraTime,
-                    'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1) ? floatval($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) : '',
-                    'consumedExtraTime' => (isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])) ? floatval($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) : 0
-                ],
-                'testTaker' => $testTaker,
-                'extraFields' => $extraFields,
-                'state' => $state,
-            );
-
-            if ($online) {
-                $execution['online'] = $online;
-            }
-
-            $executions[] = $execution;
-        }
-
-        return $executions;
-    }
-
-    private static function getRemainingTime(array $cachedData)
-    {
-        $remaining  = (isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])) ? intval($cachedData[DeliveryMonitoringService::REMAINING_TIME]) : 0;
-        return $remaining;
-    }
-
-    private static function getApproximatedRemainingTime(array $cachedData, $online)
-    {
-        $now = microtime(true);
-        $remaining = self::getRemainingTime($cachedData);
-        $elapsedApprox = 0;
-        $executionState = $cachedData[DeliveryMonitoringService::STATUS];
-
-        if (
-            isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) &&
-            $executionState === DeliveryExecution::STATE_ACTIVE
-        ) {
-            $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
-            $elapsedApprox = $now - $lastActivity;
-            $duration = (isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])) ? floatval($cachedData[DeliveryMonitoringService::ITEM_DURATION]) : 0;
-            $elapsedApprox += $duration;
-        }
-
-        if (is_bool($online) && $online === false) {
-            $elapsedApprox = 0;
-        }
-
-        $approximatedRemaining = round(floatval($remaining) - $elapsedApprox);
-        return $approximatedRemaining;
     }
 
     /**
