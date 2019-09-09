@@ -16,7 +16,10 @@
  *
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
+namespace oat\taoProctoring\test\unit\model\execution;
 
+use common_ext_Extension;
+use common_ext_ExtensionsManager;
 use oat\generis\model\data\Model;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
@@ -25,9 +28,14 @@ use oat\tao\model\service\ApplicationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
+use PHPUnit_Framework_MockObject_MockObject;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class DeliveryHelperServiceTest extends TestCase
+/**
+ * Class DeliveryHelperServiceTest
+ * @author Bartlomiej Marszal
+ */
+class DeliveryExecutionListTest extends TestCase
 {
     /**
      * @var ServiceLocatorInterface
@@ -177,8 +185,8 @@ class DeliveryHelperServiceTest extends TestCase
 
         $this->proctoringExtensionMock->method('getConfig')->willReturnOnConsecutiveCalls(
             [
-                'test_category' => "http://www.nccer.org/delivery#inheritedTestCategory",
-                'test_taker' => "https://nccersso.taocloud.org/tao.rdf#i1567503166294083"
+                'test_category' => 'http://www.nccer.org/delivery#inheritedTestCategory',
+                'test_taker' => 'https://nccersso.taocloud.org/tao.rdf#i1567503166294083'
             ],
             [
                 'testTaker' => [
@@ -212,6 +220,7 @@ class DeliveryHelperServiceTest extends TestCase
 
         $this->sessionStateServiceMock->method('hasOption')->willReturn(false);
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
+        /** @var Model|PHPUnit_Framework_MockObject_MockObject $modelMock */
         $modelMock = $this->createMock(Model::class);
         $modelMock->method('getProperty');
 
