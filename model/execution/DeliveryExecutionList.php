@@ -275,7 +275,7 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function getLastActivity(array $cachedData, ?bool $online)
     {
-        if (isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY]) && $online) {
+        if ($online && isset($cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY])) {
             $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
         } else {
             $lastActivity = null;
