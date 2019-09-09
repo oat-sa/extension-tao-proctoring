@@ -17,14 +17,13 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoProctoring\helpers;
+namespace oat\taoProctoring\model\execution;
 
 use common_ext_ExtensionsManager;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;

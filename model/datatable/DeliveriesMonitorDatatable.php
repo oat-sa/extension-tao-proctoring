@@ -22,7 +22,7 @@ namespace oat\taoProctoring\model\datatable;
 
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
-use oat\taoProctoring\helpers\DeliveryHelperService;
+use oat\taoProctoring\model\execution\DeliveryHelperService;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use oat\taoProctoring\model\ProctorService;

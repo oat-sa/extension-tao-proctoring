@@ -22,14 +22,13 @@ use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\oatbox\service\ServiceManager;
 use oat\tao\model\service\ApplicationService;
-use oat\taoProctoring\helpers\DeliveryHelperService;
+use oat\taoProctoring\model\execution\DeliveryHelperService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class DeliveryHelperServiceTest extends TestCase
 {
-
     /**
      * @var ServiceLocatorInterface
      */
