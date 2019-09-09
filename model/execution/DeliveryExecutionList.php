@@ -50,82 +50,91 @@ class DeliveryExecutionList extends ConfigurableService
 
         /** @var array $cachedData */
         foreach ($deliveryExecutions as $cachedData) {
-
-            $progressStr = $this->getProgressString($cachedData);
-
-            $state = [
-                'status' => $cachedData[DeliveryMonitoringService::STATUS],
-                'progress' => __($progressStr)
-            ];
-
-            $testTaker = [];
-            $extraFields = [];
-
-            /* @var $user User */
-            $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
-            $testTaker['test_taker_last_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
-                ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
-                : '';
-            $testTaker['test_taker_first_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
-                ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
-                : '';
-
-            foreach ($userExtraFields as $field) {
-                $value = isset($cachedData[$field['id']])
-                    ? _dh($cachedData[$field['id']])
-                    : '';
-                if (\common_Utils::isUri($value)) {
-                    $value = $this->getResource($value)->getLabel();
-                }
-                $extraFields[$field['id']] = $value;
-            }
-
-            $online = $this->isOnline($cachedData);
-            $lastActivity = $this->getLastActivity($cachedData, $online);
-
-            $executionState = $cachedData[DeliveryMonitoringService::STATUS];
-            $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
-                ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
-                : 0;
-            $remaining = $this->getRemainingTime($cachedData);
-            $approximatedRemaining = $this->getApproximatedRemainingTime($cachedData, $online);
-
-            $execution = array(
-                'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
-                'delivery' => array(
-                    'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                    'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
-                ),
-                'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
-                'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
-                    ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
-                    : null,
-                'timer' => [
-                    'lastActivity' => $lastActivity,
-                    'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
-                    'approximatedRemaining' => $approximatedRemaining,
-                    'remaining_time' => $remaining,
-                    'extraTime' => $extraTime,
-                    'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
-                        ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
-                        : '',
-                    'consumedExtraTime' => isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])
-                        ? (float)$cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
-                        : 0
-                ],
-                'testTaker' => $testTaker,
-                'extraFields' => $extraFields,
-                'state' => $state,
-            );
-
-            if ($online) {
-                $execution['online'] = $online;
-            }
-
-            $executions[] = $execution;
+            $executions[] = $this->getSingleExecution($cachedData, $userExtraFields);
         }
 
         return $executions;
+    }
+
+    private function getSingleExecution($cachedData, $userExtraFields)
+    {
+        $progressStr = $this->getProgressString($cachedData);
+
+        $state = [
+            'status' => $cachedData[DeliveryMonitoringService::STATUS],
+            'progress' => __($progressStr)
+        ];
+
+        $testTaker = [];
+        $extraFields = [];
+
+        /* @var $user User */
+        $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
+        $testTaker['test_taker_last_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
+            ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
+            : '';
+        $testTaker['test_taker_first_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
+            ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
+            : '';
+
+        foreach ($userExtraFields as $field) {
+            $extraFields[$field['id']] = $this->getFieldId($cachedData, $field);
+        }
+
+        $online = $this->isOnline($cachedData);
+        $lastActivity = $this->getLastActivity($cachedData, $online);
+
+        $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+        $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
+            ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
+            : 0;
+        $remaining = $this->getRemainingTime($cachedData);
+        $approximatedRemaining = $this->getApproximatedRemainingTime($cachedData, $online);
+
+        $execution = array(
+            'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
+            'delivery' => array(
+                'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
+                'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
+            ),
+            'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
+            'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
+                ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
+                : null,
+            'timer' => [
+                'lastActivity' => $lastActivity,
+                'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
+                'approximatedRemaining' => $approximatedRemaining,
+                'remaining_time' => $remaining,
+                'extraTime' => $extraTime,
+                'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
+                    ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
+                    : '',
+                'consumedExtraTime' => isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])
+                    ? (float)$cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
+                    : 0
+            ],
+            'testTaker' => $testTaker,
+            'extraFields' => $extraFields,
+            'state' => $state,
+        );
+
+        if ($online) {
+            $execution['online'] = $online;
+        }
+
+        return $execution;
+    }
+
+    private function getFieldId($cachedData, $field)
+    {
+        $value = isset($cachedData[$field['id']])
+            ? _dh($cachedData[$field['id']])
+            : '';
+        if (\common_Utils::isUri($value)) {
+            $value = $this->getResource($value)->getLabel();
+        }
+        return $value;
     }
 
     /**
