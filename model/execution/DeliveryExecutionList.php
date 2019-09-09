@@ -280,11 +280,20 @@ class DeliveryExecutionList extends ConfigurableService
         return $lastActivity;
     }
 
+    /**
+     * @param $input
+     * @return string
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
+     */
     private function sanitizeUserInput($input)
     {
         return htmlentities($input, ENT_COMPAT, $this->getApplicationService()->getDefaultEncoding());
     }
 
+    /**
+     * @return ApplicationService
+     */
     private function getApplicationService()
     {
         return $this->getServiceLocator()->get(ApplicationService::SERVICE_ID);
