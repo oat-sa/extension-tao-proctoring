@@ -22,7 +22,7 @@ namespace oat\taoProctoring\model\datatable;
 
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
-use oat\taoProctoring\model\execution\DeliveryHelperService;
+use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use oat\taoProctoring\model\ProctorService;
@@ -131,10 +131,10 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
     }
 
     /**
-     * @return DeliveryHelperService
+     * @return DeliveryExecutionList
      */
     private function getDeliveryHelperService()
     {
-        return $this->getServiceLocator()->get(DeliveryHelperService::class);
+        return $this->getServiceLocator()->get(DeliveryExecutionList::class);
     }
 }

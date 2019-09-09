@@ -32,7 +32,7 @@ use oat\taoQtiTest\models\SessionStateService;
  * Class DeliveryHelperService
  * @author Bartlomiej Marszal
  */
-class DeliveryHelperService extends ConfigurableService
+class DeliveryExecutionList extends ConfigurableService
 {
     use OntologyAwareTrait;
     /**

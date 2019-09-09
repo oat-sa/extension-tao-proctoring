@@ -22,7 +22,7 @@ use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\oatbox\service\ServiceManager;
 use oat\tao\model\service\ApplicationService;
-use oat\taoProctoring\model\execution\DeliveryHelperService;
+use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -115,7 +115,7 @@ class DeliveryHelperServiceTest extends TestCase
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
         $deliveryExecutions[] = $this->deliveryExecution;
 
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
         /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
@@ -126,7 +126,7 @@ class DeliveryHelperServiceTest extends TestCase
     {
         $deliveryExecutions[] = $this->getExecutionExample();
 
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
 
         /* @noinspection PhpUnhandledExceptionInspection */
@@ -151,7 +151,7 @@ class DeliveryHelperServiceTest extends TestCase
 
         $deliveryExecutions[] = $this->deliveryExecution;
 
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
 
         //getTestSessionConnectivityStatusService
@@ -188,7 +188,7 @@ class DeliveryHelperServiceTest extends TestCase
             ]
         );
 
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
         $deliveryHelperService->setModel($this->modelMock);
         $this->modelMock->method('getProperty')->willReturn($this->propertyMock);
@@ -215,7 +215,7 @@ class DeliveryHelperServiceTest extends TestCase
         $modelMock = $this->createMock(Model::class);
         $modelMock->method('getProperty');
 
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setModel($modelMock);
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
         /* @noinspection PhpUnhandledExceptionInspection */
@@ -235,7 +235,7 @@ class DeliveryHelperServiceTest extends TestCase
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
 
         //Execute
-        $deliveryHelperService = new DeliveryHelperService();
+        $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
         /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
