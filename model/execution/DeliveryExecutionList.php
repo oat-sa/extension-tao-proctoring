@@ -221,30 +221,6 @@ class DeliveryExecutionList extends ConfigurableService
     }
 
     /**
-     * @return TestSessionConnectivityStatusService
-     */
-    private function getTestSessionConnectivityStatusService()
-    {
-        return $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
-    }
-
-    /**
-     * @return SessionStateService
-     */
-    private function getSessionStateService()
-    {
-        return $this->getServiceLocator()->get(SessionStateService::SERVICE_ID);
-    }
-
-    /**
-     * @return common_ext_ExtensionsManager
-     */
-    private function getExtensionManagerService()
-    {
-        return $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
-    }
-
-    /**
      * @param array $cachedData
      * @return mixed|string
      */
@@ -252,7 +228,11 @@ class DeliveryExecutionList extends ConfigurableService
     {
         $progressStr = $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM];
 
-        if (($progress = json_decode($progressStr, true)) !== null) {
+        if (($progress = json_decode($progressStr, true)) === null) {
+            return $progressStr;
+        }
+
+        if ($progress !== null) {
             if (in_array($cachedData[DeliveryMonitoringService::STATUS], [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED], true)) {
                 return $progress['title'];
             }
@@ -266,6 +246,7 @@ class DeliveryExecutionList extends ConfigurableService
             );
             $progressStr = strtr($format, $map);
         }
+
         return $progressStr;
     }
 
@@ -296,5 +277,29 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         return $lastActivity;
+    }
+
+    /**
+     * @return TestSessionConnectivityStatusService
+     */
+    private function getTestSessionConnectivityStatusService()
+    {
+        return $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+    }
+
+    /**
+     * @return SessionStateService
+     */
+    private function getSessionStateService()
+    {
+        return $this->getServiceLocator()->get(SessionStateService::SERVICE_ID);
+    }
+
+    /**
+     * @return common_ext_ExtensionsManager
+     */
+    private function getExtensionManagerService()
+    {
+        return $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
     }
 }
