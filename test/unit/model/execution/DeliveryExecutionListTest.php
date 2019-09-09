@@ -23,7 +23,6 @@ use common_ext_ExtensionsManager;
 use oat\generis\model\data\Model;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
-use oat\oatbox\service\ServiceManager;
 use oat\tao\model\service\ApplicationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
@@ -102,19 +101,10 @@ class DeliveryExecutionListTest extends TestCase
             SessionStateService::SERVICE_ID => $this->sessionStateServiceMock,
             common_ext_ExtensionsManager::SERVICE_ID => $this->extensionManagerMock,
             TestSessionConnectivityStatusService::SERVICE_ID => $this->testSessionConnectivityStatusServiceMock,
+            ApplicationService::SERVICE_ID => $this->applicationServiceMock
         ]);
 
         $this->extensionManagerMock->method('getExtensionById')->willReturn($this->proctoringExtensionMock);
-
-
-        /** @var ServiceManager|\PHPUnit_Framework_MockObject_MockObject $serviceManager */
-        $serviceManager = $this->createMock(ServiceManager::class);
-        $serviceManager
-            ->method('get')
-            ->with(ApplicationService::SERVICE_ID)
-            ->willReturn($this->applicationServiceMock);
-
-        ServiceManager::setServiceManager($serviceManager);
     }
 
     public function testAdjustDeliveryExecutionsFinished()

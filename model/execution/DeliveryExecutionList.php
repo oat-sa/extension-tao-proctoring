@@ -23,6 +23,7 @@ use common_ext_ExtensionsManager;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
+use oat\tao\model\service\ApplicationService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
@@ -71,10 +72,10 @@ class DeliveryExecutionList extends ConfigurableService
         /* @var $user User */
         $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
         $testTaker['test_taker_last_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
-            ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
+            ? $this->sanitizeUserInput($cachedData[DeliveryMonitoringService::TEST_TAKER_LAST_NAME])
             : '';
         $testTaker['test_taker_first_name'] = isset($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
-            ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
+            ? $this->sanitizeUserInput($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
             : '';
 
         foreach ($userExtraFields as $field) {
@@ -95,7 +96,7 @@ class DeliveryExecutionList extends ConfigurableService
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
                 'uri' => $cachedData[DeliveryMonitoringService::DELIVERY_ID],
-                'label' => _dh($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
+                'label' => $this->sanitizeUserInput($cachedData[DeliveryMonitoringService::DELIVERY_NAME]),
             ),
             'start_time' => $cachedData[DeliveryMonitoringService::START_TIME],
             'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
@@ -129,7 +130,7 @@ class DeliveryExecutionList extends ConfigurableService
     private function getFieldId($cachedData, $field)
     {
         $value = isset($cachedData[$field['id']])
-            ? _dh($cachedData[$field['id']])
+            ? $this->sanitizeUserInput($cachedData[$field['id']])
             : '';
         if (\common_Utils::isUri($value)) {
             $value = $this->getResource($value)->getLabel();
@@ -277,6 +278,16 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         return $lastActivity;
+    }
+
+    private function sanitizeUserInput($input)
+    {
+        return htmlentities($input, ENT_COMPAT, $this->getApplicationService()->getDefaultEncoding());
+    }
+
+    private function getApplicationService()
+    {
+        return $this->getServiceLocator()->get(ApplicationService::SERVICE_ID);
     }
 
     /**
