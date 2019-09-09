@@ -819,7 +819,7 @@ msgid "Terminate"
 msgstr "Mettre fin"
 
 msgid "Terminate and irregularity"
-msgstr "Résiliation et irrégularité"
+msgstr "Clôturer le test"
 
 msgid "Terminate Session"
 msgstr "Mettre fin à une session"
