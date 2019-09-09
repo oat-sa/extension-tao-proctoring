@@ -35,11 +35,6 @@ use oat\taoQtiTest\models\SessionStateService;
 class DeliveryExecutionList extends ConfigurableService
 {
     use OntologyAwareTrait;
-    /**
-     * Cached value for prepopulated fields
-     * @var array
-     */
-    private $extraFields = [];
 
     /**
      * Adjusts a list of delivery executions: add information, format the result
@@ -51,6 +46,8 @@ class DeliveryExecutionList extends ConfigurableService
     public function adjustDeliveryExecutions($deliveryExecutions)
     {
         $executions = [];
+        $userExtraFields = $this->getUserExtraFields();
+
         /** @var array $cachedData */
         foreach ($deliveryExecutions as $cachedData) {
 
@@ -73,7 +70,7 @@ class DeliveryExecutionList extends ConfigurableService
                 ? _dh($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
                 : '';
 
-            foreach ($this->getUserExtraFields() as $field) {
+            foreach ($userExtraFields as $field) {
                 $value = isset($cachedData[$field['id']])
                     ? _dh($cachedData[$field['id']])
                     : '';
@@ -183,27 +180,35 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function getUserExtraFields()
     {
-        if (!$this->extraFields) {
-            $proctoringExtension = $this->getExtensionManagerService()->getExtensionById('taoProctoring');
-            $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
+        $extraFields = [];
+        $proctoringExtension = $this->getExtensionManagerService()->getExtensionById('taoProctoring');
+        $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
+        if (empty($userExtraFields) || !is_array($userExtraFields)) {
+            return [];
+        }
 
-            $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
-            if (!empty($userExtraFields) && is_array($userExtraFields)) {
-                foreach ($userExtraFields as $name => $uri) {
-                    $property = $this->getProperty($uri);
-                    $settings = array_key_exists($name, $userExtraFieldsSettings)
-                        ? $userExtraFieldsSettings[$name]
-                        : [];
-                    $this->extraFields[] = array_merge(array(
-                        'id' => $name,
-                        'property' => $property,
-                        'label' => __($property->getLabel()),
-                    ), $settings);
-                }
+        $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
+        if (!empty($userExtraFields) && is_array($userExtraFields)) {
+            foreach ($userExtraFields as $name => $uri) {
+                $extraFields[] = $this->stupidName($uri, $name, $userExtraFieldsSettings);
             }
         }
 
-        return $this->extraFields;
+        return $extraFields;
+    }
+
+    private function stupidName($uri, $name, $userExtraFieldsSettings)
+    {
+        $property = $this->getProperty($uri);
+        $settings = array_key_exists($name, $userExtraFieldsSettings)
+            ? $userExtraFieldsSettings[$name]
+            : [];
+
+        return array_merge([
+            'id' => $name,
+            'property' => $property,
+            'label' => __($property->getLabel()),
+        ], $settings);
     }
 
     /**
