@@ -198,9 +198,9 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
-            foreach ($userExtraFields as $name => $uri) {
-                $extraFields[] = $this->mergeExtraFieldsSettings($uri, $name, $userExtraFieldsSettings);
-            }
+        foreach ($userExtraFields as $name => $uri) {
+            $extraFields[] = $this->mergeExtraFieldsSettings($uri, $name, $userExtraFieldsSettings);
+        }
 
         return $extraFields;
     }
@@ -231,20 +231,18 @@ class DeliveryExecutionList extends ConfigurableService
             return $progressStr;
         }
 
-        if ($progress !== null) {
-            if (in_array($cachedData[DeliveryMonitoringService::STATUS], [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED], true)) {
-                return $progress['title'];
-            }
-            $format = $this->getSessionStateService()->hasOption(SessionStateService::OPTION_STATE_FORMAT)
-                ? $this->getSessionStateService()->getOption(SessionStateService::OPTION_STATE_FORMAT)
-                : __('%s - item %p/%c');
-            $map = array(
-                '%s' => $progress['title'] ?? '',
-                '%p' => $progress['itemPosition'] ?? '',
-                '%c' => $progress['itemCount'] ?? ''
-            );
-            $progressStr = strtr($format, $map);
+        if (in_array($cachedData[DeliveryMonitoringService::STATUS], [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED], true)) {
+            return $progress['title'];
         }
+        $format = $this->getSessionStateService()->hasOption(SessionStateService::OPTION_STATE_FORMAT)
+            ? $this->getSessionStateService()->getOption(SessionStateService::OPTION_STATE_FORMAT)
+            : __('%s - item %p/%c');
+        $map = array(
+            '%s' => $progress['title'] ?? '',
+            '%p' => $progress['itemPosition'] ?? '',
+            '%c' => $progress['itemCount'] ?? ''
+        );
+        $progressStr = strtr($format, $map);
 
         return $progressStr;
     }
