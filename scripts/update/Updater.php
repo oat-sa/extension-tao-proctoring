@@ -902,5 +902,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('17.0.0', '17.2.3');
+
+        if ($this->isVersion('17.2.3')) {
+            /** @var GuiSettingsService $guiService */
+            $guiService = $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID);
+            $guiService->setOption(GuiSettingsService::OPTION_SET_START_DATA_ONE_DAY, true);
+            $this->getServiceManager()->register(GuiSettingsService::SERVICE_ID, $guiService);
+            $this->setVersion('17.3.0');
+        }
     }
 }
