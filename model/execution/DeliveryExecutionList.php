@@ -198,11 +198,9 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
-        if (!empty($userExtraFields) && is_array($userExtraFields)) {
             foreach ($userExtraFields as $name => $uri) {
                 $extraFields[] = $this->mergeExtraFieldsSettings($uri, $name, $userExtraFieldsSettings);
             }
-        }
 
         return $extraFields;
     }
