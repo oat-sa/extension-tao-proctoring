@@ -254,8 +254,8 @@ class DeliveryExecutionList extends ConfigurableService
     private function getProgressString(array $cachedData)
     {
         $progressStr = $cachedData[DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM];
-
-        if (($progress = json_decode($progressStr, true)) === null) {
+        $progress = json_decode($progressStr, true);
+        if ($progress === null) {
             return $progressStr;
         }
 
