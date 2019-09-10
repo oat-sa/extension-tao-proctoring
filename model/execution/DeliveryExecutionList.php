@@ -271,9 +271,8 @@ class DeliveryExecutionList extends ConfigurableService
             '%p' => $progress['itemPosition'] ?? '',
             '%c' => $progress['itemCount'] ?? ''
         );
-        $progressStr = strtr($format, $map);
 
-        return $progressStr;
+        return strtr($format, $map);
     }
 
     /**
