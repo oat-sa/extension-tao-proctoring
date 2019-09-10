@@ -218,7 +218,6 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function getUserExtraFields()
     {
-        $extraFields = [];
         $proctoringExtension = $this->getExtensionManagerService()->getExtensionById('taoProctoring');
         $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
         if (empty($userExtraFields) || !is_array($userExtraFields)) {
@@ -226,6 +225,8 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
+
+        $extraFields = [];
         foreach ($userExtraFields as $name => $uri) {
             $extraFields[] = $this->mergeExtraFieldsSettings($uri, $name, $userExtraFieldsSettings);
         }
