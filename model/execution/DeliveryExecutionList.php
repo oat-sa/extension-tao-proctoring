@@ -281,11 +281,10 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function isOnline(array $cachedData)
     {
-        $online = null;
         if ($this->getTestSessionConnectivityStatusService()->hasOnlineMode()) {
-            $online = $this->getTestSessionConnectivityStatusService()->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            return $this->getTestSessionConnectivityStatusService()->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
         }
-        return $online;
+        return null;
     }
 
     /**
