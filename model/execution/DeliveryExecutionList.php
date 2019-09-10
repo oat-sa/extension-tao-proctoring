@@ -60,22 +60,13 @@ class DeliveryExecutionList extends ConfigurableService
 
     /**
      * @param $cachedData
-     * @param $userExtraFields
      * @return array
      * @throws \common_exception_Error
      * @throws \common_ext_ExtensionException
      */
-    private function getSingleExecution($cachedData, $userExtraFields)
+    private function createTestTaker($cachedData)
     {
-        $progressStr = $this->getProgressString($cachedData);
-
-        $state = [
-            'status' => $cachedData[DeliveryMonitoringService::STATUS],
-            'progress' => __($progressStr)
-        ];
-
         $testTaker = [];
-        $extraFields = [];
 
         /* @var $user User */
         $testTaker['id'] = $cachedData[DeliveryMonitoringService::TEST_TAKER];
@@ -86,20 +77,25 @@ class DeliveryExecutionList extends ConfigurableService
             ? $this->sanitizeUserInput($cachedData[DeliveryMonitoringService::TEST_TAKER_FIRST_NAME])
             : '';
 
-        foreach ($userExtraFields as $field) {
-            $extraFields[$field['id']] = $this->getFieldId($cachedData, $field);
-        }
+        return $testTaker;
+    }
+
+    /**
+     * @param $cachedData
+     * @param $extraFields
+     * @return array
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
+     */
+    private function createExecution($cachedData, $extraFields)
+    {
+        $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
+        ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
+        : 0;
 
         $online = $this->isOnline($cachedData);
-        $lastActivity = $this->getLastActivity($cachedData, $online);
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
-        $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
-            ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
-            : 0;
-        $remaining = $this->getRemainingTime($cachedData);
-        $approximatedRemaining = $this->getApproximatedRemainingTime($cachedData, $online);
-
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
@@ -111,10 +107,10 @@ class DeliveryExecutionList extends ConfigurableService
                 ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                 : null,
             'timer' => [
-                'lastActivity' => $lastActivity,
+                'lastActivity' => $this->getLastActivity($cachedData, $online),
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
-                'approximatedRemaining' => $approximatedRemaining,
-                'remaining_time' => $remaining,
+                'approximatedRemaining' => $this->getApproximatedRemainingTime($cachedData, $online),
+                'remaining_time' => $this->getRemainingTime($cachedData),
                 'extraTime' => $extraTime,
                 'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
@@ -123,16 +119,33 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
                     : 0
             ],
-            'testTaker' => $testTaker,
+            'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
-            'state' => $state,
+            'state' => $this->createState($cachedData),
         );
 
-        if ($online) {
+        if ($this->isOnline($cachedData)) {
             $execution['online'] = $online;
         }
 
         return $execution;
+    }
+
+    /**
+     * @param $cachedData
+     * @param $userExtraFields
+     * @return array
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
+     */
+    private function getSingleExecution($cachedData, $userExtraFields)
+    {
+        $extraFields = [];
+        foreach ($userExtraFields as $field) {
+            $extraFields[$field['id']] = $this->getFieldId($cachedData, $field);
+        }
+
+        return $this->createExecution($cachedData, $extraFields);
     }
 
     /**
@@ -332,5 +345,20 @@ class DeliveryExecutionList extends ConfigurableService
     private function getExtensionManagerService()
     {
         return $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+    }
+
+    /**
+     * @param $cachedData
+     * @return array
+     */
+    private function createState($cachedData): array
+    {
+        $progressStr = $this->getProgressString($cachedData);
+
+        $state = [
+            'status' => $cachedData[DeliveryMonitoringService::STATUS],
+            'progress' => __($progressStr)
+        ];
+        return $state;
     }
 }
