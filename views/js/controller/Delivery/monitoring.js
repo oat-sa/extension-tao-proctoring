@@ -635,7 +635,7 @@ define([
                     var showColumnExtendedTime = extractOption(data, 'showColumnExtendedTime', true);
                     var showActionShowHistory = extractOption(data, 'showActionShowHistory', true);
                     var setStartDataOneDay = extractOption(data, 'setStartDataOneDay', true);
-                    
+
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
                     }
@@ -866,6 +866,9 @@ define([
                                             $list.datatable('filter');
                                         }
                                         lastValue = value;
+                                    })
+                                    .on('clear', function () {
+                                        $list.datatable('filter');
                                     });
                             }
                         },
