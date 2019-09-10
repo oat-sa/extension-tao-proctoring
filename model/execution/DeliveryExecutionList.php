@@ -89,10 +89,6 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function createExecution($cachedData, $extraFields)
     {
-        $extraTime = isset($cachedData[DeliveryMonitoringService::EXTRA_TIME])
-        ? (float)$cachedData[DeliveryMonitoringService::EXTRA_TIME]
-        : 0;
-
         $online = $this->isOnline($cachedData);
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
@@ -111,13 +107,11 @@ class DeliveryExecutionList extends ConfigurableService
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
                 'approximatedRemaining' => $this->getApproximatedRemainingTime($cachedData, $online),
                 'remaining_time' => $this->getRemainingTime($cachedData),
-                'extraTime' => $extraTime,
+                'extraTime' => (float) ($cachedData[DeliveryMonitoringService::EXTRA_TIME] ?? 0),
                 'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
-                'consumedExtraTime' => isset($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])
-                    ? (float)$cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
-                    : 0
+                'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
@@ -184,9 +178,7 @@ class DeliveryExecutionList extends ConfigurableService
         ) {
             $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
             $elapsedApprox = $now - $lastActivity;
-            $duration = isset($cachedData[DeliveryMonitoringService::ITEM_DURATION])
-                ? (float)$cachedData[DeliveryMonitoringService::ITEM_DURATION]
-                : 0;
+            $duration = (float) ($cachedData[DeliveryMonitoringService::ITEM_DURATION] ?? 0);
             $elapsedApprox += $duration;
         }
 
@@ -203,10 +195,7 @@ class DeliveryExecutionList extends ConfigurableService
      */
     private function getRemainingTime(array $cachedData)
     {
-        $remaining = isset($cachedData[DeliveryMonitoringService::REMAINING_TIME])
-            ? (int)$cachedData[DeliveryMonitoringService::REMAINING_TIME]
-            : 0;
-        return $remaining;
+        return (int) ($cachedData[DeliveryMonitoringService::REMAINING_TIME] ?? 0);
     }
 
 
