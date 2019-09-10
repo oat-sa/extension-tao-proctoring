@@ -42,6 +42,7 @@ class DeliveryExecutionList extends ConfigurableService
      * @param DeliveryExecution[] $deliveryExecutions
      * @return array
      * @throws \common_ext_ExtensionException
+     * @throws \common_exception_Error
      * @internal param array $options
      */
     public function adjustDeliveryExecutions($deliveryExecutions)
@@ -57,6 +58,13 @@ class DeliveryExecutionList extends ConfigurableService
         return $executions;
     }
 
+    /**
+     * @param $cachedData
+     * @param $userExtraFields
+     * @return array
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
+     */
     private function getSingleExecution($cachedData, $userExtraFields)
     {
         $progressStr = $this->getProgressString($cachedData);
@@ -127,6 +135,13 @@ class DeliveryExecutionList extends ConfigurableService
         return $execution;
     }
 
+    /**
+     * @param $cachedData
+     * @param $field
+     * @return string
+     * @throws \common_exception_Error
+     * @throws \common_ext_ExtensionException
+     */
     private function getFieldId($cachedData, $field)
     {
         $value = isset($cachedData[$field['id']])
