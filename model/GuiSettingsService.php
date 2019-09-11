@@ -76,6 +76,8 @@ class GuiSettingsService extends ConfigurableService
 
     const OPTION_SHOW_ACTION_SHOW_HISTORY = 'showActionShowHistory';
 
+    const OPTION_SET_START_DATA_ONE_DAY = 'setStartDataOneDay';
+
     /**
      * @return array
      */
@@ -93,6 +95,7 @@ class GuiSettingsService extends ConfigurableService
             self::OPTION_SHOW_COLUMN_EXTENDED_TIME  => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) : true,
             self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : false,
             self::OPTION_SHOW_ACTION_SHOW_HISTORY   => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) : true,
+            self::OPTION_SET_START_DATA_ONE_DAY     => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY) ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY) : true,
         ];
     }
 }
