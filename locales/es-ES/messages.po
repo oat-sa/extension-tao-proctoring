@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint106\n"
-"PO-Revision-Date: 2019-07-19T08:15:53\n"
+"Project-Id-Version: TAO 3.3.0-sprint110\n"
+"PO-Revision-Date: 2019-09-13T08:52:38\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: es-ES\n"
@@ -17,6 +17,9 @@ msgid "%1$s - Item %2$s/%3$s"
 msgstr ""
 
 msgid "%d sessions of the delivery %s have not been paused"
+msgstr ""
+
+msgid "%s - item %p/%c"
 msgstr ""
 
 msgid "%s completed"
@@ -155,10 +158,10 @@ msgstr ""
 msgid "Authorize"
 msgstr ""
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr ""
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr ""
 
 msgid "Authorize sessions"
@@ -170,10 +173,10 @@ msgstr ""
 msgid "Authorize the selected proctors"
 msgstr ""
 
-msgid "Authorized"
+msgid "authorized"
 msgstr ""
 
-msgid "authorized"
+msgid "Authorized"
 msgstr ""
 
 msgid "Authorized but not started"
@@ -212,11 +215,11 @@ msgstr ""
 msgid "Behaviour"
 msgstr ""
 
-msgid "Cancel"
-msgstr "Cancelar"
-
 msgid "cancel"
 msgstr "cancelar"
+
+msgid "Cancel"
+msgstr "Cancelar"
 
 msgid "cancel the action"
 msgstr ""
@@ -317,11 +320,11 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "Date"
-msgstr "Fecha"
-
 msgid "date"
 msgstr "fecha"
+
+msgid "Date"
+msgstr "Fecha"
 
 msgid "Days"
 msgstr ""
@@ -387,10 +390,10 @@ msgstr ""
 msgid "Extended Time"
 msgstr ""
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr ""
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr ""
 
 msgid "Extra time granted"
@@ -402,10 +405,10 @@ msgstr ""
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "Finished"
+msgid "finished"
 msgstr ""
 
-msgid "finished"
+msgid "Finished"
 msgstr ""
 
 msgid "First name"
@@ -571,19 +574,19 @@ msgstr ""
 msgid "Pause due to server maintenance"
 msgstr ""
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr ""
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr ""
 
 msgid "Pause sessions"
 msgstr ""
 
-msgid "paused"
+msgid "Paused"
 msgstr ""
 
-msgid "Paused"
+msgid "paused"
 msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
@@ -646,10 +649,10 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
 msgid "Refresh"
@@ -679,10 +682,10 @@ msgstr ""
 msgid "Report irregularities"
 msgstr ""
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr ""
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr ""
 
 msgid "reported for irregularity"
@@ -740,10 +743,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -800,10 +803,10 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-msgid "Subcategory"
+msgid "subcategory"
 msgstr ""
 
-msgid "subcategory"
+msgid "Subcategory"
 msgstr ""
 
 msgid "System generated pause."
@@ -821,10 +824,10 @@ msgstr ""
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
 msgid "Terminate sessions"
@@ -833,10 +836,10 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "terminated"
+msgid "Terminated"
 msgstr ""
 
-msgid "Terminated"
+msgid "terminated"
 msgstr ""
 
 msgid "Test  must be terminated."
@@ -911,10 +914,10 @@ msgstr ""
 msgid "Test site %s"
 msgstr ""
 
-msgid "Test taker"
+msgid "test taker"
 msgstr ""
 
-msgid "test taker"
+msgid "Test taker"
 msgstr ""
 
 msgid "Test takers have been added"

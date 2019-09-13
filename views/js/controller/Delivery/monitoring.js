@@ -634,6 +634,7 @@ define([
                     var showColumnRemainingTime = extractOption(data, 'showColumnRemainingTime', true);
                     var showColumnExtendedTime = extractOption(data, 'showColumnExtendedTime', true);
                     var showActionShowHistory = extractOption(data, 'showActionShowHistory', true);
+                    var setStartDataOneDay = extractOption(data, 'setStartDataOneDay', true);
 
                     if (deliveryId) {
                         serviceParams.delivery = deliveryId;
@@ -865,6 +866,9 @@ define([
                                             $list.datatable('filter');
                                         }
                                         lastValue = value;
+                                    })
+                                    .on('clear', function () {
+                                        $list.datatable('filter');
                                     });
                             }
                         },
@@ -1138,7 +1142,7 @@ define([
                             },
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
-                            filtercolumns: {start_time: getDefaultStartTimeFilter()},
+                            filtercolumns: {start_time: (setStartDataOneDay ? getDefaultStartTimeFilter() : "")},
                             filter: true,
                             tools: tools,
                             model: model,
