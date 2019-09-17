@@ -210,8 +210,8 @@ class DeliveryExecutionListTest extends TestCase
 
         $this->sessionStateServiceMock->method('hasOption')->willReturn(false);
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
-        /** @var Model|PHPUnit_Framework_MockObject_MockObject $modelMock */
-        $modelMock = $this->createMock(Model::class);
+        /** @var Ontology|PHPUnit_Framework_MockObject_MockObject $modelMock */
+        $modelMock = $this->createMock(Ontology::class);
         $modelMock->method('getProperty');
 
         $deliveryHelperService = new DeliveryExecutionList();
