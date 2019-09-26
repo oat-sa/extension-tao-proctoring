@@ -44,7 +44,12 @@ class RegisterGuiSettingsService extends InstallAction
              */
             GuiSettingsService::PROCTORING_AUTO_REFRESH => 0,
 
-            GuiSettingsService::PROCTORING_ALLOW_PAUSE => true
+            GuiSettingsService::PROCTORING_ALLOW_PAUSE => true,
+
+            /**
+             * With start data range og one day
+             */
+            GuiSettingsService::OPTION_SET_START_DATA_ONE_DAY => true
         ]);
 
         $service->setServiceManager($this->getServiceManager());

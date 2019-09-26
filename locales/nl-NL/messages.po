@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint106\n"
-"PO-Revision-Date: 2019-07-19T08:15:53\n"
+"Project-Id-Version: TAO 3.3.0-sprint110\n"
+"PO-Revision-Date: 2019-09-13T08:52:39\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -18,6 +18,9 @@ msgstr ""
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessies van levering %s zijn niet gepauzeerd"
+
+msgid "%s - item %p/%c"
+msgstr ""
 
 msgid "%s completed"
 msgstr ""
@@ -155,10 +158,10 @@ msgstr "auteur"
 msgid "Authorize"
 msgstr "Autoriseer"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriseer sessie"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriseer sessie"
 
 msgid "Authorize sessions"
@@ -170,10 +173,10 @@ msgstr "Autoriseer de toezichthouder"
 msgid "Authorize the selected proctors"
 msgstr "Autoriseer de geselecteerde toezichthouders"
 
-msgid "Authorized"
+msgid "authorized"
 msgstr "Geautoriseerd"
 
-msgid "authorized"
+msgid "Authorized"
 msgstr "Geautoriseerd"
 
 msgid "Authorized but not started"
@@ -212,11 +215,11 @@ msgstr "Terug naar de sessies"
 msgid "Behaviour"
 msgstr "Gedrag"
 
-msgid "Cancel"
-msgstr "Annuleren"
-
 msgid "cancel"
 msgstr "annuleren"
+
+msgid "Cancel"
+msgstr "Annuleren"
 
 msgid "cancel the action"
 msgstr "Actie annuleren"
@@ -317,11 +320,11 @@ msgstr "Huidige toets activiteit"
 msgid "Current sessions"
 msgstr "Huidige sessies"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "date"
 msgstr "datum"
+
+msgid "Date"
+msgstr "Datum"
 
 msgid "Days"
 msgstr "Dagen"
@@ -387,10 +390,10 @@ msgstr "Onregelmatigheden bij export"
 msgid "Extended Time"
 msgstr ""
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Extra tijd"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Extra tijd"
 
 msgid "Extra time granted"
@@ -402,11 +405,11 @@ msgstr "Filter"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "Finished"
-msgstr "Voltooid"
-
 msgid "finished"
 msgstr "voltooid"
+
+msgid "Finished"
+msgstr "Voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
@@ -571,20 +574,20 @@ msgstr "Pauzeer actieve toets sessies"
 msgid "Pause due to server maintenance"
 msgstr "Gepauzeerd wegens server onderhoud"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Sessie pauzeren"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Sessie pauzeren"
 
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
-msgid "paused"
-msgstr "gepauzeerd"
-
 msgid "Paused"
 msgstr "Gepauzeerd"
+
+msgid "paused"
+msgstr "gepauzeerd"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
@@ -646,10 +649,10 @@ msgstr "Toezichthouders ingetrokken"
 msgid "Progress"
 msgstr "Voortgang"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
 msgid "Refresh"
@@ -679,10 +682,10 @@ msgstr "Rapporteren"
 msgid "Report irregularities"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
 msgid "reported for irregularity"
@@ -740,11 +743,11 @@ msgstr "Sessies"
 msgid "Sessions authorized"
 msgstr "Geautoriseerde sessies"
 
-msgid "Sessions paused"
-msgstr "Gepauzeerde sessies"
-
 msgid "sessions paused"
 msgstr "gepauzeerde sessies"
+
+msgid "Sessions paused"
+msgstr "Gepauzeerde sessies"
 
 msgid "Sessions reactivated"
 msgstr ""
@@ -800,11 +803,11 @@ msgstr "Gestart op"
 msgid "Status"
 msgstr "Status"
 
-msgid "Subcategory"
-msgstr "Subcategorie"
-
 msgid "subcategory"
 msgstr "subcategorie"
+
+msgid "Subcategory"
+msgstr "Subcategorie"
 
 msgid "System generated pause."
 msgstr ""
@@ -821,10 +824,10 @@ msgstr "Beeindigen"
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Beëindig sessie"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Beëindig sessie"
 
 msgid "Terminate sessions"
@@ -833,11 +836,11 @@ msgstr "Beëindig sessies"
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "terminated"
-msgstr "beëindigd"
-
 msgid "Terminated"
 msgstr "Beëindigd"
+
+msgid "terminated"
+msgstr "beëindigd"
 
 msgid "Test  must be terminated."
 msgstr ""
@@ -911,11 +914,11 @@ msgstr ""
 msgid "Test site %s"
 msgstr "Toetslocatie %s"
 
-msgid "Test taker"
-msgstr "Kandidaat"
-
 msgid "test taker"
 msgstr "kandidaat"
+
+msgid "Test taker"
+msgstr "Kandidaat"
 
 msgid "Test takers have been added"
 msgstr "Kandidaten zijn toegevoegd"

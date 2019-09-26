@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint106\n"
-"PO-Revision-Date: 2019-07-19T08:15:53\n"
+"Project-Id-Version: TAO 3.3.0-sprint110\n"
+"PO-Revision-Date: 2019-09-13T08:52:38\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -18,6 +18,9 @@ msgstr "%1$s - Item %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessions de la prestation %s n'ont pas été mises en pause"
+
+msgid "%s - item %p/%c"
+msgstr ""
 
 msgid "%s completed"
 msgstr "%s effectué"
@@ -155,10 +158,10 @@ msgstr "auteur"
 msgid "Authorize"
 msgstr "Autoriser"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriser une session"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriser une session"
 
 msgid "Authorize sessions"
@@ -170,11 +173,11 @@ msgstr "Autoriser le surveillant"
 msgid "Authorize the selected proctors"
 msgstr "Autoriser les surveillants sélectionnés"
 
-msgid "Authorized"
-msgstr "Autorisé"
-
 msgid "authorized"
 msgstr "autorisé"
+
+msgid "Authorized"
+msgstr "Autorisé"
 
 msgid "Authorized but not started"
 msgstr "Autorisé mais pas démarré"
@@ -212,11 +215,11 @@ msgstr "Retour aux sessions"
 msgid "Behaviour"
 msgstr "Comportement"
 
-msgid "Cancel"
-msgstr "Annuler"
-
 msgid "cancel"
 msgstr "annuler"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "cancel the action"
 msgstr "annuler l'action"
@@ -317,11 +320,11 @@ msgstr "Activité d'évaluation actuelle"
 msgid "Current sessions"
 msgstr "Sessions actuelles"
 
-msgid "Date"
-msgstr "Date"
-
 msgid "date"
 msgstr "date"
+
+msgid "Date"
+msgstr "Date"
 
 msgid "Days"
 msgstr "Jours"
@@ -387,10 +390,10 @@ msgstr "Exporter des irrégularités"
 msgid "Extended Time"
 msgstr "Temps prolongé"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Temps supplémentaire"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Temps supplémentaire"
 
 msgid "Extra time granted"
@@ -402,11 +405,11 @@ msgstr "Filtrer"
 msgid "Filter by the selected dates"
 msgstr "Filtrer selon les dates sélectionnées"
 
-msgid "Finished"
-msgstr "Terminé"
-
 msgid "finished"
 msgstr "terminé"
+
+msgid "Finished"
+msgstr "Terminé"
 
 msgid "First name"
 msgstr "Prénom"
@@ -571,20 +574,20 @@ msgstr "Mettre en pause des sessions de test actives"
 msgid "Pause due to server maintenance"
 msgstr "Pause due à la maintenance du serveur"
 
-msgid "Pause session"
-msgstr "Suspendre la session"
-
 msgid "Pause Session"
 msgstr "Suspendre une session"
+
+msgid "Pause session"
+msgstr "Suspendre la session"
 
 msgid "Pause sessions"
 msgstr "Suspendre des sessions"
 
-msgid "paused"
-msgstr "en pause"
-
 msgid "Paused"
 msgstr "En pause"
+
+msgid "paused"
+msgstr "en pause"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Veuillez sélectionner ou moins un site de test pour gérer les surveillants"
@@ -646,11 +649,11 @@ msgstr "Surveillants révoqués"
 msgid "Progress"
 msgstr "Progression"
 
-msgid "Reactivate session"
-msgstr "Réactiver la session"
-
 msgid "Reactivate Session"
 msgstr "Réactiver une session"
+
+msgid "Reactivate session"
+msgstr "Réactiver la session"
 
 msgid "Refresh"
 msgstr "Actualiser"
@@ -679,11 +682,11 @@ msgstr "Signaler"
 msgid "Report irregularities"
 msgstr "Signaler les irrégularités"
 
-msgid "Report irregularity"
-msgstr "Signaler l'irrégularité"
-
 msgid "Report Irregularity"
 msgstr "Signaler une irrégularité"
+
+msgid "Report irregularity"
+msgstr "Signaler l'irrégularité"
 
 msgid "reported for irregularity"
 msgstr "signalé pour irrégularité"
@@ -740,11 +743,11 @@ msgstr "Sessions"
 msgid "Sessions authorized"
 msgstr "Sessions autorisées"
 
-msgid "Sessions paused"
-msgstr "Sessions suspendues"
-
 msgid "sessions paused"
 msgstr "sessions suspendues"
+
+msgid "Sessions paused"
+msgstr "Sessions suspendues"
 
 msgid "Sessions reactivated"
 msgstr "Sessions réactivées"
@@ -800,11 +803,11 @@ msgstr "Démarré à"
 msgid "Status"
 msgstr "Statut"
 
-msgid "Subcategory"
-msgstr "Sous-catégorie"
-
 msgid "subcategory"
 msgstr "sous-catégorie"
+
+msgid "Subcategory"
+msgstr "Sous-catégorie"
 
 msgid "System generated pause."
 msgstr "Pause générée par le système."
@@ -819,13 +822,13 @@ msgid "Terminate"
 msgstr "Mettre fin"
 
 msgid "Terminate and irregularity"
-msgstr "Résiliation et irrégularité"
-
-msgid "Terminate Session"
-msgstr "Mettre fin à une session"
+msgstr "Clôturer le test"
 
 msgid "Terminate session"
 msgstr "Mettre fin à la session"
+
+msgid "Terminate Session"
+msgstr "Mettre fin à une session"
 
 msgid "Terminate sessions"
 msgstr "Mettre fin aux sessions"
@@ -833,11 +836,11 @@ msgstr "Mettre fin aux sessions"
 msgid "Terminate/Reactivate and irregularity"
 msgstr "Terminer/Réactiver et irrégularité"
 
-msgid "terminated"
-msgstr "interrompu"
-
 msgid "Terminated"
 msgstr "Interrompu"
+
+msgid "terminated"
+msgstr "interrompu"
 
 msgid "Test  must be terminated."
 msgstr "Le test doit être interrompu."
@@ -911,11 +914,11 @@ msgstr "Le test n'avait pas été démarré."
 msgid "Test site %s"
 msgstr "Site de test %s"
 
-msgid "Test taker"
-msgstr "Candidat"
-
 msgid "test taker"
 msgstr "candidat"
+
+msgid "Test taker"
+msgstr "Candidat"
 
 msgid "Test takers have been added"
 msgstr "Des candidats ont été ajoutés"

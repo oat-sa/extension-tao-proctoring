@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.3.0-sprint106\n"
-"PO-Revision-Date: 2019-07-19T08:15:54\n"
+"Project-Id-Version: TAO 3.3.0-sprint110\n"
+"PO-Revision-Date: 2019-09-13T08:52:39\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ru-RU\n"
@@ -18,6 +18,9 @@ msgstr "%1$s — элемент %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d сеанса (-ов) выдачи %s не были приостановлены"
+
+msgid "%s - item %p/%c"
+msgstr ""
 
 msgid "%s completed"
 msgstr "%s завершено"
@@ -155,10 +158,10 @@ msgstr "автор"
 msgid "Authorize"
 msgstr "Предоставить полномочия"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Предоставить полномочия по сеансу"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Предоставить полномочия по сеансу"
 
 msgid "Authorize sessions"
@@ -170,11 +173,11 @@ msgstr "Предоставить полномочия наблюдателю"
 msgid "Authorize the selected proctors"
 msgstr "Предоставить полномочия по выбранным протоколам"
 
-msgid "Authorized"
-msgstr "Полномочия предоставлены"
-
 msgid "authorized"
 msgstr "полномочия предоставлены"
+
+msgid "Authorized"
+msgstr "Полномочия предоставлены"
 
 msgid "Authorized but not started"
 msgstr "Полномочия предоставлены, но не начато"
@@ -212,11 +215,11 @@ msgstr "Назад к сеансам"
 msgid "Behaviour"
 msgstr "Поведение"
 
-msgid "Cancel"
-msgstr "Отмена"
-
 msgid "cancel"
 msgstr "отмена"
+
+msgid "Cancel"
+msgstr "Отмена"
 
 msgid "cancel the action"
 msgstr "отмена действия"
@@ -317,11 +320,11 @@ msgstr "Текущее оценивание"
 msgid "Current sessions"
 msgstr "Текущие сеансы"
 
-msgid "Date"
-msgstr "Дата"
-
 msgid "date"
 msgstr "дата"
+
+msgid "Date"
+msgstr "Дата"
 
 msgid "Days"
 msgstr "Дни"
@@ -387,10 +390,10 @@ msgstr "Экспорт нестандартных ситуаций"
 msgid "Extended Time"
 msgstr "Продленное время"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Дополнительное время"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Дополнительное время"
 
 msgid "Extra time granted"
@@ -402,11 +405,11 @@ msgstr "Фильтр"
 msgid "Filter by the selected dates"
 msgstr "Фильтровать по выбранным датам"
 
-msgid "Finished"
-msgstr "Завершено"
-
 msgid "finished"
 msgstr "завершено"
+
+msgid "Finished"
+msgstr "Завершено"
 
 msgid "First name"
 msgstr "Имя"
@@ -571,20 +574,20 @@ msgstr "Приостановить активные сеансы тестиро�
 msgid "Pause due to server maintenance"
 msgstr "Приостановить из-за обслуживания сервера"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Приостановить сеанс"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Приостановить сеанс"
 
 msgid "Pause sessions"
 msgstr "Приостановить сеансы"
 
-msgid "paused"
-msgstr "приостановлено"
-
 msgid "Paused"
 msgstr "Приостановлено"
+
+msgid "paused"
+msgstr "приостановлено"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Выберите один или несколько объектов для проведения тестирования, чтобы управлять протоколами"
@@ -646,10 +649,10 @@ msgstr "Отозванные наблюдатели"
 msgid "Progress"
 msgstr "Ход выполнения"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "Повторно активировать сеанс"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "Повторно активировать сеанс"
 
 msgid "Refresh"
@@ -679,10 +682,10 @@ msgstr "Отчет"
 msgid "Report irregularities"
 msgstr "Сообщить о нестандартных ситуациях"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Сообщить о нестандартной ситуации"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Сообщить о нестандартной ситуации"
 
 msgid "reported for irregularity"
@@ -740,11 +743,11 @@ msgstr "Сеансы"
 msgid "Sessions authorized"
 msgstr "По сеансам предоставлены полномочия"
 
-msgid "Sessions paused"
-msgstr "Сеансы приостановлены"
-
 msgid "sessions paused"
 msgstr "сеансы приостановлены"
+
+msgid "Sessions paused"
+msgstr "Сеансы приостановлены"
 
 msgid "Sessions reactivated"
 msgstr "Сеансы повторно активированы"
@@ -800,11 +803,11 @@ msgstr "Дата начала"
 msgid "Status"
 msgstr "Статус"
 
-msgid "Subcategory"
-msgstr "Подкатегория"
-
 msgid "subcategory"
 msgstr "подкатегория"
+
+msgid "Subcategory"
+msgstr "Подкатегория"
 
 msgid "System generated pause."
 msgstr "Система сгенерировала паузу."
@@ -821,10 +824,10 @@ msgstr "Прекратить"
 msgid "Terminate and irregularity"
 msgstr "Прекращение и нестандартная ситуация"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Прекратить сеанс"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Прекратить сеанс"
 
 msgid "Terminate sessions"
@@ -833,11 +836,11 @@ msgstr "Прекратить сеансы"
 msgid "Terminate/Reactivate and irregularity"
 msgstr "Завершить/Реактивировать и нестандартная ситуация"
 
-msgid "terminated"
-msgstr "прекращено"
-
 msgid "Terminated"
 msgstr "Прекращено"
+
+msgid "terminated"
+msgstr "прекращено"
 
 msgid "Test  must be terminated."
 msgstr "Тест необходимо прекратить."
@@ -911,11 +914,11 @@ msgstr "Тест не был начат."
 msgid "Test site %s"
 msgstr "Объект для проведения тестирования %s"
 
-msgid "Test taker"
-msgstr "Тестируемый"
-
 msgid "test taker"
 msgstr "тестируемый"
+
+msgid "Test taker"
+msgstr "Тестируемый"
 
 msgid "Test takers have been added"
 msgstr "Тестируемые добавлены"

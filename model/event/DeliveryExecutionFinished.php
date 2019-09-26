@@ -29,6 +29,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 class DeliveryExecutionFinished implements WebhookSerializableEventInterface
 {
     const EVENT_NAME = self::class;
+    const WEBHOOK_EVENT_NAME = 'DeliveryExecutionFinished';
 
     /**
      * @var DeliveryExecution
@@ -62,12 +63,20 @@ class DeliveryExecutionFinished implements WebhookSerializableEventInterface
     }
 
     /**
+     * @return string
+     */
+    public function getWebhookEventName()
+    {
+        return self::WEBHOOK_EVENT_NAME;
+    }
+
+    /**
      * @return array
      */
     public function serializeForWebhook()
     {
         return [
-            'delivery_execution_id' => $this->deliveryExecution->getIdentifier()
+            'deliveryExecutionId' => $this->deliveryExecution->getIdentifier()
         ];
     }
 }
