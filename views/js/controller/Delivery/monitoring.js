@@ -855,7 +855,7 @@ define([
                                 }
 
                                 startDatePicker = dateTimePicker($filterContainer, {
-                                    setup: 'date-range',
+                                    setup: 'datetime-range',
                                     format: dateFormatStr,
                                     replaceField: $elt[0]
                                 })
