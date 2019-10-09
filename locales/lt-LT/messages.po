@@ -1,17 +1,18 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint112\n"
-"PO-Revision-Date: 2019-10-09T09:03:14\n"
-"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
-"MIME-Version: 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-04 13:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: lt-LT\n"
-"sourceLanguage: en-US\n"
-"targetLanguage: lt-LT\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Basepath: ../../\n"
-"X-Poedit-KeywordsList: __\n"
-"X-Poedit-SearchPath-0: .\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+"X-Pootle-Path: /lt-LT/tao33/taoProctoring/messages.po\n"
+"X-Pootle-Revision: 29111\n"
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - Elementas %2$s/%3$s"
@@ -19,17 +20,16 @@ msgstr "%1$s - Elementas %2$s/%3$s"
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d pateikties sesijos %s nebuvo pristabdytos"
 
-msgid "%s - item %p/%c"
-msgstr ""
-
 msgid "%s completed"
 msgstr "%s atlikta"
 
 msgid "%s could not be %s because it is finished. Please refresh your data."
-msgstr "%s negali būti %s, nes jis yra užbaigtas. Prašome atnaujinti savo duomenis."
+msgstr ""
+"%s negali būti %s, nes jis yra užbaigtas. Prašome atnaujinti savo duomenis."
 
 msgid "%s could not be %s because it is terminated. Please refresh your data."
-msgstr "%s negali būti %s, nes jis yra nutrauktas. Prašome atnaujinti savo duomenis."
+msgstr ""
+"%s negali būti %s, nes jis yra nutrauktas. Prašome atnaujinti savo duomenis."
 
 msgid "%s could not be %s."
 msgstr "%s negali būti %s."
@@ -37,38 +37,38 @@ msgstr "%s negali būti %s."
 msgid "%s minutes more"
 msgstr "%s minučių daugiau"
 
-msgid "%s\'s test had already been authorized."
-msgstr ""
+msgid "%s's test had already been authorized."
+msgstr "%s testas jau buvo autorizuotas."
 
-msgid "%s\'s test had already been paused."
-msgstr ""
+msgid "%s's test had already been paused."
+msgstr "%s testas jau buvo pristabdytas."
 
-msgid "%s\'s test had already been terminated."
-msgstr ""
+msgid "%s's test had already been terminated."
+msgstr "%s testas jau buvo nutrauktas."
 
-msgid "%s\'s test had been canceled."
-msgstr ""
+msgid "%s's test had been canceled."
+msgstr "%s testas buvo atšauktas."
 
-msgid "%s\'s test had been completed."
-msgstr ""
+msgid "%s's test had been completed."
+msgstr "%s testas buvo atliktas."
 
-msgid "%s\'s test had been paused."
-msgstr ""
+msgid "%s's test had been paused."
+msgstr "%s testas buvo pristabdytas."
 
-msgid "%s\'s test had been terminated."
-msgstr ""
+msgid "%s's test had been terminated."
+msgstr "%s testas buvo nutrauktas."
 
-msgid "%s\'s test had not been finished."
-msgstr ""
+msgid "%s's test had not been finished."
+msgstr "%s testas nebuvo atliktas."
 
-msgid "%s\'s test had not been in progress."
-msgstr ""
+msgid "%s's test had not been in progress."
+msgstr "%s testas nebuvo vykdomas."
 
-msgid "%s\'s test had not been started."
-msgstr ""
+msgid "%s's test had not been started."
+msgstr "%s testas nebuvo pradėtas."
 
-msgid "%s\'s test must be terminated."
-msgstr ""
+msgid "%s's test must be terminated."
+msgstr "%s testas privalo būti nutrauktas."
 
 msgid "..."
 msgstr "..."
@@ -118,11 +118,11 @@ msgstr "Tinkinti numatytą žymę"
 msgid "Are you sure you want to end the test?"
 msgstr "Ar jūs tikrai norite užbaigti testą?"
 
-#, tao-public
 msgid "Assessment Activity"
 msgstr "Įvertinimo Veikla"
 
-msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgid ""
+"Assessment has been paused due to attempt to switch to another window/tab."
 msgstr "Verinimas buvo pristabdytas, nes buvo atidarytas kitas langas/kortelė."
 
 msgid "Assign administrator"
@@ -158,11 +158,11 @@ msgstr "autorius"
 msgid "Authorize"
 msgstr "Autorizuoti"
 
-msgid "Authorize Session"
-msgstr "Autorizuoti Sesiją"
-
 msgid "Authorize session"
 msgstr "Autorizuoti sesiją"
+
+msgid "Authorize Session"
+msgstr "Autorizuoti Sesiją"
 
 msgid "Authorize sessions"
 msgstr "Autorizuoti sesijas"
@@ -188,11 +188,19 @@ msgstr "Autorizuoti proktoriai"
 msgid "Authorized, you may proceed"
 msgstr "Autorizuota, galite tęsti"
 
-msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
-msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo atšauktos autorizavimo užklausos."
+msgid ""
+"Automatically reset by the system due to authorization request being "
+"cancelled by test taker."
+msgstr ""
+"Automatiškai atstatyti pagal sistemą dėl testo laikytojo atšauktos "
+"autorizavimo užklausos."
 
-msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
-msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti autorizuoto testo."
+msgid ""
+"Automatically reset by the system due to the test taker choosing not to "
+"proceed with the authorized test."
+msgstr ""
+"Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti "
+"autorizuoto testo."
 
 msgid "Available"
 msgstr "Galima"
@@ -215,11 +223,11 @@ msgstr "Grįžti į sesijas"
 msgid "Behaviour"
 msgstr "Elgsena"
 
-msgid "cancel"
-msgstr "atšaukti"
-
 msgid "Cancel"
 msgstr "Atšaukti"
+
+msgid "cancel"
+msgstr "atšaukti"
 
 msgid "cancel the action"
 msgstr "atšaukti veiksmą"
@@ -287,11 +295,11 @@ msgstr "komentaras"
 msgid "Complaint"
 msgstr "Skundas"
 
-msgid "completed"
-msgstr "atlikta"
-
 msgid "Completed"
 msgstr "Atlikta"
+
+msgid "completed"
+msgstr "atlikta"
 
 msgid "Completed tests"
 msgstr "Atlikti testai"
@@ -383,18 +391,17 @@ msgstr "Egzaminuojamasis"
 msgid "Export"
 msgstr "Eksportuoti"
 
-#, tao-public
 msgid "Export Irregularities"
 msgstr "Eksportuoti Neatitikimus"
 
 msgid "Extended Time"
 msgstr "Pratęstas Laikas"
 
-msgid "Extra time"
-msgstr "Papildomas laikas"
-
 msgid "Extra Time"
 msgstr "Papildomas Laikas"
+
+msgid "Extra time"
+msgstr "Papildomas laikas"
 
 msgid "Extra time granted"
 msgstr "Suteiktas papildomas laikas"
@@ -402,20 +409,20 @@ msgstr "Suteiktas papildomas laikas"
 msgid "Filter"
 msgstr "Filtras"
 
-msgid "Filter by the selected dates"
-msgstr ""
+msgid "Finished"
+msgstr "Baigta"
 
 msgid "finished"
 msgstr "baigta"
-
-msgid "Finished"
-msgstr "Baigta"
 
 msgid "First name"
 msgstr "Vardas"
 
 msgid "Freezing"
 msgstr "Užšaldyta"
+
+msgid "From"
+msgstr "Iš"
 
 msgid "Grant Extra Time"
 msgstr "Suteikti Papildomo Laiko"
@@ -486,7 +493,6 @@ msgstr "Atsijungti"
 msgid "Manage Proctors"
 msgstr "Tvarkyti Proktorius"
 
-#, tao-public
 msgid "Manage Results"
 msgstr "Tvarkyti Rezultatus"
 
@@ -649,11 +655,11 @@ msgstr "Proktoriai neautorizuoti"
 msgid "Progress"
 msgstr "Progresas"
 
-msgid "Reactivate Session"
-msgstr "Iš naujo suaktyvinti Sesiją"
-
 msgid "Reactivate session"
 msgstr "Iš naujo suaktyvinti sesiją"
+
+msgid "Reactivate Session"
+msgstr "Iš naujo suaktyvinti Sesiją"
 
 msgid "Refresh"
 msgstr "Atnaujinti"
@@ -694,12 +700,11 @@ msgstr "praneštas neatitikimas"
 msgid "Resource update task is completed"
 msgstr "Resursų atnaujinimo užduotis baigta"
 
-msgid "results"
-msgstr "rezultatai"
-
-#, tao-public
 msgid "Results"
 msgstr "Rezultatai"
+
+msgid "results"
+msgstr "rezultatai"
 
 msgid "Return to the session manager"
 msgstr "Grįžti į sesijos tvarkymą"
@@ -743,11 +748,11 @@ msgstr "Sesijos"
 msgid "Sessions authorized"
 msgstr "Sesijos autorizuotos"
 
-msgid "sessions paused"
-msgstr "sesijos pristabdytos"
-
 msgid "Sessions paused"
 msgstr "Sesijos pristabdytos"
+
+msgid "sessions paused"
+msgstr "sesijos pristabdytos"
 
 msgid "Sessions reactivated"
 msgstr "Sesijos iš naujo suaktyvintos"
@@ -803,11 +808,11 @@ msgstr "Pradėta"
 msgid "Status"
 msgstr "Būsena"
 
-msgid "subcategory"
-msgstr "subkategorija"
-
 msgid "Subcategory"
 msgstr "Subkategorija"
+
+msgid "subcategory"
+msgstr "subkategorija"
 
 msgid "System generated pause."
 msgstr "Sistemos sukurtas pristabdymas."
@@ -821,9 +826,6 @@ msgstr "Techninis"
 msgid "Terminate"
 msgstr "Nutraukti"
 
-msgid "Terminate and irregularity"
-msgstr ""
-
 msgid "Terminate session"
 msgstr "Nutraukti sesiją"
 
@@ -832,9 +834,6 @@ msgstr "Nutraukti Sesiją"
 
 msgid "Terminate sessions"
 msgstr "Nutraukti sesijas"
-
-msgid "Terminate/Reactivate and irregularity"
-msgstr ""
 
 msgid "Terminated"
 msgstr "Nutraukta"
@@ -914,11 +913,11 @@ msgstr "Testas nebuvo pradėtas."
 msgid "Test site %s"
 msgstr "Testų tinklapis %s"
 
-msgid "test taker"
-msgstr "testo laikytojai"
-
 msgid "Test taker"
 msgstr "Testo laikytojai"
+
+msgid "test taker"
+msgstr "testo laikytojai"
 
 msgid "Test takers have been added"
 msgstr "Testo laikytojai buvo pridėti"
@@ -944,14 +943,16 @@ msgstr "Veiksmas priskirtas sekančiai sesijai"
 msgid "the already granted time will be replaced by the new value"
 msgstr "jau priskirtas laikas, bus pakeistas į naują reikšmę"
 
-msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
-msgstr "Vertinimas buvo suspenduotas. Norint tęsti jūsų vertinimą, prašome paleisti iš naujo ir jeigu reikia susisiekite su jūsų proktoriumi."
-
-msgid "The assessment has been terminated. You cannot interact with it anymore."
-msgstr "Šis vertinimas buvo nutrauktas. Jūs negalite tęsti jo toliau."
-
-msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgid ""
+"The assessment has been suspended. To resume your assessment, please "
+"relaunch it and contact your proctor if required."
 msgstr ""
+"Vertinimas buvo suspenduotas. Norint tęsti jūsų vertinimą, prašome paleisti "
+"iš naujo ir jeigu reikia susisiekite su jūsų proktoriumi."
+
+msgid ""
+"The assessment has been terminated. You cannot interact with it anymore."
+msgstr "Šis vertinimas buvo nutrauktas. Jūs negalite tęsti jo toliau."
 
 msgid "The extra time must be a number"
 msgstr "Papildomas laikas privalo būti skaičius"
@@ -980,7 +981,9 @@ msgstr "Jokia pateiktis nėra vykdoma"
 msgid "Time"
 msgstr "Laikas"
 
-#, tao-public
+msgid "to"
+msgstr "į"
+
 msgid "Tools"
 msgstr "Įrankiai"
 
@@ -999,9 +1002,14 @@ msgstr "Nepavyko teste atlikti veiksmo %s."
 msgid "User Activity"
 msgstr "Vartotojo Veikla"
 
-msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
-msgstr "Įspėjimas, jūs ketinate pristabdyti visus vykdomus testus. Visi testo laikytojai bus pristabdyti arba prieš sekantį širdies plakimą. Prašome pateikti priežastį šiam veiksmui."
+msgid ""
+"Warning, you are about to pause all in progress tests. All test takers will "
+"be paused on or before the next heartbeat. Please provide a reason for this "
+"action."
+msgstr ""
+"Įspėjimas, jūs ketinate pristabdyti visus vykdomus testus. Visi testo "
+"laikytojai bus pristabdyti arba prieš sekantį širdies plakimą. Prašome "
+"pateikti priežastį šiam veiksmui."
 
 msgid "Weather"
 msgstr "Oras"
-
