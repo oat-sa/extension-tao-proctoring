@@ -911,6 +911,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('17.3.0');
         }
 
-        $this->skip('17.3.0', '17.4.0');
+        $this->skip('17.3.0', '18.0.0');
     }
 }
