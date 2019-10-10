@@ -1,0 +1,112 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint112\n"
+"PO-Revision-Date: 2019-10-09T09:03:14\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: lt-LT\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: lt-LT\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor"
+msgstr "Proktorius"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring role"
+msgstr "Proktoriaus rolė"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Manager"
+msgstr "Proktorių Tvarkytojas"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Manager Role"
+msgstr "Proktorių Tvarkymo Rolė"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr "Proktoriaus Administratorius"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator Role"
+msgstr "Proktoriaus Administratoriaus Rolė"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Awaiting"
+msgstr "Laukimas"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Awaiting of authorization status of a delivery execution"
+msgstr "Laukiama pateikties vykdymo autorizacijos būsenos"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Authorized"
+msgstr "Autorizuota"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Authorized status of a delivery execution"
+msgstr "Pateikties vykdymo autorizacijos būsena"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Terminated"
+msgstr "Nutrauktas"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Terminated status of a delivery execution"
+msgstr "Pateikties vykdymo nutraukimo būsena"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Canceled"
+msgstr "Atšauktas"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Canceled status of a delivery execution"
+msgstr "Pateikties vykdymo atšaukimo būsena"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require Proctoring"
+msgstr "Reikalingas Proktoriavimas"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Require Proctoring on selected deliveries"
+msgstr "Reikalingas Proktoriavimas pasirinktom pateiktim"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Check Enable"
+msgstr ""
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Check Enable"
+msgstr ""
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Enable"
+msgstr "Įjungta"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Enable"
+msgstr "Įjungta"
+
