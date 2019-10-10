@@ -29,6 +29,7 @@ use oat\taoDelivery\model\execution\DeliveryExecutionContextInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\generis\test\MockObject;
 
 /**
  * class DeliveryMonitoringData
@@ -41,12 +42,12 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 {
     /**
-     * @var DeliveryExecutionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeliveryExecutionInterface|MockObject
      */
     private $deliveryExecutionMock;
 
     /**
-     * @var DeliveryExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeliveryExecutionContextInterface|MockObject
      */
     private $deliveryExecutionContextMock;
 
