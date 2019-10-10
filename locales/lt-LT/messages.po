@@ -1,0 +1,1007 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint112\n"
+"PO-Revision-Date: 2019-10-09T09:03:14\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: lt-LT\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: lt-LT\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "%1$s - Item %2$s/%3$s"
+msgstr "%1$s - Elementas %2$s/%3$s"
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr "%d pateikties sesijos %s nebuvo pristabdytos"
+
+msgid "%s - item %p/%c"
+msgstr ""
+
+msgid "%s completed"
+msgstr "%s atlikta"
+
+msgid "%s could not be %s because it is finished. Please refresh your data."
+msgstr "%s negali būti %s, nes jis yra užbaigtas. Prašome atnaujinti savo duomenis."
+
+msgid "%s could not be %s because it is terminated. Please refresh your data."
+msgstr "%s negali būti %s, nes jis yra nutrauktas. Prašome atnaujinti savo duomenis."
+
+msgid "%s could not be %s."
+msgstr "%s negali būti %s."
+
+msgid "%s minutes more"
+msgstr "%s minučių daugiau"
+
+msgid "%s's test had already been authorized."
+msgstr "%s testas jau buvo autorizuotas."
+
+msgid "%s's test had already been paused."
+msgstr "%s testas jau buvo pristabdytas."
+
+msgid "%s's test had already been terminated."
+msgstr "%s testas jau buvo nutrauktas."
+
+msgid "%s's test had been canceled."
+msgstr "%s testas buvo atšauktas."
+
+msgid "%s's test had been completed."
+msgstr "%s testas buvo atliktas."
+
+msgid "%s's test had been paused."
+msgstr "%s testas buvo pristabdytas."
+
+msgid "%s's test had been terminated."
+msgstr "%s testas buvo nutrauktas."
+
+msgid "%s's test had not been finished."
+msgstr "%s testas nebuvo atliktas."
+
+msgid "%s's test had not been in progress."
+msgstr "%s testas nebuvo vykdomas."
+
+msgid "%s's test had not been started."
+msgstr "%s testas nebuvo pradėtas."
+
+msgid "%s's test must be terminated."
+msgstr "%s testas privalo būti nutrauktas."
+
+msgid "..."
+msgstr "..."
+
+msgid "A session of the delivery %s have not been paused"
+msgstr "Pateikties sesija %s nebuvo pristabdyta"
+
+msgid "Action"
+msgstr "Veiksmas"
+
+msgid "Actions"
+msgstr "Veiksmai"
+
+msgid "Active"
+msgstr "Aktyvus"
+
+msgid "Active proctors"
+msgstr "Aktyvūs proktoriai"
+
+msgid "Active test-takers"
+msgstr "Aktyvūs testo laikytojai"
+
+msgid "Actor"
+msgstr "Aktorius"
+
+msgid "Add test takers"
+msgstr "Pridėti testo laikytojus"
+
+msgid "Administer deliveries"
+msgstr "Administruoti pateiktis"
+
+msgid "Administration"
+msgstr "Administravimas"
+
+msgid "already authorized"
+msgstr "jau autorizuota"
+
+msgid "already paused"
+msgstr "jau pristabdyta"
+
+msgid "already terminated"
+msgstr "jau nutraukta"
+
+msgid "Apply default tag"
+msgstr "Tinkinti numatytą žymę"
+
+msgid "Are you sure you want to end the test?"
+msgstr "Ar jūs tikrai norite užbaigti testą?"
+
+#, tao-public
+msgid "Assessment Activity"
+msgstr "Įvertinimo Veikla"
+
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgstr "Verinimas buvo pristabdytas, nes buvo atidarytas kitas langas/kortelė."
+
+msgid "Assign administrator"
+msgstr "Priskirti administratorių"
+
+msgid "Assign more test takers to this session"
+msgstr "Priskirti daugiau testo laikytojų šiai sesijai"
+
+msgid "Assign proctors"
+msgstr "Priskirti proktorius"
+
+msgid "Assign the selected test takers"
+msgstr "Priskirti pasirinktus testo laikytojus"
+
+msgid "Assign the selected test takers to the session"
+msgstr "Priskirti pasirinktus testo laikytojus sesijai"
+
+msgid "Assign the test taker to the session"
+msgstr "Priskirti testo laikytojus sesijai"
+
+msgid "Assigned proctors"
+msgstr "Priskirti proktoriai"
+
+msgid "Assigned test takers"
+msgstr "Priskirti testo laikytojai"
+
+msgid "Attempts"
+msgstr "Bandymai"
+
+msgid "author"
+msgstr "autorius"
+
+msgid "Authorize"
+msgstr "Autorizuoti"
+
+msgid "Authorize Session"
+msgstr "Autorizuoti Sesiją"
+
+msgid "Authorize session"
+msgstr "Autorizuoti sesiją"
+
+msgid "Authorize sessions"
+msgstr "Autorizuoti sesijas"
+
+msgid "Authorize the proctor"
+msgstr "Autorizuoti proktorių"
+
+msgid "Authorize the selected proctors"
+msgstr "Autorizuoti pasirinktus proktorius"
+
+msgid "authorized"
+msgstr "autorizuota"
+
+msgid "Authorized"
+msgstr "Autorizuota"
+
+msgid "Authorized but not started"
+msgstr "Autorizuota, bet nepradėta"
+
+msgid "Authorized proctors"
+msgstr "Autorizuoti proktoriai"
+
+msgid "Authorized, you may proceed"
+msgstr "Autorizuota, galite tęsti"
+
+msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo atšauktos autorizavimo užklausos."
+
+msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
+msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti autorizuoto testo."
+
+msgid "Available"
+msgstr "Galima"
+
+msgid "Available history"
+msgstr "Galima istorija"
+
+msgid "Available test takers"
+msgstr "Galimi testo laikytojai"
+
+msgid "Awaiting"
+msgstr "Laukiama"
+
+msgid "Back"
+msgstr "Grįžti"
+
+msgid "Back to sessions"
+msgstr "Grįžti į sesijas"
+
+msgid "Behaviour"
+msgstr "Elgsena"
+
+msgid "cancel"
+msgstr "atšaukti"
+
+msgid "Cancel"
+msgstr "Atšaukti"
+
+msgid "cancel the action"
+msgstr "atšaukti veiksmą"
+
+msgid "Canceled"
+msgstr "Atšaukta"
+
+msgid "canceled"
+msgstr "atšaukta"
+
+msgid "Cannot authorize test session."
+msgstr "Nepavyko autorizuoti testo sesijos."
+
+msgid "Cannot authorize test sessions."
+msgstr "Nepavyko autorizuoti testo sesijų."
+
+msgid "Cannot execute action."
+msgstr "Negalima atlitki veiksmo."
+
+msgid "Cannot extend test session."
+msgstr "Nepavyko pratęsti testo sesijos."
+
+msgid "Cannot extend test sessions."
+msgstr "Nepavyko pratęsti testo sesijų."
+
+msgid "Cannot pause test session."
+msgstr "Nepavyko pristabdyti testo sesijos."
+
+msgid "Cannot pause test sessions."
+msgstr "Nepavyko pristabdyti testo sesijų."
+
+msgid "Cannot print test session."
+msgstr "Nepavyko atspausdinti testo sesijos."
+
+msgid "Cannot print test sessions."
+msgstr "Nepavyko atspausdinti testo sesijų."
+
+msgid "Cannot reactivate test session."
+msgstr "Negalima iš naujo suaktyvinti testo sesijos."
+
+msgid "Cannot reactivate test sessions."
+msgstr "Negalima iš naujo suaktyvinti testo sesijų."
+
+msgid "Cannot report test session."
+msgstr "Nepavyko pranešti testo sesijos."
+
+msgid "Cannot report test sessions."
+msgstr "Nepavyko pranešti testo sesijų."
+
+msgid "Cannot terminate test session."
+msgstr "Nepavyko nutraukti testo sesijos."
+
+msgid "Cannot terminate test sessions."
+msgstr "Nepavyko nutraukti testo sesijų."
+
+msgid "category"
+msgstr "kategorija"
+
+msgid "Comfort"
+msgstr "Komfortas"
+
+msgid "comment"
+msgstr "komentaras"
+
+msgid "Complaint"
+msgstr "Skundas"
+
+msgid "completed"
+msgstr "atlikta"
+
+msgid "Completed"
+msgstr "Atlikta"
+
+msgid "Completed tests"
+msgstr "Atlikti testai"
+
+msgid "Compliance"
+msgstr "Atitikimas"
+
+msgid "Connectivity"
+msgstr "Ryšys"
+
+msgid "Context"
+msgstr "Kontekstas"
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr "Sukurti ir autorizuoti proktorių pasirinktiems testų tinklapiams"
+
+msgid "Create Proctor"
+msgstr "Sukurti Proktorių"
+
+msgid "Creates and authorizes proctor"
+msgstr "Sukuria ir autorizuoja proktorių"
+
+msgid "Current Assessment Activity"
+msgstr "Dabartinė Įvertinimo Veikla"
+
+msgid "Current sessions"
+msgstr "Dabartinės sesijos"
+
+msgid "date"
+msgstr "data"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Days"
+msgstr "Dienos"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr ""
+
+msgid "Define sub-centers"
+msgstr "Nustatyti pocentrius"
+
+msgid "Deliveries"
+msgstr "Pateiktys"
+
+msgid "Delivery"
+msgstr "Pateiktis"
+
+msgid "Detailed Session History of %s"
+msgstr "%s Detali Sesijos Istorija"
+
+msgid "Detailed Session History of a selection"
+msgstr "Pasirinkimo Detali Sesijos Istorija"
+
+msgid "Details"
+msgstr "Detalės"
+
+msgid "Disturbance"
+msgstr "Trikdymas"
+
+msgid "Duration"
+msgstr "Trukmė"
+
+msgid "Edit test center"
+msgstr "Redaguoti testų centrą"
+
+msgid "Elapsed time"
+msgstr "Praėjęs laikas"
+
+msgid "End"
+msgstr "Pabaiga"
+
+msgid "End date of the export"
+msgstr "Pabaigos data eksportavimui"
+
+msgid "Environment"
+msgstr "Aplinka"
+
+msgid "Error"
+msgstr "Klaida"
+
+msgid "Event"
+msgstr "Įvykis"
+
+msgid "Examinee"
+msgstr "Egzaminuojamasis"
+
+msgid "Export"
+msgstr "Eksportuoti"
+
+#, tao-public
+msgid "Export Irregularities"
+msgstr "Eksportuoti Neatitikimus"
+
+msgid "Extended Time"
+msgstr "Pratęstas Laikas"
+
+msgid "Extra time"
+msgstr "Papildomas laikas"
+
+msgid "Extra Time"
+msgstr "Papildomas Laikas"
+
+msgid "Extra time granted"
+msgstr "Suteiktas papildomas laikas"
+
+msgid "Filter"
+msgstr "Filtras"
+
+msgid "Filter by the selected dates"
+msgstr ""
+
+msgid "finished"
+msgstr "baigta"
+
+msgid "Finished"
+msgstr "Baigta"
+
+msgid "First name"
+msgstr "Vardas"
+
+msgid "Freezing"
+msgstr "Užšaldyta"
+
+msgid "Grant Extra Time"
+msgstr "Suteikti Papildomo Laiko"
+
+msgid "Groups: %s. %s"
+msgstr "Grupės: %s. %s"
+
+msgid "Hours"
+msgstr "Valandos"
+
+msgid "However, the action will not be applied to the following sessions"
+msgstr "Tačiau, veiksmas negali būti paskirtas šioms sesijoms"
+
+msgid "ID/Authorization"
+msgstr "ID/Autorizavimas"
+
+msgid "Identifier"
+msgstr "Identifikatorius"
+
+msgid "Illness"
+msgstr "Liga"
+
+msgid "In Progress"
+msgstr "Progrese"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr ""
+
+msgid "Issue Category"
+msgstr "Problemos Kategorija"
+
+msgid "item"
+msgstr "elementas"
+
+msgid "Item Variables"
+msgstr "Elemento Kintamieji"
+
+msgid "Label"
+msgstr "Pavadinimas"
+
+msgid "Last Day"
+msgstr "Paskutinė Diena"
+
+msgid "Last launch"
+msgstr "Paskutinis paleidimas"
+
+msgid "Last Month"
+msgstr "Paskutinis Mėnuo"
+
+msgid "Last name"
+msgstr "Pavardė"
+
+msgid "Last Week"
+msgstr "Paskutinė Savaitė"
+
+msgid "Late"
+msgstr "Vėluoja"
+
+msgid "Launching"
+msgstr "Paleidžiama"
+
+msgid "Loading"
+msgstr "Įkeliama"
+
+msgid "Logout"
+msgstr "Atsijungti"
+
+msgid "Manage Proctors"
+msgstr "Tvarkyti Proktorius"
+
+#, tao-public
+msgid "Manage Results"
+msgstr "Tvarkyti Rezultatus"
+
+msgid "minutes"
+msgstr "minutės"
+
+msgid "Monitor"
+msgstr "Stebėti"
+
+msgid "Monitoring"
+msgstr "Stebėjimas"
+
+msgid "Navigation"
+msgstr "Navigacija"
+
+msgid "Network"
+msgstr "Tinklas"
+
+msgid "No assigned proctors"
+msgstr "Nėra priskirtų proktorių"
+
+msgid "No assigned test takers"
+msgstr "Nepriskirti testo laikytojai"
+
+msgid "No available test takers to assign"
+msgstr "Nėra galimų testo laikytojų priskyrimui."
+
+msgid "No history to display!"
+msgstr "Nėra istorijos parodyti!"
+
+msgid "No proctors in request param"
+msgstr "Nėra proktorių užklausos parametre"
+
+msgid "No sessions"
+msgstr "Nėra sesijų"
+
+msgid "No sessions available"
+msgstr "Nėra galimų sesijų"
+
+msgid "No Show"
+msgstr "Nerodoma"
+
+msgid "Noise"
+msgstr "Triukšmas"
+
+msgid "not finished"
+msgstr "neatlikta"
+
+msgid "not in progress"
+msgstr "nevykdoma"
+
+msgid "not started"
+msgstr "nepradėta"
+
+msgid "not terminated"
+msgstr "nenutrauktas"
+
+msgid "Note"
+msgstr "Pastaba"
+
+msgid "offline"
+msgstr "atsijungęs"
+
+msgid "OK"
+msgstr "Gerai"
+
+msgid "online"
+msgstr "prisijungęs"
+
+msgid "Other"
+msgstr "Kita"
+
+msgid "Outcome"
+msgstr "Pasekmė"
+
+msgid "Partially authorized proctors"
+msgstr "Dalinai autorizuoti proktoriai"
+
+msgid "Pause"
+msgstr "Pristabdyti"
+
+msgid "Pause Active Test Sessions"
+msgstr "Pristabdyti Vykdomas Testų Sesijas"
+
+msgid "Pause due to server maintenance"
+msgstr "Pristabdyta dėl serverio priežiūros"
+
+msgid "Pause Session"
+msgstr "Pristabdyti Sesiją"
+
+msgid "Pause session"
+msgstr "Pristabdyti sesiją"
+
+msgid "Pause sessions"
+msgstr "Pristabdyti sesijas"
+
+msgid "Paused"
+msgstr "Pristabdyta"
+
+msgid "paused"
+msgstr "pristabdyta"
+
+msgid "Please select one or more test site to manage proctors"
+msgstr "Prašome pasirinkti bent vieną testų tinkalpį proktorių tvarkymui"
+
+msgid "Please wait, authorization in process ..."
+msgstr "Prašome palaukti, vyksta autorizavimas..."
+
+msgid "Please, make your selection"
+msgstr "Prašome pateikti savo pasirinkimą"
+
+msgid "Power Outage"
+msgstr "Elektros Energijos Triktis"
+
+msgid "Previous Month"
+msgstr "Ankstesnis mėnuo"
+
+msgid "Print Results"
+msgstr "Spausdinti Rezultatus"
+
+msgid "Print Score"
+msgstr "Spausdinti Rezultatą"
+
+msgid "Print the assessment results"
+msgstr "Spausdinti įvertinimo rezultatus"
+
+msgid "Printing"
+msgstr "Spausdinimas"
+
+msgid "Proceed"
+msgstr "Tęsti"
+
+msgid "Proctor"
+msgstr "Proktorius"
+
+msgid "Proctor created"
+msgstr "Proktorius sukurtas"
+
+msgid "Proctor/Staff"
+msgstr "Proktorius/Darbuotojas"
+
+msgid "Proctored Delivery Server"
+msgstr "Proktoriuotų Pateikčių Serveris"
+
+msgid "Proctored Test-Takers"
+msgstr "Proktoriuoti Testo Laikytojai"
+
+msgid "Proctoring interface"
+msgstr "Proktoriavimo sąsaja"
+
+msgid "Proctors"
+msgstr "Proktoriai"
+
+msgid "Proctors authorized"
+msgstr "Proktoriai autorizuoti"
+
+msgid "Proctors revoked"
+msgstr "Proktoriai neautorizuoti"
+
+msgid "Progress"
+msgstr "Progresas"
+
+msgid "Reactivate Session"
+msgstr "Iš naujo suaktyvinti Sesiją"
+
+msgid "Reactivate session"
+msgstr "Iš naujo suaktyvinti sesiją"
+
+msgid "Refresh"
+msgstr "Atnaujinti"
+
+msgid "Refresh the page"
+msgstr "Atnaujinti puslapį"
+
+msgid "Remaining"
+msgstr "Liko"
+
+msgid "Remove"
+msgstr "Ištrinti"
+
+msgid "Remove default tag filtering"
+msgstr "Pašalinti numatytą žymių filtravimą"
+
+msgid "Remove the selected test takers from the session"
+msgstr "Pašalinkite pasirinktus testo laikytojus iš sesijos"
+
+msgid "Remove the test taker from the session"
+msgstr "Pašalinti testo laikytoją iš sesijos"
+
+msgid "Report"
+msgstr "Pranešti"
+
+msgid "Report irregularities"
+msgstr "Pranešti neatitikimus"
+
+msgid "Report Irregularity"
+msgstr "Pranešti Neatitikimą"
+
+msgid "Report irregularity"
+msgstr "Pranešti neatitikimą"
+
+msgid "reported for irregularity"
+msgstr "praneštas neatitikimas"
+
+msgid "Resource update task is completed"
+msgstr "Resursų atnaujinimo užduotis baigta"
+
+msgid "results"
+msgstr "rezultatai"
+
+#, tao-public
+msgid "Results"
+msgstr "Rezultatai"
+
+msgid "Return to the session manager"
+msgstr "Grįžti į sesijos tvarkymą"
+
+msgid "Return to the session monitoring"
+msgstr "Grįžti į sesijos stebėjimą"
+
+msgid "Revoke authorization for the selected proctor"
+msgstr "Panaikinti autorizavimą pasirinktam proktoriui"
+
+msgid "Revoke the proctor"
+msgstr "Atšaukti proktorių"
+
+msgid "Role"
+msgstr "Rolė"
+
+msgid "Score"
+msgstr "Rezultatas"
+
+msgid "Score Report"
+msgstr "Rezultato Ataskaita"
+
+msgid "section"
+msgstr "skyrius"
+
+msgid "Session"
+msgstr "Sesija"
+
+msgid "Session %s - %s has not been processed"
+msgstr "Sesija %s - %s nebuvo apdorota"
+
+msgid "Session history"
+msgstr "Sesijos istorija"
+
+msgid "Session time handling"
+msgstr "Sesijos laiko valdymas"
+
+msgid "Sessions"
+msgstr "Sesijos"
+
+msgid "Sessions authorized"
+msgstr "Sesijos autorizuotos"
+
+msgid "sessions paused"
+msgstr "sesijos pristabdytos"
+
+msgid "Sessions paused"
+msgstr "Sesijos pristabdytos"
+
+msgid "Sessions reactivated"
+msgstr "Sesijos iš naujo suaktyvintos"
+
+msgid "Sessions reported"
+msgstr "Sesijos raportuotos"
+
+msgid "Sessions terminated"
+msgstr "Sesijos nutrauktos"
+
+msgid "Show brief report"
+msgstr "Rodyti trumpą ataskaitą"
+
+msgid "Show detailed report"
+msgstr "Rodyti detalią ataskaitą"
+
+msgid "Show detailed session history messages"
+msgstr "Rodyti sesijos istorijos pranešimų išklotinę"
+
+msgid "Show the detailed session history"
+msgstr "Rodyti detalią sesijos istoriją"
+
+msgid "Some delivery executions have not been authorized"
+msgstr "Kaikurie pateikčių vykdymai nebuvo autorizuoti"
+
+msgid "Some delivery executions have not been paused"
+msgstr "Kaikurie pateikčių vykdymai nebuvo pristabdyti"
+
+msgid "Some delivery executions have not been reactivated"
+msgstr "Kai kurie pateikties vykdymai nebuvo iš naujo suaktyvuoti"
+
+msgid "Some delivery executions have not been reported"
+msgstr "Kaikurie pateikčių vykdymai nebuvo pranešti"
+
+msgid "Some delivery executions have not been terminated"
+msgstr "Kaikurie pateikčių vykdymai nebuvo nutraukti"
+
+msgid "Some delivery executions have not been updated"
+msgstr "Kaikurie pateikčių vykdymai nebuvo atnaujinti"
+
+msgid "Something went wrong ..."
+msgstr "Kažkas nutiko blogai..."
+
+msgid "Start"
+msgstr "Pradėti"
+
+msgid "Start date of the export"
+msgstr "Eksportavimo pradžios data"
+
+msgid "Started at"
+msgstr "Pradėta"
+
+msgid "Status"
+msgstr "Būsena"
+
+msgid "subcategory"
+msgstr "subkategorija"
+
+msgid "Subcategory"
+msgstr "Subkategorija"
+
+msgid "System generated pause."
+msgstr "Sistemos sukurtas pristabdymas."
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr "Pradėk arba tęsk testą prižiūrimą proktoriaus"
+
+msgid "Technical"
+msgstr "Techninis"
+
+msgid "Terminate"
+msgstr "Nutraukti"
+
+msgid "Terminate and irregularity"
+msgstr ""
+
+msgid "Terminate session"
+msgstr "Nutraukti sesiją"
+
+msgid "Terminate Session"
+msgstr "Nutraukti Sesiją"
+
+msgid "Terminate sessions"
+msgstr "Nutraukti sesijas"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr ""
+
+msgid "Terminated"
+msgstr "Nutraukta"
+
+msgid "terminated"
+msgstr "nutraukta"
+
+msgid "Test  must be terminated."
+msgstr "Testas  privalo būti nutrauktas."
+
+msgid "Test %s had already been authorized."
+msgstr "Testas %s jau buvo autorizuotas."
+
+msgid "Test %s had already been paused."
+msgstr "Testas %s jau buvo pristabdytas."
+
+msgid "Test %s had already been terminated."
+msgstr "Testas %s jau buvo nutrauktas."
+
+msgid "Test %s had been canceled."
+msgstr "Testas %s jau buvo atšauktas."
+
+msgid "Test %s had been completed."
+msgstr "Testas %s jau buvo atliktas."
+
+msgid "Test %s had been paused."
+msgstr "Testas %s buvo pristabdytas."
+
+msgid "Test %s had been terminated."
+msgstr "Testas %s buvo nutrauktas."
+
+msgid "Test %s had not been finished."
+msgstr "Testas %s nebuvo atliktas."
+
+msgid "Test %s had not been in progress."
+msgstr "Testas %s nebuvo vykdomas."
+
+msgid "Test %s had not been started."
+msgstr "Testas %s nebuvo pradėtas."
+
+msgid "Test %s must be terminated."
+msgstr "Testas %s privalo būti nutrauktas."
+
+msgid "Test center saved"
+msgstr "Testų centras išsaugotas"
+
+msgid "Test had already been authorized."
+msgstr "Testas jau buvo autorizuotas."
+
+msgid "Test had already been paused."
+msgstr "Testas jau buvo autorizuotas."
+
+msgid "Test had alredy been terminated."
+msgstr "Testas jau buvo nutrauktas."
+
+msgid "Test had been canceled."
+msgstr "Testas buvo atšauktas."
+
+msgid "Test had been completed."
+msgstr "Testas buvo atliktas."
+
+msgid "Test had been paused."
+msgstr "Testas buvo pristabdytas."
+
+msgid "Test had been terminated."
+msgstr "Testas buvo nutrauktas."
+
+msgid "Test had not been finished."
+msgstr "Testas nebuvo atliktas."
+
+msgid "Test had not been in progress."
+msgstr "Testas nebuvo vykdomas."
+
+msgid "Test had not been started."
+msgstr "Testas nebuvo pradėtas."
+
+msgid "Test site %s"
+msgstr "Testų tinklapis %s"
+
+msgid "test taker"
+msgstr "testo laikytojai"
+
+msgid "Test taker"
+msgstr "Testo laikytojai"
+
+msgid "Test takers have been added"
+msgstr "Testo laikytojai buvo pridėti"
+
+msgid "Test takers have been removed"
+msgstr "Testo laikytojai buvo pašalinti"
+
+msgid "Test Variables"
+msgstr "Testo Kintamieji"
+
+msgid "Test-Taker"
+msgstr "Testo Laikytojas"
+
+msgid "Testing Workstation"
+msgstr "Darbo Stoties Tikrinimas"
+
+msgid "The action cannot be applied, no eligible sessions found"
+msgstr "Veiksmas negali būti priskirtas. Nerasta tinkamų sesijų"
+
+msgid "The action will be applied to the following session"
+msgstr "Veiksmas priskirtas sekančiai sesijai"
+
+msgid "the already granted time will be replaced by the new value"
+msgstr "jau priskirtas laikas, bus pakeistas į naują reikšmę"
+
+msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
+msgstr "Vertinimas buvo suspenduotas. Norint tęsti jūsų vertinimą, prašome paleisti iš naujo ir jeigu reikia susisiekite su jūsų proktoriumi."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr "Šis vertinimas buvo nutrauktas. Jūs negalite tęsti jo toliau."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr ""
+
+msgid "The extra time must be a number"
+msgstr "Papildomas laikas privalo būti skaičius"
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr "Proktorius bus autorizuotas. Tęsti ?"
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr "Proktorius bus atšauktas. Tęsti ?"
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr "Proktoriai bus autorizuoti. Tęsti ?"
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr "Proktoriai bus atšaukti. Tęsti ?"
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr "Testo laikytojas bus pašalintas iš šios sesijos. Tęsti?"
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr "Testo laikytojai bus pašalinti iš šios sesijos. Tęsti?"
+
+msgid "There is no delivery in progress"
+msgstr "Jokia pateiktis nėra vykdoma"
+
+msgid "Time"
+msgstr "Laikas"
+
+#, tao-public
+msgid "Tools"
+msgstr "Įrankiai"
+
+msgid "Total Current Assessments"
+msgstr "Iš viso Dabartinių Įvertinimų"
+
+msgid "Total time"
+msgstr "Iš viso laiko"
+
+msgid "Unable to create irregularities export for %s"
+msgstr ""
+
+msgid "Unable to perform action on test %s."
+msgstr "Nepavyko teste atlikti veiksmo %s."
+
+msgid "User Activity"
+msgstr "Vartotojo Veikla"
+
+msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
+msgstr "Įspėjimas, jūs ketinate pristabdyti visus vykdomus testus. Visi testo laikytojai bus pristabdyti arba prieš sekantį širdies plakimą. Prašome pateikti priežastį šiam veiksmui."
+
+msgid "Weather"
+msgstr "Oras"
+
