@@ -27,7 +27,7 @@ use oat\tao\model\service\ApplicationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
-use PHPUnit_Framework_MockObject_MockObject;
+use oat\generis\test\MockObject;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -42,36 +42,36 @@ class DeliveryExecutionListTest extends TestCase
     private $serviceLocatorMock;
 
     /**
-     * @var SessionStateService|PHPUnit_Framework_MockObject_MockObject
+     * @var SessionStateService|MockObject
      */
     private $sessionStateServiceMock;
     /**
-     * @var common_ext_ExtensionsManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var common_ext_ExtensionsManager|MockObject
      */
     private $extensionManagerMock;
 
     /**
-     * @var TestSessionConnectivityStatusService|\PHPUnit_Framework_MockObject_MockObject
+     * @var TestSessionConnectivityStatusService|MockObject
      */
     private $testSessionConnectivityStatusServiceMock;
 
     /**
-     * @var common_ext_Extension|\PHPUnit_Framework_MockObject_MockObject
+     * @var common_ext_Extension|MockObject
      */
     private $proctoringExtensionMock;
 
     /**
-     * @var ApplicationService|\PHPUnit_Framework_MockObject_MockObject
+     * @var ApplicationService|MockObject
      */
     private $applicationServiceMock;
 
     /**
-     * @var Ontology|\PHPUnit_Framework_MockObject_MockObject
+     * @var Ontology|MockObject
      */
     private $modelMock;
 
     /**
-     * @var \core_kernel_classes_Property|\PHPUnit_Framework_MockObject_MockObject
+     * @var \core_kernel_classes_Property|MockObject
      */
     private $propertyMock;
 
@@ -210,7 +210,7 @@ class DeliveryExecutionListTest extends TestCase
 
         $this->sessionStateServiceMock->method('hasOption')->willReturn(false);
         $this->proctoringExtensionMock->method('getConfig')->willReturn(null);
-        /** @var Ontology|PHPUnit_Framework_MockObject_MockObject $modelMock */
+        /** @var Ontology|MockObject $modelMock */
         $modelMock = $this->createMock(Ontology::class);
         $modelMock->method('getProperty');
 
