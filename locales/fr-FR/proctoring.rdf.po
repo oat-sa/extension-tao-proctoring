@@ -1,0 +1,117 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint112\n"
+"PO-Revision-Date: 2019-10-11T08:37:28\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: fr-FR\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: fr-FR\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor"
+msgstr "Surveillant"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring role"
+msgstr "Rôle de surveillant"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Manager"
+msgstr "Responsable de surveillance"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Manager Role"
+msgstr "Rôle de responsable de la surveillance"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr "Administrateur de surveillance"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator Role"
+msgstr "Rôle d'administrateur de la surveillance"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Awaiting"
+msgstr "En attente"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Awaiting of authorization status of a delivery execution"
+msgstr "En attente du statut d'autorisation pour l'exécution d'une prestation"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Authorized"
+msgstr "Autorisé"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Authorized status of a delivery execution"
+msgstr "Statut Autorisé de l'exécution d'une prestation"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Terminated"
+msgstr "Terminé"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Terminated status of a delivery execution"
+msgstr "Statut Terminé de l'exécution d'une prestation"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Canceled"
+msgstr "Annulé"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Canceled status of a delivery execution"
+msgstr "Statut Annulé de l'exécution d'une prestation"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require Proctoring"
+msgstr "Demander une surveillance"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Require Proctoring on selected deliveries"
+msgstr "Demander une surveillance sur les prestations sélectionnées"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Check Enable"
+msgstr "Cocher Activer"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Check Enable"
+msgstr "Cocher Activer"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Enable"
+msgstr "Activer"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Enable"
+msgstr "Activer"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator role"
+msgstr "Rôle d'administrateur de la surveillance"
+

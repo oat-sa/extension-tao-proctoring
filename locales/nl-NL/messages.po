@@ -1,0 +1,1007 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint112\n"
+"PO-Revision-Date: 2019-10-11T08:37:28\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: nl-NL\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: nl-NL\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "%1$s - Item %2$s/%3$s"
+msgstr ""
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr "%d sessies van levering %s zijn niet gepauzeerd"
+
+msgid "%s - item %p/%c"
+msgstr ""
+
+msgid "%s completed"
+msgstr ""
+
+msgid "%s could not be %s because it is finished. Please refresh your data."
+msgstr "%s kon niet worden %s omdat het is geeindigd. Vernieuw a.u.b. uw data."
+
+msgid "%s could not be %s because it is terminated. Please refresh your data."
+msgstr "%s kon niet worden %s omdat het is beëindigd. Vernieuw a.u.b. uw data."
+
+msgid "%s could not be %s."
+msgstr "%s kon niet worden %s."
+
+msgid "%s minutes more"
+msgstr "%s minuten meer"
+
+msgid "%s\'s test had already been authorized."
+msgstr ""
+
+msgid "%s\'s test had already been paused."
+msgstr ""
+
+msgid "%s\'s test had already been terminated."
+msgstr ""
+
+msgid "%s\'s test had been canceled."
+msgstr ""
+
+msgid "%s\'s test had been completed."
+msgstr ""
+
+msgid "%s\'s test had been paused."
+msgstr ""
+
+msgid "%s\'s test had been terminated."
+msgstr ""
+
+msgid "%s\'s test had not been finished."
+msgstr ""
+
+msgid "%s\'s test had not been in progress."
+msgstr ""
+
+msgid "%s\'s test had not been started."
+msgstr ""
+
+msgid "%s\'s test must be terminated."
+msgstr ""
+
+msgid "..."
+msgstr ""
+
+msgid "A session of the delivery %s have not been paused"
+msgstr "Een sessie van levering %s is niet gepauzeerd"
+
+msgid "Action"
+msgstr "Actie"
+
+msgid "Actions"
+msgstr "Acties"
+
+msgid "Active"
+msgstr "Actief"
+
+msgid "Active proctors"
+msgstr "Actieve toezichthouders"
+
+msgid "Active test-takers"
+msgstr "Actieve toetsnemers"
+
+msgid "Actor"
+msgstr "Acteur"
+
+msgid "Add test takers"
+msgstr "Voeg kandidaten toe"
+
+msgid "Administer deliveries"
+msgstr "Beheer leveringen"
+
+msgid "Administration"
+msgstr "Administratie"
+
+msgid "already authorized"
+msgstr "al geautoriseerd "
+
+msgid "already paused"
+msgstr ""
+
+msgid "already terminated"
+msgstr ""
+
+msgid "Apply default tag"
+msgstr "Gebruik standaard tag"
+
+msgid "Are you sure you want to end the test?"
+msgstr "Weet u zeker dat u het examen wilt beëindigen?"
+
+#, tao-public
+msgid "Assessment Activity"
+msgstr "Examen activiteit"
+
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgstr "Examen is gepauzeerd vanwege een poging om te schakelen naar een ander window/tab. "
+
+msgid "Assign administrator"
+msgstr "Wijs beheerder toe"
+
+msgid "Assign more test takers to this session"
+msgstr "Wijs meer kandidaten toe aan deze sessie"
+
+msgid "Assign proctors"
+msgstr "Wijs toezichthouder toe"
+
+msgid "Assign the selected test takers"
+msgstr "Wijs de geselecteerde kandidaten toe"
+
+msgid "Assign the selected test takers to the session"
+msgstr "Wijs de geselecteerde kandidaten toe aan de sessie"
+
+msgid "Assign the test taker to the session"
+msgstr "Wijs de kandidaat toe aan de sessie"
+
+msgid "Assigned proctors"
+msgstr "Toegewezen toezichthouders"
+
+msgid "Assigned test takers"
+msgstr "Toegewezen kandidaten"
+
+msgid "Attempts"
+msgstr "Pogingen"
+
+msgid "author"
+msgstr "auteur"
+
+msgid "Authorize"
+msgstr "Autoriseer"
+
+msgid "Authorize Session"
+msgstr "Autoriseer sessie"
+
+msgid "Authorize session"
+msgstr "Autoriseer sessie"
+
+msgid "Authorize sessions"
+msgstr "Autoriseer sessies"
+
+msgid "Authorize the proctor"
+msgstr "Autoriseer de toezichthouder"
+
+msgid "Authorize the selected proctors"
+msgstr "Autoriseer de geselecteerde toezichthouders"
+
+msgid "authorized"
+msgstr "Geautoriseerd"
+
+msgid "Authorized"
+msgstr "Geautoriseerd"
+
+msgid "Authorized but not started"
+msgstr "Geautoriseerd, maar nog niet gestart"
+
+msgid "Authorized proctors"
+msgstr "Geautoriseerde toezichthouders"
+
+msgid "Authorized, you may proceed"
+msgstr "Geautoriseerd, u mag verder"
+
+msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr "Automatisch gereset door het systeem omdat het autorisatie verzoek gecanceld is door de kandidaat."
+
+msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
+msgstr "Automatisch gereset door het systeem omdat de kandidaat ervoor gekozen heeft om niet verder te gaan met de autorisatie test."
+
+msgid "Available"
+msgstr "Beschikbaar"
+
+msgid "Available history"
+msgstr "Beschikbare geschiedenis"
+
+msgid "Available test takers"
+msgstr "Beschikbare kandidaten"
+
+msgid "Awaiting"
+msgstr "Wachtend"
+
+msgid "Back"
+msgstr "Terug"
+
+msgid "Back to sessions"
+msgstr "Terug naar de sessies"
+
+msgid "Behaviour"
+msgstr "Gedrag"
+
+msgid "cancel"
+msgstr "annuleren"
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "cancel the action"
+msgstr "Actie annuleren"
+
+msgid "Canceled"
+msgstr "Geannuleerd"
+
+msgid "canceled"
+msgstr ""
+
+msgid "Cannot authorize test session."
+msgstr ""
+
+msgid "Cannot authorize test sessions."
+msgstr ""
+
+msgid "Cannot execute action."
+msgstr ""
+
+msgid "Cannot extend test session."
+msgstr ""
+
+msgid "Cannot extend test sessions."
+msgstr ""
+
+msgid "Cannot pause test session."
+msgstr ""
+
+msgid "Cannot pause test sessions."
+msgstr ""
+
+msgid "Cannot print test session."
+msgstr ""
+
+msgid "Cannot print test sessions."
+msgstr ""
+
+msgid "Cannot reactivate test session."
+msgstr ""
+
+msgid "Cannot reactivate test sessions."
+msgstr ""
+
+msgid "Cannot report test session."
+msgstr ""
+
+msgid "Cannot report test sessions."
+msgstr ""
+
+msgid "Cannot terminate test session."
+msgstr ""
+
+msgid "Cannot terminate test sessions."
+msgstr ""
+
+msgid "category"
+msgstr "category"
+
+msgid "Comfort"
+msgstr "Comfort"
+
+msgid "comment"
+msgstr "opmerking"
+
+msgid "Complaint"
+msgstr "Klacht"
+
+msgid "completed"
+msgstr ""
+
+msgid "Completed"
+msgstr "Voltooid"
+
+msgid "Completed tests"
+msgstr "Voltooide examens"
+
+msgid "Compliance"
+msgstr "Voldoet aan"
+
+msgid "Connectivity"
+msgstr "Connectiviteit"
+
+msgid "Context"
+msgstr "Context"
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr "Maak een toezichthouder aan en autoriseer deze voor de geselecteerde toets locaties"
+
+msgid "Create Proctor"
+msgstr "Maak toezichthouder aan"
+
+msgid "Creates and authorizes proctor"
+msgstr "Maakt toezichthouder aan en autoriseert deze"
+
+msgid "Current Assessment Activity"
+msgstr "Huidige toets activiteit"
+
+msgid "Current sessions"
+msgstr "Huidige sessies"
+
+msgid "date"
+msgstr "datum"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Days"
+msgstr "Dagen"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr ""
+
+msgid "Define sub-centers"
+msgstr "Definieer sub-centra"
+
+msgid "Deliveries"
+msgstr "Leveringen"
+
+msgid "Delivery"
+msgstr "Levering"
+
+msgid "Detailed Session History of %s"
+msgstr "Gedetailleerde sessie geschiedenis van %s"
+
+msgid "Detailed Session History of a selection"
+msgstr "Gedetailleerde sessie-geschiedenis van een selectie"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Disturbance"
+msgstr "Verstoring"
+
+msgid "Duration"
+msgstr "Tijdsduur"
+
+msgid "Edit test center"
+msgstr "Pas toets centrum aan"
+
+msgid "Elapsed time"
+msgstr "Verstreken tijd"
+
+msgid "End"
+msgstr "Einde"
+
+msgid "End date of the export"
+msgstr "Eind datum van de export"
+
+msgid "Environment"
+msgstr "Omgeving"
+
+msgid "Error"
+msgstr "Fout"
+
+msgid "Event"
+msgstr "Gebeurtenis"
+
+msgid "Examinee"
+msgstr "Geëxamineerde"
+
+msgid "Export"
+msgstr "Exporteren"
+
+#, tao-public
+msgid "Export Irregularities"
+msgstr "Onregelmatigheden bij export"
+
+msgid "Extended Time"
+msgstr ""
+
+msgid "Extra time"
+msgstr "Extra tijd"
+
+msgid "Extra Time"
+msgstr "Extra tijd"
+
+msgid "Extra time granted"
+msgstr "Extra tijd gegeven"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Filter by the selected dates"
+msgstr ""
+
+msgid "finished"
+msgstr "voltooid"
+
+msgid "Finished"
+msgstr "Voltooid"
+
+msgid "First name"
+msgstr "Voornaam"
+
+msgid "Freezing"
+msgstr "Bevriezend"
+
+msgid "Grant Extra Time"
+msgstr "Geef extra tijd"
+
+msgid "Groups: %s. %s"
+msgstr "Groepen: %s. %s"
+
+msgid "Hours"
+msgstr "Uren"
+
+msgid "However, the action will not be applied to the following sessions"
+msgstr "Maar de actie zal niet worden toegepast op de volgende sessies"
+
+msgid "ID/Authorization"
+msgstr "ID/Autorisatie"
+
+msgid "Identifier"
+msgstr "Identificatie"
+
+msgid "Illness"
+msgstr "Ziekte"
+
+msgid "In Progress"
+msgstr "In behandeling"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr ""
+
+msgid "Issue Category"
+msgstr "kwestie categorie"
+
+msgid "item"
+msgstr "item"
+
+msgid "Item Variables"
+msgstr "Item variabelen"
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Last Day"
+msgstr "Laatste dag"
+
+msgid "Last launch"
+msgstr ""
+
+msgid "Last Month"
+msgstr "Afgelopen maand"
+
+msgid "Last name"
+msgstr "Achternaam"
+
+msgid "Last Week"
+msgstr "Vorige week"
+
+msgid "Late"
+msgstr "Laat"
+
+msgid "Launching"
+msgstr "Starten"
+
+msgid "Loading"
+msgstr "Bezig met laden…"
+
+msgid "Logout"
+msgstr "Afmelden"
+
+msgid "Manage Proctors"
+msgstr "Beheer toezichthouders"
+
+#, tao-public
+msgid "Manage Results"
+msgstr "Beheer resultaten"
+
+msgid "minutes"
+msgstr "minuten"
+
+msgid "Monitor"
+msgstr "Observeren"
+
+msgid "Monitoring"
+msgstr "Observeren"
+
+msgid "Navigation"
+msgstr "Navigatie"
+
+msgid "Network"
+msgstr "Netwerk"
+
+msgid "No assigned proctors"
+msgstr "Geen toegewezen toezichthouders"
+
+msgid "No assigned test takers"
+msgstr "Geen toegewezen kandidaten"
+
+msgid "No available test takers to assign"
+msgstr "Geen kandidaten beschikbaar om toe te wijzen"
+
+msgid "No history to display!"
+msgstr "Geen geschiedenis om te tonen!"
+
+msgid "No proctors in request param"
+msgstr "Geen toezichthouder in de verzoek parameter"
+
+msgid "No sessions"
+msgstr "Geen sessies"
+
+msgid "No sessions available"
+msgstr "Geen sessie beschikbaar"
+
+msgid "No Show"
+msgstr "Niet op komen dagen"
+
+msgid "Noise"
+msgstr "Geluid"
+
+msgid "not finished"
+msgstr "Niet afgemaakt"
+
+msgid "not in progress"
+msgstr "niet in uitvoering"
+
+msgid "not started"
+msgstr "niet gestart"
+
+msgid "not terminated"
+msgstr ""
+
+msgid "Note"
+msgstr "Notitie"
+
+msgid "offline"
+msgstr "offline"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "online"
+msgstr "online"
+
+msgid "Other"
+msgstr "Overig"
+
+msgid "Outcome"
+msgstr "Uitkomst"
+
+msgid "Partially authorized proctors"
+msgstr "Gedeeltelijk geautoriseerde toezichthouders"
+
+msgid "Pause"
+msgstr "Pauze"
+
+msgid "Pause Active Test Sessions"
+msgstr "Pauzeer actieve toets sessies"
+
+msgid "Pause due to server maintenance"
+msgstr "Gepauzeerd wegens server onderhoud"
+
+msgid "Pause Session"
+msgstr "Sessie pauzeren"
+
+msgid "Pause session"
+msgstr "Sessie pauzeren"
+
+msgid "Pause sessions"
+msgstr "Sessies pauzeren"
+
+msgid "Paused"
+msgstr "Gepauzeerd"
+
+msgid "paused"
+msgstr "gepauzeerd"
+
+msgid "Please select one or more test site to manage proctors"
+msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
+
+msgid "Please wait, authorization in process ..."
+msgstr "Een moment a.u.b., autorisatie in behandeling..."
+
+msgid "Please, make your selection"
+msgstr "Kies a.u.b. een selectie"
+
+msgid "Power Outage"
+msgstr "Stroomuitval"
+
+msgid "Previous Month"
+msgstr "Vorige maand"
+
+msgid "Print Results"
+msgstr "Print resultaten"
+
+msgid "Print Score"
+msgstr "Print score"
+
+msgid "Print the assessment results"
+msgstr "Print de examen resultaten"
+
+msgid "Printing"
+msgstr "Afdrukken"
+
+msgid "Proceed"
+msgstr "Doorgaan"
+
+msgid "Proctor"
+msgstr "Toezichthouder"
+
+msgid "Proctor created"
+msgstr "Toezichthouder gecreëerd"
+
+msgid "Proctor/Staff"
+msgstr "Toezichthouder/staf"
+
+msgid "Proctored Delivery Server"
+msgstr "Levering server onder toezicht"
+
+msgid "Proctored Test-Takers"
+msgstr "Kandidaten onder toezichthouder"
+
+msgid "Proctoring interface"
+msgstr "Toezichthouder interface"
+
+msgid "Proctors"
+msgstr "Toezichthouders"
+
+msgid "Proctors authorized"
+msgstr "Toezichthouder geautoriseerd"
+
+msgid "Proctors revoked"
+msgstr "Toezichthouders ingetrokken"
+
+msgid "Progress"
+msgstr "Voortgang"
+
+msgid "Reactivate Session"
+msgstr ""
+
+msgid "Reactivate session"
+msgstr ""
+
+msgid "Refresh"
+msgstr "Verversen"
+
+msgid "Refresh the page"
+msgstr "Pagina verversen"
+
+msgid "Remaining"
+msgstr "Resterend"
+
+msgid "Remove"
+msgstr "Verwijderen"
+
+msgid "Remove default tag filtering"
+msgstr "Verwijder de default tag filter"
+
+msgid "Remove the selected test takers from the session"
+msgstr "Verwijder de geselecteerde kandidaten van de sessie"
+
+msgid "Remove the test taker from the session"
+msgstr "Verwijder de kandidaat van de sessie"
+
+msgid "Report"
+msgstr "Rapporteren"
+
+msgid "Report irregularities"
+msgstr "Rapporteer onregelmatigheden"
+
+msgid "Report Irregularity"
+msgstr "Rapporteer onregelmatigheden"
+
+msgid "Report irregularity"
+msgstr "Rapporteer onregelmatigheden"
+
+msgid "reported for irregularity"
+msgstr "Gerapporteerd wegens onregelmatigheden"
+
+msgid "Resource update task is completed"
+msgstr ""
+
+msgid "results"
+msgstr "resultaten"
+
+#, tao-public
+msgid "Results"
+msgstr "Resultaten"
+
+msgid "Return to the session manager"
+msgstr "Geef terug aan de sessie beheerder"
+
+msgid "Return to the session monitoring"
+msgstr "Geef terug aan sessie toezicht"
+
+msgid "Revoke authorization for the selected proctor"
+msgstr "Trek autorisatie in van de geselecteerde toezichthouder"
+
+msgid "Revoke the proctor"
+msgstr "Trek toezichthoudersrol in"
+
+msgid "Role"
+msgstr "Rol"
+
+msgid "Score"
+msgstr "Score"
+
+msgid "Score Report"
+msgstr "Score rapport"
+
+msgid "section"
+msgstr "sectie"
+
+msgid "Session"
+msgstr "Sessie"
+
+msgid "Session %s - %s has not been processed"
+msgstr "Sessie %s - %s is niet verwerkt"
+
+msgid "Session history"
+msgstr "Sessie geschiedenis"
+
+msgid "Session time handling"
+msgstr "Sessie tijd behandeling"
+
+msgid "Sessions"
+msgstr "Sessies"
+
+msgid "Sessions authorized"
+msgstr "Geautoriseerde sessies"
+
+msgid "sessions paused"
+msgstr "gepauzeerde sessies"
+
+msgid "Sessions paused"
+msgstr "Gepauzeerde sessies"
+
+msgid "Sessions reactivated"
+msgstr ""
+
+msgid "Sessions reported"
+msgstr "Gerapporteerde sessies"
+
+msgid "Sessions terminated"
+msgstr "Afgebroken sessies"
+
+msgid "Show brief report"
+msgstr "Toon (ver)kort rapport"
+
+msgid "Show detailed report"
+msgstr "Toon uitgebreid rapport"
+
+msgid "Show detailed session history messages"
+msgstr "Toon uitgebreide sessiegeschiedenis berichten"
+
+msgid "Show the detailed session history"
+msgstr "Toon de gedetailleerde sessie geschiedenis"
+
+msgid "Some delivery executions have not been authorized"
+msgstr "Sommige uitleveringen zijn niet geautoriseerd"
+
+msgid "Some delivery executions have not been paused"
+msgstr "Sommige uitleveringen zijn niet gepauzeerd"
+
+msgid "Some delivery executions have not been reactivated"
+msgstr ""
+
+msgid "Some delivery executions have not been reported"
+msgstr "Sommige uitleveringen zijn niet gerapporteerd"
+
+msgid "Some delivery executions have not been terminated"
+msgstr "Sommige uitleveringen zijn niet beëindigd"
+
+msgid "Some delivery executions have not been updated"
+msgstr "Sommige uitleveringen zijn niet geupdate"
+
+msgid "Something went wrong ..."
+msgstr "Er ging iets verkeerd..."
+
+msgid "Start"
+msgstr "Starten"
+
+msgid "Start date of the export"
+msgstr "Startdatum van de export"
+
+msgid "Started at"
+msgstr "Gestart op"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "subcategory"
+msgstr "subcategorie"
+
+msgid "Subcategory"
+msgstr "Subcategorie"
+
+msgid "System generated pause."
+msgstr ""
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr "Start of continueer een examen gecontroleerd door een toezichthouder"
+
+msgid "Technical"
+msgstr "Technisch"
+
+msgid "Terminate"
+msgstr "Beeindigen"
+
+msgid "Terminate and irregularity"
+msgstr ""
+
+msgid "Terminate session"
+msgstr "Beëindig sessie"
+
+msgid "Terminate Session"
+msgstr "Beëindig sessie"
+
+msgid "Terminate sessions"
+msgstr "Beëindig sessies"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr ""
+
+msgid "Terminated"
+msgstr "Beëindigd"
+
+msgid "terminated"
+msgstr "beëindigd"
+
+msgid "Test  must be terminated."
+msgstr ""
+
+msgid "Test %s had already been authorized."
+msgstr ""
+
+msgid "Test %s had already been paused."
+msgstr ""
+
+msgid "Test %s had already been terminated."
+msgstr ""
+
+msgid "Test %s had been canceled."
+msgstr ""
+
+msgid "Test %s had been completed."
+msgstr ""
+
+msgid "Test %s had been paused."
+msgstr ""
+
+msgid "Test %s had been terminated."
+msgstr ""
+
+msgid "Test %s had not been finished."
+msgstr ""
+
+msgid "Test %s had not been in progress."
+msgstr ""
+
+msgid "Test %s had not been started."
+msgstr ""
+
+msgid "Test %s must be terminated."
+msgstr ""
+
+msgid "Test center saved"
+msgstr "Toetslocatie opgeslagen"
+
+msgid "Test had already been authorized."
+msgstr ""
+
+msgid "Test had already been paused."
+msgstr ""
+
+msgid "Test had alredy been terminated."
+msgstr ""
+
+msgid "Test had been canceled."
+msgstr ""
+
+msgid "Test had been completed."
+msgstr ""
+
+msgid "Test had been paused."
+msgstr ""
+
+msgid "Test had been terminated."
+msgstr ""
+
+msgid "Test had not been finished."
+msgstr ""
+
+msgid "Test had not been in progress."
+msgstr ""
+
+msgid "Test had not been started."
+msgstr ""
+
+msgid "Test site %s"
+msgstr "Toetslocatie %s"
+
+msgid "test taker"
+msgstr "kandidaat"
+
+msgid "Test taker"
+msgstr "Kandidaat"
+
+msgid "Test takers have been added"
+msgstr "Kandidaten zijn toegevoegd"
+
+msgid "Test takers have been removed"
+msgstr "Kandidaten zijn verwijderd"
+
+msgid "Test Variables"
+msgstr "Examen variabelen"
+
+msgid "Test-Taker"
+msgstr "Kandidaat"
+
+msgid "Testing Workstation"
+msgstr "Test werkstation"
+
+msgid "The action cannot be applied, no eligible sessions found"
+msgstr "De actie kan niet worden uitgevoerd. Er zijn geen in aanmerking komende sessies gevonden"
+
+msgid "The action will be applied to the following session"
+msgstr "Deze actie zal worden doorgevoerd op de volgende sessie"
+
+msgid "the already granted time will be replaced by the new value"
+msgstr "de al eerder gegeven extra tijd zal worden vervangen door de nieuwe waarde"
+
+msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
+msgstr "Het examen is geschorst. Herstart a.u.b. het examen en neem indien nodig contact op met de uw toezichthouder om uw examen te hervatten."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr "Het examen is beëindigd.U kunt er niet meer aan werken."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr ""
+
+msgid "The extra time must be a number"
+msgstr "De extra tijd moet numeriek zijn"
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr "De toezichthouder zal geautoriseerd worden. Verder gaan..?"
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr "De toezichthouder zal worden ingetrokken. Verder gaan...?"
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr "De toezichthouders zullen worden geautoriseerd. Verder gaan...?"
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr "De toezichthouders zullen worden ingetrokken. Verder gaan...?"
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr "De kandidaat zal worden verwijderd van deze sessie. verder gaan...?"
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr "De kandidaten zullen worden verwijderd van deze sessie. verder gaan...?"
+
+msgid "There is no delivery in progress"
+msgstr "Er is geen levering in bewerking"
+
+msgid "Time"
+msgstr "Tijd"
+
+#, tao-public
+msgid "Tools"
+msgstr "Hulpmiddelen"
+
+msgid "Total Current Assessments"
+msgstr "Totaal aantal huidige examens"
+
+msgid "Total time"
+msgstr "Totale tijd"
+
+msgid "Unable to create irregularities export for %s"
+msgstr ""
+
+msgid "Unable to perform action on test %s."
+msgstr ""
+
+msgid "User Activity"
+msgstr "Gebruikers activiteit"
+
+msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
+msgstr "Waarschuwing! U gaat alle actieve examens pauzeren. Alle kandidaten zullen gepauzeerd worden op of voor de volgende heartbeat. Geef a.u.b. een reden voor deze actie."
+
+msgid "Weather"
+msgstr "Weer"
+

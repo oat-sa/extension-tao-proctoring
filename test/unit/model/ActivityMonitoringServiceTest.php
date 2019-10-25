@@ -21,7 +21,7 @@
 
 namespace oat\taoProctoring\test\unit\model;
 
-use oat\tao\test\TaoPhpUnitTestRunner;
+use oat\generis\test\TestCase;
 use oat\taoProctoring\model\ActivityMonitoringService;
 
 /**
@@ -29,42 +29,33 @@ use oat\taoProctoring\model\ActivityMonitoringService;
  * @package oat\taoProctoring\test\model
  * @author Aleh Hutnikau, <hutnikau@1pt.com>
  */
-class ActivityMonitoringServiceTest extends TaoPhpUnitTestRunner
+class ActivityMonitoringServiceTest extends TestCase
 {
-
     public function testGetTimeKeys()
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $service = $this->createService();
+        $service = new ActivityMonitoringService();
+
         $timeKeys = $service->getTimeKeys(new \DateInterval('PT1M'), clone($date));
         $this->assertEquals(60, count($timeKeys));
-        $this->assertEquals($date->format('i')+1, $timeKeys[0]->format('i'));
+        $this->assertEquals(((int)$date->format('i') + 1) % 60, (int)$timeKeys[0]->format('i'));
         $this->assertEquals(0, $timeKeys[0]->format('s'));
-
 
         $timeKeys = $service->getTimeKeys(new \DateInterval('PT1H'), clone($date));
         $this->assertEquals(24, count($timeKeys));
-        $this->assertEquals($date->format('h')+1, $timeKeys[0]->format('h'));
+        $this->assertEquals(((int)$date->format('H') + 1) % 24, (int)$timeKeys[0]->format('H'));
         $this->assertEquals(0, $timeKeys[0]->format('i'));
 
-
         $timeKeys = $service->getTimeKeys(new \DateInterval('P1D'), clone($date));
-        $this->assertEquals(cal_days_in_month(CAL_GREGORIAN, $date->format('m'), $date->format('Y')), count($timeKeys));
-        $this->assertEquals($date->format('d')+1, $timeKeys[0]->format('d'));
+        $tomorrow = (new \DateTime('now', new \DateTimeZone('UTC')))->add(new \DateInterval('P1D'));
+        $this->assertEquals($tomorrow->format('t'), count($timeKeys));
+        $this->assertEquals($tomorrow->format('d'), $timeKeys[0]->format('d'));
         $this->assertEquals('00', $timeKeys[0]->format('H'));
-
 
         $timeKeys = $service->getTimeKeys(new \DateInterval('P1M'), clone($date));
         $this->assertEquals(12, count($timeKeys));
-        $this->assertEquals($date->format('m')+1, $timeKeys[0]->format('m'));
+        $this->assertEquals((int)$date->format('m') % 12 + 1, (int)$timeKeys[0]->format('m'));
         $this->assertEquals(0, $timeKeys[0]->format('H'));
         $this->assertEquals('01', $timeKeys[0]->format('d'));
     }
-
-    protected function createService()
-    {
-        $service = new ActivityMonitoringService([]);
-        return $service;
-    }
-
 }

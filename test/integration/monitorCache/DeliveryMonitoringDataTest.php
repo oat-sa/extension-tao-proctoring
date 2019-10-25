@@ -25,8 +25,11 @@ require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionContextInterface;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\generis\test\MockObject;
 
 /**
  * class DeliveryMonitoringData
@@ -38,6 +41,30 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
  */
 class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 {
+    /**
+     * @var DeliveryExecutionInterface|MockObject
+     */
+    private $deliveryExecutionMock;
+
+    /**
+     * @var DeliveryExecutionContextInterface|MockObject
+     */
+    private $deliveryExecutionContextMock;
+
+    /**
+     * @var DeliveryMonitoringData
+     */
+    private $object;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->deliveryExecutionContextMock = $this->createMock(DeliveryExecutionContextInterface::class);
+        $this->deliveryExecutionMock = $this->createMock(DeliveryExecutionInterface::class);
+        $this->object = new DeliveryMonitoringData($this->deliveryExecutionMock, []);
+    }
+
     public function testConstruct()
     {
         $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
@@ -49,7 +76,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
         $deliveryExecution = $this->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
         foreach ($columns as $columnKey => $columnVal) {
             $data->addValue($columnKey, $columnVal);
@@ -64,7 +91,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testAddValue()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution,[]);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
 
         $this->assertEquals($data->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $deliveryExecution->getIdentifier());
@@ -84,7 +111,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testValidate()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, []);
+        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
         $data->setServiceLocator($this->getServiceManagerProphecy());
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();
@@ -99,12 +126,69 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
         $this->assertTrue(empty($errors));
     }
 
-    private function getDeliveryExecution()
+    private function getDeliveryExecution($state = null)
     {
         $id = 'http://sample/first.rdf#i1450190828500474_test_record';
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize(DeliveryExecution::class);
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+        $deliveryExecutionProphecy->getState()->willReturn($state);
         return $deliveryExecutionProphecy->reveal();
+    }
+
+    public function testGetDeliveryExecution()
+    {
+        $deliveryExecution = $this->object->getDeliveryExecution();
+
+        $this->assertInstanceOf(DeliveryExecutionInterface::class, $deliveryExecution, 'Method must return an instance of expected interface.');
+    }
+
+    public function testSetDeliveryExecutionContext()
+    {
+        $this->deliveryExecutionContextMock->expects($this->once())
+            ->method('jsonSerialize')
+            ->willReturn([]);
+
+        $this->object->setDeliveryExecutionContext($this->deliveryExecutionContextMock);
+
+        $monitoringData = $this->object->get();
+        $this->assertArrayHasKey(
+            'execution_context',
+            $monitoringData,
+            'Delivery execution context object must be stored in monitoring data.'
+        );
+        $this->assertInternalType(
+            'string',
+            $monitoringData['execution_context'],
+            'Delivery monitoring context must be stored as JSON string.'
+        );
+    }
+
+    public function testDetDeliveryExecutionContextDoesNotExist()
+    {
+        $result = $this->object->getDeliveryExecutionContext();
+
+        $this->assertNull($result, 'Method must return false if context does not exist.');
+    }
+
+    public function testGetDeliveryExecutionContext()
+    {
+        $contextData = [
+            'execution_id' => 'http://test-execution-uri.dev',
+            'context_id' => 'test_context_id',
+        ];
+        $this->deliveryExecutionContextMock->expects($this->once())
+            ->method('jsonSerialize')
+            ->willReturn($contextData);
+
+        $this->object->setDeliveryExecutionContext($this->deliveryExecutionContextMock);
+
+        $result = $this->object->getDeliveryExecutionContext();
+
+        $this->assertInstanceOf(
+            DeliveryExecutionContextInterface::class,
+            $result,
+            'Method must return an instance of expected interface.'
+        );
     }
 }

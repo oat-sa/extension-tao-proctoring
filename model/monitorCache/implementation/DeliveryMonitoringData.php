@@ -21,6 +21,8 @@
 
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
+use oat\taoDelivery\model\execution\DeliveryExecutionContext;
+use oat\taoDelivery\model\execution\DeliveryExecutionContextInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\implementation\TestSessionService;
@@ -77,17 +79,14 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     ];
 
     /**
-     * DeliveryMonitoringData constructor.
      * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $data
+     * @throws \common_exception_NotFound
      */
-    public function __construct(DeliveryExecutionInterface $deliveryExecution, $data)
+    public function __construct(DeliveryExecutionInterface $deliveryExecution, array $data)
     {
         $this->deliveryExecution = $deliveryExecution;
-        if (is_array($data) && !empty($data)) {
-            $this->data = $data;
-        } else {
-            $this->data = [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()];
-        }
+        $this->data = $data;
     }
 
     /**
@@ -122,6 +121,36 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     }
 
     /**
+     * @return DeliveryExecutionInterface
+     */
+    public function getDeliveryExecution()
+    {
+        return $this->deliveryExecution;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDeliveryExecutionContext(DeliveryExecutionContextInterface $context)
+    {
+        $this->update(self::PARAM_EXECUTION_CONTEXT, json_encode($context));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeliveryExecutionContext()
+    {
+        try {
+            if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
+                return DeliveryExecutionContext::createFromArray(json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true));
+            }
+        } catch (\Exception $e) {}
+
+        return null;
+    }
+
+    /**
      * Validate data
      * @return bool whether data is valid and can be saved.
      */
@@ -137,6 +166,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
                 $this->errors[$requiredField] = 'cannot be empty';
             }
         }
+
+        foreach ($data as $fieldName => $fieldValue) {
+            if (!array_key_exists($fieldName, $this->errors) && $fieldValue !== null && !is_string($fieldValue)) {
+                $this->errors[$fieldName] = 'should be a string';
+            }
+        }
+
         return $result;
     }
 

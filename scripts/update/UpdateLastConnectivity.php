@@ -51,7 +51,7 @@ class UpdateLastConnectivity implements Action
                 $deliveryData->updateData([
                     DeliveryMonitoringService::CONNECTIVITY
                 ]);
-                $monitoring->save($deliveryData);
+                $monitoring->partialSave($deliveryData);
                 $executions++;
             } catch (\common_exception_NotFound $e) {
                 //Delivery execution not found; Skip

@@ -25,13 +25,16 @@ use common_ext_ExtensionUpdater;
 use common_persistence_Manager;
 use Doctrine\DBAL\Schema\SchemaException;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\event\MetadataModified;
 use oat\tao\model\mvc\DefaultUrlService;
+use oat\tao\model\taskQueue\TaskLogInterface;
 use oat\tao\model\user\import\UserCsvImporterFactory;
 use oat\tao\model\user\TaoRoles;
+use oat\tao\model\webhooks\WebhookEventsServiceInterface;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
@@ -42,6 +45,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
 use oat\taoProctoring\controller\DeliverySelection;
+use oat\taoProctoring\controller\ExecutionRestService;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
@@ -51,7 +55,9 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\FinishDeliveryExecutionsService;
@@ -87,6 +93,7 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
 use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteService;
 
 /**
  *
@@ -751,7 +758,159 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('10.2.0');
         }
 
-        $this->skip('10.2.0', '10.2.3');
+        $this->skip('10.2.0', '10.2.4');
 
+        if ($this->isVersion('10.2.4')){
+            AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
+            $this->setVersion('10.3.0');
+        }
+
+        if ($this->isVersion('10.3.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(TestChangedEvent::EVENT_NAME, [TestUpdate::class, 'testStateChange']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('10.3.1');
+        }
+
+        $this->skip('10.3.1', '11.0.0');
+
+        if ($this->isVersion('11.0.0')) {
+            AclProxy::revokeRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
+            $this->setVersion('12.0.0');
+        }
+
+
+        $this->skip('12.0.0', '12.3.0');
+
+        if ($this->isVersion('12.3.0')) {
+
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryExecutionFinished::class, ['oat\\taoEventLog\\model\\LoggerService', 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('12.3.1');
+        }
+
+        $this->skip('12.3.1', '12.3.2.3');
+
+        if ($this->isVersion('12.3.2.3')) {
+            $extensionManager = \common_ext_ExtensionsManager::singleton();
+            if (!$extensionManager->isInstalled('taoTestCenter') || !$extensionManager->isEnabled('taoTestCenter')) {
+                /** @var DefaultUrlService $urlService */
+                $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
+                $proctoringHomeRoute = $urlService->getRoute('ProctoringHome');
+
+                $dumbRoute = [
+                    'ext' => 'taoProctoring',
+                    'controller' => 'TestCenter',
+                    'action' => 'index'
+                ];
+
+                if ($proctoringHomeRoute == $dumbRoute) {
+                    $urlService->setRoute('ProctoringHome', [
+                            'ext' => 'tao',
+                            'controller' => 'Main',
+                            'action' => 'entry',
+                        ]
+                    );
+                }
+                $this->getServiceManager()->register(DefaultUrlService::SERVICE_ID, $urlService);
+            }
+
+            $this->setVersion('12.3.3');
+        }
+
+        $this->skip('12.3.3', '12.3.4');
+
+        if ($this->isVersion('12.3.4')) {
+            /** @var TaskLogInterface|ConfigurableService $taskLogService */
+            $taskLogService = $this->getServiceManager()->get(TaskLogInterface::SERVICE_ID);
+            $taskLogService->linkTaskToCategory(AbstractIrregularityReport::class, TaskLogInterface::CATEGORY_EXPORT);
+            $this->getServiceManager()->register(TaskLogInterface::SERVICE_ID, $taskLogService);
+
+            $this->setVersion('12.4.0');
+        }
+
+        $this->skip('12.4.0', '12.5.2');
+
+        if ($this->isVersion('12.5.2')) {
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->detach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $eventManager->attach(DeliveryExecutionFinished::class, [LoggerService::class, 'logEvent']);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('12.5.3');
+        }
+
+        $this->skip('12.5.3', '13.0.0');
+
+        if ($this->isVersion('13.0.0')) {
+            /** @var DeliveryExecutionDeleteService $executionDeleteService */
+            $executionDeleteService = $this->getServiceManager()->get(DeliveryExecutionDeleteService::SERVICE_ID);
+            $previousServices       = $executionDeleteService->getOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES);
+
+            $executionDeleteService->setOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
+                array_merge($previousServices, [
+                    'taoProctoring/DeliveryLog',
+                    'taoProctoring/DeliveryMonitoring',
+                ])
+            );
+
+            $this->getServiceManager()->register(DeliveryExecutionDeleteService::SERVICE_ID, $executionDeleteService);
+
+            $this->setVersion('13.1.0');
+        }
+
+        $this->skip('13.1.0', '15.1.2');
+
+        if ($this->isVersion('15.1.2')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('16.0.0');
+        }
+
+        $this->skip('16.0.0', '16.3.1');
+
+        if ($this->isVersion('16.3.1')) {
+
+            /** @var RdsDeliveryLogService $deliveryLog */
+            $deliveryLog = $this->getServiceManager()->get(DeliveryLog::SERVICE_ID);
+
+            $deliveryLog->setOption(DeliveryLog::OPTION_FIELDS, [
+                DeliveryLog::EVENT_ID,
+                DeliveryLog::CREATED_BY,
+                DeliveryLog::DELIVERY_EXECUTION_ID,
+                DeliveryLog::ID
+            ]);
+
+            $this->getServiceManager()->register(DeliveryLog::SERVICE_ID, $deliveryLog);
+
+            $this->setVersion('16.4.0');
+        }
+
+        if ($this->isVersion('16.4.0')) {
+            /** @var EventManager $eventManager */
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            /** @var WebhookEventsServiceInterface $webhooksService */
+            $webhooksService = $this->getServiceManager()->get(WebhookEventsServiceInterface::SERVICE_ID);
+            $webhooksService->registerEvent(DeliveryExecutionFinished::EVENT_NAME);
+            /** @noinspection PhpParamsInspection */
+            $this->getServiceManager()->register(WebhookEventsServiceInterface::SERVICE_ID, $webhooksService);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+
+            $this->setVersion('17.0.0');
+        }
+
+        $this->skip('17.0.0', '17.2.3');
+
+        if ($this->isVersion('17.2.3')) {
+            /** @var GuiSettingsService $guiService */
+            $guiService = $this->getServiceManager()->get(GuiSettingsService::SERVICE_ID);
+            $guiService->setOption(GuiSettingsService::OPTION_SET_START_DATA_ONE_DAY, true);
+            $this->getServiceManager()->register(GuiSettingsService::SERVICE_ID, $guiService);
+            $this->setVersion('17.3.0');
+        }
+
+        $this->skip('17.3.0', '18.0.1');
     }
 }

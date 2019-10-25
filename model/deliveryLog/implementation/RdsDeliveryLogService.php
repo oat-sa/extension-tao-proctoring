@@ -20,10 +20,13 @@
 
 namespace oat\taoProctoring\model\deliveryLog\implementation;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use oat\oatbox\event\EventManager;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 
 /**
  * Interface DeliveryLog
@@ -35,9 +38,6 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 {
     const OPTION_PERSISTENCE = 'persistence';
     const TABLE_NAME = 'delivery_log';
-    const ID = 'id';
-
-    const OPTION_FIELDS = 'fields';
 
     /**
      * Log delivery execution data.
@@ -61,16 +61,20 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
             $user = 'cli';
         }
 
+        $createdAt = microtime(true);
         $result = $this->getPersistence()->insert(
             self::TABLE_NAME,
             array(
                 self::DELIVERY_EXECUTION_ID => $deliveryExecutionId,
                 self::EVENT_ID => $eventId,
                 self::DATA => $data,
-                self::CREATED_AT => microtime(true),
+                self::CREATED_AT => $createdAt,
                 self::CREATED_BY => $user,
             )
         );
+
+        $id = $this->getPersistence()->lastInsertId();
+        $this->getServiceLocator()->get(EventManager::SERVICE_ID)->trigger(new DeliveryLogEvent($id));
 
         return $result === 1;
     }
@@ -79,7 +83,7 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      * Get logged data by delivery execution id
      *
      * @param string $deliveryExecutionId
-     * @param sting|null $eventId - filter data by event id
+     * @param string|null $eventId - filter data by event id
      * @return mixed
      */
     public function get($deliveryExecutionId, $eventId = null)
@@ -173,9 +177,14 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 
         $fields = $this->getFields();
         foreach ($params as $key => $val) {
-            if (in_array($key, $fields)) {
-                $queryBuilder->andWhere($key . '= :'.$key);
-                $queryBuilder->setParameter($key, $val);
+            if (in_array($key, $fields, false)) {
+                if (is_array($val)) {
+                    $queryBuilder->andWhere($key . ' IN (:'.$key.')');
+                    $queryBuilder->setParameter($key, $val, Connection::PARAM_STR_ARRAY);
+                } else {
+                    $queryBuilder->andWhere($key . '= :'.$key);
+                    $queryBuilder->setParameter($key, $val);
+                }
             }
         }
 

@@ -31,8 +31,9 @@ define([
     'util/url',
     'ui/dialog/confirm',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess',
-    'tpl!taoProctoring/templates/deliveryServer/authorizationListBoxActions'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, url, dialogConfirm, authSuccessTpl, listBoxActionsTpl){
+    'tpl!taoProctoring/templates/deliveryServer/authorizationListBoxActions',
+    'util/clipboard'
+], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, url, dialogConfirm, authSuccessTpl, listBoxActionsTpl, clipboard){
     'use strict';
 
     /**
@@ -82,6 +83,7 @@ define([
             var deliveryStarted = false;
             var runDelivery = function runDelivery () {
                 loadingBar.start();
+                clipboard.clean();
                 deliveryStarted = true;
                 window.location.href = runDeliveryUrl;
             };

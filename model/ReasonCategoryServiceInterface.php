@@ -14,21 +14,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  *
  */
 
-namespace oat\taoProctoring\model\event;
+namespace oat\taoProctoring\model;
 
-class DeliveryExecutionReactivated extends DeliveryExecutionTerminated
+
+interface ReasonCategoryServiceInterface
 {
-    const LOG_KEY = 'TEST_REACTIVATED';
+    const SERVICE_ID = 'taoProctoring/reasonCategory';
 
     /**
-     * @return string
+     * @return array
      */
-    public function getName()
-    {
-        return __CLASS__;
-    }
+    public function getIrregularities();
 }

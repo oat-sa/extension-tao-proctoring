@@ -22,7 +22,7 @@ namespace oat\taoProctoring\model\datatable;
 
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
-use oat\oatbox\service\ServiceManager;
+use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use oat\taoProctoring\model\ProctorService;
@@ -99,9 +99,8 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
         $executions = $service->getProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
         $total = $service->countProctorableDeliveryExecutions($proctor, $this->delivery, $context, $options);
         $totalPages = ceil($total / $this->datatableRequest->getRows());
-        $result = $this->doPostProcessing($executions, $total, $totalPages);
 
-        return $result;
+        return $this->doPostProcessing($executions, $total, $totalPages);
     }
 
     /**
@@ -109,6 +108,7 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
      * @param integer $amount
      * @param integer $pages
      * @return array
+     * @throws \common_ext_ExtensionException
      */
     protected function doPostProcessing(array $executionsData, $amount, $pages)
     {
@@ -118,7 +118,7 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
             'total' => $pages,
             'page' => $this->datatableRequest->getPage(),
             'rows' => $this->datatableRequest->getRows(),
-            'data' => DeliveryHelper::buildDeliveryExecutionData($executionsData),
+            'data' => $this->getDeliveryHelperService()->adjustDeliveryExecutions($executionsData),
         ];
     }
 
@@ -128,5 +128,13 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
     public function jsonSerialize()
     {
         return $this->getPayload();
+    }
+
+    /**
+     * @return DeliveryExecutionList
+     */
+    private function getDeliveryHelperService()
+    {
+        return $this->getServiceLocator()->get(DeliveryExecutionList::class);
     }
 }

@@ -19,8 +19,6 @@
  */
 namespace oat\taoProctoring\test\integration\model\authorization;
 
-require_once dirname(__FILE__).'/../../../../../tao/includes/raw_start.php';
-
 use core_kernel_classes_Resource;
 use oat\oatbox\user\User;
 use oat\tao\test\TaoPhpUnitTestRunner;
@@ -32,6 +30,8 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
 use oat\taoProctoring\model\ProctorService;
 use Prophecy\Argument;
 use Prophecy\Prophet;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 
 /**
  * Test the ProctorAuthorizationProvider
@@ -46,8 +46,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     protected function getDelivery()
     {
-        $prophet = new Prophet();
-        $prophecy = $prophet->prophesize(core_kernel_classes_Resource::class);
+        $prophecy = $this->prophesize(core_kernel_classes_Resource::class);
         $prophecy->getUri()->willReturn('fakeDelivery');
         $prophecy->getOnePropertyValue(Argument::any())->willReturn(new core_kernel_classes_Resource(ProctorService::ACCESSIBLE_PROCTOR_ENABLED));
 
@@ -62,11 +61,12 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     protected function getDeliveryExecution($executionStateUri = ProctoredDeliveryExecution::STATE_AUTHORIZED)
     {
-        $prophet = new Prophet();
-        $prophecy = $prophet->prophesize();
-        $prophecy->willImplement(DeliveryExecutionInterface::class);
+        $pState = $this->prophesize(\core_kernel_classes_Resource::class);
+        $pState->getUri()->willReturn($executionStateUri);
+
+        $prophecy = $this->prophesize(DeliveryExecutionInterface::class);
         $prophecy->getDelivery()->willReturn($this->getDelivery());
-        $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($executionStateUri));
+        $prophecy->getState()->willReturn($pState->reveal());
         $prophecy->getIdentifier()->willReturn('fakeDeliveryExecution');
         $prophecy->setState(Argument::any())->will(function($args) use ($prophecy){
             $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($args[0]));
@@ -91,10 +91,11 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     {
         $authorizationProvider = new ProctorAuthorizationProvider();
         $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
-        $user = $this->prophesize(User::class)->reveal();
+        $userP = $this->prophesize(User::class);
+        $userP->getRoles()->willReturn([]);
 
         $authorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_AUTHORIZED);
-        $authorizationProvider->verifyResumeAuthorization($authorized, $user);
+        $authorizationProvider->verifyResumeAuthorization($authorized, $userP->reveal());
     }
 
     /**
@@ -102,10 +103,13 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
      */
     public function testIsUnauthorized()
     {
+        $ttas = $this->prophesize(TestTakerAuthorizationService::class);
+        $sl = $this->prophesize(ServiceLocatorInterface::class);
+        $sl->get(TestTakerAuthorizationService::SERVICE_ID)->willReturn(new TestTakerAuthorizationService());
         $authorizationProvider = new ProctorAuthorizationProvider();
-        $authorizationProvider->setServiceLocator($this->getServiceManagerProphecy());
+        $authorizationProvider->setServiceLocator($sl->reveal());
         $user = $this->prophesize(User::class)->reveal();
-        $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_PAUSED);
+        $unauthorized = $this->getDeliveryExecution(ProctoredDeliveryExecution::STATE_FINISHIED);
         $authorizationProvider->verifyResumeAuthorization($unauthorized, $user);
     }
 }

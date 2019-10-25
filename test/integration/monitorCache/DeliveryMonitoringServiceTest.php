@@ -29,6 +29,7 @@ use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * class DeliveryMonitoringData
@@ -46,14 +47,49 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     protected $service;
     protected $persistence;
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
+    protected $fixtureData = [
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
+            MonitoringStorage::COLUMN_STATUS => 'active_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
+            'error_code' => 1,
+            'session_id' => 'i1450191587554175',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
+            MonitoringStorage::COLUMN_STATUS => 'paused_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
+            'error_code' => 2,
+            'session_id' => 'i1450191587554176',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
+            MonitoringStorage::COLUMN_STATUS => 'finished_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
+            'error_code' => 3,
+            'session_id' => 'i1450191587554177',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
+            MonitoringStorage::COLUMN_STATUS => 'finished_test',
+            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
+            'error_code' => 0,
+            'session_id' => 'i1450191587554178',
+        ],
+        [
+            MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554179_test_record',
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_5',
+            MonitoringStorage::COLUMN_STATUS => 'terminated_test',
+        ],
+    ];
+
 
     public function setUp()
     {
-        parent::setUp();
-        TaoPhpUnitTestRunner::initTest();
-
-        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
-
         $this->service = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
             MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
@@ -66,17 +102,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
                 'end_time'
             )
         ]);
-        $this->persistence = \common_persistence_Manager::getPersistence('default');
-        $this->service->setServiceLocator($this->getServiceManagerProphecy());
 
         $pmMock = $this->getSqlMock('test_monitoring');
         $this->persistence = $pmMock->getPersistenceById('test_monitoring');
         DbSetup::generateTable($this->persistence);
 
-        $config = $this->prophesize(\common_persistence_KeyValuePersistence::class);
-        $config->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
-        $config->get(DeliveryMonitoringService::SERVICE_ID)->willReturn($this->service);
-        $this->service->setServiceLocator(new ServiceManager($config->reveal()));
+        $sl = $this->prophesize(ServiceLocatorInterface::class);
+        $sl->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $this->service->setServiceLocator($sl->reveal());
     }
 
     public function tearDown()
@@ -99,82 +132,152 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->persistence->exec($sql);
     }
 
-    public function testSave()
+    public function testPartialSave()
     {
-        $service = $this->service;
-        $data = [
+        // 1. create regular cache record
+        $dataToUpdate = [
             MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_id',
             MonitoringStorage::COLUMN_STATUS => 'active',
         ];
-
-        $secondaryData = [
+        $secondaryDataToUpdate = [
             'secondary_data_key' => 'secondary_data_val',
             'secondary_data_key_2' => 'secondary_data_val_2',
         ];
+        $dataToCheck = $dataToUpdate;
+        $secondaryDataToCheck = $secondaryDataToUpdate;
 
-        $deliveryExecution = $this->getDeliveryExecution();
-        $dataModel = $this->service->getData($deliveryExecution);
+        $this->save(false, false, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
 
-        //data is not valid
-        $this->assertFalse($this->service->save($dataModel));
-        //$data->validate() has been called
-        $this->assertNotEmpty($dataModel->getErrors());
+        // 2. update partially
 
-        foreach ($data as $key => $val) {
-            $dataModel->addValue($key, $val);
+        $dataToCheck = $dataToUpdate;
+        $secondaryDataToCheck = $secondaryDataToUpdate;
+        $dataToUpdate = [
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_id_STEP_2',
+        ];
+        $dataToCheck[MonitoringStorage::COLUMN_TEST_TAKER] = 'test_taker_id_STEP_2';
+        $secondaryDataToUpdate = [
+            'secondary_data_key_2' => 'secondary_data_val_2_STEP_2',
+        ];
+        $secondaryDataToCheck['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
+
+
+        $this->save(true, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
+    }
+
+    public function testSaveFallbackAfterInsertFailed()
+    {
+        // 1. create regular cache record
+        $dataToUpdate = [
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_id',
+            MonitoringStorage::COLUMN_STATUS => 'active',
+        ];
+        $secondaryDataToUpdate = [
+            'secondary_data_key' => 'secondary_data_val',
+            'secondary_data_key_2' => 'secondary_data_val_2',
+        ];
+        $dataToCheck = $dataToUpdate;
+        $secondaryDataToCheck = $secondaryDataToUpdate;
+
+        $this->save(false, false, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
+
+        // 2. check fallback of partialSave() (insert fails, update works)
+
+        $dataToCheck = $dataToUpdate;
+        $dataToUpdate[MonitoringStorage::COLUMN_TEST_TAKER] = 'test_taker_id_STEP_2';
+        $dataToCheck[MonitoringStorage::COLUMN_TEST_TAKER] = 'test_taker_id_STEP_2';
+        $secondaryDataToUpdate['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
+        $secondaryDataToCheck['secondary_data_key_2'] = 'secondary_data_val_2_STEP_2';
+
+        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
+    }
+
+    public function testSaveFallbackAfterUpdateReturns0Rows()
+    {
+        // 1. create regular cache record
+        $dataToUpdate = [
+            MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_id',
+            MonitoringStorage::COLUMN_STATUS => 'active',
+        ];
+        $secondaryDataToUpdate = [
+            'secondary_data_key' => 'secondary_data_val',
+            'secondary_data_key_2' => 'secondary_data_val_2',
+        ];
+        $dataToCheck = $dataToUpdate;
+        $secondaryDataToCheck = $secondaryDataToUpdate;
+
+        $this->save(false, true, $dataToUpdate, $secondaryDataToUpdate, $dataToCheck, $secondaryDataToCheck);
+    }
+
+    /**
+     * @param $partialModel
+     * @param $saveAsPartial
+     * @param array $dataToUpdate
+     * @param array $secondaryDataToUpdate
+     * @param array $dataToCheck
+     * @param array $secondaryDataToCheck
+     * @throws \common_exception_NotFound
+     */
+    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck)
+    {
+        $deliveryExecution = $this->getDeliveryExecution($this->deliveryExecutionId, 'active');
+        if ($partialModel) {
+            $dataModel = $this->service->createMonitoringData($deliveryExecution);
+        } else {
+            $dataModel = $this->service->getData($deliveryExecution);
         }
 
-        foreach ($secondaryData as $secKey => $secVal) {
-            $dataModel->addValue($secKey, $secVal);
+        foreach ($dataToUpdate as $key => $val) {
+            $dataModel->addValue($key, $val, true);
+        }
+        foreach ($secondaryDataToUpdate as $secKey => $secVal) {
+            $dataModel->addValue($secKey, $secVal, true);
         }
 
-        $this->assertTrue($this->service->save($dataModel));
+        if ($saveAsPartial) {
+            $saveResult = $this->service->partialSave($dataModel);
+        } else {
+            $saveResult = $this->service->save($dataModel);
+        }
+
+        $this->assertTrue($saveResult);
         $this->assertEmpty($dataModel->getErrors());
 
 
         $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
         $this->assertNotEmpty($insertedData);
-        //one row has been inserted
         $this->assertEquals(1, count($insertedData));
         $this->assertEquals('active', $insertedData[0][MonitoringStorage::COLUMN_STATUS]);
 
-        foreach ($data as $key => $val) {
+        foreach ($dataToCheck as $key => $val) {
             $this->assertEquals($insertedData[0][$key], $val);
         }
 
+        // check key value data
+        $service = $this->service;
         $insertedKvData = $this->getKvRecordsByParentId($insertedData[0][$service::COLUMN_ID]);
 
         $this->assertNotEmpty($insertedKvData);
-        $this->assertEquals(count($secondaryData), count($insertedKvData));
+
+        $insertedKvDataNotEmptyFieldCount = 0;
+        foreach ($insertedKvData as $fieldData) {
+            $fieldValue = $fieldData[MonitoringStorage::KV_COLUMN_VALUE];
+            if ($fieldValue !== null) {
+                $insertedKvDataNotEmptyFieldCount++;
+            }
+        }
+
+        $this->assertEquals(count($secondaryDataToCheck), $insertedKvDataNotEmptyFieldCount);
 
         foreach ($insertedKvData as $kvData) {
             $key = $kvData[MonitoringStorage::KV_COLUMN_KEY];
             $val = $kvData[MonitoringStorage::KV_COLUMN_VALUE];
-            $this->assertTrue(isset($secondaryData[$key]));
-            $this->assertEquals($secondaryData[$key], $val);
+            if ($val !== null) {
+                $this->assertTrue(isset($secondaryDataToCheck[$key]));
+                $this->assertEquals($secondaryDataToCheck[$key], $val);
+            }
         }
-
-
-        $dataModel->addValue(MonitoringStorage::COLUMN_STATUS, 'finished', true);
-        $this->assertTrue($this->service->save($dataModel));
-        $insertedData = $this->getRecordByDeliveryExecutionId($this->deliveryExecutionId);
-        //new row has not been inserted
-        $this->assertEquals(count($insertedData), 1);
-        $this->assertEquals($insertedData[0][MonitoringStorage::COLUMN_STATUS], 'finished');
-
-        //update record in kv table
-        $dataModel->addValue('secondary_data_key', 'new value', true);
-        $this->assertTrue($this->service->save($dataModel));
-        $insertedData = $this->getKvRecordsByParentId($this->deliveryExecutionId);
-        $this->assertTrue(
-            in_array([
-                MonitoringStorage::KV_COLUMN_PARENT_ID => $this->deliveryExecutionId,
-                MonitoringStorage::KV_COLUMN_KEY => 'secondary_data_key',
-                MonitoringStorage::KV_COLUMN_VALUE => 'new value'
-            ], $insertedData)
-        );
     }
-
 
     public function testDelete()
     {
@@ -278,7 +381,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $this->assertEquals($rowKey, $resultRow->get()['error_code']);
         }
 
-
         $result = $this->service->find([
             [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => [
                 'http://sample/first.rdf#i1450191587554175_test_record',
@@ -290,6 +392,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
         $this->assertEquals($result[1]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554176_test_record');
         $this->assertEquals($result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
+
     }
 
     public function testCount()
@@ -297,7 +400,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->loadFixture();
 
         $result = $this->service->count();
-        $this->assertEquals(4, $result);
+        $this->assertEquals(count($this->fixtureData), $result);
 
 
         $result = $this->service->count([
@@ -370,42 +473,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     {
         $this->setUp();
 
-        $data = [
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
-                MonitoringStorage::COLUMN_STATUS => 'active_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
-                'error_code' => 1,
-                'session_id' => 'i1450191587554175',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
-                MonitoringStorage::COLUMN_STATUS => 'paused_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
-                'error_code' => 2,
-                'session_id' => 'i1450191587554176',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
-                MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
-                'error_code' => 3,
-                'session_id' => 'i1450191587554177',
-            ],
-            [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
-                MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
-                MonitoringStorage::COLUMN_STATUS => 'finished_test',
-                OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
-                'error_code' => 0,
-                'session_id' => 'i1450191587554178',
-            ],
-        ];
-
-        foreach ($data as $item) {
+        foreach ($this->fixtureData as $item) {
             $dataModel = $this->service->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
@@ -414,7 +482,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         }
 
         return [
-            [$data],
+            [$this->fixtureData],
         ];
     }
 
@@ -436,7 +504,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         return $this->persistence->query($sql, [$parentId])->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    protected function getDeliveryExecution($id = null)
+    protected function getDeliveryExecution($id = null, $state = null)
     {
         if ($id === null) {
             $id = $this->deliveryExecutionId;
@@ -444,6 +512,11 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $prophet = new \Prophecy\Prophet();
         $deliveryExecutionProphecy = $prophet->prophesize('oat\taoDelivery\model\execution\DeliveryExecution');
         $deliveryExecutionProphecy->getIdentifier()->willReturn($id);
+
+        $stateProphecy = $this->prophesize(\core_kernel_classes_Resource::class);
+        $stateProphecy->getUri()->willReturn($state);
+
+        $deliveryExecutionProphecy->getState()->willReturn($stateProphecy);
         return $deliveryExecutionProphecy->reveal();
     }
 }

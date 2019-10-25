@@ -1,0 +1,1007 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint112\n"
+"PO-Revision-Date: 2019-10-11T08:37:28\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ru-RU\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ru-RU\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "%1$s - Item %2$s/%3$s"
+msgstr "%1$s — элемент %2$s/%3$s"
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr "%d сеанса (-ов) выдачи %s не были приостановлены"
+
+msgid "%s - item %p/%c"
+msgstr ""
+
+msgid "%s completed"
+msgstr "%s завершено"
+
+msgid "%s could not be %s because it is finished. Please refresh your data."
+msgstr "%s не может быть %s (уже завершено). Обновите свои данные."
+
+msgid "%s could not be %s because it is terminated. Please refresh your data."
+msgstr "%s не может быть %s (прекращено). Обновите свои данные."
+
+msgid "%s could not be %s."
+msgstr "%s не может быть %s."
+
+msgid "%s minutes more"
+msgstr "Еще %s минут (-ы)"
+
+msgid "%s\'s test had already been authorized."
+msgstr "Для теста %s уже предоставлены необходимые полномочия."
+
+msgid "%s\'s test had already been paused."
+msgstr "Тест %s уже приостановлен."
+
+msgid "%s\'s test had already been terminated."
+msgstr "Тест %s уже прекращен."
+
+msgid "%s\'s test had been canceled."
+msgstr "Тест %s отменен."
+
+msgid "%s\'s test had been completed."
+msgstr "Тест %s завершен."
+
+msgid "%s\'s test had been paused."
+msgstr "Тест %s приостановлен."
+
+msgid "%s\'s test had been terminated."
+msgstr "Тест %s прекращен."
+
+msgid "%s\'s test had not been finished."
+msgstr "Тест %s не был завершен."
+
+msgid "%s\'s test had not been in progress."
+msgstr "Тест %s не был в процессе прохождения."
+
+msgid "%s\'s test had not been started."
+msgstr "Тест %s не был начат."
+
+msgid "%s\'s test must be terminated."
+msgstr "Тест %s необходимо прекратить."
+
+msgid "..."
+msgstr "..."
+
+msgid "A session of the delivery %s have not been paused"
+msgstr "Сеанс выдачи %s не был приостановлен"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Active"
+msgstr "Активн."
+
+msgid "Active proctors"
+msgstr "Активные протоколы"
+
+msgid "Active test-takers"
+msgstr "Активные тестируемые"
+
+msgid "Actor"
+msgstr "Субъект"
+
+msgid "Add test takers"
+msgstr "Добавить тестируемых"
+
+msgid "Administer deliveries"
+msgstr "Администрирование выдач"
+
+msgid "Administration"
+msgstr "Администрирование"
+
+msgid "already authorized"
+msgstr "полномочия уже предоставлены"
+
+msgid "already paused"
+msgstr "уже приостановлено"
+
+msgid "already terminated"
+msgstr "уже прекращено"
+
+msgid "Apply default tag"
+msgstr "Применить тег по умолчанию"
+
+msgid "Are you sure you want to end the test?"
+msgstr "Вы действительно желаете завершить этот тест?"
+
+#, tao-public
+msgid "Assessment Activity"
+msgstr "Оценивание"
+
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgstr "Оценка приостановлена из-за попытки переключения на другое окно/вкладку."
+
+msgid "Assign administrator"
+msgstr "Назначить администратора"
+
+msgid "Assign more test takers to this session"
+msgstr "Назначить больше тестируемых для этого сеанса"
+
+msgid "Assign proctors"
+msgstr "Назначить протоколы"
+
+msgid "Assign the selected test takers"
+msgstr "Назначить выбранных тестируемых"
+
+msgid "Assign the selected test takers to the session"
+msgstr "Назначить выбранных тестируемых для этого сеанса"
+
+msgid "Assign the test taker to the session"
+msgstr "Назначить тестируемого для этого сеанса"
+
+msgid "Assigned proctors"
+msgstr "Назначенные протоколы"
+
+msgid "Assigned test takers"
+msgstr "Назначенные тестируемые"
+
+msgid "Attempts"
+msgstr "Попытки"
+
+msgid "author"
+msgstr "автор"
+
+msgid "Authorize"
+msgstr "Предоставить полномочия"
+
+msgid "Authorize Session"
+msgstr "Предоставить полномочия по сеансу"
+
+msgid "Authorize session"
+msgstr "Предоставить полномочия по сеансу"
+
+msgid "Authorize sessions"
+msgstr "Предоставить полномочия по сеансам"
+
+msgid "Authorize the proctor"
+msgstr "Предоставить полномочия наблюдателю"
+
+msgid "Authorize the selected proctors"
+msgstr "Предоставить полномочия по выбранным протоколам"
+
+msgid "authorized"
+msgstr "полномочия предоставлены"
+
+msgid "Authorized"
+msgstr "Полномочия предоставлены"
+
+msgid "Authorized but not started"
+msgstr "Полномочия предоставлены, но не начато"
+
+msgid "Authorized proctors"
+msgstr "Наблюдатели, которым предоставлены полномочия"
+
+msgid "Authorized, you may proceed"
+msgstr "Полномочия предоставлены, можно продолжать"
+
+msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr "Система автоматически выполнила сброс, поскольку тестируемый отменил запрос авторизации."
+
+msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
+msgstr "Система автоматически выполнила сброс, поскольку тестируемый решил не продолжать тест, по которому он получил полномочия."
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "Available history"
+msgstr "Доступная история"
+
+msgid "Available test takers"
+msgstr "Доступные тестируемые"
+
+msgid "Awaiting"
+msgstr "Ожидание"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Back to sessions"
+msgstr "Назад к сеансам"
+
+msgid "Behaviour"
+msgstr "Поведение"
+
+msgid "cancel"
+msgstr "отмена"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "cancel the action"
+msgstr "отмена действия"
+
+msgid "Canceled"
+msgstr "Отменено"
+
+msgid "canceled"
+msgstr "отменено"
+
+msgid "Cannot authorize test session."
+msgstr "Невозможно предоставить полномочия по сеансу тестирования."
+
+msgid "Cannot authorize test sessions."
+msgstr "Невозможно предоставить полномочия по сеансам тестирования."
+
+msgid "Cannot execute action."
+msgstr "Невозможно выполнить действие."
+
+msgid "Cannot extend test session."
+msgstr "Невозможно продлить сеанс тестирования."
+
+msgid "Cannot extend test sessions."
+msgstr "Невозможно продлить сеансы тестирования."
+
+msgid "Cannot pause test session."
+msgstr "Невозможно приостановить сеанс тестирования."
+
+msgid "Cannot pause test sessions."
+msgstr "Невозможно приостановить сеансы тестирования."
+
+msgid "Cannot print test session."
+msgstr "Невозможно распечатать сеанс тестирования."
+
+msgid "Cannot print test sessions."
+msgstr "Невозможно распечатать сеансы тестирования."
+
+msgid "Cannot reactivate test session."
+msgstr "Невозможно повторно активировать сеанс тестирования."
+
+msgid "Cannot reactivate test sessions."
+msgstr "Невозможно повторно активировать сеансы тестирования."
+
+msgid "Cannot report test session."
+msgstr "Невозможно составить отчет по сеансу тестирования."
+
+msgid "Cannot report test sessions."
+msgstr "Невозможно составить отчет по сеансам тестирования."
+
+msgid "Cannot terminate test session."
+msgstr "Невозможно прекратить сеанс тестирования."
+
+msgid "Cannot terminate test sessions."
+msgstr "Невозможно прекратить сеансы тестирования."
+
+msgid "category"
+msgstr "категория"
+
+msgid "Comfort"
+msgstr "Комфорт"
+
+msgid "comment"
+msgstr "комментарий"
+
+msgid "Complaint"
+msgstr "Жалоба"
+
+msgid "completed"
+msgstr "завершено"
+
+msgid "Completed"
+msgstr "Завершено"
+
+msgid "Completed tests"
+msgstr "Завершенные тесты"
+
+msgid "Compliance"
+msgstr "Соответствие"
+
+msgid "Connectivity"
+msgstr "Подключение"
+
+msgid "Context"
+msgstr "Контекст"
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr "Создание записи наблюдателя и предоставление ему полномочий для доступа к выбранным объектам для проведения тестирования."
+
+msgid "Create Proctor"
+msgstr "Создать запись наблюдателя"
+
+msgid "Creates and authorizes proctor"
+msgstr "Создание записи наблюдателя и предоставление ему полномочий"
+
+msgid "Current Assessment Activity"
+msgstr "Текущее оценивание"
+
+msgid "Current sessions"
+msgstr "Текущие сеансы"
+
+msgid "date"
+msgstr "дата"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Days"
+msgstr "Дни"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr "Ошибка расшифровки из-за использования неправильного ключа пользовательского приложения."
+
+msgid "Define sub-centers"
+msgstr "Задать субцентры"
+
+msgid "Deliveries"
+msgstr "Выдачи"
+
+msgid "Delivery"
+msgstr "Выдача"
+
+msgid "Detailed Session History of %s"
+msgstr "Подробная история сеанса для %s"
+
+msgid "Detailed Session History of a selection"
+msgstr "Подробная история сеанса для выбора"
+
+msgid "Details"
+msgstr "Подробности"
+
+msgid "Disturbance"
+msgstr "Помехи"
+
+msgid "Duration"
+msgstr "Длительность"
+
+msgid "Edit test center"
+msgstr "Редактировать центр тестирования"
+
+msgid "Elapsed time"
+msgstr "Затраченное время"
+
+msgid "End"
+msgstr "Конец"
+
+msgid "End date of the export"
+msgstr "Конечная дата для экспорта"
+
+msgid "Environment"
+msgstr "Среда"
+
+msgid "Error"
+msgstr "Ошибка"
+
+msgid "Event"
+msgstr "Событие"
+
+msgid "Examinee"
+msgstr "Экзаменуемый"
+
+msgid "Export"
+msgstr "Экспорт"
+
+#, tao-public
+msgid "Export Irregularities"
+msgstr "Экспорт нестандартных ситуаций"
+
+msgid "Extended Time"
+msgstr "Продленное время"
+
+msgid "Extra time"
+msgstr "Дополнительное время"
+
+msgid "Extra Time"
+msgstr "Дополнительное время"
+
+msgid "Extra time granted"
+msgstr "Предоставленное дополнительное время"
+
+msgid "Filter"
+msgstr "Фильтр"
+
+msgid "Filter by the selected dates"
+msgstr "Фильтровать по выбранным датам"
+
+msgid "finished"
+msgstr "завершено"
+
+msgid "Finished"
+msgstr "Завершено"
+
+msgid "First name"
+msgstr "Имя"
+
+msgid "Freezing"
+msgstr "Зависание"
+
+msgid "Grant Extra Time"
+msgstr "Предоставить дополнительное время"
+
+msgid "Groups: %s. %s"
+msgstr "Группы: %s. %s"
+
+msgid "Hours"
+msgstr "Часы"
+
+msgid "However, the action will not be applied to the following sessions"
+msgstr "При этом указанное действие не применяется к следующим сеансам"
+
+msgid "ID/Authorization"
+msgstr "Идентификатор / предоставление полномочий"
+
+msgid "Identifier"
+msgstr "Идентификатор"
+
+msgid "Illness"
+msgstr "Болезнь"
+
+msgid "In Progress"
+msgstr "В процессе"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr "Нестандартные ситуации для «%s» успешно экспортированы"
+
+msgid "Issue Category"
+msgstr "Категория проблемы"
+
+msgid "item"
+msgstr "элемент"
+
+msgid "Item Variables"
+msgstr "Переменные элементов"
+
+msgid "Label"
+msgstr "Метка"
+
+msgid "Last Day"
+msgstr "Последний день"
+
+msgid "Last launch"
+msgstr "Последний запуск"
+
+msgid "Last Month"
+msgstr "Последний месяц"
+
+msgid "Last name"
+msgstr "Фамилия"
+
+msgid "Last Week"
+msgstr "Последняя неделя"
+
+msgid "Late"
+msgstr "Поздн."
+
+msgid "Launching"
+msgstr "Запуск"
+
+msgid "Loading"
+msgstr "Загрузка"
+
+msgid "Logout"
+msgstr "Выход"
+
+msgid "Manage Proctors"
+msgstr "Управление протоколами"
+
+#, tao-public
+msgid "Manage Results"
+msgstr "Управление результатами"
+
+msgid "minutes"
+msgstr "минуты"
+
+msgid "Monitor"
+msgstr "Монитор"
+
+msgid "Monitoring"
+msgstr "Мониторинг"
+
+msgid "Navigation"
+msgstr "Навигация"
+
+msgid "Network"
+msgstr "Сеть"
+
+msgid "No assigned proctors"
+msgstr "Нет назначенных протоколов"
+
+msgid "No assigned test takers"
+msgstr "Нет назначенных тестируемых"
+
+msgid "No available test takers to assign"
+msgstr "Нет доступных тестируемых для назначения"
+
+msgid "No history to display!"
+msgstr "Нет истории для отображения!"
+
+msgid "No proctors in request param"
+msgstr "Нет наблюдателей в параметре запроса"
+
+msgid "No sessions"
+msgstr "Нет сеансов"
+
+msgid "No sessions available"
+msgstr "Нет доступных сеансов"
+
+msgid "No Show"
+msgstr "Неявка"
+
+msgid "Noise"
+msgstr "Шум"
+
+msgid "not finished"
+msgstr "не завершено"
+
+msgid "not in progress"
+msgstr "не в процессе"
+
+msgid "not started"
+msgstr "не начато"
+
+msgid "not terminated"
+msgstr "не прекращено"
+
+msgid "Note"
+msgstr "Примечание"
+
+msgid "offline"
+msgstr "офлайн"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "online"
+msgstr "онлайн"
+
+msgid "Other"
+msgstr "Другое"
+
+msgid "Outcome"
+msgstr "Результат"
+
+msgid "Partially authorized proctors"
+msgstr "Наблюдатели, которым частично предоставлены полномочия"
+
+msgid "Pause"
+msgstr "Приостановить"
+
+msgid "Pause Active Test Sessions"
+msgstr "Приостановить активные сеансы тестирования"
+
+msgid "Pause due to server maintenance"
+msgstr "Приостановить из-за обслуживания сервера"
+
+msgid "Pause Session"
+msgstr "Приостановить сеанс"
+
+msgid "Pause session"
+msgstr "Приостановить сеанс"
+
+msgid "Pause sessions"
+msgstr "Приостановить сеансы"
+
+msgid "Paused"
+msgstr "Приостановлено"
+
+msgid "paused"
+msgstr "приостановлено"
+
+msgid "Please select one or more test site to manage proctors"
+msgstr "Выберите один или несколько объектов для проведения тестирования, чтобы управлять протоколами"
+
+msgid "Please wait, authorization in process ..."
+msgstr "Подождите, выполняется предоставление полномочий..."
+
+msgid "Please, make your selection"
+msgstr "Выполните выбор"
+
+msgid "Power Outage"
+msgstr "Перебои в энергоснабжении"
+
+msgid "Previous Month"
+msgstr "Предыдущий месяц"
+
+msgid "Print Results"
+msgstr "Распечатка результатов"
+
+msgid "Print Score"
+msgstr "Распечатка баллов"
+
+msgid "Print the assessment results"
+msgstr "Распечатка результатов оценивания"
+
+msgid "Printing"
+msgstr "Печать"
+
+msgid "Proceed"
+msgstr "Продолжить"
+
+msgid "Proctor"
+msgstr "Наблюдатель"
+
+msgid "Proctor created"
+msgstr "Запись наблюдателя создана"
+
+msgid "Proctor/Staff"
+msgstr "Наблюдатель/персонал"
+
+msgid "Proctored Delivery Server"
+msgstr "Сервер выдачи под надзором"
+
+msgid "Proctored Test-Takers"
+msgstr "Тестируемые под надзором"
+
+msgid "Proctoring interface"
+msgstr "Интерфейс для надзора"
+
+msgid "Proctors"
+msgstr "Наблюдатели"
+
+msgid "Proctors authorized"
+msgstr "Наблюдатели, которым предоставлены полномочия"
+
+msgid "Proctors revoked"
+msgstr "Отозванные наблюдатели"
+
+msgid "Progress"
+msgstr "Ход выполнения"
+
+msgid "Reactivate Session"
+msgstr "Повторно активировать сеанс"
+
+msgid "Reactivate session"
+msgstr "Повторно активировать сеанс"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Refresh the page"
+msgstr "Обновить страницу"
+
+msgid "Remaining"
+msgstr "Осталось"
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "Remove default tag filtering"
+msgstr "Удалить фильтрацию тегов по умолчанию"
+
+msgid "Remove the selected test takers from the session"
+msgstr "Удалить выбранных тестируемых из этого сеанса"
+
+msgid "Remove the test taker from the session"
+msgstr "Удалить тестируемого из этого сеанса"
+
+msgid "Report"
+msgstr "Отчет"
+
+msgid "Report irregularities"
+msgstr "Сообщить о нестандартных ситуациях"
+
+msgid "Report Irregularity"
+msgstr "Сообщить о нестандартной ситуации"
+
+msgid "Report irregularity"
+msgstr "Сообщить о нестандартной ситуации"
+
+msgid "reported for irregularity"
+msgstr "сообщено о нестандартной ситуации"
+
+msgid "Resource update task is completed"
+msgstr "Задание по обновлению ресурса выполнено"
+
+msgid "results"
+msgstr "результаты"
+
+#, tao-public
+msgid "Results"
+msgstr "Результаты"
+
+msgid "Return to the session manager"
+msgstr "Вернуться к диспетчеру сеансов"
+
+msgid "Return to the session monitoring"
+msgstr "Вернуться к мониторингу сеансов"
+
+msgid "Revoke authorization for the selected proctor"
+msgstr "Отозвать полномочия от выбранного наблюдателя"
+
+msgid "Revoke the proctor"
+msgstr "Отозвать наблюдателя"
+
+msgid "Role"
+msgstr "Роль"
+
+msgid "Score"
+msgstr "Балл"
+
+msgid "Score Report"
+msgstr "Протокол оценивания"
+
+msgid "section"
+msgstr "раздел"
+
+msgid "Session"
+msgstr "Сеанс"
+
+msgid "Session %s - %s has not been processed"
+msgstr "Сеанс %s — %s не был обработан"
+
+msgid "Session history"
+msgstr "История сеансов"
+
+msgid "Session time handling"
+msgstr "Обработка времени сеанса"
+
+msgid "Sessions"
+msgstr "Сеансы"
+
+msgid "Sessions authorized"
+msgstr "По сеансам предоставлены полномочия"
+
+msgid "sessions paused"
+msgstr "сеансы приостановлены"
+
+msgid "Sessions paused"
+msgstr "Сеансы приостановлены"
+
+msgid "Sessions reactivated"
+msgstr "Сеансы повторно активированы"
+
+msgid "Sessions reported"
+msgstr "По сеансам составлен отчет"
+
+msgid "Sessions terminated"
+msgstr "Сеансы прекращены"
+
+msgid "Show brief report"
+msgstr "Показывать краткий отчет"
+
+msgid "Show detailed report"
+msgstr "Показывать подробный отчет"
+
+msgid "Show detailed session history messages"
+msgstr "Показывать сообщения касательно подробной истории сеансов тестирования"
+
+msgid "Show the detailed session history"
+msgstr "Показывать подробную историю сеансов тестирования"
+
+msgid "Some delivery executions have not been authorized"
+msgstr "По некоторым выполнениям выдач не предоставлены полномочия"
+
+msgid "Some delivery executions have not been paused"
+msgstr "Некоторые выполнения выдач не приостановлены"
+
+msgid "Some delivery executions have not been reactivated"
+msgstr "Некоторые выполнения выдач не активированы повторно"
+
+msgid "Some delivery executions have not been reported"
+msgstr "По некоторым выполнениям выдач не составлен отчет"
+
+msgid "Some delivery executions have not been terminated"
+msgstr "Некоторые выполнения выдач не прекращены"
+
+msgid "Some delivery executions have not been updated"
+msgstr "Некоторые выполнения выдач не обновлены"
+
+msgid "Something went wrong ..."
+msgstr "Произошла ошибка..."
+
+msgid "Start"
+msgstr "Начало"
+
+msgid "Start date of the export"
+msgstr "Начальная дата для экспорта"
+
+msgid "Started at"
+msgstr "Дата начала"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "subcategory"
+msgstr "подкатегория"
+
+msgid "Subcategory"
+msgstr "Подкатегория"
+
+msgid "System generated pause."
+msgstr "Система сгенерировала паузу."
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr "Начните или продолжите тест с надсмотром со стороны наблюдателя"
+
+msgid "Technical"
+msgstr "Техническ."
+
+msgid "Terminate"
+msgstr "Прекратить"
+
+msgid "Terminate and irregularity"
+msgstr "Прекращение и нестандартная ситуация"
+
+msgid "Terminate session"
+msgstr "Прекратить сеанс"
+
+msgid "Terminate Session"
+msgstr "Прекратить сеанс"
+
+msgid "Terminate sessions"
+msgstr "Прекратить сеансы"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "Завершить/Реактивировать и нестандартная ситуация"
+
+msgid "Terminated"
+msgstr "Прекращено"
+
+msgid "terminated"
+msgstr "прекращено"
+
+msgid "Test  must be terminated."
+msgstr "Тест необходимо прекратить."
+
+msgid "Test %s had already been authorized."
+msgstr "По тесту %s уже предоставлены полномочия."
+
+msgid "Test %s had already been paused."
+msgstr "Тест %s уже приостановлен."
+
+msgid "Test %s had already been terminated."
+msgstr "Тест %s уже прекращен."
+
+msgid "Test %s had been canceled."
+msgstr "Тест %s отменен."
+
+msgid "Test %s had been completed."
+msgstr "Тест %s завершен."
+
+msgid "Test %s had been paused."
+msgstr "Тест %s приостановлен."
+
+msgid "Test %s had been terminated."
+msgstr "Тест %s прекращен."
+
+msgid "Test %s had not been finished."
+msgstr "Тест %s не был завершен."
+
+msgid "Test %s had not been in progress."
+msgstr "Тест %s не был в процессе выполнения."
+
+msgid "Test %s had not been started."
+msgstr "Тест %s не был начат."
+
+msgid "Test %s must be terminated."
+msgstr "Тест %s необходимо прекратить."
+
+msgid "Test center saved"
+msgstr "Центр тестирования сохранен"
+
+msgid "Test had already been authorized."
+msgstr "По тесту уже предоставлены полномочия."
+
+msgid "Test had already been paused."
+msgstr "Тест уже приостановлен."
+
+msgid "Test had alredy been terminated."
+msgstr "Тест уже прекращен."
+
+msgid "Test had been canceled."
+msgstr "Тест отменен."
+
+msgid "Test had been completed."
+msgstr "Тест завершен."
+
+msgid "Test had been paused."
+msgstr "Тест приостановлен."
+
+msgid "Test had been terminated."
+msgstr "Тест прекращен."
+
+msgid "Test had not been finished."
+msgstr "Тест не был завершен."
+
+msgid "Test had not been in progress."
+msgstr "Тест не был в процессе выполнения."
+
+msgid "Test had not been started."
+msgstr "Тест не был начат."
+
+msgid "Test site %s"
+msgstr "Объект для проведения тестирования %s"
+
+msgid "test taker"
+msgstr "тестируемый"
+
+msgid "Test taker"
+msgstr "Тестируемый"
+
+msgid "Test takers have been added"
+msgstr "Тестируемые добавлены"
+
+msgid "Test takers have been removed"
+msgstr "Тестируемые удалены"
+
+msgid "Test Variables"
+msgstr "Переменные теста"
+
+msgid "Test-Taker"
+msgstr "Тестируемый"
+
+msgid "Testing Workstation"
+msgstr "Рабочая станция, на которой выполняется тестирование"
+
+msgid "The action cannot be applied, no eligible sessions found"
+msgstr "Невозможно применить действие, не найдены допустимые сеансы"
+
+msgid "The action will be applied to the following session"
+msgstr "Указанное действие будет применено к следующим сеансам"
+
+msgid "the already granted time will be replaced by the new value"
+msgstr "ранее предоставленное время будет заменено новым значением"
+
+msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
+msgstr "Оценка приостановлена. Чтобы возобновить оценку, перезапустите ее и при необходимости обратитесь к наблюдателю."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr "Оценка прекращена. Вы больше не можете взаимодействовать с ней."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr "Оценка была прекращена. Вы не можете больше продолжать с оценкой. Пожалуйста, обратитесь к наблюдателю."
+
+msgid "The extra time must be a number"
+msgstr "Значение дополнительного времени должно быть числом"
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr "Наблюдателю будут предоставлены полномочия. Продолжить?"
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr "Наблюдатель будет отозван. Продолжить?"
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr "Наблюдателям будут предоставлены полномочия. Продолжить?"
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr "Наблюдатели будет отозваны. Продолжить?"
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr "Тестируемый будет удален из данного сеанса. Продолжить?"
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr "Тестируемые будут удалены из данного сеанса. Продолжить?"
+
+msgid "There is no delivery in progress"
+msgstr "Нет выдач в процессе выполнения"
+
+msgid "Time"
+msgstr "Время"
+
+#, tao-public
+msgid "Tools"
+msgstr "Средства"
+
+msgid "Total Current Assessments"
+msgstr "Всего текущих оценок"
+
+msgid "Total time"
+msgstr "Общее время"
+
+msgid "Unable to create irregularities export for %s"
+msgstr "Невозможно создать экспорт нестандартных ситуаций для %s"
+
+msgid "Unable to perform action on test %s."
+msgstr "Невозможно выполнить действие для теста %s."
+
+msgid "User Activity"
+msgstr "Действие пользователя"
+
+msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
+msgstr "Предупреждение! Вы собираетесь приостановить все тесты, выполняющиеся в текущий момент. Действия всех тестируемых будут приостановлены во время следующего цикла или до него. Укажите причину для данного действия."
+
+msgid "Weather"
+msgstr "Погода"
+

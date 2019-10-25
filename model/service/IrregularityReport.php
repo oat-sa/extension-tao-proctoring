@@ -17,8 +17,8 @@
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA;
  *
  */
-namespace oat\taoProctoring\model\service;
 
+namespace oat\taoProctoring\model\service;
 
 use oat\oatbox\service\ServiceManager;
 use oat\taoDelivery\model\execution\ServiceProxy;
@@ -29,29 +29,26 @@ use oat\oatbox\user\User;
 
 class IrregularityReport extends AbstractIrregularityReport
 {
-
     private $userNames = [];
 
     /**
      * @param \core_kernel_classes_Resource $delivery
-     * @param string $from
-     * @param string $to
+     * @param string                        $from
+     * @param string                        $to
      * @return array
      */
     public function getIrregularitiesTable(\core_kernel_classes_Resource $delivery, $from = '', $to = '')
     {
-        $export = array(
-            array(__('date'), __('author'), __('test taker'), __('category'), __('subcategory'), __('comment'))
-        );
-        \common_Logger::d(var_export($delivery , true));
+        $export = [
+            [__('date'), __('author'), __('test taker'), __('category'), __('subcategory'), __('comment')],
+        ];
         $deliveryLog = ServiceManager::getServiceManager()->get(DeliveryLog::SERVICE_ID);
         $service = ResultsService::singleton();
         $implementation = $service->getReadableImplementation($delivery);
 
         $service->setImplementation($implementation);
 
-
-        $results = $service->getImplementation()->getResultByDelivery(array($delivery->getUri()));
+        $results = $service->getImplementation()->getResultByDelivery([$delivery->getUri()]);
 
         foreach ($results as $res) {
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
@@ -60,7 +57,7 @@ class IrregularityReport extends AbstractIrregularityReport
                 'TEST_IRREGULARITY'
             );
             foreach ($logs as $data) {
-                $exportable = array();
+                $exportable = [];
                 if ((empty($from) || $data['created_at'] > $from) && (empty($to) || $data['created_at'] < $to)) {
                     $exportable[] = \tao_helpers_Date::displayeDate($data['created_at']);
                     $exportable[] = $this->getUserName($data['created_by']);
@@ -90,6 +87,7 @@ class IrregularityReport extends AbstractIrregularityReport
             }
             $this->userNames[$userId] = $userName;
         }
+
         return $this->userNames[$userId];
     }
 }

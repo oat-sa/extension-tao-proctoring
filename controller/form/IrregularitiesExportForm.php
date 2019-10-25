@@ -30,10 +30,16 @@ class IrregularitiesExportForm extends \tao_helpers_form_FormContainer
 {
     private $instanceUri;
 
-    public function __construct($instanceUri)
+    /**
+     * IrregularitiesExportForm constructor.
+     * @param $instanceUri
+     * @param array $data
+     * @param array $options
+     */
+    public function __construct($instanceUri, $data = [], $options = [])
     {
         $this->instanceUri = $instanceUri;
-        parent::__construct();
+        parent::__construct($data, $options);
 
     }
 

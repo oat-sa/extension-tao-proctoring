@@ -49,8 +49,53 @@ class GuiSettingsService extends ConfigurableService
      */
     const PROCTORING_ALLOW_PAUSE = 'canPause';
 
-    public function __construct(array $options = array())
+    /**
+     * Settings: message and icon for different actions will be displayed in dialog (bulkActionPopup)
+     * !!!only for one language
+     * TODO: add translation for message
+     * example:
+     * [
+     *   'terminate' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'danger'
+     *   ],
+     *   'authorize' => [
+     *      'message' => 'Some text...',
+     *      'icon' => 'warning'
+     *   ],
+     * ]
+     */
+    const OPTION_DIALOG_SETTINGS = 'dialogSettings';
+
+    const OPTION_SHOW_COLUMN_FIRST_NAME = 'showColumnFirstName';
+    const OPTION_SHOW_COLUMN_LAST_NAME = 'showColumnLastName';
+    const OPTION_SHOW_COLUMN_AUTHORIZE = 'showColumnAuthorize';
+    const OPTION_SHOW_COLUMN_REMAINING_TIME = 'showColumnRemainingTime';
+    const OPTION_SHOW_COLUMN_EXTENDED_TIME = 'showColumnExtendedTime';
+    const OPTION_SHOW_COLUMN_CONNECTIVITY = 'onlineStatus';
+
+    const OPTION_SHOW_ACTION_SHOW_HISTORY = 'showActionShowHistory';
+
+    const OPTION_SET_START_DATA_ONE_DAY = 'setStartDataOneDay';
+
+    /**
+     * @return array
+     */
+    public function asArray()
     {
-        parent::__construct($options);
+        return [
+            self::PROCTORING_REFRESH_BUTTON         => $this->hasOption(self::PROCTORING_REFRESH_BUTTON) ? $this->getOption(self::PROCTORING_REFRESH_BUTTON) : true,
+            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : 0,
+            self::PROCTORING_ALLOW_PAUSE            => $this->hasOption(self::PROCTORING_ALLOW_PAUSE) ? $this->getOption(self::PROCTORING_ALLOW_PAUSE) : true,
+            self::OPTION_DIALOG_SETTINGS            => $this->hasOption(self::OPTION_DIALOG_SETTINGS) ? $this->getOption(self::OPTION_DIALOG_SETTINGS) : [],
+            self::OPTION_SHOW_COLUMN_FIRST_NAME     => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) : true,
+            self::OPTION_SHOW_COLUMN_LAST_NAME      => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME) : true,
+            self::OPTION_SHOW_COLUMN_AUTHORIZE      => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) : true,
+            self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) : true,
+            self::OPTION_SHOW_COLUMN_EXTENDED_TIME  => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) : true,
+            self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : false,
+            self::OPTION_SHOW_ACTION_SHOW_HISTORY   => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) : true,
+            self::OPTION_SET_START_DATA_ONE_DAY     => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY) ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY) : true,
+        ];
     }
 }

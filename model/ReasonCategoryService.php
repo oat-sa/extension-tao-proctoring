@@ -25,10 +25,8 @@ use oat\oatbox\service\ConfigurableService;
 /**
  * Provides methods to return the list of available categories and subcategories
  */
-class ReasonCategoryService extends ConfigurableService
+class ReasonCategoryService extends ConfigurableService implements ReasonCategoryServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/reasonCategory';
-
     /**
      * @return array
      */

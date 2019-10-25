@@ -35,9 +35,11 @@ use oat\taoProctoring\scripts\install\RegisterProctoringLog;
 use oat\taoProctoring\scripts\install\RegisterReasonCategoryService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\RegisterServices;
+use oat\taoProctoring\scripts\install\RegisterWebhookEvents;
 use oat\taoProctoring\scripts\install\SetupDeliveryMonitoring;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
+use oat\taoProctoring\scripts\install\SetUpQueueTasks;
 use oat\taoProctoring\scripts\uninstall\RestoreServices;
 use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
@@ -46,17 +48,17 @@ return array(
     'label' => 'Proctoring',
     'description' => 'Proctoring for deliveries',
     'license' => 'GPL-2.0',
-    'version' => '10.2.3',
+    'version' => '18.0.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=19.0.0',
-        'taoDelivery' => '>=10.0.0',
-        'taoDeliveryRdf' => '>=5.2.1',
-        'taoTestTaker' => '>=2.6.0',
-        'taoQtiTest' => '>=25.15.0',
-        'taoOutcomeUi' => '>=2.6.6',
-        'taoEventLog' => '>=1.5.0',
-        'generis' => '>=6.2.0',
+        'tao'            => '>=38.9.0',
+        'taoDelivery'    => '>=13.1.2',
+        'taoDeliveryRdf' => '>=7.0.0',
+        'taoTestTaker'   => '>=4.0.0',
+        'taoQtiTest'     => '>=34.2.0',
+        'taoOutcomeUi'   => '>=7.0.0',
+        'taoEventLog'    => '>=2.0.0',
+        'generis'        => '>=12.5.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
@@ -66,7 +68,7 @@ return array(
         array('grant', ProctorService::ROLE_PROCTOR, \tao_actions_Breadcrumbs::class),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
         array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
+        array('grant', TaoRoles::DELIVERY, array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
         array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
         array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools')),
         array('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class),
@@ -91,6 +93,9 @@ return array(
             \oat\taoProctoring\scripts\install\SetupProctorCsvImporter::class,
             \oat\taoProctoring\scripts\install\RegisterProctorAttemptService::class,
             RegisterProctoringDeliveryDeleteService::class,
+            SetUpQueueTasks::class,
+            \oat\taoProctoring\scripts\install\RegisterDeleteDeliveryExecution::class,
+            RegisterWebhookEvents::class
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'

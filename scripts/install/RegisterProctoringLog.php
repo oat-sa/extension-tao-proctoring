@@ -20,6 +20,7 @@
 namespace oat\taoProctoring\scripts\install;
 
 use Doctrine\DBAL\Schema\SchemaException;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
 class RegisterProctoringLog extends \common_ext_action_InstallAction
@@ -28,11 +29,11 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
     {
         $persistenceId = count($params) > 0 ? reset($params) : 'default';
         $persistence = \common_persistence_Manager::getPersistence($persistenceId);
-        
+
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
-        
+
         try {
             $tableLog = $schema->createTable(RdsDeliveryLogService::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
@@ -42,9 +43,9 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             $tableLog->addColumn(RdsDeliveryLogService::DATA, "text", array("notnull" => true));
             $tableLog->addColumn(RdsDeliveryLogService::CREATED_AT, "string", array("notnull" => true, "length" => 255));
             $tableLog->addColumn(RdsDeliveryLogService::CREATED_BY, "string", array("notnull" => true, "length" => 255));
-        
+
             $tableLog->setPrimaryKey(array(RdsDeliveryLogService::ID));
-        
+
             $tableLog->addIndex(
                 array(RdsDeliveryLogService::DELIVERY_EXECUTION_ID),
                 'IDX_' . RdsDeliveryLogService::TABLE_NAME . '_' . RdsDeliveryLogService::DELIVERY_EXECUTION_ID
@@ -73,15 +74,16 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
         } catch(SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
-        
+
         $this->registerService(
-            RdsDeliveryLogService::SERVICE_ID,
+            DeliveryLog::SERVICE_ID,
             new RdsDeliveryLogService(array(
                 RdsDeliveryLogService::OPTION_PERSISTENCE => $persistenceId,
-                RdsDeliveryLogService::OPTION_FIELDS => [
-                    RdsDeliveryLogService::EVENT_ID,
-                    RdsDeliveryLogService::CREATED_BY,
-                    RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+                DeliveryLog::OPTION_FIELDS => [
+                    DeliveryLog::EVENT_ID,
+                    DeliveryLog::CREATED_BY,
+                    DeliveryLog::DELIVERY_EXECUTION_ID,
+                    DeliveryLog::ID,
                 ]
             ))
         );

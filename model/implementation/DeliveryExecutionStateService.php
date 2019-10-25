@@ -22,17 +22,15 @@ namespace oat\taoProctoring\model\implementation;
 
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
-use oat\taoProctoring\model\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoClientDiagnostic\model\browserDetector\WebBrowserService;
-use oat\taoClientDiagnostic\model\browserDetector\OSService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
@@ -40,6 +38,10 @@ use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\oatbox\user\User;
+use Sinergi\BrowserDetector\Browser;
+use Sinergi\BrowserDetector\Os;
+use oat\oatbox\mutex\LockTrait;
+use Symfony\Component\Lock\Lock;
 
 /**
  * Class DeliveryExecutionStateService
@@ -56,11 +58,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     const OPTION_TIME_HANDLING = 'time_handling';
 
     use LoggerAwareTrait;
+    use LockTrait;
 
     /**
      * @var TestSessionService
      */
     private $testSessionService;
+
+    /** @var Lock[]  */
+    private $executionLocks = [];
 
     /**
      * @return array
@@ -90,20 +96,28 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * @param DeliveryExecution $deliveryExecution
      * @return bool
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
+        $result = false;
+        $this->lockExecution($deliveryExecution);
         $executionState = $deliveryExecution->getState()->getUri();
-
-        if (ProctoredDeliveryExecution::STATE_TERMINATED != $executionState && ProctoredDeliveryExecution::STATE_FINISHED != $executionState) {
+        if (
+            ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState &&
+            ProctoredDeliveryExecution::STATE_FINISHED !== $executionState
+        ) {
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AWAITING);
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AWAITING_AUTHORISATION', [
                 'timestamp' => microtime(true),
                 'context' => $this->getContext($deliveryExecution),
             ]);
-            return true;
+            $result = true;
         }
-        return false;
+
+        $this->releaseExecution($deliveryExecution);
+        return $result;
     }
 
     /**
@@ -114,7 +128,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function resumeExecution(DeliveryExecution $deliveryExecution)
     {
-        $this->run($deliveryExecution);
+        return $this->run($deliveryExecution);
     }
 
     /**
@@ -123,12 +137,13 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     public function run(DeliveryExecution $deliveryExecution)
     {
+        $this->lockExecution($deliveryExecution);
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $logData = [
-            'web_browser_name' => WebBrowserService::singleton()->getClientName(),
-            'web_browser_version' => WebBrowserService::singleton()->getClientVersion(),
-            'os_name' => OSService::singleton()->getClientName(),
-            'os_version' => OSService::singleton()->getClientVersion(),
+            'web_browser_name' => $this->getBrowserDetector()->getName(),
+            'web_browser_version' => $this->getBrowserDetector()->getVersion(),
+            'os_name' => $this->getOsDetector()->getName(),
+            'os_version' => $this->getOsDetector()->getVersion(),
             'context' => $this->getContext($deliveryExecution),
         ];
 
@@ -143,23 +158,23 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         }
 
         $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
-
-        $result = true;
-
-        return $result;
+        $this->releaseExecution($deliveryExecution);
+        return true;
     }
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
-     * @param string $testCenter test center uri
+     * @param null $reason
+     * @param null $testCenter
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
     {
-        $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
-
+        $this->lockExecution($deliveryExecution);
         if ($this->canBeAuthorised($deliveryExecution)) {
             $proctor = \common_session_SessionManager::getSession()->getUser();
             $logData = [
@@ -180,7 +195,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $eventManager->trigger(new AuthorizationGranted($deliveryExecution, $proctor));
             $result = true;
         }
-
+        $this->releaseExecution($deliveryExecution);
         return $result;
     }
 
@@ -197,11 +212,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Terminates a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
+     * @param null $reason
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws \qtism\runtime\storage\common\StorageException
+     * @throws \qtism\runtime\tests\AssessmentTestSessionException
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $this->lockExecution($deliveryExecution);
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
@@ -214,25 +236,26 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'reason' => $reason,
                 'timestamp' => microtime(true),
                 'context' => $this->getContext($deliveryExecution),
+                'itemId' => $session ? $this->getCurrentItemId($deliveryExecution) : null,
             ];
+
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
+
             if ($session) {
-                $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
                 if ($session->isRunning()) {
                     $session->endTestSession();
                 }
                 $this->getTestSessionService()->persist($session);
                 $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
-            
+
             // Delivery execution state changes after test session ends, in the same way as it happens
             // when a human test taker takes the test.
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_TERMINATED);
             $eventManager->trigger(new DeliveryExecutionTerminated($deliveryExecution, $proctor, $reason));
-
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
             $result = true;
         }
-
+        $this->releaseExecution($deliveryExecution);
         return $result;
     }
 
@@ -240,12 +263,13 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Alias for self::pause() (for backward capability).
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
+     * @param null $reason
      * @return bool
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      * @throws \common_exception_NotFound
      * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws \qtism\runtime\storage\common\StorageException
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -256,15 +280,17 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Pauses a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
+     * @param null $reason
      * @return bool
-     * @throws \common_exception_NotFound
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
      * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws \qtism\runtime\storage\common\StorageException
      */
     public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $this->lockExecution($deliveryExecution);
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
@@ -287,7 +313,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
             $result = true;
         }
-
+        $this->releaseExecution($deliveryExecution);
         return $result;
     }
 
@@ -297,6 +323,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -307,14 +335,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $this->lockExecution($deliveryExecution);
         $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
         if ($result) {
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->trigger(new DeliveryExecutionFinished($deliveryExecution));
         }
+        $this->releaseExecution($deliveryExecution);
         return $result;
     }
 
@@ -322,9 +354,14 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $this->lockExecution($deliveryExecution);
         $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
         if ($session === null) {
             $data = [
@@ -333,16 +370,23 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'context' => $this->getContext($deliveryExecution),
             ];
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
-            return $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
+            $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
             $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
-            return false;
+            $result = false;
         }
+
+        $this->releaseExecution($deliveryExecution);
+
+        return $result;
     }
 
     /**
      * @param DeliveryExecution $deliveryExecution
      * @return bool
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function isCancelable(DeliveryExecution $deliveryExecution)
     {
@@ -513,32 +557,20 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param null|string $reason
      * @return bool
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
-     * @throws \common_exception_MissingParameter
+     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
      */
     public function reactivateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
+        $this->lockExecution($deliveryExecution);
         $executionState = $deliveryExecution->getState()->getUri();
-        $result = false;
+
+        $result = parent::reactivateExecution($deliveryExecution, $reason);
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED === $executionState) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
-
-            /** @var TestSessionService $testSessionService */
-            $testSessionService = $this->getServiceManager()->get(TestSessionService::SERVICE_ID);
-            $session = $testSessionService->getTestSession($deliveryExecution);
-            if ($session) {
-                $session->setState(AssessmentTestSessionState::SUSPENDED);
-                $testSessionService->persist($session);
-            }
-            $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_PAUSED);
-
-            /** @var EventManager $eventManager */
-            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            $eventManager->trigger(new DeliveryExecutionReactivated($deliveryExecution, $proctor, $reason));
 
             $logData = [
                 'reason' => $reason,
@@ -547,9 +579,51 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             ];
 
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
-            $result = true;
         }
-
+        $this->releaseExecution($deliveryExecution);
         return $result;
     }
+
+    /**
+     * Get the browser detector
+     *
+     * @return Browser
+     */
+    protected function getBrowserDetector()
+    {
+        return new Browser();
+    }
+
+    /**
+     * Get the operating system detector
+     *
+     * @return Os
+     */
+    protected function getOsDetector()
+    {
+        return new Os();
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     */
+    protected function lockExecution(DeliveryExecution $deliveryExecution)
+    {
+        $deId = $deliveryExecution->getIdentifier();
+        $this->executionLocks[$deId] = $this->createLock(static::class.$deId, 30);
+        $this->executionLocks[$deId]->acquire(true);
+    }
+
+    /**
+     * @param DeliveryExecution $deliveryExecution
+     */
+    protected function releaseExecution(DeliveryExecution $deliveryExecution)
+    {
+        $deId = $deliveryExecution->getIdentifier();
+        if (isset($this->executionLocks[$deId])) {
+            $this->executionLocks[$deId]->release();
+            unset($this->executionLocks[$deId]);
+        }
+    }
+
 }

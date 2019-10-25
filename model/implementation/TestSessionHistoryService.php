@@ -128,7 +128,6 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 }
 
                 $author = $this->getAuthor($data);
-                $user = UserHelper::getUser($author->getUri());
                 $details = $this->getEventDetails($data);
                 $context = $this->getEventContext($data);
                 $role = $this->getUserRole($author);
@@ -139,7 +138,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 }
                 $exportable['date'] = DateHelper::displayeDate($exportable['timestamp'], DateHelper::FORMAT_LONG_MICROSECONDS);
                 $exportable['role'] = $role;
-                $exportable['actor'] = _dh(UserHelper::getUserName($user, true));
+                $exportable['actor'] = _dh($this->getActorName($author->getUri()));
                 $exportable['event'] = $eventId;
                 $exportable['details'] = $details;
                 $exportable['context'] = $context;
@@ -297,12 +296,23 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
      * @param array $data event data from delivery log
      * @return \core_kernel_classes_Resource
      */
-    private function getAuthor(array $data)
+    protected function getAuthor(array $data)
     {
         if (!isset($this->authors[$data['created_by']])) {
             $this->authors[$data['created_by']] = new \core_kernel_classes_Resource($data['created_by']);
         }
         return $this->authors[$data['created_by']];
+    }
+
+    /**
+     * @param $userId
+     * @return string
+     */
+    protected function getActorName($userId)
+    {
+        $user = UserHelper::getUser($userId);
+
+        return UserHelper::getUserName($user, true);
     }
 
     /**
@@ -313,7 +323,13 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     {
         $userService = \tao_models_classes_UserService::singleton();
         if (!isset($this->authorRoles[$user->getUri()])) {
-            $this->authorRoles[$user->getUri()] = ($userService->userHasRoles($user, $this->proctorRoles)) ? __('Proctor') : __('Test-Taker');
+            $userRole = '';
+            $allUserRoles = $userService->getUserRoles($user);
+            if (!empty($allUserRoles)) {
+                $userRole = $userService->userHasRoles($user, $this->proctorRoles) ? __('Proctor') : __('Test-Taker');
+            }
+
+            $this->authorRoles[$user->getUri()] = $userRole;
         }
         return $this->authorRoles[$user->getUri()];
     }

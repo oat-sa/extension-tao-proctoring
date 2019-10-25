@@ -62,4 +62,11 @@ class DeliveryExecutionCounterService extends ConfigurableService implements Del
     public function executionCreated(DeliveryExecutionCreated $event)
     {
     }
+
+    /**
+     * @param $statusUri
+     */
+    public function refresh($statusUri)
+    {
+    }
 }

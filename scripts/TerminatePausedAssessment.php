@@ -129,25 +129,24 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                 }
             } catch (\common_exception_NotFound $e) {
                 //Delivery execution entry missed.
-                if ($data[DeliveryMonitoringService::STATUS] !== DeliveryExecution::STATE_PAUSED) {
-                    $deliveryExecutionData->update(
-                        DeliveryMonitoringService::STATUS,
-                        DeliveryExecution::STATE_PAUSED
-                    );
-                    $deliveryMonitoringService->save($deliveryExecutionData);
-                    common_Logger::w(
-                        'Delivery execution ' . $deliveryExecution->getIdentifier() .
-                        ' is missed. Set it\'s state in delivery monitoring to Paused'
-                    );
-                    $this->addReport(
-                        Report::TYPE_WARNING,
-                        "Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `paused` ".
-                        "due to missed delivery execution entry."
-                    );
-                }
-                continue;
+                $deliveryExecutionData->update(
+                    DeliveryMonitoringService::STATUS,
+                    DeliveryExecution::STATE_TERMINATED
+                );
+                $deliveryMonitoringService->partialSave($deliveryExecutionData);
+                common_Logger::w(
+                    'Delivery execution ' . $deliveryExecution->getIdentifier() .
+                    ' is missed. Set it\'s state in delivery monitoring to Terminated'
+                );
+                $this->addReport(
+                    Report::TYPE_WARNING,
+                    'Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `terminated` ' .
+                    'due to missed delivery execution entry.'
+                );
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
+            } catch (\Throwable $e) {
+                common_Logger::f($e->getMessage());
             }
 
             // Should we stop terminating assessments?
@@ -213,7 +212,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         if (in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
-            ])
+            ], true)
         ) {
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
@@ -235,15 +234,23 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     }
 
     /**
-     * Get time of last pause
+     * Get time of the last pause
      * @param DeliveryExecution $deliveryExecution
-     * @return \DateTimeImmutable|null
+     * @return DateTimeImmutable
+     * @throws \Exception
      */
-    protected function getLastPause(DeliveryExecution $deliveryExecution)
+    private function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
         $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
-        return isset($pauses[0]) ? (new DateTimeImmutable())->setTimestamp($pauses[0]['created_at']) : null;
+
+        if (!empty($pauses)) {
+            $lastPause = $pauses[0]['created_at'];
+        } else {
+            $lastPause = $this->getLastTestTakersEvent($deliveryExecution)['created_at'];
+        }
+
+        return (new DateTimeImmutable())->setTimestamp($lastPause);
     }
 
 }
