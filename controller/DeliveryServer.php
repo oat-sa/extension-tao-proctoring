@@ -78,7 +78,7 @@ class DeliveryServer extends DefaultDeliveryServer
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
             $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
                 'reasons' => ['category' => 'System'],
-                'comment' => __('System generated pause.'),
+                'comment' => 'System generated pause.',
             ]);
         }
 
@@ -181,7 +181,7 @@ class DeliveryServer extends DefaultDeliveryServer
                 $deliveryExecution,
                 [
                     'reasons' => ['category' => 'focus-loss'],
-                    'comment' => __('Assessment has been paused due to attempt to switch to another window/tab.'),
+                    'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
                 ]
             );
         }
