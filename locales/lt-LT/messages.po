@@ -195,10 +195,10 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti autorizuoto testo."
 
 msgid "Available"
-msgstr "Galima"
+msgstr "Galimas"
 
 msgid "Available history"
-msgstr "Galima istorija"
+msgstr "Esanti istorija"
 
 msgid "Available test takers"
 msgstr "Galimi testo laikytojai"
@@ -472,7 +472,7 @@ msgid "Last Week"
 msgstr "Paskutinė Savaitė"
 
 msgid "Late"
-msgstr "Vėluoja"
+msgstr "data"
 
 msgid "Launching"
 msgstr "Paleidžiama"
@@ -671,10 +671,10 @@ msgid "Remove default tag filtering"
 msgstr "Pašalinti numatytą žymių filtravimą"
 
 msgid "Remove the selected test takers from the session"
-msgstr "Pašalinkite pasirinktus testo laikytojus iš sesijos"
+msgstr "Priskirti pasirinktus testo laikytojus sesijai"
 
 msgid "Remove the test taker from the session"
-msgstr "Pašalinti testo laikytoją iš sesijos"
+msgstr "Priskirti testo laikytojus sesijai"
 
 msgid "Report"
 msgstr "Pranešti"
