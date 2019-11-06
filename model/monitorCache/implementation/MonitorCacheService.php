@@ -77,29 +77,44 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function executionStateChanged(DeliveryExecutionState $event)
     {
-        $deliveryExecution = $event->getDeliveryExecution();
+        $data = $this->createMonitoringData($event->getDeliveryExecution());
 
-        $data = $this->createMonitoringData($deliveryExecution);
+        $this->fillMonitoringOnExecutionStateChanged($event, $data);
 
+        $success = $this->partialSave($data);
+        if (!$success) {
+            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
+        }
+    }
+
+    /**
+     * @param DeliveryExecutionState $event
+     * @param DeliveryMonitoringData $data
+     * @throws \common_exception_Error
+     * @throws \common_exception_NotFound
+     */
+    protected function fillMonitoringOnExecutionStateChanged(DeliveryExecutionState $event, DeliveryMonitoringData $data)
+    {
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = \common_session_SessionManager::getSession()->getUser();
 
         if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
             && $user instanceof GuestTestUser) {
-            $deliveryExecution->setState(DeliveryExecution::STATE_AUTHORIZED);
-
+            $data->getDeliveryExecution()->setState(DeliveryExecution::STATE_AUTHORIZED);
         }
 
+        if ($event->getState() == DeliveryExecution::STATE_TERMINATED) {
+            $data->update(
+                DeliveryMonitoringService::END_TIME,
+                \tao_helpers_Date::getTimeStamp(time(), true)
+            );
+        }
         if ($event->getState() == DeliveryExecution::STATE_FINISHED) {
             $data->update(
                 DeliveryMonitoringService::END_TIME,
                 \tao_helpers_Date::getTimeStamp($event->getDeliveryExecution()->getFinishTime(), true)
             );
-        }
-        $success = $this->partialSave($data);
-        if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
         }
     }
 
