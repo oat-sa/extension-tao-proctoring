@@ -76,9 +76,11 @@ class DeliveryServer extends DefaultDeliveryServer
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
+            //do not remove these comments, this is used to generate the translation in .po file
+            // __('System generated pause.');
             $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
                 'reasons' => ['category' => 'System'],
-                'comment' => __('System generated pause.'),
+                'comment' => 'System generated pause.',
             ]);
         }
 
@@ -177,11 +179,13 @@ class DeliveryServer extends DefaultDeliveryServer
         if($deliveryExecution->getState()->getUri() != DeliveryExecutionState::STATE_PAUSED){
             /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            //do not remove these comments, this is used to generate the translation in .po file
+            // __('Assessment has been paused due to attempt to switch to another window/tab.');
             $deliveryExecutionStateService->pauseExecution(
                 $deliveryExecution,
                 [
                     'reasons' => ['category' => 'focus-loss'],
-                    'comment' => __('Assessment has been paused due to attempt to switch to another window/tab.'),
+                    'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
                 ]
             );
         }
