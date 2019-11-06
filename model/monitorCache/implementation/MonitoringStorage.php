@@ -272,6 +272,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
+        if ($together) {
+            $this->joinKvData();
+        }
+
         $options['order'] = $this->prepareOrderStmt($options['order']);
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
 
@@ -279,7 +283,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
+
         $selectClause = "SELECT " . implode(',', $this->selectColumns);
+
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL .
@@ -294,17 +300,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $stmt = $this->getPersistence()->query($sql, $this->queryParams);
 
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if ($together) {
-            $ids = array_column($data, static::COLUMN_ID);
-            $kvData = $this->getKvData($ids);
-            foreach ($data as &$row) {
-                if (isset($kvData[$row[static::COLUMN_ID]])) {
-                    $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
-                }
-            }
-            unset($row);
-        }
 
         if ($options['asArray']) {
             $result = $data;
@@ -549,6 +544,21 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = true;
 
         return $result;
+    }
+
+    /**
+     * Join data from kv storage.
+     */
+    protected function joinKvData()
+    {
+        $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
+        foreach ($kvColumns as $kvColNum => $kvColName) {
+            $joinTableAlias = 'kv_values_' . $kvColNum;
+            $this->selectColumns[] = $joinTableAlias . '.monitoring_value as \'' . $kvColName . '\'';
+            $this->joins[] = 'LEFT JOIN kv_delivery_monitoring '.$joinTableAlias.
+                ' on '.$joinTableAlias.'.parent_id = t.delivery_execution_id and '.$joinTableAlias.'.monitoring_key = ?';
+            $this->queryParams[] = $kvColName;
+        }
     }
 
     /**
