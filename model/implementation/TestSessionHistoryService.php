@@ -198,8 +198,8 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         } else {
             if (isset($data['data']['reason']) && isset($data['data']['reason']['reasons'])) {
                 $details = is_array($data['data']['reason']['reasons']) ?
-                    array_merge(array_values($data['data']['reason']['reasons']), [$data['data']['reason']['comment']])
-                    : array_merge([$data['data']['reason']['reasons']], [$data['data']['reason']['comment']]);
+                    array_merge(array_values($data['data']['reason']['reasons']), [__($data['data']['reason']['comment'])])
+                    : array_merge([$data['data']['reason']['reasons']], [__($data['data']['reason']['comment'])]);
             } else if (isset($data['data']['exitCode'])) {
                 $details = $data['data']['exitCode'];
             } else if (isset($data['data']['itemId'])) {
