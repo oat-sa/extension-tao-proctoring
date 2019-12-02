@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use oat\generis\persistence\PersistenceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -272,6 +273,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
+        if ($together) {
+            $this->joinKvData();
+        }
+
         $options['order'] = $this->prepareOrderStmt($options['order']);
         $fromClause = "FROM " . self::TABLE_NAME . " t ";
 
@@ -279,7 +284,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
+
         $selectClause = "SELECT " . implode(',', $this->selectColumns);
+
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL .
@@ -294,17 +301,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $stmt = $this->getPersistence()->query($sql, $this->queryParams);
 
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        if ($together) {
-            $ids = array_column($data, static::COLUMN_ID);
-            $kvData = $this->getKvData($ids);
-            foreach ($data as &$row) {
-                if (isset($kvData[$row[static::COLUMN_ID]])) {
-                    $row = array_merge($row, $kvData[$row[static::COLUMN_ID]]);
-                }
-            }
-            unset($row);
-        }
 
         if ($options['asArray']) {
             $result = $data;
@@ -474,7 +470,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
         $dataToBeInserted = [];
         $dataToBeUpdated = [];
+        $kvColumns = $this->getKvColumns();
         foreach ($kvTableData as $kvDataKey => $kvDataValue) {
+            if (!in_array($kvDataKey, $kvColumns, true)) {
+                $this->clearKvColumnsCache();
+            }
             if (isset($existent[$kvDataKey]) && $existent[$kvDataKey] == $kvDataValue) {
                 continue;
             }
@@ -540,7 +540,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function deleteKvData(DeliveryMonitoringDataInterface $deliveryMonitoring)
     {
-        $result = false;
         $data = $deliveryMonitoring->get();
 
         $sql = 'DELETE FROM ' . self::KV_TABLE_NAME . '
@@ -549,6 +548,50 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $result = true;
 
         return $result;
+    }
+
+    /**
+     * Join data from kv storage.
+     */
+    protected function joinKvData()
+    {
+        $kvColumns = $this->getKvColumns();
+        foreach ($kvColumns as $kvColNum => $kvColName) {
+            $joinTableAlias = 'kv_values_' . $kvColNum;
+            $this->selectColumns[] = $joinTableAlias . '.monitoring_value as \'' . $kvColName . '\'';
+            $this->joins[] = 'LEFT JOIN kv_delivery_monitoring '.$joinTableAlias.
+                ' on '.$joinTableAlias.'.parent_id = t.delivery_execution_id and '.$joinTableAlias.'.monitoring_key = ?';
+            $this->queryParams[] = $kvColName;
+        }
+    }
+
+    /**
+     * @return array
+     * @throws \common_Exception
+     */
+    protected function getKvColumns()
+    {
+        /** @var \common_persistence_KeyValuePersistence $cache */
+        $cache = $this->getServiceLocator()->get(PersistenceManager::SERVICE_ID)->getPersistenceById('cache');
+        $key = self::class . '_KvColumns';
+        if (!$cache->exists($key)) {
+            $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
+            $cache->set($key, json_encode($kvColumns));
+        } else {
+            $kvColumns = json_decode($cache->get($key), true);
+        }
+        return $kvColumns;
+    }
+
+    /**
+     * Crear kv columns cache
+     */
+    protected function clearKvColumnsCache()
+    {
+        /** @var \common_persistence_KeyValuePersistence $cache */
+        $cache = $this->getServiceLocator()->get(PersistenceManager::SERVICE_ID)->getPersistenceById('cache');
+        $key = self::class . '_KvColumns';
+        $cache->del($key);
     }
 
     /**
