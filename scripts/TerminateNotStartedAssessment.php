@@ -96,9 +96,11 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
                         ]);
                         $cancel++;
                     } else {
+                        //do not remove these comments, this is used to generate the translation in .po file
+                        // __('Automatically paused by the system due to authorized test not being launched by test taker.');
                         $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
-                            'comment' => __('Automatically paused by the system due to authorized test not being launched by test taker.'),
+                            'comment' => 'Automatically paused by the system due to authorized test not being launched by test taker.',
                         ]);
                         $pause++;
                     }
