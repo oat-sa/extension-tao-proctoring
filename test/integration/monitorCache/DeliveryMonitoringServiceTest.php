@@ -23,6 +23,7 @@ namespace oat\taoProctoring\test\integration\monitorCache;
 
 require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
+use oat\generis\persistence\PersistenceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\oatbox\service\ServiceManager;
@@ -103,12 +104,29 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             )
         ]);
 
-        $pmMock = $this->getSqlMock('test_monitoring');
-        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
+        $sqlMock = $this->getSqlMock('test_monitoring');
+        $cacheMock = $this->getKvMock('cache');
+        $this->persistence = $sqlMock->getPersistenceById('test_monitoring');
         DbSetup::generateTable($this->persistence);
 
+        $pmMock = $this->getMockBuilder(PersistenceManager::class)
+            ->setMethods(['getPersistenceById'])
+            ->getMock();
+
+        $pmMock->method('getPersistenceById')
+            ->will($this->returnCallback(
+                function ($persistenceId) use ($sqlMock, $cacheMock) {
+                    if ($persistenceId === 'cache') {
+                        return $cacheMock->getPersistenceById('cache');
+                    }
+                    if ($persistenceId === 'test_monitoring') {
+                        return $sqlMock->getPersistenceById('test_monitoring');
+                    }
+                }
+            ));
+
         $sl = $this->prophesize(ServiceLocatorInterface::class);
-        $sl->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $sl->get(PersistenceManager::SERVICE_ID)->willReturn($pmMock);
         $this->service->setServiceLocator($sl->reveal());
     }
 
