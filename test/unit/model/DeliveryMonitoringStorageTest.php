@@ -22,10 +22,11 @@ namespace oat\taoProctoring\test\unit\model;
 
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
-use oat\generis\test\TestCase;
+use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\taoProctoring\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
+use oat\generis\persistence\PersistenceManager;
 
 /**
  * class DeliveryMonitoringStorageTest
@@ -35,11 +36,12 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
  * @package oat\taoProctoring
  * @author Joel Bout <joel@taotesting.com>
  */
-class DeliveryMonitoringStorageTest extends TestCase
+class DeliveryMonitoringStorageTest extends TaoPhpUnitTestRunner
 {
     public function testPartialSave()
     {
-        $pm = $this->getSqlMock('monitoring');
+        //$pm = $this->getSqlMock('monitoring');
+        $pm = $this->getPmMock();
         DbSetup::generateTable($pm->getPersistenceById('monitoring'));
         $sl = $this->getServiceLocatorMock([\common_persistence_Manager::SERVICE_ID => $pm]);
         $deP = $this->prophesize(DeliveryExecution::class);
@@ -79,5 +81,29 @@ class DeliveryMonitoringStorageTest extends TestCase
         $this->assertArrayHasKey('a', $dataArray);
         $this->assertEquals('3', $dataArray['a']);
         $this->assertEquals('2', $dataArray['b']);
+    }
+
+    private function getPmMock()
+    {
+        $sqlMock = $this->getSqlMock('monitoring');
+        $cacheMock = $this->getKvMock('cache');
+        $this->persistence = $sqlMock->getPersistenceById('monitoring');
+
+        $pmMock = $this->getMockBuilder(PersistenceManager::class)
+            ->setMethods(['getPersistenceById'])
+            ->getMock();
+
+        $pmMock->method('getPersistenceById')
+            ->will($this->returnCallback(
+                function ($persistenceId) use ($sqlMock, $cacheMock) {
+                    if ($persistenceId === 'cache') {
+                        return $cacheMock->getPersistenceById('cache');
+                    }
+                    if ($persistenceId === 'monitoring') {
+                        return $sqlMock->getPersistenceById('monitoring');
+                    }
+                }
+            ));
+        return $pmMock;
     }
 }
