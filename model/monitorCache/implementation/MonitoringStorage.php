@@ -555,13 +555,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function joinKvData()
     {
+        $connection = $this->getQueryBuilder()->getConnection();
         $kvColumns = $this->getKvColumns();
         foreach ($kvColumns as $kvColNum => $kvColName) {
             $joinTableAlias = 'kv_values_' . $kvColNum;
-            $this->selectColumns[] = $joinTableAlias . '.monitoring_value as \'' . $kvColName . '\'';
+            $this->selectColumns[] = $joinTableAlias . '.monitoring_value as ' . $connection->quoteIdentifier($kvColName);
             $this->joins[] = 'LEFT JOIN kv_delivery_monitoring '.$joinTableAlias.
                 ' on '.$joinTableAlias.'.parent_id = t.delivery_execution_id and '.$joinTableAlias.'.monitoring_key = ?';
             $this->queryParams[] = $kvColName;
+            $this->groupColumns[] = $joinTableAlias . '.monitoring_value';
         }
     }
 
