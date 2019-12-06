@@ -23,6 +23,7 @@ namespace oat\taoProctoring\test\integration\monitorCache;
 
 require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
+use oat\generis\persistence\PersistenceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\oatbox\service\ServiceManager;
@@ -52,7 +53,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
             MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
             MonitoringStorage::COLUMN_STATUS => 'active_test',
-            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
+            'user_uri' => 'http://sample/first.rdf#i1450191587554175_test_user',
             'error_code' => 1,
             'session_id' => 'i1450191587554175',
         ],
@@ -60,7 +61,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554176_test_record',
             MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_2',
             MonitoringStorage::COLUMN_STATUS => 'paused_test',
-            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554176_test_user',
+            'user_uri' => 'http://sample/first.rdf#i1450191587554176_test_user',
             'error_code' => 2,
             'session_id' => 'i1450191587554176',
         ],
@@ -68,7 +69,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554177_test_record',
             MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_3',
             MonitoringStorage::COLUMN_STATUS => 'finished_test',
-            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554177_test_user',
+            'user_uri' => 'http://sample/first.rdf#i1450191587554177_test_user',
             'error_code' => 3,
             'session_id' => 'i1450191587554177',
         ],
@@ -76,7 +77,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554178_test_record',
             MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_4',
             MonitoringStorage::COLUMN_STATUS => 'finished_test',
-            OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554178_test_user',
+            'user_uri' => 'http://sample/first.rdf#i1450191587554178_test_user',
             'error_code' => 0,
             'session_id' => 'i1450191587554178',
         ],
@@ -103,12 +104,29 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             )
         ]);
 
-        $pmMock = $this->getSqlMock('test_monitoring');
-        $this->persistence = $pmMock->getPersistenceById('test_monitoring');
+        $sqlMock = $this->getSqlMock('test_monitoring');
+        $cacheMock = $this->getKvMock('cache');
+        $this->persistence = $sqlMock->getPersistenceById('test_monitoring');
         DbSetup::generateTable($this->persistence);
 
+        $pmMock = $this->getMockBuilder(PersistenceManager::class)
+            ->setMethods(['getPersistenceById'])
+            ->getMock();
+
+        $pmMock->method('getPersistenceById')
+            ->will($this->returnCallback(
+                function ($persistenceId) use ($sqlMock, $cacheMock) {
+                    if ($persistenceId === 'cache') {
+                        return $cacheMock->getPersistenceById('cache');
+                    }
+                    if ($persistenceId === 'test_monitoring') {
+                        return $sqlMock->getPersistenceById('test_monitoring');
+                    }
+                }
+            ));
+
         $sl = $this->prophesize(ServiceLocatorInterface::class);
-        $sl->get(\common_persistence_Manager::SERVICE_ID)->willReturn($pmMock);
+        $sl->get(PersistenceManager::SERVICE_ID)->willReturn($pmMock);
         $this->service->setServiceLocator($sl->reveal());
     }
 
