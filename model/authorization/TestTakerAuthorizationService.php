@@ -80,7 +80,13 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
                 'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
             );
         }
-        if ($this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+        if (
+            $this->isProctored($deliveryExecution->getDelivery()->getUri(), $user)
+            && !in_array(
+                $state,
+                [ProctoredDeliveryExecution::STATE_AUTHORIZED, ProctoredDeliveryExecution::STATE_ACTIVE]
+            )
+        ) {
             $this->throwUnAuthorizedException($deliveryExecution);
         }
     }
