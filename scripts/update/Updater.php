@@ -910,8 +910,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(GuiSettingsService::SERVICE_ID, $guiService);
             $this->setVersion('17.3.0');
         }
-
         $this->skip('17.3.0', '18.2.0');
-
     }
 }
