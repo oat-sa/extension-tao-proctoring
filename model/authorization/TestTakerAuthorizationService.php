@@ -72,7 +72,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         $state = $deliveryExecution->getState()->getUri();
-        $deliveryUri= $deliveryExecution->getDelivery()->getUri();
+
         if (in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
@@ -83,7 +83,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
                 'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
             );
         }
-
+        $deliveryUri= $deliveryExecution->getDelivery()->getUri();
         if (
             $this->isProctored($deliveryUri, $user)
             && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED

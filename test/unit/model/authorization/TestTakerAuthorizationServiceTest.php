@@ -25,11 +25,13 @@ use core_kernel_classes_Resource;
 use Exception;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
+use oat\oatbox\user\User;
+use oat\taoDelivery\model\authorization\UnAuthorizedException;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 
 class TestTakerAuthorizationServiceTest extends TestCase
 {
-
     /**
      * @dataProvider isActiveUnSecureDeliveryDataProvider
      * @param string $propertyValue
@@ -111,6 +113,40 @@ class TestTakerAuthorizationServiceTest extends TestCase
                 'state',
                 false
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidStates
+     * @param string $state
+     * @throws Exception
+     */
+    public function testVerifyResumeAuthorizationWithInvalidState($state)
+    {
+        $ontologyMock = $this->getMock(Ontology::class);
+        $deliveryExecutionMock = $this->getMock(DeliveryExecutionInterface::class);
+        $userMock = $this->getMock(User::class);
+
+        $state = new core_kernel_classes_Resource($state);
+        $deliveryExecutionMock->expects($this->once())->method('getState')->willReturn($state);
+
+        $service = (new TestTakerAuthorizationService());
+        $service->setServiceLocator($this->getServiceLocatorMock([Ontology::SERVICE_ID => $ontologyMock]));
+
+        $this->expectException(UnAuthorizedException::class);
+        $service->verifyResumeAuthorization($deliveryExecutionMock, $userMock);
+
+    }
+
+    /**
+     * @return array
+     */
+    public function getInvalidStates()
+    {
+        return [
+            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished'],
+            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled'],
+            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated'],
         ];
     }
 }
