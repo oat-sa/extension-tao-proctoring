@@ -29,6 +29,7 @@ use oat\oatbox\user\User;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
+use oat\taoProctoring\model\delivery\DeliverySyncService;
 
 class TestTakerAuthorizationServiceTest extends TestCase
 {
@@ -147,6 +148,83 @@ class TestTakerAuthorizationServiceTest extends TestCase
             ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished'],
             ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled'],
             ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated'],
+        ];
+    }
+
+    /**
+     * @dataProvider isProctoredDataProvider
+     * @param core_kernel_classes_Property|null $propertyValue
+     * @param bool $proctorByDefault
+     * @param bool $expected
+     */
+    public function testIsProctored($propertyValue, $proctorByDefault, $expected)
+    {
+        $ontologyMock = $this->getMock(Ontology::class);
+        $deliverySyncServiceMock = $this->getMock(DeliverySyncService::class);
+
+        $delivery = $this
+            ->getMockBuilder(core_kernel_classes_Resource::class)
+            ->setConstructorArgs(['deliveryUri'])
+            ->getMock();
+
+        $property = new core_kernel_classes_Property(
+            'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible'
+        );
+
+        $ontologyMock->expects($this->once())
+            ->method('getResource')
+            ->with('deliveryUri')
+            ->willReturn($delivery);
+
+        $ontologyMock->expects($this->once())
+            ->method('getProperty')
+            ->with('http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible')
+            ->willReturn($property);
+
+        $delivery->expects($this->once())
+            ->method('getOnePropertyValue')
+            ->with($property)
+            ->willReturn($propertyValue);
+
+        $deliverySyncServiceMock->method('isProctoredByDefault')->willReturn($proctorByDefault);
+
+        $service = (new TestTakerAuthorizationService());
+        $service->setServiceLocator(
+            $this->getServiceLocatorMock(
+                [Ontology::SERVICE_ID => $ontologyMock, DeliverySyncService::SERVICE_ID => $deliverySyncServiceMock]
+            )
+        );
+
+        if ($expected) {
+            $this->assertTrue(
+                $service->isProctored('deliveryUri', $this->getMock(User::class))
+            );
+        } else {
+            $this->assertFalse(
+                $service->isProctored('deliveryUri', $this->getMock(User::class))
+            );
+        }
+
+    }
+
+    /**
+     * @return array
+     */
+    public function isProctoredDataProvider()
+    {
+        return [
+            'byDefault' => [null, true, true],
+            'byDefaultNo' => [null, false, false],
+            'proctored' => [
+                new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled'),
+                false,
+                true
+            ],
+            'notProctored' => [
+                new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled'),
+                true,
+                false
+            ],
         ];
     }
 }
