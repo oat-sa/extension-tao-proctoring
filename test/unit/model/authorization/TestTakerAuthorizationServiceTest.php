@@ -30,6 +30,7 @@ use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 
 class TestTakerAuthorizationServiceTest extends TestCase
 {
@@ -226,5 +227,51 @@ class TestTakerAuthorizationServiceTest extends TestCase
                 false
             ],
         ];
+    }
+
+    public function testVerifyResumeAuthorization()
+    {
+        $ontologyMock = $this->getMock(Ontology::class);
+        $ontologyMock->method('getProperty')
+            ->willReturnOnConsecutiveCalls(
+                new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled'),
+                new core_kernel_classes_Property(
+                    'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryTestRunnerFeatures'
+                )
+            );
+        $delivery = $this
+            ->getMockBuilder(core_kernel_classes_Resource::class)
+            ->setConstructorArgs(['deliveryUri'])
+            ->getMock();
+
+        $delivery->method('getUri')->willReturn('deliveryUri');
+
+        $ontologyMock->method('getResource')->willReturn($delivery);
+        $deliveryExecutionMock = $this
+            ->getMockBuilder(DeliveryExecution::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $propertyEnabled = new core_kernel_classes_Property(
+            'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled'
+        );
+
+        $delivery->method('getOnePropertyValue')
+            ->willReturnOnConsecutiveCalls($propertyEnabled, 'feature');
+
+        $deliveryExecutionMock->method('getState')->willReturn(new core_kernel_classes_Resource('state'));
+        $deliveryExecutionMock->method('getDelivery')->willReturn($delivery);
+
+        $service = (new TestTakerAuthorizationService());
+        $service->setServiceLocator(
+            $this->getServiceLocatorMock(
+                [
+                    Ontology::SERVICE_ID => $ontologyMock,
+                    DeliverySyncService::SERVICE_ID => $this->getMock(DeliverySyncService::class)
+                ]
+            )
+        );
+        $this->expectException(UnAuthorizedException::class);
+        $service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
     }
 }
