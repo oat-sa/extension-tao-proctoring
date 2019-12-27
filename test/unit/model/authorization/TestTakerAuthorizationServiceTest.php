@@ -49,8 +49,8 @@ class TestTakerAuthorizationServiceTest extends TestCase
         parent::setUp();
         $this->ontologyMock = $this->getMock(Ontology::class);
         $this->service = new TestTakerAuthorizationService();
-
     }
+
     /**
      * @dataProvider isActiveUnSecureDeliveryDataProvider
      * @param string $propertyValue
