@@ -92,9 +92,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
     {
         return [
             'activeAndUnSecure' => [
-                null,
-                'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
-                true
+                null, 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive', true
             ],
             'activeAndUnSecure2' => [
                 'feature,feature2',
@@ -116,11 +114,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
                 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 false
             ],
-            'notActiveAndSecure2' => [
-                'security',
-                'state',
-                false
-            ]
+            'notActiveAndSecure2' => ['security', 'state', false]
         ];
     }
 
@@ -147,7 +141,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
         return [
             ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished'],
             ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled'],
-            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated'],
+            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated']
         ];
     }
 
