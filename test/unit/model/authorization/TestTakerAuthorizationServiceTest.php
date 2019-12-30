@@ -79,7 +79,6 @@ class TestTakerAuthorizationServiceTest extends TestCase
         $this->service->setServiceLocator($this->getServiceLocatorMock([Ontology::SERVICE_ID => $this->ontologyMock]));
 
         $this->assertEquals($expected, $this->service->isActiveUnSecureDelivery('deliveryUri',$state));
-
     }
 
     /**
@@ -89,29 +88,31 @@ class TestTakerAuthorizationServiceTest extends TestCase
     {
         return [
             'activeAndUnSecure' => [
-                null, 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive', true
+                'propertyValue' => null,
+                'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                'expected' => true
             ],
             'activeAndUnSecure2' => [
-                'feature,feature2',
-                'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
-                true
+                'propertyValue' => 'feature,feature2',
+                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                'expected' => true
             ],
             'notActiveAndUnSecure' => [
-                'feature,feature2',
-                'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
-                false
+                'propertyValue' => 'feature,feature2',
+                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+                'expected' => false
             ],
             'ActiveAndSecure' => [
-                'feature,security',
-                'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
-                false
+                'propertyValue' => 'feature,security',
+                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                'expected' => false
             ],
             'notActiveAndSecure' => [
-                'feature,security',
-                'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
-                false
+                'propertyValue' => 'feature,security',
+                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+                'expected' => false
             ],
-            'notActiveAndSecure2' => ['security', 'state', false]
+            'notActiveAndSecure2' => ['propertyValue' => 'security', 'state' => 'state', 'expected' => false]
         ];
     }
 
@@ -127,7 +128,6 @@ class TestTakerAuthorizationServiceTest extends TestCase
 
         $this->expectException(UnAuthorizedException::class);
         $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
-
     }
 
     /**
@@ -136,9 +136,9 @@ class TestTakerAuthorizationServiceTest extends TestCase
     public function getInvalidStates()
     {
         return [
-            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished'],
-            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled'],
-            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated']
+            ['state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished'],
+            ['state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled'],
+            ['state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated']
         ];
     }
 
@@ -184,7 +184,6 @@ class TestTakerAuthorizationServiceTest extends TestCase
             $expected,
             $this->service->isProctored('deliveryUri', $this->getMock(User::class))
         );
-
     }
 
     /**
@@ -193,28 +192,24 @@ class TestTakerAuthorizationServiceTest extends TestCase
     public function isProctoredDataProvider()
     {
         return [
-            'byDefault' => [null, true, true],
-            'byDefaultNo' => [null, false, false],
+            'byDefault' => ['propertyValue' => null, 'proctorByDefault' => true, 'expected' => true],
+            'byDefaultNo' => ['propertyValue' => null, 'proctorByDefault' => false, 'expected' => false],
             'proctored' => [
-                new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled'),
-                false,
-                true
+                'propertyValue'
+                => new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled'),
+                'proctorByDefault' => false,
+                'expected' => true
             ],
             'notProctored' => [
-                new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled'),
-                true,
-                false
+                'propertyValue' =>
+                    new core_kernel_classes_Property('http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled'),
+                'proctorByDefault' => true,
+                'expected' => false
             ],
         ];
     }
 
-    /**
-     * @dataProvider verifyResumeAuthorizationDataProvider
-     * @param string $state
-     * @param bool $isSuccess
-     * @throws Exception
-     */
-    public function testVerifyResumeAuthorization($state, $isSuccess)
+    public function testVerifyResumeAuthorization()
     {
         $this->ontologyMock->method('getProperty')
             ->willReturnOnConsecutiveCalls(
@@ -230,7 +225,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
             'feature'
         );
 
-        $deliveryExecutionMock = $this->getDeliveryExecutionMock($state);
+        $deliveryExecutionMock = $this->getDeliveryExecutionMock('state');
         $deliveryExecutionMock->method('getDelivery')->willReturn($delivery);
 
         $this->service->setServiceLocator(
@@ -241,21 +236,9 @@ class TestTakerAuthorizationServiceTest extends TestCase
                 ]
             )
         );
-        if (!$isSuccess) {
-            $this->expectException(UnAuthorizedException::class);
-        }
-        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
-    }
 
-    /**
-     * @return array
-     */
-    public function verifyResumeAuthorizationDataProvider()
-    {
-        return [
-            ['state', false],
-            ['http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized', true]
-        ];
+        $this->expectException(UnAuthorizedException::class);
+        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
     }
 
     /**
