@@ -121,7 +121,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      */
     public function isActiveUnSecureDelivery($deliveryId, $state)
     {
-        return $this->isNotSecure($deliveryId) && $state === DeliveryExecutionInterface::STATE_ACTIVE;
+        return $state === DeliveryExecutionInterface::STATE_ACTIVE && !$this->isSecure($deliveryId);
     }
 
     /**
@@ -129,7 +129,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      * @return bool
      * @throws common_Exception
      */
-    private function isNotSecure($deliveryId)
+    private function isSecure($deliveryId)
     {
         $delivery = $this->getResource($deliveryId);
         $activeFeatures = explode(
@@ -138,7 +138,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
                 $this->getProperty(DeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY)
             )
         );
-        return !in_array('security', $activeFeatures);
+        return in_array('security', $activeFeatures);
     }
 
     /**
