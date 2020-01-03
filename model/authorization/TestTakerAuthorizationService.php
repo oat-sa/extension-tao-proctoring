@@ -19,8 +19,10 @@
  */
 namespace oat\taoProctoring\model\authorization;
 
-use oat\oatbox\event\EventManager;
+
+use common_Exception;
 use oat\oatbox\service\ConfigurableService;
+use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\DelegatedServiceHandler;
@@ -70,6 +72,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
     {
         $state = $deliveryExecution->getState()->getUri();
+
         if (in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
@@ -80,7 +83,13 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
                 'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
             );
         }
-        if ($this->isProctored($deliveryExecution->getDelivery()->getUri(), $user) && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED) {
+        $deliveryUri = $deliveryExecution->getDelivery()->getUri();
+
+        if (
+            $this->isProctored($deliveryUri, $user)
+            && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED
+            && !$this->isActiveUnSecureDelivery($deliveryUri, $state)
+        ) {
             $this->throwUnAuthorizedException($deliveryExecution);
         }
     }
@@ -102,6 +111,34 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         return $proctored instanceof \core_kernel_classes_Resource
             ? $proctored->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED
             : $deliverySyncService->isProctoredByDefault();
+    }
+
+    /**
+     * @param string $deliveryId
+     * @param string $state
+     * @return bool
+     * @throws common_Exception
+     */
+    public function isActiveUnSecureDelivery($deliveryId, $state)
+    {
+        return $state === DeliveryExecutionInterface::STATE_ACTIVE && !$this->isSecure($deliveryId);
+    }
+
+    /**
+     * @param string $deliveryId
+     * @return bool
+     * @throws common_Exception
+     */
+    private function isSecure($deliveryId)
+    {
+        $delivery = $this->getResource($deliveryId);
+        $activeFeatures = explode(
+            ',',
+            $delivery->getOnePropertyValue(
+                $this->getProperty(DeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY)
+            )
+        );
+        return in_array('security', $activeFeatures);
     }
 
     /**
