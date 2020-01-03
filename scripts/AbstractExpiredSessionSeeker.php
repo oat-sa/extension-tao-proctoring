@@ -67,7 +67,7 @@ abstract class AbstractExpiredSessionSeeker implements Action, ServiceLocatorAwa
             $message
         ));
     }
-    
+
     /**
      * Get last test takers event from delivery log
      * @param DeliveryExecution $deliveryExecution
@@ -76,16 +76,18 @@ abstract class AbstractExpiredSessionSeeker implements Action, ServiceLocatorAwa
      */
     protected function getLastTestTakersEvent(DeliveryExecution $deliveryExecution)
     {
+        /** @var DeliveryLog $deliveryLogService */
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
-        $testTakerIdentifier = $deliveryExecution->getUserIdentifier();
-        $events = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier()));
-
+        $events = $deliveryLogService->search(
+            [
+                DeliveryLog::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+                DeliveryLog::CREATED_BY            => $deliveryExecution->getUserIdentifier()
+            ],
+            ['limit' => 1, 'order' => DeliveryLog::ID, 'dir' => 'DESC']
+        );
         $lastTestTakersEvent = null;
-        foreach ($events as $event) {
-            if ($event[DeliveryLog::CREATED_BY] === $testTakerIdentifier) {
-                $lastTestTakersEvent = $event;
-                break;
-            }
+        if (!empty($events[0])) {
+            $lastTestTakersEvent = $events[0];
         }
 
         return $lastTestTakersEvent;
