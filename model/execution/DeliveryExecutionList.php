@@ -116,6 +116,7 @@ class DeliveryExecutionList extends ConfigurableService
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
             'state' => $this->createState($cachedData),
+            'allow_irr' => $cachedData['allow_irr'],
         );
 
         if ($this->isOnline($cachedData)) {

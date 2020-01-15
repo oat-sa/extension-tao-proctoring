@@ -336,17 +336,18 @@ define([
                         });
                     }
 
-                    buttons.push({
-                        id: 'irregularity',
-                        type: 'info',
-                        label: __('Report irregularity'),
-                        icon: 'delivery-small',
-                        close: true,
-                        action(){
-                            report(selection);
-                        }
-                    });
-
+                    if(delivery.allow_irr=="Y"){
+	                    buttons.push({
+	                        id: 'irregularity',
+	                        type: 'info',
+	                        label: __('Report irregularity'),
+	                        icon: 'delivery-small',
+	                        close: true,
+	                        action(){
+	                            report(selection);
+	                        }
+	                    });
+                    }    	
                     dialog({
                         message: __('Please, make your selection'),
                         autoRender: true,
@@ -1063,6 +1064,11 @@ define([
                         });
                     }
 
+                    model.push({
+                        id: 'allow_irr',
+                        label: __('Allow IRR'),
+                    });                    
+                    
                     model.push({
                         id: 'administrationCl',
                         label: __('Administration'),

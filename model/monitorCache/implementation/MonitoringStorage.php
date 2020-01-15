@@ -262,10 +262,21 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function find(array $criteria = [], array $options = [], $together = false)
     {
         $result = [];
-        $this->joins = [];
+        $this->joins = ["left join delivery_log dl
+	           on dl.delivery_execution_id = t.delivery_execution_id
+	           and dl.event_id = 'LTI_PARAMETERS'"];
         $this->queryParams = [];
-        $this->selectColumns = $this->getPrimaryColumns();
-        $this->groupColumns = ['t.delivery_execution_id'];
+        
+        $columns = $this->getPrimaryColumns();
+        foreach($columns as $key => $value){
+            if($value=='delivery_execution_id'){
+                $columns[$key] = 't.'.$value;                
+            }
+        }
+        $columns[] = 'dl.data';
+        $this->selectColumns = $columns;
+        $this->groupColumns = ['t.delivery_execution_id','dl.data'];
+        
         $defaultOptions = [
             'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
             'offset' => 0,
@@ -303,7 +314,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if ($options['asArray']) {
-            $result = $data;
+            $result = [];
+            foreach($data as $row) {
+                $json = json_decode($row['data'],true);
+                $row['allow_irr'] = (($json['custom_allow_irr'] ?? 'true') !== 'false' ? 'Y' : 'N');
+                unset($row['data']);
+                $result[] = $row;
+                
+            }
         } else {
             foreach($data as $row) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
