@@ -129,7 +129,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      * @return bool
      * @throws common_Exception
      */
-    protected function isSecure($deliveryId)
+    public function isSecure($deliveryId)
     {
         $delivery = $this->getResource($deliveryId);
         $testRunnerFeatures = $delivery->getOnePropertyValue($this->getProperty(DeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY));
