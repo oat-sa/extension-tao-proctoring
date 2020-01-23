@@ -23,6 +23,7 @@ namespace oat\taoProctoring\test\unit\model\authorization;
 use core_kernel_classes_Property;
 use core_kernel_classes_Resource;
 use Exception;
+use common_Exception;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\MockObject;
 use oat\generis\test\TestCase;
@@ -47,7 +48,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->ontologyMock = $this->getMock(Ontology::class);
+        $this->ontologyMock = $this->createMock(Ontology::class);
         $this->service = new TestTakerAuthorizationService();
     }
 
@@ -239,6 +240,63 @@ class TestTakerAuthorizationServiceTest extends TestCase
 
         $this->expectException(UnAuthorizedException::class);
         $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
+    }
+
+    /**
+     * @param $testRunnerFeatures
+     * @param $expectedResult
+     * @throws common_Exception
+     *
+     * @dataProvider dataProviderTestIsSecure
+     */
+    public function testIsSecure($testRunnerFeatures, $expectedResult)
+    {
+        $deliveryUri = 'FAKE_DELIVERY_URI';
+        $runnerFeaturesPropertyMock = $this->createMock(core_kernel_classes_Property::class);
+        $deliveryResourceMock = $this->createMock(core_kernel_classes_Resource::class);
+        $deliveryResourceMock->method('getOnePropertyValue')
+            ->willReturn($testRunnerFeatures);
+
+        $this->ontologyMock->method('getResource')
+            ->willReturn($deliveryResourceMock);
+        $this->ontologyMock->method('getProperty')
+            ->willReturn($runnerFeaturesPropertyMock);
+        $slMock = $this->getServiceLocatorMock([
+            Ontology::SERVICE_ID => $this->ontologyMock
+        ]);
+        $this->service->setServiceLocator($slMock);
+
+        $result = $this->service->isSecure($deliveryUri);
+        $this->assertEquals($expectedResult, $result, 'Result of checking if test is secure must be as expected.');
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderTestIsSecure()
+    {
+        return [
+            'Empty features list' => [
+                'testRunnerFeatures' => '',
+                'expectedResult' => false,
+            ],
+            'One feature, security feature disabled' => [
+                'testRunnerFeatures' => 'DUMMY_FEATURE',
+                'expectedResult' => false,
+            ],
+            'Multiple features, security feature disabled' => [
+                'testRunnerFeatures' => 'DUMMY_FEATURE_1,DUMMY_FEATURE_2,DUMMY_FEATURE_3',
+                'expectedResult' => false,
+            ],
+            'Only security feature enabled' => [
+                'testRunnerFeatures' => 'security',
+                'expectedResult' => true,
+            ],
+            'Multiple features, security feature enabled' => [
+                'testRunnerFeatures' => 'DUMMY_FEATURE_1,security,DUMMY_FEATURE_3',
+                'expectedResult' => true,
+            ]
+        ];
     }
 
     /**
