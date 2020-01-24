@@ -19,7 +19,6 @@
  */
 namespace oat\taoProctoring\model\authorization;
 
-
 use common_Exception;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
@@ -30,12 +29,8 @@ use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
-use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
-use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
-use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
-use oat\taoTestRunnerPlugins\model\event\DeliveryTypeEvent;
 
 /**
  * Manage the Delivery authorization.
@@ -101,16 +96,21 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      * @param User $user
      * @return bool
      * @internal param core_kernel_classes_Resource $delivery
+     * @throws \core_kernel_persistence_Exception
      */
     public function isProctored($deliveryId, User $user)
     {
         $delivery = $this->getResource($deliveryId);
         $proctored = $delivery->getOnePropertyValue($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR));
-        $deliverySyncService = $this->getServiceLocator()->get(DeliverySyncService::SERVICE_ID);
 
-        return $proctored instanceof \core_kernel_classes_Resource
-            ? $proctored->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED
-            : $deliverySyncService->isProctoredByDefault();
+        if ($proctored instanceof \core_kernel_classes_Resource) {
+            $isProctored = $proctored->getUri() == ProctorService::ACCESSIBLE_PROCTOR_ENABLED;
+        } else {
+            $deliverySyncService = $this->getServiceLocator()->get(DeliverySyncService::SERVICE_ID);
+            $isProctored = $deliverySyncService->isProctoredByDefault();
+        }
+
+        return $isProctored;
     }
 
     /**
