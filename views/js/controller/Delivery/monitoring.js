@@ -530,7 +530,7 @@ define([
                         bulkActionPopup(config).on('ok', function(reason){
                             //execute callback
                             if(_.isFunction(cb)){
-                                cb(_selection, reason);
+                                cb(config.allowedResources.map(res => res.id), reason);
                             }
                         });
                     }
