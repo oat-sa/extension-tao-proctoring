@@ -434,6 +434,8 @@ define([
                     } else {
                         deliveryName = testTakerData.delivery;
                     }
+                    //decode all accent character
+                    deliveryName = $("<div/>").html(deliveryName).text();
                     formatted = {
                         id : testTakerData.id,
                         label: `${deliveryName} [${testTakerData.start_time}] ${testTakerData.test_taker_first_name} ${testTakerData.test_taker_last_name}`
@@ -530,7 +532,7 @@ define([
                         bulkActionPopup(config).on('ok', function(reason){
                             //execute callback
                             if(_.isFunction(cb)){
-                                cb(_selection, reason);
+                                cb(config.allowedResources.map(res => res.id), reason);
                             }
                         });
                     }
