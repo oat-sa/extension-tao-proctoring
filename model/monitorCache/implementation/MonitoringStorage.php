@@ -578,6 +578,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $key = self::class . '_KvColumns';
         if (!$cache->exists($key)) {
             $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
+            //remove columns which presented in primary columns list
+            $kvColumns = array_diff($kvColumns, $this->getPrimaryColumns());
             $cache->set($key, json_encode($kvColumns));
         } else {
             $kvColumns = json_decode($cache->get($key), true);
