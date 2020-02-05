@@ -555,15 +555,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      */
     protected function joinKvData()
     {
-        $connection = $this->getQueryBuilder()->getConnection();
         $kvColumns = $this->getKvColumns();
+        $this->joins[] = 'LEFT JOIN kv_delivery_monitoring as kv_case
+                   on kv_case.parent_id = t.delivery_execution_id';
         foreach ($kvColumns as $kvColNum => $kvColName) {
-            $joinTableAlias = 'kv_values_' . $kvColNum;
-            $this->selectColumns[] = $joinTableAlias . '.monitoring_value as ' . $connection->quoteIdentifier($kvColName);
-            $this->joins[] = 'LEFT JOIN kv_delivery_monitoring '.$joinTableAlias.
-                ' on '.$joinTableAlias.'.parent_id = t.delivery_execution_id and '.$joinTableAlias.'.monitoring_key = ?';
-            $this->queryParams[] = $kvColName;
-            $this->groupColumns[] = $joinTableAlias . '.monitoring_value';
+            if ( $this->getPersistence()->getPlatForm()->getName() == 'postgresql') {
+                $this->selectColumns[] = 'string_agg(case when kv_case.monitoring_key = \''.$kvColName.'\' then kv_case.monitoring_value else \'\' end,\'\') as "'.$kvColName.'"';
+            } else {
+                $this->selectColumns[] = 'GROUP_CONCAT(case when kv_case.monitoring_key = \''.$kvColName.'\' then kv_case.monitoring_value else \'\' end,\'\') as `'.$kvColName.'`';
+            }
         }
     }
 
