@@ -1005,3 +1005,8 @@ msgstr "Advertencia: Está a punto de pausar todas las pruebas en curso. Todos l
 msgid "Weather"
 msgstr "Condiciones meteorológicas"
 
+msgid "session"
+msgstr "sesión"
+
+msgid "sessions"
+msgstr "sesiones"
