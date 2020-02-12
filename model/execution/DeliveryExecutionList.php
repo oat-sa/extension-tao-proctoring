@@ -179,6 +179,7 @@ class DeliveryExecutionList extends ConfigurableService
             $lastActivity = $cachedData[DeliveryMonitoringService::LAST_TEST_TAKER_ACTIVITY];
             $elapsedApprox = $now - $lastActivity;
             $duration = (float) ($cachedData[DeliveryMonitoringService::ITEM_DURATION] ?? 0);
+            $duration -= (float) ($cachedData[DeliveryMonitoringService::STORED_ITEM_DURATION] ?? 0);
             $elapsedApprox += $duration;
         }
 

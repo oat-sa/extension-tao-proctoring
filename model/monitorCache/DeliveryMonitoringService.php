@@ -63,6 +63,7 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
 
     const DIFF_TIMESTAMP = 'diff_timestamp';
     const ITEM_DURATION = 'item_duration';
+    const STORED_ITEM_DURATION = 'stored_item_duration';
 
     const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
     const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
@@ -81,7 +82,7 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
 
     /**
      * Retrieve the currently cached delivery data
-     * 
+     *
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return DeliveryMonitoringData
      */
