@@ -134,6 +134,7 @@ define([
             var deliveryId = pageParams.delivery;
             var context = pageParams.context;
             var defaultTag = pageParams.defaultTag;
+            var allowIrr = pageParams.allowIrr !== 'false';
             var defaultAvailableLabel = __('Current sessions');
             var dataset;
             var extraFields;
@@ -304,9 +305,11 @@ define([
 
                 // report irregularities on the selected delivery executions
                 function report(selection) {
-                    execBulkAction( 'report', __('Report Irregularity'), selection, function(sel, reason){
-                        request('report', sel, {reason: reason}, __('Sessions reported'));
-                    });
+                    if (allowIrr) {
+                        execBulkAction('report', __('Report Irregularity'), selection, function (sel, reason) {
+                            request('report', sel, {reason: reason}, __('Sessions reported'));
+                        });
+                    }
                 }
 
                 function terminateOrReactivateAndIrregularity(selection) {
@@ -336,16 +339,18 @@ define([
                         });
                     }
 
-                    buttons.push({
-                        id: 'irregularity',
-                        type: 'info',
-                        label: __('Report irregularity'),
-                        icon: 'delivery-small',
-                        close: true,
-                        action(){
-                            report(selection);
-                        }
-                    });
+                    if (allowIrr) {
+                        buttons.push({
+                            id: 'irregularity',
+                            type: 'info',
+                            label: __('Report irregularity'),
+                            icon: 'delivery-small',
+                            close: true,
+                            action() {
+                                report(selection);
+                            }
+                        });
+                    }
 
                     dialog({
                         message: __('Please, make your selection'),
@@ -726,15 +731,17 @@ define([
                         action: terminate
                     });
 
-                    // tool: report irregularities
-                    tools.push({
-                        id: 'irregularity',
-                        icon: 'delivery-small',
-                        title: __('Report irregularities'),
-                        label: __('Report'),
-                        massAction: true,
-                        action: report
-                    });
+                    if (allowIrr) {
+                        // tool: report irregularities
+                        tools.push({
+                            id: 'irregularity',
+                            icon: 'delivery-small',
+                            title: __('Report irregularities'),
+                            label: __('Report'),
+                            massAction: true,
+                            action: report
+                        });
+                    }
 
                     // tools: print results
                     if (printReportButton) {
@@ -1033,9 +1040,14 @@ define([
                         }
                     });
 
-                    label = __('Terminate and irregularity');
-                    if (hasAccessToReactivate) {
-                        label = __('Terminate/Reactivate and irregularity');
+                    label = __('Terminate');
+                    if (allowIrr) {
+                        label = __('Terminate and irregularity');
+                        if (hasAccessToReactivate) {
+                            label = __('Terminate/Reactivate and irregularity');
+                        }
+                    } else if (hasAccessToReactivate) {
+                        label = __('Terminate/Reactivate');
                     }
 
                     // column: proctoring actions
