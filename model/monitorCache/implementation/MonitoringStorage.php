@@ -562,7 +562,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             if ( $this->getPersistence()->getPlatForm()->getName() == 'postgresql') {
                 $this->selectColumns[] = 'string_agg(case when kv_case.monitoring_key = \''.$kvColName.'\' then kv_case.monitoring_value else \'\' end,\'\') as "'.$kvColName.'"';
             } else {
-                $this->selectColumns[] = 'GROUP_CONCAT(case when kv_case.monitoring_key = \''.$kvColName.'\' then kv_case.monitoring_value else \'\' end,\'\') as `'.$kvColName.'`';
+                $this->selectColumns[] = 'GROUP_CONCAT(case when kv_case.monitoring_key = \''.$kvColName.'\' then kv_case.monitoring_value else \'\' end SEPARATOR \'\' ) as `'.$kvColName.'`';
             }
         }
     }
