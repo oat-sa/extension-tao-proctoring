@@ -498,7 +498,8 @@ define([
                     });
 
                     return {
-                        resourceType : 'session',
+                        resourceType : __('session'),
+                        resourceTypes: __('sessions'),
                         allowedResources: allowedDeliveries,
                         deniedResources: forbiddenDeliveries
                     };
