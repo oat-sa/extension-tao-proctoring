@@ -31,6 +31,7 @@ use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\oatbox\user\User;
 use oat\taoProctoring\model\ProctorService;
 use oat\generis\model\OntologyAwareTrait;
+use oat\taoTests\models\runner\plugins\TestPlugin;
 
 /**
  * Manage the Delivery authorization.
@@ -83,7 +84,7 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         if (
             $this->isProctored($deliveryUri, $user)
             && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED
-            && !$this->isActiveUnSecureDelivery($deliveryUri, $state)
+            && !$this->isActiveUnSecureDelivery($deliveryExecution, $state)
         ) {
             $this->throwUnAuthorizedException($deliveryExecution);
         }
@@ -114,28 +115,35 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     }
 
     /**
-     * @param string $deliveryId
+     * @param DeliveryExecution $deliveryExecution
      * @param string $state
      * @return bool
      * @throws common_Exception
      */
-    public function isActiveUnSecureDelivery($deliveryId, $state)
+    public function isActiveUnSecureDelivery(DeliveryExecution $deliveryExecution, $state)
     {
-        return $state === DeliveryExecutionInterface::STATE_ACTIVE && !$this->isSecure($deliveryId);
+        return $state === DeliveryExecutionInterface::STATE_ACTIVE && !$this->isSecure($deliveryExecution);
     }
 
     /**
-     * @param string $deliveryId
+     * @param DeliveryExecution $deliveryExecution
      * @return bool
      * @throws common_Exception
      */
-    public function isSecure($deliveryId)
+    public function isSecure(DeliveryExecution $deliveryExecution)
     {
-        $delivery = $this->getResource($deliveryId);
-        $testRunnerFeatures = $delivery->getOnePropertyValue($this->getProperty(DeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY));
-        $testRunnerFeatures = explode(',', $testRunnerFeatures);
+        $deliveryContainerService = $this->getServiceLocator()->get(DeliveryContainerService::SERVICE_ID);
+        $enabledPlugins = $deliveryContainerService->getPlugins($deliveryExecution);
 
-        return in_array('security', $testRunnerFeatures);
+        $secure = false;
+        foreach ($enabledPlugins as $plugin) {
+            if ($plugin instanceof TestPlugin && $plugin->getId() === 'blurPause') {
+                $secure = true;
+                break;
+            }
+        }
+
+        return $secure;
     }
 
     /**
