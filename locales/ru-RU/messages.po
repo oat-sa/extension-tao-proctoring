@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:59\n"
+"Project-Id-Version: TAO 3.4.0-sprint122\n"
+"PO-Revision-Date: 2020-02-28T12:48:15\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ru-RU\n"
@@ -158,10 +158,10 @@ msgstr "автор"
 msgid "Authorize"
 msgstr "Предоставить полномочия"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Предоставить полномочия по сеансу"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Предоставить полномочия по сеансу"
 
 msgid "Authorize sessions"
@@ -224,11 +224,11 @@ msgstr "Отмена"
 msgid "cancel the action"
 msgstr "отмена действия"
 
-msgid "Canceled"
-msgstr "Отменено"
-
 msgid "canceled"
 msgstr "отменено"
+
+msgid "Canceled"
+msgstr "Отменено"
 
 msgid "Cannot authorize test session."
 msgstr "Невозможно предоставить полномочия по сеансу тестирования."
@@ -287,11 +287,11 @@ msgstr "комментарий"
 msgid "Complaint"
 msgstr "Жалоба"
 
-msgid "completed"
-msgstr "завершено"
-
 msgid "Completed"
 msgstr "Завершено"
+
+msgid "completed"
+msgstr "завершено"
 
 msgid "Completed tests"
 msgstr "Завершенные тесты"
@@ -320,11 +320,11 @@ msgstr "Текущее оценивание"
 msgid "Current sessions"
 msgstr "Текущие сеансы"
 
-msgid "date"
-msgstr "дата"
-
 msgid "Date"
 msgstr "Дата"
+
+msgid "date"
+msgstr "дата"
 
 msgid "Days"
 msgstr "Дни"
@@ -583,11 +583,11 @@ msgstr "Приостановить сеанс"
 msgid "Pause sessions"
 msgstr "Приостановить сеансы"
 
-msgid "Paused"
-msgstr "Приостановлено"
-
 msgid "paused"
 msgstr "приостановлено"
+
+msgid "Paused"
+msgstr "Приостановлено"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Выберите один или несколько объектов для проведения тестирования, чтобы управлять протоколами"
@@ -649,10 +649,10 @@ msgstr "Отозванные наблюдатели"
 msgid "Progress"
 msgstr "Ход выполнения"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "Повторно активировать сеанс"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "Повторно активировать сеанс"
 
 msgid "Refresh"
@@ -694,12 +694,12 @@ msgstr "сообщено о нестандартной ситуации"
 msgid "Resource update task is completed"
 msgstr "Задание по обновлению ресурса выполнено"
 
-msgid "results"
-msgstr "результаты"
-
 #, tao-public
 msgid "Results"
 msgstr "Результаты"
+
+msgid "results"
+msgstr "результаты"
 
 msgid "Return to the session manager"
 msgstr "Вернуться к диспетчеру сеансов"
@@ -728,6 +728,9 @@ msgstr "раздел"
 msgid "Session"
 msgstr "Сеанс"
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr "Сеанс %s — %s не был обработан"
 
@@ -736,6 +739,9 @@ msgstr "История сеансов"
 
 msgid "Session time handling"
 msgstr "Обработка времени сеанса"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions"
 msgstr "Сеансы"
@@ -803,11 +809,11 @@ msgstr "Дата начала"
 msgid "Status"
 msgstr "Статус"
 
-msgid "subcategory"
-msgstr "подкатегория"
-
 msgid "Subcategory"
 msgstr "Подкатегория"
+
+msgid "subcategory"
+msgstr "подкатегория"
 
 msgid "System generated pause."
 msgstr "Система сгенерировала паузу."
@@ -832,6 +838,9 @@ msgstr "Прекратить сеанс"
 
 msgid "Terminate sessions"
 msgstr "Прекратить сеансы"
+
+msgid "Terminate/Reactivate"
+msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr "Завершить/Реактивировать и нестандартная ситуация"

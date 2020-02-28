@@ -29,9 +29,11 @@ use oat\generis\test\MockObject;
 use oat\generis\test\TestCase;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\authorization\UnAuthorizedException;
+use oat\taoDelivery\model\DeliveryContainerService;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoTests\models\runner\plugins\TestPlugin;
 
 class TestTakerAuthorizationServiceTest extends TestCase
 {
@@ -45,41 +47,48 @@ class TestTakerAuthorizationServiceTest extends TestCase
      */
     private $service;
 
+    /**
+     * @var DeliveryContainerService|MockObject
+     */
+    private $deliveryContainerMock;
+
+    /**
+     * @var DeliverySyncService|MockObject
+     */
+    private $deliverySyncServiceMock;
+
     protected function setUp()
     {
         parent::setUp();
         $this->ontologyMock = $this->createMock(Ontology::class);
+        $this->deliveryContainerMock = $this->createMock(DeliveryContainerService::class);
+        $this->deliverySyncServiceMock = $this->getMock(DeliverySyncService::class);
+
         $this->service = new TestTakerAuthorizationService();
+
+        $this->service->setServiceLocator($this->getServiceLocatorMock([
+            Ontology::SERVICE_ID => $this->ontologyMock,
+            DeliveryContainerService::SERVICE_ID => $this->deliveryContainerMock,
+            DeliverySyncService::SERVICE_ID => $this->deliverySyncServiceMock,
+        ]));
     }
 
     /**
      * @dataProvider isActiveUnSecureDeliveryDataProvider
-     * @param string $propertyValue
+     * @param string $enabledPlugins
      * @param string $state
      * @param bool $expected
      * @throws Exception
      */
-    public function testIsActiveUnSecureDelivery($propertyValue, $state, $expected)
+    public function testIsActiveUnSecureDelivery($enabledPlugins, $state, $expected)
     {
-        $delivery = $this->getDeliveryMock();
-        $property = new core_kernel_classes_Property(
-            'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryTestRunnerFeatures'
-        );
-       $this->ontologyMock->method('getResource')->with('deliveryUri');
+        $pluginsMocks = $this->getPluginsMocks($enabledPlugins);
+        $this->deliveryContainerMock->method('getPlugins')
+            ->willReturn($pluginsMocks);
 
-        $this->ontologyMock
-            ->method('getProperty')
-            ->with('http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryTestRunnerFeatures')
-            ->willReturn($property);
+        $deliveryExecutionMock = $this->getDeliveryExecutionMock($state);
 
-        $delivery
-            ->method('getOnePropertyValue')
-            ->with($property)
-            ->willReturn($propertyValue);
-
-        $this->service->setServiceLocator($this->getServiceLocatorMock([Ontology::SERVICE_ID => $this->ontologyMock]));
-
-        $this->assertEquals($expected, $this->service->isActiveUnSecureDelivery('deliveryUri',$state));
+        $this->assertEquals($expected, $this->service->isActiveUnSecureDelivery($deliveryExecutionMock, $state));
     }
 
     /**
@@ -88,32 +97,36 @@ class TestTakerAuthorizationServiceTest extends TestCase
     public function isActiveUnSecureDeliveryDataProvider()
     {
         return [
-            'activeAndUnSecure' => [
-                'propertyValue' => null,
+            'Execution active, not secure mode (empty plugins list)' => [
+                'enabledPlugins' => [],
                 'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 'expected' => true
             ],
-            'activeAndUnSecure2' => [
-                'propertyValue' => 'feature,feature2',
+            'Execution active, not secure mode (pause plugin disabled)' => [
+                'enabledPlugins' => ['PLUGIN2', 'PLUGIN2'],
                 'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 'expected' => true
             ],
-            'notActiveAndUnSecure' => [
-                'propertyValue' => 'feature,feature2',
+            'Execution not active, not secure mode (pause plugin disabled)' => [
+                'enabledPlugins' => ['PLUGIN2', 'PLUGIN2'],
                 'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 'expected' => false
             ],
-            'ActiveAndSecure' => [
-                'propertyValue' => 'feature,security',
+            'Execution active, secure mode (pause plugin enabled)' => [
+                'enabledPlugins' => ['PLUGIN2', 'PLUGIN2', 'blurPause'],
                 'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 'expected' => false
             ],
-            'notActiveAndSecure' => [
-                'propertyValue' => 'feature,security',
+            'Execution not active, secure mode (pause plugin enabled)' => [
+                'enabledPlugins' => ['PLUGIN2', 'PLUGIN2', 'blurPause'],
                 'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 'expected' => false
             ],
-            'notActiveAndSecure2' => ['propertyValue' => 'security', 'state' => 'state', 'expected' => false]
+            'Execution not active, secure mode (only pause plugin enabled)' => [
+                'propertyValue' => ['blurPause'],
+                'state' => 'state',
+                'expected' => false
+            ]
         ];
     }
 
@@ -125,7 +138,6 @@ class TestTakerAuthorizationServiceTest extends TestCase
     public function testVerifyResumeAuthorizationWithInvalidState($state)
     {
         $deliveryExecutionMock = $this->getDeliveryExecutionMock($state);
-        $this->service->setServiceLocator($this->getServiceLocatorMock([Ontology::SERVICE_ID => $this->ontologyMock]));
 
         $this->expectException(UnAuthorizedException::class);
         $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
@@ -151,35 +163,24 @@ class TestTakerAuthorizationServiceTest extends TestCase
      */
     public function testIsProctored($propertyValue, $proctorByDefault, $expected)
     {
-        $deliverySyncServiceMock = $this->getMock(DeliverySyncService::class);
-        $delivery = $this->getDeliveryMock();
-
         $property = new core_kernel_classes_Property(
             'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible'
         );
-
-        $this->ontologyMock->expects($this->once())->method('getResource')->with('deliveryUri');
-
-        $this->ontologyMock->expects($this->once())
-            ->method('getProperty')
-            ->with('http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible')
-            ->willReturn($property);
-
+        $delivery = $this->getDeliveryMock();
         $delivery->expects($this->once())
             ->method('getOnePropertyValue')
             ->with($property)
             ->willReturn($propertyValue);
 
-        $deliverySyncServiceMock->method('isProctoredByDefault')->willReturn($proctorByDefault);
+        $this->ontologyMock->expects($this->once())
+            ->method('getResource')
+            ->with('deliveryUri');
+        $this->ontologyMock->expects($this->once())
+            ->method('getProperty')
+            ->with('http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible')
+            ->willReturn($property);
 
-        $this->service->setServiceLocator(
-            $this->getServiceLocatorMock(
-                [
-                    Ontology::SERVICE_ID => $this->ontologyMock,
-                    DeliverySyncService::SERVICE_ID => $deliverySyncServiceMock
-                ]
-            )
-        );
+        $this->deliverySyncServiceMock->method('isProctoredByDefault')->willReturn($proctorByDefault);
 
         $this->assertEquals(
             $expected,
@@ -229,44 +230,26 @@ class TestTakerAuthorizationServiceTest extends TestCase
         $deliveryExecutionMock = $this->getDeliveryExecutionMock('state');
         $deliveryExecutionMock->method('getDelivery')->willReturn($delivery);
 
-        $this->service->setServiceLocator(
-            $this->getServiceLocatorMock(
-                [
-                    Ontology::SERVICE_ID => $this->ontologyMock,
-                    DeliverySyncService::SERVICE_ID => $this->getMock(DeliverySyncService::class)
-                ]
-            )
-        );
-
         $this->expectException(UnAuthorizedException::class);
         $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
     }
 
     /**
-     * @param $testRunnerFeatures
-     * @param $expectedResult
+     * @param array $enabledPlugins
+     * @param bool $expectedResult
      * @throws common_Exception
      *
      * @dataProvider dataProviderTestIsSecure
      */
-    public function testIsSecure($testRunnerFeatures, $expectedResult)
+    public function testIsSecure(array $enabledPlugins, $expectedResult)
     {
-        $deliveryUri = 'FAKE_DELIVERY_URI';
-        $runnerFeaturesPropertyMock = $this->createMock(core_kernel_classes_Property::class);
-        $deliveryResourceMock = $this->createMock(core_kernel_classes_Resource::class);
-        $deliveryResourceMock->method('getOnePropertyValue')
-            ->willReturn($testRunnerFeatures);
+        $pluginsMock = $this->getPluginsMocks($enabledPlugins);
+        $this->deliveryContainerMock->method('getPlugins')
+            ->willReturn($pluginsMock);
 
-        $this->ontologyMock->method('getResource')
-            ->willReturn($deliveryResourceMock);
-        $this->ontologyMock->method('getProperty')
-            ->willReturn($runnerFeaturesPropertyMock);
-        $slMock = $this->getServiceLocatorMock([
-            Ontology::SERVICE_ID => $this->ontologyMock
-        ]);
-        $this->service->setServiceLocator($slMock);
+        $deliveryExecutionMock = $this->getDeliveryExecutionMock('STATE');
 
-        $result = $this->service->isSecure($deliveryUri);
+        $result = $this->service->isSecure($deliveryExecutionMock);
         $this->assertEquals($expectedResult, $result, 'Result of checking if test is secure must be as expected.');
     }
 
@@ -276,24 +259,20 @@ class TestTakerAuthorizationServiceTest extends TestCase
     public function dataProviderTestIsSecure()
     {
         return [
-            'Empty features list' => [
-                'testRunnerFeatures' => '',
+            'No enabled plugins' => [
+                'enabledPlugins' => [],
                 'expectedResult' => false,
             ],
-            'One feature, security feature disabled' => [
-                'testRunnerFeatures' => 'DUMMY_FEATURE',
+            'Pause plugin not enabled' => [
+                'enabledPlugins' => ['DUMMY_PLUGIN_1', 'DUMMY_PLUGIN_2'],
                 'expectedResult' => false,
             ],
-            'Multiple features, security feature disabled' => [
-                'testRunnerFeatures' => 'DUMMY_FEATURE_1,DUMMY_FEATURE_2,DUMMY_FEATURE_3',
-                'expectedResult' => false,
-            ],
-            'Only security feature enabled' => [
-                'testRunnerFeatures' => 'security',
+            'Only pause plugin enabled' => [
+                'enabledPlugins' => ['blurPause'],
                 'expectedResult' => true,
             ],
-            'Multiple features, security feature enabled' => [
-                'testRunnerFeatures' => 'DUMMY_FEATURE_1,security,DUMMY_FEATURE_3',
+            'Multiple plugins enabled, pause plugin enabled' => [
+                'enabledPlugins' => ['DUMMY_PLUGIN_1', 'DUMMY_PLUGIN_2', 'blurPause'],
                 'expectedResult' => true,
             ]
         ];
@@ -330,5 +309,23 @@ class TestTakerAuthorizationServiceTest extends TestCase
         $deliveryExecutionMock->method('getState')->willReturn(new core_kernel_classes_Resource($state));
 
         return $deliveryExecutionMock;
+    }
+
+    /**
+     * @param array $plugins
+     * @return array
+     */
+    protected function getPluginsMocks(array $plugins)
+    {
+        $pluginsMocks = [];
+        foreach ($plugins as $pluginId) {
+            $pluginMock = $this->createMock(TestPlugin::class);
+            $pluginMock->method('getId')
+                ->willReturn($pluginId);
+
+            $pluginsMocks[$pluginId] = $pluginMock;
+        }
+
+        return $pluginsMocks;
     }
 }

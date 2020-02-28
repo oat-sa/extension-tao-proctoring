@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:58\n"
+"Project-Id-Version: TAO 3.4.0-sprint122\n"
+"PO-Revision-Date: 2020-02-28T12:48:14\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -158,10 +158,10 @@ msgstr ""
 msgid "Authorize"
 msgstr ""
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr ""
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr ""
 
 msgid "Authorize sessions"
@@ -224,10 +224,10 @@ msgstr ""
 msgid "cancel the action"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -287,10 +287,10 @@ msgstr ""
 msgid "Complaint"
 msgstr ""
 
-msgid "completed"
+msgid "Completed"
 msgstr ""
 
-msgid "Completed"
+msgid "completed"
 msgstr ""
 
 msgid "Completed tests"
@@ -320,10 +320,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
 msgid "Days"
@@ -583,10 +583,10 @@ msgstr ""
 msgid "Pause sessions"
 msgstr ""
 
-msgid "Paused"
+msgid "paused"
 msgstr ""
 
-msgid "paused"
+msgid "Paused"
 msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
@@ -649,10 +649,10 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
@@ -694,11 +694,11 @@ msgstr ""
 msgid "Resource update task is completed"
 msgstr ""
 
-msgid "results"
-msgstr ""
-
 #, tao-public
 msgid "Results"
+msgstr ""
+
+msgid "results"
 msgstr ""
 
 msgid "Return to the session manager"
@@ -728,6 +728,9 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr ""
 
@@ -735,6 +738,9 @@ msgid "Session history"
 msgstr ""
 
 msgid "Session time handling"
+msgstr ""
+
+msgid "sessions"
 msgstr ""
 
 msgid "Sessions"
@@ -803,10 +809,10 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-msgid "subcategory"
+msgid "Subcategory"
 msgstr ""
 
-msgid "Subcategory"
+msgid "subcategory"
 msgstr ""
 
 msgid "System generated pause."
@@ -831,6 +837,9 @@ msgid "Terminate Session"
 msgstr ""
 
 msgid "Terminate sessions"
+msgstr ""
+
+msgid "Terminate/Reactivate"
 msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"

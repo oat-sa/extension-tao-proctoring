@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:59\n"
+"Project-Id-Version: TAO 3.4.0-sprint122\n"
+"PO-Revision-Date: 2020-02-28T12:48:15\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -158,10 +158,10 @@ msgstr "auteur"
 msgid "Authorize"
 msgstr "Autoriser"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriser une session"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriser une session"
 
 msgid "Authorize sessions"
@@ -224,11 +224,11 @@ msgstr "Annuler"
 msgid "cancel the action"
 msgstr "annuler l'action"
 
-msgid "Canceled"
-msgstr "Annulé"
-
 msgid "canceled"
 msgstr "annulé"
+
+msgid "Canceled"
+msgstr "Annulé"
 
 msgid "Cannot authorize test session."
 msgstr "Impossible d'autoriser la session de test."
@@ -287,11 +287,11 @@ msgstr "commentaire"
 msgid "Complaint"
 msgstr "Réclamation"
 
-msgid "completed"
-msgstr "achevé"
-
 msgid "Completed"
 msgstr "Achevé"
+
+msgid "completed"
+msgstr "achevé"
 
 msgid "Completed tests"
 msgstr "Tests achevés"
@@ -320,11 +320,11 @@ msgstr "Activité d'évaluation actuelle"
 msgid "Current sessions"
 msgstr "Sessions actuelles"
 
-msgid "date"
-msgstr "date"
-
 msgid "Date"
 msgstr "Date"
+
+msgid "date"
+msgstr "date"
 
 msgid "Days"
 msgstr "Jours"
@@ -583,11 +583,11 @@ msgstr "Suspendre la session"
 msgid "Pause sessions"
 msgstr "Suspendre des sessions"
 
-msgid "Paused"
-msgstr "En pause"
-
 msgid "paused"
 msgstr "en pause"
+
+msgid "Paused"
+msgstr "En pause"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Veuillez sélectionner ou moins un site de test pour gérer les surveillants"
@@ -649,11 +649,11 @@ msgstr "Surveillants révoqués"
 msgid "Progress"
 msgstr "Progression"
 
-msgid "Reactivate Session"
-msgstr "Réactiver une session"
-
 msgid "Reactivate session"
 msgstr "Réactiver la session"
+
+msgid "Reactivate Session"
+msgstr "Réactiver une session"
 
 msgid "Refresh"
 msgstr "Actualiser"
@@ -694,12 +694,12 @@ msgstr "signalé pour irrégularité"
 msgid "Resource update task is completed"
 msgstr "La tâche de mise à jour de ressource est terminée"
 
-msgid "results"
-msgstr "résultats"
-
 #, tao-public
 msgid "Results"
 msgstr "Résultats"
+
+msgid "results"
+msgstr "résultats"
 
 msgid "Return to the session manager"
 msgstr "Retour à la gestion de session"
@@ -728,6 +728,9 @@ msgstr "section"
 msgid "Session"
 msgstr "Session"
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr "La session %s - %s n'a pas été traitée"
 
@@ -736,6 +739,9 @@ msgstr "Historique des sessions"
 
 msgid "Session time handling"
 msgstr "Gestion du temps imparti"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions"
 msgstr "Sessions"
@@ -803,11 +809,11 @@ msgstr "Démarré à"
 msgid "Status"
 msgstr "Statut"
 
-msgid "subcategory"
-msgstr "sous-catégorie"
-
 msgid "Subcategory"
 msgstr "Sous-catégorie"
+
+msgid "subcategory"
+msgstr "sous-catégorie"
 
 msgid "System generated pause."
 msgstr "Pause générée par le système."
@@ -832,6 +838,9 @@ msgstr "Mettre fin à une session"
 
 msgid "Terminate sessions"
 msgstr "Mettre fin aux sessions"
+
+msgid "Terminate/Reactivate"
+msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr "Terminer/Réactiver et irrégularité"
