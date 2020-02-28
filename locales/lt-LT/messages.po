@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:59\n"
+"Project-Id-Version: TAO 3.4.0-sprint122\n"
+"PO-Revision-Date: 2020-02-28T12:48:15\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: lt-LT\n"
@@ -158,11 +158,11 @@ msgstr "autorius"
 msgid "Authorize"
 msgstr "Autorizuoti"
 
-msgid "Authorize Session"
-msgstr "Autorizuoti Sesiją"
-
 msgid "Authorize session"
 msgstr "Autorizuoti sesiją"
+
+msgid "Authorize Session"
+msgstr "Autorizuoti Sesiją"
 
 msgid "Authorize sessions"
 msgstr "Autorizuoti sesijas"
@@ -224,11 +224,11 @@ msgstr "Atšaukti"
 msgid "cancel the action"
 msgstr "atšaukti veiksmą"
 
-msgid "Canceled"
-msgstr "Atšaukta"
-
 msgid "canceled"
 msgstr "atšaukta"
+
+msgid "Canceled"
+msgstr "Atšaukta"
 
 msgid "Cannot authorize test session."
 msgstr "Nepavyko autorizuoti testo sesijos."
@@ -287,11 +287,11 @@ msgstr "komentaras"
 msgid "Complaint"
 msgstr "Skundas"
 
-msgid "completed"
-msgstr "atlikta"
-
 msgid "Completed"
 msgstr "Atlikta"
+
+msgid "completed"
+msgstr "atlikta"
 
 msgid "Completed tests"
 msgstr "Atlikti testai"
@@ -320,11 +320,11 @@ msgstr "Dabartinė Įvertinimo Veikla"
 msgid "Current sessions"
 msgstr "Dabartinės sesijos"
 
-msgid "date"
-msgstr "data"
-
 msgid "Date"
 msgstr "Data"
+
+msgid "date"
+msgstr "data"
 
 msgid "Days"
 msgstr "Dienos"
@@ -583,11 +583,11 @@ msgstr "Pristabdyti sesiją"
 msgid "Pause sessions"
 msgstr "Pristabdyti sesijas"
 
-msgid "Paused"
-msgstr "Pristabdyta"
-
 msgid "paused"
 msgstr "pristabdyta"
+
+msgid "Paused"
+msgstr "Pristabdyta"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Prašome pasirinkti bent vieną testų tinkalpį proktorių tvarkymui"
@@ -649,11 +649,11 @@ msgstr "Proktoriai neautorizuoti"
 msgid "Progress"
 msgstr "Progresas"
 
-msgid "Reactivate Session"
-msgstr "Iš naujo suaktyvinti Sesiją"
-
 msgid "Reactivate session"
 msgstr "Iš naujo suaktyvinti sesiją"
+
+msgid "Reactivate Session"
+msgstr "Iš naujo suaktyvinti Sesiją"
 
 msgid "Refresh"
 msgstr "Atnaujinti"
@@ -694,12 +694,12 @@ msgstr "praneštas neatitikimas"
 msgid "Resource update task is completed"
 msgstr "Resursų atnaujinimo užduotis baigta"
 
-msgid "results"
-msgstr "rezultatai"
-
 #, tao-public
 msgid "Results"
 msgstr "Rezultatai"
+
+msgid "results"
+msgstr "rezultatai"
 
 msgid "Return to the session manager"
 msgstr "Grįžti į sesijos tvarkymą"
@@ -728,6 +728,9 @@ msgstr "skyrius"
 msgid "Session"
 msgstr "Sesija"
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr "Sesija %s - %s nebuvo apdorota"
 
@@ -736,6 +739,9 @@ msgstr "Sesijos istorija"
 
 msgid "Session time handling"
 msgstr "Sesijos laiko valdymas"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions"
 msgstr "Sesijos"
@@ -803,11 +809,11 @@ msgstr "Pradėta"
 msgid "Status"
 msgstr "Būsena"
 
-msgid "subcategory"
-msgstr "subkategorija"
-
 msgid "Subcategory"
 msgstr "Subkategorija"
+
+msgid "subcategory"
+msgstr "subkategorija"
 
 msgid "System generated pause."
 msgstr "Sistemos sukurtas pristabdymas."
@@ -832,6 +838,9 @@ msgstr "Nutraukti Sesiją"
 
 msgid "Terminate sessions"
 msgstr "Nutraukti sesijas"
+
+msgid "Terminate/Reactivate"
+msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""

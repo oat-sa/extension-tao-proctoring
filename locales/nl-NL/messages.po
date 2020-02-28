@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:59\n"
+"Project-Id-Version: TAO 3.4.0-sprint122\n"
+"PO-Revision-Date: 2020-02-28T12:48:15\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -158,10 +158,10 @@ msgstr "auteur"
 msgid "Authorize"
 msgstr "Autoriseer"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriseer sessie"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriseer sessie"
 
 msgid "Authorize sessions"
@@ -224,11 +224,11 @@ msgstr "Annuleren"
 msgid "cancel the action"
 msgstr "Actie annuleren"
 
-msgid "Canceled"
-msgstr "Geannuleerd"
-
 msgid "canceled"
 msgstr ""
+
+msgid "Canceled"
+msgstr "Geannuleerd"
 
 msgid "Cannot authorize test session."
 msgstr ""
@@ -287,11 +287,11 @@ msgstr "opmerking"
 msgid "Complaint"
 msgstr "Klacht"
 
-msgid "completed"
-msgstr ""
-
 msgid "Completed"
 msgstr "Voltooid"
+
+msgid "completed"
+msgstr ""
 
 msgid "Completed tests"
 msgstr "Voltooide examens"
@@ -320,11 +320,11 @@ msgstr "Huidige toets activiteit"
 msgid "Current sessions"
 msgstr "Huidige sessies"
 
-msgid "date"
-msgstr "datum"
-
 msgid "Date"
 msgstr "Datum"
+
+msgid "date"
+msgstr "datum"
 
 msgid "Days"
 msgstr "Dagen"
@@ -583,11 +583,11 @@ msgstr "Sessie pauzeren"
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
-msgid "Paused"
-msgstr "Gepauzeerd"
-
 msgid "paused"
 msgstr "gepauzeerd"
+
+msgid "Paused"
+msgstr "Gepauzeerd"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
@@ -649,10 +649,10 @@ msgstr "Toezichthouders ingetrokken"
 msgid "Progress"
 msgstr "Voortgang"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
 msgid "Refresh"
@@ -694,12 +694,12 @@ msgstr "Gerapporteerd wegens onregelmatigheden"
 msgid "Resource update task is completed"
 msgstr ""
 
-msgid "results"
-msgstr "resultaten"
-
 #, tao-public
 msgid "Results"
 msgstr "Resultaten"
+
+msgid "results"
+msgstr "resultaten"
 
 msgid "Return to the session manager"
 msgstr "Geef terug aan de sessie beheerder"
@@ -728,6 +728,9 @@ msgstr "sectie"
 msgid "Session"
 msgstr "Sessie"
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr "Sessie %s - %s is niet verwerkt"
 
@@ -736,6 +739,9 @@ msgstr "Sessie geschiedenis"
 
 msgid "Session time handling"
 msgstr "Sessie tijd behandeling"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions"
 msgstr "Sessies"
@@ -803,11 +809,11 @@ msgstr "Gestart op"
 msgid "Status"
 msgstr "Status"
 
-msgid "subcategory"
-msgstr "subcategorie"
-
 msgid "Subcategory"
 msgstr "Subcategorie"
+
+msgid "subcategory"
+msgstr "subcategorie"
 
 msgid "System generated pause."
 msgstr ""
@@ -832,6 +838,9 @@ msgstr "Beëindig sessie"
 
 msgid "Terminate sessions"
 msgstr "Beëindig sessies"
+
+msgid "Terminate/Reactivate"
+msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
