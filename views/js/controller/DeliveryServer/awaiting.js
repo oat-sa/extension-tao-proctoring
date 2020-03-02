@@ -24,83 +24,82 @@ define([
     'i18n',
     'helpers',
     'layout/loading-bar',
-    'ui/listbox',
     'ui/dialog/alert',
     'core/polling',
     'taoQtiTest/testRunner/resumingStrategy/keepAfterResume',
-    'util/url',
     'ui/dialog/confirm',
     'tpl!taoProctoring/templates/deliveryServer/authorizationSuccess',
     'tpl!taoProctoring/templates/deliveryServer/authorizationListBoxActions',
-    'util/clipboard'
-], function (_, $, __, helpers, loadingBar, listBox, dialogAlert, polling, keepAfterResume, url, dialogConfirm, authSuccessTpl, listBoxActionsTpl, clipboard){
+    'tpl!taoProctoring/templates/deliveryServer/authorizationEntryPoint',
+    'util/clipboard',
+    'ui/component',
+], function (_, $, __, helpers, loadingBar, dialogAlert, polling, keepAfterResume, dialogConfirm, authSuccessTpl, listBoxActionsTpl, authorizationEntryPointTpl, clipboard) {
     'use strict';
 
     /**
      * The polling delay used to refresh the list
      * @type {Number}
      */
-    var refreshPolling = 10 * 1000; // once every 10 seconds
+    const refreshPolling = 10 * 1000; // once every 10 seconds
 
     /**
      * The CSS scope
      * @type {String}
      */
-    var cssScope = '.awaiting-authorization';
+    const cssScope = '.awaiting-authorization';
 
     /**
      * Controls the ProctorDelivery index page
      *
      * @type {Object}
      */
-    var awaitingAuthorizationCtlr = {
+    const awaitingAuthorizationCtlr = {
         /**
          * Entry point of the page
          */
-        start : function start(config){
+        start: function start(config) {
+            const $container = $(cssScope);
+            const isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', { deliveryExecution: config.deliveryExecution });
+            const runDeliveryUrl = config.runDeliveryUrl;
+            const spaceEnterKeyCodes = [13, 32];
 
-            var $container = $(cssScope);
-            var isAuthorizedUrl = helpers._url('isAuthorized', 'DeliveryServer', 'taoProctoring', {deliveryExecution : config.deliveryExecution});
-            var runDeliveryUrl = config.runDeliveryUrl;
-            var boxes = [{
-                id : 'goToDelivery',
-                label : config.deliveryLabel,
-                url : runDeliveryUrl,
-                content : __('Please wait, authorization in process ...'),
-                html : listBoxActionsTpl({id : config.deliveryExecution, cancelable: config.cancelable})
-            }];
-            var list = listBox({
-                title : '',
-                textEmpty : '',
-                textNumber : '',
-                textLoading : '',
-                renderTo : $container,
-                list : boxes,
-                width : 12
-            });
-            var $content = $container.find('.listbox .content');
+            $container.html(authorizationEntryPointTpl({ label: config.deliveryLabel }));
+            $container
+                .find('.authorization-actions')
+                .html(listBoxActionsTpl({ id: config.deliveryExecution, cancelable: config.cancelable }));
 
-            var deliveryStarted = false;
-            var runDelivery = function runDelivery () {
+            const $content = $container.find('.authorization-status');
+            let deliveryStarted = false;
+            const runDelivery = () => {
                 loadingBar.start();
                 clipboard.clean();
                 deliveryStarted = true;
                 window.location.href = runDeliveryUrl;
             };
-            var isRunnable = function isRunnable () {
+            const isRunnable = () => {
                 return !$container.hasClass('authorization-in-progress') && !deliveryStarted;
             };
+            /**
+             * Function to be called when the delivery execution has been authorized
+             */
+            const authorized = () => {
+                $content.html(authSuccessTpl({ message: __('Authorized, you may proceed') }));
+                loadingBar.stop();
+                $container.addClass('authorization-granted').removeClass('authorization-in-progress');
+            }
+            /**
+             * Goes back to the delivery index
+             */
+            const exit = () => {
+                window.location.href = config.returnUrl;
+            }
 
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();
 
             loadingBar.start(false);
 
-            $container.on('click', '.js-cancel', function (e) {
-                //prevent clicking the parent link that goes to the monitoring screen
-                e.stopPropagation();
-                e.preventDefault();
-
+            $container.on('click', '.js-cancel', () => {
                 dialogConfirm(
                     __('Are you sure you want to end the test?'),
                     function () {
@@ -108,28 +107,46 @@ define([
                     }
                 );
             });
-            $container.on('click', '.js-proceed', function (e) {
+
+            $container.on('keyup', '.js-cancel', (e) => {
+                if (spaceEnterKeyCodes.includes(e.which)) {
+                    dialogConfirm(
+                        __('Are you sure you want to end the test?'),
+                        function () {
+                            window.location.href = config.cancelUrl;
+                        }
+                    );
+                }
+            });
+
+            $container.on('click', '.js-proceed', () => {
                 if (isRunnable()) {
                     runDelivery();
                 }
+
                 return false;
             });
 
-            $container.on('click', '.block.box', function (e) {
-                if (isRunnable()) {
-                    runDelivery();
+            $container.on('keyup', '.js-proceed', (e) => {
+                if (spaceEnterKeyCodes.includes(e.which)) {
+                    if (isRunnable()) {
+                        runDelivery();
+                    }
                 }
+
                 return false;
             });
 
             polling({
-                action : function (){
-                    var async = this.async();
-                    $.get(isAuthorizedUrl, function(result){
-                        var stop = false;
+                action: function () {
+                    const async = this.async();
+
+                    $.get(isAuthorizedUrl, (result) => {
+                        let stop = false;
 
                         if (!result.success) {
                             stop = true;
+
                             if (result.message) {
                                 dialogAlert(result.message, exit);
                             } else {
@@ -137,6 +154,7 @@ define([
                             }
                         } else if (result.authorized) {
                             stop = true;
+
                             authorized();
                         }
 
@@ -147,27 +165,11 @@ define([
                         }
                     });
                 },
-                interval : refreshPolling,
-                autoStart : true
+                interval: refreshPolling,
+                autoStart: true
             })
-            // Trigger the action immediately
-            .next();
-
-            /**
-             * Function to be called when the delivery execution has been authorized
-             */
-            function authorized(){
-                $content.html(authSuccessTpl({message : __('Authorized, you may proceed')}));
-                loadingBar.stop();
-                $container.addClass('authorization-granted').removeClass('authorization-in-progress');
-            }
-
-            /**
-             * Goes back to the delivery index
-             */
-            function exit() {
-                window.location.href = config.returnUrl;
-            }
+                // Trigger the action immediately
+                .next();
         }
     };
 
