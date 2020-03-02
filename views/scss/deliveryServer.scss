@@ -50,3 +50,18 @@
         }
     }
 }
+
+.authorization-container {
+    margin: auto;
+
+    .entry-point {
+        min-height: 150px;
+        width: calc(100% - 20px);
+    }
+
+    .listbox-actions {
+        .action {
+            cursor: pointer;
+        }
+    }
+}
