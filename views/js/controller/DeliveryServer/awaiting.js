@@ -71,15 +71,18 @@ define([
             const $content = $container.find('.authorization-status');
             const $proccedButton = $container.find('.js-proceed');
             let deliveryStarted = false;
+
             const runDelivery = () => {
                 loadingBar.start();
                 clipboard.clean();
                 deliveryStarted = true;
                 window.location.href = runDeliveryUrl;
             };
+
             const isRunnable = () => {
                 return !$container.hasClass('authorization-in-progress') && !deliveryStarted;
             };
+
             /**
              * Function to be called when the delivery execution has been authorized
              */
@@ -92,6 +95,7 @@ define([
                 $proccedButton.removeClass('dissabled-action');
                 $proccedButton.attr('aria-disabled', false);
             }
+
             /**
              * Goes back to the delivery index
              */
