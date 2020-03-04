@@ -69,6 +69,7 @@ define([
                 .html(listBoxActionsTpl({ id: config.deliveryExecution, cancelable: config.cancelable }));
 
             const $content = $container.find('.authorization-status');
+            const $proccedButton = $container.find('.js-proceed');
             let deliveryStarted = false;
             const runDelivery = () => {
                 loadingBar.start();
@@ -86,6 +87,10 @@ define([
                 $content.html(authSuccessTpl({ message: __('Authorized, you may proceed') }));
                 loadingBar.stop();
                 $container.addClass('authorization-granted').removeClass('authorization-in-progress');
+
+                // Enable procced button proccedButton
+                $proccedButton.removeClass('dissabled-action');
+                $proccedButton.attr('aria-disabled', false);
             }
             /**
              * Goes back to the delivery index
@@ -93,6 +98,10 @@ define([
             const exit = () => {
                 window.location.href = config.returnUrl;
             }
+
+            // Disable procced button proccedButton
+            $proccedButton.addClass('dissabled-action');
+            $proccedButton.attr('aria-disabled', true);
 
             // we need to reset the local timer to avoid loss of time inside the assessment test session
             keepAfterResume().reset();

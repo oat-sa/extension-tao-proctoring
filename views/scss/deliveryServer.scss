@@ -6,7 +6,7 @@
 
 .awaiting-authorization {
     padding-top:40px;
-    &.authorization-in-progress .listbox .list-box {
+    &.authorization-in-progress {
         .listbox-actions .action.play {
             color: #999;
         }
