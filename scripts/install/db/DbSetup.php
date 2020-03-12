@@ -25,14 +25,14 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use common_Logger;
 
 class DbSetup {
-    
+
     public static function generateTable(\common_persistence_SqlPersistence $persistence)
     {
 
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
-        
+
         try {
             $tableLog = $schema->createTable(MonitoringStorage::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
@@ -49,7 +49,7 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false));
 
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
-        
+
             $tableLog->addIndex(
                 array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID
@@ -59,6 +59,10 @@ class DbSetup {
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_START_TIME
             );
             $tableLog->addIndex(
+                [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID, MonitoringStorage::COLUMN_START_TIME],
+                'idx_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_' . MonitoringStorage::COLUMN_START_TIME
+            );
+            $tableLog->addIndex(
                 array(MonitoringStorage::COLUMN_END_TIME),
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_END_TIME
             );
@@ -66,15 +70,19 @@ class DbSetup {
                 array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
             );
-        
+
             $tableData = $schema->createTable(MonitoringStorage::KV_TABLE_NAME);
             $tableData->addOption('engine', 'InnoDB');
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_VALUE, "text", array("notnull" => false));
-        
+
             $tableData->setPrimaryKey(array(MonitoringStorage::KV_COLUMN_PARENT_ID, MonitoringStorage::KV_COLUMN_KEY));
-        
+            $tableData->addIndex(
+                [MonitoringStorage::KV_COLUMN_VALUE, MonitoringStorage::KV_COLUMN_KEY, MonitoringStorage::KV_COLUMN_PARENT_ID],
+                'idx_' . MonitoringStorage::KV_TABLE_NAME . '_value_key_parent'
+            );
+
             $tableData->addForeignKeyConstraint(
                 $tableLog,
                 array(MonitoringStorage::KV_COLUMN_PARENT_ID),
@@ -88,7 +96,7 @@ class DbSetup {
         } catch(SchemaException $e) {
             common_Logger::i('Database Schema already up to date.');
         }
-        
+
         $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
         foreach ($queries as $query) {
             $persistence->exec($query);
