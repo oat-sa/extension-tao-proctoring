@@ -6,7 +6,7 @@
 
 .awaiting-authorization {
     padding-top:40px;
-    &.authorization-in-progress .listbox .list-box {
+    &.authorization-in-progress {
         .listbox-actions .action.play {
             color: #999;
         }
@@ -47,6 +47,21 @@
             &:hover {
                 color: $info;
             }
+        }
+    }
+}
+
+.authorization-container {
+    margin: auto;
+
+    .entry-point {
+        min-height: 150px;
+        width: calc(100% - 20px);
+    }
+
+    .listbox-actions {
+        .action {
+            cursor: pointer;
         }
     }
 }
