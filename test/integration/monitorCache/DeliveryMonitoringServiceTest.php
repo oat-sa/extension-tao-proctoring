@@ -89,7 +89,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     ];
 
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->service = new MonitoringStorage([
             MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
@@ -130,7 +130,7 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->service->setServiceLocator($sl->reveal());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         $this->deleteTestData();
