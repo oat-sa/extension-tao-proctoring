@@ -1,6 +1,6 @@
 @import "inc/bootstrap";
 
-$entrypointLinkColor: #276d9b;
+$actionColor: whiten($info, .1);
 
 .dark-bar .infoControl[data-control="logout"] {
     display: none;
@@ -35,7 +35,7 @@ $entrypointLinkColor: #276d9b;
         position: absolute;
         right: -1px;
         bottom: -1px;
-        color: $entrypointLinkColor;
+        color: $actionColor;
         outline: 0;
         .action {
             display: inline-block;
@@ -47,7 +47,7 @@ $entrypointLinkColor: #276d9b;
                 margin-right: 10px;
             }
             &:focus {
-                outline: 3px solid $entrypointLinkColor;
+                outline: 3px solid $actionColor;
                 outline-offset: 3px;
             }
             &:hover {
