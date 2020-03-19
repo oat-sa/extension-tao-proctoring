@@ -71,7 +71,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
         /** @var TestSessionService $testSessionService */
         $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
 
-        $testSession = $testSessionService->getTestSession($deliveryExecution);
+        $testSession = $testSessionService->getTestSession($deliveryExecution, true);
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
         } else {

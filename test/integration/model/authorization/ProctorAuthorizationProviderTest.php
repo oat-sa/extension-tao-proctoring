@@ -23,6 +23,7 @@ use core_kernel_classes_Resource;
 use oat\oatbox\user\User;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\authorization\AuthorizationProvider;
+use oat\taoDelivery\model\authorization\UnAuthorizedException;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
@@ -98,11 +99,9 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
         $authorizationProvider->verifyResumeAuthorization($authorized, $userP->reveal());
     }
 
-    /**
-     * @expectedException \oat\taoDelivery\model\authorization\UnAuthorizedException
-     */
     public function testIsUnauthorized()
     {
+        $this->expectException(UnAuthorizedException::class);
         $ttas = $this->prophesize(TestTakerAuthorizationService::class);
         $sl = $this->prophesize(ServiceLocatorInterface::class);
         $sl->get(TestTakerAuthorizationService::SERVICE_ID)->willReturn(new TestTakerAuthorizationService());

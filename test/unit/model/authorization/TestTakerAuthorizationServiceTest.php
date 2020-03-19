@@ -57,12 +57,12 @@ class TestTakerAuthorizationServiceTest extends TestCase
      */
     private $deliverySyncServiceMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->ontologyMock = $this->createMock(Ontology::class);
         $this->deliveryContainerMock = $this->createMock(DeliveryContainerService::class);
-        $this->deliverySyncServiceMock = $this->getMock(DeliverySyncService::class);
+        $this->deliverySyncServiceMock = $this->createMock(DeliverySyncService::class);
 
         $this->service = new TestTakerAuthorizationService();
 
@@ -140,7 +140,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
         $deliveryExecutionMock = $this->getDeliveryExecutionMock($state);
 
         $this->expectException(UnAuthorizedException::class);
-        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
+        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->createMock(User::class));
     }
 
     /**
@@ -184,7 +184,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
 
         $this->assertEquals(
             $expected,
-            $this->service->isProctored('deliveryUri', $this->getMock(User::class))
+            $this->service->isProctored('deliveryUri', $this->createMock(User::class))
         );
     }
 
@@ -231,7 +231,7 @@ class TestTakerAuthorizationServiceTest extends TestCase
         $deliveryExecutionMock->method('getDelivery')->willReturn($delivery);
 
         $this->expectException(UnAuthorizedException::class);
-        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->getMock(User::class));
+        $this->service->verifyResumeAuthorization($deliveryExecutionMock, $this->createMock(User::class));
     }
 
     /**
