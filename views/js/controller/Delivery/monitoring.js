@@ -1100,10 +1100,10 @@ define([
                             dataset = newDataset;
 
                             // activate irregularity buttons
-                            $('.terminateOrReactivateAndIrregularity', $list).each(function (ind, btn) {
-                                var $btn = $(btn);
-                                var uri = $btn.closest('[data-item-identifier]').data('item-identifier');
-                                var delivery = getExecutionData(uri);
+                            $('.terminateOrReactivateAndIrregularity', $list).each((ind, btn) => {
+                                const $btn = $(btn);
+                                const uri = $btn.closest('[data-item-identifier]').data('item-identifier');
+                                const delivery = getExecutionData(uri);
                                 if (
                                   hasAccessToReactivate && canDo('reactivate', delivery.state)
                                       || canDo('terminate', delivery.state)
