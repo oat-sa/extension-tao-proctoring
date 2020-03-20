@@ -352,12 +352,14 @@ define([
                         });
                     }
 
-                    dialog({
-                        message: __('Please, make your selection'),
-                        autoRender: true,
-                        autoDestroy: true,
-                        buttons: buttons
-                    });
+                    if (buttons.length) {
+                        dialog({
+                            message: __('Please, make your selection'),
+                            autoRender: true,
+                            autoDestroy: true,
+                            buttons: buttons
+                        });
+                    }
                 }
 
                 // display the session history
@@ -1056,9 +1058,9 @@ define([
                         id: 'terminateOrReactivateAndIrregularity',
                         icon: 'delivery-small',
                         title: label,
+                        disabled: true,
                         action: terminateOrReactivateAndIrregularity
                     }];
-
 
                     if (showActionShowHistory) {
                         actionList.push({
@@ -1096,6 +1098,20 @@ define([
 
                             //update dateset in memory
                             dataset = newDataset;
+
+                            // activate irregularity buttons
+                            $('.terminateOrReactivateAndIrregularity', $list).each((ind, btn) => {
+                                const $btn = $(btn);
+                                const uri = $btn.closest('[data-item-identifier]').data('item-identifier');
+                                const delivery = getExecutionData(uri);
+                                if (
+                                  hasAccessToReactivate && canDo('reactivate', delivery.state)
+                                      || canDo('terminate', delivery.state)
+                                      || allowIrr
+                                ) {
+                                    $btn.prop('disabled', false);
+                                }
+                            });
 
                             //update the buttons, which have been reconstructed
                             actionButtons = _({
