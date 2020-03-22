@@ -1,7 +1,5 @@
 @import "inc/bootstrap";
 
-$actionColor: whiten($info, .1);
-
 .dark-bar .infoControl[data-control="logout"] {
     display: none;
 }
@@ -35,7 +33,7 @@ $actionColor: whiten($info, .1);
         position: absolute;
         right: -1px;
         bottom: -1px;
-        color: $actionColor;
+        color: $deliveryColor;
         outline: 0;
         .action {
             display: inline-block;
@@ -47,11 +45,11 @@ $actionColor: whiten($info, .1);
                 margin-right: 10px;
             }
             &:focus {
-                outline: 3px solid $actionColor;
+                outline: 3px solid $deliveryColor;
                 outline-offset: 3px;
             }
             &:hover {
-                color: $info;
+                color: $deliveryHoverColor;
             }
         }
     }
