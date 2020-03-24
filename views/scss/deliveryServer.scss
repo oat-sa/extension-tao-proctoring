@@ -33,7 +33,7 @@
         position: absolute;
         right: -1px;
         bottom: -1px;
-        color: $deliveryColor;
+        color: $actionLinkColor;
         outline: 0;
         .action {
             display: inline-block;
@@ -45,11 +45,11 @@
                 margin-right: 10px;
             }
             &:focus {
-                outline: 3px solid $deliveryColor;
+                outline: 3px solid $actionLinkColor;
                 outline-offset: 3px;
             }
             &:hover {
-                color: $deliveryHoverColor;
+                color: $actionLinkHoverColor;
             }
         }
     }
