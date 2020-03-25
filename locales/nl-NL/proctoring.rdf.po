@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint122\n"
-"PO-Revision-Date: 2020-02-28T12:48:15\n"
+"Project-Id-Version: TAO 3.4.0-sprint124\n"
+"PO-Revision-Date: 2020-03-20T11:17:08\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -33,12 +33,12 @@ msgstr "De toezichthouder beheerdersrol"
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Administrator"
-msgstr ""
+msgstr "Toezichthouder Administrateur"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Administrator Role"
-msgstr ""
+msgstr "De Toezichthouder Administrateur rol"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
@@ -83,12 +83,12 @@ msgstr "Annuleringsstatus van een uitlevering"
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Require Proctoring"
-msgstr ""
+msgstr "Toezichthouder vereist"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Require Proctoring on selected deliveries"
-msgstr ""
+msgstr "Toezichthouder vereist op geselecteerde publicaties"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
