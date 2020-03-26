@@ -1,51 +1,55 @@
 @import "inc/bootstrap";
 
-.dark-bar .infoControl[data-control="logout"]{
-    display : none;
+.dark-bar .infoControl[data-control="logout"] {
+    display: none;
 }
 
 .awaiting-authorization {
-    padding-top:40px;
+    padding-top: 40px;
     &.authorization-in-progress {
         .listbox-actions .action.play {
             color: #999;
         }
     }
     @include keyframes(authorized) {
-        0%   { opacity:1; }
-        50%  { opacity:0; }
-        100% { opacity:1; }
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
     }
     &.authorization-granted .listbox .list-box {
         @include animation(authorized .5s linear 1);
     }
     .listbox {
-        width : 500px;
+        width: 500px;
         .list-box .entry {
-            margin-left : 0;
+            margin-left: 0;
         }
     }
-    .success-message .icon-result-ok{
+    .success-message .icon-result-ok {
         margin-left: 6px;
-        color : $success;
+        color: $success;
     }
-    .listbox-actions{
+    .listbox-actions {
         position: absolute;
         right: -1px;
         bottom: -1px;
-        color: $uiClickableHoverBg;
+        color: $actionLinkColor;
         outline: 0;
-        .action{
+        .action {
             display: inline-block;
             padding: 20px;
             border-bottom: 3px solid !important;
             height: 62px;
             margin-left: -3px;
             span {
-                margin-right:10px;
+                margin-right: 10px;
+            }
+            &:focus {
+                outline: 3px solid $actionLinkColor;
+                outline-offset: 3px;
             }
             &:hover {
-                color: $info;
+                color: $actionLinkHoverColor;
             }
         }
     }
