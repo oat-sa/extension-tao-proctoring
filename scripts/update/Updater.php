@@ -914,7 +914,7 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('17.3.0', '19.3.1');
 
         if ($this->isVersion('19.3.1')) {
-            $script = 'sudo -u www-data php index.php \'oat\taoProctoring\scripts\tools\KvMonitoringMigration\' -f test_taker_first_name,test_taker_last_name,remaining_time,extended_time,extra_time,consumed_extra_time -d 1 -s 0 -pc';
+            $script = 'sudo -u www-data php index.php \'oat\taoProctoring\scripts\tools\KvMonitoringMigration\' -f test_taker_first_name,test_taker_last_name,remaining_time,extended_time,extra_time,consumed_extra_time,last_test_taker_activity -d 1 -s 0 -pc';
             $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating."));
             $this->setVersion('19.4.0');
         }
