@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint122\n"
-"PO-Revision-Date: 2020-02-28T12:48:14\n"
+"Project-Id-Version: TAO 3.4.0-sprint125\n"
+"PO-Revision-Date: 2020-03-27T10:59:10\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -155,6 +155,9 @@ msgstr ""
 msgid "author"
 msgstr ""
 
+msgid "Authorization status"
+msgstr ""
+
 msgid "Authorize"
 msgstr ""
 
@@ -224,10 +227,10 @@ msgstr ""
 msgid "cancel the action"
 msgstr ""
 
-msgid "canceled"
+msgid "Canceled"
 msgstr ""
 
-msgid "Canceled"
+msgid "canceled"
 msgstr ""
 
 msgid "Cannot authorize test session."
@@ -287,10 +290,10 @@ msgstr ""
 msgid "Complaint"
 msgstr ""
 
-msgid "Completed"
+msgid "completed"
 msgstr ""
 
-msgid "completed"
+msgid "Completed"
 msgstr ""
 
 msgid "Completed tests"
@@ -320,10 +323,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
 msgid "Days"
@@ -405,10 +408,10 @@ msgstr ""
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
+msgid "Finished"
 msgstr ""
 
-msgid "Finished"
+msgid "finished"
 msgstr ""
 
 msgid "First name"
@@ -725,10 +728,10 @@ msgstr ""
 msgid "section"
 msgstr ""
 
-msgid "Session"
+msgid "session"
 msgstr ""
 
-msgid "session"
+msgid "Session"
 msgstr ""
 
 msgid "Session %s - %s has not been processed"
@@ -740,10 +743,10 @@ msgstr ""
 msgid "Session time handling"
 msgstr ""
 
-msgid "sessions"
+msgid "Sessions"
 msgstr ""
 
-msgid "Sessions"
+msgid "sessions"
 msgstr ""
 
 msgid "Sessions authorized"
@@ -830,10 +833,10 @@ msgstr ""
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
 msgid "Terminate sessions"
@@ -845,10 +848,10 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "Terminated"
+msgid "terminated"
 msgstr ""
 
-msgid "terminated"
+msgid "Terminated"
 msgstr ""
 
 msgid "Test  must be terminated."
