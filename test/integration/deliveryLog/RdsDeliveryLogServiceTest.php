@@ -48,7 +48,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
     /**
      * Set up test
      */
-    public function setUp()
+    public function setUp(): void
     {
         TaoPhpUnitTestRunner::initTest();
         $this->service = new RdsDeliveryLogService(array(RdsDeliveryLogService::OPTION_PERSISTENCE => 'default',
@@ -60,7 +60,7 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
         $this->persistence = \common_persistence_Manager::getPersistence('default');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->deleteTestData();
     }

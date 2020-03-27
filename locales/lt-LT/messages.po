@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint122\n"
-"PO-Revision-Date: 2020-02-28T12:48:15\n"
+"Project-Id-Version: TAO 3.4.0-sprint125\n"
+"PO-Revision-Date: 2020-03-27T10:59:11\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: lt-LT\n"
@@ -155,6 +155,9 @@ msgstr "Bandymai"
 msgid "author"
 msgstr "autorius"
 
+msgid "Authorization status"
+msgstr ""
+
 msgid "Authorize"
 msgstr "Autorizuoti"
 
@@ -224,11 +227,11 @@ msgstr "Atšaukti"
 msgid "cancel the action"
 msgstr "atšaukti veiksmą"
 
-msgid "canceled"
-msgstr "atšaukta"
-
 msgid "Canceled"
 msgstr "Atšaukta"
+
+msgid "canceled"
+msgstr "atšaukta"
 
 msgid "Cannot authorize test session."
 msgstr "Nepavyko autorizuoti testo sesijos."
@@ -287,11 +290,11 @@ msgstr "komentaras"
 msgid "Complaint"
 msgstr "Skundas"
 
-msgid "Completed"
-msgstr "Atlikta"
-
 msgid "completed"
 msgstr "atlikta"
+
+msgid "Completed"
+msgstr "Atlikta"
 
 msgid "Completed tests"
 msgstr "Atlikti testai"
@@ -320,11 +323,11 @@ msgstr "Dabartinė Įvertinimo Veikla"
 msgid "Current sessions"
 msgstr "Dabartinės sesijos"
 
-msgid "Date"
-msgstr "Data"
-
 msgid "date"
 msgstr "data"
+
+msgid "Date"
+msgstr "Data"
 
 msgid "Days"
 msgstr "Dienos"
@@ -405,11 +408,11 @@ msgstr "Filtras"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
-msgstr "baigta"
-
 msgid "Finished"
 msgstr "Baigta"
+
+msgid "finished"
+msgstr "baigta"
 
 msgid "First name"
 msgstr "Vardas"
@@ -725,11 +728,11 @@ msgstr "Rezultato Ataskaita"
 msgid "section"
 msgstr "skyrius"
 
-msgid "Session"
-msgstr "Sesija"
-
 msgid "session"
 msgstr ""
+
+msgid "Session"
+msgstr "Sesija"
 
 msgid "Session %s - %s has not been processed"
 msgstr "Sesija %s - %s nebuvo apdorota"
@@ -740,11 +743,11 @@ msgstr "Sesijos istorija"
 msgid "Session time handling"
 msgstr "Sesijos laiko valdymas"
 
-msgid "sessions"
-msgstr ""
-
 msgid "Sessions"
 msgstr "Sesijos"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions authorized"
 msgstr "Sesijos autorizuotos"
@@ -830,11 +833,11 @@ msgstr "Nutraukti"
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate session"
-msgstr "Nutraukti sesiją"
-
 msgid "Terminate Session"
 msgstr "Nutraukti Sesiją"
+
+msgid "Terminate session"
+msgstr "Nutraukti sesiją"
 
 msgid "Terminate sessions"
 msgstr "Nutraukti sesijas"
@@ -845,11 +848,11 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "Terminated"
-msgstr "Nutraukta"
-
 msgid "terminated"
 msgstr "nutraukta"
+
+msgid "Terminated"
+msgstr "Nutraukta"
 
 msgid "Test  must be terminated."
 msgstr "Testas  privalo būti nutrauktas."

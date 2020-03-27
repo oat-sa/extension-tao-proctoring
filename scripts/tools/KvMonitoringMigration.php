@@ -127,7 +127,7 @@ class KvMonitoringMigration extends ScriptAction
         $executionProcessed = 0;
         $removed = 0;
 
-        while ($offset < $total || $total < $chunkSize) {
+        while ($offset < $total ) {
             $this->getCache()->set(__CLASS__ . 'offset', $offset);
 
             $options = [

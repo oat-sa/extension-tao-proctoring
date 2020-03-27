@@ -80,7 +80,7 @@ class DeliveryExecutionListTest extends TestCase
      */
     private $deliveryExecution;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
         $this->extensionManagerMock = $this->createMock(common_ext_ExtensionsManager::class);

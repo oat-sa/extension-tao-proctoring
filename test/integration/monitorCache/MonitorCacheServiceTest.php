@@ -41,7 +41,7 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
 class MonitorCacheServiceTest extends DeliveryMonitoringServiceTest
 {
 
-    public function setUp()
+    public function setUp(): void
     {
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
         TaoPhpUnitTestRunner::initTest();
