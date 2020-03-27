@@ -92,7 +92,7 @@ msgid "Active test-takers"
 msgstr "Examinados activos"
 
 msgid "Actor"
-msgstr "Participante"
+msgstr "Actor"
 
 msgid "Add test takers"
 msgstr "Añadir examinados"
