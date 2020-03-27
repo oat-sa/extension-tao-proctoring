@@ -112,6 +112,12 @@ class KvMonitoringMigration extends ScriptAction
         $originalPrimaryColumns = $monitoringService->getOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS);
         $fields = array_unique(explode(',', $this->getOption('fields')));
         $kvFields = array_diff($fields, $originalPrimaryColumns);
+        if (empty($kvFields)) {
+            return new Report(
+                Report::TYPE_INFO,
+                'Nothing to migrate'
+            );
+        }
         foreach ($kvFields as $field) {
             $createColumnReport = $this->addColumn($field);
             $subReport->add($createColumnReport);

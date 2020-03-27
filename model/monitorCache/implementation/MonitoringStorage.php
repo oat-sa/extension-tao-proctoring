@@ -285,7 +285,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $whereClause = 'WHERE ' . $whereClause;
         }
 
-        $selectClause = "SELECT " . implode(',', $this->selectColumns);
+        $selectClause = "SELECT " . implode(','.PHP_EOL, $this->selectColumns).PHP_EOL;
 
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
@@ -579,12 +579,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         if (!$cache->exists($key)) {
             $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
             //remove columns which presented in primary columns list
-            $kvColumns = array_diff($kvColumns, $this->getPrimaryColumns());
             $cache->set($key, json_encode($kvColumns));
         } else {
             $kvColumns = json_decode($cache->get($key), true);
         }
-        return $kvColumns;
+        return array_diff($kvColumns, $this->getPrimaryColumns());
     }
 
     /**
@@ -641,7 +640,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function getPersistence()
     {
         return $this->getServiceLocator()
-            ->get(\common_persistence_Manager::SERVICE_ID)
+            ->get(PersistenceManager::SERVICE_ID)
             ->getPersistenceById($this->getOption(self::OPTION_PERSISTENCE));
     }
 
