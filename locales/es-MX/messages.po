@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint122\n"
-"PO-Revision-Date: 2020-02-28T12:48:14\n"
+"Project-Id-Version: TAO 3.4.0-sprint125\n"
+"PO-Revision-Date: 2020-03-27T10:59:10\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: es-MX\n"
@@ -92,7 +92,7 @@ msgid "Active test-takers"
 msgstr "Examinados activos"
 
 msgid "Actor"
-msgstr "Participante"
+msgstr "Actor"
 
 msgid "Add test takers"
 msgstr "Añadir examinados"
@@ -154,6 +154,9 @@ msgstr "Intentos"
 
 msgid "author"
 msgstr "autor"
+
+msgid "Authorization status"
+msgstr ""
 
 msgid "Authorize"
 msgstr "Autorizar"
@@ -224,11 +227,11 @@ msgstr "Cancelar"
 msgid "cancel the action"
 msgstr "cancelar la acción"
 
-msgid "canceled"
-msgstr "cancelado"
-
 msgid "Canceled"
 msgstr "Cancelado"
+
+msgid "canceled"
+msgstr "cancelado"
 
 msgid "Cannot authorize test session."
 msgstr "No se puede autorizar la sesión de prueba."
@@ -287,11 +290,11 @@ msgstr "comentario"
 msgid "Complaint"
 msgstr "Queja"
 
-msgid "Completed"
-msgstr "Completado"
-
 msgid "completed"
 msgstr "completado"
+
+msgid "Completed"
+msgstr "Completado"
 
 msgid "Completed tests"
 msgstr "Pruebas completadas"
@@ -320,11 +323,11 @@ msgstr "Actividad de evaluación actual"
 msgid "Current sessions"
 msgstr "Sesiones actuales"
 
-msgid "Date"
-msgstr "Fecha"
-
 msgid "date"
 msgstr "fecha"
+
+msgid "Date"
+msgstr "Fecha"
 
 msgid "Days"
 msgstr "Días"
@@ -405,11 +408,11 @@ msgstr "Filtro"
 msgid "Filter by the selected dates"
 msgstr "Filtrar por las fechas seleccionadas"
 
-msgid "finished"
-msgstr "finalizado"
-
 msgid "Finished"
 msgstr "Finalizado"
+
+msgid "finished"
+msgstr "finalizado"
 
 msgid "First name"
 msgstr "Nombre"
@@ -725,11 +728,11 @@ msgstr "Reporte de puntajes"
 msgid "section"
 msgstr "sección"
 
-msgid "Session"
-msgstr "Sesión"
-
 msgid "session"
 msgstr "sesión"
+
+msgid "Session"
+msgstr "Sesión"
 
 msgid "Session %s - %s has not been processed"
 msgstr "La sesión %s - %s no se procesó"
@@ -740,11 +743,11 @@ msgstr "Historial de sesiones"
 msgid "Session time handling"
 msgstr "Gestión del tiempo de sesión"
 
-msgid "sessions"
-msgstr "sesiones"
-
 msgid "Sessions"
 msgstr "Sesiones"
+
+msgid "sessions"
+msgstr "sesiones"
 
 msgid "Sessions authorized"
 msgstr "Sesiones autorizadas"
@@ -830,10 +833,10 @@ msgstr "Terminar"
 msgid "Terminate and irregularity"
 msgstr "Terminación e irregularidad"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Terminar sesión"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Terminar sesión"
 
 msgid "Terminate sessions"
@@ -845,11 +848,11 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr "Terminar/Reactivar e irregularidad"
 
-msgid "Terminated"
-msgstr "Terminada"
-
 msgid "terminated"
 msgstr "terminada"
+
+msgid "Terminated"
+msgstr "Terminada"
 
 msgid "Test  must be terminated."
 msgstr "La prueba debe terminarse."
