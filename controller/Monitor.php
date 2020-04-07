@@ -51,6 +51,7 @@ class Monitor extends SimplePageModule
     const ERROR_TERMINATE_EXECUTIONS = 3;
     const ERROR_REPORT_IRREGULARITIES = 4;
     const ERROR_SET_EXTRA_TIME = 5;
+    const ERROR_ADJUST_TIME = 6;
 
     /**
      * Returns the currently proctored delivery
@@ -302,6 +303,7 @@ class Monitor extends SimplePageModule
         }
 
         try {
+            /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
             $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
             $data = $deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
@@ -320,5 +322,31 @@ class Monitor extends SimplePageModule
             \common_Logger::w('No delivery service defined for proctoring');
             $this->returnError('Proctoring interface not available');
         }
+    }
+
+    public function adjustTime()
+    {
+        $deliveryExecutions = $this->getPostParameter('execution');
+        $seconds = $this->getPostParameter('time');
+
+        if (!is_array($deliveryExecutions)) {
+            $deliveryExecutions = [$deliveryExecutions];
+        }
+
+        /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
+        $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        $data = $deliveryExecutionManagerService->adjustTimers($deliveryExecutions, $seconds);
+
+        $response = [
+            'success' => !count($data['unprocessed']),
+            'data' => $data
+        ];
+
+        if (!$response['success']) {
+            $response['errorCode'] = self::ERROR_ADJUST_TIME;
+            $response['errorMsg'] = __('Some delivery executions have not been updated');
+        }
+
+        $this->returnJson($response);
     }
 }

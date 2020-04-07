@@ -30,7 +30,9 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
+use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoTests\models\runner\time\TimePoint;
+use oat\taoTests\models\runner\time\TimerAdjustmentServiceInterface;
 use oat\taoTests\models\runner\time\TimerStrategyInterface;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
@@ -68,10 +70,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
         }
 
-        /** @var TestSessionService $testSessionService */
-        $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
-
-        $testSession = $testSessionService->getTestSession($deliveryExecution, true);
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution, true);
         if ($testSession instanceof TestSession) {
             $timer = $testSession->getTimer();
         } else {
@@ -139,8 +138,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        /** @var TestSessionService $testSessionService */
-        $testSessionService = $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+        $testSessionService = $this->getTestSessionService();
 
         $result = ['processed' => [], 'unprocessed' => []];
 
@@ -238,4 +236,60 @@ class DeliveryExecutionManagerService extends ConfigurableService
         return $result;
     }
 
+    public function adjustTimers(array $deliveryExecutions, $seconds)
+    {
+        $result = ['processed' => [], 'unprocessed' => []];
+
+        /** @var TimerAdjustmentServiceInterface $timerAdjustmentService */
+        $timerAdjustmentService = $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
+
+        /** @var DeliveryExecution $deliveryExecution */
+        foreach ($deliveryExecutions as $deliveryExecution) {
+            if (is_string($deliveryExecution)) {
+                $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
+            }
+
+            $success = false;
+            if ($this->isCorrectDeliveryExecutionStateForAdjustment($deliveryExecution)) {
+                if ($seconds > 0) {
+                    $success = $timerAdjustmentService->increase($deliveryExecution, $seconds);
+                } else {
+                    $success = $timerAdjustmentService->decrease($deliveryExecution, abs($seconds));
+                }
+            }
+
+            if ($success) {
+                $result['processed'][$deliveryExecution->getIdentifier()] = true;
+            } else {
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = false;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @return bool
+     */
+    private function isCorrectDeliveryExecutionStateForAdjustment($deliveryExecution)
+    {
+        if ($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_AWAITING) {
+            return false;
+        }
+
+        if (!$this->getTestSessionService()->getTestSession($deliveryExecution)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return TestSessionService
+     */
+    private function getTestSessionService()
+    {
+        return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+    }
 }
