@@ -292,7 +292,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             implode(PHP_EOL, $this->joins) . PHP_EOL .
             $whereClause . PHP_EOL;
 
-        if ($together === true) {
+        if (!empty($this->groupColumns)) {
             $sql .= 'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
         }
 
