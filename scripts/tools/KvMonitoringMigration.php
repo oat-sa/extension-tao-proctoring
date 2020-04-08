@@ -163,8 +163,9 @@ class KvMonitoringMigration extends ScriptAction
         }
 
         if ($persistConfig) {
+            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
             $this->getServiceManager()->register(DeliveryMonitoringService::SERVICE_ID, $monitoringService);
-            $subReport->add(Report::createSuccess('Config persisted'));
+            $subReport->add(Report::createSuccess('Config persisted (ONLY ON THE CURRENT SERVER. UPDATE CONFIGS ON ALL OTHER SERVERS)'));
         }
 
         // And return a Report!
