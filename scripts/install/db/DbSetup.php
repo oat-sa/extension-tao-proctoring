@@ -47,6 +47,11 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::COLUMN_TEST_TAKER_LAST_NAME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::DELIVERY_ID, "text", array("notnull" => false));
             $tableLog->addColumn(MonitoringStorage::DELIVERY_NAME, "text", array("notnull" => false));
+            $tableLog->addColumn(MonitoringStorage::LAST_TEST_TAKER_ACTIVITY, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::EXTENDED_TIME, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
 
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
         
@@ -110,8 +115,15 @@ class DbSetup {
             MonitoringStorage::COLUMN_AUTHORIZED_BY,
             MonitoringStorage::COLUMN_START_TIME,
             MonitoringStorage::COLUMN_END_TIME,
+            MonitoringStorage::COLUMN_TEST_TAKER_FIRST_NAME,
+            MonitoringStorage::COLUMN_TEST_TAKER_LAST_NAME,
             MonitoringStorage::DELIVERY_ID,
             MonitoringStorage::DELIVERY_NAME,
+            MonitoringStorage::LAST_TEST_TAKER_ACTIVITY,
+            MonitoringStorage::REMAINING_TIME,
+            MonitoringStorage::EXTENDED_TIME,
+            MonitoringStorage::EXTRA_TIME,
+            MonitoringStorage::CONSUMED_EXTRA_TIME,
         ];
     }
 }

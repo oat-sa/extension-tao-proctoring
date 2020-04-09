@@ -40,6 +40,13 @@ class KvMonitoringMigration extends ScriptAction
                 'description' => 'A string contains coma separated list of target fields'
             ],
 
+            'dataLength' => [
+                'prefix' => 'l',
+                'longPrefix' => 'dataLength',
+                'required' => false,
+                'description' => 'Data length. If present new column(s) will have type VARCHAR($length), otherwise - TEXT column will be created'
+            ],
+
             'deleteKV' => [
                 'prefix' => 'd',
                 'longPrefix' => 'deleteKV',
@@ -112,8 +119,19 @@ class KvMonitoringMigration extends ScriptAction
         $originalPrimaryColumns = $monitoringService->getOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS);
         $fields = array_unique(explode(',', $this->getOption('fields')));
         $kvFields = array_diff($fields, $originalPrimaryColumns);
+        if (empty($kvFields)) {
+            return new Report(
+                Report::TYPE_INFO,
+                'Nothing to migrate'
+            );
+        }
+
+        $dataLength = 0;
+        if ($this->hasOption('dataLength')) {
+            $dataLength = (int) $this->getOption('dataLength');
+        }
         foreach ($kvFields as $field) {
-            $createColumnReport = $this->addColumn($field);
+            $createColumnReport = $this->addColumn($field, $dataLength);
             $subReport->add($createColumnReport);
         }
 
@@ -157,8 +175,9 @@ class KvMonitoringMigration extends ScriptAction
         }
 
         if ($persistConfig) {
+            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
             $this->getServiceManager()->register(DeliveryMonitoringService::SERVICE_ID, $monitoringService);
-            $subReport->add(Report::createSuccess('Config persisted'));
+            $subReport->add(Report::createSuccess('Config persisted (ONLY ON THE CURRENT SERVER. UPDATE CONFIGS ON ALL OTHER SERVERS)'));
         }
 
         // And return a Report!
@@ -184,7 +203,7 @@ class KvMonitoringMigration extends ScriptAction
         ];
     }
 
-    protected function addColumn($columnName)
+    protected function addColumn(string $columnName, int $dataLength)
     {
         $strictMode = $this->getOption('strictMode');
 
@@ -194,9 +213,17 @@ class KvMonitoringMigration extends ScriptAction
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
+
         try {
             $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
-            $tableData->addColumn($columnName, 'text', ['notnull' => false]);
+            $options = ['notnull' => false];
+            $columnType = 'text';
+            if ($dataLength > 0) {
+                $columnType = 'string';
+                $options['length'] = $dataLength;
+            }
+
+            $tableData->addColumn($columnName, $columnType, $options);
             $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
             foreach ($queries as $query) {
                 $persistence->exec($query);

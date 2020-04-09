@@ -265,7 +265,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $this->joins = [];
         $this->queryParams = [];
         $this->selectColumns = $this->getPrimaryColumns();
-        $this->groupColumns = ['t.delivery_execution_id'];
+        $this->groupColumns = [];
         $defaultOptions = [
             'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
             'offset' => 0,
@@ -273,7 +273,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
-        if ($together) {
+        if ($together === true) {
+            $this->groupColumns = ['t.delivery_execution_id'];
             $this->joinKvData();
         }
 
@@ -285,12 +286,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $whereClause = 'WHERE ' . $whereClause;
         }
 
-        $selectClause = "SELECT " . implode(',', $this->selectColumns);
+        $selectClause = "SELECT " . implode(','.PHP_EOL, $this->selectColumns).PHP_EOL;
 
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL .
-            'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
+            $whereClause . PHP_EOL;
+
+        if (!empty($this->groupColumns)) {
+            $sql .= 'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
+        }
 
         $sql .= "ORDER BY " . $options['order'];
 
@@ -579,12 +583,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         if (!$cache->exists($key)) {
             $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
             //remove columns which presented in primary columns list
-            $kvColumns = array_diff($kvColumns, $this->getPrimaryColumns());
             $cache->set($key, json_encode($kvColumns));
         } else {
             $kvColumns = json_decode($cache->get($key), true);
         }
-        return $kvColumns;
+        return array_diff($kvColumns, $this->getPrimaryColumns());
     }
 
     /**
@@ -641,7 +644,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     public function getPersistence()
     {
         return $this->getServiceLocator()
-            ->get(\common_persistence_Manager::SERVICE_ID)
+            ->get(PersistenceManager::SERVICE_ID)
             ->getPersistenceById($this->getOption(self::OPTION_PERSISTENCE));
     }
 

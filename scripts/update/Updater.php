@@ -911,6 +911,14 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('17.3.0');
         }
 
-        $this->skip('17.3.0', '19.4.0');
+        $this->skip('17.3.0', '19.3.3');
+
+        if ($this->isVersion('19.3.3')) {
+            $script = 'sudo -u www-data php index.php \'oat\taoProctoring\scripts\tools\KvMonitoringMigration\' -f test_taker_first_name,test_taker_last_name,remaining_time,extended_time,extra_time,consumed_extra_time,last_test_taker_activity -d 1 -s 0 -pc -l 255';
+            $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating or for each field separately. May take few hours based on table size."));
+            $this->setVersion('19.4.0');
+        }
+
+        $this->skip('19.4.0', '19.5.0');
     }
 }
