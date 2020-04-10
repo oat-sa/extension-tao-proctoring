@@ -30,7 +30,6 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
-use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoTests\models\runner\time\TimePoint;
 use oat\taoTests\models\runner\time\TimerAdjustmentServiceInterface;
 use oat\taoTests\models\runner\time\TimerStrategyInterface;
@@ -250,7 +249,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             }
 
             $success = false;
-            if ($this->isCorrectDeliveryExecutionStateForAdjustment($deliveryExecution)) {
+            if ($this->isTimerAdjustmentAllowed($deliveryExecution)) {
                 if ($seconds > 0) {
                     $success = $timerAdjustmentService->increase($deliveryExecution, $seconds);
                 } else {
@@ -272,7 +271,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return bool
      */
-    private function isCorrectDeliveryExecutionStateForAdjustment($deliveryExecution)
+    private function isTimerAdjustmentAllowed($deliveryExecution)
     {
         if ($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_AWAITING) {
             return false;
