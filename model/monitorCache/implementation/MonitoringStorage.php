@@ -265,7 +265,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $this->joins = [];
         $this->queryParams = [];
         $this->selectColumns = $this->getPrimaryColumns();
-        $this->groupColumns = [];
+        $this->groupColumns = ['t.delivery_execution_id'];
         $defaultOptions = [
             'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
             'offset' => 0,
@@ -273,8 +273,7 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         ];
         $options = array_merge($defaultOptions, $options);
 
-        if ($together === true) {
-            $this->groupColumns = ['t.delivery_execution_id'];
+        if ($together) {
             $this->joinKvData();
         }
 
@@ -290,11 +289,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
         $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
             implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL;
-
-        if ($together === true) {
-            $sql .= 'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
-        }
+            $whereClause . PHP_EOL .
+            'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
 
         $sql .= "ORDER BY " . $options['order'];
 
