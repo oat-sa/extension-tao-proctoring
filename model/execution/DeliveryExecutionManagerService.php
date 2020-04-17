@@ -31,7 +31,7 @@ use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use oat\taoTests\models\runner\time\TimePoint;
-use oat\taoTests\models\runner\time\TimerAdjustmentServiceInterface;
+use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
 use oat\taoTests\models\runner\time\TimerStrategyInterface;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
@@ -250,10 +250,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             $success = false;
             if ($this->isTimerAdjustmentAllowed($deliveryExecution)) {
+                $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
                 if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($deliveryExecution, $seconds);
+                    $success = $timerAdjustmentService->increase($testSession, $seconds);
                 } else {
-                    $success = $timerAdjustmentService->decrease($deliveryExecution, abs($seconds));
+                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
                 }
             }
 
