@@ -235,6 +235,12 @@ class DeliveryExecutionManagerService extends ConfigurableService
         return $result;
     }
 
+    /**
+     * Registers timer adjustments to a list of delivery executions
+     * @param array $deliveryExecutions
+     * @param int $seconds
+     * @return array
+     */
     public function adjustTimers(array $deliveryExecutions, $seconds)
     {
         $result = ['processed' => [], 'unprocessed' => []];
