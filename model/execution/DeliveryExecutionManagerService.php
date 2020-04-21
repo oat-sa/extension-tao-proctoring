@@ -81,14 +81,24 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
+     * @param TestSession $testSession
      * @param $part
      * @return int|null
      */
-    protected function getPartTimeLimits($part)
+    protected function getPartTimeLimits($testSession, $part)
     {
         $timeLimits = $part->getTimeLimits();
-        if ($timeLimits && $timeLimits->hasMaxTime()) {
-            return $timeLimits->getMaxTime()->getSeconds(true);
+        if ($timeLimits && ($maxTime = $timeLimits->getMaxTime()) !== null) {
+            $maximumTime = clone $maxTime;
+            if ($testSession !== null && ($timer = $testSession->getTimer()) !== null) {
+                $adjustmentSeconds = $timer->getAdjustmentMap()->get($part->getIdentifier());
+                if ($adjustmentSeconds > 0) {
+                    $maximumTime->add(new QtiDuration('PT' . $adjustmentSeconds . 'S'));
+                } else {
+                    $maximumTime->sub(new QtiDuration('PT' . $adjustmentSeconds . 'S'));
+                }
+            }
+            return $maximumTime->getSeconds(true);
         }
         return null;
     }
@@ -103,19 +113,19 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $seconds = null;
 
         if ($item = $testSession->getCurrentAssessmentItemRef()) {
-            $seconds = $this->getPartTimeLimits($item);
+            $seconds = $this->getPartTimeLimits($testSession, $item);
         }
 
         if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
-            $seconds = $this->getPartTimeLimits($section);
+            $seconds = $this->getPartTimeLimits($testSession, $section);
         }
 
         if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
-            $seconds = $this->getPartTimeLimits($testPart);
+            $seconds = $this->getPartTimeLimits($testSession, $testPart);
         }
 
         if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
-            $seconds = $this->getPartTimeLimits($assessmentTest);
+            $seconds = $this->getPartTimeLimits($testSession, $assessmentTest);
         }
 
         return $seconds;
@@ -163,7 +173,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 if ($testSession) {
                     $seconds = $this->getTimeLimits($testSession);
                 } else {
-                    $seconds = $this->getPartTimeLimits($testDefinition);
+                    $seconds = $this->getPartTimeLimits($testSession, $testDefinition);
                 }
 
                 if ($seconds) {
@@ -209,7 +219,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
 
                     $testSessionService->persist($testSession);
-                    $maxTime = $this->getPartTimeLimits($testSession);
+                    $maxTime = $this->getPartTimeLimits($testSession, $testDefinition);
                 }
             }
 
