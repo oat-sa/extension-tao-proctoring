@@ -275,11 +275,15 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
-     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param DeliveryExecutionInterface|string $deliveryExecution
      * @return bool
      */
-    private function isTimerAdjustmentAllowed($deliveryExecution)
+    public function isTimerAdjustmentAllowed($deliveryExecution)
     {
+        if (is_string($deliveryExecution)) {
+            $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
+        }
+
         if ($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_AWAITING) {
             return false;
         }
