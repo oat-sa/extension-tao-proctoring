@@ -275,4 +275,33 @@
       width: 180px;
       font-size: 12px;
     }
+
+    .step-controls-container {
+        font-size: 0;
+
+        .step-control--down,
+        .step-control--up {
+            border: 1px solid $websiteBorder;
+            background-color: $info;
+            color: white;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 18px;
+            height: 24px;
+            line-height: 22px;
+            position: relative;
+            text-align: center;
+            top: 2px;
+            user-select: none;
+            width: 24px;
+        }
+
+        .step-control--down {
+          background-color: white;
+          color: $textColor;
+          font-size: 16px;
+          line-height: 19px;
+          top: 0;
+        }
+    }
 }
