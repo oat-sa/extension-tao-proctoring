@@ -3,15 +3,23 @@
 
     {{#if allowedResources.length}}
     <div class="multiple">
-        <p>{{__ "The action will be applied to the following session"}}:</p>
+        <p>{{__ "The action will be applied to the following session(s)"}}:</p>
         <ul class="plain applicables">
-            {{#each allowedResources}}
-            <li data-resource="{{id}}">
-                <span class="resource-label">{{label}}</span>
-                {{#if remainingStr}}<span class="remaining">{{remainingStr}}</span>{{/if}}
-                {{#if extraTimeStr}}<span class="time">({{extraTimeStr}})</span>{{/if}}
-            </li>
-            {{/each}}
+            {{#if changeTimeMode}}
+                {{#each allowedResources}}
+                    <li data-resource="{{id}}">
+                        <span class="resource-label">{{label}}</span>
+                    </li>
+                {{/each}}
+            {{else}}
+                {{#each allowedResources}}
+                    <li data-resource="{{id}}">
+                        <span class="resource-label">{{label}}</span>
+                        {{#if remainingStr}}<span class="remaining">{{remainingStr}}</span>{{/if}}
+                        {{#if extraTimeStr}}<span class="time">({{extraTimeStr}})</span>{{/if}}
+                    </li>
+                {{/each}}
+            {{/if}}
         </ul>
     </div>
 
@@ -33,14 +41,24 @@
 
     <div class="form">
         <p>
-            <label for="input-extra-time">{{__ "Extra time"}}:</label>
-            <input type="text" id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
-            <label for="input-extra-time">{{__ "minutes"}}</label>
+            {{#if changeTimeMode}}
+                <label for="input-extra-time">{{inputLabel}}:</label>
+                <span class="step-controls-container">
+                    <i class="step-control--up">+</i>
+                    <i class="step-control--down">—</i>
+                </span>
+                <input type="number" id="input-extra-time" data-control="time" value="{{time}}" step="1" />
+                <label for="input-extra-time">{{__ "minutes"}}</label>
+            {{else}}
+                <label for="input-extra-time">{{inputLabel}}:</label>
+                <input type="text" id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
+                <label for="input-extra-time">{{__ "minutes"}}</label>
+            {{/if}}
         </p>
     </div>
     <p>
         <strong>{{__ "Note"}}:</strong>
-        <em>{{__ "the already granted time will be replaced by the new value"}}</em>
+        <em>{{note}}</em>
     </p>
 
     <div class="actions">

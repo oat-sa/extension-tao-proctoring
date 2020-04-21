@@ -76,12 +76,14 @@ define([
                 var $time = $cmp.find('[data-control="time"]');
                 var $error = $cmp.find('.feedback-error');
                 var $ok = $cmp.find('[data-control="done"]');
+                const $stepUp = $cmp.find('.step-control--up');
+                const $stepDown = $cmp.find('.step-control--down');
 
                 /**
                  * Validate the input time
                  * @returns {Boolean}
                  */
-                function checkInputError() {
+                function checkInputError(checkForEmpty = true) {
                     var value = $time.val().trim();
 
                     // use Number() instead of parseInt/parseFloat to prevent number with text like "10$$" to be
@@ -90,7 +92,11 @@ define([
 
                     // here we also check with the parseFloat to detect non decimal notation,
                     // otherwise numbers like 0x10 will be accepted, but misunderstood when applied
-                    var error = isNaN(time) || time !== parseFloat(value);
+                    let error = isNaN(time) || time !== parseFloat(value);
+
+                    if (!(value || checkForEmpty)) {
+                        error = false;
+                    }
 
                     if (error) {
                         hider.show($error);
@@ -139,9 +145,11 @@ define([
                 }
 
                 // we need to find the common extra time for all selected test takers
-                $time.val(_.reduce(initConfig.allowedResources, function(time, testTaker) {
-                    return Math.max(time, testTaker && testTaker.extraTime || 0);
-                }, 0) / timeUnit);
+                if (!config.changeTimeMode) {
+                    $time.val(_.reduce(initConfig.allowedResources, function(time, testTaker) {
+                        return Math.max(time, testTaker && testTaker.extraTime || 0);
+                    }, 0) / timeUnit);
+                }
 
                 $cmp
                     .addClass('modal')
@@ -149,13 +157,13 @@ define([
                         self.destroy();
                     })
                     .on('change', $time, function() {
-                        checkInputError();
+                        checkInputError(!config.changeTimeMode);
                     })
                     .on('keyup', function(event) {
                         if (13 === event.keyCode) {
                             submit();
                         } else {
-                            checkInputError();
+                            checkInputError(!config.changeTimeMode);
                         }
                     })
                     .on('click', '.action', function (event) {
@@ -172,6 +180,18 @@ define([
                     })
                     .modal({
                         width: 800
+                    });
+
+                    $stepUp.on('click', () => {
+                        if(!checkInputError(false)) {
+                            $time.val((parseFloat($time.val()) || 0) + 1);
+                        }
+                    });
+
+                    $stepDown.on('click', () => {
+                        if(!checkInputError(false)) {
+                            $time.val((parseFloat($time.val()) || 0) - 1);
+                        }
                     });
 
                 focus();
