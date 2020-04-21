@@ -94,6 +94,7 @@ define([
     var serviceUrl = urlHelper.route('monitor', 'Monitor', 'taoProctoring');
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
+    const adjustTimeUrl = urlHelper.route('adjustTime', 'Monitor', 'taoProctoring');
 
 
     /**
@@ -139,7 +140,8 @@ define([
             var dataset;
             var extraFields;
             var categories;
-            var timeHandlingButton;
+            let timeHandlingMode;
+            let changeTimeMode;
             var allowedConnectivity;
             var printReportButton;
             var printReportUrl;
@@ -204,6 +206,10 @@ define([
                     },
                     extraTime: {
                         url: extraTimeUrl,
+                        validate: validateParams
+                    },
+                    adjustTime: {
+                        url: adjustTimeUrl,
                         validate: validateParams
                     }
                 }
@@ -398,17 +404,45 @@ define([
                     });
                 }
 
-                // display the time handling popup
                 function timeHandling(selection) {
-                    var _selection = _.isArray(selection) ? selection : [selection];
-                    var config = _.merge(listSessions('time', _selection), {
+                    const _selection = _.isArray(selection) ? selection : [selection];
+                    const config = _.merge(listSessions('time', _selection), {
                         renderTo : $content,
                         actionName : __('Grant Extra Time'),
-                        unit: extraTimeUnit // input extra time in minutes
+                        unit: extraTimeUnit, // input extra time in minutes
+                        note: __('the already granted time will be replaced by the new value'),
+                        inputLabel: __('Extra time'),
                     });
 
                     extraTimePopup(config).on('ok', function(time){
                         request('extraTime', _selection, {time: time}, __('Extra time granted'));
+                    });
+                }
+
+                // display the time adjustment popup
+                function timeAdjustment(selection) {
+                    const _selection = _.isArray(selection) ? selection : [selection];
+                    const sessionsList = listSessions('changeTime', _selection);
+                    const config = Object.assign(
+                        {},
+                        sessionsList,
+                        {
+                            renderTo: $content,
+                            actionName: __('Change time'),
+                            unit: extraTimeUnit, // input extra time in minutes
+                            note: __('Already changed time will be added or substracted by the new value.'),
+                            inputLabel: __('Change time'),
+                            changeTimeMode: true,
+                        }
+                    );
+
+                    extraTimePopup(config).on('ok', (time) => {
+                        request(
+                            'adjustTime',
+                            sessionsList.allowedResources.map(({ id }) => id),
+                            { time: time },
+                            __('Time adjusted'),
+                        );
                     });
                 }
 
@@ -451,6 +485,11 @@ define([
 
                     if(status){
                         formatted.allowed = (status.can[actionName] === true);
+
+                        if (actionName === 'changeTime') {
+                            formatted.allowed = testTakerData.allowTimerAdjustment;
+                        }
+
                         if(!formatted.allowed){
                             formatted.reason = status.can[actionName];
                             formatted.warning = status.warning[actionName] ?
@@ -630,7 +669,8 @@ define([
                     categories = data.categories;
                     deliveryId = data.delivery || deliveryId;
                     context = data.context || context;
-                    timeHandlingButton = data.timeHandling;
+                    timeHandlingMode = data.timeHandling === 'extra_time';
+                    changeTimeMode = data.timeHandling === 'timer_adjustment';
                     allowedConnectivity = data.onlineStatus || false;
                     printReportButton = data.printReportButton;
                     printReportUrl = data.printReportUrl;
@@ -759,7 +799,7 @@ define([
                     }
 
                     // tools: handles the session time
-                    if (timeHandlingButton) {
+                    if (timeHandlingMode) {
                         tools.push({
                             id : 'timeHandling',
                             title : __('Session time handling'),
@@ -767,6 +807,18 @@ define([
                             label : __('Time'),
                             massAction: true,
                             action : timeHandling
+                        });
+                    }
+
+                    // tools: adjust the session time
+                    if (changeTimeMode) {
+                        tools.push({
+                            id : 'timeAdjustment',
+                            title : __('Session time handling'),
+                            icon : 'time',
+                            label : __('Time'),
+                            massAction: true,
+                            action : timeAdjustment,
                         });
                     }
 
@@ -991,7 +1043,7 @@ define([
                             }
                         });
                     }
-                    if (timeHandlingButton) {
+                    if (timeHandlingMode) {
                         model.push({
                             id: 'extraTime',
                             label: __('Extra Time'),
@@ -1004,6 +1056,22 @@ define([
                                 hidden() {
                                     var allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
                                     return !canDo('time', this.state) || !allowExtraTime;
+                                }
+                            }]
+                        });
+                    }
+                    if (changeTimeMode) {
+                        model.push({
+                            id: 'adjustTime',
+                            label: __('Change time'),
+                            type: 'actions',
+                            actions: [{
+                                id : 'timeHandling',
+                                title : __('Session time handling'),
+                                icon : 'time',
+                                action : timeAdjustment,
+                                hidden() {
+                                    return !this.allowTimerAdjustment;
                                 }
                             }]
                         });
