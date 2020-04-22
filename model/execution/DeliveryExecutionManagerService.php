@@ -95,7 +95,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 if ($adjustmentSeconds > 0) {
                     $maximumTime->add(new QtiDuration('PT' . $adjustmentSeconds . 'S'));
                 } else {
-                    $maximumTime->sub(new QtiDuration('PT' . $adjustmentSeconds . 'S'));
+                    $maximumTime->sub(new QtiDuration('PT' . abs($adjustmentSeconds) . 'S'));
                 }
             }
             return $maximumTime->getSeconds(true);
