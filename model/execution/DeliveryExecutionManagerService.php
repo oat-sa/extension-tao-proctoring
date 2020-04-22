@@ -258,6 +258,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
         /** @var TimerAdjustmentServiceInterface $timerAdjustmentService */
         $timerAdjustmentService = $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
 
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
@@ -272,6 +275,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 } else {
                     $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
                 }
+
+                $data = $deliveryMonitoringService->getData($deliveryExecution);
+                $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
+                $deliveryMonitoringService->save($data);
             }
 
             if ($success) {
