@@ -25,6 +25,7 @@ use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\tao\model\service\ApplicationService;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
 use oat\generis\test\MockObject;
@@ -56,6 +57,11 @@ class DeliveryExecutionListTest extends TestCase
     private $testSessionConnectivityStatusServiceMock;
 
     /**
+     * @var DeliveryExecutionManagerService|MockObject
+     */
+    private $deliveryExecutionManagerServiceMock;
+
+    /**
      * @var common_ext_Extension|MockObject
      */
     private $proctoringExtensionMock;
@@ -85,6 +91,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
         $this->extensionManagerMock = $this->createMock(common_ext_ExtensionsManager::class);
         $this->testSessionConnectivityStatusServiceMock = $this->createMock(TestSessionConnectivityStatusService::class);
+        $this->deliveryExecutionManagerServiceMock = $this->createMock(DeliveryExecutionManagerService::class);
         $this->applicationServiceMock = $this->createMock(ApplicationService::class);
         $this->proctoringExtensionMock = $this->createMock(common_ext_Extension::class);
         $this->modelMock = $this->createMock(Ontology::class);
@@ -101,7 +108,8 @@ class DeliveryExecutionListTest extends TestCase
             SessionStateService::SERVICE_ID => $this->sessionStateServiceMock,
             common_ext_ExtensionsManager::SERVICE_ID => $this->extensionManagerMock,
             TestSessionConnectivityStatusService::SERVICE_ID => $this->testSessionConnectivityStatusServiceMock,
-            ApplicationService::SERVICE_ID => $this->applicationServiceMock
+            ApplicationService::SERVICE_ID => $this->applicationServiceMock,
+            DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock
         ]);
 
         $this->extensionManagerMock->method('getExtensionById')->willReturn($this->proctoringExtensionMock);
