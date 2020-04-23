@@ -918,5 +918,20 @@ class Updater extends common_ext_ExtensionUpdater
             $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating or for each field separately. May take few hours based on table size."));
             $this->setVersion('19.4.0');
         }
+
+        if ($this->isVersion('19.4.0')) {
+            /** @var DeliveryExecutionStateService $service */
+            $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $currentOptionValue = $service->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING);
+            if ($currentOptionValue === true) {
+                $service->setOption(
+                    DeliveryExecutionStateService::OPTION_TIME_HANDLING,
+                    DeliveryExecutionStateService::TIME_HANDLING_EXTRA_TIME
+                );
+                $this->getServiceManager()->register(DeliveryExecutionStateService::SERVICE_ID, $service);
+            }
+
+            $this->setVersion('19.5.0');
+        }
     }
 }

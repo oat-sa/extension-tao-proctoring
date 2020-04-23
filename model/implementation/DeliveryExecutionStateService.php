@@ -57,6 +57,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
     const OPTION_TIME_HANDLING = 'time_handling';
 
+    const TIME_HANDLING_EXTRA_TIME = 'extra_time';
+    const TIME_HANDLING_TIMER_ADJUSTMENT = 'timer_adjustment';
+
     use LoggerAwareTrait;
     use LockTrait;
 
