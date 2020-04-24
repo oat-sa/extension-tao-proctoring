@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -25,8 +25,8 @@ define([
     'core/encoder/time',
     'ui/component',
     'ui/hider',
-    'taoProctoring/component/extraTime/encoder',
-    'tpl!taoProctoring/component/extraTime/extraTime',
+    'taoProctoring/component/timeHandling/encoder',
+    'tpl!taoProctoring/component/timeHandling/timeHandling',
     'ui/modal'
 ], function ($, _, __, timeEncoder, component, hider, encodeExtraTime, extraTimeTpl) {
     'use strict';
@@ -36,7 +36,7 @@ define([
      * @type {Object}
      * @private
      */
-    var _defaults = {
+    const _defaults = {
         unit: 60,           // default time unit is minutes
         deniedResources: []
     };
@@ -49,17 +49,18 @@ define([
      * @param {Array} config.allowedResources - list of allowed resources to be displayed
      * @param {Array} [config.deniedResources] - list of denied resources to be displayed
      * @param {Number} [config.unit] - the time is stored in seconds, but can be handled in other time units, by default this is minutes (60)
+     * @param {Boolean} [config.changeTimeMode] - mode for change time action
      * @fires cancel when the component is closed without validation
      * @fires ok when the ok button is clicked
      */
-    function extraTimeFactory(config) {
-        var initConfig = _.defaults(config || {}, _defaults);
-        var timeUnit = initConfig.unit || _defaults.unit;
+    function timeHandlingFactory(config) {
+        const initConfig = _.defaults(config || {}, _defaults);
+        const timeUnit = initConfig.unit || _defaults.unit;
 
-        _.forEach(initConfig.allowedResources, function(resource) {
-            var remaining = parseFloat(resource.remaining) || 0;
-            var extraTime = parseFloat(resource.extraTime);
-            var consumedTime = parseFloat(resource.consumedTime);
+        _.forEach(initConfig.allowedResources, (resource) => {
+            const remaining = parseFloat(resource.remaining) || 0;
+            const extraTime = parseFloat(resource.extraTime);
+            const consumedTime = parseFloat(resource.consumedTime);
 
             if (remaining) {
                 resource.remainingStr = timeEncoder.encode(remaining);
@@ -71,32 +72,30 @@ define([
         return component()
             .setTemplate(extraTimeTpl)
             .on('render', function () {
-                var self = this;
-                var $cmp = this.getElement();
-                var $time = $cmp.find('[data-control="time"]');
-                var $error = $cmp.find('.feedback-error');
-                var $ok = $cmp.find('[data-control="done"]');
-                const $stepUp = $cmp.find('.step-control--up');
-                const $stepDown = $cmp.find('.step-control--down');
+                const self = this;
+                const $cmp = this.getElement();
+                const $time = $cmp.find('[data-control="time"]');
+                const $error = $cmp.find('.feedback-error');
+                const $ok = $cmp.find('[data-control="done"]');
+                const $changeTimeCotrols = $cmp.find('input[name="changeTimeControl"]');
+                let changeTimeOperator = '';
 
                 /**
                  * Validate the input time
                  * @returns {Boolean}
                  */
-                function checkInputError(checkForEmpty = true) {
-                    var value = $time.val().trim();
+                function checkInputError() {
+                    const value = $time.val().trim();
 
                     // use Number() instead of parseInt/parseFloat to prevent number with text like "10$$" to be
                     // converted to number, as we need to avoid that case
-                    var time = Number(value);
+                    const time = Number(value);
 
                     // here we also check with the parseFloat to detect non decimal notation,
                     // otherwise numbers like 0x10 will be accepted, but misunderstood when applied
-                    let error = isNaN(time) || time !== parseFloat(value);
-
-                    if (!(value || checkForEmpty)) {
-                        error = false;
-                    }
+                    const error = isNaN(time)
+                        || time !== parseFloat(value)
+                        || (config.changeTimeMode && parseFloat(value) === 0);
 
                     if (error) {
                         hider.show($error);
@@ -120,7 +119,7 @@ define([
                          * @event ok
                          * @param {Number} time
                          */
-                        self.trigger('ok', parseFloat($time.val()) * timeUnit);
+                        self.trigger('ok', parseFloat(`${changeTimeOperator}${$time.val()}`) * timeUnit);
                         $cmp.modal('close');
                     }
                 }
@@ -156,19 +155,16 @@ define([
                     .on('closed.modal', function () {
                         self.destroy();
                     })
-                    .on('change', $time, function() {
-                        checkInputError(!config.changeTimeMode);
-                    })
                     .on('keyup', function(event) {
                         if (13 === event.keyCode) {
                             submit();
                         } else {
-                            checkInputError(!config.changeTimeMode);
+                            checkInputError();
                         }
                     })
                     .on('click', '.action', function (event) {
-                        var $btn = $(event.target).closest('.action');
-                        var control = $btn.data('control');
+                        const $btn = $(event.target).closest('.action');
+                        const control = $btn.data('control');
 
                         event.preventDefault();
 
@@ -182,17 +178,13 @@ define([
                         width: 800
                     });
 
-                    $stepUp.on('click', () => {
-                        if(!checkInputError(false)) {
-                            $time.val((parseFloat($time.val()) || 0) + 1);
-                        }
-                    });
+                $time.on('change', function() {
+                  checkInputError();
+                });
 
-                    $stepDown.on('click', () => {
-                        if(!checkInputError(false)) {
-                            $time.val((parseFloat($time.val()) || 0) - 1);
-                        }
-                    });
+                $changeTimeCotrols.on('change', ({ target: { value } }) => {
+                  changeTimeOperator = value;
+                });
 
                 focus();
             })
@@ -204,5 +196,5 @@ define([
             .init(initConfig);
     }
 
-    return extraTimeFactory;
+    return timeHandlingFactory;
 });

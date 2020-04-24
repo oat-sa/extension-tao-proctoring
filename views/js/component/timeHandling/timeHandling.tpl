@@ -43,11 +43,17 @@
         <p>
             {{#if changeTimeMode}}
                 <label for="input-extra-time">{{inputLabel}}:</label>
-                <span class="step-controls-container">
-                    <i class="step-control--up">+</i>
-                    <i class="step-control--down">—</i>
+                <span class="change-time-controls-container">
+                    <label class="change-time-control-container">
+                        <input class="change-time-control__input" checked="checked" type="radio" name="changeTimeControl" value="">
+                        <i class="change-time-control--add">+</i>
+                    </label>
+                    <label class="change-time-control-container">
+                        <input class="change-time-control__input" type="radio" name="changeTimeControl" value="-">
+                        <i class="change-time-control--sub">—</i>
+                    </label>
                 </span>
-                <input type="number" id="input-extra-time" data-control="time" value="{{time}}" step="1" />
+                <input type="number" id="input-extra-time" data-control="time" value="{{time}}" step="1" min="0" />
                 <label for="input-extra-time">{{__ "minutes"}}</label>
             {{else}}
                 <label for="input-extra-time">{{inputLabel}}:</label>
@@ -62,7 +68,7 @@
     </p>
 
     <div class="actions">
-        <div class="feedback-error small hidden">{{__ "The extra time must be a number"}}</div>
+        <div class="feedback-error small hidden">{{errorMessage}}</div>
         <button class="btn btn-info small action done" data-control="done">{{__ "OK"}}</button>
         <a href="#" class="btn action cancel" title="{{__ 'cancel the action'}}" data-control="cancel">{{__ "cancel"}}</a>
     </div>
