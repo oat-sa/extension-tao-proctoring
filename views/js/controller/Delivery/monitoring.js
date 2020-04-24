@@ -37,8 +37,8 @@ define([
     'ui/container',
     'ui/datetime/picker',
     'taoProctoring/component/proxy',
-    'taoProctoring/component/extraTime/extraTime',
-    'taoProctoring/component/extraTime/encoder',
+    'taoProctoring/component/timeHandling/timeHandling',
+    'taoProctoring/component/timeHandling/encoder',
     'taoProctoring/helper/status',
     'tpl!taoProctoring/templates/delivery/monitoring',
     'tpl!taoProctoring/templates/delivery/deliveryLink',
@@ -67,8 +67,8 @@ define([
     containerFactory,
     dateTimePicker,
     proxyFactory,
-    extraTimePopup,
-    encodeExtraTime,
+    timeHandlingPopup,
+    encodeTime,
     _status,
     monitoringTpl,
     deliveryLinkTpl,
@@ -409,12 +409,13 @@ define([
                     const config = _.merge(listSessions('time', _selection), {
                         renderTo : $content,
                         actionName : __('Grant Extra Time'),
+                        errorMessage: __('The extra time must be a number'),
                         unit: extraTimeUnit, // input extra time in minutes
                         note: __('the already granted time will be replaced by the new value'),
                         inputLabel: __('Extra time'),
                     });
 
-                    extraTimePopup(config).on('ok', function(time){
+                    timeHandlingPopup(config).on('ok', function(time){
                         request('extraTime', _selection, {time: time}, __('Extra time granted'));
                     });
                 }
@@ -429,6 +430,7 @@ define([
                         {
                             renderTo: $content,
                             actionName: __('Change time'),
+                            errorMessage: __('The extra time must be a number bigger than 0'),
                             unit: extraTimeUnit, // input extra time in minutes
                             note: __('Already changed time will be added or substracted by the new value.'),
                             inputLabel: __('Change time'),
@@ -436,7 +438,7 @@ define([
                         }
                     );
 
-                    extraTimePopup(config).on('ok', (time) => {
+                    timeHandlingPopup(config).on('ok', (time) => {
                         request(
                             'adjustTime',
                             sessionsList.allowedResources.map(({ id }) => id),
