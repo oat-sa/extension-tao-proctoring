@@ -113,6 +113,12 @@ define([
                  * Submit the data
                  */
                 function submit() {
+                    if (!initConfig.allowedResources.length) {
+                        $cmp.modal('close');
+
+                        return;
+                    }
+
                     if (!checkInputError()) {
                         /**
                          * The user has input a time and submitted the data

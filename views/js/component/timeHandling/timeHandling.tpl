@@ -35,42 +35,44 @@
     </ul>
     {{/if}}
 
+        <div class="form">
+            <p>
+                {{#if changeTimeMode}}
+                    <label for="input-extra-time">{{inputLabel}}:</label>
+                    <span class="change-time-controls-container">
+                        <label class="change-time-control-container">
+                            <input class="change-time-control__input" checked="checked" type="radio" name="changeTimeControl" value="">
+                            <i class="change-time-control--add">+</i>
+                        </label>
+                        <label class="change-time-control-container">
+                            <input class="change-time-control__input" type="radio" name="changeTimeControl" value="-">
+                            <i class="change-time-control--sub">—</i>
+                        </label>
+                    </span>
+                    <input type="number" id="input-extra-time" data-control="time" value="{{time}}" step="1" min="0" />
+                    <label for="input-extra-time">{{__ "minutes"}}</label>
+                {{else}}
+                    <label for="input-extra-time">{{inputLabel}}:</label>
+                    <input type="text" id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
+                    <label for="input-extra-time">{{__ "minutes"}}</label>
+                {{/if}}
+            </p>
+        </div>
+        <p>
+            <strong>{{__ "Note"}}:</strong>
+            <em>{{note}}</em>
+        </p>
+
     {{else}}
     <p>{{__ "The action cannot be applied, no eligible sessions found"}}</p>
     {{/if}}
 
-    <div class="form">
-        <p>
-            {{#if changeTimeMode}}
-                <label for="input-extra-time">{{inputLabel}}:</label>
-                <span class="change-time-controls-container">
-                    <label class="change-time-control-container">
-                        <input class="change-time-control__input" checked="checked" type="radio" name="changeTimeControl" value="">
-                        <i class="change-time-control--add">+</i>
-                    </label>
-                    <label class="change-time-control-container">
-                        <input class="change-time-control__input" type="radio" name="changeTimeControl" value="-">
-                        <i class="change-time-control--sub">—</i>
-                    </label>
-                </span>
-                <input type="number" id="input-extra-time" data-control="time" value="{{time}}" step="1" min="0" />
-                <label for="input-extra-time">{{__ "minutes"}}</label>
-            {{else}}
-                <label for="input-extra-time">{{inputLabel}}:</label>
-                <input type="text" id="input-extra-time" data-control="time" value="{{time}}" maxlength="4" size="4" />
-                <label for="input-extra-time">{{__ "minutes"}}</label>
-            {{/if}}
-        </p>
-    </div>
-    <p>
-        <strong>{{__ "Note"}}:</strong>
-        <em>{{note}}</em>
-    </p>
-
     <div class="actions">
         <div class="feedback-error small hidden">{{errorMessage}}</div>
         <button class="btn btn-info small action done" data-control="done">{{__ "OK"}}</button>
-        <a href="#" class="btn action cancel" title="{{__ 'cancel the action'}}" data-control="cancel">{{__ "cancel"}}</a>
+        {{#if allowedResources.length}}
+            <a href="#" class="btn action cancel" title="{{__ 'cancel the action'}}" data-control="cancel">{{__ "cancel"}}</a>
+        {{/if}}
     </div>
 
 </div>
