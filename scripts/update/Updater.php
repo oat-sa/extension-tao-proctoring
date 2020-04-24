@@ -918,5 +918,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating or for each field separately. May take few hours based on table size."));
             $this->setVersion('19.4.0');
         }
+
+        $this->skip('19.4.0', '19.4.1');
     }
 }

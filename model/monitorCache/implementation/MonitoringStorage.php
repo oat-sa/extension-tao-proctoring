@@ -293,6 +293,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $whereClause . PHP_EOL;
 
         if (!empty($this->groupColumns)) {
+            if (!in_array('t.delivery_execution_id', $this->groupColumns)) {
+                $this->groupColumns[] = 't.delivery_execution_id';
+            }
             $sql .= 'GROUP BY ' . implode(',', $this->groupColumns) . PHP_EOL;
         }
 
