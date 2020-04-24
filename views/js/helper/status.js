@@ -38,7 +38,7 @@ define(['lodash', 'i18n'], function(_, __){
                 print : __('not finished'),
                 reactivate : __('not terminated'),
                 time : true,
-                changeTime: __('already authorized'),
+                changeTime: __('in Progress'),
             },
             warning : {
                 authorize : function (username, testId) {
@@ -81,7 +81,7 @@ define(['lodash', 'i18n'], function(_, __){
                 print : __('not finished'),
                 reactivate : __('not terminated'),
                 time : true,
-                changeTime: __('already authorized'),
+                changeTime: __('authorized but not started'),
             },
             warning : {
                 authorize : function (username, testId) {
@@ -133,7 +133,7 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 time : true,
-                changeTime: __('not authorized'),
+                changeTime: __('awaiting'),
             },
             warning : {
                 pause : function (username, testId) {
