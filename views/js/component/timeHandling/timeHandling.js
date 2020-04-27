@@ -77,7 +77,7 @@ define([
                 const $time = $cmp.find('[data-control="time"]');
                 const $error = $cmp.find('.feedback-error');
                 const $ok = $cmp.find('[data-control="done"]');
-                const $changeTimeCotrols = $cmp.find('input[name="changeTimeControl"]');
+                const $changeTimeControls = $cmp.find('input[name="changeTimeControl"]');
                 let changeTimeOperator = '';
 
                 /**
@@ -188,7 +188,7 @@ define([
                   checkInputError();
                 });
 
-                $changeTimeCotrols.on('change', ({ target: { value } }) => {
+                $changeTimeControls.on('change', ({ target: { value } }) => {
                   changeTimeOperator = value;
                 });
 

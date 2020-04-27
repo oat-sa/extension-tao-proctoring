@@ -38,7 +38,7 @@ define(['lodash', 'i18n'], function(_, __){
                 print : __('not finished'),
                 reactivate : __('not terminated'),
                 time : true,
-                changeTime: __('in Progress'),
+                changeTime: __('in progress'),
             },
             warning : {
                 authorize : function (username, testId) {
