@@ -89,16 +89,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $timeLimits = $part->getTimeLimits();
         if ($timeLimits && ($maxTime = $timeLimits->getMaxTime()) !== null) {
-            $maximumTime = clone $maxTime;
             if ($testSession !== null && ($timer = $testSession->getTimer()) !== null) {
-                $adjustmentSeconds = $timer->getAdjustmentMap()->get($part->getIdentifier());
-                if ($adjustmentSeconds > 0) {
-                    $maximumTime->add(new QtiDuration('PT' . $adjustmentSeconds . 'S'));
-                } else {
-                    $maximumTime->sub(new QtiDuration('PT' . abs($adjustmentSeconds) . 'S'));
-                }
+                $maxTime = $this->getTimerAdjustmentService()->getAdjustedMaxTime($part, $timer);
             }
-            return $maximumTime->getSeconds(true);
+            return $maxTime->getSeconds(true);
         }
         return null;
     }
@@ -255,8 +249,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $result = ['processed' => [], 'unprocessed' => []];
 
-        /** @var TimerAdjustmentServiceInterface $timerAdjustmentService */
-        $timerAdjustmentService = $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
+        $timerAdjustmentService = $this->getTimerAdjustmentService();
 
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
@@ -318,5 +311,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
     private function getTestSessionService()
     {
         return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+    }
+
+    /**
+     * @return TimerAdjustmentServiceInterface
+     */
+    private function getTimerAdjustmentService()
+    {
+        return $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
     }
 }
