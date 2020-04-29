@@ -35,6 +35,7 @@ use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
 use oat\taoTests\models\runner\time\TimerStrategyInterface;
 use qtism\common\datatypes\QtiDuration;
 use qtism\data\AssessmentTest;
+use qtism\data\QtiIdentifiable;
 use qtism\runtime\tests\AssessmentTestSessionState;
 
 /**
@@ -138,8 +139,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      */
     public function setExtraTime($deliveryExecutions, $extraTime = 0, $extendedTime = null)
     {
-        /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryMonitoringService = $this->getDeliveryMonitoringService();
 
         $testSessionService = $this->getTestSessionService();
 
@@ -240,6 +240,50 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param $extendedTime
+     * @throws \common_exception_Error
+     * @throws \common_exception_MissingParameter
+     * @throws \common_exception_NotFound
+     * @throws \oat\taoTests\models\runner\time\InvalidStorageException
+     */
+    public function updateDeliveryExtendedTime(DeliveryExecutionInterface $deliveryExecution, $extendedTime)
+    {
+        $timer = $this->getDeliveryTimer($deliveryExecution);
+        if ($timer->getExtendedTime()) {
+            return;
+        }
+
+        $inputParameters = $this->getTestSessionService()->getRuntimeInputParameters($deliveryExecution);
+        /** @var AssessmentTest $testDefinition */
+        $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
+        $components = $testDefinition->getComponentsByClassName(['testPart', 'assessmentSection', 'assessmentItemRef']);
+        $components->attach($testDefinition);
+
+        /** @var QtiIdentifiable $component */
+        foreach ($components as $component) {
+            $timeLimits = $component->getTimeLimits();
+            if ($timeLimits && $timeLimits->hasMaxTime()) {
+                $currentLimitSeconds = $timeLimits->getMaxTime()->getSeconds(true);
+                $increaseSeconds = $this->getServiceLocator()
+                    ->get(TimerStrategyInterface::SERVICE_ID)
+                    ->getExtraTime($currentLimitSeconds, $extendedTime);
+                if ($increaseSeconds > 0) {
+                    $timer->getAdjustmentMap()->increase($component->getIdentifier(), $increaseSeconds);
+                }
+            }
+        }
+        $timer->setExtendedTime($extendedTime);
+        $timer->save();
+        $this->getServiceLocator()->get(StorageManager::SERVICE_ID)->persist();
+
+        $deliveryMonitoringService = $this->getDeliveryMonitoringService();
+        $data = $deliveryMonitoringService->getData($deliveryExecution);
+        $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
+        $deliveryMonitoringService->save($data);
+    }
+
+    /**
      * Registers timer adjustments to a list of delivery executions
      * @param array $deliveryExecutions
      * @param int $seconds
@@ -251,8 +295,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
         $timerAdjustmentService = $this->getTimerAdjustmentService();
 
-        /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+        $deliveryMonitoringService = $this->getDeliveryMonitoringService();
 
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -319,5 +362,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
     private function getTimerAdjustmentService()
     {
         return $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
+    }
+
+    /**
+     * @return DeliveryMonitoringService
+     */
+    private function getDeliveryMonitoringService()
+    {
+        return $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
     }
 }
