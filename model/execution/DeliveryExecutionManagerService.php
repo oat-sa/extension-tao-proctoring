@@ -130,14 +130,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * Sets the extra time to a list of delivery executions
      * @param $deliveryExecutions
      * @param int $extraTime
-     * @param null $extendedTime
      * @return array
      * @throws \common_exception_Error
      * @throws \common_exception_MissingParameter
      * @throws \common_exception_NotFound
      * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
-    public function setExtraTime($deliveryExecutions, $extraTime = 0, $extendedTime = null)
+    public function setExtraTime($deliveryExecutions, $extraTime = 0)
     {
         $deliveryMonitoringService = $this->getDeliveryMonitoringService();
 
@@ -155,32 +154,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $data = $deliveryMonitoringService->getData($deliveryExecution);
             $maxTime = 0;
             $timerTarget = TimePoint::TARGET_SERVER;
-            if ($extendedTime) {
-                $inputParameters = $testSessionService->getRuntimeInputParameters($deliveryExecution);
-                /** @var AssessmentTest $testDefinition */
-                $testDefinition = \taoQtiTest_helpers_Utils::getTestDefinition($inputParameters['QtiTestCompilation']);
-                $deliveryExecutionArray[] = $deliveryExecution;
-                $extraTime = null;
-
-                /* @var TestSession $testSession */
-                $testSession = $testSessionService->getTestSession($deliveryExecution);
-                if ($testSession) {
-                    $seconds = $this->getTimeLimits($testSession);
-                } else {
-                    $seconds = $this->getPartTimeLimits($testSession, $testDefinition);
-                }
-
-                if ($seconds) {
-                    $extraTime = $this->getServiceLocator()
-                        ->get(TimerStrategyInterface::SERVICE_ID)
-                        ->getExtraTime($seconds, $extendedTime);
-
-                    $dataArray = $data->get();
-                    if (!isset($dataArray[DeliveryMonitoringService::REMAINING_TIME])) {
-                        $data->update(DeliveryMonitoringService::REMAINING_TIME, $seconds);
-                    }
-                }
-            }
 
             // reopen the execution if already closed
             if ($deliveryExecution->getState()->getUri() == DeliveryExecution::STATE_FINISHED) {
@@ -221,11 +194,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $timer = $this->getDeliveryTimer($deliveryExecution);
             $timer
                 ->setExtraTime($extraTime)
-                ->setExtendedTime($extendedTime)
                 ->save();
 
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
-            $data->update(DeliveryMonitoringService::EXTENDED_TIME, $timer->getExtendedTime());
             $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(null, $maxTime, $timerTarget));
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
