@@ -337,6 +337,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             $timer = $qtiTimerFactory->getTimer($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier());
         }
 
+        /** @var DeliveryExecutionManagerService $deliveryExecutionManager */
         $deliveryExecutionManager = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $maxTimeSeconds = $deliveryExecutionManager->getTimeLimits($testSession);
 
