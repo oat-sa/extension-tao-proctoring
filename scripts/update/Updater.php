@@ -919,7 +919,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.4.0');
         }
 
-        if ($this->isVersion('19.4.0')) {
+        $this->skip('19.4.0', '19.4.1');
+
+        if ($this->isVersion('19.4.1')) {
             /** @var DeliveryExecutionStateService $service */
             $service = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $currentOptionValue = $service->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING);
