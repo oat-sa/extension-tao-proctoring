@@ -81,14 +81,18 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
+     * @param TestSession $testSession
      * @param $part
      * @return int|null
      */
-    protected function getPartTimeLimits($part)
+    protected function getPartTimeLimits($testSession, $part)
     {
         $timeLimits = $part->getTimeLimits();
-        if ($timeLimits && $timeLimits->hasMaxTime()) {
-            return $timeLimits->getMaxTime()->getSeconds(true);
+        if ($timeLimits && ($maxTime = $timeLimits->getMaxTime()) !== null) {
+            if ($testSession !== null && ($timer = $testSession->getTimer()) !== null) {
+                $maxTime = $this->getTimerAdjustmentService()->getAdjustedMaxTime($part, $timer);
+            }
+            return $maxTime->getSeconds(true);
         }
         return null;
     }
@@ -103,19 +107,19 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $seconds = null;
 
         if ($item = $testSession->getCurrentAssessmentItemRef()) {
-            $seconds = $this->getPartTimeLimits($item);
+            $seconds = $this->getPartTimeLimits($testSession, $item);
         }
 
         if (!$seconds && $section = $testSession->getCurrentAssessmentSection()) {
-            $seconds = $this->getPartTimeLimits($section);
+            $seconds = $this->getPartTimeLimits($testSession, $section);
         }
 
         if (!$seconds && $testPart = $testSession->getCurrentTestPart()) {
-            $seconds = $this->getPartTimeLimits($testPart);
+            $seconds = $this->getPartTimeLimits($testSession, $testPart);
         }
 
         if (!$seconds && $assessmentTest = $testSession->getAssessmentTest()) {
-            $seconds = $this->getPartTimeLimits($assessmentTest);
+            $seconds = $this->getPartTimeLimits($testSession, $assessmentTest);
         }
 
         return $seconds;
@@ -163,7 +167,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 if ($testSession) {
                     $seconds = $this->getTimeLimits($testSession);
                 } else {
-                    $seconds = $this->getPartTimeLimits($testDefinition);
+                    $seconds = $this->getPartTimeLimits($testSession, $testDefinition);
                 }
 
                 if ($seconds) {
@@ -209,7 +213,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     $durationStore[$testDefinition->getIdentifier()] = new QtiDuration("PT${newSeconds}S");
 
                     $testSessionService->persist($testSession);
-                    $maxTime = $this->getPartTimeLimits($testSession);
+                    $maxTime = $this->getPartTimeLimits($testSession, $testDefinition);
                 }
             }
 
@@ -245,8 +249,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $result = ['processed' => [], 'unprocessed' => []];
 
-        /** @var TimerAdjustmentServiceInterface $timerAdjustmentService */
-        $timerAdjustmentService = $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
+        $timerAdjustmentService = $this->getTimerAdjustmentService();
+
+        /** @var DeliveryMonitoringService $deliveryMonitoringService */
+        $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
 
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -262,6 +268,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 } else {
                     $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
                 }
+
+                $data = $deliveryMonitoringService->getData($deliveryExecution);
+                $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
+                $deliveryMonitoringService->save($data);
             }
 
             if ($success) {
@@ -301,5 +311,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
     private function getTestSessionService()
     {
         return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
+    }
+
+    /**
+     * @return TimerAdjustmentServiceInterface
+     */
+    private function getTimerAdjustmentService()
+    {
+        return $this->getServiceLocator()->get(TimerAdjustmentServiceInterface::SERVICE_ID);
     }
 }
