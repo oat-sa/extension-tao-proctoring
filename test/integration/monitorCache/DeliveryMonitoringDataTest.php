@@ -157,8 +157,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
             $monitoringData,
             'Delivery execution context object must be stored in monitoring data.'
         );
-        $this->assertInternalType(
-            'string',
+        $this->assertIsString(
             $monitoringData['execution_context'],
             'Delivery monitoring context must be stored as JSON string.'
         );
