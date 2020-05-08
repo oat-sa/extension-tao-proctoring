@@ -102,6 +102,9 @@ class DeliveryExecutionList extends ConfigurableService
             'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
                 ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                 : null,
+            'allowTimerAdjustment' => $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
+                $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+            ),
             'timer' => [
                 'lastActivity' => $this->getLastActivity($cachedData, $online),
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
@@ -332,6 +335,14 @@ class DeliveryExecutionList extends ConfigurableService
     private function getExtensionManagerService()
     {
         return $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+    }
+
+    /**
+     * @return DeliveryExecutionManagerService
+     */
+    private function getDeliveryExecutionManagerService()
+    {
+        return $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
     }
 
     /**

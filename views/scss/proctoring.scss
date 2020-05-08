@@ -275,4 +275,49 @@
       width: 180px;
       font-size: 12px;
     }
+
+    .change-time-controls-container {
+        font-size: 0;
+
+        .change-time-control-container {
+            margin: 0;
+            padding: 0;
+            position: relative;
+
+            .change-time-control--add,
+            .change-time-control--sub {
+                background-color: white;
+                border: 1px solid $websiteBorder;
+                color: $textColor;
+                cursor: pointer;
+                display: inline-block;
+                font-size: 18px;
+                height: 24px;
+                line-height: 22px;
+                position: relative;
+                text-align: center;
+                top: 2px;
+                user-select: none;
+                width: 24px;
+            }
+
+            .change-time-control--sub {
+                font-size: 16px;
+                line-height: 19px;
+                top: 0;
+            }
+
+            .change-time-control__input {
+                cursor: pointer;
+                opacity: 0;
+                position: absolute;
+            }
+
+            input:checked ~ .change-time-control--add,
+            input:checked ~ .change-time-control--sub {
+                background-color: $info;
+                color: white;
+            }
+        }
+    }
 }

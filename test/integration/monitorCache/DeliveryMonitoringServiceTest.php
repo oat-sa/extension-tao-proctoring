@@ -23,13 +23,12 @@ namespace oat\taoProctoring\test\integration\monitorCache;
 
 require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
 
+use common_persistence_Persistence;
+use common_persistence_SqlPersistence;
 use oat\generis\persistence\PersistenceManager;
 use oat\tao\test\TaoPhpUnitTestRunner;
-use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
-use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\scripts\install\db\DbSetup;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -46,6 +45,9 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      * @var MonitoringStorage
      */
     protected $service;
+    /**
+     * @var common_persistence_SqlPersistence
+     */
     protected $persistence;
     protected $deliveryExecutionId = 'http://sample/first.rdf#i1450191587554175_test_record';
     protected $fixtureData = [
@@ -89,45 +91,62 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     ];
 
 
-    public function setUp(): void
+    private function getService(): MonitoringStorage {
+        if (!$this->service) {
+            $this->service = new MonitoringStorage([
+                MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
+                MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
+                    'delivery_execution_id',
+                    'status',
+                    'current_assessment_item',
+                    'test_taker',
+                    'authorized_by',
+                    'start_time',
+                    'end_time'
+                )
+            ]);
+        }
+
+        return $this->service;
+    }
+
+    /**
+     * @return common_persistence_Persistence
+     */
+    private function getPersistence(): common_persistence_Persistence
     {
-        $this->service = new MonitoringStorage([
-            MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
-            MonitoringStorage::OPTION_PRIMARY_COLUMNS => array(
-                'delivery_execution_id',
-                'status',
-                'current_assessment_item',
-                'test_taker',
-                'authorized_by',
-                'start_time',
-                'end_time'
-            )
-        ]);
+        if (!$this->persistence) {
+            $sqlMock = $this->getSqlMock('test_monitoring');
+            $cacheMock = $this->getKvMock('cache');
+            $this->persistence = $sqlMock->getPersistenceById('test_monitoring');
+            DbSetup::generateTable($this->persistence);
 
-        $sqlMock = $this->getSqlMock('test_monitoring');
-        $cacheMock = $this->getKvMock('cache');
-        $this->persistence = $sqlMock->getPersistenceById('test_monitoring');
-        DbSetup::generateTable($this->persistence);
+            $pmMock = $this->getMockBuilder(PersistenceManager::class)
+                ->setMethods(['getPersistenceById'])
+                ->getMock();
 
-        $pmMock = $this->getMockBuilder(PersistenceManager::class)
-            ->setMethods(['getPersistenceById'])
-            ->getMock();
-
-        $pmMock->method('getPersistenceById')
-            ->will($this->returnCallback(
-                function ($persistenceId) use ($sqlMock, $cacheMock) {
+            $pmMock->method('getPersistenceById')
+                ->willReturnCallback(static function ($persistenceId) use ($sqlMock, $cacheMock) {
                     if ($persistenceId === 'cache') {
                         return $cacheMock->getPersistenceById('cache');
                     }
                     if ($persistenceId === 'test_monitoring') {
                         return $sqlMock->getPersistenceById('test_monitoring');
                     }
-                }
-            ));
+                    return false;
+                });
 
-        $sl = $this->prophesize(ServiceLocatorInterface::class);
-        $sl->get(PersistenceManager::SERVICE_ID)->willReturn($pmMock);
-        $this->service->setServiceLocator($sl->reveal());
+            $sl = $this->prophesize(ServiceLocatorInterface::class);
+            $sl->get(PersistenceManager::SERVICE_ID)->willReturn($pmMock);
+            $this->getService()->setServiceLocator($sl->reveal());
+        }
+        return $this->persistence;
+    }
+
+    public function setUp(): void
+    {
+        $this->getService();
+        $this->getPersistence();
     }
 
     public function tearDown(): void
@@ -142,12 +161,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      */
     public function deleteTestData()
     {
-        $service = $this->service;
+        $sql = 'DELETE FROM ' . MonitoringStorage::TABLE_NAME .
+            ' WHERE ' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
 
-        $sql = 'DELETE FROM ' . $service::TABLE_NAME .
-            ' WHERE ' . $service::COLUMN_DELIVERY_EXECUTION_ID . " LIKE '%_test_record'";
-
-        $this->persistence->exec($sql);
+        $this->getPersistence()->exec($sql);
     }
 
     public function testPartialSave()
