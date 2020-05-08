@@ -345,7 +345,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $oldConsumedExtraTime = isset($data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) ? $data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] : 0;
         $consumedExtraTime = max($oldConsumedExtraTime, $timer->getConsumedExtraTime(null, $maxTimeSeconds, $timerTarget));
 
-        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime($maxTimeSeconds), true);
+        $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $consumedExtraTime, true);
     }
 

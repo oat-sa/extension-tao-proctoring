@@ -318,13 +318,12 @@ class DeliveryHelper
      *
      * @param array $deliveryExecutions
      * @param float $extraTime
-     * @param float $extendedTime
      * @return array
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
-    public static function setExtraTime($deliveryExecutions, $extraTime = null, $extendedTime = null)
+    public static function setExtraTime($deliveryExecutions, $extraTime = null)
     {
-        return self::getDeliveryExecutionManagerService()->setExtraTime($deliveryExecutions, $extraTime, $extendedTime);
+        return self::getDeliveryExecutionManagerService()->setExtraTime($deliveryExecutions, $extraTime);
     }
 
     public static function getDeliveryExecutionById($deliveryExecutionId)
