@@ -99,6 +99,7 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('client_config_url', $this->getClientConfigUrl());
             $this->setData('showControls', true);
             $this->setData('runDeliveryUrl', $runDeliveryUrl);
+            $this->setData('title', __("TAO - An Open and Versatile Computer-Based Assessment Platform"));
 
             //set template
             $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
