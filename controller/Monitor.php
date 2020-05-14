@@ -328,6 +328,7 @@ class Monitor extends SimplePageModule
     {
         $deliveryExecutions = $this->getPostParameter('execution');
         $seconds = $this->getPostParameter('time');
+        $reason = $this->getPostParameter('reason', []);
 
         if (!is_array($deliveryExecutions)) {
             $deliveryExecutions = [$deliveryExecutions];
@@ -335,7 +336,7 @@ class Monitor extends SimplePageModule
 
         /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
         $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
-        $data = $deliveryExecutionManagerService->adjustTimers($deliveryExecutions, $seconds);
+        $data = $deliveryExecutionManagerService->adjustTimers($deliveryExecutions, $seconds, $reason);
 
         $response = [
             'success' => !count($data['unprocessed']),

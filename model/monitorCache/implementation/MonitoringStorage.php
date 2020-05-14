@@ -107,7 +107,6 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
     const KV_COLUMN_VALUE = 'monitoring_value';
     const KV_FK_PARENT = 'FK_DeliveryMonitoring_kvDeliveryMonitoring';
 
-
     const DEFAULT_SORT_COLUMN = self::COLUMN_ID;
     const DEFAULT_SORT_ORDER = 'ASC';
     const DEFAULT_SORT_TYPE = 'string';
