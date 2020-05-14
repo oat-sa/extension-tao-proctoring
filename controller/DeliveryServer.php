@@ -105,6 +105,7 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
             $this->setData('content-template', 'DeliveryServer/awaiting.tpl');
             $this->setData('content-extension', 'taoProctoring');
+            $this->setData('title', __('TAO: User Authorization'));
             $this->setView('DeliveryServer/layout.tpl', 'taoDelivery');
         } else {
             // inconsistent state
