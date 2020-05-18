@@ -24,11 +24,15 @@ use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
 use common_ext_ExtensionException;
+use common_session_Session;
+use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\oatbox\session\SessionService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -265,13 +269,14 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * Registers timer adjustments to a list of delivery executions
      * @param array $deliveryExecutions
      * @param int $seconds
+     * @param array $reason
      * @return array
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
      * @throws common_Exception
      * @throws common_exception_Error
      * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
-     * @throws InvalidServiceManagerException
-     * @throws QtiTestExtractionFailedException
      */
     public function adjustTimers(array $deliveryExecutions, $seconds, array $reason = []): array
     {
@@ -280,6 +285,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $timerAdjustmentService = $this->getTimerAdjustmentService();
 
         $deliveryMonitoringService = $this->getDeliveryMonitoringService();
+        /** @var common_session_Session $session */
+        $session = $this->getServiceLocator()->get(SessionService::SERVICE_ID)->getCurrentSession();
+        $proctor = $session->getUser();
+        $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
 
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -301,13 +310,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
 
                 $deliveryMonitoringService->save($data);
-
-                // log adjusted time of the de
-                $adjustmentLog = [
-                    'reason' => $reason,
-                    'increment' => $seconds,
-                ];
-                $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'ADJUSTED_TIME', $adjustmentLog);
+                $eventManager->trigger(new DeliveryExecutionTimerAdjusted($deliveryExecution, $proctor, $seconds, $reason));
             }
 
             if ($success) {
@@ -318,14 +321,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return $result;
-    }
-
-    /**
-     * @return array|object
-     */
-    private function getDeliveryLogService()
-    {
-        return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
 
     /**
