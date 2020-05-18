@@ -28,6 +28,16 @@ class DeliveryLogEvent implements Event
 {
     const EVENT_NAME = __CLASS__;
 
+    public const EVENT_ID_TEST_EXIT_CODE = 'TEST_EXIT_CODE';
+    public const EVENT_ID_SECTION_EXIT_CODE = 'SECTION_EXIT_CODE';
+    public const EVENT_ID_TEST_PAUSE = 'TEST_PAUSE';
+    public const EVENT_ID_TEST_CANCEL = 'TEST_CANCEL';
+    public const EVENT_ID_TEST_RUN = 'TEST_RUN';
+    public const EVENT_ID_TEST_RESUME = 'TEST_RESUME';
+    public const EVENT_ID_TEST_AUTHORISE = 'TEST_AUTHORISE';
+    public const EVENT_ID_TEST_TERMINATE = 'TEST_TERMINATE';
+    public const EVENT_ID_TEST_IRREGULARITY = 'TEST_IRREGULARITY';
+
     /**
      * @var int unique identifier of the record in the delivery_log table
      */
