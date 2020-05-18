@@ -415,8 +415,8 @@ define([
                         inputLabel: __('Extra time'),
                     });
 
-                    timeHandlingPopup(config).on('ok', function(time){
-                        request('extraTime', _selection, {time: time}, __('Extra time granted'));
+                    timeHandlingPopup(config).on('ok', function(state){
+                        request('extraTime', _selection, {time: state.time}, __('Extra time granted'));
                     });
                 }
 
@@ -446,11 +446,11 @@ define([
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
 
-                    timeHandlingPopup(config).on('ok', (time) => {
+                    timeHandlingPopup(config).on('ok', (state) => {
                         request(
                             'adjustTime',
                             sessionsList.allowedResources.map(({ id }) => id),
-                            { time: time },
+                            state,
                             __('Time adjusted'),
                         );
                     });
