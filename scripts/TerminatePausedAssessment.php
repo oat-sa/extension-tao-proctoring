@@ -252,7 +252,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     private function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
-        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSED));
+        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSE));
 
         if (!empty($pauses)) {
             $lastPause = $pauses[0]['created_at'];

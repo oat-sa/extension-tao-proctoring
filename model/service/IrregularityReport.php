@@ -55,7 +55,7 @@ class IrregularityReport extends AbstractIrregularityReport
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
             $logs = $deliveryLog->get(
                 $deliveryExecution->getIdentifier(),
-                DeliveryLogEvent::EVENT_ID_TEST_IRREGULARITY:
+                DeliveryLogEvent::EVENT_ID_TEST_IRREGULARITY
             );
             foreach ($logs as $data) {
                 $exportable = [];
