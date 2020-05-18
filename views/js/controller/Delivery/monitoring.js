@@ -1080,7 +1080,7 @@ define([
                                 title : __('Session time handling'),
                                 icon : 'time',
                                 action : timeAdjustment,
-                                hidden() {
+                                disabled() {
                                     return !this.allowTimerAdjustment;
                                 }
                             }]
