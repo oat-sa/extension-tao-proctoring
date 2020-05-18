@@ -432,7 +432,7 @@ define([
                             actionName: __('Change time'),
                             errorMessage: __('The extra time must be a number bigger than 0'),
                             unit: extraTimeUnit, // input extra time in minutes
-                            note: __('Already changed time will be added or substracted by the new value.'),
+                            note: __('Already changed time will be added or subtracted by the new value.'),
                             inputLabel: __('Change time'),
                             changeTimeMode: true,
                         }
