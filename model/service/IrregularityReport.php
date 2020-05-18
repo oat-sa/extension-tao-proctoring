@@ -26,6 +26,7 @@ use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\tao\helpers\UserHelper;
 use oat\oatbox\user\User;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 
 class IrregularityReport extends AbstractIrregularityReport
 {
@@ -54,7 +55,7 @@ class IrregularityReport extends AbstractIrregularityReport
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($res['deliveryResultIdentifier']);
             $logs = $deliveryLog->get(
                 $deliveryExecution->getIdentifier(),
-                'TEST_IRREGULARITY'
+                DeliveryLogEvent::EVENT_ID_TEST_IRREGULARITY:
             );
             foreach ($logs as $data) {
                 $exportable = [];

@@ -23,6 +23,7 @@ namespace oat\taoProctoring\scripts;
 
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\oatbox\service\ServiceManager;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -251,7 +252,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     private function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
-        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), 'TEST_PAUSE'));
+        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSED));
 
         if (!empty($pauses)) {
             $lastPause = $pauses[0]['created_at'];
