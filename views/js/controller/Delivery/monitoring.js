@@ -424,6 +424,8 @@ define([
                 function timeAdjustment(selection) {
                     const _selection = _.isArray(selection) ? selection : [selection];
                     const sessionsList = listSessions('changeTime', _selection);
+                    const actionName = 'timeAdjustment';
+                    const askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                     const config = Object.assign(
                         {},
                         sessionsList,
@@ -435,8 +437,14 @@ define([
                             note: __('Already changed time will be added or subtracted by the new value.'),
                             inputLabel: __('Change time'),
                             changeTimeMode: true,
-                        }
+                            reason : askForReason,
+                            reasonRequired: true,
+                        },
                     );
+
+                    if (!_.isEmpty(categories[actionName])) {
+                        config.categoriesSelector = cascadingComboBox(categories[actionName]);
+                    }
 
                     timeHandlingPopup(config).on('ok', (time) => {
                         request(
@@ -563,7 +571,7 @@ define([
                         renderTo : $content,
                         actionName : actionTitle,
                         reason : askForReason,
-                        reasonRequired: true
+                        reasonRequired: true,
                     });
 
                     if (dialogSettings && dialogSettings[actionName]) {

@@ -156,6 +156,11 @@ define([
                     }, 0) / timeUnit);
                 }
 
+                if (_.isObject(this.config.categoriesSelector)) {
+                    const $reason = $cmp.find('.reason').children('.categories');
+                    this.config.categoriesSelector.render($reason);
+                }
+
                 $cmp
                     .addClass('modal')
                     .on('closed.modal', function () {
@@ -165,7 +170,12 @@ define([
                         if (13 === event.keyCode) {
                             submit();
                         } else {
-                            checkInputError();
+                            if (
+                                event.hasOwnProperty('target')
+                                && event.target.hasOwnProperty('id')
+                                && event.target.id === 'input-extra-time') {
+                                    checkInputError();
+                            }
                         }
                     })
                     .on('click', '.action', function (event) {

@@ -63,6 +63,18 @@
             <em>{{note}}</em>
         </p>
 
+        {{#if reason}}
+        <div class="reason">
+            <p>
+                {{__ "Please provide a reason"}}:
+            </p>
+            <div class="categories"></div>
+            <div class="comment">
+                <textarea placeholder="{{__ "comment..."}}"></textarea>
+            </div>
+        </div>
+        {{/if}}
+
     {{else}}
     <p>{{__ "The action cannot be applied, no eligible sessions found"}}</p>
     {{/if}}

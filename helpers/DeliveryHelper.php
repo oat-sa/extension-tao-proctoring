@@ -482,6 +482,7 @@ class DeliveryHelper
             'pause' => $categoryService->getIrregularities(),
             'terminate' => $categoryService->getIrregularities(),
             'report' => $categoryService->getIrregularities(),
+            'timeAdjustment' => $categoryService->getIrregularities(),
             'print' => [],
         );
         if ($hasAccessToReactivate) {
