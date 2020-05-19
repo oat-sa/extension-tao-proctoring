@@ -79,6 +79,11 @@ define([
                 const $ok = $cmp.find('[data-control="done"]');
                 const $changeTimeControls = $cmp.find('input[name="changeTimeControl"]');
                 let changeTimeOperator = '';
+                const state = {
+                    reasons: null,
+                    comment: '',
+                    time: 0,
+                };
 
                 /**
                  * Validate the input time
@@ -110,6 +115,33 @@ define([
                 }
 
                 /**
+                 * Validates that all required fields have been filled
+                 * @param {jQuery} $container
+                 * @returns {Boolean}
+                 */
+                function checkRequiredFields($container) {
+                    return (
+                        $('select, textarea', $container).filter(function() {
+                            return $.trim($(this).val()).length === 0;
+                        }).length === 0
+                    );
+                }
+
+                function checkReasonError() {
+                    const $element = self.getElement();
+
+                    if ($element) {
+                        $('.feedback-error', $element).remove();
+                        if (!checkRequiredFields($element)) {
+                            const $error = $('<div class="feedback-error small"></div>').text(__('All fields are required'));
+                            $element.find('.actions').prepend($error);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                /**
                  * Submit the data
                  */
                 function submit() {
@@ -119,13 +151,9 @@ define([
                         return;
                     }
 
-                    if (!checkInputError()) {
-                        /**
-                         * The user has input a time and submitted the data
-                         * @event ok
-                         * @param {Number} time
-                         */
-                        self.trigger('ok', parseFloat(`${changeTimeOperator}${$time.val()}`) * timeUnit);
+                    if (!checkInputError() && !checkReasonError()) {
+                        state.time = parseFloat(`${changeTimeOperator}${$time.val()}`) * timeUnit;
+                        self.trigger('ok', state);
                         $cmp.modal('close');
                     }
                 }
@@ -156,16 +184,34 @@ define([
                     }, 0) / timeUnit);
                 }
 
+                if (_.isObject(this.config.categoriesSelector)) {
+                    const $reason = $cmp.find('.reason').children('.categories');
+                    this.config.categoriesSelector.render($reason);
+                }
+
                 $cmp
                     .addClass('modal')
                     .on('closed.modal', function () {
                         self.destroy();
                     })
+                    .on('selected.cascading-combobox', (e, reasons) => {
+                        state.reasons = reasons;
+                        self.trigger('change', state);
+                    })
+                    .on('change', 'textarea', (e) => {
+                        state.comment = $(e.currentTarget).val();
+                        self.trigger('change', state);
+                    })
                     .on('keyup', function(event) {
                         if (13 === event.keyCode) {
                             submit();
                         } else {
-                            checkInputError();
+                            if (
+                                event.hasOwnProperty('target')
+                                && event.target.hasOwnProperty('id')
+                                && event.target.id === 'input-extra-time') {
+                                    checkInputError();
+                            }
                         }
                     })
                     .on('click', '.action', function (event) {
