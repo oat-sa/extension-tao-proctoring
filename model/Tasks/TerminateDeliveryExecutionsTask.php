@@ -19,22 +19,29 @@
  */
 namespace oat\taoProctoring\model\Tasks;
 
+use common_exception_Error as Error;
+use common_report_Report as Report;
+use JsonSerializable;
 use oat\oatbox\extension\AbstractAction;
 use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 
-class TerminateDeliveryExecutionsTask extends AbstractAction implements \JsonSerializable
+/**
+ * Class TerminateDeliveryExecutionsTask
+ * @package oat\taoProctoring\model\Tasks
+ */
+class TerminateDeliveryExecutionsTask extends AbstractAction implements JsonSerializable
 {
     /**
      * @param $params
-     * @return \common_report_Report
-     * @throws \common_exception_Error
+     * @return Report
+     * @throws Error
      */
     public function __invoke($params)
     {
-        /** @var TerminateDeliveryExecutionsService $finishDeService */
-        $finishDeService = $this->getServiceLocator()->get(TerminateDeliveryExecutionsService::SERVICE_ID);
+        /** @var TerminateDeliveryExecutionsService $terminateDEService */
+        $terminateDEService = $this->getServiceLocator()->get(TerminateDeliveryExecutionsService::SERVICE_ID);
 
-        return $finishDeService->execute();
+        return $terminateDEService->execute();
     }
 
     /**

@@ -17,35 +17,53 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoProctoring\model;
 
-
+use common_Exception;
+use common_exception_Error as Error;
+use common_exception_NotFound;
+use common_ext_ExtensionException;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoProctoring\model\execution\DeliveryExecutionsUpdater;
 use common_report_Report as Report;
+use oat\taoQtiTest\models\QtiTestExtractionFailedException;
+use qtism\runtime\storage\common\StorageException;
+use qtism\runtime\tests\AssessmentTestSessionException;
 
 class TerminateDeliveryExecutionsService extends DeliveryExecutionsUpdater
 {
-    const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
+    public const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
 
     /**
      * Terminate delivery execution
      *
-     * @param $deliveryExecution
-     * @param $executionId
+     * @param      $deliveryExecution
+     * @param      $executionId
      * @param bool $isEndDate
+     *
      * @return mixed|void
-     * @throws \common_exception_Error
+     * @throws Error
+     * @throws common_Exception
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws StorageException
+     * @throws AssessmentTestSessionException
      */
     protected function action($deliveryExecution, $executionId, $isEndDate = false)
     {
         $this->getDeliveryStateService()->terminateExecution($deliveryExecution, [
-            'reasons' =>[
-                'category' => 'Technical'
+            'reasons' => [
+                ReasonCategoryServiceInterface::PROPERTY_CATEGORY => 'Technical',
+                ReasonCategoryServiceInterface::PROPERTY_SUBCATEGORY => 'Abandoned'
             ],
             'comment' => $isEndDate
-                ? 'The assessment was automatically terminated because end time expired.'
+                ? 'The assessment was automatically terminated because of end time expired.'
                 : 'The assessment was automatically terminated.'
         ]);
-        $this->report->add(Report::createSuccess('Execution terminated with success:'. $executionId ));
+
+        $this->report->add(Report::createSuccess(sprintf('Execution %s successfully terminated', $executionId)));
     }
 }
