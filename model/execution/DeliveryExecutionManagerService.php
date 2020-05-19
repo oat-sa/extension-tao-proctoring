@@ -310,6 +310,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
 
                 $deliveryMonitoringService->save($data);
+
                 $eventManager->trigger(new DeliveryExecutionTimerAdjusted($deliveryExecution, $proctor, $seconds, $reason));
             }
 
