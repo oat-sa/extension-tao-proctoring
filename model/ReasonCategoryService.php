@@ -33,14 +33,8 @@ class ReasonCategoryService extends ConfigurableService implements ReasonCategor
     private function getDefinitions()
     {
         return [
-            array(
-                'id' => 'category',
-                'placeholder' => __('Issue Category')
-            ),
-            array(
-                'id' => 'subCategory',
-                'placeholder' => __('Subcategory')
-            )
+            ['id' => self::PROPERTY_CATEGORY,       'placeholder' => __('Issue Category')],
+            ['id' => self::PROPERTY_SUBCATEGORY,    'placeholder' => __('Subcategory')],
         ];
     }
 
@@ -52,124 +46,55 @@ class ReasonCategoryService extends ConfigurableService implements ReasonCategor
      */
     protected function getCategories()
     {
-        return array(
-            array(
+        return [
+            [
                 'id' => 'environment',
                 'label' => __('Environment'),
-                'categories' => array(
-                    array(
-                        'id' => 'comfort',
-                        'label' => __('Comfort')
-                    ),
-                    array(
-                        'id' => 'disturbance',
-                        'label' => __('Disturbance')
-                    ),
-                    array(
-                        'id' => 'noise',
-                        'label' => __('Noise')
-                    ),
-                    array(
-                        'id' => 'powerOutage',
-                        'label' => __('Power Outage')
-                    ),
-                    array(
-                        'id' => 'weather',
-                        'label' => __('Weather')
-                    ),
-                )
-            ),
-            array(
+                'categories' => [
+                    ['id' => 'comfort',     'label' => __('Comfort')],
+                    ['id' => 'disturbance', 'label' => __('Disturbance')],
+                    ['id' => 'noise',       'label' => __('Noise')],
+                    ['id' => 'powerOutage', 'label' => __('Power Outage')],
+                    ['id' => 'weather',     'label' => __('Weather')],
+                ],
+            ],
+            [
                 'id' => 'examinee',
                 'label' => __('Examinee'),
-                'categories' => array(
-                    array(
-                        'id' => 'behaviour',
-                        'label' => __('Behaviour')
-                    ),
-                    array(
-                        'id' => 'complaint',
-                        'label' => __('Complaint')
-                    ),
-                    array(
-                        'id' => 'idAuthorization',
-                        'label' => __('ID/Authorization')
-                    ),
-                    array(
-                        'id' => 'illness',
-                        'label' => __('Illness')
-                    ),
-                    array(
-                        'id' => 'late',
-                        'label' => __('Late')
-                    ),
-                    array(
-                        'id' => 'navigation',
-                        'label' => __('Navigation')
-                    ),
-                    array(
-                        'id' => 'noShow',
-                        'label' => __('No Show')
-                    ),
-                )
-            ),
-            array(
+                'categories' => [
+                    ['id' => 'behaviour',   'label' => __('Behaviour')],
+                    ['id' => 'complaint',   'label' => __('Complaint')],
+                    ['id' => 'idAuthorization', 'label' => __('ID/Authorization')],
+                    ['id' => 'illness',     'label' => __('Illness')],
+                    ['id' => 'late',        'label' => __('Late')],
+                    ['id' => 'navigation',  'label' => __('Navigation')],
+                    ['id' => 'noShow',      'label' => __('No Show')],
+                ],
+            ],
+            [
                 'id' => 'proctorStaff',
                 'label' => __('Proctor/Staff'),
-                'categories' => array(
-                    array(
-                        'id' => 'behaviour',
-                        'label' => __('Behaviour')
-                    ),
-                    array(
-                        'id' => 'compliance',
-                        'label' => __('Compliance')
-                    ),
-                    array(
-                        'id' => 'error',
-                        'label' => __('Error')
-                    ),
-                    array(
-                        'id' => 'late',
-                        'label' => __('Late')
-                    ),
-                    array(
-                        'id' => 'noShow',
-                        'label' => __('No Show')
-                    ),
-                )
-            ),
-            array(
+                'categories' => [
+                    ['id' => 'behaviour',   'label' => __('Behaviour')],
+                    ['id' => 'compliance',  'label' => __('Compliance')],
+                    ['id' => 'error',       'label' => __('Error')],
+                    ['id' => 'late',        'label' => __('Late')],
+                    ['id' => 'noShow',      'label' => __('No Show')],
+                ]
+            ],
+            [
                 'id' => 'technical',
                 'label' => __('Technical'),
-                'categories' => array(
-                    array(
-                        'id' => 'freezing',
-                        'label' => __('Freezing')
-                    ),
-                    array(
-                        'id' => 'launching',
-                        'label' => __('Launching')
-                    ),
-                    array(
-                        'id' => 'network',
-                        'label' => __('Network')
-                    ),
-                    array(
-                        'id' => 'printing',
-                        'label' => __('Printing')
-                    ),
-                    array(
-                        'id' => 'testingWorkstation',
-                        'label' => __('Testing Workstation')
-                    ),
-                )
-            ),
-            array(
-                'id' => 'other',
-                'label' => __('Other')
-            )
-        );
+                'categories' => [
+                    ['id' => 'freezing',    'label' => __('Freezing')],
+                    ['id' => 'launching',   'label' => __('Launching')],
+                    ['id' => 'network',     'label' => __('Network')],
+                    ['id' => 'printing',    'label' => __('Printing'),],
+                    ['id' => 'testingWorkstation', 'label' => __('Testing Workstation')]
+                ]
+            ],
+            ['id' => 'other', 'label' => __('Other')]
+        ];
     }
 
     /**

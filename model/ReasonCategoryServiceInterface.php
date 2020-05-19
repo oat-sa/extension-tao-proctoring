@@ -20,10 +20,12 @@
 
 namespace oat\taoProctoring\model;
 
-
 interface ReasonCategoryServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/reasonCategory';
+    public const SERVICE_ID = 'taoProctoring/reasonCategory';
+
+    public const PROPERTY_CATEGORY = 'category';
+    public const PROPERTY_SUBCATEGORY = 'subCategory';
 
     /**
      * @return array
