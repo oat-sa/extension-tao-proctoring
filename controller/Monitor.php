@@ -324,11 +324,11 @@ class Monitor extends SimplePageModule
         }
     }
 
-    public function adjustTime()
+    public function adjustTime(): void
     {
         $deliveryExecutions = $this->getPostParameter('execution');
         $seconds = $this->getPostParameter('time');
-        $reason = $this->getPostParameter('reason', []);
+        $reason = $this->getPostParameter('reasons', []);
 
         if (!is_array($deliveryExecutions)) {
             $deliveryExecutions = [$deliveryExecutions];
