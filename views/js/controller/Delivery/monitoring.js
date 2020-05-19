@@ -415,8 +415,8 @@ define([
                         inputLabel: __('Extra time'),
                     });
 
-                    timeHandlingPopup(config).on('ok', function(time){
-                        request('extraTime', _selection, {time: time}, __('Extra time granted'));
+                    timeHandlingPopup(config).on('ok', function(state){
+                        request('extraTime', _selection, {time: state.time}, __('Extra time granted'));
                     });
                 }
 
@@ -424,6 +424,8 @@ define([
                 function timeAdjustment(selection) {
                     const _selection = _.isArray(selection) ? selection : [selection];
                     const sessionsList = listSessions('changeTime', _selection);
+                    const actionName = 'timeAdjustment';
+                    const askForReason = (categories[actionName] && categories[actionName].categoriesDefinitions && categories[actionName].categoriesDefinitions.length);
                     const config = Object.assign(
                         {},
                         sessionsList,
@@ -432,17 +434,23 @@ define([
                             actionName: __('Change time'),
                             errorMessage: __('The extra time must be a number bigger than 0'),
                             unit: extraTimeUnit, // input extra time in minutes
-                            note: __('Already changed time will be added or substracted by the new value.'),
+                            note: __('Already changed time will be added or subtracted by the new value.'),
                             inputLabel: __('Change time'),
                             changeTimeMode: true,
-                        }
+                            reason : askForReason,
+                            reasonRequired: true,
+                        },
                     );
 
-                    timeHandlingPopup(config).on('ok', (time) => {
+                    if (!_.isEmpty(categories[actionName])) {
+                        config.categoriesSelector = cascadingComboBox(categories[actionName]);
+                    }
+
+                    timeHandlingPopup(config).on('ok', (state) => {
                         request(
                             'adjustTime',
                             sessionsList.allowedResources.map(({ id }) => id),
-                            { time: time },
+                            state,
                             __('Time adjusted'),
                         );
                     });
@@ -563,7 +571,7 @@ define([
                         renderTo : $content,
                         actionName : actionTitle,
                         reason : askForReason,
-                        reasonRequired: true
+                        reasonRequired: true,
                     });
 
                     if (dialogSettings && dialogSettings[actionName]) {
