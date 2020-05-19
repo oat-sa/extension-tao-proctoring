@@ -21,6 +21,7 @@
     },
     "minimum-stability" : "dev",
     "require": {
+        "ext-json": "*",
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
         "sinergi/browser-detector": "^6.0.2"
     },
