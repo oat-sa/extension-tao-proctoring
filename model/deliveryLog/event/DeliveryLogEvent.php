@@ -37,7 +37,7 @@ class DeliveryLogEvent implements Event
     public const EVENT_ID_TEST_AUTHORISE = 'TEST_AUTHORISE';
     public const EVENT_ID_TEST_TERMINATE = 'TEST_TERMINATE';
     public const EVENT_ID_TEST_IRREGULARITY = 'TEST_IRREGULARITY';
-    public const EVENT_ID_TEST_ADJUSTED_TIME = 'TEST_ADJUSTED_TIME';
+    public const EVENT_ID_TEST_ADJUST_TIME = 'TEST_ADJUSTED_TIME';
 
     /**
      * @var int unique identifier of the record in the delivery_log table

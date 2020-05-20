@@ -15,8 +15,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Copyright (c) 2020  (original work) Open Assessment Technologies SA;
- *
- * @author Oleksandr Zagovorychev <zagovorichev@gmail.com>
  */
 declare(strict_types=1);
 
@@ -26,15 +24,15 @@ use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
 use common_ext_ExtensionException;
-use Context;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
+use oat\taoProctoring\model\ProctoringContextService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
+use qtism\runtime\tests\AssessmentTestSession;
 
 class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
 {
@@ -47,22 +45,22 @@ class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
      * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
      */
-    public function onTimerAdjusted(DeliveryExecutionTimerAdjusted $event): void
+    public function adjustTime(DeliveryExecutionTimerAdjusted $event): void
     {
         $data = [
             'reason' => $event->getReason(),
             'increment' => $event->getSeconds(),
-            'context' => $this->getContext()
+            'context' => $this->getContextString()
         ];
 
         $session = $this->getTestSessionService()->getTestSession($event->getDeliveryExecution());
         if ($session) {
-            $data['itemId'] = $this->getCurrentItemId($event->getDeliveryExecution());
+            $data['itemId'] = $this->getCurrentItemId($session);
         }
 
         $this->getDeliveryLogService()->log(
             $event->getDeliveryExecution()->getIdentifier(),
-            DeliveryLogEvent::EVENT_ID_TEST_ADJUSTED_TIME,
+            DeliveryLogEvent::EVENT_ID_TEST_ADJUST_TIME,
             $data
         );
     }
@@ -83,32 +81,21 @@ class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
         return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
     }
 
-    private function getContext(): string
+    private function getContextString(): string
     {
-        return 'cli' === PHP_SAPI
-            ? $_SERVER['PHP_SELF']
-            : Context::getInstance()->getRequest()->getRequestURI();
+        return $this->getServiceLocator()->get(ProctoringContextService::class)->getContextString();
     }
 
     /**
-     * @param DeliveryExecution $deliveryExecution
+     * @param $session
      * @return string|null
-     * @throws common_Exception
-     * @throws common_exception_Error
-     * @throws common_exception_NotFound
-     * @throws common_ext_ExtensionException
-     * @throws InvalidServiceManagerException
-     * @throws QtiTestExtractionFailedException
      */
-    private function getCurrentItemId(DeliveryExecution $deliveryExecution): string
+    private function getCurrentItemId(AssessmentTestSession $session): ?string
     {
         $result = null;
-        $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
-        if ($session) {
-            $item = $session->getCurrentAssessmentItemRef();
-            if ($item) {
-                $result = $item->getIdentifier();
-            }
+        $item = $session->getCurrentAssessmentItemRef();
+        if ($item) {
+            $result = $item->getIdentifier();
         }
         return $result;
     }

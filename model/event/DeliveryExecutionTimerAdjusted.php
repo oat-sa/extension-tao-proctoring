@@ -23,7 +23,6 @@ namespace oat\taoProctoring\model\event;
 use oat\oatbox\event\Event;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 
 class DeliveryExecutionTimerAdjusted implements Event
 {
@@ -49,12 +48,12 @@ class DeliveryExecutionTimerAdjusted implements Event
 
     /**
      * DeliveryExecutionTimerAdjusted constructor.
-     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param DeliveryExecution $deliveryExecution
      * @param User $proctor
      * @param int $seconds
      * @param null $reason
      */
-    public function __construct(DeliveryExecutionInterface $deliveryExecution, User $proctor, int $seconds, $reason = null)
+    public function __construct(DeliveryExecution $deliveryExecution, User $proctor, int $seconds, $reason = null)
     {
         $this->deliveryExecution = $deliveryExecution;
         $this->proctor = $proctor;
