@@ -213,6 +213,11 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         } elseif (is_string($data['data'])) {
             $details = $data['data'];
         }
+
+        if (isset($data['data']['increment']) && is_array($details)) {
+            $details[] = $data['data']['increment'] . __(' sec');
+        }
+
         return $details;
     }
 

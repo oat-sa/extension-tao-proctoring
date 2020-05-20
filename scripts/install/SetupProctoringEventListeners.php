@@ -74,7 +74,7 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(DeliveryCreatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryCreated']);
         $this->registerEvent(DeliveryUpdatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryUpdated']);
 
-        $this->registerEvent(DeliveryExecutionTimerAdjusted::class, [DeliveryLogTimerAdjustedEventListener::class, 'onTimerAdjusted']);
+        $this->registerEvent(DeliveryExecutionTimerAdjusted::class, [DeliveryLogTimerAdjustedEventListener::class, 'logTimeAdjustment']);
     }
 }
 

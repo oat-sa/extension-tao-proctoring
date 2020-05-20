@@ -30,7 +30,6 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
-use oat\taoProctoring\model\ProctoringContextService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -50,12 +49,12 @@ class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
         $data = [
             'reason' => $event->getReason(),
             'increment' => $event->getSeconds(),
-            'context' => $this->getContextString()
+            'context' => ''
         ];
 
         $session = $this->getTestSessionService()->getTestSession($event->getDeliveryExecution());
         if ($session) {
-            $data['itemId'] = $this->getCurrentItemId($session);
+            $data['context'] = $data['itemId'] = $this->getCurrentItemId($session);
         }
 
         $this->getDeliveryLogService()->log(
@@ -79,11 +78,6 @@ class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
     private function getTestSessionService(): TestSessionService
     {
         return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
-    }
-
-    private function getContextString(): string
-    {
-        return $this->getServiceLocator()->get(ProctoringContextService::class)->getContextString();
     }
 
     /**

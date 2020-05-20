@@ -31,7 +31,6 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
-use oat\taoProctoring\model\ProctoringContextService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use qtism\data\AssessmentItemRef;
 use qtism\runtime\tests\AssessmentTestSession;
@@ -64,7 +63,7 @@ class DeliveryLogTimerAdjustedEventListenerTest extends TestCase
             [
                 'reason' => ['reason'],
                 'increment' => 1,
-                'context' => 'context',
+                'context' => 'PHPUnitItemID',
                 'itemId' => 'PHPUnitItemID',
             ]
         );
@@ -78,13 +77,9 @@ class DeliveryLogTimerAdjustedEventListenerTest extends TestCase
         $testSessionServiceMock = $this->createMock(TestSessionService::class);
         $testSessionServiceMock->method('getTestSession')->willReturn($assessmentTestSessionMock);
 
-        $proctoringContextServiceMock = $this->createMock(ProctoringContextService::class);
-        $proctoringContextServiceMock->method('getContextString')->willReturn('context');
-
         $serviceLocatorMock = $this->getServiceLocatorMock([
             DeliveryLog::SERVICE_ID => $deliveryLogServiceMock,
             TestSessionService::SERVICE_ID => $testSessionServiceMock,
-            ProctoringContextService::class => $proctoringContextServiceMock,
         ]);
 
         $listener = new DeliveryLogTimerAdjustedEventListener();
