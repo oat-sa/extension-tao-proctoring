@@ -45,7 +45,7 @@ class DeliveryLogTimerAdjustedEventListener extends ConfigurableService
      * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
      */
-    public function adjustTime(DeliveryExecutionTimerAdjusted $event): void
+    public function logTimeAdjustment(DeliveryExecutionTimerAdjusted $event): void
     {
         $data = [
             'reason' => $event->getReason(),

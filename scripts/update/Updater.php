@@ -944,7 +944,7 @@ class Updater extends common_ext_ExtensionUpdater
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->attach(DeliveryExecutionTimerAdjusted::class, [
                 DeliveryLogTimerAdjustedEventListener::class,
-                'adjustTime'
+                'logTimeAdjustment'
             ]);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('19.10.0');

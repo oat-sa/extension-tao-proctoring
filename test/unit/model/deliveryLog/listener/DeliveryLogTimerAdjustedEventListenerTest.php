@@ -89,7 +89,7 @@ class DeliveryLogTimerAdjustedEventListenerTest extends TestCase
 
         $listener = new DeliveryLogTimerAdjustedEventListener();
         $listener->setServiceLocator($serviceLocatorMock);
-        $listener->adjustTime($eventMock);
+        $listener->logTimeAdjustment($eventMock);
         
         $this->assertTrue(true);
     }
