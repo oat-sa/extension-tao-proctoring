@@ -58,7 +58,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         'focus-loss-prohibited',
         'leave-fullscreen-prohibited',
         'pause-on-disconnect',
-        'test_adjusted_time',
+        'test_adjust_time',
     ];
 
     /**

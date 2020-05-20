@@ -59,7 +59,7 @@ class DeliveryLogTimerAdjustedEventListenerTest extends TestCase
         $deliveryLogServiceMock->method('log')->with(
             // de id
             'DEPHPUNITID',
-            'TEST_ADJUSTED_TIME',
+            'TEST_ADJUST_TIME',
             [
                 'reason' => ['reason'],
                 'increment' => 1,
