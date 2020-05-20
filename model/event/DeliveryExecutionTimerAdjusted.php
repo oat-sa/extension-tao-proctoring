@@ -71,7 +71,7 @@ class DeliveryExecutionTimerAdjusted implements Event
     }
 
     /**
-     * Returns the terminated delivery execution
+     * Returns the delivery execution
      *
      * @return DeliveryExecution
      */
@@ -81,7 +81,7 @@ class DeliveryExecutionTimerAdjusted implements Event
     }
 
     /**
-     * Returns the reason for termination
+     * Returns the reason
      *
      * @return mixed
      */
@@ -91,7 +91,7 @@ class DeliveryExecutionTimerAdjusted implements Event
     }
 
     /**
-     * Returns the proctor that terminated the execution
+     * Returns the proctor
      */
     public function getProctor(): User
     {
