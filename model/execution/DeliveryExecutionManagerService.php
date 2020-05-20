@@ -283,12 +283,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $result = ['processed' => [], 'unprocessed' => []];
 
         $timerAdjustmentService = $this->getTimerAdjustmentService();
-
         $deliveryMonitoringService = $this->getDeliveryMonitoringService();
+
         /** @var common_session_Session $session */
         $session = $this->getServiceLocator()->get(SessionService::SERVICE_ID)->getCurrentSession();
         $proctor = $session->getUser();
-        $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+
+        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
 
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
