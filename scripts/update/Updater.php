@@ -949,5 +949,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
             $this->setVersion('19.10.0');
         }
+
+        $this->skip('19.10.0', '19.10.1');
     }
 }
