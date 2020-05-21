@@ -2,7 +2,7 @@
 use oat\tao\helpers\Template;
 use oat\tao\helpers\Layout;
 ?>
-<div class="section-container">
+<div class="section-container" role="main" aria-label="<?= __('Proctor authorization') ?>">
     <div class="clear content-wrapper content-panel">
         <section class="content-container awaiting-authorization authorization-in-progress">
         </section>
