@@ -24,6 +24,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
@@ -154,10 +155,18 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $session->resume();
             $this->getTestSessionService()->persist($session);
             $logData['timestamp'] = microtime(true);
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RESUME', $logData);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_RESUME,
+                $logData
+            );
         } else {
             $logData['timestamp'] = microtime(true);
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_RUN', $logData);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_RUN,
+                $logData
+            );
         }
 
         $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
@@ -192,9 +201,13 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             }
             $logData['itemId'] = $this->getCurrentItemId($deliveryExecution);
             $logData['context'] = $this->getContext($deliveryExecution);
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_AUTHORISE', $logData);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_AUTHORISE,
+                $logData
+            );
             $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_AUTHORIZED);
-            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
             $eventManager->trigger(new AuthorizationGranted($deliveryExecution, $proctor));
             $result = true;
         }
@@ -242,7 +255,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'itemId' => $session ? $this->getCurrentItemId($deliveryExecution) : null,
             ];
 
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_TERMINATE', $logData);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_TERMINATE,
+                $logData
+            );
 
             if ($session) {
                 if ($session->isRunning()) {
@@ -313,7 +330,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 }
                 $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_PAUSE', $data);
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSE, $data);
             $result = true;
         }
         $this->releaseExecution($deliveryExecution);
@@ -372,7 +389,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'timestamp' => microtime(true),
                 'context' => $this->getContext($deliveryExecution),
             ];
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), 'TEST_CANCEL', $data);
+            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_CANCEL, $data);
             $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
             $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
@@ -413,7 +430,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'itemId' => $this->getCurrentItemId($deliveryExecution),
             'context' => $this->getContext($deliveryExecution)
         ];
-        $returnValue = $deliveryLog->log($deliveryExecution->getIdentifier(), 'TEST_IRREGULARITY', $data);
+        $returnValue = $deliveryLog->log(
+            $deliveryExecution->getIdentifier(),
+            DeliveryLogEvent::EVENT_ID_TEST_IRREGULARITY,
+            $data
+        );
 
         // Trigger a report event.
         /** @var EventManager $eventManager */

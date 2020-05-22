@@ -20,12 +20,23 @@
 
 namespace oat\taoProctoring\model\execution;
 
+use common_Exception;
+use common_exception_Error;
+use common_exception_NotFound;
+use common_ext_ExtensionException;
+use common_session_Session;
+use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\oatbox\session\SessionService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
@@ -60,9 +71,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
      *
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return QtiTimer
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
+     * @throws common_exception_NotFound
      */
     public function getDeliveryTimer($deliveryExecution)
     {
@@ -131,9 +142,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param $deliveryExecutions
      * @param int $extraTime
      * @return array
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
+     * @throws common_exception_NotFound
      * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
     public function setExtraTime($deliveryExecutions, $extraTime = 0)
@@ -213,9 +224,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
     /**
      * @param DeliveryExecutionInterface $deliveryExecution
      * @param $extendedTime
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
+     * @throws common_exception_NotFound
      * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
     public function updateDeliveryExtendedTime(DeliveryExecutionInterface $deliveryExecution, $extendedTime)
@@ -258,15 +269,27 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * Registers timer adjustments to a list of delivery executions
      * @param array $deliveryExecutions
      * @param int $seconds
+     * @param array $reason
      * @return array
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
-    public function adjustTimers(array $deliveryExecutions, $seconds)
+    public function adjustTimers(array $deliveryExecutions, $seconds, array $reason = []): array
     {
         $result = ['processed' => [], 'unprocessed' => []];
 
         $timerAdjustmentService = $this->getTimerAdjustmentService();
-
         $deliveryMonitoringService = $this->getDeliveryMonitoringService();
+
+        /** @var common_session_Session $session */
+        $session = $this->getServiceLocator()->get(SessionService::SERVICE_ID)->getCurrentSession();
+        $proctor = $session->getUser();
+
+        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
 
         /** @var DeliveryExecution $deliveryExecution */
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -276,6 +299,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             $success = false;
             if ($this->isTimerAdjustmentAllowed($deliveryExecution)) {
+
                 $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
                 if ($seconds > 0) {
                     $success = $timerAdjustmentService->increase($testSession, $seconds);
@@ -285,7 +309,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
+
                 $deliveryMonitoringService->save($data);
+
+                $eventManager->trigger(new DeliveryExecutionTimerAdjusted($deliveryExecution, $proctor, $seconds, $reason));
             }
 
             if ($success) {

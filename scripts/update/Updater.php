@@ -57,7 +57,9 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
+use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
 use oat\taoProctoring\model\FinishDeliveryExecutionsService;
@@ -936,6 +938,18 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.5.0');
         }
 
-        $this->skip('19.5.0', '19.6.0');
+        $this->skip('19.5.0', '19.9.0');
+
+        if ($this->isVersion('19.9.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->attach(DeliveryExecutionTimerAdjusted::class, [
+                DeliveryLogTimerAdjustedEventListener::class,
+                'logTimeAdjustment'
+            ]);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('19.10.0');
+        }
+
+        $this->skip('19.10.0', '19.10.1');
     }
 }
