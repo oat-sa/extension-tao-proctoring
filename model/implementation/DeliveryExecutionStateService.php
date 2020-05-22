@@ -20,21 +20,32 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use common_Exception;
+use common_exception_Error;
+use common_exception_NotFound;
+use common_ext_ExtensionException;
+use common_session_SessionManager;
+use Context;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\oatbox\event\EventManager;
 use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
 use oat\taoQtiTest\models\ExtendedStateService;
+use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\oatbox\log\LoggerAwareTrait;
 use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use qtism\runtime\storage\common\StorageException;
+use qtism\runtime\tests\AssessmentTestSessionException;
 use qtism\runtime\tests\AssessmentTestSessionState;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\oatbox\user\User;
@@ -50,22 +61,20 @@ use Symfony\Component\Lock\Lock;
  */
 class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
-    const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
-    /**
-     * @var string lifetime delivery executions in awaiting state
-     */
-    const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
-    const OPTION_TIME_HANDLING = 'time_handling';
+    public const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
 
-    const TIME_HANDLING_EXTRA_TIME = 'extra_time';
-    const TIME_HANDLING_TIMER_ADJUSTMENT = 'timer_adjustment';
+    /** @var string lifetime delivery executions in awaiting state */
+    public const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
+
+    public const OPTION_TIME_HANDLING = 'time_handling';
+
+    public const TIME_HANDLING_EXTRA_TIME = 'extra_time';
+    public const TIME_HANDLING_TIMER_ADJUSTMENT = 'timer_adjustment';
 
     use LoggerAwareTrait;
     use LockTrait;
 
-    /**
-     * @var TestSessionService
-     */
+    /** @var TestSessionService */
     private $testSessionService;
 
     /** @var Lock[]  */
@@ -98,9 +107,9 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
+     *
      * @return bool
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws common_exception_NotFound
      */
     public function waitExecution(DeliveryExecution $deliveryExecution)
     {
@@ -120,6 +129,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         }
 
         $this->releaseExecution($deliveryExecution);
+
         return $result;
     }
 
@@ -136,7 +146,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
+     *
      * @return bool
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws StorageException
+     * @throws common_exception_NotFound
      */
     public function run(DeliveryExecution $deliveryExecution)
     {
@@ -162,24 +180,26 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
         $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
         $this->releaseExecution($deliveryExecution);
+
         return true;
     }
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
-     * @param null $testCenter
+     * @param array $reason
+     * @param string $testCenter
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
      */
     public function authoriseExecution(DeliveryExecution $deliveryExecution, $reason = null, $testCenter = null)
     {
         $result = false;
         $this->lockExecution($deliveryExecution);
         if ($this->canBeAuthorised($deliveryExecution)) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
+            $proctor = common_session_SessionManager::getSession()->getUser();
             $logData = [
                 'proctorUri' => $proctor->getIdentifier(),
                 'timestamp' => microtime(true),
@@ -215,14 +235,17 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Terminates a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param null              $reason
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     * @throws \qtism\runtime\storage\common\StorageException
-     * @throws \qtism\runtime\tests\AssessmentTestSessionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws StorageException
+     * @throws AssessmentTestSessionException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function terminateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -231,8 +254,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
-            $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
+            $proctor = common_session_SessionManager::getSession()->getUser();
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             $logData = [
@@ -267,12 +290,13 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     *
      * @return bool
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     * @throws \qtism\runtime\storage\common\StorageException
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
+     * @throws StorageException
      */
     public function pauseExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -283,13 +307,16 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Pauses a delivery execution
      *
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param null              $reason
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     * @throws \qtism\runtime\storage\common\StorageException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws StorageException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function pause(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -325,9 +352,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      *
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     *
      * @return bool
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
      */
     public function finishExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -337,14 +365,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * @param DeliveryExecution $deliveryExecution
      * @param null $reason
+     *
      * @return bool
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
      */
     public function finish(DeliveryExecution $deliveryExecution, $reason = null)
     {
         $this->lockExecution($deliveryExecution);
-        $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED, $reason);
+        $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_FINISHED);
         if ($result) {
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->trigger(new DeliveryExecutionFinished($deliveryExecution));
@@ -355,12 +384,15 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
-     * @param null $reason
+     * @param null              $reason
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_MissingParameter
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function cancelExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -386,10 +418,14 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * @param DeliveryExecution $deliveryExecution
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_MissingParameter
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function isCancelable(DeliveryExecution $deliveryExecution)
     {
@@ -399,10 +435,12 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     /**
      * Report irregularity to a delivery execution
      *
-     * @todo remove this method to separate service
      * @param DeliveryExecution $deliveryExecution
-     * @param array $reason
+     * @param array             $reason
+     *
      * @return bool
+     * @throws InvalidServiceManagerException
+     * @todo remove this method to separate service
      */
     public function reportExecution(DeliveryExecution $deliveryExecution, $reason)
     {
@@ -468,7 +506,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     protected function canBeAuthorised(DeliveryExecution $deliveryExecution)
     {
         $result = false;
-        $user = \common_session_SessionManager::getSession()->getUser();
+        $user = common_session_SessionManager::getSession()->getUser();
         $stateUri = $deliveryExecution->getState()->getUri();
         if ($stateUri === ProctoredDeliveryExecution::STATE_AWAITING) {
             $result = true;
@@ -480,7 +518,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 ProctoredDeliveryExecution::STATE_FINISHED,
                 ProctoredDeliveryExecution::STATE_TERMINATED,
                 ProctoredDeliveryExecution::STATE_CANCELED,
-            ])
+            ], true)
         ){
             $result = true;
         }
@@ -489,7 +527,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
-     * @return \oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService
+     * @return RdsDeliveryLogService
      */
     private function getDeliveryLogService()
     {
@@ -500,7 +538,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      * Gets test session service
      *
      * @return TestSessionService
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws InvalidServiceManagerException
      */
     private function getTestSessionService()
     {
@@ -512,8 +550,16 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * Get identifier of current item.
+     *
      * @param DeliveryExecution $deliveryExecution
+     *
      * @return null|string
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     protected function getCurrentItemId(DeliveryExecution $deliveryExecution)
     {
@@ -530,13 +576,22 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
 
     /**
      * Pause delivery execution if test session was paused.
+     *
      * @param TestExecutionPausedEvent $event
+     *
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws StorageException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function catchSessionPause(TestExecutionPausedEvent $event)
     {
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
         /** @var DeliveryExecutionStateService $service */
-        $requestParams = \Context::getInstance()->getRequest()->getParameters();
+        $requestParams = Context::getInstance()->getRequest()->getParameters();
         $reason = null;
         if (isset($requestParams['reason'])) {
             $reason = $requestParams['reason'];
@@ -552,19 +607,19 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
      */
     protected function getContext(DeliveryExecution $deliveryExecution)
     {
-        $result = 'cli' === php_sapi_name()
+        return 'cli' === PHP_SAPI
             ? $_SERVER['PHP_SELF']
-            : \Context::getInstance()->getRequest()->getRequestURI();
-        return $result;
+            : Context::getInstance()->getRequest()->getRequestURI();
     }
 
     /**
      * @param DeliveryExecution $deliveryExecution
      * @param null|string $reason
+     *
      * @return bool
-     * @throws \common_exception_Error
-     * @throws \common_exception_NotFound
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
      */
     public function reactivateExecution(DeliveryExecution $deliveryExecution, $reason = null)
     {
@@ -584,6 +639,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
         }
         $this->releaseExecution($deliveryExecution);
+
         return $result;
     }
 

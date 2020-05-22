@@ -21,10 +21,13 @@
 
 namespace oat\taoProctoring\scripts;
 
+use common_exception_NotFound;
+use Exception;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\ReasonCategoryServiceInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use common_Logger;
 use common_report_Report as Report;
@@ -115,8 +118,9 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
         $count = 0;
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
-        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
+        $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+
         $startTimeFilter = (new DateTimeImmutable('now'))->sub(new DateInterval($delay))->getTimestamp();
         $deliveryExecutionsData = $deliveryMonitoringService->find([
             [DeliveryMonitoringService::STATUS     => [
@@ -136,8 +140,8 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                     $this->terminateExecution($deliveryExecution);
                     $count++;
                 }
-            } catch (\common_exception_NotFound $e) {
-                //Delivery execution entry missed.
+            } catch (common_exception_NotFound $e) {
+                // Delivery execution entry missed.
                 $deliveryExecutionData->update(
                     DeliveryMonitoringService::STATUS,
                     DeliveryExecution::STATE_TERMINATED
@@ -196,14 +200,16 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
      * Return Termination Reasons.
      *
      * Provides the 'reasons' information array with keys 'category' and 'subCategory'.
-     * This method may be overriden by subclasses to provide customer specific information.
+     * This method may be overridden by subclasses to provide customer specific information.
      *
      * @return array.
      */
-    protected function getTerminationReasons()
+    protected function getTerminationReasons(): array
     {
-        // @fixme remove customer specific information.
-        return ['category' => 'Technical', 'subCategory' => 'ACT'];
+        return [
+            ReasonCategoryServiceInterface::PROPERTY_CATEGORY => 'Technical',
+            ReasonCategoryServiceInterface::PROPERTY_SUBCATEGORY => 'ACT',
+        ];
     }
 
     /**
@@ -223,7 +229,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                 DeliveryExecutionState::STATE_ACTIVE,
             ], true)
         ) {
-            /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
+            /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
             if ($executionState === DeliveryExecutionState::STATE_ACTIVE) {
@@ -244,9 +250,10 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
     /**
      * Get time of the last pause
+     *
      * @param DeliveryExecution $deliveryExecution
      * @return DateTimeImmutable
-     * @throws \Exception
+     * @throws Exception
      */
     private function getLastPause(DeliveryExecution $deliveryExecution)
     {

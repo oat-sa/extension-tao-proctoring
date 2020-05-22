@@ -19,6 +19,8 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace oat\taoProctoring\scripts;
 
 use oat\oatbox\action\Action;
@@ -35,9 +37,7 @@ abstract class AbstractExpiredSessionSeeker implements Action, ServiceLocatorAwa
 {
     use ServiceLocatorAwareTrait;
 
-    /**
-     * @var Report
-     */
+    /** @var Report */
     protected $report;
 
     /**
@@ -56,16 +56,23 @@ abstract class AbstractExpiredSessionSeeker implements Action, ServiceLocatorAwa
     abstract protected function isExpired(DeliveryExecution $deliveryExecution);
 
     /**
+     * Returns Termination Reasons.
+     *
+     * Provides the 'reasons' information array with keys 'category' and 'subCategory'.
+     * This method should be overridden by subclasses to provide customer specific information.
+     *
+     * @return array
+     */
+    abstract protected function getTerminationReasons(): array;
+
+    /**
      * @param $type
      * @param string $message
      * @throws
      */
-    protected function addReport($type, $message)
+    protected function addReport($type, $message): void
     {
-        $this->report->add(new Report(
-            $type,
-            $message
-        ));
+        $this->report->add(new Report($type, $message));
     }
 
     /**

@@ -21,6 +21,7 @@ namespace oat\taoProctoring\model\execution;
 
 
 use common_report_Report as Report;
+use core_kernel_classes_Property as Property;
 use DateInterval;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
@@ -37,32 +38,26 @@ use DateTimeImmutable;
  *
  * Class UpdateDeliveryExecutionsService
  * @package oat\taoProctoring\model\execution
+ *
+ * @todo: refactor it
  */
 abstract class DeliveryExecutionsUpdater extends ConfigurableService
 {
     use OntologyAwareTrait;
 
-    /**
-     * Action based on the time of the last delivery execution activity
-     */
-    const OPTION_TTL_AS_ACTIVE = 'ttlAsActive';
+    /** Action based on the time of the last delivery execution activity */
+    public const OPTION_TTL_AS_ACTIVE = 'ttlAsActive';
 
-    /**
-     * Action based on the delivery end time
-     */
-    const OPTION_USE_DELIVERY_END_TIME = 'useDeliveryEndTime';
+    /** Action based on the delivery end time */
+    public const OPTION_USE_DELIVERY_END_TIME = 'useDeliveryEndTime';
 
-    /**
-     * Statuses of the DE which will be updated
-     */
-    const OPTION_UPDATEABLE_STATUSES = 'updateableExecutionStatuses';
+    /** Statuses of the DE which will be updated */
+    public const OPTION_UPDATEABLE_STATUSES = 'updateableExecutionStatuses';
 
     /** @var Report */
     protected $report;
 
-    /**
-     * @var \core_kernel_classes_Property
-     */
+    /** @var Property */
     private $propertyDeliveryEndDate;
 
     /**
@@ -326,10 +321,14 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
 
     /**
      * Caching property to avoid multiple generations
-     * @return \core_kernel_classes_Property
+     * @return Property
      */
-    private function getDeliveryEndDateProperty() {
-        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate ?: $this->getProperty(DeliveryAssemblyService::PROPERTY_END);
+    private function getDeliveryEndDateProperty()
+    {
+        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate ?: $this->getProperty(
+            DeliveryAssemblyService::PROPERTY_END
+        );
+
         return $this->propertyDeliveryEndDate;
     }
 }
