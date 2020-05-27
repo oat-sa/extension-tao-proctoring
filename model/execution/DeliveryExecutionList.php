@@ -25,8 +25,10 @@ use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 use oat\tao\model\service\ApplicationService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoQtiTest\models\SessionStateService;
 
 /**
@@ -115,6 +117,7 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
+                'adjustedTime' => $this->getAdjustedTime($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]),
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
@@ -126,6 +129,42 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         return $execution;
+    }
+
+    private function getAdjustedTime(string $deliveryExecutionId): ?int
+    {
+        $deliveryExecution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        $adjustedTime = null;
+        if ($testSession) {
+            /** @var AdjustmentMap $adjustmentMap */
+            $adjustmentMap = $testSession->getTimer()->getAdjustmentMap();
+
+            if ($item = $testSession->getCurrentAssessmentItemRef()) {
+                $adjustedTime = $adjustmentMap->get($item->getIdentifier());
+            }
+
+            if (!$adjustedTime && $section = $testSession->getCurrentAssessmentSection()) {
+                $adjustedTime = $adjustmentMap->get($section->getIdentifier());
+            }
+
+            if (!$adjustedTime && $testPart = $testSession->getCurrentTestPart()) {
+                $adjustedTime = $adjustmentMap->get($testPart->getIdentifier());
+            }
+
+            if (!$adjustedTime && $assessmentTest = $testSession->getAssessmentTest()) {
+                $adjustedTime = $adjustmentMap->get($assessmentTest->getIdentifier());
+            }
+        }
+        return $adjustedTime;
+    }
+
+    /**
+     * @return TestSessionService|object
+     */
+    private function getTestSessionService(): TestSessionService
+    {
+        return $this->getServiceLocator()->get(TestSessionService::SERVICE_ID);
     }
 
     /**

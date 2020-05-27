@@ -20,15 +20,21 @@ namespace oat\taoProctoring\test\unit\model\execution;
 
 use common_ext_Extension;
 use common_ext_ExtensionsManager;
-use oat\generis\model\data\Model;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\tao\model\service\ApplicationService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\AdjustmentMap;
+use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\SessionStateService;
 use oat\generis\test\MockObject;
+use qtism\data\AssessmentItemRef;
+use qtism\data\AssessmentTest;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -86,12 +92,19 @@ class DeliveryExecutionListTest extends TestCase
      */
     private $deliveryExecution;
 
+    /**
+     * @var TestSessionService
+     */
+    private $testSessionServiceMock;
+
     public function setUp(): void
     {
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
         $this->extensionManagerMock = $this->createMock(common_ext_ExtensionsManager::class);
         $this->testSessionConnectivityStatusServiceMock = $this->createMock(TestSessionConnectivityStatusService::class);
         $this->deliveryExecutionManagerServiceMock = $this->createMock(DeliveryExecutionManagerService::class);
+        $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
+        $this->deliveryExecutionManagerServiceMock->method('getDeliveryExecutionById')->willReturn($deliveryExecutionMock);
         $this->applicationServiceMock = $this->createMock(ApplicationService::class);
         $this->proctoringExtensionMock = $this->createMock(common_ext_Extension::class);
         $this->modelMock = $this->createMock(Ontology::class);
@@ -103,19 +116,21 @@ class DeliveryExecutionListTest extends TestCase
             'delivery_name' => 'delivery_name_string',
             'start_time' => '1567508223.829546',
         ];
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
 
         $this->serviceLocatorMock = $this->getServiceLocatorMock([
             SessionStateService::SERVICE_ID => $this->sessionStateServiceMock,
             common_ext_ExtensionsManager::SERVICE_ID => $this->extensionManagerMock,
             TestSessionConnectivityStatusService::SERVICE_ID => $this->testSessionConnectivityStatusServiceMock,
             ApplicationService::SERVICE_ID => $this->applicationServiceMock,
-            DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock
+            DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
         ]);
 
         $this->extensionManagerMock->method('getExtensionById')->willReturn($this->proctoringExtensionMock);
     }
 
-    public function testAdjustDeliveryExecutionsFinished()
+    public function testAdjustDeliveryExecutionsFinished(): void
     {
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
@@ -128,7 +143,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testAdjustDeliveryFullExecutionExample()
+    public function testAdjustDeliveryFullExecutionExample(): void
     {
         $deliveryExecutions[] = $this->getExecutionExample();
 
@@ -149,7 +164,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testAdjustDeliveryExecutionsOnline()
+    public function testAdjustDeliveryExecutionsOnline(): void
     {
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
@@ -160,7 +175,7 @@ class DeliveryExecutionListTest extends TestCase
         $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
 
-        //getTestSessionConnectivityStatusService
+        // getTestSessionConnectivityStatusService
         $this->testSessionConnectivityStatusServiceMock->method('hasOnlineMode')->willReturn(true);
         $this->testSessionConnectivityStatusServiceMock->method('isOnline')->willReturn(true);
 
@@ -170,7 +185,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertTrue($result[0]['online']);
     }
 
-    public function testAdjustDeliveryExecutionsUserExtraFields()
+    public function testAdjustDeliveryExecutionsUserExtraFields(): void
     {
         $this->deliveryExecution['test_category'] = 'http://www.nccer.org/testmodel#category_01';
         $this->deliveryExecution['test_taker'] = '12345';
@@ -210,7 +225,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('12345', $result[0]['extraFields']['test_taker']);
     }
 
-    public function testAdjustDeliveryExecutionsProgressStringWithNoOption()
+    public function testAdjustDeliveryExecutionsProgressStringWithNoOption(): void
     {
         $this->deliveryExecution['current_assessment_item'] = '{"title":"in progress","itemPosition":"1","itemCount":"2"}';
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive';
@@ -231,7 +246,7 @@ class DeliveryExecutionListTest extends TestCase
 
     }
 
-    public function testAdjustDeliveryExecutionsProgressStringWithCustomOption()
+    public function testAdjustDeliveryExecutionsProgressStringWithCustomOption(): void
     {
         //Prepare
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
@@ -251,7 +266,70 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    private function getExecutionExample()
+    public function testTimerAdjustedTimeNull(): void
+    {
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+        $this->assertNull($result[0]['timer']['adjustedTime']);
+    }
+
+    public function testTimerAdjustedTimeItem(): void
+    {
+        $itemMock = $this->createMock(AssessmentItemRef::class);
+        $itemMock->method('getIdentifier')->willReturn('PHPUnitItemRef');
+
+        $adjustmentMapMock = $this->createMock(AdjustmentMap::class);
+        $adjustmentMapMock->method('get')->willReturn(1);
+
+        $qtiTimerMock = $this->createMock(QtiTimer::class);
+        $qtiTimerMock->method('getAdjustmentMap')->willReturn($adjustmentMapMock);
+
+        $testSessionMock = $this->createMock(TestSession::class);
+        $testSessionMock->method('getTimer')->willReturn($qtiTimerMock);
+        $testSessionMock->method('getCurrentAssessmentItemRef')->willReturn($itemMock);
+
+        $this->testSessionServiceMock->method('getTestSession')->willReturn($testSessionMock);
+
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+        $this->assertSame(1, $result[0]['timer']['adjustedTime']);
+    }
+
+    public function testTimerAdjustedTimeAssessmentTest(): void
+    {
+        $testMock = $this->createMock(AssessmentTest::class);
+        $testMock->method('getIdentifier')->willReturn('PHPUnitTestRef');
+
+        $adjustmentMapMock = $this->createMock(AdjustmentMap::class);
+        $adjustmentMapMock->method('get')->willReturn(10);
+
+        $qtiTimerMock = $this->createMock(QtiTimer::class);
+        $qtiTimerMock->method('getAdjustmentMap')->willReturn($adjustmentMapMock);
+
+        $testSessionMock = $this->createMock(TestSession::class);
+        $testSessionMock->method('getTimer')->willReturn($qtiTimerMock);
+        $testSessionMock->method('getAssessmentTest')->willReturn($testMock);
+
+        $this->testSessionServiceMock->method('getTestSession')->willReturn($testSessionMock);
+
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+        $this->assertSame(10, $result[0]['timer']['adjustedTime']);
+    }
+
+    private function getExecutionExample(): array
     {
         return $executions[] = [
             'delivery_execution_id' => "https://nccersso.taocloud.org/tao.rdf#i15675082249329111",
@@ -284,5 +362,4 @@ class DeliveryExecutionListTest extends TestCase
             'allow_extra_time' => false
         ];
     }
-
 }
