@@ -25,6 +25,8 @@ use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 use oat\tao\model\service\ApplicationService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
@@ -91,6 +93,10 @@ class DeliveryExecutionList extends ConfigurableService
     {
         $online = $this->isOnline($cachedData);
 
+        $isTimerAdjustmentAllowed = $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
+            $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+        );
+
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
@@ -102,9 +108,7 @@ class DeliveryExecutionList extends ConfigurableService
             'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
                 ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                 : null,
-            'allowTimerAdjustment' => $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
-                $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-            ),
+            'allowTimerAdjustment' => $isTimerAdjustmentAllowed,
             'timer' => [
                 'lastActivity' => $this->getLastActivity($cachedData, $online),
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
@@ -125,7 +129,41 @@ class DeliveryExecutionList extends ConfigurableService
             $execution['online'] = $online;
         }
 
+        if ($isTimerAdjustmentAllowed) {
+            $reason = $this->getLastPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            if ($reason) {
+                $execution['lastPauseReason'] = $reason;
+            }
+        }
+
         return $execution;
+    }
+
+    private function getLastPauseReason(string $deliveryExecutionId): ?array
+    {
+        $reason = null;
+        $lastPause = $this->getDeliveryLogService()->search([
+            DeliveryLog::DELIVERY_EXECUTION_ID => $deliveryExecutionId,
+            DeliveryLog::EVENT_ID => DeliveryLogEvent::EVENT_ID_TEST_PAUSE,
+        ], [
+            'order' => 'created_at',
+            'dir' => 'desc',
+            'limit' => 1,
+        ]);
+
+        if (isset($lastPause[0][DeliveryLog::DATA]['reason'])) {
+            $reason = $lastPause[0][DeliveryLog::DATA]['reason'];
+        }
+
+        return $reason;
+    }
+
+    /**
+     * @return DeliveryLog|object
+     */
+    private function getDeliveryLogService(): DeliveryLog
+    {
+        return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
 
     /**
