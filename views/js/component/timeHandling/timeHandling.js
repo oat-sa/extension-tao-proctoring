@@ -147,7 +147,6 @@ define([
                 function submit() {
                     if (!initConfig.allowedResources.length) {
                         $cmp.modal('close');
-
                         return;
                     }
 
@@ -185,8 +184,35 @@ define([
                 }
 
                 if (_.isObject(this.config.categoriesSelector)) {
-                    const $reason = $cmp.find('.reason').children('.categories');
-                    this.config.categoriesSelector.render($reason);
+                    const $reason = $cmp.find('.reason');
+                    const $reasonCategories = $reason.children('.categories');
+                    this.config.categoriesSelector
+                        .on('render', () => {
+                            if (initConfig.hasOwnProperty('predefinedReason')) {
+                                const predefinedReason = initConfig.predefinedReason;
+                                if (predefinedReason.hasOwnProperty('comment')) {
+                                    $('textarea', $reason).text(predefinedReason.comment);
+                                }
+                                if (predefinedReason.hasOwnProperty('reasons')) {
+                                    const reasons = predefinedReason.reasons;
+                                    if (reasons.hasOwnProperty('category')) {
+                                        $('select[data-id="category"]', $reasonCategories)
+                                            .val(reasons.category)
+                                            .on('change', () => {
+                                                _.defer(() => {
+                                                    if (reasons.hasOwnProperty('subCategory')) {
+                                                        $('select[data-id="subCategory"]', $reasonCategories)
+                                                            .val(reasons.subCategory)
+                                                            .trigger('change');
+                                                    }
+                                                })
+                                            })
+                                            .trigger('change');
+                                    }
+                                }
+                            }
+                        })
+                        .render($reasonCategories);
                 }
 
                 $cmp
