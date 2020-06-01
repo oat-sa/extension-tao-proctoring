@@ -43,6 +43,7 @@ use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
+use oat\taoQtiTest\models\runner\time\TimerAdjustmentService;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use qtism\data\QtiIdentifiable;
@@ -105,10 +106,6 @@ class DeliveryExecutionManagerServiceTest extends TestCase
      * @var QtiTimer|MockObject
      */
     private $qtiTimerMock;
-    /**
-     * @var AdjustmentMap|MockObject
-     */
-    private $adjustmentMapMock;
 
     protected function setUp(): void
     {
@@ -152,7 +149,6 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
         $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
         $this->qtiTimerMock = $this->createMock(QtiTimer::class);
-        $this->adjustmentMapMock = $this->createMock(AdjustmentMap::class);
     }
 
     /**
@@ -222,7 +218,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $this->assertSame(0, $service->getAdjustedTime('PHPUnitDeliveryExecutionId'));
     }
 
-    public function testAdjustedTimeForItem(): void
+    public function testAdjustedTime(): void
     {
         $item = $this->createMock(QtiIdentifiable::class);
         $item->expects($this->once())
@@ -247,11 +243,11 @@ class DeliveryExecutionManagerServiceTest extends TestCase
             ->method('getDeliveryExecution')
             ->willReturn($this->pausedExecution);
 
-        $this->adjustmentMapMock
+        $this->timerAdjustmentServiceMock
             ->expects($this->exactly(4))
-            ->method('get')
-            ->willReturnCallback(static function($part) {
-                switch ($part) {
+            ->method('getAdjustment')
+            ->willReturnCallback(static function(QtiIdentifiable $part) {
+                switch ($part->getIdentifier()) {
                     case 'item':
                         return 10;
                     case 'section':
@@ -264,13 +260,8 @@ class DeliveryExecutionManagerServiceTest extends TestCase
                 return 0; // should never be here
             });
 
-        $this->qtiTimerMock
-            ->expects($this->once())
-            ->method('getAdjustmentMap')
-            ->willReturn($this->adjustmentMapMock);
-
         $this->testSessionMock
-            ->expects($this->once())
+            ->expects($this->exactly(4))
             ->method('getTimer')
             ->willReturn($this->qtiTimerMock);
 
@@ -299,6 +290,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $serviceLocatorMock = $this->getServiceLocatorMock([
             ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
             TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            TimerAdjustmentService::SERVICE_ID => $this->timerAdjustmentServiceMock,
         ]);
 
         $service = new DeliveryExecutionManagerService();

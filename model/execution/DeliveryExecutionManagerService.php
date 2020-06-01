@@ -378,23 +378,24 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
         $adjustedTimes = [];
         if ($testSession) {
-            /** @var AdjustmentMap $adjustmentMap */
-            $adjustmentMap = $testSession->getTimer()->getAdjustmentMap();
-
             if ($item = $testSession->getCurrentAssessmentItemRef()) {
-                $adjustedTimes[] = $adjustmentMap->get($item->getIdentifier());
+                $adjustedTimes[] = $this->getTimerAdjustmentService()
+                    ->getAdjustment($item, $testSession->getTimer());
             }
 
             if ($section = $testSession->getCurrentAssessmentSection()) {
-                $adjustedTimes[] = $adjustmentMap->get($section->getIdentifier());
+                $adjustedTimes[] = $this->getTimerAdjustmentService()
+                    ->getAdjustment($section, $testSession->getTimer());
             }
 
             if ($testPart = $testSession->getCurrentTestPart()) {
-                $adjustedTimes[] = $adjustmentMap->get($testPart->getIdentifier());
+                $adjustedTimes[] = $this->getTimerAdjustmentService()
+                    ->getAdjustment($testPart, $testSession->getTimer());
             }
 
             if ($assessmentTest = $testSession->getAssessmentTest()) {
-                $adjustedTimes[] = $adjustmentMap->get($assessmentTest->getIdentifier());
+                $adjustedTimes[] = $this->getTimerAdjustmentService()
+                    ->getAdjustment($assessmentTest, $testSession->getTimer());
             }
         }
         return count($adjustedTimes) ? min($adjustedTimes) : 0;
