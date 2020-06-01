@@ -55,7 +55,7 @@ return array(
         'taoDelivery'    => '>=14.14.0',
         'taoDeliveryRdf' => '>=7.0.0',
         'taoTestTaker'   => '>=4.0.0',
-        'taoQtiTest'     => '>=37.6.1',
+        'taoQtiTest'     => '>=37.12.0',
         'taoOutcomeUi'   => '>=7.0.0',
         'taoEventLog'    => '>=2.0.0',
         'generis'        => '>=12.15.0',
