@@ -16,6 +16,8 @@
  *
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
+declare(strict_types=1);
+
 namespace oat\taoProctoring\test\unit\model\execution;
 
 use common_ext_Extension;
@@ -28,13 +30,8 @@ use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
-use oat\taoQtiTest\models\runner\session\TestSession;
-use oat\taoQtiTest\models\runner\time\AdjustmentMap;
-use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\SessionStateService;
 use oat\generis\test\MockObject;
-use qtism\data\AssessmentItemRef;
-use qtism\data\AssessmentTest;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -266,7 +263,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testTimerAdjustedTimeNull(): void
+    public function testTimerAdjustedTime(): void
     {
         $deliveryExecutions[] = $this->deliveryExecution;
 
@@ -274,59 +271,7 @@ class DeliveryExecutionListTest extends TestCase
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
         /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
-        $this->assertNull($result[0]['timer']['adjustedTime']);
-    }
-
-    public function testTimerAdjustedTimeItem(): void
-    {
-        $itemMock = $this->createMock(AssessmentItemRef::class);
-        $itemMock->method('getIdentifier')->willReturn('PHPUnitItemRef');
-
-        $adjustmentMapMock = $this->createMock(AdjustmentMap::class);
-        $adjustmentMapMock->method('get')->willReturn(1);
-
-        $qtiTimerMock = $this->createMock(QtiTimer::class);
-        $qtiTimerMock->method('getAdjustmentMap')->willReturn($adjustmentMapMock);
-
-        $testSessionMock = $this->createMock(TestSession::class);
-        $testSessionMock->method('getTimer')->willReturn($qtiTimerMock);
-        $testSessionMock->method('getCurrentAssessmentItemRef')->willReturn($itemMock);
-
-        $this->testSessionServiceMock->method('getTestSession')->willReturn($testSessionMock);
-
-        $deliveryExecutions[] = $this->deliveryExecution;
-
-        $deliveryHelperService = new DeliveryExecutionList();
-        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
-        /* @noinspection PhpUnhandledExceptionInspection */
-        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
-        $this->assertSame(1, $result[0]['timer']['adjustedTime']);
-    }
-
-    public function testTimerAdjustedTimeAssessmentTest(): void
-    {
-        $testMock = $this->createMock(AssessmentTest::class);
-        $testMock->method('getIdentifier')->willReturn('PHPUnitTestRef');
-
-        $adjustmentMapMock = $this->createMock(AdjustmentMap::class);
-        $adjustmentMapMock->method('get')->willReturn(10);
-
-        $qtiTimerMock = $this->createMock(QtiTimer::class);
-        $qtiTimerMock->method('getAdjustmentMap')->willReturn($adjustmentMapMock);
-
-        $testSessionMock = $this->createMock(TestSession::class);
-        $testSessionMock->method('getTimer')->willReturn($qtiTimerMock);
-        $testSessionMock->method('getAssessmentTest')->willReturn($testMock);
-
-        $this->testSessionServiceMock->method('getTestSession')->willReturn($testSessionMock);
-
-        $deliveryExecutions[] = $this->deliveryExecution;
-
-        $deliveryHelperService = new DeliveryExecutionList();
-        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
-        /* @noinspection PhpUnhandledExceptionInspection */
-        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
-        $this->assertSame(10, $result[0]['timer']['adjustedTime']);
+        $this->assertSame(0, $result[0]['timer']['adjustedTime']);
     }
 
     private function getExecutionExample(): array

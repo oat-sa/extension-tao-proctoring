@@ -18,10 +18,13 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace oat\taoProctoring\model\execution;
 
 use common_Exception;
 use common_exception_Error;
+use common_exception_MissingParameter;
 use common_exception_NotFound;
 use common_ext_ExtensionException;
 use common_session_Session;
@@ -29,9 +32,9 @@ use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\session\SessionService;
+use oat\taoDelivery\model\execution\DeliveryExecution as BaseDeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
@@ -39,6 +42,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
+use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use oat\taoTests\models\runner\time\TimePoint;
@@ -55,15 +59,23 @@ use qtism\runtime\tests\AssessmentTestSessionState;
  */
 class DeliveryExecutionManagerService extends ConfigurableService
 {
-    const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
+    public const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
 
     /**
      * @param $deliveryExecutionId
-     * @return DeliveryExecutionInterface
+     * @return BaseDeliveryExecution
      */
-    public function getDeliveryExecutionById($deliveryExecutionId)
+    public function getDeliveryExecutionById($deliveryExecutionId): BaseDeliveryExecution
     {
-        return ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+        return $this->getServiceProxy()->getDeliveryExecution($deliveryExecutionId);
+    }
+
+    /**
+     * @return ServiceProxy|object
+     */
+    private function getServiceProxy(): ServiceProxy
+    {
+        return $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID);
     }
 
     /**
@@ -71,9 +83,12 @@ class DeliveryExecutionManagerService extends ConfigurableService
      *
      * @param DeliveryExecutionInterface $deliveryExecution
      * @return QtiTimer
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
      * @throws common_exception_Error
-     * @throws \common_exception_MissingParameter
      * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     public function getDeliveryTimer($deliveryExecution)
     {
@@ -143,7 +158,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param int $extraTime
      * @return array
      * @throws common_exception_Error
-     * @throws \common_exception_MissingParameter
+     * @throws common_exception_MissingParameter
      * @throws common_exception_NotFound
      * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
@@ -225,7 +240,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param DeliveryExecutionInterface $deliveryExecution
      * @param $extendedTime
      * @throws common_exception_Error
-     * @throws \common_exception_MissingParameter
+     * @throws common_exception_MissingParameter
      * @throws common_exception_NotFound
      * @throws \oat\taoTests\models\runner\time\InvalidStorageException
      */
@@ -329,7 +344,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @param DeliveryExecutionInterface|string $deliveryExecution
      * @return bool
      */
-    public function isTimerAdjustmentAllowed($deliveryExecution)
+    public function isTimerAdjustmentAllowed($deliveryExecution): bool
     {
         if (is_string($deliveryExecution)) {
             $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecution);
@@ -344,6 +359,45 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return true;
+    }
+
+    /**
+     * Returns smaller time value for the current item/section/testPart/test chain
+     * @param string $deliveryExecutionId
+     * @return int
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
+     */
+    public function getAdjustedTime(string $deliveryExecutionId): int
+    {
+        $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        $adjustedTimes = [];
+        if ($testSession) {
+            /** @var AdjustmentMap $adjustmentMap */
+            $adjustmentMap = $testSession->getTimer()->getAdjustmentMap();
+
+            if ($item = $testSession->getCurrentAssessmentItemRef()) {
+                $adjustedTimes[] = $adjustmentMap->get($item->getIdentifier());
+            }
+
+            if ($section = $testSession->getCurrentAssessmentSection()) {
+                $adjustedTimes[] = $adjustmentMap->get($section->getIdentifier());
+            }
+
+            if ($testPart = $testSession->getCurrentTestPart()) {
+                $adjustedTimes[] = $adjustmentMap->get($testPart->getIdentifier());
+            }
+
+            if ($assessmentTest = $testSession->getAssessmentTest()) {
+                $adjustedTimes[] = $adjustmentMap->get($assessmentTest->getIdentifier());
+            }
+        }
+        return count($adjustedTimes) ? min($adjustedTimes) : 0;
     }
 
     /**
