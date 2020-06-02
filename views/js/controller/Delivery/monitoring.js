@@ -1089,10 +1089,20 @@ define([
                     if (showColumnExtendedTime) {
                         model.push({
                             id: 'extendedTime',
-                            label: __('Extended Time'),
+                            label: __('Changed Time'),
                             transform(value, row) {
-                                var extendedTimer = _.isObject(row.timer) ? row.timer : {};
-                                return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
+                                let state = [];
+                                const timer = _.isObject(row.timer) ? row.timer : {};
+                                if (timer.hasOwnProperty('extendedTime') && timer.extendedTime) {
+                                    state.push(': x' + timer.extendedTime);
+                                }
+                                if (timer.hasOwnProperty('extraTime') && timer.extraTime) {
+                                    state.push(__('Extra') + ': ' + timer.extraTime);
+                                }
+                                if (timer.hasOwnProperty('adjustedTime') && timer.adjustedTime) {
+                                    state.push(__('Adjusted') + ': ' . timer.adjustedTime);
+                                }
+                                return state.join('<br />');
                             }
                         });
                     }
