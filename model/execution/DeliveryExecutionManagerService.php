@@ -251,7 +251,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     ->get(TimerStrategyInterface::SERVICE_ID)
                     ->getExtraTime($currentLimitSeconds, $extendedTime);
                 if ($increaseSeconds > 0) {
-                    $timer->getAdjustmentMap()->increase($component->getIdentifier(), $increaseSeconds);
+                    $timer->getAdjustmentMap()->increase(
+                        $component->getIdentifier(),
+                        TimerAdjustmentServiceInterface::TYPE_EXTENDED_TIME,
+                        $increaseSeconds
+                    );
                 }
             }
         }
@@ -302,9 +306,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
                 if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($testSession, $seconds);
+                    $success = $timerAdjustmentService->increase($testSession, $seconds, TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 } else {
-                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
+                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds), TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 }
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
