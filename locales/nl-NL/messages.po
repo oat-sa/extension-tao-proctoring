@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint126\n"
-"PO-Revision-Date: 2020-04-24T11:19:30\n"
+"Project-Id-Version: TAO 3.4.0-sprint127\n"
+"PO-Revision-Date: 2020-05-29T12:50:03\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -12,6 +12,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+
+msgid " sec"
+msgstr ""
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr ""
@@ -103,8 +106,14 @@ msgstr "Beheer leveringen"
 msgid "Administration"
 msgstr "Administratie"
 
+msgid "All fields are required"
+msgstr ""
+
 msgid "already authorized"
 msgstr "al geautoriseerd "
+
+msgid "Already changed time will be added or subtracted by the new value."
+msgstr ""
 
 msgid "already paused"
 msgstr "al gepauzeerd"
@@ -161,10 +170,10 @@ msgstr ""
 msgid "Authorize"
 msgstr "Autoriseer"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriseer sessie"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriseer sessie"
 
 msgid "Authorize sessions"
@@ -176,14 +185,17 @@ msgstr "Autoriseer de toezichthouder"
 msgid "Authorize the selected proctors"
 msgstr "Autoriseer de geselecteerde toezichthouders"
 
-msgid "authorized"
+msgid "Authorized"
 msgstr "Geautoriseerd"
 
-msgid "Authorized"
+msgid "authorized"
 msgstr "Geautoriseerd"
 
 msgid "Authorized but not started"
 msgstr "Geautoriseerd, maar nog niet gestart"
+
+msgid "authorized but not started"
+msgstr ""
 
 msgid "Authorized proctors"
 msgstr "Geautoriseerde toezichthouders"
@@ -206,6 +218,9 @@ msgstr "Beschikbare geschiedenis"
 msgid "Available test takers"
 msgstr "Beschikbare kandidaten"
 
+msgid "awaiting"
+msgstr ""
+
 msgid "Awaiting"
 msgstr "Wachtend"
 
@@ -218,20 +233,20 @@ msgstr "Terug naar de sessies"
 msgid "Behaviour"
 msgstr "Gedrag"
 
-msgid "cancel"
-msgstr "annuleren"
-
 msgid "Cancel"
 msgstr "Annuleren"
+
+msgid "cancel"
+msgstr "annuleren"
 
 msgid "cancel the action"
 msgstr "Actie annuleren"
 
-msgid "Canceled"
-msgstr "Geannuleerd"
-
 msgid "canceled"
 msgstr "geannuleerd"
+
+msgid "Canceled"
+msgstr "Geannuleerd"
 
 msgid "Cannot authorize test session."
 msgstr "Kan de testsessie niet autorizeren."
@@ -281,20 +296,26 @@ msgstr "Kan de testsessies niet beëindigen."
 msgid "category"
 msgstr "category"
 
+msgid "Change time"
+msgstr ""
+
 msgid "Comfort"
 msgstr "Comfort"
 
 msgid "comment"
 msgstr "opmerking"
 
+msgid "comment..."
+msgstr ""
+
 msgid "Complaint"
 msgstr "Klacht"
 
-msgid "completed"
-msgstr "voltooid"
-
 msgid "Completed"
 msgstr "Voltooid"
+
+msgid "completed"
+msgstr "voltooid"
 
 msgid "Completed tests"
 msgstr "Voltooide examens"
@@ -393,10 +414,10 @@ msgstr "Exporteer onregelmatigheden"
 msgid "Extended Time"
 msgstr "Verlengde Tijd"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Extra tijd"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Extra tijd"
 
 msgid "Extra time granted"
@@ -408,11 +429,11 @@ msgstr "Filter"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "Finished"
-msgstr "Voltooid"
-
 msgid "finished"
 msgstr "voltooid"
+
+msgid "Finished"
+msgstr "Voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
@@ -443,6 +464,9 @@ msgstr "Ziekte"
 
 msgid "In Progress"
 msgstr "In behandeling"
+
+msgid "in progress"
+msgstr ""
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "Onregelmatigheden voor \"%s\" zijn met succes geëxporteerd"
@@ -485,6 +509,9 @@ msgstr "Bezig met laden…"
 
 msgid "Logout"
 msgstr "Afmelden"
+
+msgid "Main Menu"
+msgstr ""
 
 msgid "Manage Proctors"
 msgstr "Beheer toezichthouders"
@@ -577,20 +604,23 @@ msgstr "Pauzeer actieve toets sessies"
 msgid "Pause due to server maintenance"
 msgstr "Gepauzeerd wegens server onderhoud"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Sessie pauzeren"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Sessie pauzeren"
 
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
+msgid "Paused"
+msgstr "Gepauzeerd"
+
 msgid "paused"
 msgstr "gepauzeerd"
 
-msgid "Paused"
-msgstr "Gepauzeerd"
+msgid "Please provide a reason"
+msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Selecteer a.u.b. een of meerdere test sites om toezichthouders te beheren"
@@ -624,6 +654,9 @@ msgstr "Doorgaan"
 
 msgid "Proctor"
 msgstr "Toezichthouder"
+
+msgid "Proctor authorization"
+msgstr ""
 
 msgid "Proctor created"
 msgstr "Toezichthouder gecreëerd"
@@ -685,10 +718,10 @@ msgstr "Rapporteren"
 msgid "Report irregularities"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
 msgid "reported for irregularity"
@@ -697,12 +730,12 @@ msgstr "Gerapporteerd wegens onregelmatigheden"
 msgid "Resource update task is completed"
 msgstr "Resource-update taak is voltooid"
 
+msgid "results"
+msgstr "resultaten"
+
 #, tao-public
 msgid "Results"
 msgstr "Resultaten"
-
-msgid "results"
-msgstr "resultaten"
 
 msgid "Return to the session manager"
 msgstr "Geef terug aan de sessie beheerder"
@@ -824,6 +857,9 @@ msgstr "Systeem gegenereerde pauze."
 msgid "Take or continue a test controlled by a proctor"
 msgstr "Start of continueer een examen gecontroleerd door een toezichthouder"
 
+msgid "TAO: User Authorization"
+msgstr ""
+
 msgid "Technical"
 msgstr "Technisch"
 
@@ -833,10 +869,10 @@ msgstr "Beeindigen"
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Beëindig sessie"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Beëindig sessie"
 
 msgid "Terminate sessions"
@@ -848,11 +884,11 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "terminated"
-msgstr "beëindigd"
-
 msgid "Terminated"
 msgstr "Beëindigd"
+
+msgid "terminated"
+msgstr "beëindigd"
 
 msgid "Test  must be terminated."
 msgstr "Test moet worden beëindigd."
@@ -950,8 +986,8 @@ msgstr "Test werkstation"
 msgid "The action cannot be applied, no eligible sessions found"
 msgstr "De actie kan niet worden uitgevoerd. Er zijn geen in aanmerking komende sessies gevonden"
 
-msgid "The action will be applied to the following session"
-msgstr "Deze actie zal worden doorgevoerd op de volgende sessie"
+msgid "The action will be applied to the following session(s)"
+msgstr ""
 
 msgid "the already granted time will be replaced by the new value"
 msgstr "de al eerder gegeven extra tijd zal worden vervangen door de nieuwe waarde"
@@ -967,6 +1003,9 @@ msgstr ""
 
 msgid "The extra time must be a number"
 msgstr "De extra tijd moet numeriek zijn"
+
+msgid "The extra time must be a number bigger than 0"
+msgstr ""
 
 msgid "The proctor will be authorized. Continue ?"
 msgstr "De toezichthouder zal geautoriseerd worden. Verder gaan..?"
@@ -991,6 +1030,9 @@ msgstr "Er is geen levering in bewerking"
 
 msgid "Time"
 msgstr "Tijd"
+
+msgid "Time adjusted"
+msgstr ""
 
 #, tao-public
 msgid "Tools"

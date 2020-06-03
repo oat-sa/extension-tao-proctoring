@@ -22,7 +22,7 @@ use oat\tao\model\theme\Theme;
 <?php Template::inc('blocks/requirement-check.tpl', 'tao'); ?>
 
         <div class="content-wrap">
-            <header class="dark-bar clearfix">
+            <header aria-label="<?=__('Main Menu')?>" class="dark-bar clearfix">
                 <?= Layout::renderThemeTemplate(Theme::CONTEXT_BACKOFFICE, 'header-logo') ?>
                 <div class="lft title-box"></div>
                 <nav class="rgt">
