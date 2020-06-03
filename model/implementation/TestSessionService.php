@@ -28,6 +28,8 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
+use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -243,4 +245,29 @@ class TestSessionService extends QtiTestSessionService
         return $lastTestTakersEvent;
     }
 
+    /**
+     * Returns current/smallest max time constraint.
+     *
+     * @param TestSession $testSession
+     * @return QtiTimeConstraint|null
+     */
+    public function getSmallestMaxTimeConstraint(TestSession $testSession): ?QtiTimeConstraint
+    {
+        $constraints = $testSession->getTimeConstraints();
+        $smallestTimeConstraint = null;
+        $remainingTime = PHP_INT_MAX;
+        foreach ($constraints as $constraint) {
+            $constraintRemainingDuration = $constraint->getMaximumRemainingTime();
+            if ($constraintRemainingDuration === false) {
+                continue;
+            }
+
+            if (($constraintRemainingTime = $constraintRemainingDuration->getSeconds(true)) < $remainingTime) {
+                $smallestTimeConstraint = $constraint;
+                $remainingTime = $constraintRemainingTime;
+            }
+        }
+
+        return $smallestTimeConstraint;
+    }
 }
