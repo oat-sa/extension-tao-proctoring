@@ -115,6 +115,14 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
+                'timeAdjustmentLimits' => [
+                    'min' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentDecreaseLimit(
+                        $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                    ),
+                    'max' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentIncreaseLimit(
+                        $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                    ),
+                ],
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
