@@ -92,6 +92,11 @@ class DeliveryExecutionList extends ConfigurableService
         $online = $this->isOnline($cachedData);
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
+        $timerAdjustmentAllowed = $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
+            $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+        );
+
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
@@ -102,9 +107,7 @@ class DeliveryExecutionList extends ConfigurableService
             'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
                 ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                 : null,
-            'allowTimerAdjustment' => $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
-                $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-            ),
+            'allowTimerAdjustment' => $timerAdjustmentAllowed,
             'timer' => [
                 'lastActivity' => $this->getLastActivity($cachedData, $online),
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
@@ -115,19 +118,22 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
-                'timeAdjustmentLimits' => [
-                    'min' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentDecreaseLimit(
-                        $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-                    ),
-                    'max' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentIncreaseLimit(
-                        $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-                    ),
-                ],
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
             'state' => $this->createState($cachedData),
         );
+
+        if ($timerAdjustmentAllowed) {
+            $execution['timer']['timeAdjustmentLimits'] = [
+                'decrease' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentDecreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+                'increase' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentIncreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+            ];
+        }
 
         if ($this->isOnline($cachedData)) {
             $execution['online'] = $online;
