@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint126\n"
-"PO-Revision-Date: 2020-04-24T11:19:28\n"
+"Project-Id-Version: TAO 3.4.0-sprint127\n"
+"PO-Revision-Date: 2020-05-29T12:49:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -12,6 +12,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+
+msgid " sec"
+msgstr ""
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - Item %2$s/%3$s"
@@ -103,8 +106,14 @@ msgstr "Administrer des passations"
 msgid "Administration"
 msgstr "Administration"
 
+msgid "All fields are required"
+msgstr ""
+
 msgid "already authorized"
 msgstr "déjà autorisé"
+
+msgid "Already changed time will be added or subtracted by the new value."
+msgstr ""
 
 msgid "already paused"
 msgstr "déjà mis en pause"
@@ -161,11 +170,11 @@ msgstr ""
 msgid "Authorize"
 msgstr "Autoriser"
 
-msgid "Authorize session"
-msgstr "Autoriser la session"
-
 msgid "Authorize Session"
 msgstr "Autoriser cette session "
+
+msgid "Authorize session"
+msgstr "Autoriser la session"
 
 msgid "Authorize sessions"
 msgstr "Autoriser les sessions"
@@ -176,14 +185,17 @@ msgstr "Autoriser le surveillant"
 msgid "Authorize the selected proctors"
 msgstr "Autoriser les surveillants sélectionnés"
 
-msgid "authorized"
-msgstr "autorisé"
-
 msgid "Authorized"
 msgstr "Autorisé"
 
+msgid "authorized"
+msgstr "autorisé"
+
 msgid "Authorized but not started"
 msgstr "Autorisé mais non démarré"
+
+msgid "authorized but not started"
+msgstr ""
 
 msgid "Authorized proctors"
 msgstr "Surveillants autorisés"
@@ -206,6 +218,9 @@ msgstr "Historique disponible"
 msgid "Available test takers"
 msgstr "Participants disponibles"
 
+msgid "awaiting"
+msgstr ""
+
 msgid "Awaiting"
 msgstr "En attente"
 
@@ -218,20 +233,20 @@ msgstr "Retour aux sessions"
 msgid "Behaviour"
 msgstr "Comportement"
 
-msgid "cancel"
-msgstr "annuler"
-
 msgid "Cancel"
 msgstr "Annuler"
+
+msgid "cancel"
+msgstr "annuler"
 
 msgid "cancel the action"
 msgstr "annuler l'action"
 
-msgid "Canceled"
-msgstr "Annulé"
-
 msgid "canceled"
 msgstr "annulé"
+
+msgid "Canceled"
+msgstr "Annulé"
 
 msgid "Cannot authorize test session."
 msgstr "Ne peut autoriser la session de test."
@@ -281,20 +296,26 @@ msgstr "Ne peut achever les sessions de test."
 msgid "category"
 msgstr "catégorie"
 
+msgid "Change time"
+msgstr ""
+
 msgid "Comfort"
 msgstr "confort"
 
 msgid "comment"
 msgstr "commentaire"
 
+msgid "comment..."
+msgstr ""
+
 msgid "Complaint"
 msgstr "Réclamation"
 
-msgid "completed"
-msgstr "terminé"
-
 msgid "Completed"
 msgstr "Terminé"
+
+msgid "completed"
+msgstr "terminé"
 
 msgid "Completed tests"
 msgstr "Tests terminés"
@@ -393,10 +414,10 @@ msgstr "Exporter les irrégularités"
 msgid "Extended Time"
 msgstr "Temps supplémentaire"
 
-msgid "Extra time"
+msgid "Extra Time"
 msgstr "Temps supplémentaire"
 
-msgid "Extra Time"
+msgid "Extra time"
 msgstr "Temps supplémentaire"
 
 msgid "Extra time granted"
@@ -408,11 +429,11 @@ msgstr "Filtrer"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "Finished"
-msgstr "Terminé"
-
 msgid "finished"
 msgstr "terminé"
+
+msgid "Finished"
+msgstr "Terminé"
 
 msgid "First name"
 msgstr "Prénom"
@@ -443,6 +464,9 @@ msgstr "Maladie"
 
 msgid "In Progress"
 msgstr "En cours"
+
+msgid "in progress"
+msgstr ""
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "Irrégularités pour \"%s\" exportées avec succès"
@@ -485,6 +509,9 @@ msgstr "Chargement"
 
 msgid "Logout"
 msgstr "Déconnexion"
+
+msgid "Main Menu"
+msgstr ""
 
 msgid "Manage Proctors"
 msgstr "Gestion des surveillants d'examen"
@@ -577,20 +604,23 @@ msgstr "Mettre en pause les sessions de test actives"
 msgid "Pause due to server maintenance"
 msgstr "Pause due à une maintenance serveur"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "Mettre en pause la session"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "Mettre en pause la session"
 
 msgid "Pause sessions"
 msgstr "Suspendre les sessions"
 
+msgid "Paused"
+msgstr "Suspendu"
+
 msgid "paused"
 msgstr "suspendu"
 
-msgid "Paused"
-msgstr "Suspendu"
+msgid "Please provide a reason"
+msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Veuillez choisir un ou plusieurs tests pour gérer les surveillants d'examen."
@@ -624,6 +654,9 @@ msgstr "Continuer"
 
 msgid "Proctor"
 msgstr "Surveillant d'examen"
+
+msgid "Proctor authorization"
+msgstr ""
 
 msgid "Proctor created"
 msgstr "Surveillant d'examen créé"
@@ -685,10 +718,10 @@ msgstr "Rapport"
 msgid "Report irregularities"
 msgstr "Rapporter des irrégularités"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporter une irrégularité"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporter une irrégularité"
 
 msgid "reported for irregularity"
@@ -697,12 +730,12 @@ msgstr "rapporté pour irrégularité"
 msgid "Resource update task is completed"
 msgstr "La tâche de mise à jour de la ressource est achevée."
 
+msgid "results"
+msgstr "résultats"
+
 #, tao-public
 msgid "Results"
 msgstr "Résultats"
-
-msgid "results"
-msgstr "résultats"
 
 msgid "Return to the session manager"
 msgstr "Retour au gestionnaire de session"
@@ -824,6 +857,9 @@ msgstr "Le système a généré une mise en pause."
 msgid "Take or continue a test controlled by a proctor"
 msgstr "Prendre ou continuer un test contrôlé par un surveillant d'examen"
 
+msgid "TAO: User Authorization"
+msgstr ""
+
 msgid "Technical"
 msgstr "Technique"
 
@@ -833,10 +869,10 @@ msgstr "Terminer"
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Terminer la session"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Terminer la session"
 
 msgid "Terminate sessions"
@@ -848,11 +884,11 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "terminated"
-msgstr "terminé"
-
 msgid "Terminated"
 msgstr "Terminé"
+
+msgid "terminated"
+msgstr "terminé"
 
 msgid "Test  must be terminated."
 msgstr "Le test doit être résilié."
@@ -950,8 +986,8 @@ msgstr "Test en cours de la station de travail"
 msgid "The action cannot be applied, no eligible sessions found"
 msgstr "L'action ne peut être appliquée, pas de session éligible trouvée."
 
-msgid "The action will be applied to the following session"
-msgstr "L'action sera appliquée à la session suivante."
+msgid "The action will be applied to the following session(s)"
+msgstr ""
 
 msgid "the already granted time will be replaced by the new value"
 msgstr "le temps déjà accordé sera remplacé par la nouvelle valeur"
@@ -967,6 +1003,9 @@ msgstr ""
 
 msgid "The extra time must be a number"
 msgstr "Le temps additionnel doit être un nombre."
+
+msgid "The extra time must be a number bigger than 0"
+msgstr ""
 
 msgid "The proctor will be authorized. Continue ?"
 msgstr "Le surveillant d'examen va obtenir une autorisation. Continuer ?"
@@ -991,6 +1030,9 @@ msgstr "Il n'y a pas de passation en cours."
 
 msgid "Time"
 msgstr "Durée"
+
+msgid "Time adjusted"
+msgstr ""
 
 #, tao-public
 msgid "Tools"
