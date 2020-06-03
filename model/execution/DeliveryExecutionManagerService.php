@@ -42,7 +42,6 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
-use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use oat\taoTests\models\runner\time\TimePoint;
@@ -73,7 +72,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
     /**
      * @return ServiceProxy|object
      */
-    private function getServiceProxy(): ServiceProxy
+    private function getServiceProxy()
     {
         return $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID);
     }
