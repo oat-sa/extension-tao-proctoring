@@ -258,7 +258,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testLatPauseReason(): void
+    public function testLastPauseReason(): void
     {
         //Prepare
         $this->deliveryExecutionManagerServiceMock->method('isTimerAdjustmentAllowed')->willReturn(true);
