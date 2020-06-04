@@ -56,7 +56,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 {
     const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
 
-    protected CONST NO_TIME_ADJUSTMENT_LIMIT = -1;
+    protected const NO_TIME_ADJUSTMENT_LIMIT = -1;
 
     private $deliveryExecutions = [];
 
