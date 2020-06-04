@@ -446,14 +446,20 @@ define([
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
 
-                    timeHandlingPopup(config).on('ok', (state) => {
-                        request(
-                            'adjustTime',
-                            sessionsList.allowedResources.map(({ id }) => id),
-                            state,
-                            __('Time adjusted'),
-                        );
-                    });
+                    const deliveryExecutionData = getExecutionData(selection);
+
+                    if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
+                        config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
+                    }
+                    timeHandlingPopup(config)
+                        .on('ok', (state) => {
+                            request(
+                                'adjustTime',
+                                sessionsList.allowedResources.map(({ id }) => id),
+                                state,
+                                __('Time adjusted'),
+                            );
+                        });
                 }
 
                 /**

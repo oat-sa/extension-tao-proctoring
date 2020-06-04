@@ -31,7 +31,6 @@ use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\session\SessionService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
@@ -57,13 +56,24 @@ class DeliveryExecutionManagerService extends ConfigurableService
 {
     const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
 
+    protected const NO_TIME_ADJUSTMENT_LIMIT = -1;
+
+    private $deliveryExecutions = [];
+
     /**
      * @param $deliveryExecutionId
      * @return DeliveryExecutionInterface
      */
     public function getDeliveryExecutionById($deliveryExecutionId)
     {
-        return ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+        if (!isset($this->deliveryExecutions[$deliveryExecutionId])) {
+            $deliveryExecution = $this->getServiceLocator()
+                ->get(ServiceProxy::SERVICE_ID)
+                ->getDeliveryExecution($deliveryExecutionId);
+            $this->deliveryExecutions[$deliveryExecutionId] = $deliveryExecution;
+        }
+
+        return $this->deliveryExecutions[$deliveryExecutionId];
     }
 
     /**
@@ -251,7 +261,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     ->get(TimerStrategyInterface::SERVICE_ID)
                     ->getExtraTime($currentLimitSeconds, $extendedTime);
                 if ($increaseSeconds > 0) {
-                    $timer->getAdjustmentMap()->increase($component->getIdentifier(), $increaseSeconds);
+                    $timer->getAdjustmentMap()->increase(
+                        $component->getIdentifier(),
+                        TimerAdjustmentServiceInterface::TYPE_EXTENDED_TIME,
+                        $increaseSeconds
+                    );
                 }
             }
         }
@@ -302,9 +316,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
                 if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($testSession, $seconds);
+                    $success = $timerAdjustmentService->increase($testSession, $seconds, TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 } else {
-                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
+                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds), TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 }
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
@@ -344,6 +358,34 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return true;
+    }
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return int
+     */
+    public function getTimerAdjustmentDecreaseLimit(string $deliveryExecutionId): int
+    {
+        $decreaseLimit = self::NO_TIME_ADJUSTMENT_LIMIT;
+        try {
+            $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
+            $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            $currentTimer = $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
+            $decreaseLimit = $currentTimer->getMaximumRemainingTime()->getSeconds(true);
+        } catch (common_Exception $e) {
+            $this->logError("Cannot calculate minimum time adjustment limit.");
+        }
+
+        return $decreaseLimit;
+    }
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return int
+     */
+    public function getTimerAdjustmentIncreaseLimit(string $deliveryExecutionId): int
+    {
+        return self::NO_TIME_ADJUSTMENT_LIMIT;
     }
 
     /**
