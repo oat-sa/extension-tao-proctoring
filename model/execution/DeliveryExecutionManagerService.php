@@ -28,6 +28,7 @@ use common_exception_MissingParameter;
 use common_exception_NotFound;
 use common_ext_ExtensionException;
 use common_session_Session;
+use Exception;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
@@ -273,7 +274,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $timeLimits = $component->getTimeLimits();
             if ($timeLimits && $timeLimits->hasMaxTime()) {
                 $currentLimitSeconds = $timeLimits->getMaxTime()->getSeconds(true);
-                $increaseSeconds = $this->getServiceLocator()
+                $increaseSeconds = (int) $this->getServiceLocator()
                     ->get(TimerStrategyInterface::SERVICE_ID)
                     ->getExtraTime($currentLimitSeconds, $extendedTime);
                 if ($increaseSeconds > 0) {
@@ -308,7 +309,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
      */
-    public function adjustTimers(array $deliveryExecutions, $seconds, array $reason = []): array
+    public function adjustTimers(array $deliveryExecutions, int $seconds, array $reason = []): array
     {
         $result = ['processed' => [], 'unprocessed' => []];
 
@@ -386,7 +387,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
         try {
             $currentTimeConstraint = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
             $decreaseLimit = $currentTimeConstraint->getMaximumRemainingTime()->getSeconds(true);
-        } catch (common_Exception $e) {
+        } catch (Exception $e) {
             $this->logError("Cannot calculate minimum time adjustment limit.");
         }
 
@@ -420,7 +421,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     TimerAdjustmentService::TYPE_TIME_ADJUSTMENT
                 );
             }
-        } catch (common_Exception $e) {
+        } catch (Exception $e) {
             $this->logError("Cannot calculate adjusted time for provided execution ID: {$deliveryExecutionId}.");
         }
 
