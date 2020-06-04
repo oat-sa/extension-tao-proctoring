@@ -44,8 +44,11 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
+use oat\taoQtiTest\models\runner\time\QtiTimer;
+use oat\taoQtiTest\models\runner\time\TimerAdjustmentService;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
 use qtism\common\datatypes\Duration;
+use qtism\data\QtiIdentifiable;
 
 class DeliveryExecutionManagerServiceTest extends TestCase
 {
@@ -64,32 +67,62 @@ class DeliveryExecutionManagerServiceTest extends TestCase
      */
     private $testSessionServiceMock;
 
+    /**
+     * @var DeliveryExecution|MockObject
+     */
+    private $awaitingExecution;
+    /**
+     * @var DeliveryExecution|MockObject
+     */
+    private $canceledExecution;
+    /**
+     * @var DeliveryExecution|MockObject
+     */
+    private $pausedExecution;
+    /**
+     * @var TimerAdjustmentServiceInterface|MockObject
+     */
+    private $timerAdjustmentServiceMock;
+    /**
+     * @var DeliveryMonitoringData|MockObject
+     */
+    private $deliveryMonitoringDataMock;
+    /**
+     * @var DeliveryMonitoringService|MockObject
+     */
+    private $deliveryMonitoringServiceMock;
+    /**
+     * @var User|MockObject
+     */
+    private $userMock;
+    /**
+     * @var common_session_Session|MockObject
+     */
+    private $sessionMock;
+    /**
+     * @var SessionService|MockObject
+     */
+    private $sessionServiceMock;
+    /**
+     * @var EventManager|MockObject
+     */
+    private $eventManagerMock;
+    /**
+     * @var TestSession|MockObject
+     */
+    private $testSessionMock;
+
+    /**
+     * @var QtiTimer|MockObject
+     */
+    private $qtiTimerMock;
+
+
+    private $loggerServiceMock;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
-        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
-        $serviceLocatorMock = $this->getServiceLocatorMock([
-            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
-            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
-            LoggerService::SERVICE_ID => $this->createMock(LoggerService::class),
-        ]);
-
-        $this->subject = new DeliveryExecutionManagerService();
-        $this->subject->setServiceLocator($serviceLocatorMock);
-    }
-
-    /**
-     * @throws common_Exception
-     * @throws common_exception_Error
-     * @throws common_exception_NotFound
-     * @throws common_ext_ExtensionException
-     * @throws InvalidServiceManagerException
-     * @throws QtiTestExtractionFailedException
-     */
-    public function testAdjustTimers(): void
-    {
-        $service = new DeliveryExecutionManagerService();
 
         $awaitingState = $this->createMock(core_kernel_classes_Resource::class);
         $awaitingState->method('getUri')->willReturn(DeliveryExecutionProctoring::STATE_AWAITING);
@@ -106,64 +139,89 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $authorizedState = $this->createMock(core_kernel_classes_Resource::class);
         $authorizedState->method('getUri')->willReturn(DeliveryExecutionProctoring::STATE_AUTHORIZED);
 
-        $awaitingExecution = $this->createMock(DeliveryExecution::class);
-        $awaitingExecution->method('getState')->willReturn($awaitingState);
-        $awaitingExecution->method('getIdentifier')->willReturn('awaiting');
+        $this->awaitingExecution = $this->createMock(DeliveryExecution::class);
+        $this->awaitingExecution->method('getState')->willReturn($awaitingState);
+        $this->awaitingExecution->method('getIdentifier')->willReturn('awaiting');
 
-        $canceledExecution = $this->createMock(DeliveryExecution::class);
-        $canceledExecution->method('getState')->willReturn($canceledState);
-        $canceledExecution->method('getIdentifier')->willReturn('canceled');
+        $this->canceledExecution = $this->createMock(DeliveryExecution::class);
+        $this->canceledExecution->method('getState')->willReturn($canceledState);
+        $this->canceledExecution->method('getIdentifier')->willReturn('canceled');
 
-        $pausedExecution = $this->createMock(DeliveryExecution::class);
-        $pausedExecution->method('getState')->willReturn($pausedState);
-        $pausedExecution->method('getIdentifier')->willReturn('paused');
+        $this->pausedExecution = $this->createMock(DeliveryExecution::class);
+        $this->pausedExecution->method('getState')->willReturn($pausedState);
+        $this->pausedExecution->method('getIdentifier')->willReturn('paused');
 
-        $deliveryExecutions = [
-            $awaitingExecution,
-            $canceledExecution,
-            $pausedExecution,
-        ];
-
-        $timerAdjustmentServiceMock = $this->createMock(TimerAdjustmentServiceInterface::class);
-        $timerAdjustmentServiceMock->method('increase')->willReturn(true);
-        $timerAdjustmentServiceMock->method('decrease')->willReturn(true);
-
-        $deliveryMonitoringDataMock = $this->createMock(DeliveryMonitoringData::class);
-        $deliveryMonitoringDataMock->method('updateData')->with([DeliveryMonitoringService::REMAINING_TIME]);
-
-        $deliveryMonitoringServiceMock = $this->createMock(DeliveryMonitoringService::class);
-        $deliveryMonitoringServiceMock->method('getData')->willReturn($deliveryMonitoringDataMock);
-
-        $userMock = $this->createMock(User::class);
-
-        $sessionMock = $this->createMock(common_session_Session::class);
-        $sessionMock->method('getUser')->willReturn($userMock);
-
-        $sessionServiceMock = $this->createMock(SessionService::class);
-        $sessionServiceMock->method('getCurrentSession')->willReturn($sessionMock);
-
-        $eventManagerMock = $this->createMock(EventManager::class);
-        $self = $this;
-        $eventManagerMock->method('trigger')->willReturnCallback(static function (DeliveryExecutionTimerAdjusted $event) use ($self, $awaitingExecution, $userMock) {
-            $self->assertSame(['reasons'], $event->getReason());
-            $self->assertSame($awaitingExecution, $event->getDeliveryExecution());
-            $self->assertSame(1, $event->getSeconds());
-            $self->assertSame($userMock, $event->getProctor());
-        });
-
-        $testSessionMock = $this->createMock(TestSession::class);
-
-        $testSessionServiceMock = $this->createMock(TestSessionService::class);
-        $testSessionServiceMock->method('getTestSession')->willReturn($testSessionMock);
-
+        $this->timerAdjustmentServiceMock = $this->createMock(TimerAdjustmentServiceInterface::class);
+        $this->deliveryMonitoringDataMock = $this->createMock(DeliveryMonitoringData::class);
+        $this->deliveryMonitoringServiceMock = $this->createMock(DeliveryMonitoringService::class);
+        $this->userMock = $this->createMock(User::class);
+        $this->sessionMock = $this->createMock(common_session_Session::class);
+        $this->sessionServiceMock = $this->createMock(SessionService::class);
+        $this->eventManagerMock = $this->createMock(EventManager::class);
+        $this->testSessionMock = $this->createMock(TestSession::class);
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
+        $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
+        $this->qtiTimerMock = $this->createMock(QtiTimer::class);
+        $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
+        $this->loggerServiceMock = $this->createMock(LoggerService::class);
         $serviceLocatorMock = $this->getServiceLocatorMock([
-            TimerAdjustmentServiceInterface::SERVICE_ID => $timerAdjustmentServiceMock,
-            DeliveryMonitoringService::SERVICE_ID => $deliveryMonitoringServiceMock,
-            SessionService::SERVICE_ID => $sessionServiceMock,
-            EventManager::SERVICE_ID => $eventManagerMock,
-            TestSessionService::SERVICE_ID => $testSessionServiceMock,
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            LoggerService::SERVICE_ID => $this->loggerServiceMock,
         ]);
 
+        $this->subject = new DeliveryExecutionManagerService();
+        $this->subject->setServiceLocator($serviceLocatorMock);
+    }
+
+    /**
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     */
+    public function testAdjustTimers(): void
+    {
+        $deliveryExecutions = [
+            $this->awaitingExecution,
+            $this->canceledExecution,
+            $this->pausedExecution,
+        ];
+
+        $this->timerAdjustmentServiceMock->method('increase')->willReturn(true);
+        $this->timerAdjustmentServiceMock->method('decrease')->willReturn(true);
+        $this->deliveryMonitoringDataMock->method('updateData')->with([DeliveryMonitoringService::REMAINING_TIME]);
+        $this->deliveryMonitoringServiceMock->method('getData')->willReturn($this->deliveryMonitoringDataMock);
+        $this->sessionMock->method('getUser')->willReturn($this->userMock);
+        $this->sessionServiceMock->method('getCurrentSession')->willReturn($this->sessionMock);
+
+        $self = $this;
+        $awaitingExecution = $this->awaitingExecution;
+        $userMock = $this->userMock;
+        $this->eventManagerMock->method('trigger')
+            ->willReturnCallback(
+                static function (DeliveryExecutionTimerAdjusted $event)
+                    use ($self, $awaitingExecution, $userMock) {
+                        $self->assertSame(['reasons'], $event->getReason());
+                        $self->assertSame($awaitingExecution, $event->getDeliveryExecution());
+                        $self->assertSame(1, $event->getSeconds());
+                        $self->assertSame($userMock, $event->getProctor());
+                    });
+
+        $this->testSessionServiceMock->method('getTestSession')->willReturn($this->testSessionMock);
+
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            TimerAdjustmentServiceInterface::SERVICE_ID => $this->timerAdjustmentServiceMock,
+            DeliveryMonitoringService::SERVICE_ID => $this->deliveryMonitoringServiceMock,
+            SessionService::SERVICE_ID => $this->sessionServiceMock,
+            EventManager::SERVICE_ID => $this->eventManagerMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+        ]);
+
+        $service = new DeliveryExecutionManagerService();
         $service->setServiceLocator($serviceLocatorMock);
 
         $service->adjustTimers($deliveryExecutions, 1, ['reasons']);
@@ -225,5 +283,91 @@ class DeliveryExecutionManagerServiceTest extends TestCase
             $this->subject->getTimerAdjustmentIncreaseLimit($deliveryExecutionId),
             'Method must return correct maximum limit for timer increase.'
         );
+    }
+
+    public function testAdjustedTimeWithoutTestSession(): void {
+        $this->serviceProxyMock
+            ->expects($this->once())
+            ->method('getDeliveryExecution')
+            ->willReturn($this->pausedExecution);
+
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            LoggerService::SERVICE_ID => $this->loggerServiceMock,
+        ]);
+        $service = new DeliveryExecutionManagerService();
+        $service->setServiceLocator($serviceLocatorMock);
+        $this->assertSame(0, $service->getAdjustedTime('PHPUnitDeliveryExecutionId'));
+    }
+
+    public function testAdjustedTimeWithoutTimer(): void
+    {
+        $this->serviceProxyMock
+            ->expects($this->once())
+            ->method('getDeliveryExecution')
+            ->willReturn($this->pausedExecution);
+
+        $this->testSessionServiceMock
+            ->expects($this->once())
+            ->method('getTestSession')
+            ->willReturn($this->testSessionMock);
+
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            TimerAdjustmentService::SERVICE_ID => $this->timerAdjustmentServiceMock,
+        ]);
+
+        $service = new DeliveryExecutionManagerService();
+        $service->setServiceLocator($serviceLocatorMock);
+        $this->assertSame(0, $service->getAdjustedTime('PHPUnitDeliveryExecutionId'));
+    }
+
+    /**
+     * @throws QtiTestExtractionFailedException
+     */
+    public function testAdjustedTime(): void
+    {
+        $item = $this->createMock(QtiIdentifiable::class);
+
+        $this->serviceProxyMock
+            ->expects($this->once())
+            ->method('getDeliveryExecution')
+            ->willReturn($this->pausedExecution);
+
+        $this->timerAdjustmentServiceMock
+            ->expects($this->once())
+            ->method('getAdjustmentByType')
+            ->willReturn(9);
+
+        $this->testSessionServiceMock
+            ->expects($this->once())
+            ->method('getTestSession')
+            ->willReturn($this->testSessionMock);
+
+        $qtiTimeConstrainMock = $this->createMock(QtiTimeConstraint::class);
+        $qtiTimeConstrainMock
+            ->expects($this->once())
+            ->method('getSource')
+            ->willReturn($item);
+        $qtiTimeConstrainMock
+            ->expects($this->once())
+            ->method('getTimer')
+            ->willReturn($this->qtiTimerMock);
+        $this->testSessionServiceMock
+            ->expects($this->once())
+            ->method('getSmallestMaxTimeConstraint')
+            ->willReturn($qtiTimeConstrainMock);
+
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            TimerAdjustmentService::SERVICE_ID => $this->timerAdjustmentServiceMock,
+        ]);
+
+        $service = new DeliveryExecutionManagerService();
+        $service->setServiceLocator($serviceLocatorMock);
+        $this->assertSame(9, $service->getAdjustedTime('PHPUnitDeliveryExecutionId'));
     }
 }
