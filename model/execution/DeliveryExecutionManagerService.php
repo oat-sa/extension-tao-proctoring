@@ -60,13 +60,23 @@ class DeliveryExecutionManagerService extends ConfigurableService
 {
     public const SERVICE_ID = 'taoProctoring/DeliveryExecutionManagerService';
 
+    protected const NO_TIME_ADJUSTMENT_LIMIT = -1;
+
+    private $deliveryExecutions = [];
+
     /**
      * @param $deliveryExecutionId
      * @return BaseDeliveryExecution
      */
     public function getDeliveryExecutionById($deliveryExecutionId): BaseDeliveryExecution
     {
-        return $this->getServiceProxy()->getDeliveryExecution($deliveryExecutionId);
+        if (!isset($this->deliveryExecutions[$deliveryExecutionId])) {
+            $deliveryExecution = $this->getServiceProxy()
+                ->getDeliveryExecution($deliveryExecutionId);
+            $this->deliveryExecutions[$deliveryExecutionId] = $deliveryExecution;
+        }
+
+        return $this->deliveryExecutions[$deliveryExecutionId];
     }
 
     /**
@@ -265,7 +275,11 @@ class DeliveryExecutionManagerService extends ConfigurableService
                     ->get(TimerStrategyInterface::SERVICE_ID)
                     ->getExtraTime($currentLimitSeconds, $extendedTime);
                 if ($increaseSeconds > 0) {
-                    $timer->getAdjustmentMap()->increase($component->getIdentifier(), $increaseSeconds);
+                    $timer->getAdjustmentMap()->increase(
+                        $component->getIdentifier(),
+                        TimerAdjustmentServiceInterface::TYPE_EXTENDED_TIME,
+                        $increaseSeconds
+                    );
                 }
             }
         }
@@ -316,9 +330,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
                 if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($testSession, $seconds);
+                    $success = $timerAdjustmentService->increase($testSession, $seconds, TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 } else {
-                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds));
+                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds), TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
                 }
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
@@ -358,6 +372,34 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return true;
+    }
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return int
+     */
+    public function getTimerAdjustmentDecreaseLimit(string $deliveryExecutionId): int
+    {
+        $decreaseLimit = self::NO_TIME_ADJUSTMENT_LIMIT;
+        try {
+            $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
+            $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+            $currentTimer = $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
+            $decreaseLimit = $currentTimer->getMaximumRemainingTime()->getSeconds(true);
+        } catch (common_Exception $e) {
+            $this->logError("Cannot calculate minimum time adjustment limit.");
+        }
+
+        return $decreaseLimit;
+    }
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return int
+     */
+    public function getTimerAdjustmentIncreaseLimit(string $deliveryExecutionId): int
+    {
+        return self::NO_TIME_ADJUSTMENT_LIMIT;
     }
 
     /**

@@ -25,6 +25,7 @@ use common_ext_ExtensionsManager;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\tao\model\service\ApplicationService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -90,6 +91,11 @@ class DeliveryExecutionListTest extends TestCase
     private $deliveryExecution;
 
     /**
+     * @var DeliveryLog
+     */
+    private $deliveryLogService;
+
+    /**
      * @var TestSessionService
      */
     private $testSessionServiceMock;
@@ -113,6 +119,7 @@ class DeliveryExecutionListTest extends TestCase
             'delivery_name' => 'delivery_name_string',
             'start_time' => '1567508223.829546',
         ];
+        $this->deliveryLogService = $this->createMock(DeliveryLog::class);
         $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
 
         $this->serviceLocatorMock = $this->getServiceLocatorMock([
@@ -121,6 +128,7 @@ class DeliveryExecutionListTest extends TestCase
             TestSessionConnectivityStatusService::SERVICE_ID => $this->testSessionConnectivityStatusServiceMock,
             ApplicationService::SERVICE_ID => $this->applicationServiceMock,
             DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock,
+            DeliveryLog::SERVICE_ID => $this->deliveryLogService,
             TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
         ]);
 
@@ -274,7 +282,30 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame(0, $result[0]['timer']['adjustedTime']);
     }
 
-    private function getExecutionExample(): array
+    public function testLastPauseReason(): void
+    {
+        //Prepare
+        $this->deliveryExecutionManagerServiceMock->method('isTimerAdjustmentAllowed')->willReturn(true);
+        $this->deliveryLogService->method('search')->willReturn([
+            [
+                DeliveryLog::DATA => [
+                    'reason' => ['reason'],
+                ]
+            ]
+        ]);
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        //Execute
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+
+        //Assert
+        $this->assertSame(['reason'], $result[0]['lastPauseReason']);
+    }
+
+    private function getExecutionExample()
     {
         return $executions[] = [
             'delivery_execution_id' => "https://nccersso.taocloud.org/tao.rdf#i15675082249329111",

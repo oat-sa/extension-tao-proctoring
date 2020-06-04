@@ -26,8 +26,10 @@ use common_exception_NotFound;
 use common_ext_ExtensionException;
 use common_session_Session;
 use core_kernel_classes_Resource;
+use oat\generis\test\MockObject;
 use oat\generis\test\TestCase;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\log\LoggerService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\session\SessionService;
 use oat\oatbox\user\User;
@@ -41,15 +43,31 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\runner\time\AdjustmentMap;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentService;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use qtism\common\datatypes\Duration;
 use qtism\data\QtiIdentifiable;
 
 class DeliveryExecutionManagerServiceTest extends TestCase
 {
+    /**
+     * @var DeliveryExecutionManagerService
+     */
+    private $subject;
+
+    /**
+     * @var ServiceProxy|MockObject
+     */
+    private $serviceProxyMock;
+
+    /**
+     * @var TestSessionService|MockObject
+     */
+    private $testSessionServiceMock;
+
     /**
      * @var DeliveryExecution|MockObject
      */
@@ -94,14 +112,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
      * @var TestSession|MockObject
      */
     private $testSessionMock;
-    /**
-     * @var TestSessionService|MockObject
-     */
-    private $testSessionServiceMock;
-    /**
-     * @var ServiceProxy|MockObject
-     */
-    private $serviceProxyMock;
+
     /**
      * @var QtiTimer|MockObject
      */
@@ -149,6 +160,17 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
         $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
         $this->qtiTimerMock = $this->createMock(QtiTimer::class);
+
+        $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            LoggerService::SERVICE_ID => $this->createMock(LoggerService::class),
+        ]);
+
+        $this->subject = new DeliveryExecutionManagerService();
+        $this->subject->setServiceLocator($serviceLocatorMock);
     }
 
     /**
@@ -201,6 +223,64 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $service->setServiceLocator($serviceLocatorMock);
 
         $service->adjustTimers($deliveryExecutions, 1, ['reasons']);
+    }
+
+    public function testGetTimerAdjustmentDecreaseLimit_CalculationFailedNoDecreaseLimit(): void
+    {
+        $expectedLimit = 300;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
+        $this->serviceProxyMock->method('getDeliveryExecution')
+            ->willReturn($deliveryExecutionMock);
+
+
+        // Setup TestSessionService mock
+        $durationMock = $this->createMock(Duration::class);
+        $durationMock->method('getSeconds')
+            ->willReturn($expectedLimit);
+        $qtiTimeConstraintMock = $this->createMock(QtiTimeConstraint::class);
+        $qtiTimeConstraintMock->method('getMaximumRemainingTime')
+            ->willReturn($durationMock);
+
+        $testSessionMock = $this->createMock(TestSession::class);
+        $this->testSessionServiceMock->method('getTestSession')
+            ->willReturn($testSessionMock);
+        $this->testSessionServiceMock->method('getSmallestMaxTimeConstraint')
+            ->willReturn($qtiTimeConstraintMock);
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentDecreaseLimit($deliveryExecutionId),
+            'Method must return correct value of maximum possible time decrease.'
+        );
+    }
+
+    public function testGetTimerAdjustmentDecreaseLimit(): void
+    {
+        $expectedLimit = -1;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        $this->serviceProxyMock->method('getDeliveryExecution')
+            ->willThrowException(new common_Exception('FAKE ERROR MESSAGE'));
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentDecreaseLimit($deliveryExecutionId),
+            'Method must return correct value in case when limit calculation failed.'
+        );
+    }
+
+    public function testGetTimerAdjustmentIncreaseLimit(): void
+    {
+        $expectedLimit = -1;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentIncreaseLimit($deliveryExecutionId),
+            'Method must return correct maximum limit for timer increase.'
+        );
     }
 
     public function testAdjustedTimeWithoutTestSession(): void {
