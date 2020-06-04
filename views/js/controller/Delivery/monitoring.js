@@ -1106,7 +1106,7 @@ define([
                                     state.push(__('Extra') + ': ' + timer.extraTime);
                                 }
                                 if (timer.hasOwnProperty('adjustedTime') && timer.adjustedTime) {
-                                    state.push(__('Adjusted') + ': ' . timer.adjustedTime);
+                                    state.push(__('Adjusted') + ': ' + timer.adjustedTime);
                                 }
                                 return state.join('<br />');
                             }
