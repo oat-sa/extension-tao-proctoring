@@ -26,12 +26,15 @@ use common_exception_NotFound;
 use common_ext_ExtensionException;
 use common_session_Session;
 use core_kernel_classes_Resource;
+use oat\generis\test\MockObject;
 use oat\generis\test\TestCase;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\log\LoggerService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\session\SessionService;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionProctoring;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
@@ -40,10 +43,42 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
+use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
+use qtism\common\datatypes\Duration;
 
 class DeliveryExecutionManagerServiceTest extends TestCase
 {
+    /**
+     * @var DeliveryExecutionManagerService
+     */
+    private $subject;
+
+    /**
+     * @var ServiceProxy|MockObject
+     */
+    private $serviceProxyMock;
+
+    /**
+     * @var TestSessionService|MockObject
+     */
+    private $testSessionServiceMock;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->serviceProxyMock = $this->createMock(ServiceProxy::class);
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
+        $serviceLocatorMock = $this->getServiceLocatorMock([
+            ServiceProxy::SERVICE_ID => $this->serviceProxyMock,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
+            LoggerService::SERVICE_ID => $this->createMock(LoggerService::class),
+        ]);
+
+        $this->subject = new DeliveryExecutionManagerService();
+        $this->subject->setServiceLocator($serviceLocatorMock);
+    }
+
     /**
      * @throws common_Exception
      * @throws common_exception_Error
@@ -132,5 +167,63 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $service->setServiceLocator($serviceLocatorMock);
 
         $service->adjustTimers($deliveryExecutions, 1, ['reasons']);
+    }
+
+    public function testGetTimerAdjustmentDecreaseLimit_CalculationFailedNoDecreaseLimit(): void
+    {
+        $expectedLimit = 300;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
+        $this->serviceProxyMock->method('getDeliveryExecution')
+            ->willReturn($deliveryExecutionMock);
+
+
+        // Setup TestSessionService mock
+        $durationMock = $this->createMock(Duration::class);
+        $durationMock->method('getSeconds')
+            ->willReturn($expectedLimit);
+        $qtiTimeConstraintMock = $this->createMock(QtiTimeConstraint::class);
+        $qtiTimeConstraintMock->method('getMaximumRemainingTime')
+            ->willReturn($durationMock);
+
+        $testSessionMock = $this->createMock(TestSession::class);
+        $this->testSessionServiceMock->method('getTestSession')
+            ->willReturn($testSessionMock);
+        $this->testSessionServiceMock->method('getSmallestMaxTimeConstraint')
+            ->willReturn($qtiTimeConstraintMock);
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentDecreaseLimit($deliveryExecutionId),
+            'Method must return correct value of maximum possible time decrease.'
+        );
+    }
+
+    public function testGetTimerAdjustmentDecreaseLimit(): void
+    {
+        $expectedLimit = -1;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        $this->serviceProxyMock->method('getDeliveryExecution')
+            ->willThrowException(new common_Exception('FAKE ERROR MESSAGE'));
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentDecreaseLimit($deliveryExecutionId),
+            'Method must return correct value in case when limit calculation failed.'
+        );
+    }
+
+    public function testGetTimerAdjustmentIncreaseLimit(): void
+    {
+        $expectedLimit = -1;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentIncreaseLimit($deliveryExecutionId),
+            'Method must return correct maximum limit for timer increase.'
+        );
     }
 }

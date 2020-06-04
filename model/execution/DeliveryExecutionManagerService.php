@@ -67,7 +67,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
     public function getDeliveryExecutionById($deliveryExecutionId)
     {
         if (!isset($this->deliveryExecutions[$deliveryExecutionId])) {
-            $this->deliveryExecutions[$deliveryExecutionId] = ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
+            $deliveryExecution = $this->getServiceLocator()
+                ->get(ServiceProxy::SERVICE_ID)
+                ->getDeliveryExecution($deliveryExecutionId);
+            $this->deliveryExecutions[$deliveryExecutionId] = $deliveryExecution;
         }
 
         return $this->deliveryExecutions[$deliveryExecutionId];
