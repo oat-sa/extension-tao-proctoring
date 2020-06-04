@@ -20,6 +20,7 @@
 
 namespace oat\taoProctoring\model\execution;
 
+use Exception;
 use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
@@ -372,7 +373,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
             $currentTimer = $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
             $decreaseLimit = $currentTimer->getMaximumRemainingTime()->getSeconds(true);
-        } catch (common_Exception $e) {
+        } catch (Exception $e) {
             $this->logError("Cannot calculate minimum time adjustment limit.");
         }
 
