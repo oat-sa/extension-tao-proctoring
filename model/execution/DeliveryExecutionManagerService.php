@@ -39,6 +39,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\StorageManager;
+use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\QtiTimerFactory;
 use oat\taoTests\models\runner\time\TimePoint;
@@ -314,13 +315,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             $success = false;
             if ($this->isTimerAdjustmentAllowed($deliveryExecution)) {
-
-                $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
-                if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($testSession, $seconds, TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
-                } else {
-                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds), TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
-                }
+                $success = $this->adjustDeliveryExecutionTimer($seconds, $deliveryExecution, $timerAdjustmentService);
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
@@ -338,6 +333,37 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return $result;
+    }
+
+    /**
+     * @param $seconds
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param TimerAdjustmentServiceInterface $timerAdjustmentService
+     * @return bool
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     */
+    protected function adjustDeliveryExecutionTimer(
+        $seconds,
+        DeliveryExecutionInterface $deliveryExecution,
+        TimerAdjustmentServiceInterface $timerAdjustmentService
+    ): bool {
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($seconds > 0) {
+            $success = $timerAdjustmentService->increase(
+                $testSession,
+                $seconds,
+                TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT
+            );
+        } else {
+            $success = $timerAdjustmentService->decrease(
+                $testSession,
+                abs($seconds),
+                TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT
+            );
+        }
+        return $success;
     }
 
     /**
@@ -369,9 +395,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $decreaseLimit = self::NO_TIME_ADJUSTMENT_LIMIT;
         try {
-            $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
-            $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
-            $currentTimer = $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
+            $currentTimer = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
             $decreaseLimit = $currentTimer->getMaximumRemainingTime()->getSeconds(true);
         } catch (Exception $e) {
             $this->logError("Cannot calculate minimum time adjustment limit.");
@@ -411,5 +435,20 @@ class DeliveryExecutionManagerService extends ConfigurableService
     private function getDeliveryMonitoringService()
     {
         return $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+    }
+
+    /**
+     * @param string $deliveryExecutionId
+     * @return QtiTimeConstraint
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     */
+    protected function getSmallestMaxTimeConstraint(string $deliveryExecutionId): QtiTimeConstraint
+    {
+        $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+
+        return $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
     }
 }
