@@ -403,26 +403,23 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
-     * Returns smaller time value for the current item/section/testPart/test chain
+     * Returns timerAdjustment for the timer with smaller value for the current item/section/testPart/test chain
      * @param string $deliveryExecutionId
      * @return int
-     * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
-     * @throws common_Exception
-     * @throws common_exception_Error
-     * @throws common_exception_NotFound
-     * @throws common_ext_ExtensionException
      */
     public function getAdjustedTime(string $deliveryExecutionId): int
     {
         $adjustedTime = 0;
         try {
             $currentTimeConstraint = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
-            $adjustedTime = $this->getTimerAdjustmentService()->getAdjustmentByType(
-                $currentTimeConstraint->getSource(),
-                $currentTimeConstraint->getTimer(),
-                TimerAdjustmentService::TYPE_TIME_ADJUSTMENT
-            );
+            if ($currentTimeConstraint) {
+                $adjustedTime = $this->getTimerAdjustmentService()->getAdjustmentByType(
+                    $currentTimeConstraint->getSource(),
+                    $currentTimeConstraint->getTimer(),
+                    TimerAdjustmentService::TYPE_TIME_ADJUSTMENT
+                );
+            }
         } catch (common_Exception $e) {
             $this->logError("Cannot calculate adjusted time for provided execution ID: {$deliveryExecutionId}.");
         }
@@ -461,10 +458,14 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @throws QtiTestExtractionFailedException
      * @throws common_Exception
      */
-    private function getSmallestMaxTimeConstraint(string $deliveryExecutionId): QtiTimeConstraint
+    private function getSmallestMaxTimeConstraint(string $deliveryExecutionId): ?QtiTimeConstraint
     {
         $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
         $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+
+        if (!$testSession) {
+            throw new common_Exception('Test Session not found');
+        }
 
         return $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
     }
