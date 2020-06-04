@@ -98,6 +98,11 @@ class DeliveryExecutionList extends ConfigurableService
         );
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
+        $timerAdjustmentAllowed = $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
+            $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+        );
+
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
@@ -134,6 +139,15 @@ class DeliveryExecutionList extends ConfigurableService
             if ($reason) {
                 $execution['lastPauseReason'] = $reason;
             }
+
+            $execution['timer']['timeAdjustmentLimits'] = [
+                'decrease' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentDecreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+                'increase' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentIncreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+            ];
         }
 
         return $execution;
