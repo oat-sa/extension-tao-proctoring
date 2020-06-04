@@ -109,10 +109,6 @@ class DeliveryExecutionList extends ConfigurableService
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
 
-        $timerAdjustmentAllowed = $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
-            $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-        );
-
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
