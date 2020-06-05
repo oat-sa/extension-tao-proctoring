@@ -479,7 +479,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
     /**
      * @param string $deliveryExecutionId
-     * @return QtiTimeConstraint
+     * @return QtiTimeConstraint|null
      * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
      * @throws common_Exception
