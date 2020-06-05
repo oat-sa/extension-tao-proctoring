@@ -19,14 +19,22 @@
 
 namespace oat\taoProctoring\model\execution;
 
+use common_Exception;
+use common_exception_Error;
+use common_exception_NotFound;
+use common_ext_ExtensionException;
 use common_ext_ExtensionsManager;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\user\User;
 use oat\tao\model\service\ApplicationService;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
+use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\SessionStateService;
 
 /**
@@ -41,8 +49,8 @@ class DeliveryExecutionList extends ConfigurableService
      * Adjusts a list of delivery executions: add information, format the result
      * @param DeliveryExecution[] $deliveryExecutions
      * @return array
-     * @throws \common_ext_ExtensionException
-     * @throws \common_exception_Error
+     * @throws common_ext_ExtensionException
+     * @throws common_exception_Error
      * @internal param array $options
      */
     public function adjustDeliveryExecutions($deliveryExecutions)
@@ -61,8 +69,8 @@ class DeliveryExecutionList extends ConfigurableService
     /**
      * @param $cachedData
      * @return array
-     * @throws \common_exception_Error
-     * @throws \common_ext_ExtensionException
+     * @throws common_exception_Error
+     * @throws common_ext_ExtensionException
      */
     private function createTestTaker($cachedData)
     {
@@ -84,14 +92,23 @@ class DeliveryExecutionList extends ConfigurableService
      * @param $cachedData
      * @param $extraFields
      * @return array
-     * @throws \common_exception_Error
-     * @throws \common_ext_ExtensionException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
      */
-    private function createExecution($cachedData, $extraFields)
+    private function createExecution($cachedData, $extraFields): array
     {
         $online = $this->isOnline($cachedData);
 
+        $isTimerAdjustmentAllowed = $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
+            $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+        );
+
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
+
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
@@ -102,9 +119,7 @@ class DeliveryExecutionList extends ConfigurableService
             'allowExtraTime' => isset($cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME])
                 ? (bool)$cachedData[DeliveryMonitoringService::ALLOW_EXTRA_TIME]
                 : null,
-            'allowTimerAdjustment' => $this->getDeliveryExecutionManagerService()->isTimerAdjustmentAllowed(
-                $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-            ),
+            'allowTimerAdjustment' => $isTimerAdjustmentAllowed,
             'timer' => [
                 'lastActivity' => $this->getLastActivity($cachedData, $online),
                 'countDown' => DeliveryExecution::STATE_ACTIVE === $executionState && $online,
@@ -115,6 +130,8 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
+                'adjustedTime' => $this->getDeliveryExecutionManagerService()
+                    ->getAdjustedTime($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID])
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
@@ -125,15 +142,62 @@ class DeliveryExecutionList extends ConfigurableService
             $execution['online'] = $online;
         }
 
+        if ($isTimerAdjustmentAllowed) {
+            $reason = $this->getLastPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            if ($reason) {
+                $execution['lastPauseReason'] = $reason;
+            }
+
+            $execution['timer']['timeAdjustmentLimits'] = [
+                'decrease' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentDecreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+                'increase' => $this->getDeliveryExecutionManagerService()->getTimerAdjustmentIncreaseLimit(
+                    $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ),
+            ];
+        }
+
         return $execution;
+    }
+
+    private function getLastPauseReason(string $deliveryExecutionId): ?array
+    {
+        $reason = null;
+        $lastPause = $this->getDeliveryLogService()->search([
+            DeliveryLog::DELIVERY_EXECUTION_ID => $deliveryExecutionId,
+            DeliveryLog::EVENT_ID => DeliveryLogEvent::EVENT_ID_TEST_PAUSE,
+        ], [
+            'order' => 'created_at',
+            'dir' => 'desc',
+            'limit' => 1,
+        ]);
+
+        if (isset($lastPause[0][DeliveryLog::DATA]['reason'])) {
+            $reason = $lastPause[0][DeliveryLog::DATA]['reason'];
+        }
+
+        return $reason;
+    }
+
+    /**
+     * @return DeliveryLog|object
+     */
+    private function getDeliveryLogService(): DeliveryLog
+    {
+        return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
 
     /**
      * @param $cachedData
      * @param $userExtraFields
      * @return array
-     * @throws \common_exception_Error
-     * @throws \common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
      */
     private function getSingleExecution($cachedData, $userExtraFields)
     {
@@ -149,8 +213,8 @@ class DeliveryExecutionList extends ConfigurableService
      * @param $cachedData
      * @param $field
      * @return string
-     * @throws \common_exception_Error
-     * @throws \common_ext_ExtensionException
+     * @throws common_exception_Error
+     * @throws common_ext_ExtensionException
      */
     private function getFieldId($cachedData, $field)
     {
@@ -207,7 +271,7 @@ class DeliveryExecutionList extends ConfigurableService
      * Get array of user specific extra fields to be displayed in the monitoring data table
      *
      * @return array
-     * @throws \common_ext_ExtensionException
+     * @throws common_ext_ExtensionException
      */
     private function getUserExtraFields()
     {
@@ -297,8 +361,8 @@ class DeliveryExecutionList extends ConfigurableService
     /**
      * @param $input
      * @return string
-     * @throws \common_exception_Error
-     * @throws \common_ext_ExtensionException
+     * @throws common_exception_Error
+     * @throws common_ext_ExtensionException
      */
     private function sanitizeUserInput($input)
     {

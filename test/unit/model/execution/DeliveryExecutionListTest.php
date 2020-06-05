@@ -16,16 +16,20 @@
  *
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
+declare(strict_types=1);
+
 namespace oat\taoProctoring\test\unit\model\execution;
 
 use common_ext_Extension;
 use common_ext_ExtensionsManager;
-use oat\generis\model\data\Model;
 use oat\generis\model\data\Ontology;
 use oat\generis\test\TestCase;
 use oat\tao\model\service\ApplicationService;
+use oat\taoProctoring\model\deliveryLog\DeliveryLog;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\SessionStateService;
 use oat\generis\test\MockObject;
@@ -86,12 +90,24 @@ class DeliveryExecutionListTest extends TestCase
      */
     private $deliveryExecution;
 
+    /**
+     * @var DeliveryLog
+     */
+    private $deliveryLogService;
+
+    /**
+     * @var TestSessionService
+     */
+    private $testSessionServiceMock;
+
     public function setUp(): void
     {
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
         $this->extensionManagerMock = $this->createMock(common_ext_ExtensionsManager::class);
         $this->testSessionConnectivityStatusServiceMock = $this->createMock(TestSessionConnectivityStatusService::class);
         $this->deliveryExecutionManagerServiceMock = $this->createMock(DeliveryExecutionManagerService::class);
+        $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
+        $this->deliveryExecutionManagerServiceMock->method('getDeliveryExecutionById')->willReturn($deliveryExecutionMock);
         $this->applicationServiceMock = $this->createMock(ApplicationService::class);
         $this->proctoringExtensionMock = $this->createMock(common_ext_Extension::class);
         $this->modelMock = $this->createMock(Ontology::class);
@@ -103,19 +119,23 @@ class DeliveryExecutionListTest extends TestCase
             'delivery_name' => 'delivery_name_string',
             'start_time' => '1567508223.829546',
         ];
+        $this->deliveryLogService = $this->createMock(DeliveryLog::class);
+        $this->testSessionServiceMock = $this->createMock(TestSessionService::class);
 
         $this->serviceLocatorMock = $this->getServiceLocatorMock([
             SessionStateService::SERVICE_ID => $this->sessionStateServiceMock,
             common_ext_ExtensionsManager::SERVICE_ID => $this->extensionManagerMock,
             TestSessionConnectivityStatusService::SERVICE_ID => $this->testSessionConnectivityStatusServiceMock,
             ApplicationService::SERVICE_ID => $this->applicationServiceMock,
-            DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock
+            DeliveryExecutionManagerService::SERVICE_ID => $this->deliveryExecutionManagerServiceMock,
+            DeliveryLog::SERVICE_ID => $this->deliveryLogService,
+            TestSessionService::SERVICE_ID => $this->testSessionServiceMock,
         ]);
 
         $this->extensionManagerMock->method('getExtensionById')->willReturn($this->proctoringExtensionMock);
     }
 
-    public function testAdjustDeliveryExecutionsFinished()
+    public function testAdjustDeliveryExecutionsFinished(): void
     {
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
@@ -128,7 +148,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testAdjustDeliveryFullExecutionExample()
+    public function testAdjustDeliveryFullExecutionExample(): void
     {
         $deliveryExecutions[] = $this->getExecutionExample();
 
@@ -149,7 +169,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
-    public function testAdjustDeliveryExecutionsOnline()
+    public function testAdjustDeliveryExecutionsOnline(): void
     {
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
@@ -160,7 +180,7 @@ class DeliveryExecutionListTest extends TestCase
         $deliveryHelperService = new DeliveryExecutionList();
         $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
 
-        //getTestSessionConnectivityStatusService
+        // getTestSessionConnectivityStatusService
         $this->testSessionConnectivityStatusServiceMock->method('hasOnlineMode')->willReturn(true);
         $this->testSessionConnectivityStatusServiceMock->method('isOnline')->willReturn(true);
 
@@ -170,7 +190,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertTrue($result[0]['online']);
     }
 
-    public function testAdjustDeliveryExecutionsUserExtraFields()
+    public function testAdjustDeliveryExecutionsUserExtraFields(): void
     {
         $this->deliveryExecution['test_category'] = 'http://www.nccer.org/testmodel#category_01';
         $this->deliveryExecution['test_taker'] = '12345';
@@ -210,7 +230,7 @@ class DeliveryExecutionListTest extends TestCase
         $this->assertSame('12345', $result[0]['extraFields']['test_taker']);
     }
 
-    public function testAdjustDeliveryExecutionsProgressStringWithNoOption()
+    public function testAdjustDeliveryExecutionsProgressStringWithNoOption(): void
     {
         $this->deliveryExecution['current_assessment_item'] = '{"title":"in progress","itemPosition":"1","itemCount":"2"}';
         $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive';
@@ -231,7 +251,7 @@ class DeliveryExecutionListTest extends TestCase
 
     }
 
-    public function testAdjustDeliveryExecutionsProgressStringWithCustomOption()
+    public function testAdjustDeliveryExecutionsProgressStringWithCustomOption(): void
     {
         //Prepare
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
@@ -249,6 +269,40 @@ class DeliveryExecutionListTest extends TestCase
 
         //Assert
         $this->assertSame('finished', $result[0]['state']['progress']);
+    }
+
+    public function testTimerAdjustedTime(): void
+    {
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+        $this->assertSame(0, $result[0]['timer']['adjustedTime']);
+    }
+
+    public function testLastPauseReason(): void
+    {
+        //Prepare
+        $this->deliveryExecutionManagerServiceMock->method('isTimerAdjustmentAllowed')->willReturn(true);
+        $this->deliveryLogService->method('search')->willReturn([
+            [
+                DeliveryLog::DATA => [
+                    'reason' => ['reason'],
+                ]
+            ]
+        ]);
+        $deliveryExecutions[] = $this->deliveryExecution;
+
+        //Execute
+        $deliveryHelperService = new DeliveryExecutionList();
+        $deliveryHelperService->setServiceLocator($this->serviceLocatorMock);
+        /* @noinspection PhpUnhandledExceptionInspection */
+        $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
+
+        //Assert
+        $this->assertSame(['reason'], $result[0]['lastPauseReason']);
     }
 
     private function getExecutionExample()
@@ -284,5 +338,4 @@ class DeliveryExecutionListTest extends TestCase
             'allow_extra_time' => false
         ];
     }
-
 }
