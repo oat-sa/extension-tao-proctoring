@@ -479,12 +479,12 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
     /**
      * @param string $deliveryExecutionId
-     * @return QtiTimeConstraint
+     * @return QtiTimeConstraint|null
      * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
      * @throws common_Exception
      */
-    protected function getSmallestMaxTimeConstraint(string $deliveryExecutionId): QtiTimeConstraint
+    protected function getSmallestMaxTimeConstraint(string $deliveryExecutionId): ?QtiTimeConstraint
     {
         $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
         $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
