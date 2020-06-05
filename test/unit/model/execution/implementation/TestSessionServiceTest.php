@@ -48,18 +48,18 @@ class TestSessionServiceTest extends TestCase
         $this->subject = new TestSessionService();
     }
 
-    public function testGetSmallestMaxTimeConstraint_NoConstraints_ReturnsNull(): void
+    public function testGetSmallestRemainingTimeConstraint_NoConstraints_ReturnsNull(): void
     {
         $this->testSessionMock->method('getTimeConstraints')
             ->willReturn(new TimeConstraintCollection());
 
         self::assertNull(
-            $this->subject->getSmallestMaxTimeConstraint($this->testSessionMock),
+            $this->subject->getSmallestRemainingTimeConstraint($this->testSessionMock),
             'Method must return correct response in case session does not have time constraints.'
         );
     }
 
-    public function testGetSmallestMaxTimeConstraint_NoConstraintsWithMaximumRemainingTime_ReturnsNull(): void
+    public function testGetSmallestRemainingTimeConstraint_NoConstraintsWithMaximumRemainingTime_ReturnsNull(): void
     {
         $timeConstraintSession = $this->mockQtiTimeConstraint(false);
         $timeConstraintTestPart = $this->mockQtiTimeConstraint(false);
@@ -69,12 +69,12 @@ class TestSessionServiceTest extends TestCase
             ->willReturn($timeConstraintsCollection);
 
         self::assertNull(
-            $this->subject->getSmallestMaxTimeConstraint($this->testSessionMock),
+            $this->subject->getSmallestRemainingTimeConstraint($this->testSessionMock),
             'Method must return correct response in case constraints do not have max time limits.'
         );
     }
 
-    public function testGetSmallestMaxTimeConstraint_OneConstraintWithMaximumRemainingTime(): void
+    public function testGetSmallestRemainingTimeConstraint_OneConstraintWithMaximumRemainingTime(): void
     {
         $timeConstraintSession = $this->mockQtiTimeConstraint(false);
         $timeConstraintTestPart = $this->mockQtiTimeConstraint(false);
@@ -91,12 +91,12 @@ class TestSessionServiceTest extends TestCase
 
         self::assertSame(
             $expectedConstraint,
-            $this->subject->getSmallestMaxTimeConstraint($this->testSessionMock),
+            $this->subject->getSmallestRemainingTimeConstraint($this->testSessionMock),
             'Method must return correct response in case there is one constraint with max time limit.'
         );
     }
 
-    public function testGetSmallestMaxTimeConstraint_MultipleConstraintsWithMaximumRemainingTime(): void
+    public function testGetSmallestRemainingTimeConstraint_MultipleConstraintsWithMaximumRemainingTime(): void
     {
         $timeConstraintTest = $this->mockQtiTimeConstraint($this->mockQtiDuration(600));
         $timeConstraintTestPart = $this->mockQtiTimeConstraint($this->mockQtiDuration(450));
@@ -113,7 +113,7 @@ class TestSessionServiceTest extends TestCase
 
         self::assertSame(
             $expectedConstraint,
-            $this->subject->getSmallestMaxTimeConstraint($this->testSessionMock),
+            $this->subject->getSmallestRemainingTimeConstraint($this->testSessionMock),
             'Method must return correct response in case there multiple constraints with max time limit.'
         );
     }

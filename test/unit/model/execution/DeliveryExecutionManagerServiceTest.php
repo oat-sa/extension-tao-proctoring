@@ -248,7 +248,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $testSessionMock = $this->createMock(TestSession::class);
         $this->testSessionServiceMock->method('getTestSession')
             ->willReturn($testSessionMock);
-        $this->testSessionServiceMock->method('getSmallestMaxTimeConstraint')
+        $this->testSessionServiceMock->method('getSmallestRemainingTimeConstraint')
             ->willReturn($qtiTimeConstraintMock);
 
         self::assertSame(
@@ -357,7 +357,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
             ->willReturn($this->qtiTimerMock);
         $this->testSessionServiceMock
             ->expects($this->once())
-            ->method('getSmallestMaxTimeConstraint')
+            ->method('getSmallestRemainingTimeConstraint')
             ->willReturn($qtiTimeConstrainMock);
 
         $serviceLocatorMock = $this->getServiceLocatorMock([

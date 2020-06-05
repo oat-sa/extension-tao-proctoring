@@ -360,7 +360,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @throws common_Exception
      */
     protected function adjustDeliveryExecutionTimer(
-        $seconds,
+        int $seconds,
         DeliveryExecutionInterface $deliveryExecution,
         TimerAdjustmentServiceInterface $timerAdjustmentService
     ): bool {
@@ -410,7 +410,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $decreaseLimit = self::NO_TIME_ADJUSTMENT_LIMIT;
         try {
-            $currentTimeConstraint = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
+            $currentTimeConstraint = $this->getSmallestRemainingTimeConstraint($deliveryExecutionId);
             $decreaseLimit = $currentTimeConstraint->getMaximumRemainingTime()->getSeconds(true);
         } catch (Exception $e) {
             $this->logError("Cannot calculate minimum time adjustment limit.");
@@ -438,7 +438,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
     {
         $adjustedTime = 0;
         try {
-            $currentTimeConstraint = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
+            $currentTimeConstraint = $this->getSmallestRemainingTimeConstraint($deliveryExecutionId);
             if ($currentTimeConstraint) {
                 $adjustedTime = $this->getTimerAdjustmentService()->getAdjustmentByType(
                     $currentTimeConstraint->getSource(),
@@ -484,7 +484,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
      * @throws QtiTestExtractionFailedException
      * @throws common_Exception
      */
-    protected function getSmallestMaxTimeConstraint(string $deliveryExecutionId): QtiTimeConstraint
+    protected function getSmallestRemainingTimeConstraint(string $deliveryExecutionId): ?QtiTimeConstraint
     {
         $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
         $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
@@ -493,6 +493,6 @@ class DeliveryExecutionManagerService extends ConfigurableService
             throw new common_Exception('Test Session not found');
         }
 
-        return $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
+        return $this->getTestSessionService()->getSmallestRemainingTimeConstraint($testSession);
     }
 }

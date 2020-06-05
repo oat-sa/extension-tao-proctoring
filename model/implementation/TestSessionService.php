@@ -32,6 +32,7 @@ use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\TestSessionService as QtiTestSessionService;
 use qtism\common\datatypes\Duration;
+use qtism\data\TimeLimits;
 use qtism\runtime\tests\AssessmentTestSession;
 
 /**
@@ -252,7 +253,7 @@ class TestSessionService extends QtiTestSessionService
      * @param TestSession $testSession
      * @return QtiTimeConstraint|null
      */
-    public function getSmallestMaxTimeConstraint(TestSession $testSession): ?QtiTimeConstraint
+    public function getSmallestRemainingTimeConstraint(TestSession $testSession): ?QtiTimeConstraint
     {
         $constraints = $testSession->getTimeConstraints();
         $smallestTimeConstraint = null;
@@ -268,6 +269,28 @@ class TestSessionService extends QtiTestSessionService
             if (($constraintRemainingTime = $constraintRemainingDuration->getSeconds(true)) < $remainingTime) {
                 $smallestTimeConstraint = $constraint;
                 $remainingTime = $constraintRemainingTime;
+            }
+        }
+
+        return $smallestTimeConstraint;
+    }
+
+    public function getSmallestMaxTimeConstraint(TestSession $testSession): ?QtiTimeConstraint
+    {
+        $constraints = $testSession->getTimeConstraints();
+        $smallestTimeConstraint = null;
+        $smallestMaxTime = PHP_INT_MAX;
+        /** @var QtiTimeConstraint $constraint */
+        foreach ($constraints as $constraint) {
+            /** @var TimeLimits $timeLimits */
+            $timeLimits = $constraint->getSource()->getTimeLimits();
+            if (!$timeLimits || !$timeLimits->hasMaxTime()) {
+                continue;
+            }
+
+            if (($constraintMaxTime = $timeLimits->getMaxTime()->getSeconds(true)) < $smallestMaxTime) {
+                $smallestTimeConstraint = $constraint;
+                $smallestMaxTime = $constraintMaxTime;
             }
         }
 
