@@ -330,13 +330,7 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
             $success = false;
             if ($this->isTimerAdjustmentAllowed($deliveryExecution)) {
-
-                $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
-                if ($seconds > 0) {
-                    $success = $timerAdjustmentService->increase($testSession, $seconds, TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
-                } else {
-                    $success = $timerAdjustmentService->decrease($testSession, abs($seconds), TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT);
-                }
+                $success = $this->adjustDeliveryExecutionTimer($seconds, $deliveryExecution, $timerAdjustmentService);
 
                 $data = $deliveryMonitoringService->getData($deliveryExecution);
                 $data->updateData([DeliveryMonitoringService::REMAINING_TIME]);
@@ -354,6 +348,37 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return $result;
+    }
+
+    /**
+     * @param $seconds
+     * @param DeliveryExecutionInterface $deliveryExecution
+     * @param TimerAdjustmentServiceInterface $timerAdjustmentService
+     * @return bool
+     * @throws InvalidServiceManagerException
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     */
+    protected function adjustDeliveryExecutionTimer(
+        $seconds,
+        DeliveryExecutionInterface $deliveryExecution,
+        TimerAdjustmentServiceInterface $timerAdjustmentService
+    ): bool {
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if ($seconds > 0) {
+            $success = $timerAdjustmentService->increase(
+                $testSession,
+                $seconds,
+                TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT
+            );
+        } else {
+            $success = $timerAdjustmentService->decrease(
+                $testSession,
+                abs($seconds),
+                TimerAdjustmentServiceInterface::TYPE_TIME_ADJUSTMENT
+            );
+        }
+        return $success;
     }
 
     /**
@@ -454,12 +479,12 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
     /**
      * @param string $deliveryExecutionId
-     * @return QtiTimeConstraint
+     * @return QtiTimeConstraint|null
      * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
      * @throws common_Exception
      */
-    private function getSmallestMaxTimeConstraint(string $deliveryExecutionId): ?QtiTimeConstraint
+    protected function getSmallestMaxTimeConstraint(string $deliveryExecutionId): ?QtiTimeConstraint
     {
         $deliveryExecution = $this->getDeliveryExecutionById($deliveryExecutionId);
         $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
