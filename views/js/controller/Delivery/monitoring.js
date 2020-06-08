@@ -1097,16 +1097,18 @@ define([
                             id: 'extendedTime',
                             label: __('Changed Time'),
                             transform(value, row) {
-                                let state = [];
+                                const state = [];
                                 const timer = _.isObject(row.timer) ? row.timer : {};
-                                if (timer.hasOwnProperty('extendedTime') && timer.extendedTime) {
-                                    state.push(': x' + timer.extendedTime);
+                                const { adjustedTime, extendedTime, extraTime } = timer
+
+                                if (extendedTime) {
+                                    state.push(`${__('Extended time')}: x${extendedTime}`);
                                 }
-                                if (timer.hasOwnProperty('extraTime') && timer.extraTime) {
-                                    state.push(__('Extra') + ': ' + timer.extraTime);
+                                if (extraTime) {
+                                    state.push(`${__('Extra')}: ${timeEncoder.encode(extraTime)}`);
                                 }
-                                if (timer.hasOwnProperty('adjustedTime') && timer.adjustedTime) {
-                                    state.push(__('Adjusted') + ': ' + timer.adjustedTime);
+                                if (adjustedTime) {
+                                    state.push(`${__('Adjusted')}: ${adjustedTime > 0 ? '' : '-'}${timeEncoder.encode(Math.abs(adjustedTime))}`);
                                 }
                                 return state.join('<br />');
                             }
