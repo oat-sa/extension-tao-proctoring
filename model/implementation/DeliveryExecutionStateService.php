@@ -20,28 +20,30 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use common_session_SessionManager as SessionManager;
+use Context;
+use oat\oatbox\event\EventManager;
+use oat\oatbox\log\LoggerAwareTrait;
+use oat\oatbox\mutex\LockTrait;
+use oat\oatbox\user\User;
+use oat\taoDelivery\model\execution\AbstractStateService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
+use oat\taoDeliveryRdf\model\guest\GuestTestUser;
+use oat\taoProctoring\model\authorization\AuthorizationGranted;
+use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
-use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
-use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
-use oat\oatbox\event\EventManager;
-use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
+use oat\taoProctoring\model\event\DeliveryExecutionIrregularityReport;
+use oat\taoProctoring\model\event\DeliveryExecutionTerminated;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoProctoring\model\authorization\AuthorizationGranted;
-use oat\taoDelivery\model\execution\AbstractStateService;
-use oat\oatbox\log\LoggerAwareTrait;
-use oat\taoDeliveryRdf\model\guest\GuestTestUser;
 use qtism\runtime\tests\AssessmentTestSessionState;
-use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
-use oat\oatbox\user\User;
 use Sinergi\BrowserDetector\Browser;
 use Sinergi\BrowserDetector\Os;
-use oat\oatbox\mutex\LockTrait;
 use Symfony\Component\Lock\Lock;
 
 /**
@@ -151,6 +153,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             'context' => $this->getContext($deliveryExecution),
         ];
 
+        $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
+
         if ($session && $session->getState() !== AssessmentTestSessionState::INITIAL) {
             $session->resume();
             $this->getTestSessionService()->persist($session);
@@ -169,7 +173,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             );
         }
 
-        $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_ACTIVE);
         $this->releaseExecution($deliveryExecution);
         return true;
     }
@@ -188,7 +191,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $result = false;
         $this->lockExecution($deliveryExecution);
         if ($this->canBeAuthorised($deliveryExecution)) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
+            $proctor = SessionManager::getSession()->getUser();
             $logData = [
                 'proctorUri' => $proctor->getIdentifier(),
                 'timestamp' => microtime(true),
@@ -244,7 +247,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $result = false;
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
-            $proctor = \common_session_SessionManager::getSession()->getUser();
+            $proctor = SessionManager::getSession()->getUser();
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
 
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
@@ -453,25 +456,25 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $testCenter = null;
         switch ($state) {
             case ProctoredDeliveryExecution::STATE_ACTIVE:
-                $result = $this->resumeExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->resumeExecution($deliveryExecution);
                 break;
             case ProctoredDeliveryExecution::STATE_AUTHORIZED:
                 $result = $this->authoriseExecution($deliveryExecution, $reason, $testCenter);
                 break;
             case ProctoredDeliveryExecution::STATE_AWAITING:
-                $result = $this->waitExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->waitExecution($deliveryExecution);
                 break;
             case ProctoredDeliveryExecution::STATE_CANCELED:
-                $result = $this->cancelExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->cancelExecution($deliveryExecution, $reason);
                 break;
             case ProctoredDeliveryExecution::STATE_FINISHED:
-                $result = $this->finishExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->finishExecution($deliveryExecution, $reason);
                 break;
             case ProctoredDeliveryExecution::STATE_PAUSED:
-                $result = $this->pauseExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->pauseExecution($deliveryExecution, $reason);
                 break;
             case ProctoredDeliveryExecution::STATE_TERMINATED:
-                $result = $this->terminateExecution($deliveryExecution, $reason, $testCenter);
+                $result = $this->terminateExecution($deliveryExecution, $reason);
                 break;
             default:
                 $this->logWarning('Unrecognised state '.$state);
@@ -489,7 +492,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     protected function canBeAuthorised(DeliveryExecution $deliveryExecution)
     {
         $result = false;
-        $user = \common_session_SessionManager::getSession()->getUser();
+        $user = SessionManager::getSession()->getUser();
         $stateUri = $deliveryExecution->getState()->getUri();
         if ($stateUri === ProctoredDeliveryExecution::STATE_AWAITING) {
             $result = true;
@@ -510,10 +513,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     }
 
     /**
-     * @return \oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService
+     * @return DeliveryLog
      */
     private function getDeliveryLogService()
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
     }
 
@@ -557,7 +561,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     {
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getTestExecutionId());
         /** @var DeliveryExecutionStateService $service */
-        $requestParams = \Context::getInstance()->getRequest()->getParameters();
+        $requestParams = Context::getInstance()->getRequest()->getParameters();
         $reason = null;
         if (isset($requestParams['reason'])) {
             $reason = $requestParams['reason'];
@@ -575,7 +579,8 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     {
         $result = 'cli' === php_sapi_name()
             ? $_SERVER['PHP_SELF']
-            : \Context::getInstance()->getRequest()->getRequestURI();
+            : Context::getInstance()->getRequest()->getRequestURI();
+
         return $result;
     }
 

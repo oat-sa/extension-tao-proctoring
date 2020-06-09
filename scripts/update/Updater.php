@@ -37,6 +37,10 @@ use oat\tao\model\user\TaoRoles;
 use oat\tao\model\webhooks\WebhookEventsServiceInterface;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoDelivery\model\AssignmentService;
+use oat\taoDelivery\model\AttemptService;
+use oat\taoDelivery\model\AttemptServiceInterface;
+use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteService;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
@@ -44,12 +48,14 @@ use oat\taoDeliveryRdf\model\Delete\DeliveryDeleteService;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\GroupAssignment;
+use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoProctoring\controller\DeliverySelection;
 use oat\taoProctoring\controller\ExecutionRestService;
 use oat\taoProctoring\controller\Monitor;
 use oat\taoProctoring\controller\MonitorProctorAdministrator;
 use oat\taoProctoring\controller\Tools;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoProctoring\model\AssessmentResultsService;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationInterface;
@@ -57,15 +63,19 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
+use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionFinished;
+use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
+use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
+use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\ProctoredSectionPauseService;
-use oat\taoProctoring\model\FinishDeliveryExecutionsService;
-use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 use oat\taoProctoring\model\execution\ProctoringDeliveryDeleteService;
+use oat\taoProctoring\model\FinishDeliveryExecutionsService;
 use oat\taoProctoring\model\GuiSettingsService;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\implementation\TestRunnerMessageService;
+use oat\taoProctoring\model\import\ProctorCsvImporter;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\monitorCache\update\TestUpdate;
@@ -77,23 +87,15 @@ use oat\taoProctoring\model\runner\ProctoringRunnerService;
 use oat\taoProctoring\model\service\AbstractIrregularityReport;
 use oat\taoProctoring\model\service\IrregularityReport;
 use oat\taoProctoring\model\ServiceDelegatorInterface;
+use oat\taoProctoring\model\TerminateDeliveryExecutionsService;
 use oat\taoProctoring\scripts\install\RegisterBreadcrumbsServices;
 use oat\taoProctoring\scripts\install\RegisterGuiSettingsService;
 use oat\taoProctoring\scripts\install\RegisterRunnerMessageService;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
-use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\taoProctoring\model\import\ProctorCsvImporter;
+use oat\taoQtiTest\models\SectionPauseService;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoEventLog\model\eventLog\LoggerService;
-use oat\taoDelivery\model\AttemptService;
-use oat\taoDelivery\model\AttemptServiceInterface;
-use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
-use oat\taoProctoring\model\AssessmentResultsService;
-use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
-use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;
-use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteService;
 
 /**
  *
@@ -198,7 +200,7 @@ class Updater extends common_ext_ExtensionUpdater
                 [TaoRoles::ANONYMOUS, 'oat\\taoProctoring\\controller\\DiagnosticChecker']
             );
             foreach ($old as $row) {
-                list($role, $acl) = $row;
+                [$role, $acl] = $row;
                 AclProxy::revokeRule(new AccessRule('grant', $role, $acl));
             }
             $this->setVersion('4.0.0');
@@ -936,6 +938,18 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.5.0');
         }
 
-        $this->skip('19.5.0', '19.10.0');
+        $this->skip('19.5.0', '19.9.0');
+
+        if ($this->isVersion('19.9.0')) {
+            $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
+            $eventManager->attach(DeliveryExecutionTimerAdjusted::class, [
+                DeliveryLogTimerAdjustedEventListener::class,
+                'logTimeAdjustment'
+            ]);
+            $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+            $this->setVersion('19.10.0');
+        }
+
+        $this->skip('19.10.0', '19.14.0');
     }
 }

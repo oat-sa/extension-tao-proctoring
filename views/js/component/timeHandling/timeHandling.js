@@ -147,7 +147,6 @@ define([
                 function submit() {
                     if (!initConfig.allowedResources.length) {
                         $cmp.modal('close');
-
                         return;
                     }
 
@@ -182,11 +181,6 @@ define([
                     $time.val(_.reduce(initConfig.allowedResources, function(time, testTaker) {
                         return Math.max(time, testTaker && testTaker.extraTime || 0);
                     }, 0) / timeUnit);
-                }
-
-                if (_.isObject(this.config.categoriesSelector)) {
-                    const $reason = $cmp.find('.reason').children('.categories');
-                    this.config.categoriesSelector.render($reason);
                 }
 
                 $cmp
@@ -229,6 +223,40 @@ define([
                     .modal({
                         width: 800
                     });
+
+                if (_.isObject(this.config.categoriesSelector)) {
+                    const $reason = $cmp.find('.reason');
+                    const $reasonCategories = $reason.children('.categories');
+                    this.config.categoriesSelector
+                        .on('render', () => {
+                            if (initConfig.hasOwnProperty('predefinedReason')) {
+                                const predefinedReason = initConfig.predefinedReason;
+                                if (predefinedReason.hasOwnProperty('comment')) {
+                                    const $textarea = $('textarea', $reason);
+                                    $textarea.text(predefinedReason.comment);
+                                    $textarea.trigger('change');
+                                }
+                                if (predefinedReason.hasOwnProperty('reasons')) {
+                                    const reasons = predefinedReason.reasons;
+                                    if (reasons.hasOwnProperty('category')) {
+                                        $('select[data-id="category"]', $reasonCategories)
+                                            .val(reasons.category)
+                                            .on('change', () => {
+                                                _.defer(() => {
+                                                    if (reasons.hasOwnProperty('subCategory')) {
+                                                        $('select[data-id="subCategory"]', $reasonCategories)
+                                                            .val(reasons.subCategory)
+                                                            .trigger('change');
+                                                    }
+                                                })
+                                            })
+                                            .trigger('change');
+                                    }
+                                }
+                            }
+                        })
+                        .render($reasonCategories);
+                }
 
                 $time.on('change', function() {
                   checkInputError();

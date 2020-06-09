@@ -20,7 +20,12 @@
 
 namespace oat\taoProctoring\controller;
 
+use common_Exception;
+use common_exception_Error;
+use common_exception_NotFound;
+use common_ext_ExtensionException;
 use oat\generis\model\OntologyAwareTrait;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\service\ServiceNotFoundException;
 use oat\tao\model\accessControl\AclProxy;
 use oat\tao\model\mvc\DefaultUrlService;
@@ -68,7 +73,7 @@ class Monitor extends SimplePageModule
     /**
      * Gets the view parameters and data to display
      * @return array
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      */
     protected function getViewData()
     {
@@ -127,7 +132,7 @@ class Monitor extends SimplePageModule
     /**
      * Gets the list of current executions for a delivery
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      */
     public function deliveryExecutions()
     {
@@ -139,7 +144,7 @@ class Monitor extends SimplePageModule
     /**
      * Authorises a delivery execution
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public function authoriseExecutions()
@@ -186,7 +191,7 @@ class Monitor extends SimplePageModule
     /**
      * Terminates delivery executions
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public function terminateExecutions()
@@ -221,7 +226,7 @@ class Monitor extends SimplePageModule
     /**
      * Pauses delivery executions
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public function pauseExecutions()
@@ -256,7 +261,7 @@ class Monitor extends SimplePageModule
     /**
      * Report irregularities in delivery executions
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      * @throws \oat\oatbox\service\ServiceNotFoundException
      */
     public function reportExecutions()
@@ -291,7 +296,7 @@ class Monitor extends SimplePageModule
     /**
      * Extra Time handling: add or remove time on delivery executions
      *
-     * @throws \common_Exception
+     * @throws common_Exception
      */
     public function extraTime()
     {
@@ -324,10 +329,22 @@ class Monitor extends SimplePageModule
         }
     }
 
-    public function adjustTime()
+    /**
+     * @throws QtiTestExtractionFailedException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     * @throws common_ext_ExtensionException
+     * @throws InvalidServiceManagerException
+     */
+    public function adjustTime(): void
     {
         $deliveryExecutions = $this->getPostParameter('execution');
         $seconds = $this->getPostParameter('time');
+        $reason = [
+            'reasons' => $this->getPostParameter('reasons', []),
+            'comment' => $this->getPostParameter('comment', ''),
+        ];
 
         if (!is_array($deliveryExecutions)) {
             $deliveryExecutions = [$deliveryExecutions];
@@ -335,7 +352,7 @@ class Monitor extends SimplePageModule
 
         /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
         $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
-        $data = $deliveryExecutionManagerService->adjustTimers($deliveryExecutions, $seconds);
+        $data = $deliveryExecutionManagerService->adjustTimers($deliveryExecutions, $seconds, $reason);
 
         $response = [
             'success' => !count($data['unprocessed']),

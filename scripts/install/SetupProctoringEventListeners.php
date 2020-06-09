@@ -18,18 +18,18 @@
  *
  *
  */
+declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install;
 
-use oat\oatbox\service\ServiceManager;
-use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
+use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
+use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoTests\models\event\TestChangedEvent;
-use oat\taoProctoring\model\monitorCache\update\TestUpdate;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\tao\model\event\MetadataModified;
@@ -38,7 +38,6 @@ use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\update\TestTakerUpdate;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoEventLog\model\eventLog\LoggerService;
-use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 
@@ -74,6 +73,8 @@ class SetupProctoringEventListeners extends InstallAction
          */
         $this->registerEvent(DeliveryCreatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryCreated']);
         $this->registerEvent(DeliveryUpdatedEvent::class, [DeliverySyncService::SERVICE_ID, 'onDeliveryUpdated']);
+
+        $this->registerEvent(DeliveryExecutionTimerAdjusted::class, [DeliveryLogTimerAdjustedEventListener::class, 'logTimeAdjustment']);
     }
 }
 

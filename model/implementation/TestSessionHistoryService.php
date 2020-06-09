@@ -19,6 +19,7 @@
 
 namespace oat\taoProctoring\model\implementation;
 
+use Exception;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\TestSessionHistoryService as TestSessionHistoryServiceInterface;
 use \oat\oatbox\service\ConfigurableService;
@@ -57,6 +58,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         'focus-loss-prohibited',
         'leave-fullscreen-prohibited',
         'pause-on-disconnect',
+        'test_adjust_time',
     ];
 
     /**
@@ -117,7 +119,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
             $exportable = [];
 
             foreach ($logs as $data) {
-                $eventId = isset($data['data']['type']) ? $data['data']['type'] : $data[DeliveryLog::EVENT_ID];
+                $eventId = $data['data']['type'] ?? $data[DeliveryLog::EVENT_ID];
                 $eventName = strtolower(explode('.', $eventId)[0]);
 
                 if (
@@ -188,31 +190,34 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
 
     /**
      * @param array $data event data from delivery log
-     * @return string
+     * @return string|array
      */
     private function getEventDetails($data)
     {
         $details = '';
         if(isset($data['data']['type'])) {
-            $details = (isset($data['data']['context']['shortcut'])) ? $data['data']['context']['shortcut']: '';
-        } else {
-            if (isset($data['data']['reason']) && isset($data['data']['reason']['reasons'])) {
-                $details = is_array($data['data']['reason']['reasons']) ?
-                    array_merge(array_values($data['data']['reason']['reasons']), [__($data['data']['reason']['comment'])])
-                    : array_merge([$data['data']['reason']['reasons']], [__($data['data']['reason']['comment'])]);
-            } else if (isset($data['data']['exitCode'])) {
-                $details = $data['data']['exitCode'];
-            } else if (isset($data['data']['itemId'])) {
-                $details = $data['data']['itemId'];
-            } else if (isset($data['data']['web_browser_name'])) {
-                $details = ($data['data']['web_browser_name'] . ' ') .
-                    (isset($data['data']['web_browser_version']) ? $data['data']['web_browser_version'] . '; ' : '') .
-                    (isset($data['data']['os_name']) ? $data['data']['os_name'] . ' ' : '') .
-                    (isset($data['data']['os_version']) ? $data['data']['os_version'] . ' ' : '');
-            } else if (is_string($data['data'])) {
-                $details = $data['data'];
-            }
+            $details = $data['data']['context']['shortcut'] ?? '';
+        } elseif (isset($data['data']['reason'], $data['data']['reason']['reasons'])) {
+            $details = is_array($data['data']['reason']['reasons']) ?
+                array_merge(array_values($data['data']['reason']['reasons']), [__($data['data']['reason']['comment'])])
+                : array_merge([$data['data']['reason']['reasons']], [__($data['data']['reason']['comment'])]);
+        } elseif (isset($data['data']['exitCode'])) {
+            $details = $data['data']['exitCode'];
+        } elseif (isset($data['data']['itemId'])) {
+            $details = $data['data']['itemId'];
+        } elseif (isset($data['data']['web_browser_name'])) {
+            $details = ($data['data']['web_browser_name'] . ' ') .
+                (isset($data['data']['web_browser_version']) ? $data['data']['web_browser_version'] . '; ' : '') .
+                (isset($data['data']['os_name']) ? $data['data']['os_name'] . ' ' : '') .
+                (isset($data['data']['os_version']) ? $data['data']['os_version'] . ' ' : '');
+        } elseif (is_string($data['data'])) {
+            $details = $data['data'];
         }
+
+        if (isset($data['data']['increment']) && is_array($details)) {
+            $details[] = $data['data']['increment'] . __(' sec');
+        }
+
         return $details;
     }
 
@@ -220,10 +225,10 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
      * @param array $data event data from delivery log
      * @return string
      */
-    private function getEventContext($data)
+    private function getEventContext($data): string
     {
         if (isset($data['data']['type'])) {
-            $context = (isset($data['data']['context']['readable']))?$data['data']['context']['readable'] : '';
+            $context = $data['data']['context']['readable'] ?? '';
         } else {
             $context = (isset($data['data']['context']) && !is_null($data['data']['context'])) ? $data['data']['context'] : '';
         }
@@ -233,6 +238,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     /**
      * @param $options
      * @return null|number timestamp
+     * @throws Exception
      */
     private function getPeriodStart(array $options)
     {
