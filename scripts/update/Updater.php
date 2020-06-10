@@ -951,5 +951,12 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('19.10.0', '19.13.1');
+
+        if ($this->isVersion('19.13.1')) {
+            $script = 'sudo -u www-data php index.php \'oat\taoProctoring\scripts\tools\KvMonitoringMigration\' -f item_duration,stored_item_duration -d 1 -s 0 -pc -l 32';
+            $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating. Time to completion depends on table size."));
+
+            $this->setVersion('19.14.0');
+        }
     }
 }
