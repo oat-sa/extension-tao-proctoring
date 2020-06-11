@@ -86,6 +86,31 @@ define([
                 };
 
                 /**
+                 * Remove errors messages
+                 * @returns undefined
+                 */
+                function clearErrors() {
+                    const $error = $('.feedback-error', $cmp);
+                    hider.hide($error);
+                    $error.remove();
+                }
+
+                /**
+                 * Show error messages
+                 * @param {string[]} errors
+                 * @returns undefined
+                 */
+                function renderErrors(errors) {
+                    if ($cmp) {
+                        errors.forEach( error => {
+                            const $error = $('<div class="feedback-error small"></div>').text(error);
+                            $cmp.find('.actions').prepend($error);
+                        })
+                        hider.show($error);
+                    }
+                }
+
+                /**
                  * Validate the input time
                  * @returns {Boolean}
                  */
@@ -103,12 +128,13 @@ define([
                         || (config.changeTimeMode && parseFloat(value) === 0);
 
                     if (error) {
-                        hider.show($error);
+                        renderErrors([
+                            config.errorMessage
+                        ])
                         $ok.attr('disabled', true);
                         focus();
                     } else {
                         $ok.removeAttr('disabled');
-                        hider.hide($error);
                     }
 
                     return error;
@@ -128,13 +154,11 @@ define([
                 }
 
                 function checkReasonError() {
-                    const $element = self.getElement();
-
-                    if ($element) {
-                        $('.feedback-error', $element).remove();
-                        if (!checkRequiredFields($element)) {
-                            const $error = $('<div class="feedback-error small"></div>').text(__('All fields are required'));
-                            $element.find('.actions').prepend($error);
+                    if ($cmp) {
+                        if (!checkRequiredFields($cmp)) {
+                            renderErrors([
+                                __('All fields are required')
+                            ]);
                             return true;
                         }
                     }
@@ -150,6 +174,7 @@ define([
                         return;
                     }
 
+                    clearErrors();
                     if (!checkInputError() && !checkReasonError()) {
                         state.time = parseFloat(`${changeTimeOperator}${$time.val()}`) * timeUnit;
                         self.trigger('ok', state);
@@ -204,6 +229,7 @@ define([
                                 event.hasOwnProperty('target')
                                 && event.target.hasOwnProperty('id')
                                 && event.target.id === 'input-extra-time') {
+                                    clearErrors();
                                     checkInputError();
                             }
                         }
@@ -259,7 +285,8 @@ define([
                 }
 
                 $time.on('change', function() {
-                  checkInputError();
+                    clearErrors()
+                    checkInputError();
                 });
 
                 $changeTimeControls.on('change', ({ target: { value } }) => {
