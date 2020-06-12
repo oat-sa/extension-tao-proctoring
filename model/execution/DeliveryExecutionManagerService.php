@@ -411,7 +411,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
         $decreaseLimit = self::NO_TIME_ADJUSTMENT_LIMIT;
         try {
             $currentTimeConstraint = $this->getSmallestMaxTimeConstraint($deliveryExecutionId);
-            $decreaseLimit = $currentTimeConstraint->getMaximumRemainingTime()->getSeconds(true);
+            if ($currentTimeConstraint) {
+                $decreaseLimit = $currentTimeConstraint->getMaximumRemainingTime()->getSeconds(true);
+            }
         } catch (Exception $e) {
             $this->logError("Cannot calculate minimum time adjustment limit.");
         }
