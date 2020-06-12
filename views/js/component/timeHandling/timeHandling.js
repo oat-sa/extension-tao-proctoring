@@ -126,18 +126,32 @@ define([
                     const error = isNaN(time)
                         || time !== parseFloat(value)
                         || (config.changeTimeMode && parseFloat(value) === 0);
+                    const tooMuch = true;
+                    const tooFew = true;
+                    const errs = error || tooMuch || tooFew;
+                    const errList = [];
 
-                    if (error) {
-                        renderErrors([
-                            config.errorMessage
-                        ])
+                    switch (true) {
+                        case error:
+                            errList.push(config.errorMessage);
+                            break;
+                        case tooMuch:
+                            errList.push(__('',));
+                            break;
+                        case tooFew:
+                            errList.push(__('',));
+                            break;
+                    }
+
+                    if (errs) {
                         $ok.attr('disabled', true);
+                        renderErrors(errList);
                         focus();
                     } else {
                         $ok.removeAttr('disabled');
                     }
 
-                    return error;
+                    return errs;
                 }
 
                 /**
