@@ -258,6 +258,29 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         );
     }
 
+    public function testGetTimerAdjustmentDecreaseLimit_NullSmallestMaxTime(): void
+    {
+        $expectedLimit = -1;
+        $deliveryExecutionId = 'FAKE_ID';
+
+        $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
+        $this->serviceProxyMock->method('getDeliveryExecution')
+            ->willReturn($deliveryExecutionMock);
+
+
+        $testSessionMock = $this->createMock(TestSession::class);
+        $this->testSessionServiceMock->method('getTestSession')
+            ->willReturn($testSessionMock);
+        $this->testSessionServiceMock->method('getSmallestMaxTimeConstraint')
+            ->willReturn(null);
+
+        self::assertSame(
+            $expectedLimit,
+            $this->subject->getTimerAdjustmentDecreaseLimit($deliveryExecutionId),
+            'Method must return correct value of maximum possible time decrease.'
+        );
+    }
+
     public function testGetTimerAdjustmentDecreaseLimit(): void
     {
         $expectedLimit = -1;
