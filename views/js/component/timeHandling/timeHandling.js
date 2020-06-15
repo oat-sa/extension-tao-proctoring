@@ -126,22 +126,37 @@ define([
                     const error = isNaN(time)
                         || time !== parseFloat(value)
                         || (config.changeTimeMode && parseFloat(value) === 0);
-                    const tooMuch = false;
-                    const tooFew = false;
-                    const errs = error || tooMuch || tooFew;
+                    const timeUnit = config.unit;
+                    let errs = error;
                     const errList = [];
 
-                    switch (true) {
-                        case error:
-                            errList.push(config.errorMessage);
-                            break;
-                        case tooMuch:
-                            errList.push(__('The increased time, when added to the remaining time, (remaining time in HH:MM/SS) cannot be higher than the overall time granted for this timer (overall time in HH:MM:SS)',));
-                            break;
-                        case tooFew:
-                            errList.push(__('The decreased time cannot be higher than remaining time (remaining time in HH:MM/SS)',));
-                            break;
-                    }
+                    _.forEach(config.allowedResources, (resource) => {
+                        const remainingTime = Math.floor(resource.remaining_time) || 0;
+                        const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
+                        // const extraTime = Math.floor(resource.extraTime);
+                        // const consumedTime = Math.floor(resource.consumedTime);
+
+                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
+                        const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
+
+                        errs = errs || tooMuch || tooFew;
+
+                        if (remainingTime) {
+                            resource.remainingStr = timeEncoder.encode(remainingTime);
+                            resource.timeLimitsStr = timeEncoder.encode(limitTime);
+                            switch (true) {
+                                case error:
+                                    errList.push(config.errorMessage);
+                                    break;
+                                case tooFew:
+                                    errList.push(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                    break;
+                                case tooMuch:
+                                    errList.push(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                    break;
+                            }
+                        }
+                    });
 
                     if (errs) {
                         $ok.attr('disabled', true);

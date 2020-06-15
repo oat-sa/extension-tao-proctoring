@@ -446,11 +446,14 @@ define([
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
 
-                    const deliveryExecutionData = getExecutionData(selection);
+                    _.each(_selection, function (uri) {
+                        const deliveryExecutionData = getExecutionData(uri);
+                        if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
+                            config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
+                        }
+                    });
 
-                    if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
-                        config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
-                    }
+
                     timeHandlingPopup(config)
                         .on('ok', (state) => {
                             request(
@@ -517,6 +520,12 @@ define([
                         formatted.extraTime = testTakerData.timer.extraTime;
                         formatted.consumedTime = testTakerData.timer.consumedExtraTime;
                         formatted.remaining_time = testTakerData.timer.remaining_time;
+                        formatted.adjustedTime = testTakerData.timer.adjustedTime;
+                        formatted.approximatedRemaining = testTakerData.timer.approximatedRemaining;
+                        formatted.countDown = testTakerData.timer.countDown;
+                        formatted.extendedTime = testTakerData.timer.extendedTime;
+                        formatted.lastActivity = testTakerData.timer.lastActivity;
+                        formatted.timeAdjustmentLimits = testTakerData.timer.timeAdjustmentLimits;
                     }
                     return formatted;
                 }
