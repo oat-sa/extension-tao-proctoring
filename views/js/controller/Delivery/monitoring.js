@@ -759,9 +759,7 @@ define([
                                     try {
                                         const shouldRefreshDataTable = isReponseDataChanged(response, originalDataset);
 
-                                        console.log('shouldRefreshDataTable', shouldRefreshDataTable);
                                         if (shouldRefreshDataTable) {
-                                            console.log('refresh');
                                             $list.datatable('refresh', response);
                                         }
                                     } finally {
