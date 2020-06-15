@@ -126,8 +126,8 @@ define([
                     const error = isNaN(time)
                         || time !== parseFloat(value)
                         || (config.changeTimeMode && parseFloat(value) === 0);
-                    const tooMuch = true;
-                    const tooFew = true;
+                    const tooMuch = false;
+                    const tooFew = false;
                     const errs = error || tooMuch || tooFew;
                     const errList = [];
 
@@ -136,10 +136,10 @@ define([
                             errList.push(config.errorMessage);
                             break;
                         case tooMuch:
-                            errList.push(__('',));
+                            errList.push(__('The increased time, when added to the remaining time, (remaining time in HH:MM/SS) cannot be higher than the overall time granted for this timer (overall time in HH:MM:SS)',));
                             break;
                         case tooFew:
-                            errList.push(__('',));
+                            errList.push(__('The decreased time cannot be higher than remaining time (remaining time in HH:MM/SS)',));
                             break;
                     }
 
