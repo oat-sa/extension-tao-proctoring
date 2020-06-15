@@ -118,6 +118,7 @@ class DeliveryExecutionListTest extends TestCase
             'delivery_id' => 'delivery_id_string',
             'delivery_name' => 'delivery_name_string',
             'start_time' => '1567508223.829546',
+            'status' => 'FAKE_EXECUTION_STATUS',
         ];
         $this->deliveryLogService = $this->createMock(DeliveryLog::class);
         $this->testSessionServiceMock = $this->createMock(TestSessionService::class);

@@ -1095,10 +1095,22 @@ define([
                     if (showColumnExtendedTime) {
                         model.push({
                             id: 'extendedTime',
-                            label: __('Extended Time'),
+                            label: __('Changed Time'),
                             transform(value, row) {
-                                var extendedTimer = _.isObject(row.timer) ? row.timer : {};
-                                return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
+                                const state = [];
+                                const timer = _.isObject(row.timer) ? row.timer : {};
+                                const { adjustedTime, extendedTime, extraTime } = timer
+
+                                if (extendedTime) {
+                                    state.push(`${__('Extended time')}: x${extendedTime}`);
+                                }
+                                if (extraTime) {
+                                    state.push(`${__('Extra')}: ${timeEncoder.encode(extraTime)}`);
+                                }
+                                if (adjustedTime) {
+                                    state.push(`${__('Adjusted')}: ${adjustedTime > 0 ? '' : '-'}${timeEncoder.encode(Math.abs(adjustedTime))}`);
+                                }
+                                return state.join('<br />');
                             }
                         });
                     }
