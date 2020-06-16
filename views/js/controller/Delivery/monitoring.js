@@ -721,17 +721,17 @@ define([
                                     return true;
                                 }
 
-                                // We have to exlude the timer property from comparising since
-                                // the values for that property are always changed when test is in progress state
-                                const omitPropertiesToBeCompare = ['timer'];
-
                                 while (newDataSize--) {
-                                    let isDataEqual = _.isEqual(
-                                        _.omit(newData[newDataSize], omitPropertiesToBeCompare),
-                                        _.omit(savedData[newDataSize], omitPropertiesToBeCompare)
-                                    );
+                                    const newDeliveryId = newData[newDataSize].id;
+                                    const newDeliveryStatus = newData[newDataSize].state.status;
+                                    const savedDeliveryId = savedData[newDataSize].id;
+                                    const savedDeliveryStatus = savedData[newDataSize].state.status;
 
-                                    if (!isDataEqual) {
+                                    const isDeliveriesEqual =
+                                        _.isEqual(newDeliveryId, savedDeliveryId) &&
+                                        _.isEqual(newDeliveryStatus, savedDeliveryStatus);
+
+                                    if (!isDeliveriesEqual) {
                                         return true;
                                     }
                                 }
