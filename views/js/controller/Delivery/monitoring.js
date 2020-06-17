@@ -742,14 +742,8 @@ define([
                         return _.isEqual(response, savedResponse);
                     }
 
-                    function startPollingData(data, ajaxConfig) {
-                        const isPollingAvailable = data.autoRefresh && ajaxConfig;
-
+                    function startPollingData(pollingInterval, ajaxConfig) {
                         stopPollingData();
-
-                        if (!isPollingAvailable) {
-                            return;
-                        }
 
                         dataPolling.setAction(function (process) {
                             const action = process.async();
@@ -769,7 +763,7 @@ define([
                                 .fail(action.resolve);
                         });
 
-                        dataPolling.setInterval(data.autoRefresh);
+                        dataPolling.setInterval(pollingInterval);
                         dataPolling.start();
                     }
 
@@ -1304,7 +1298,12 @@ define([
                             .on('query.datatable', function (event, ajaxConfig) {
                                 loadingBar.start();
                                 highlightRows = [];
-                                startPollingData(data, ajaxConfig);
+
+                                const isPollingAvailable = data.autoRefresh && ajaxConfig;
+
+                                if (isPollingAvailable) {
+                                    startPollingData(data.autoRefresh, ajaxConfig);
+                                }
                             })
                             .on('beforeload.datatable', (e, dataSet) => {
                                 // We save response data here because on load the data will be transformed
@@ -1356,6 +1355,7 @@ define([
                                     polling.stop();
                                 });
 
+                                console.log('Start timer');
                                 polling.start();
                                 timer.resume();
                             })
