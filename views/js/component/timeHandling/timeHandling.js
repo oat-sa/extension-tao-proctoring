@@ -127,8 +127,8 @@ define([
                         || time !== parseFloat(value)
                         || (config.changeTimeMode && parseFloat(value) === 0);
                     const timeUnit = config.unit;
-                    let errs = error;
                     const errList = [];
+                    let errs = error;
 
                     _.forEach(config.allowedResources, (resource) => {
                         const remainingTime = Math.floor(resource.remaining_time) || 0;
@@ -138,8 +138,7 @@ define([
 
                         const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
                         const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
-
-                        errs = errs || tooMuch || tooFew;
+                        const resError = error || tooMuch || tooFew;
 
                         if (remainingTime) {
                             resource.remainingStr = timeEncoder.encode(remainingTime);
@@ -147,15 +146,28 @@ define([
                             switch (true) {
                                 case error:
                                     errList.push(config.errorMessage);
+                                    resource.errorLabel = __('The status is not correct');
                                     break;
                                 case tooFew:
                                     errList.push(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                    resource.errorLabel = __('Time decrease is too high');
                                     break;
                                 case tooMuch:
                                     errList.push(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                    resource.errorLabel = __('Time increase is too high');
                                     break;
+                                default:
+                                    resource.errorLabel = undefined;
                             }
                         }
+
+                        $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
+                        if (resError) {
+                            const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
+                            $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
+                        }
+
+                        errs = errs || resError;
                     });
 
                     if (errs) {
@@ -314,12 +326,14 @@ define([
                 }
 
                 $time.on('change', function() {
-                    clearErrors()
+                    clearErrors();
                     checkInputError();
                 });
 
                 $changeTimeControls.on('change', ({ target: { value } }) => {
                   changeTimeOperator = value;
+                    clearErrors();
+                    checkInputError();
                 });
 
                 focus();
