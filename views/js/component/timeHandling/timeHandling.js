@@ -133,8 +133,6 @@ define([
                     _.forEach(config.allowedResources, (resource) => {
                         const remainingTime = Math.floor(resource.remaining_time) || 0;
                         const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
-                        // const extraTime = Math.floor(resource.extraTime);
-                        // const consumedTime = Math.floor(resource.consumedTime);
 
                         const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
                         const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
