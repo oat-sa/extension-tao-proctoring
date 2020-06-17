@@ -678,7 +678,7 @@ define([
                     }
 
                     /**
-                     * Additional action perfomed with filter element
+                     * Additional action performed with filter element
                      * @param {jQueryElement} $el
                      */
                     function statusFilterHandler($el) {
@@ -708,7 +708,7 @@ define([
                      * @param {*} response
                      * @param {*} savedResponse
                      */
-                    function isReponseDataChanged(response, savedResponse) {
+                    function isResponseDataChanged(response, savedResponse) {
                         if (_.has(response, 'data') && _.has(savedResponse, 'data')) {
                             const newData = response.data;
                             const savedData = savedResponse.data;
@@ -743,21 +743,21 @@ define([
                     }
 
                     function startPollingData(data, ajaxConfig) {
-                        const isPollingAvaible = data.autoRefresh && ajaxConfig;
+                        const isPollingAvailable = data.autoRefresh && ajaxConfig;
 
                         stopPollingData();
 
-                        if (!isPollingAvaible) {
+                        if (!isPollingAvailable) {
                             return;
                         }
 
-                        dataPolling.setAction(function (proccess) {
-                            const action = proccess.async();
+                        dataPolling.setAction(function (process) {
+                            const action = process.async();
 
                             $.ajax(ajaxConfig)
                                 .then(response => {
                                     try {
-                                        const shouldRefreshDataTable = isReponseDataChanged(response, originalDataset);
+                                        const shouldRefreshDataTable = isResponseDataChanged(response, originalDataset);
 
                                         if (shouldRefreshDataTable) {
                                             $list.datatable('refresh', response);
