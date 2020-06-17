@@ -950,9 +950,9 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.10.0');
         }
 
-        $this->skip('19.10.0', '19.14.0');
+        $this->skip('19.10.0', '19.14.1');
 
-        if ($this->isVersion('19.14.0')) {
+        if ($this->isVersion('19.14.1')) {
             $script = 'sudo -u www-data php index.php \'oat\taoProctoring\scripts\tools\KvMonitoringMigration\' -f item_duration,stored_item_duration -d 1 -s 0 -pc -l 32';
             $this->addReport(\common_report_Report::createInfo("Run script :'" . $script . "' to finish updating. Time to completion depends on table size."));
 
