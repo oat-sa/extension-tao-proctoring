@@ -819,7 +819,7 @@ define([
                                 title: __('Refresh the page'),
                                 label: __('Refresh'),
                                 action() {
-                                    $list.datatable('refresh', {});
+                                    $list.datatable('refresh');
                                 }
                             });
                         }
