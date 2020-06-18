@@ -1355,7 +1355,6 @@ define([
                                     polling.stop();
                                 });
 
-                                console.log('Start timer');
                                 polling.start();
                                 timer.resume();
                             })
