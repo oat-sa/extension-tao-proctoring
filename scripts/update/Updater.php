@@ -959,7 +959,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.15.0');
         }
 
-        $this->skip('19.15.0', '19.16.1');
+        $this->skip('19.15.0', '19.17.0');
 
     }
 }
