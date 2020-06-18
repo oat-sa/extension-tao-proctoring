@@ -25,14 +25,14 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use common_Logger;
 
 class DbSetup {
-    
+
     public static function generateTable(\common_persistence_SqlPersistence $persistence)
     {
 
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
-        
+
         try {
             $tableLog = $schema->createTable(MonitoringStorage::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
@@ -52,9 +52,11 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::EXTENDED_TIME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
             $tableLog->addColumn(MonitoringStorage::CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
+            $tableLog->addColumn(MonitoringStorage::ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
+            $tableLog->addColumn(MonitoringStorage::STORED_ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
 
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
-        
+
             $tableLog->addIndex(
                 array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID
@@ -71,15 +73,15 @@ class DbSetup {
                 array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
             );
-        
+
             $tableData = $schema->createTable(MonitoringStorage::KV_TABLE_NAME);
             $tableData->addOption('engine', 'InnoDB');
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
             $tableData->addColumn(MonitoringStorage::KV_COLUMN_VALUE, "text", array("notnull" => false));
-        
+
             $tableData->setPrimaryKey(array(MonitoringStorage::KV_COLUMN_PARENT_ID, MonitoringStorage::KV_COLUMN_KEY));
-        
+
             $tableData->addForeignKeyConstraint(
                 $tableLog,
                 array(MonitoringStorage::KV_COLUMN_PARENT_ID),
@@ -93,7 +95,7 @@ class DbSetup {
         } catch(SchemaException $e) {
             common_Logger::i('Database Schema already up to date.');
         }
-        
+
         $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
         foreach ($queries as $query) {
             $persistence->exec($query);
@@ -124,6 +126,8 @@ class DbSetup {
             MonitoringStorage::EXTENDED_TIME,
             MonitoringStorage::EXTRA_TIME,
             MonitoringStorage::CONSUMED_EXTRA_TIME,
+            MonitoringStorage::ITEM_DURATION,
+            MonitoringStorage::STORED_ITEM_DURATION,
         ];
     }
 }
