@@ -86,6 +86,31 @@ define([
                 };
 
                 /**
+                 * Remove errors messages
+                 * @returns undefined
+                 */
+                function clearErrors() {
+                    const $error = $('.feedback-error', $cmp);
+                    hider.hide($error);
+                    $error.remove();
+                }
+
+                /**
+                 * Show error messages
+                 * @param {string[]} errors
+                 * @returns undefined
+                 */
+                function renderErrors(errors) {
+                    if ($cmp) {
+                        errors.forEach( error => {
+                            const $error = $('<div class="feedback-error small"></div>').text(error);
+                            $cmp.find('.actions').prepend($error);
+                        })
+                        hider.show($error);
+                    }
+                }
+
+                /**
                  * Validate the input time
                  * @returns {Boolean}
                  */
@@ -101,17 +126,57 @@ define([
                     const error = isNaN(time)
                         || time !== parseFloat(value)
                         || (config.changeTimeMode && parseFloat(value) === 0);
+                    const timeUnit = config.unit;
+                    const errList = [];
+                    let errs = error;
 
-                    if (error) {
-                        hider.show($error);
+                    _.forEach(config.allowedResources, (resource) => {
+                        const remainingTime = Math.floor(resource.remaining_time) || 0;
+                        const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
+
+                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
+                        const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
+                        const resError = error || tooMuch || tooFew;
+
+                        if (remainingTime) {
+                            resource.remainingStr = timeEncoder.encode(remainingTime);
+                            resource.timeLimitsStr = timeEncoder.encode(limitTime);
+                            switch (true) {
+                                case error:
+                                    errList.push(config.errorMessage);
+                                    resource.errorLabel = __('The status is not correct');
+                                    break;
+                                case tooFew:
+                                    errList.push(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                    resource.errorLabel = __('Time decrease is too high');
+                                    break;
+                                case tooMuch:
+                                    errList.push(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                    resource.errorLabel = __('Time increase is too high');
+                                    break;
+                                default:
+                                    resource.errorLabel = undefined;
+                            }
+                        }
+
+                        $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
+                        if (resError) {
+                            const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
+                            $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
+                        }
+
+                        errs = errs || resError;
+                    });
+
+                    if (errs) {
                         $ok.attr('disabled', true);
+                        renderErrors(errList);
                         focus();
                     } else {
                         $ok.removeAttr('disabled');
-                        hider.hide($error);
                     }
 
-                    return error;
+                    return errs;
                 }
 
                 /**
@@ -128,13 +193,11 @@ define([
                 }
 
                 function checkReasonError() {
-                    const $element = self.getElement();
-
-                    if ($element) {
-                        $('.feedback-error', $element).remove();
-                        if (!checkRequiredFields($element)) {
-                            const $error = $('<div class="feedback-error small"></div>').text(__('All fields are required'));
-                            $element.find('.actions').prepend($error);
+                    if ($cmp) {
+                        if (!checkRequiredFields($cmp)) {
+                            renderErrors([
+                                __('All fields are required')
+                            ]);
                             return true;
                         }
                     }
@@ -150,6 +213,7 @@ define([
                         return;
                     }
 
+                    clearErrors();
                     if (!checkInputError() && !checkReasonError()) {
                         state.time = parseFloat(`${changeTimeOperator}${$time.val()}`) * timeUnit;
                         self.trigger('ok', state);
@@ -204,6 +268,7 @@ define([
                                 event.hasOwnProperty('target')
                                 && event.target.hasOwnProperty('id')
                                 && event.target.id === 'input-extra-time') {
+                                    clearErrors();
                                     checkInputError();
                             }
                         }
@@ -259,11 +324,14 @@ define([
                 }
 
                 $time.on('change', function() {
-                  checkInputError();
+                    clearErrors();
+                    checkInputError();
                 });
 
                 $changeTimeControls.on('change', ({ target: { value } }) => {
                   changeTimeOperator = value;
+                    clearErrors();
+                    checkInputError();
                 });
 
                 focus();

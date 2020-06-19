@@ -446,11 +446,14 @@ define([
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
 
-                    const deliveryExecutionData = getExecutionData(selection);
+                    _.each(_selection, function (uri) {
+                        const deliveryExecutionData = getExecutionData(uri);
+                        if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
+                            config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
+                        }
+                    });
 
-                    if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
-                        config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
-                    }
+
                     timeHandlingPopup(config)
                         .on('ok', (state) => {
                             request(
@@ -517,6 +520,12 @@ define([
                         formatted.extraTime = testTakerData.timer.extraTime;
                         formatted.consumedTime = testTakerData.timer.consumedExtraTime;
                         formatted.remaining_time = testTakerData.timer.remaining_time;
+                        formatted.adjustedTime = testTakerData.timer.adjustedTime;
+                        formatted.approximatedRemaining = testTakerData.timer.approximatedRemaining;
+                        formatted.countDown = testTakerData.timer.countDown;
+                        formatted.extendedTime = testTakerData.timer.extendedTime;
+                        formatted.lastActivity = testTakerData.timer.lastActivity;
+                        formatted.timeAdjustmentLimits = testTakerData.timer.timeAdjustmentLimits;
                     }
                     return formatted;
                 }
@@ -1095,10 +1104,22 @@ define([
                     if (showColumnExtendedTime) {
                         model.push({
                             id: 'extendedTime',
-                            label: __('Extended Time'),
+                            label: __('Changed Time'),
                             transform(value, row) {
-                                var extendedTimer = _.isObject(row.timer) ? row.timer : {};
-                                return (extendedTimer.extendedTime ? 'x' : '') + extendedTimer.extendedTime;
+                                const state = [];
+                                const timer = _.isObject(row.timer) ? row.timer : {};
+                                const { adjustedTime, extendedTime, extraTime } = timer
+
+                                if (extendedTime) {
+                                    state.push(`${__('Extended time')}: x${extendedTime}`);
+                                }
+                                if (extraTime) {
+                                    state.push(`${__('Extra')}: ${timeEncoder.encode(extraTime)}`);
+                                }
+                                if (adjustedTime) {
+                                    state.push(`${__('Adjusted')}: ${adjustedTime > 0 ? '' : '-'}${timeEncoder.encode(Math.abs(adjustedTime))}`);
+                                }
+                                return state.join('<br />');
                             }
                         });
                     }
