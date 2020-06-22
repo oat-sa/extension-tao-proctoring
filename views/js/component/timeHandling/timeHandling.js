@@ -134,7 +134,7 @@ define([
                         const remainingTime = Math.floor(resource.remaining_time) || 0;
                         const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
 
-                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
+                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.increase < timeUnit*value) ;
                         const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
                         const resError = error || tooMuch || tooFew;
 
