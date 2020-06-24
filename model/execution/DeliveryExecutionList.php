@@ -94,9 +94,7 @@ class DeliveryExecutionList extends ConfigurableService
      * @return array
      * @throws common_Exception
      * @throws common_exception_Error
-     * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
-     * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
      */
     private function createExecution($cachedData, $extraFields): array
@@ -143,7 +141,7 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         if ($isTimerAdjustmentAllowed) {
-            $reason = $this->getLastPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            $reason = $this->getLastProctorPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
             if ($reason) {
                 $execution['lastPauseReason'] = $reason;
             }
@@ -161,7 +159,7 @@ class DeliveryExecutionList extends ConfigurableService
         return $execution;
     }
 
-    private function getLastPauseReason(string $deliveryExecutionId): ?array
+    private function getLastProctorPauseReason(string $deliveryExecutionId): ?array
     {
         $reason = null;
         $lastPause = $this->getDeliveryLogService()->search([
@@ -173,7 +171,13 @@ class DeliveryExecutionList extends ConfigurableService
             'limit' => 1,
         ]);
 
-        if (isset($lastPause[0][DeliveryLog::DATA]['reason'])) {
+        if (
+            isset(
+                $lastPause[0][DeliveryLog::DATA]['reason'],
+                $lastPause[0][DeliveryLog::DATA]['context']
+            )
+            && $lastPause[0][DeliveryLog::DATA]['context'] === '/taoProctoring/Monitor/pauseExecutions'
+        ) {
             $reason = $lastPause[0][DeliveryLog::DATA]['reason'];
         }
 
