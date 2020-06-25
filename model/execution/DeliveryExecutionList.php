@@ -159,6 +159,15 @@ class DeliveryExecutionList extends ConfigurableService
         return $execution;
     }
 
+    private function isPausedByProctor($lastPause): bool
+    {
+        return isset(
+            $lastPause[0][DeliveryLog::DATA]['reason'],
+            $lastPause[0][DeliveryLog::DATA]['context']
+        )
+        && $lastPause[0][DeliveryLog::DATA]['context'] === '/taoProctoring/Monitor/pauseExecutions';
+    }
+
     private function getLastProctorPauseReason(string $deliveryExecutionId): ?array
     {
         $reason = null;
@@ -171,13 +180,7 @@ class DeliveryExecutionList extends ConfigurableService
             'limit' => 1,
         ]);
 
-        if (
-            isset(
-                $lastPause[0][DeliveryLog::DATA]['reason'],
-                $lastPause[0][DeliveryLog::DATA]['context']
-            )
-            && $lastPause[0][DeliveryLog::DATA]['context'] === '/taoProctoring/Monitor/pauseExecutions'
-        ) {
+        if ($this->isPausedByProctor($lastPause)) {
             $reason = $lastPause[0][DeliveryLog::DATA]['reason'];
         }
 
