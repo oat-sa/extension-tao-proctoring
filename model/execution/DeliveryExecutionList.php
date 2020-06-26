@@ -36,6 +36,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\SessionStateService;
+use tao_helpers_Uri;
 
 /**
  * Class DeliveryHelperService
@@ -161,11 +162,14 @@ class DeliveryExecutionList extends ConfigurableService
 
     private function isPausedByProctor($lastPause): bool
     {
+        $url = '/'.tao_helpers_Uri::getPath(
+            _url('pauseExecutions', 'Monitor', 'taoProctoring')
+        );
         return isset(
             $lastPause[0][DeliveryLog::DATA]['reason'],
             $lastPause[0][DeliveryLog::DATA]['context']
         )
-        && $lastPause[0][DeliveryLog::DATA]['context'] === '/taoProctoring/Monitor/pauseExecutions';
+        && mb_strpos($lastPause[0][DeliveryLog::DATA]['context'], $url) !== false;
     }
 
     private function getLastProctorPauseReason(string $deliveryExecutionId): ?array
