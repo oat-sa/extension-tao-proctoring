@@ -162,7 +162,7 @@ class DeliveryExecutionList extends ConfigurableService
 
     private function isPausedByProctor($lastPause): bool
     {
-        $url = '/'.tao_helpers_Uri::getPath(
+        $url = tao_helpers_Uri::getPath(
             _url('pauseExecutions', 'Monitor', 'taoProctoring')
         );
         return isset(
