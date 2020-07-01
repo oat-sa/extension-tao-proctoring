@@ -137,7 +137,6 @@ define([
                             if (errList.length === 0) {
                                 errList.push(config.errorMessage);
                             }
-                            resource.errorLabel = __('Entered value is not correct');
                         }
                     });
 
@@ -155,6 +154,9 @@ define([
                             resource.remainingStr = timeEncoder.encode(remainingTime);
                             resource.timeLimitsStr = timeEncoder.encode(limitTime);
                             switch (true) {
+                                case error:
+                                    resource.errorLabel = __('Entered value is not correct');
+                                    break;
                                 case tooFew:
                                     errList.unshift(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
                                     resource.errorLabel = __('Time decrease is too high');
