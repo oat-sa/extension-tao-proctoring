@@ -131,15 +131,15 @@ define([
                     let errs = error;
                     let resError = error;
 
-                    // // add shared error once, but update each session message
-                    // _.forEach(config.allowedResources, (resource) => {
-                    //     if (error) {
-                    //         if (errList.length === 0) {
-                    //             errList.push(config.errorMessage);
-                    //         }
-                    //         resource.errorLabel = __('The status is not correct');
-                    //     }
-                    // });
+                    // add shared error once, but update each session message
+                    _.forEach(config.allowedResources, (resource) => {
+                        if (error) {
+                            if (errList.length === 0) {
+                                errList.push(config.errorMessage);
+                            }
+                            resource.errorLabel = __('Entered value is not correct');
+                        }
+                    });
 
                     // add messages about separated errors
                     _.forEach(config.allowedResources, (resource) => {
@@ -155,16 +155,12 @@ define([
                             resource.remainingStr = timeEncoder.encode(remainingTime);
                             resource.timeLimitsStr = timeEncoder.encode(limitTime);
                             switch (true) {
-                                case error:
-                                    errList.push(config.errorMessage);
-                                    resource.errorLabel = __('The status is not correct');
-                                    break;
                                 case tooFew:
-                                    errList.push(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                    errList.unshift(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
                                     resource.errorLabel = __('Time decrease is too high');
                                     break;
                                 case tooMuch:
-                                    errList.push(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                    errList.unshift(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
                                     resource.errorLabel = __('Time increase is too high');
                                     break;
                                 default:
