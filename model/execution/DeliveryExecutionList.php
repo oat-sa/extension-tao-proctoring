@@ -36,6 +36,7 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\TestSessionConnectivityStatusService;
 use oat\taoQtiTest\models\QtiTestExtractionFailedException;
 use oat\taoQtiTest\models\SessionStateService;
+use tao_helpers_Uri;
 
 /**
  * Class DeliveryHelperService
@@ -94,9 +95,7 @@ class DeliveryExecutionList extends ConfigurableService
      * @return array
      * @throws common_Exception
      * @throws common_exception_Error
-     * @throws common_exception_NotFound
      * @throws common_ext_ExtensionException
-     * @throws InvalidServiceManagerException
      * @throws QtiTestExtractionFailedException
      */
     private function createExecution($cachedData, $extraFields): array
@@ -143,7 +142,7 @@ class DeliveryExecutionList extends ConfigurableService
         }
 
         if ($isTimerAdjustmentAllowed) {
-            $reason = $this->getLastPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            $reason = $this->getLastProctorPauseReason($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
             if ($reason) {
                 $execution['lastPauseReason'] = $reason;
             }
@@ -161,7 +160,19 @@ class DeliveryExecutionList extends ConfigurableService
         return $execution;
     }
 
-    private function getLastPauseReason(string $deliveryExecutionId): ?array
+    private function isPausedByProctor($lastPause): bool
+    {
+        $url = tao_helpers_Uri::getPath(
+            _url('pauseExecutions', 'Monitor', 'taoProctoring')
+        );
+        return isset(
+            $lastPause[0][DeliveryLog::DATA]['reason'],
+            $lastPause[0][DeliveryLog::DATA]['context']
+        )
+        && mb_strpos($lastPause[0][DeliveryLog::DATA]['context'], $url) !== false;
+    }
+
+    private function getLastProctorPauseReason(string $deliveryExecutionId): ?array
     {
         $reason = null;
         $lastPause = $this->getDeliveryLogService()->search([
@@ -173,7 +184,7 @@ class DeliveryExecutionList extends ConfigurableService
             'limit' => 1,
         ]);
 
-        if (isset($lastPause[0][DeliveryLog::DATA]['reason'])) {
+        if ($this->isPausedByProctor($lastPause)) {
             $reason = $lastPause[0][DeliveryLog::DATA]['reason'];
         }
 

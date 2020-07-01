@@ -292,6 +292,7 @@ class DeliveryExecutionListTest extends TestCase
             [
                 DeliveryLog::DATA => [
                     'reason' => ['reason'],
+                    'context' => '/taoProctoring/Monitor/pauseExecutions'
                 ]
             ]
         ]);
