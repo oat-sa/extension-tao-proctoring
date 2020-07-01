@@ -129,14 +129,27 @@ define([
                     const timeUnit = config.unit;
                     const errList = [];
                     let errs = error;
+                    let resError = error;
 
+                    // // add shared error once, but update each session message
+                    // _.forEach(config.allowedResources, (resource) => {
+                    //     if (error) {
+                    //         if (errList.length === 0) {
+                    //             errList.push(config.errorMessage);
+                    //         }
+                    //         resource.errorLabel = __('The status is not correct');
+                    //     }
+                    // });
+
+                    // add messages about separated errors
                     _.forEach(config.allowedResources, (resource) => {
                         const remainingTime = Math.floor(resource.remaining_time) || 0;
                         const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
 
                         const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.increase < timeUnit*value) ;
                         const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
-                        const resError = error || tooMuch || tooFew;
+
+                        resError = error || tooMuch || tooFew;
 
                         if (remainingTime) {
                             resource.remainingStr = timeEncoder.encode(remainingTime);
