@@ -457,6 +457,8 @@ class DeliveryExecutionManagerService extends ConfigurableService
     }
 
     /**
+     * get Title of the Webpage on the Browser Tab
+     *
      * @param core_kernel_classes_Resource $delivery
      * @return string
      */
