@@ -28,6 +28,7 @@ use common_exception_MissingParameter;
 use common_exception_NotFound;
 use common_ext_ExtensionException;
 use common_session_Session;
+use core_kernel_classes_Resource;
 use Exception;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\service\ConfigurableService;
@@ -453,6 +454,15 @@ class DeliveryExecutionManagerService extends ConfigurableService
         }
 
         return $adjustedTime;
+    }
+
+    /**
+     * @param core_kernel_classes_Resource $delivery
+     * @return string
+     */
+    public function getTitle(core_kernel_classes_Resource $delivery)
+    {
+        return __('TAO: %s', $delivery->getLabel());
     }
 
     /**
