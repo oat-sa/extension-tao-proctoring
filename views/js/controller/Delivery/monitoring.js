@@ -78,8 +78,6 @@ define([
     approximatedTimerTpl
 ) {
     'use strict';
-
-    debugger;
     /**
      * The CSS scope
      * @type {String}
