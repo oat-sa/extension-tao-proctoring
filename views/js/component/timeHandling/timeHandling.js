@@ -142,41 +142,43 @@ define([
 
                     // add messages about separated errors
                     _.forEach(config.allowedResources, (resource) => {
-                        const remainingTime = Math.floor(resource.remaining_time) || 0;
-                        const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease + resource.timeAdjustmentLimits.increase) || 0;
+                        if (resource.timeAdjustmentLimits) {
+                            const remainingTime = Math.floor(resource.remaining_time) || 0;
+                            const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease + resource.timeAdjustmentLimits.increase) || 0;
 
-                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.increase < timeUnit*value) ;
-                        const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
+                            const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.increase < timeUnit*value) ;
+                            const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
 
-                        resError = error || tooMuch || tooFew;
+                            resError = error || tooMuch || tooFew;
 
-                        if (remainingTime) {
-                            resource.remainingStr = timeEncoder.encode(remainingTime);
-                            resource.timeLimitsStr = timeEncoder.encode(limitTime);
-                            switch (true) {
-                                case error:
-                                    resource.errorLabel = __('Entered value is not correct');
-                                    break;
-                                case tooFew:
-                                    errList.unshift(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
-                                    resource.errorLabel = __('Time decrease is too high');
-                                    break;
-                                case tooMuch:
-                                    errList.unshift(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
-                                    resource.errorLabel = __('Time increase is too high');
-                                    break;
-                                default:
-                                    resource.errorLabel = undefined;
+                            if (remainingTime) {
+                                resource.remainingStr = timeEncoder.encode(remainingTime);
+                                resource.timeLimitsStr = timeEncoder.encode(limitTime);
+                                switch (true) {
+                                    case error:
+                                        resource.errorLabel = __('Entered value is not correct');
+                                        break;
+                                    case tooFew:
+                                        errList.unshift(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                        resource.errorLabel = __('Time decrease is too high');
+                                        break;
+                                    case tooMuch:
+                                        errList.unshift(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                        resource.errorLabel = __('Time increase is too high');
+                                        break;
+                                    default:
+                                        resource.errorLabel = undefined;
+                                }
                             }
-                        }
 
-                        $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
-                        if (resError) {
-                            const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
-                            $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
-                        }
+                            $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
+                            if (resError) {
+                                const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
+                                $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
+                            }
 
-                        errs = errs || resError;
+                            errs = errs || resError;
+                        }
                     });
 
                     if (errs) {
