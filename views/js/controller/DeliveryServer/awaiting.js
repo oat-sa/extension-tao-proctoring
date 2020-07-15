@@ -81,7 +81,7 @@ define([
                         if (result.message) {
                             dialogAlert(result.message, exit);
                         } else {
-                            exit();
+                            dialogAlert(__('Unexpected response'), exit);
                         }
                     } else if (result.authorized) {
                         clipboard.clean();
@@ -177,7 +177,7 @@ define([
                             if (result.message) {
                                 dialogAlert(result.message, exit);
                             } else {
-                                exit();
+                                dialogAlert(__('Unexpected response'), exit);
                             }
                         } else if (result.authorized) {
                             stop = true;
