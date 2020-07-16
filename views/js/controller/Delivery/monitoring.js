@@ -78,7 +78,6 @@ define([
     approximatedTimerTpl
 ) {
     'use strict';
-
     /**
      * The CSS scope
      * @type {String}
@@ -140,6 +139,7 @@ define([
             var dataset;
             var extraFields;
             var categories;
+            var originalDataset;
             let timeHandlingMode;
             let changeTimeMode;
             var allowedConnectivity;
@@ -176,6 +176,12 @@ define([
                 interval: 1000,
                 autoStart: false
             });
+
+            const dataPolling = pollingFactory({
+                interval: 2000,
+                autoStart: false
+            });
+
             appController.on('change.deliveryMonitoring', function() {
                 appController.off('.deliveryMonitoring');
                 container.destroy();
@@ -681,6 +687,73 @@ define([
                     return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
 
+                /**
+                * Compare responses data
+                * @param {Object} response
+                * @param {Object} savedResponse
+                */
+                function isResponseDataChanged(response, savedResponse) {
+                    if (_.has(response, 'data') && _.has(savedResponse, 'data')) {
+                        const newData = response.data;
+                        const savedData = savedResponse.data;
+
+                        if (_.isArray(newData) && _.isArray(savedData)) {
+                            let newDataSize = _.size(newData);
+                            let savedDataSize = _.size(savedData);
+
+                            if (newDataSize !== savedDataSize) {
+                                return true;
+                            }
+
+                            while (newDataSize--) {
+                                const newDeliveryId = newData[newDataSize].id;
+                                const newDeliveryStatus = newData[newDataSize].state.status;
+                                const savedDeliveryId = savedData[newDataSize].id;
+                                const savedDeliveryStatus = savedData[newDataSize].state.status;
+
+                                const isDeliveriesEqual = _.isEqual(newDeliveryId, savedDeliveryId) && _.isEqual(newDeliveryStatus, savedDeliveryStatus);
+
+                                if (!isDeliveriesEqual) {
+                                    return true;
+                                }
+                            }
+                            
+                            return false;
+                        }
+                    }
+
+                    return _.isEqual(response, savedResponse);
+                }
+
+                function startPollingData(pollingInterval, ajaxConfig) {
+                    stopPollingData();
+
+                    dataPolling.setAction(function (process) {
+                        const action = process.async();
+
+                        $.ajax(ajaxConfig)
+                            .then(response => {
+                                try {
+                                    const shouldRefreshDataTable = isResponseDataChanged(response, originalDataset);
+
+                                    if (shouldRefreshDataTable) {
+                                       $list.datatable('refresh', response);
+                                    }
+                                } finally {
+                                   action.resolve();
+                                }
+                            })
+                            .fail(action.resolve);
+                        });
+
+                    dataPolling.setInterval(pollingInterval);
+                    dataPolling.start();
+                }
+
+                function stopPollingData() {
+                    dataPolling.stop();
+                }
+
                 if (deliveryId) {
                     serviceParams.delivery = deliveryId;
                 }
@@ -732,15 +805,6 @@ define([
                                 $list.datatable('refresh');
                             }
                         });
-                    }
-
-                    /**
-                     * Configurable parameter to auto renew datatable
-                     */
-                    if (data.autoRefresh) {
-                        setInterval(function () {
-                            $list.datatable('refresh');
-                        }, data.autoRefresh);
                     }
 
                     if (defaultTag) {
@@ -1194,9 +1258,19 @@ define([
 
                     // renders the datatable
                     $list
-                        .on('query.datatable', function() {
+                        .on('query.datatable', function(event, ajaxConfig) {
                             loadingBar.start();
                             highlightRows = [];
+
+                            const isPollingAvailable = data.autoRefresh && ajaxConfig;
+
+                            if (isPollingAvailable) {
+                                startPollingData(data.autoRefresh, ajaxConfig);
+                            }
+                        })
+                        .on('beforeload.datatable', (e, dataSet) => {
+                            // We save response data here because on load the data will be transformed
+                            originalDataset = dataSet;
                         })
                         .on('load.datatable', function(e, newDataset) {
                             var applyTags;

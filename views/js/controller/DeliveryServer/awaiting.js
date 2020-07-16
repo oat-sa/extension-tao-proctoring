@@ -74,9 +74,23 @@ define([
 
             const runDelivery = () => {
                 loadingBar.start();
-                clipboard.clean();
-                deliveryStarted = true;
-                window.location.href = runDeliveryUrl;
+
+                // make sure that the delivery is still allowed (before redirect)
+                $.get(isAuthorizedUrl, (result) => {
+                    if (!result.success) {
+                        if (result.message) {
+                            dialogAlert(result.message, exit);
+                        } else {
+                            dialogAlert(__('Unexpected response'), exit);
+                        }
+                    } else if (result.authorized) {
+                        clipboard.clean();
+                        deliveryStarted = true;
+                        window.location.href = runDeliveryUrl;
+                    } else {
+                        dialogAlert(__('Unexpected response'), exit);
+                    }
+                });
             };
 
             const isRunnable = () => {
@@ -163,7 +177,7 @@ define([
                             if (result.message) {
                                 dialogAlert(result.message, exit);
                             } else {
-                                exit();
+                                dialogAlert(__('Unexpected response'), exit);
                             }
                         } else if (result.authorized) {
                             stop = true;
