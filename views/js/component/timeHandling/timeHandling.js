@@ -125,7 +125,7 @@ define([
                     // otherwise numbers like 0x10 will be accepted, but misunderstood when applied
                     const error = isNaN(time)
                         || time !== parseFloat(value)
-                        || (config.changeTimeMode && parseFloat(value) === 0);
+                        || (config.changeTimeMode && parseFloat(value) <= 0);
                     const timeUnit = config.unit;
                     const errList = [];
                     let errs = error;
@@ -151,7 +151,7 @@ define([
 
                             resError = error || tooMuch || tooFew;
 
-                            if (remainingTime) {
+                            if (typeof remainingTime !== 'undefined') {
                                 resource.remainingStr = timeEncoder.encode(remainingTime);
                                 resource.timeLimitsStr = timeEncoder.encode(limitTime);
                                 switch (true) {
