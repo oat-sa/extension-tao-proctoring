@@ -395,7 +395,13 @@ class DeliveryExecutionManagerService extends ConfigurableService
             return false;
         }
 
-        if (!$this->getTestSessionService()->getTestSession($deliveryExecution)) {
+        $testSession = $this->getTestSessionService()->getTestSession($deliveryExecution);
+        if (!$testSession instanceof TestSession) {
+            return false;
+        }
+
+        $timeConstraint = $this->getTestSessionService()->getSmallestMaxTimeConstraint($testSession);
+        if ($timeConstraint === null) {
             return false;
         }
 
