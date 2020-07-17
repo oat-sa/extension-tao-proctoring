@@ -960,7 +960,7 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('19.15.0');
         }
 
-        $this->skip('19.15.0', '19.17.0');
+        $this->skip('19.15.0', '19.17.1');
 
         
         //Updater files are deprecated. Please use migrations.

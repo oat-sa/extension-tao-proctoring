@@ -125,47 +125,60 @@ define([
                     // otherwise numbers like 0x10 will be accepted, but misunderstood when applied
                     const error = isNaN(time)
                         || time !== parseFloat(value)
-                        || (config.changeTimeMode && parseFloat(value) === 0);
+                        || (config.changeTimeMode && parseFloat(value) <= 0);
                     const timeUnit = config.unit;
                     const errList = [];
                     let errs = error;
+                    let resError = error;
 
+                    // add shared error once, but update each session message
                     _.forEach(config.allowedResources, (resource) => {
-                        const remainingTime = Math.floor(resource.remaining_time) || 0;
-                        const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease) || 0;
-
-                        const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.decrease < timeUnit*value) ;
-                        const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
-                        const resError = error || tooMuch || tooFew;
-
-                        if (remainingTime) {
-                            resource.remainingStr = timeEncoder.encode(remainingTime);
-                            resource.timeLimitsStr = timeEncoder.encode(limitTime);
-                            switch (true) {
-                                case error:
-                                    errList.push(config.errorMessage);
-                                    resource.errorLabel = __('The status is not correct');
-                                    break;
-                                case tooFew:
-                                    errList.push(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
-                                    resource.errorLabel = __('Time decrease is too high');
-                                    break;
-                                case tooMuch:
-                                    errList.push(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
-                                    resource.errorLabel = __('Time increase is too high');
-                                    break;
-                                default:
-                                    resource.errorLabel = undefined;
+                        if (error) {
+                            if (errList.length === 0) {
+                                errList.push(config.errorMessage);
                             }
                         }
+                    });
 
-                        $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
-                        if (resError) {
-                            const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
-                            $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
+                    // add messages about separated errors
+                    _.forEach(config.allowedResources, (resource) => {
+                        if (resource.timeAdjustmentLimits) {
+                            const remainingTime = Math.floor(resource.remaining_time) || 0;
+                            const limitTime = Math.floor(resource.timeAdjustmentLimits.decrease + resource.timeAdjustmentLimits.increase) || 0;
+
+                            const tooMuch = (changeTimeOperator === '') && (resource.timeAdjustmentLimits.increase < timeUnit*value) ;
+                            const tooFew = (changeTimeOperator === '-') && (timeUnit*value > resource.remaining_time);
+
+                            resError = error || tooMuch || tooFew;
+
+                            if (typeof remainingTime !== 'undefined') {
+                                resource.remainingStr = timeEncoder.encode(remainingTime);
+                                resource.timeLimitsStr = timeEncoder.encode(limitTime);
+                                switch (true) {
+                                    case error:
+                                        resource.errorLabel = __('Entered value is not correct');
+                                        break;
+                                    case tooFew:
+                                        errList.unshift(__('The decreased time cannot be higher than remaining time %s', resource.remainingStr));
+                                        resource.errorLabel = __('Time decrease is too high');
+                                        break;
+                                    case tooMuch:
+                                        errList.unshift(__('The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s', resource.remainingStr, resource.timeLimitsStr));
+                                        resource.errorLabel = __('Time increase is too high');
+                                        break;
+                                    default:
+                                        resource.errorLabel = undefined;
+                                }
+                            }
+
+                            $(`LI[data-resource="${resource.id}"] .error`, $cmp).remove();
+                            if (resError) {
+                                const $resError = $('<span class="error"></span>').text(' - ' + resource.errorLabel);
+                                $(`LI[data-resource="${resource.id}"] .resource-label`, $cmp).append($resError);
+                            }
+
+                            errs = errs || resError;
                         }
-
-                        errs = errs || resError;
                     });
 
                     if (errs) {

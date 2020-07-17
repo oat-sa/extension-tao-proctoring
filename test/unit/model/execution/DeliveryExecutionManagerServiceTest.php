@@ -34,6 +34,7 @@ use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\session\SessionService;
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionProctoring;
@@ -343,6 +344,67 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $this->assertSame(9, $this->subject->getAdjustedTime('PHPUnitDeliveryExecutionId'));
     }
 
+    public function isTimerAdjustmentAllowed_WhenSessionHasTimer_ThenReturnTrue(): void
+    {
+        $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
+        $deliveryExecution = $this->getDeliveryExecutionMock($executionState);
+
+        $this->testSessionServiceMock
+            ->method('getTestSession')
+            ->willReturn($this->testSessionMock);
+
+        $timeConstraintMock = $this->createMock(QtiTimeConstraint::class);
+        $this->testSessionServiceMock
+            ->method('getSmallestMaxTimeConstraint')
+            ->willReturn($timeConstraintMock);
+
+        $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
+
+        self::assertTrue($adjustmentAllowed, 'Timer adjustment must be allowed if test session has time constraint.');
+    }
+
+    public function isTimerAdjustmentAllowed_WhenIncorrectSessionStatus_ThenReturnFalse(): void
+    {
+        $executionState = 'INVALID_URI';
+        $deliveryExecution = $this->getDeliveryExecutionMock($executionState);
+
+        $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
+
+        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session is in incorrect state.');
+    }
+
+    public function isTimerAdjustmentAllowed_WhenSessionNotLoaded_ThenReturnFalse(): void
+    {
+        $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
+        $deliveryExecution = $this->getDeliveryExecutionMock($executionState);
+
+        $this->testSessionServiceMock
+            ->method('getTestSession')
+            ->willReturn(null);
+
+        $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
+
+        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session cannot be loaded.');
+    }
+
+    public function isTimerAdjustmentAllowed_WhenSessionWithoutTimer_ThenReturnFalse(): void
+    {
+        $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
+        $deliveryExecution = $this->getDeliveryExecutionMock($executionState);
+
+        $this->testSessionServiceMock
+            ->method('getTestSession')
+            ->willReturn($this->testSessionMock);
+
+        $this->testSessionServiceMock
+            ->method('getSmallestMaxTimeConstraint')
+            ->willReturn(null);
+
+        $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
+
+        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session has no time constraints.');
+    }
+
     /**
      * @param string $stateUri
      * @param string $deliveryIdentifier
@@ -358,5 +420,22 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $deliveryExecutionMock->method('getIdentifier')->willReturn($deliveryIdentifier);
 
         return $deliveryExecutionMock;
+    }
+
+    /**
+     * @param string $state
+     * @return DeliveryExecutionInterface|MockObject
+     */
+    private function getDeliveryExecutionMock(string $state): DeliveryExecutionInterface
+    {
+        $stateMock = $this->createMock(core_kernel_classes_Resource::class);
+        $stateMock->method('getUri')
+            ->willReturn($state);
+
+        $deliveryExecution = $this->createMock(DeliveryExecutionInterface::class);
+        $deliveryExecution->method('getState')
+            ->willReturn($stateMock);
+
+        return $deliveryExecution;
     }
 }
