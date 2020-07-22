@@ -148,42 +148,64 @@ class DeliveryExecutionManagerServiceTest extends TestCase
      */
     public function testAdjustTimers(): void
     {
+        $expectedResult = [
+            'processed' => [
+                'AWAITING_URI' => true
+            ],
+            'unprocessed' => [
+                'CANCELED_URI' => false,
+                'PAUSED_URI' => false,
+            ]
+        ];
+
+        // Mock input data
         $awaitingExecution = $this->getDeliveryExecutionMockWithState(
             DeliveryExecutionProctoring::STATE_AWAITING,
-            'awaiting'
+            'AWAITING_URI'
         );
         $canceledExecution = $this->getDeliveryExecutionMockWithState(
             DeliveryExecutionProctoring::STATE_CANCELED,
-            'canceled'
+            'CANCELED_URI'
         );
         $pausedExecution = $this->getDeliveryExecutionMockWithState(
             DeliveryExecutionProctoring::STATE_PAUSED,
-            'paused'
+            'PAUSED_URI'
         );
         $deliveryExecutions = [$awaitingExecution,$canceledExecution, $pausedExecution];
 
-        $this->timerAdjustmentServiceMock->method('increase')->willReturn(true);
-        $this->timerAdjustmentServiceMock->method('decrease')->willReturn(true);
-        $this->deliveryMonitoringDataMock->method('updateData')->with([DeliveryMonitoringService::REMAINING_TIME]);
-        $this->deliveryMonitoringServiceMock->method('getData')->willReturn($this->deliveryMonitoringDataMock);
+        // Mock user session
         $this->sessionMock->method('getUser')->willReturn($this->userMock);
         $this->sessionServiceMock->method('getCurrentSession')->willReturn($this->sessionMock);
 
-        $self = $this;
-        $userMock = $this->userMock;
-        $this->eventManagerMock->method('trigger')
-            ->willReturnCallback(
-                static function (DeliveryExecutionTimerAdjusted $event)
-                    use ($self, $awaitingExecution, $userMock) {
-                        $self->assertSame(['reasons'], $event->getReason());
-                        $self->assertSame($awaitingExecution, $event->getDeliveryExecution());
-                        $self->assertSame(1, $event->getSeconds());
-                        $self->assertSame($userMock, $event->getProctor());
-                    });
+        // Mock time adjustment
+        $timeConstraintMock = $this->createMock(QtiTimeConstraint::class);
+        $this->testSessionServiceMock
+            ->method('getTestSession')
+            ->willReturn($this->testSessionMock);
+        $this->testSessionServiceMock
+            ->method('getSmallestMaxTimeConstraint')
+            ->willReturn($timeConstraintMock);
 
-        $this->testSessionServiceMock->method('getTestSession')->willReturn($this->testSessionMock);
+        $this->timerAdjustmentServiceMock
+            ->expects(self::once())
+            ->method('increase')
+            ->willReturn(true);
 
-        $this->subject->adjustTimers($deliveryExecutions, 1, ['reasons']);
+        $this->deliveryMonitoringServiceMock
+            ->method('getData')
+            ->willReturn($this->deliveryMonitoringDataMock);
+        $this->deliveryMonitoringDataMock
+            ->method('updateData')
+            ->with([DeliveryMonitoringService::REMAINING_TIME]);
+
+        $this->eventManagerMock
+            ->expects(self::once())
+            ->method('trigger');
+
+        $adjustmentValue = 10;
+        $adjustmentResult = $this->subject->adjustTimers($deliveryExecutions, $adjustmentValue, ['reasons']);
+
+        self::assertSame($expectedResult, $adjustmentResult, 'Method must return response in correct format.');
     }
 
     public function testGetTimerAdjustmentDecreaseLimit_CalculationFailedNoDecreaseLimit(): void
