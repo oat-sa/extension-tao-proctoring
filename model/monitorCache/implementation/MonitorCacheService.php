@@ -25,6 +25,7 @@ use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdfs;
 use oat\tao\model\taskQueue\QueueDispatcherInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\DeliveryExecutionService;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
@@ -169,14 +170,17 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
     {
-        // assumes test execution id = delivery execution id
-        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        /** @var DeliveryExecutionService $deliveryExecutionService */
+        $deliveryExecutionService = $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID);
+        $deliveryExecution = $deliveryExecutionService->getDeliveryExecution($event->getServiceCallId());
 
         $data = $this->createMonitoringData($deliveryExecution);
 
         $data->setTestSession($event->getSession());
+        $data->update(DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM, $event->getNewStateDescription());
         $data->updateData([
-            DeliveryMonitoringService::CONNECTIVITY
+            DeliveryMonitoringService::CONNECTIVITY,
+            DeliveryMonitoringService::REMAINING_TIME
         ]);
         $success = $this->partialSave($data);
         if (!$success) {
