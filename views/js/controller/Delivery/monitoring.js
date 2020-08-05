@@ -1271,6 +1271,7 @@ define([
                         .on('beforeload.datatable', (e, dataSet) => {
                             // We save response data here because on load the data will be transformed
                             originalDataset = dataSet;
+                            highlightRows = [];
                         })
                         .on('load.datatable', function(e, newDataset) {
                             var applyTags;
@@ -1306,12 +1307,8 @@ define([
                                 setTagUsage(applyTags);
                             }
 
-                            // highlight rows
-                            if (highlightRows.length) {
-                                _.forEach(highlightRows, function (v) {
-                                    $list.datatable('highlightRow', v);
-                                });
-                            }
+                            
+                            $list.datatable('highlightRows', highlightRows);
                             loadingBar.stop();
 
                             appController
