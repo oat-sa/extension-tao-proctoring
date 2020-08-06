@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint120\n"
-"PO-Revision-Date: 2020-01-31T12:41:59\n"
+"Project-Id-Version: TAO 3.4.0-sprint121\n"
+"PO-Revision-Date: 2020-08-03T11:25:47\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: lt-LT\n"
@@ -69,6 +69,39 @@ msgstr ""
 
 msgid "%s\'s test must be terminated."
 msgstr ""
+
+msgid "%s\\'s test had already been authorized."
+msgstr "%s testas jau buvo autorizuotas."
+
+msgid "%s\\'s test had already been paused."
+msgstr "%s testas jau buvo pristabdytas."
+
+msgid "%s\\'s test had already been terminated."
+msgstr "%s testas jau buvo nutrauktas."
+
+msgid "%s\\'s test had been canceled."
+msgstr "%s testas buvo atšauktas."
+
+msgid "%s\\'s test had been completed."
+msgstr "%s testas buvo atliktas."
+
+msgid "%s\\'s test had been paused."
+msgstr "%s testas buvo pristabdytas."
+
+msgid "%s\\'s test had been terminated."
+msgstr "%s testas buvo nutrauktas."
+
+msgid "%s\\'s test had not been finished."
+msgstr "%s testas nebuvo atliktas."
+
+msgid "%s\\'s test had not been in progress."
+msgstr "%s testas nebuvo vykdomas."
+
+msgid "%s\\'s test had not been started."
+msgstr "%s testas nebuvo pradėtas."
+
+msgid "%s\\'s test must be terminated."
+msgstr "%s testas privalo būti nutrauktas."
 
 msgid "..."
 msgstr "..."
@@ -195,10 +228,10 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti autorizuoto testo."
 
 msgid "Available"
-msgstr "Galimas"
+msgstr "Galima"
 
 msgid "Available history"
-msgstr "Esanti istorija"
+msgstr "Galima istorija"
 
 msgid "Available test takers"
 msgstr "Galimi testo laikytojai"
@@ -215,20 +248,20 @@ msgstr "Grįžti į sesijas"
 msgid "Behaviour"
 msgstr "Elgsena"
 
-msgid "cancel"
-msgstr "atšaukti"
-
 msgid "Cancel"
 msgstr "Atšaukti"
+
+msgid "cancel"
+msgstr "atšaukti"
 
 msgid "cancel the action"
 msgstr "atšaukti veiksmą"
 
-msgid "Canceled"
-msgstr "Atšaukta"
-
 msgid "canceled"
 msgstr "atšaukta"
+
+msgid "Canceled"
+msgstr "Atšaukta"
 
 msgid "Cannot authorize test session."
 msgstr "Nepavyko autorizuoti testo sesijos."
@@ -287,11 +320,11 @@ msgstr "komentaras"
 msgid "Complaint"
 msgstr "Skundas"
 
-msgid "completed"
-msgstr "atlikta"
-
 msgid "Completed"
 msgstr "Atlikta"
+
+msgid "completed"
+msgstr "atlikta"
 
 msgid "Completed tests"
 msgstr "Atlikti testai"
@@ -405,17 +438,20 @@ msgstr "Filtras"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
-msgstr "baigta"
-
 msgid "Finished"
 msgstr "Baigta"
+
+msgid "finished"
+msgstr "baigta"
 
 msgid "First name"
 msgstr "Vardas"
 
 msgid "Freezing"
 msgstr "Užšaldyta"
+
+msgid "From"
+msgstr "Iš"
 
 msgid "Grant Extra Time"
 msgstr "Suteikti Papildomo Laiko"
@@ -472,7 +508,7 @@ msgid "Last Week"
 msgstr "Paskutinė Savaitė"
 
 msgid "Late"
-msgstr "data"
+msgstr "Vėluoja"
 
 msgid "Launching"
 msgstr "Paleidžiama"
@@ -574,20 +610,20 @@ msgstr "Pristabdyti Vykdomas Testų Sesijas"
 msgid "Pause due to server maintenance"
 msgstr "Pristabdyta dėl serverio priežiūros"
 
-msgid "Pause Session"
-msgstr "Pristabdyti Sesiją"
-
 msgid "Pause session"
 msgstr "Pristabdyti sesiją"
+
+msgid "Pause Session"
+msgstr "Pristabdyti Sesiją"
 
 msgid "Pause sessions"
 msgstr "Pristabdyti sesijas"
 
-msgid "Paused"
-msgstr "Pristabdyta"
-
 msgid "paused"
 msgstr "pristabdyta"
+
+msgid "Paused"
+msgstr "Pristabdyta"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Prašome pasirinkti bent vieną testų tinkalpį proktorių tvarkymui"
@@ -649,11 +685,11 @@ msgstr "Proktoriai neautorizuoti"
 msgid "Progress"
 msgstr "Progresas"
 
-msgid "Reactivate Session"
-msgstr "Iš naujo suaktyvinti Sesiją"
-
 msgid "Reactivate session"
 msgstr "Iš naujo suaktyvinti sesiją"
+
+msgid "Reactivate Session"
+msgstr "Iš naujo suaktyvinti Sesiją"
 
 msgid "Refresh"
 msgstr "Atnaujinti"
@@ -671,10 +707,10 @@ msgid "Remove default tag filtering"
 msgstr "Pašalinti numatytą žymių filtravimą"
 
 msgid "Remove the selected test takers from the session"
-msgstr "Priskirti pasirinktus testo laikytojus sesijai"
+msgstr "Pašalinkite pasirinktus testo laikytojus iš sesijos"
 
 msgid "Remove the test taker from the session"
-msgstr "Priskirti testo laikytojus sesijai"
+msgstr "Pašalinti testo laikytoją iš sesijos"
 
 msgid "Report"
 msgstr "Pranešti"
@@ -914,11 +950,11 @@ msgstr "Testas nebuvo pradėtas."
 msgid "Test site %s"
 msgstr "Testų tinklapis %s"
 
-msgid "test taker"
-msgstr "testo laikytojai"
-
 msgid "Test taker"
 msgstr "Testo laikytojai"
+
+msgid "test taker"
+msgstr "testo laikytojai"
 
 msgid "Test takers have been added"
 msgstr "Testo laikytojai buvo pridėti"
@@ -979,6 +1015,9 @@ msgstr "Jokia pateiktis nėra vykdoma"
 
 msgid "Time"
 msgstr "Laikas"
+
+msgid "to"
+msgstr "į"
 
 #, tao-public
 msgid "Tools"

@@ -1,0 +1,1046 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint121\n"
+"PO-Revision-Date: 2020-08-03T11:27:05\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: vi-VN\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: vi-VN\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "%1$s - Item %2$s/%3$s"
+msgstr ""
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr ""
+
+msgid "%s - item %p/%c"
+msgstr ""
+
+msgid "%s completed"
+msgstr ""
+
+msgid "%s could not be %s because it is finished. Please refresh your data."
+msgstr ""
+
+msgid "%s could not be %s because it is terminated. Please refresh your data."
+msgstr ""
+
+msgid "%s could not be %s."
+msgstr ""
+
+msgid "%s minutes more"
+msgstr ""
+
+msgid "%s\'s test had already been authorized."
+msgstr ""
+
+msgid "%s\'s test had already been paused."
+msgstr ""
+
+msgid "%s\'s test had already been terminated."
+msgstr ""
+
+msgid "%s\'s test had been canceled."
+msgstr ""
+
+msgid "%s\'s test had been completed."
+msgstr ""
+
+msgid "%s\'s test had been paused."
+msgstr ""
+
+msgid "%s\'s test had been terminated."
+msgstr ""
+
+msgid "%s\'s test had not been finished."
+msgstr ""
+
+msgid "%s\'s test had not been in progress."
+msgstr ""
+
+msgid "%s\'s test had not been started."
+msgstr ""
+
+msgid "%s\'s test must be terminated."
+msgstr ""
+
+msgid "%s\\'s test had already been authorized."
+msgstr ""
+
+msgid "%s\\'s test had already been paused."
+msgstr ""
+
+msgid "%s\\'s test had already been terminated."
+msgstr ""
+
+msgid "%s\\'s test had been canceled."
+msgstr ""
+
+msgid "%s\\'s test had been completed."
+msgstr ""
+
+msgid "%s\\'s test had been paused."
+msgstr ""
+
+msgid "%s\\'s test had been terminated."
+msgstr ""
+
+msgid "%s\\'s test had not been finished."
+msgstr ""
+
+msgid "%s\\'s test had not been in progress."
+msgstr ""
+
+msgid "%s\\'s test had not been started."
+msgstr ""
+
+msgid "%s\\'s test must be terminated."
+msgstr ""
+
+msgid "..."
+msgstr "..."
+
+msgid "A session of the delivery %s have not been paused"
+msgstr ""
+
+msgid "Action"
+msgstr "Hoạt động"
+
+msgid "Actions"
+msgstr "Các hoạt động"
+
+msgid "Active"
+msgstr "Đang hoạt động"
+
+msgid "Active proctors"
+msgstr "Điều hành hoạt động"
+
+msgid "Active test-takers"
+msgstr "Hoạt động thử nghiệm-thực thi"
+
+msgid "Actor"
+msgstr "Thí sinh"
+
+msgid "Add test takers"
+msgstr "Thêm thí sinh kiểm tra"
+
+msgid "Administer deliveries"
+msgstr ""
+
+msgid "Administration"
+msgstr "Quản trị viên"
+
+msgid "already authorized"
+msgstr "đã ủy quyền"
+
+msgid "already paused"
+msgstr ""
+
+msgid "already terminated"
+msgstr ""
+
+msgid "Apply default tag"
+msgstr ""
+
+msgid "Are you sure you want to end the test?"
+msgstr "Bạn có chắc chắn muốn kết thúc bài kiểm tra?"
+
+#, tao-public
+msgid "Assessment Activity"
+msgstr "Hoạt động đánh giá"
+
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgstr ""
+
+msgid "Assign administrator"
+msgstr "Nhiệm vụ quản trị viên"
+
+msgid "Assign more test takers to this session"
+msgstr "Chỉ định thêm người kiểm tra cho phiên này"
+
+msgid "Assign proctors"
+msgstr "Chỉ định người điều hành"
+
+msgid "Assign the selected test takers"
+msgstr "Chỉ định người kiểm tra đã chọn"
+
+msgid "Assign the selected test takers to the session"
+msgstr "Chỉ định thêm người kiểm tra đã chọn cho phiên này"
+
+msgid "Assign the test taker to the session"
+msgstr "Chỉ định thêm người kiểm tra cho phiên này"
+
+msgid "Assigned proctors"
+msgstr ""
+
+msgid "Assigned test takers"
+msgstr "Được chỉ định người kiểm tra"
+
+msgid "Attempts"
+msgstr "Đã đạt đến giới hạn."
+
+msgid "author"
+msgstr "Tác giả"
+
+msgid "Authorize"
+msgstr "Ủy quyền"
+
+msgid "Authorize Session"
+msgstr "Ủy quyền Phiên"
+
+msgid "Authorize session"
+msgstr "Ủy quyền Phiên"
+
+msgid "Authorize sessions"
+msgstr "Ủy quyền Phiên"
+
+msgid "Authorize the proctor"
+msgstr "Ủy quyền người điều hành"
+
+msgid "Authorize the selected proctors"
+msgstr "Ủy quyền người điều hành đã chọn"
+
+msgid "authorized"
+msgstr "ủy quyền"
+
+msgid "Authorized"
+msgstr "Ủy quyền"
+
+msgid "Authorized but not started"
+msgstr "Ủy quyền nhưng chưa bắt đầu"
+
+msgid "Authorized proctors"
+msgstr ""
+
+msgid "Authorized, you may proceed"
+msgstr "Ủy quyền, bạn có thể tiếp tục"
+
+msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr "Tự động thiết lập lại bởi hệ thống do yêu cầu ủy quyền bị hủy bỏ bởi người kiểm tra."
+
+msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
+msgstr "Tự động thiết lập lại bởi hệ thống do người kiểm tra chọn không tiến hành kiểm tra có thẩm quyền."
+
+msgid "Available"
+msgstr "Có sẵn"
+
+msgid "Available history"
+msgstr "Lịch sử"
+
+msgid "Available test takers"
+msgstr "Người làm bài kiểm tra"
+
+msgid "Awaiting"
+msgstr "Chờ đợi"
+
+msgid "Back"
+msgstr "Trở lại"
+
+msgid "Back to sessions"
+msgstr "Trở lại phiên"
+
+msgid "Behaviour"
+msgstr "Hành vi"
+
+msgid "Cancel"
+msgstr "Hủy"
+
+msgid "cancel"
+msgstr "hủy"
+
+msgid "cancel the action"
+msgstr "hủy hành động"
+
+msgid "canceled"
+msgstr ""
+
+msgid "Canceled"
+msgstr "Đã hủy"
+
+msgid "Cannot authorize test session."
+msgstr ""
+
+msgid "Cannot authorize test sessions."
+msgstr ""
+
+msgid "Cannot execute action."
+msgstr ""
+
+msgid "Cannot extend test session."
+msgstr ""
+
+msgid "Cannot extend test sessions."
+msgstr ""
+
+msgid "Cannot pause test session."
+msgstr ""
+
+msgid "Cannot pause test sessions."
+msgstr ""
+
+msgid "Cannot print test session."
+msgstr ""
+
+msgid "Cannot print test sessions."
+msgstr ""
+
+msgid "Cannot reactivate test session."
+msgstr ""
+
+msgid "Cannot reactivate test sessions."
+msgstr ""
+
+msgid "Cannot report test session."
+msgstr ""
+
+msgid "Cannot report test sessions."
+msgstr ""
+
+msgid "Cannot terminate test session."
+msgstr ""
+
+msgid "Cannot terminate test sessions."
+msgstr ""
+
+msgid "category"
+msgstr "thể loại"
+
+msgid "Comfort"
+msgstr "Tiện ích"
+
+msgid "comment"
+msgstr "Bình luận"
+
+msgid "Complaint"
+msgstr "Lời phàn nàn"
+
+msgid "Completed"
+msgstr "Hoàn thành"
+
+msgid "completed"
+msgstr ""
+
+msgid "Completed tests"
+msgstr "Hoàn thành kiểm tra"
+
+msgid "Compliance"
+msgstr "Tuân thủ"
+
+msgid "Connectivity"
+msgstr "Kết nối"
+
+msgid "Context"
+msgstr "Bối cảnh"
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr ""
+
+msgid "Create Proctor"
+msgstr ""
+
+msgid "Creates and authorizes proctor"
+msgstr ""
+
+msgid "Current Assessment Activity"
+msgstr ""
+
+msgid "Current sessions"
+msgstr ""
+
+msgid "date"
+msgstr "Ngày"
+
+msgid "Date"
+msgstr "Ngày"
+
+msgid "Days"
+msgstr "Các ngày"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr ""
+
+msgid "Define sub-centers"
+msgstr ""
+
+msgid "Deliveries"
+msgstr ""
+
+msgid "Delivery"
+msgstr ""
+
+msgid "Detailed Session History of %s"
+msgstr ""
+
+msgid "Detailed Session History of a selection"
+msgstr ""
+
+msgid "Details"
+msgstr "Chi tiết"
+
+msgid "Disturbance"
+msgstr "Xáo trộn"
+
+msgid "Duration"
+msgstr "Thời lượng"
+
+msgid "Edit test center"
+msgstr ""
+
+msgid "Elapsed time"
+msgstr "Thời gian trôi qua"
+
+msgid "End"
+msgstr "Kết thúc"
+
+msgid "End date of the export"
+msgstr "Ngày kết thúc xuất ra"
+
+msgid "Environment"
+msgstr "Môi trường"
+
+msgid "Error"
+msgstr "Lỗi"
+
+msgid "Event"
+msgstr "Sự kiện"
+
+msgid "Examinee"
+msgstr "Người kiểm tra"
+
+msgid "Export"
+msgstr "Xuất ra"
+
+#, tao-public
+msgid "Export Irregularities"
+msgstr "Xuất bất thường"
+
+msgid "Extended Time"
+msgstr ""
+
+msgid "Extra time"
+msgstr "Thêm thời gian"
+
+msgid "Extra Time"
+msgstr "Thêm thời gian"
+
+msgid "Extra time granted"
+msgstr "Thêm thời gian"
+
+msgid "Filter"
+msgstr "Bộ lọc"
+
+msgid "Filter by the selected dates"
+msgstr ""
+
+msgid "Finished"
+msgstr "Đã kết thúc"
+
+msgid "finished"
+msgstr "đã kết thúc"
+
+msgid "First name"
+msgstr "Tên"
+
+msgid "Freezing"
+msgstr "Đóng băng"
+
+msgid "From"
+msgstr ""
+
+msgid "Grant Extra Time"
+msgstr ""
+
+msgid "Groups: %s. %s"
+msgstr ""
+
+msgid "Hours"
+msgstr "Các giờ"
+
+msgid "However, the action will not be applied to the following sessions"
+msgstr "Tuy nhiên, hành động sẽ không được áp dụng cho các phiên sau"
+
+msgid "ID/Authorization"
+msgstr ""
+
+msgid "Identifier"
+msgstr "Định danh"
+
+msgid "Illness"
+msgstr ""
+
+msgid "In Progress"
+msgstr "Trong tiến trình"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr ""
+
+msgid "Issue Category"
+msgstr "Phân loại vấn đề"
+
+msgid "item"
+msgstr "Mục"
+
+msgid "Item Variables"
+msgstr "Các biến mục"
+
+msgid "Label"
+msgstr "Nhãn"
+
+msgid "Last Day"
+msgstr ""
+
+msgid "Last launch"
+msgstr ""
+
+msgid "Last Month"
+msgstr ""
+
+msgid "Last name"
+msgstr "Họ"
+
+msgid "Last Week"
+msgstr ""
+
+msgid "Late"
+msgstr "Trễ"
+
+msgid "Launching"
+msgstr "Khởi chạy"
+
+msgid "Loading"
+msgstr "Đang tải"
+
+msgid "Logout"
+msgstr "Đăng xuất"
+
+msgid "Manage Proctors"
+msgstr "Quản lý điều hành"
+
+#, tao-public
+msgid "Manage Results"
+msgstr "Quản lý kết quả"
+
+msgid "minutes"
+msgstr "phút"
+
+msgid "Monitor"
+msgstr "Theo dõi"
+
+msgid "Monitoring"
+msgstr "Đang theo dõi"
+
+msgid "Navigation"
+msgstr "Điều hướng"
+
+msgid "Network"
+msgstr "Mạng"
+
+msgid "No assigned proctors"
+msgstr ""
+
+msgid "No assigned test takers"
+msgstr ""
+
+msgid "No available test takers to assign"
+msgstr ""
+
+msgid "No history to display!"
+msgstr ""
+
+msgid "No proctors in request param"
+msgstr ""
+
+msgid "No sessions"
+msgstr ""
+
+msgid "No sessions available"
+msgstr ""
+
+msgid "No Show"
+msgstr "Không hiển thị"
+
+msgid "Noise"
+msgstr "Tiếng ồn"
+
+msgid "not finished"
+msgstr "chưa xong"
+
+msgid "not in progress"
+msgstr "không tiến triển"
+
+msgid "not started"
+msgstr "Chưa bắt đầu"
+
+msgid "not terminated"
+msgstr ""
+
+msgid "Note"
+msgstr "Chú thích"
+
+msgid "offline"
+msgstr "ngoại tuyến"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "online"
+msgstr "trực tuyến"
+
+msgid "Other"
+msgstr ""
+
+msgid "Outcome"
+msgstr "Kết quả"
+
+msgid "Partially authorized proctors"
+msgstr ""
+
+msgid "Pause"
+msgstr "Dừng"
+
+msgid "Pause Active Test Sessions"
+msgstr ""
+
+msgid "Pause due to server maintenance"
+msgstr ""
+
+msgid "Pause session"
+msgstr "Dừng phiên"
+
+msgid "Pause Session"
+msgstr "Dừng phiên"
+
+msgid "Pause sessions"
+msgstr "Dừng phiên"
+
+msgid "paused"
+msgstr "đã dừng"
+
+msgid "Paused"
+msgstr "Đã dừng"
+
+msgid "Please select one or more test site to manage proctors"
+msgstr ""
+
+msgid "Please wait, authorization in process ..."
+msgstr ""
+
+msgid "Please, make your selection"
+msgstr ""
+
+msgid "Power Outage"
+msgstr ""
+
+msgid "Previous Month"
+msgstr ""
+
+msgid "Print Results"
+msgstr ""
+
+msgid "Print Score"
+msgstr ""
+
+msgid "Print the assessment results"
+msgstr ""
+
+msgid "Printing"
+msgstr "In"
+
+msgid "Proceed"
+msgstr "Tiến hành"
+
+msgid "Proctor"
+msgstr "Giám thị"
+
+msgid "Proctor created"
+msgstr "Giám thị đã tạo"
+
+msgid "Proctor/Staff"
+msgstr "Giám thị/Nhân viên"
+
+msgid "Proctored Delivery Server"
+msgstr ""
+
+msgid "Proctored Test-Takers"
+msgstr ""
+
+msgid "Proctoring interface"
+msgstr ""
+
+msgid "Proctors"
+msgstr ""
+
+msgid "Proctors authorized"
+msgstr ""
+
+msgid "Proctors revoked"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+msgid "Reactivate session"
+msgstr ""
+
+msgid "Reactivate Session"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Refresh the page"
+msgstr ""
+
+msgid "Remaining"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Remove default tag filtering"
+msgstr ""
+
+msgid "Remove the selected test takers from the session"
+msgstr ""
+
+msgid "Remove the test taker from the session"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Report irregularities"
+msgstr ""
+
+msgid "Report Irregularity"
+msgstr ""
+
+msgid "Report irregularity"
+msgstr ""
+
+msgid "reported for irregularity"
+msgstr ""
+
+msgid "Resource update task is completed"
+msgstr ""
+
+msgid "results"
+msgstr ""
+
+#, tao-public
+msgid "Results"
+msgstr ""
+
+msgid "Return to the session manager"
+msgstr ""
+
+msgid "Return to the session monitoring"
+msgstr ""
+
+msgid "Revoke authorization for the selected proctor"
+msgstr ""
+
+msgid "Revoke the proctor"
+msgstr ""
+
+msgid "Role"
+msgstr ""
+
+msgid "Score"
+msgstr ""
+
+msgid "Score Report"
+msgstr ""
+
+msgid "section"
+msgstr "lựa chọn"
+
+msgid "Session"
+msgstr "Phiên"
+
+msgid "Session %s - %s has not been processed"
+msgstr ""
+
+msgid "Session history"
+msgstr "Lịch sử phiên"
+
+msgid "Session time handling"
+msgstr ""
+
+msgid "Sessions"
+msgstr ""
+
+msgid "Sessions authorized"
+msgstr ""
+
+msgid "sessions paused"
+msgstr ""
+
+msgid "Sessions paused"
+msgstr ""
+
+msgid "Sessions reactivated"
+msgstr ""
+
+msgid "Sessions reported"
+msgstr ""
+
+msgid "Sessions terminated"
+msgstr ""
+
+msgid "Show brief report"
+msgstr ""
+
+msgid "Show detailed report"
+msgstr ""
+
+msgid "Show detailed session history messages"
+msgstr ""
+
+msgid "Show the detailed session history"
+msgstr ""
+
+msgid "Some delivery executions have not been authorized"
+msgstr ""
+
+msgid "Some delivery executions have not been paused"
+msgstr ""
+
+msgid "Some delivery executions have not been reactivated"
+msgstr ""
+
+msgid "Some delivery executions have not been reported"
+msgstr ""
+
+msgid "Some delivery executions have not been terminated"
+msgstr ""
+
+msgid "Some delivery executions have not been updated"
+msgstr ""
+
+msgid "Something went wrong ..."
+msgstr ""
+
+msgid "Start"
+msgstr "Bắt đầu"
+
+msgid "Start date of the export"
+msgstr ""
+
+msgid "Started at"
+msgstr ""
+
+msgid "Status"
+msgstr "Trạng thái"
+
+msgid "subcategory"
+msgstr ""
+
+msgid "Subcategory"
+msgstr ""
+
+msgid "System generated pause."
+msgstr ""
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr ""
+
+msgid "Technical"
+msgstr ""
+
+msgid "Terminate"
+msgstr ""
+
+msgid "Terminate and irregularity"
+msgstr ""
+
+msgid "Terminate session"
+msgstr ""
+
+msgid "Terminate Session"
+msgstr ""
+
+msgid "Terminate sessions"
+msgstr ""
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr ""
+
+msgid "Terminated"
+msgstr "đã chấm dứt"
+
+msgid "terminated"
+msgstr ""
+
+msgid "Test  must be terminated."
+msgstr ""
+
+msgid "Test %s had already been authorized."
+msgstr ""
+
+msgid "Test %s had already been paused."
+msgstr ""
+
+msgid "Test %s had already been terminated."
+msgstr ""
+
+msgid "Test %s had been canceled."
+msgstr ""
+
+msgid "Test %s had been completed."
+msgstr ""
+
+msgid "Test %s had been paused."
+msgstr ""
+
+msgid "Test %s had been terminated."
+msgstr ""
+
+msgid "Test %s had not been finished."
+msgstr ""
+
+msgid "Test %s had not been in progress."
+msgstr ""
+
+msgid "Test %s had not been started."
+msgstr ""
+
+msgid "Test %s must be terminated."
+msgstr ""
+
+msgid "Test center saved"
+msgstr "Đã lưu bài kiểm tra"
+
+msgid "Test had already been authorized."
+msgstr ""
+
+msgid "Test had already been paused."
+msgstr ""
+
+msgid "Test had alredy been terminated."
+msgstr ""
+
+msgid "Test had been canceled."
+msgstr ""
+
+msgid "Test had been completed."
+msgstr ""
+
+msgid "Test had been paused."
+msgstr ""
+
+msgid "Test had been terminated."
+msgstr ""
+
+msgid "Test had not been finished."
+msgstr ""
+
+msgid "Test had not been in progress."
+msgstr ""
+
+msgid "Test had not been started."
+msgstr ""
+
+msgid "Test site %s"
+msgstr ""
+
+msgid "Test taker"
+msgstr "Thí sinh"
+
+msgid "test taker"
+msgstr "thí sinh"
+
+msgid "Test takers have been added"
+msgstr ""
+
+msgid "Test takers have been removed"
+msgstr ""
+
+msgid "Test Variables"
+msgstr ""
+
+msgid "Test-Taker"
+msgstr "Thí sinh"
+
+msgid "Testing Workstation"
+msgstr ""
+
+msgid "The action cannot be applied, no eligible sessions found"
+msgstr "Không thể áp dụng hành động, không tìm thấy các phiên hợp lệ"
+
+msgid "The action will be applied to the following session"
+msgstr "Tác vụ sẽ được áp dụng cho phiên sau"
+
+msgid "the already granted time will be replaced by the new value"
+msgstr "thời gian đã được cấp sẽ được thay thế bằng giá trị mới"
+
+msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
+msgstr ""
+
+msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr ""
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr ""
+
+msgid "The extra time must be a number"
+msgstr "Thời gian thêm phải là một số"
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr ""
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr ""
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr ""
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr ""
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr "Người kiểm tra sẽ bị xóa khỏi phiên này. Tiếp tục ?"
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr "Người kiểm tra sẽ bị xóa khỏi phiên này. Tiếp tục?"
+
+msgid "There is no delivery in progress"
+msgstr ""
+
+msgid "Time"
+msgstr "Thời gian"
+
+msgid "to"
+msgstr ""
+
+#, tao-public
+msgid "Tools"
+msgstr ""
+
+msgid "Total Current Assessments"
+msgstr ""
+
+msgid "Total time"
+msgstr "Tổng thời gian"
+
+msgid "Unable to create irregularities export for %s"
+msgstr ""
+
+msgid "Unable to perform action on test %s."
+msgstr ""
+
+msgid "User Activity"
+msgstr ""
+
+msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
+msgstr "Cảnh báo, bạn sắp tạm dừng tất cả các tiến trình bài kiểm tra. Tất cả người kiểm tra sẽ được tạm dừng hoặc trước tiếng kêu kế tiếp. Vui lòng cung cấp nguyên nhân cho hành động này."
+
+msgid "Weather"
+msgstr ""
+
