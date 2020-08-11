@@ -20,10 +20,10 @@
 
 namespace oat\taoProctoring\model;
 
-use oat\oatbox\user\User;
-use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoDelivery\model\execution\ServiceProxy;
+use common_exception_NotFound;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryDeliveryExecution;
 
 /**
  * Service to manage the execution of deliveries
@@ -47,5 +47,27 @@ class DeliveryServerService extends \oat\taoDelivery\model\execution\DeliverySer
                 ,DeliveryExecution::STATE_AUTHORIZED
             ]
         );
+    }
+
+    /**
+     * @param DeliveryDeliveryExecution $deliveryExecution
+     * @throws common_exception_NotFound
+     * @throws InvalidServiceManagerException
+     */
+    public function revoke(DeliveryDeliveryExecution $deliveryExecution)
+    {
+        if($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_PAUSED){
+            /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
+            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            //do not remove these comments, this is used to generate the translation in .po file
+            // __('Assessment has been paused due to attempt to switch to another window/tab.');
+            $deliveryExecutionStateService->pauseExecution(
+                $deliveryExecution,
+                [
+                    'reasons' => ['category' => 'focus-loss'],
+                    'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
+                ]
+            );
+        }
     }
 }
