@@ -58,7 +58,7 @@ class DeliveryServerService extends \oat\taoDelivery\model\execution\DeliverySer
     {
         if($deliveryExecution->getState()->getUri() !== DeliveryExecution::STATE_PAUSED){
             /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
             //do not remove these comments, this is used to generate the translation in .po file
             // __('Assessment has been paused due to attempt to switch to another window/tab.');
             $deliveryExecutionStateService->pauseExecution(
