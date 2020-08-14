@@ -25,6 +25,7 @@ use common_session_SessionManager;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoDelivery\controller\DeliveryServer as DefaultDeliveryServer;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
+use oat\taoProctoring\model\DeliveryServerService;
 use oat\taoProctoring\model\execution\DeliveryExecution as DeliveryExecutionState;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
@@ -47,7 +48,7 @@ class DeliveryServer extends DefaultDeliveryServer
         $startedExecutions = $this->service->getResumableDeliveries($user);
         foreach($startedExecutions as $startedExecution) {
             if($startedExecution->getDelivery()->exists()) {
-                $this->revoke($startedExecution);
+                $this->getDeliveryServerService()->revoke($startedExecution);
             }
         }
 
@@ -175,20 +176,11 @@ class DeliveryServer extends DefaultDeliveryServer
         return $this->redirect($this->getReturnUrl());
     }
 
-    protected function revoke(DeliveryExecution $deliveryExecution)
+    /**
+     * @return DeliveryServerService
+     */
+    protected function getDeliveryServerService()
     {
-        if($deliveryExecution->getState()->getUri() != DeliveryExecutionState::STATE_PAUSED){
-            /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-            $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
-            //do not remove these comments, this is used to generate the translation in .po file
-            // __('Assessment has been paused due to attempt to switch to another window/tab.');
-            $deliveryExecutionStateService->pauseExecution(
-                $deliveryExecution,
-                [
-                    'reasons' => ['category' => 'focus-loss'],
-                    'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
-                ]
-            );
-        }
+        return $this->getServiceLocator()->get(DeliveryServerService::SERVICE_ID);
     }
 }
