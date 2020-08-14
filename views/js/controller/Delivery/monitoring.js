@@ -687,44 +687,6 @@ define([
                     return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
 
-                /**
-                * Compare responses data
-                * @param {Object} response
-                * @param {Object} savedResponse
-                */
-                function isResponseDataChanged(response, savedResponse) {
-                    if (_.has(response, 'data') && _.has(savedResponse, 'data')) {
-                        const newData = response.data;
-                        const savedData = savedResponse.data;
-
-                        if (_.isArray(newData) && _.isArray(savedData)) {
-                            let newDataSize = _.size(newData);
-                            let savedDataSize = _.size(savedData);
-
-                            if (newDataSize !== savedDataSize) {
-                                return true;
-                            }
-
-                            while (newDataSize--) {
-                                const newDeliveryId = newData[newDataSize].id;
-                                const newDeliveryStatus = newData[newDataSize].state.status;
-                                const savedDeliveryId = savedData[newDataSize].id;
-                                const savedDeliveryStatus = savedData[newDataSize].state.status;
-
-                                const isDeliveriesEqual = _.isEqual(newDeliveryId, savedDeliveryId) && _.isEqual(newDeliveryStatus, savedDeliveryStatus);
-
-                                if (!isDeliveriesEqual) {
-                                    return true;
-                                }
-                            }
-                            
-                            return false;
-                        }
-                    }
-
-                    return _.isEqual(response, savedResponse);
-                }
-
                 function startPollingData(pollingInterval, ajaxConfig) {
                     stopPollingData();
 
@@ -733,15 +695,8 @@ define([
 
                         $.ajax(ajaxConfig)
                             .then(response => {
-                                try {
-                                    const shouldRefreshDataTable = isResponseDataChanged(response, originalDataset);
-
-                                    if (shouldRefreshDataTable) {
-                                       $list.datatable('refresh', response);
-                                    }
-                                } finally {
-                                   action.resolve();
-                                }
+                                $list.datatable('refresh', response);
+                                action.resolve();
                             })
                             .fail(action.resolve);
                         });
@@ -1271,6 +1226,7 @@ define([
                         .on('beforeload.datatable', (e, dataSet) => {
                             // We save response data here because on load the data will be transformed
                             originalDataset = dataSet;
+                            highlightRows = [];
                         })
                         .on('load.datatable', function(e, newDataset) {
                             var applyTags;
@@ -1306,12 +1262,8 @@ define([
                                 setTagUsage(applyTags);
                             }
 
-                            // highlight rows
-                            if (highlightRows.length) {
-                                _.forEach(highlightRows, function (v) {
-                                    $list.datatable('highlightRow', v);
-                                });
-                            }
+                            
+                            $list.datatable('highlightRows', highlightRows);
                             loadingBar.stop();
 
                             appController
@@ -1350,6 +1302,7 @@ define([
                                 },
                                 loading: __('Loading')
                             },
+                            atomicUpdate: !!data.autoRefresh,
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
                             filtercolumns: {start_time: (setStartDataOneDay ? getDefaultStartTimeFilter() : "")},
