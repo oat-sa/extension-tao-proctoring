@@ -24,7 +24,9 @@ use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\user\User;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
+use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
 /**
  * Sample Delivery Service for proctoring
@@ -67,7 +69,7 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
         $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $criteria = $this->getCriteria($delivery, $context, $options);
         $options['asArray'] =  true;
-        return $monitoringService->find($criteria, $options, true);
+        return $monitoringService->find($criteria, $options, $this->shouldIncludeSecondaryData());
     }
 
     public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
@@ -109,4 +111,20 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
         return true;
     }
 
+    /**
+     * @return bool
+     */
+    protected function shouldIncludeSecondaryData()
+    {
+        $monitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+        $primaryColumns = $monitoringService->getOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS);
+        $include = false;
+        foreach (DeliveryHelper::getExtraFieldsProperties() as $extraField) {
+            if (!in_array($extraField['id'], $primaryColumns, true)) {
+                $include = true;
+            }
+        }
+
+        return $include;
+    }
 }
