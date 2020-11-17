@@ -31,6 +31,15 @@ use oat\taoTests\models\runner\time\TimePoint;
 
 class DeliveryExecutionStateListener extends ConfigurableService
 {
+    /**
+     * When test session is paused by proctor remaining time is recalculated based on server timer to show
+     * more precise value. After receiving pause confirmation from client remaining time will be recalculated
+     * to show correct value.
+     *
+     * @param DeliveryExecutionState $event
+     * @throws \common_Exception
+     * @throws \common_exception_NotFound
+     */
     public function updateRemainingTime(DeliveryExecutionState $event): void
     {
         if ($event->getState() != DeliveryExecution::STATE_PAUSED) {
