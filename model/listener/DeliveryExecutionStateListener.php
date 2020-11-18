@@ -63,8 +63,8 @@ class DeliveryExecutionStateListener extends ConfigurableService
 
         $success = $monitoringService->save($data);
         if (!$success) {
-            $this->logWarning(
-                'monitor cache for delivery ' . $executionId . ' could not be updated. Remaining time was not updated'
+            $this->logError(
+                'Monitor cache for delivery ' . $executionId . ' could not be updated. Remaining time was not updated'
             );
         }
     }
