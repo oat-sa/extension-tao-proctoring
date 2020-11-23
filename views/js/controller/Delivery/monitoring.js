@@ -716,6 +716,18 @@ define([
                     serviceParams.context = context;
                 }
 
+                /**
+                 * Checks if button to add extra time must be available or not for a given ttSession checking
+                 * session configuration and status
+                 * @param {Object} ttSession - proctoring tts session
+                 */
+                function getAllowExtraTime(ttSession) {
+                    const sessionAllowsExtraTime = _.isNull(ttSession.allowExtraTime) || ttSession.allowExtraTime;
+                    const sessionStatusAllowsExtraTime = (ttSession.status !== 'Completed' && ttSession.status !== 'Terminated' && ttSession.timer.remaining_time !== 0);
+                    
+                    return sessionAllowsExtraTime && sessionStatusAllowsExtraTime;
+                }
+
                 return proxyExecutions.read(serviceParams).then(function(data) {
                     dataset = data.set;
                     extraFields = data.extrafields;
@@ -1098,7 +1110,7 @@ define([
                                 icon : 'time',
                                 action : timeHandling,
                                 hidden() {
-                                    var allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
+                                    const allowExtraTime = getAllowExtraTime(this);
                                     return !canDo('time', this.state) || !allowExtraTime;
                                 }
                             }]
