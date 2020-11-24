@@ -327,7 +327,7 @@ define([
                 function terminateOrReactivateAndIrregularity(selection) {
                     var delivery = getExecutionData(selection);
                     var buttons = [];
-                    if (hasAccessToReactivate && canDo('reactivate', delivery.state)) {
+                    if (hasAccessToReactivate && canDo('reactivate', delivery)) {
                         buttons.push({
                             id: 'reactivate',
                             type: 'error',
@@ -338,7 +338,7 @@ define([
                                 reactivate(selection);
                             }
                         });
-                    }else if (canDo('terminate', delivery.state)) {
+                    }else if (canDo('terminate', delivery)) {
                         buttons.push({
                             id: 'terminate',
                             type: 'error',
@@ -411,8 +411,8 @@ define([
                 }
 
                 function timeHandling(selection) {
-                    const _selection = _.isArray(selection) ? selection : [selection];
-                    const config = _.merge(listSessions('time', _selection), {
+                    const _selection = listSessions('time', _.isArray(selection) ? selection : [selection]);
+                    const config = _.merge(_selection, {
                         renderTo : $content,
                         actionName : __('Grant Extra Time'),
                         errorMessage: __('The extra time must be a number'),
@@ -422,7 +422,9 @@ define([
                     });
 
                     timeHandlingPopup(config).on('ok', function(state){
-                        request('extraTime', _selection, {time: state.time}, __('Extra time granted'));
+                        const sessionsToUpdate = _selection.allowedResources.map((session) => session.id);
+
+                        request('extraTime', sessionsToUpdate, {time: state.time}, __('Extra time granted'));
                     });
                 }
 
@@ -472,16 +474,17 @@ define([
                 }
 
                 /**
-                 * Check if an action is available with respect to the provided state
+                 * Check if an action is available for a provided delivery with respect to the provided state
                  * @param {String} what
-                 * @param {Object} state
+                 * @param {Object} delivery
                  * @returns {Boolean}
                  */
-                function canDo(what, state) {
-                    var status;
-                    if (state && state.status) {
-                        status = _status.getStatusByCode(state.status);
-                        return status && status.can[what] === true;
+                function canDo(what, delivery) {
+                    if (delivery && delivery.state.status) {
+                        const status = _status.getStatusByCode(delivery.state.status);
+                        const canDo = _.isFunction(status.can[what]) ?status.can[what](delivery) : status.can[what];
+
+                        return status && canDo === true;
                     }
                     return false;
                 }
@@ -509,14 +512,14 @@ define([
                     status = _status.getStatusByCode(testTakerData.state.status);
 
                     if(status){
-                        formatted.allowed = (status.can[actionName] === true);
+                        formatted.allowed = (canDo(actionName, testTakerData) === true);
 
                         if (actionName === 'changeTime') {
                             formatted.allowed = testTakerData.allowTimerAdjustment;
                         }
 
                         if(!formatted.allowed){
-                            formatted.reason = status.can[actionName];
+                            formatted.reason = canDo(actionName, testTakerData);
                             formatted.warning = status.warning[actionName] ?
                                 status.warning[actionName](null, testTakerData.id) :
                                 __('Unable to perform action on test %s.', testTakerData.id);
@@ -714,18 +717,6 @@ define([
                 }
                 if (context) {
                     serviceParams.context = context;
-                }
-
-                /**
-                 * Checks if button to add extra time must be available or not for a given ttSession checking
-                 * session configuration and status
-                 * @param {Object} ttSession - proctoring tts session
-                 */
-                function getAllowExtraTime(ttSession) {
-                    const sessionAllowsExtraTime = _.isNull(ttSession.allowExtraTime) || ttSession.allowExtraTime;
-                    const sessionStatusAllowsExtraTime = (ttSession.status !== 'Completed' && ttSession.status !== 'Terminated' && ttSession.timer.remaining_time !== 0);
-                    
-                    return sessionAllowsExtraTime && sessionStatusAllowsExtraTime;
                 }
 
                 return proxyExecutions.read(serviceParams).then(function(data) {
@@ -1036,7 +1027,7 @@ define([
                                 icon: 'play',
                                 title: __('Authorize session'),
                                 disabled() {
-                                    return !canDo('authorize', this.state);
+                                    return !canDo('authorize', this);
                                 },
                                 action: authorize
                             }]
@@ -1054,7 +1045,7 @@ define([
                                 icon: 'pause',
                                 title: __('Pause session'),
                                 disabled() {
-                                    return !canDo('pause', this.state);
+                                    return !canDo('pause', this);
                                 },
                                 action: pause
                             }]
@@ -1110,8 +1101,8 @@ define([
                                 icon : 'time',
                                 action : timeHandling,
                                 hidden() {
-                                    const allowExtraTime = getAllowExtraTime(this);
-                                    return !canDo('time', this.state) || !allowExtraTime;
+                                    const allowExtraTime = _.isNull(this.allowExtraTime) || this.allowExtraTime;
+                                    return !canDo('time', this) || !allowExtraTime;
                                 }
                             }]
                         });
@@ -1252,8 +1243,8 @@ define([
                                 const uri = $btn.closest('[data-item-identifier]').data('item-identifier');
                                 const delivery = getExecutionData(uri);
                                 if (
-                                  hasAccessToReactivate && canDo('reactivate', delivery.state)
-                                      || canDo('terminate', delivery.state)
+                                  hasAccessToReactivate && canDo('reactivate', delivery)
+                                      || canDo('terminate', delivery)
                                       || allowIrr
                                 ) {
                                     $btn.prop('disabled', false);

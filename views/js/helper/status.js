@@ -37,7 +37,9 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 reactivate : __('not terminated'),
-                time : true,
+                time : function(delivery) {
+                    return delivery.timer.remaining_time > 0;
+                },
                 changeTime: __('in progress'),
             },
             warning : {
@@ -236,7 +238,7 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print: true,
-                time : true,
+                time : false,
                 changeTime: __('completed'),
             },
             warning : {
@@ -341,7 +343,7 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 reactivate : true,
                 print: true,
-                time : true,
+                time : false,
                 changeTime: __('terminated'),
             },
             warning : {
