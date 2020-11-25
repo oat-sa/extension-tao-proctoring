@@ -325,8 +325,8 @@ define([
                 }
 
                 function terminateOrReactivateAndIrregularity(selection) {
-                    var delivery = getExecutionData(selection);
-                    var buttons = [];
+                    const delivery = getExecutionData(selection);
+                    const buttons = [];
                     if (hasAccessToReactivate && canDo('reactivate', delivery)) {
                         buttons.push({
                             id: 'reactivate',
