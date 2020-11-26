@@ -482,9 +482,9 @@ define([
                 function canDo(what, delivery) {
                     if (delivery && delivery.state.status) {
                         const status = _status.getStatusByCode(delivery.state.status);
-                        const canDo = _.isFunction(status.can[what]) ?status.can[what](delivery) : status.can[what];
+                        const isAllowed = _.isFunction(status.can[what]) ?status.can[what](delivery) : status.can[what];
 
-                        return status && canDo === true;
+                        return status && isAllowed === true;
                     }
                     return false;
                 }
