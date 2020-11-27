@@ -480,7 +480,7 @@ define([
                  * @returns {Boolean}
                  */
                 function canDo(what, delivery) {
-                    if (delivery && delivery.state.status) {
+                    if (delivery && delivery.state && delivery.state.status) {
                         const status = _status.getStatusByCode(delivery.state.status);
                         const isAllowed = _.isFunction(status.can[what]) ?status.can[what](delivery) : status.can[what];
 
