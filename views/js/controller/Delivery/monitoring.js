@@ -519,7 +519,7 @@ define([
                         }
 
                         if(!formatted.allowed){
-                            formatted.reason = canDo(actionName, testTakerData);
+                            formatted.reason = _.isFunction(status.can[actionName])? status.can[actionName](testTakerData) : status.can[actionName]; 
                             formatted.warning = status.warning[actionName] ?
                                 status.warning[actionName](null, testTakerData.id) :
                                 __('Unable to perform action on test %s.', testTakerData.id);
