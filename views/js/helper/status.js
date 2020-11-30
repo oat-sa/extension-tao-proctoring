@@ -85,7 +85,12 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not started'), //not in progress
                 print : __('not finished'),
                 reactivate : __('not terminated'),
-                time : true,
+                time : function(delivery) {
+                    if (delivery.timer.remaining_time > 0) {
+                        return true;
+                    }
+                    return __('test has no time limits');
+                },
                 changeTime: __('authorized but not started'),
             },
             warning : {
@@ -137,7 +142,12 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print : __('not finished'),
-                time : true,
+                time : function(delivery) {
+                    if (delivery.timer.remaining_time > 0) {
+                        return true;
+                    }
+                    return __('test has no time limits');
+                },
                 changeTime: __('awaiting'),
             },
             warning : {
@@ -180,7 +190,7 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print: __('canceled'),
-                time : true,
+                time : __('canceled'),
                 changeTime: __('canceled'),
             },
             warning : {
@@ -294,7 +304,12 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : true,
                 report : true,
                 print : __('not finished'),
-                time : true,
+                time : function(delivery) {
+                    if (delivery.timer.remaining_time > 0) {
+                        return true;
+                    }
+                    return __('test has no time limits');
+                },
                 changeTime: __('paused'),
             },
             warning : {
