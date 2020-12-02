@@ -34,7 +34,7 @@ define(['lodash', 'i18n'], function(_, __){
      * @returns {boolean | string } - returns true if adding extra time is possible, reason of denied if not
      */
     function canAddExtraTime (delivery) {
-        return delivery.timer.remaining_time > 0 ||__('test has no time limits');
+        return delivery.timer.remaining_time > 0 || __('test has no time limits');
     }
 
     var _status = {
