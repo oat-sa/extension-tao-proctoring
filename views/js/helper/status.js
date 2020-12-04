@@ -25,6 +25,17 @@ define(['lodash', 'i18n'], function(_, __){
         _completed = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
         _terminated = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated',
         _canceled = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled';
+        
+    /**
+     * Checks if adding extra time should be possible or not for the given delivery.
+     * Adding extra time will be possible if the delivery contains sections
+     * with time limits.
+     * @param {Object} delivery - delivery to check
+     * @returns {boolean | string } - returns true if adding extra time is possible, reason of denied if not
+     */
+    function canAddExtraTime (delivery) {
+        return delivery.timer.remaining_time > 0 || __('test has no time limits');
+    }
 
     var _status = {
         inprogress : {
@@ -37,7 +48,7 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 print : __('not finished'),
                 reactivate : __('not terminated'),
-                time : true,
+                time: canAddExtraTime,
                 changeTime: __('in progress'),
             },
             warning : {
@@ -80,7 +91,7 @@ define(['lodash', 'i18n'], function(_, __){
                 pause : __('not started'), //not in progress
                 print : __('not finished'),
                 reactivate : __('not terminated'),
-                time : true,
+                time: canAddExtraTime,
                 changeTime: __('authorized but not started'),
             },
             warning : {
@@ -132,7 +143,7 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print : __('not finished'),
-                time : true,
+                time : canAddExtraTime,
                 changeTime: __('awaiting'),
             },
             warning : {
@@ -175,7 +186,7 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print: __('canceled'),
-                time : true,
+                time : __('canceled'),
                 changeTime: __('canceled'),
             },
             warning : {
@@ -236,7 +247,7 @@ define(['lodash', 'i18n'], function(_, __){
                 reactivate : __('not terminated'),
                 report : true,
                 print: true,
-                time : true,
+                time :  __('completed'),
                 changeTime: __('completed'),
             },
             warning : {
@@ -289,7 +300,7 @@ define(['lodash', 'i18n'], function(_, __){
                 terminate : true,
                 report : true,
                 print : __('not finished'),
-                time : true,
+                time : canAddExtraTime,
                 changeTime: __('paused'),
             },
             warning : {
@@ -341,7 +352,7 @@ define(['lodash', 'i18n'], function(_, __){
                 report : true,
                 reactivate : true,
                 print: true,
-                time : true,
+                time : __('terminated'),
                 changeTime: __('terminated'),
             },
             warning : {
