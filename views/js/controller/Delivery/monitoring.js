@@ -938,7 +938,6 @@ define([
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
-                            console.log(value, dateFormat)
 
                             if (values.length >= 2) {
                                 first = values[0];
@@ -958,8 +957,6 @@ define([
                                 var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
                                 var lastValue;
-
-                                console.log(dateFormat);
 
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
