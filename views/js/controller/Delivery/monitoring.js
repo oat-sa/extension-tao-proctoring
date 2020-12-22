@@ -955,8 +955,6 @@ define([
                                     startDatePicker.destroy();
                                 }
 
-                                console.log($elt.val())
-
                                 startDatePicker = dateTimePicker($filterContainer, {
                                     setup: 'date-range',
                                     format: dateFormatStr,
