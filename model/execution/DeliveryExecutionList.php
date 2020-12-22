@@ -108,6 +108,9 @@ class DeliveryExecutionList extends ConfigurableService
 
         $executionState = $cachedData[DeliveryMonitoringService::STATUS];
 
+        $adjustedTime = $isTimerAdjustmentAllowed ? $this->getDeliveryExecutionManagerService()
+            ->getAdjustedTime($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]) : 0;
+
         $execution = array(
             'id' => $cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
             'delivery' => array(
@@ -129,8 +132,7 @@ class DeliveryExecutionList extends ConfigurableService
                     ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
                     : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
-                'adjustedTime' => $this->getDeliveryExecutionManagerService()
-                    ->getAdjustedTime($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID])
+                'adjustedTime' => $adjustedTime
             ],
             'testTaker' => $this->createTestTaker($cachedData),
             'extraFields' => $extraFields,
