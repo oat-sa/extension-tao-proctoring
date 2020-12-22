@@ -933,19 +933,16 @@ define([
                             return locale.formatDateTime(value);
                         },
                         filterTransform(value) {
-                            var first;
-                            var last;
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
-
-                            if (values.length >= 2) {
-                                first = values[0];
-                                last = values[values.length - 1];
-
-                                result += moment(first, dateFormat).format('X');
+                            var start_day = values[0]
+                            var last_day = values[values.length - 1];
+                        
+                            if (start_day && last_day) {
+                                result += moment(start_day, dateFormat).format('X');
                                 result += ' - ';
-                                result += moment(last, dateFormat).add(1, 'd').format('X');
+                                result += moment(last_day, dateFormat).add(1, 'd').format('X');
                             }
 
                             return result;
