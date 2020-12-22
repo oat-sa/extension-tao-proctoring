@@ -519,7 +519,7 @@ define([
                         }
 
                         if(!formatted.allowed){
-                            formatted.reason = _.isFunction(status.can[actionName])? status.can[actionName](testTakerData) : status.can[actionName]; 
+                            formatted.reason = _.isFunction(status.can[actionName])? status.can[actionName](testTakerData) : status.can[actionName];
                             formatted.warning = status.warning[actionName] ?
                                 status.warning[actionName](null, testTakerData.id) :
                                 __('Unable to perform action on test %s.', testTakerData.id);
@@ -938,6 +938,7 @@ define([
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
+                            console.log(value, dateFormat)
 
                             if (values.length >= 2) {
                                 first = values[0];
@@ -958,6 +959,8 @@ define([
                                 var dateFormatStr = dateFormat[0];
                                 var lastValue;
 
+                                console.log(dateFormat);
+
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
 
@@ -966,7 +969,7 @@ define([
                                 }
 
                                 startDatePicker = dateTimePicker($filterContainer, {
-                                    setup: 'datetime-range',
+                                    setup: 'date-range',
                                     format: dateFormatStr,
                                     replaceField: $elt[0]
                                 })
@@ -1265,7 +1268,7 @@ define([
                                 setTagUsage(applyTags);
                             }
 
-                            
+
                             $list.datatable('highlightRows', highlightRows);
                             loadingBar.stop();
 
