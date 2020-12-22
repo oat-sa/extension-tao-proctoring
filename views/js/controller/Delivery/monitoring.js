@@ -677,15 +677,6 @@ define([
                     });
                 }
 
-                /**
-                 * Return the default date range of one day
-                 * @returns {string}
-                 */
-                function getDefaultStartTimeFilter() {
-                    var dateFormat = locale.getDateTimeFormat().split(' ')[0];
-                    return `${moment().format(dateFormat)} to ${moment().add('1', 'd').format(dateFormat)}`;
-                }
-
                 function extractOption(object, option, defaultValue) {
                     return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
@@ -947,7 +938,6 @@ define([
                                 result += ' - ';
                                 result += moment(last, dateFormat).add(1, 'd').format('X');
                             }
-
                             return result;
                         },
                         customFilter : {
@@ -965,11 +955,22 @@ define([
                                     startDatePicker.destroy();
                                 }
 
+                                console.log($elt.val())
+
                                 startDatePicker = dateTimePicker($filterContainer, {
                                     setup: 'date-range',
                                     format: dateFormatStr,
-                                    replaceField: $elt[0]
+                                    replaceField: $elt[0],
                                 })
+                                    .on('ready', function () {
+                                        // set default date range
+                                        if (setStartDataOneDay) {
+                                            const dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                                            const from = moment().format(dateFormat);
+                                            const to = moment().add('1', 'd').format(dateFormat);
+                                            startDatePicker.setValue([from, to]);
+                                        }
+                                    })
                                     .on('change', function (value) {
                                         var selection = this.getSelectedDates();
                                         if ((value === '' && lastValue !== value) ||
@@ -1004,10 +1005,10 @@ define([
                                 status = _status.getStatusByCode(row.state.status);
                                 if (status) {
                                     result = status.label;
-                                    if (row.state.status === 'INPROGRESS') {
+                                    if (row.state.status === __('INPROGRESS')) {
                                         result = status.label;
                                     }
-                                    if (result === 'Awaiting') {
+                                    if (result === __('Awaiting')) {
                                         highlightRows.push(row.id);
                                     }
                                 }
@@ -1265,7 +1266,6 @@ define([
                                 setTagUsage(applyTags);
                             }
 
-
                             $list.datatable('highlightRows', highlightRows);
                             loadingBar.stop();
 
@@ -1308,7 +1308,6 @@ define([
                             atomicUpdate: !!data.autoRefresh,
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
-                            filtercolumns: {start_time: (setStartDataOneDay ? getDefaultStartTimeFilter() : "")},
                             filter: true,
                             tools: tools,
                             model: model,
