@@ -952,20 +952,18 @@ define([
                             return locale.formatDateTime(value);
                         },
                         filterTransform(value) {
-                            var first;
-                            var last;
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
 
-                            if (values.length >= 2) {
-                                first = values[0];
-                                last = values[values.length - 1];
-
-                                result += moment(first, dateFormat).format('X');
+                            const start_day = values[0];
+                            const last_day = values[values.length - 1];
+                            if (start_day && last_day) {
+                                result += moment(start_day, dateFormat).format('X');
                                 result += ' - ';
-                                result += moment(last, dateFormat).add(1, 'd').format('X');
+                                result += moment(last_day, dateFormat).add(1, 'd').format('X');
                             }
+
                             return result;
                         },
                         customFilter : {
@@ -988,13 +986,11 @@ define([
                                     format: dateFormatStr,
                                     replaceField: $elt[0],
                                 })
-                                    .on('change', function (value) {
+                                    .on('close', function () {
                                         const selection = this.getSelectedDates();
-                                        if ((value === '' && lastValue !== value) ||
-                                            (selection && selection.length === 2)) {
+                                        if (selection.length === 2) {
                                             $list.datatable('filter');
                                         }
-                                        lastValue = value;
                                     })
                                     .on('clear', function () {
                                         $list.datatable('filter');
