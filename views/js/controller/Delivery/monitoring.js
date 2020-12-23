@@ -46,6 +46,7 @@ define([
     'moment',
     'util/locale',
     'tpl!taoProctoring/templates/delivery/approximatedTimer',
+    'lib/flatpickr/l10n/index',
     'ui/datatable',
     'select2'
 ], function (
@@ -75,7 +76,8 @@ define([
     statusFilterTpl,
     moment,
     locale,
-    approximatedTimerTpl
+    approximatedTimerTpl,
+    flatpickrLocalization
 ) {
     'use strict';
     /**
@@ -94,7 +96,6 @@ define([
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
     const adjustTimeUrl = urlHelper.route('adjustTime', 'Monitor', 'taoProctoring');
-    let datePickerDate = null;
 
 
     /**
@@ -678,6 +679,32 @@ define([
                     });
                 }
 
+                /**
+                 * Detects document language
+                 * @returns {""|string}
+                 */
+                function getPageLang() {
+                    const documentLang = window.document.documentElement.getAttribute('lang');
+                    return documentLang && documentLang.split('-')[0];
+                }
+
+                /**
+                 * Return the default date range of one day
+                 * @returns {string}
+                 */
+                function getDefaultStartTimeFilter() {
+                    const dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                    let separator = ' - ';
+                    const lang = getPageLang();
+                    if (_.isObject(flatpickrLocalization.default[lang])) {
+                        const flatpickrLang = flatpickrLocalization.default[lang];
+                        if (flatpickrLang.hasOwnProperty('rangeSeparator')) {
+                            separator = flatpickrLang.rangeSeparator;
+                        }
+                    }
+                    return `${moment().format(dateFormat)} ${separator} ${moment().add('1', 'd').format(dateFormat)}`;
+                }
+
                 function extractOption(object, option, defaultValue) {
                     return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
@@ -961,19 +988,8 @@ define([
                                     format: dateFormatStr,
                                     replaceField: $elt[0],
                                 })
-                                    .on('ready', function () {
-                                        // set default date range
-                                        if (setStartDataOneDay && !datePickerDate) {
-                                            const dateFormat = locale.getDateTimeFormat().split(' ')[0];
-                                            const from = moment().format(dateFormat);
-                                            const to = moment().add('1', 'd').format(dateFormat);
-                                            datePickerDate = [from, to];
-                                        }
-                                        startDatePicker.setValue(datePickerDate);
-                                    })
                                     .on('change', function (value) {
                                         const selection = this.getSelectedDates();
-                                        datePickerDate = selection;
                                         if ((value === '' && lastValue !== value) ||
                                             (selection && selection.length === 2)) {
                                             $list.datatable('filter');
@@ -1309,6 +1325,7 @@ define([
                             atomicUpdate: !!data.autoRefresh,
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                            filtercolumns: {start_time: (setStartDataOneDay ? getDefaultStartTimeFilter() : '')},
                             filter: true,
                             tools: tools,
                             model: model,
