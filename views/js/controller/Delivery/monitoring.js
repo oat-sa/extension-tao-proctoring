@@ -46,6 +46,7 @@ define([
     'moment',
     'util/locale',
     'tpl!taoProctoring/templates/delivery/approximatedTimer',
+    'lib/flatpickr/l10n/index',
     'ui/datatable',
     'select2'
 ], function (
@@ -75,7 +76,8 @@ define([
     statusFilterTpl,
     moment,
     locale,
-    approximatedTimerTpl
+    approximatedTimerTpl,
+    flatpickrLocalization
 ) {
     'use strict';
     /**
@@ -677,6 +679,32 @@ define([
                     });
                 }
 
+                /**
+                 * Detects document language
+                 * @returns {""|string}
+                 */
+                function getPageLang() {
+                    const documentLang = window.document.documentElement.getAttribute('lang');
+                    return documentLang && documentLang.split('-')[0];
+                }
+
+                /**
+                 * Return the default date range of one day
+                 * @returns {string}
+                 */
+                function getDefaultStartTimeFilter() {
+                    const dateFormat = locale.getDateTimeFormat().split(' ')[0];
+                    let separator = ' - ';
+                    const lang = getPageLang();
+                    if (_.isObject(flatpickrLocalization.default[lang])) {
+                        const flatpickrLang = flatpickrLocalization.default[lang];
+                        if (flatpickrLang.hasOwnProperty('rangeSeparator')) {
+                            separator = flatpickrLang.rangeSeparator;
+                        }
+                    }
+                    return `${moment().format(dateFormat)} ${separator} ${moment().add('1', 'd').format(dateFormat)}`;
+                }
+
                 function extractOption(object, option, defaultValue) {
                     return _.isUndefined(object[option], undefined) ? defaultValue : object[option];
                 }
@@ -924,20 +952,18 @@ define([
                             return locale.formatDateTime(value);
                         },
                         filterTransform(value) {
-                            var first;
-                            var last;
                             var dateFormat = locale.getDateTimeFormat().split(' ')[0];
                             var values = value.split(' ');
                             var result = '';
 
-                            if (values.length >= 2) {
-                                first = values[0];
-                                last = values[values.length - 1];
-
-                                result += moment(first, dateFormat).format('X');
+                            const start_day = values[0];
+                            const last_day = values[values.length - 1];
+                            if (start_day && last_day) {
+                                result += moment(start_day, dateFormat).format('X');
                                 result += ' - ';
-                                result += moment(last, dateFormat).add(1, 'd').format('X');
+                                result += moment(last_day, dateFormat).add(1, 'd').format('X');
                             }
+
                             return result;
                         },
                         customFilter : {
@@ -960,22 +986,11 @@ define([
                                     format: dateFormatStr,
                                     replaceField: $elt[0],
                                 })
-                                    .on('ready', function () {
-                                        // set default date range
-                                        if (setStartDataOneDay) {
-                                            const dateFormat = locale.getDateTimeFormat().split(' ')[0];
-                                            const from = moment().format(dateFormat);
-                                            const to = moment().add('1', 'd').format(dateFormat);
-                                            startDatePicker.setValue([from, to]);
-                                        }
-                                    })
-                                    .on('change', function (value) {
-                                        var selection = this.getSelectedDates();
-                                        if ((value === '' && lastValue !== value) ||
-                                            (selection && selection.length === 2)) {
+                                    .on('close', function () {
+                                        const selection = this.getSelectedDates();
+                                        if (selection.length === 2) {
                                             $list.datatable('filter');
                                         }
-                                        lastValue = value;
                                     })
                                     .on('clear', function () {
                                         $list.datatable('filter');
@@ -1306,6 +1321,7 @@ define([
                             atomicUpdate: !!data.autoRefresh,
                             filterStrategy: 'multiple',
                             filterSelector: 'select, input:not(.select2-input, .select2-focusser)',
+                            filtercolumns: {start_time: (setStartDataOneDay ? getDefaultStartTimeFilter() : '')},
                             filter: true,
                             tools: tools,
                             model: model,
