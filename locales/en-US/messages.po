@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint127\n"
-"PO-Revision-Date: 2020-05-29T12:48:56\n"
+"Project-Id-Version: TAO 3.4.0-sprint143\n"
+"PO-Revision-Date: 2020-12-23T17:41:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -35,6 +35,12 @@ msgid "%s could not be %s because it is terminated. Please refresh your data."
 msgstr ""
 
 msgid "%s could not be %s."
+msgstr ""
+
+msgid "%s executions migrated"
+msgstr ""
+
+msgid "%s KV entries removed"
 msgstr ""
 
 msgid "%s minutes more"
@@ -98,6 +104,9 @@ msgid "Actor"
 msgstr ""
 
 msgid "Add test takers"
+msgstr ""
+
+msgid "Adjusted"
 msgstr ""
 
 msgid "Administer deliveries"
@@ -170,10 +179,10 @@ msgstr ""
 msgid "Authorize"
 msgstr ""
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr ""
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr ""
 
 msgid "Authorize sessions"
@@ -203,7 +212,13 @@ msgstr ""
 msgid "Authorized, you may proceed"
 msgstr ""
 
+msgid "Automatically paused by the system due to authorized test not being launched by test taker."
+msgstr ""
+
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr ""
+
+msgid "Automatically reset by the system due to authorized test not being launched by test taker."
 msgstr ""
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
@@ -299,6 +314,12 @@ msgstr ""
 msgid "Change time"
 msgstr ""
 
+msgid "Changed Time"
+msgstr ""
+
+msgid "Column %s successfully created"
+msgstr ""
+
 msgid "Comfort"
 msgstr ""
 
@@ -344,10 +365,10 @@ msgstr ""
 msgid "Current sessions"
 msgstr ""
 
-msgid "date"
+msgid "Date"
 msgstr ""
 
-msgid "Date"
+msgid "date"
 msgstr ""
 
 msgid "Days"
@@ -392,6 +413,9 @@ msgstr ""
 msgid "End date of the export"
 msgstr ""
 
+msgid "Entered value is not correct"
+msgstr ""
+
 msgid "Environment"
 msgstr ""
 
@@ -411,7 +435,10 @@ msgstr ""
 msgid "Export Irregularities"
 msgstr ""
 
-msgid "Extended Time"
+msgid "Extended time"
+msgstr ""
+
+msgid "Extra"
 msgstr ""
 
 msgid "Extra Time"
@@ -429,10 +456,10 @@ msgstr ""
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
+msgid "Finished"
 msgstr ""
 
-msgid "Finished"
+msgid "finished"
 msgstr ""
 
 msgid "First name"
@@ -466,6 +493,9 @@ msgid "In Progress"
 msgstr ""
 
 msgid "in progress"
+msgstr ""
+
+msgid "INPROGRESS"
 msgstr ""
 
 msgid "Irregularities for \"%s\" successfully exported"
@@ -613,10 +643,10 @@ msgstr ""
 msgid "Pause sessions"
 msgstr ""
 
-msgid "Paused"
+msgid "paused"
 msgstr ""
 
-msgid "paused"
+msgid "Paused"
 msgstr ""
 
 msgid "Please provide a reason"
@@ -685,16 +715,19 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr ""
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr ""
 
 msgid "Refresh"
 msgstr ""
 
 msgid "Refresh the page"
+msgstr ""
+
+msgid "Registered proctoring log"
 msgstr ""
 
 msgid "Remaining"
@@ -718,10 +751,10 @@ msgstr ""
 msgid "Report irregularities"
 msgstr ""
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr ""
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr ""
 
 msgid "reported for irregularity"
@@ -761,10 +794,10 @@ msgstr ""
 msgid "section"
 msgstr ""
 
-msgid "session"
+msgid "Session"
 msgstr ""
 
-msgid "Session"
+msgid "session"
 msgstr ""
 
 msgid "Session %s - %s has not been processed"
@@ -785,10 +818,10 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr ""
 
-msgid "sessions paused"
+msgid "Sessions paused"
 msgstr ""
 
-msgid "Sessions paused"
+msgid "sessions paused"
 msgstr ""
 
 msgid "Sessions reactivated"
@@ -845,13 +878,16 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-msgid "Subcategory"
-msgstr ""
-
 msgid "subcategory"
 msgstr ""
 
+msgid "Subcategory"
+msgstr ""
+
 msgid "System generated pause."
+msgstr ""
+
+msgid "Tables successfully altered"
 msgstr ""
 
 msgid "Take or continue a test controlled by a proctor"
@@ -869,10 +905,10 @@ msgstr ""
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr ""
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr ""
 
 msgid "Terminate sessions"
@@ -884,10 +920,10 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "Terminated"
+msgid "terminated"
 msgstr ""
 
-msgid "terminated"
+msgid "Terminated"
 msgstr ""
 
 msgid "Test  must be terminated."
@@ -959,13 +995,16 @@ msgstr ""
 msgid "Test had not been started."
 msgstr ""
 
+msgid "test has no time limits"
+msgstr ""
+
 msgid "Test site %s"
 msgstr ""
 
-msgid "test taker"
+msgid "Test taker"
 msgstr ""
 
-msgid "Test taker"
+msgid "test taker"
 msgstr ""
 
 msgid "Test takers have been added"
@@ -1001,10 +1040,19 @@ msgstr ""
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
 msgstr ""
 
+msgid "The assessment was automatically terminated by the system due to inactivity."
+msgstr ""
+
+msgid "The decreased time cannot be higher than remaining time %s"
+msgstr ""
+
 msgid "The extra time must be a number"
 msgstr ""
 
 msgid "The extra time must be a number bigger than 0"
+msgstr ""
+
+msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
 msgstr ""
 
 msgid "The proctor will be authorized. Continue ?"
@@ -1034,6 +1082,12 @@ msgstr ""
 msgid "Time adjusted"
 msgstr ""
 
+msgid "Time decrease is too high"
+msgstr ""
+
+msgid "Time increase is too high"
+msgstr ""
+
 #, tao-public
 msgid "Tools"
 msgstr ""
@@ -1048,6 +1102,9 @@ msgid "Unable to create irregularities export for %s"
 msgstr ""
 
 msgid "Unable to perform action on test %s."
+msgstr ""
+
+msgid "Unexpected response"
 msgstr ""
 
 msgid "User Activity"
