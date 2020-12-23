@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint127\n"
-"PO-Revision-Date: 2020-05-29T12:50:03\n"
+"Project-Id-Version: TAO 3.4.0-sprint143\n"
+"PO-Revision-Date: 2020-12-23T17:41:37\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl-NL\n"
@@ -36,6 +36,12 @@ msgstr "%s kon niet worden %s omdat het is beëindigd. Vernieuw a.u.b. uw data."
 
 msgid "%s could not be %s."
 msgstr "%s kon niet worden %s."
+
+msgid "%s executions migrated"
+msgstr ""
+
+msgid "%s KV entries removed"
+msgstr ""
 
 msgid "%s minutes more"
 msgstr "%s minuten meer"
@@ -99,6 +105,9 @@ msgstr "Acteur"
 
 msgid "Add test takers"
 msgstr "Voeg kandidaten toe"
+
+msgid "Adjusted"
+msgstr ""
 
 msgid "Administer deliveries"
 msgstr "Beheer leveringen"
@@ -170,10 +179,10 @@ msgstr ""
 msgid "Authorize"
 msgstr "Autoriseer"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "Autoriseer sessie"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "Autoriseer sessie"
 
 msgid "Authorize sessions"
@@ -203,8 +212,14 @@ msgstr "Geautoriseerde toezichthouders"
 msgid "Authorized, you may proceed"
 msgstr "Geautoriseerd, u mag verder"
 
+msgid "Automatically paused by the system due to authorized test not being launched by test taker."
+msgstr ""
+
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
 msgstr "Automatisch gereset door het systeem omdat het autorisatie verzoek gecanceld is door de kandidaat."
+
+msgid "Automatically reset by the system due to authorized test not being launched by test taker."
+msgstr ""
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
 msgstr "Automatisch gereset door het systeem omdat de kandidaat ervoor gekozen heeft om niet verder te gaan met de autorisatie test."
@@ -299,6 +314,12 @@ msgstr "category"
 msgid "Change time"
 msgstr ""
 
+msgid "Changed Time"
+msgstr ""
+
+msgid "Column %s successfully created"
+msgstr ""
+
 msgid "Comfort"
 msgstr "Comfort"
 
@@ -344,11 +365,11 @@ msgstr "Huidige toets activiteit"
 msgid "Current sessions"
 msgstr "Huidige sessies"
 
-msgid "date"
-msgstr "datum"
-
 msgid "Date"
 msgstr "Datum"
+
+msgid "date"
+msgstr "datum"
 
 msgid "Days"
 msgstr "Dagen"
@@ -392,6 +413,9 @@ msgstr "Einde"
 msgid "End date of the export"
 msgstr "Eind datum van de export"
 
+msgid "Entered value is not correct"
+msgstr ""
+
 msgid "Environment"
 msgstr "Omgeving"
 
@@ -411,8 +435,11 @@ msgstr "Exporteren"
 msgid "Export Irregularities"
 msgstr "Exporteer onregelmatigheden"
 
-msgid "Extended Time"
-msgstr "Verlengde Tijd"
+msgid "Extended time"
+msgstr ""
+
+msgid "Extra"
+msgstr ""
 
 msgid "Extra Time"
 msgstr "Extra tijd"
@@ -429,11 +456,11 @@ msgstr "Filter"
 msgid "Filter by the selected dates"
 msgstr ""
 
-msgid "finished"
-msgstr "voltooid"
-
 msgid "Finished"
 msgstr "Voltooid"
+
+msgid "finished"
+msgstr "voltooid"
 
 msgid "First name"
 msgstr "Voornaam"
@@ -466,6 +493,9 @@ msgid "In Progress"
 msgstr "In behandeling"
 
 msgid "in progress"
+msgstr ""
+
+msgid "INPROGRESS"
 msgstr ""
 
 msgid "Irregularities for \"%s\" successfully exported"
@@ -613,11 +643,11 @@ msgstr "Sessie pauzeren"
 msgid "Pause sessions"
 msgstr "Sessies pauzeren"
 
-msgid "Paused"
-msgstr "Gepauzeerd"
-
 msgid "paused"
 msgstr "gepauzeerd"
+
+msgid "Paused"
+msgstr "Gepauzeerd"
 
 msgid "Please provide a reason"
 msgstr ""
@@ -685,17 +715,20 @@ msgstr "Toezichthouders ingetrokken"
 msgid "Progress"
 msgstr "Voortgang"
 
-msgid "Reactivate session"
-msgstr "Heractiveren van de sessie"
-
 msgid "Reactivate Session"
 msgstr "Heractiveer sessie"
+
+msgid "Reactivate session"
+msgstr "Heractiveren van de sessie"
 
 msgid "Refresh"
 msgstr "Verversen"
 
 msgid "Refresh the page"
 msgstr "Pagina verversen"
+
+msgid "Registered proctoring log"
+msgstr ""
 
 msgid "Remaining"
 msgstr "Resterend"
@@ -718,10 +751,10 @@ msgstr "Rapporteren"
 msgid "Report irregularities"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporteer onregelmatigheden"
 
 msgid "reported for irregularity"
@@ -761,11 +794,11 @@ msgstr "Score rapport"
 msgid "section"
 msgstr "sectie"
 
-msgid "session"
-msgstr ""
-
 msgid "Session"
 msgstr "Sessie"
+
+msgid "session"
+msgstr ""
 
 msgid "Session %s - %s has not been processed"
 msgstr "Sessie %s - %s is niet verwerkt"
@@ -785,11 +818,11 @@ msgstr ""
 msgid "Sessions authorized"
 msgstr "Geautoriseerde sessies"
 
-msgid "sessions paused"
-msgstr "gepauzeerde sessies"
-
 msgid "Sessions paused"
 msgstr "Gepauzeerde sessies"
+
+msgid "sessions paused"
+msgstr "gepauzeerde sessies"
 
 msgid "Sessions reactivated"
 msgstr "Sessies gereactiveerd"
@@ -845,14 +878,17 @@ msgstr "Gestart op"
 msgid "Status"
 msgstr "Status"
 
-msgid "Subcategory"
-msgstr "Subcategorie"
-
 msgid "subcategory"
 msgstr "subcategorie"
 
+msgid "Subcategory"
+msgstr "Subcategorie"
+
 msgid "System generated pause."
 msgstr "Systeem gegenereerde pauze."
+
+msgid "Tables successfully altered"
+msgstr ""
 
 msgid "Take or continue a test controlled by a proctor"
 msgstr "Start of continueer een examen gecontroleerd door een toezichthouder"
@@ -869,10 +905,10 @@ msgstr "Beeindigen"
 msgid "Terminate and irregularity"
 msgstr ""
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "Beëindig sessie"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "Beëindig sessie"
 
 msgid "Terminate sessions"
@@ -884,11 +920,11 @@ msgstr ""
 msgid "Terminate/Reactivate and irregularity"
 msgstr ""
 
-msgid "Terminated"
-msgstr "Beëindigd"
-
 msgid "terminated"
 msgstr "beëindigd"
+
+msgid "Terminated"
+msgstr "Beëindigd"
 
 msgid "Test  must be terminated."
 msgstr "Test moet worden beëindigd."
@@ -959,14 +995,17 @@ msgstr "Test was niet in behandeling."
 msgid "Test had not been started."
 msgstr "Test was niet gestart."
 
+msgid "test has no time limits"
+msgstr ""
+
 msgid "Test site %s"
 msgstr "Toetslocatie %s"
 
-msgid "test taker"
-msgstr "kandidaat"
-
 msgid "Test taker"
 msgstr "Kandidaat"
+
+msgid "test taker"
+msgstr "kandidaat"
 
 msgid "Test takers have been added"
 msgstr "Kandidaten zijn toegevoegd"
@@ -1001,10 +1040,19 @@ msgstr "Het examen is beëindigd.U kunt er niet meer aan werken."
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
 msgstr ""
 
+msgid "The assessment was automatically terminated by the system due to inactivity."
+msgstr ""
+
+msgid "The decreased time cannot be higher than remaining time %s"
+msgstr ""
+
 msgid "The extra time must be a number"
 msgstr "De extra tijd moet numeriek zijn"
 
 msgid "The extra time must be a number bigger than 0"
+msgstr ""
+
+msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
 msgstr ""
 
 msgid "The proctor will be authorized. Continue ?"
@@ -1034,6 +1082,12 @@ msgstr "Tijd"
 msgid "Time adjusted"
 msgstr ""
 
+msgid "Time decrease is too high"
+msgstr ""
+
+msgid "Time increase is too high"
+msgstr ""
+
 #, tao-public
 msgid "Tools"
 msgstr "Hulpmiddelen"
@@ -1049,6 +1103,9 @@ msgstr "Niet in staat om onregelmatigheden te exporteren voor %s"
 
 msgid "Unable to perform action on test %s."
 msgstr "Niet in staat om actie te ondernemen op de test %s."
+
+msgid "Unexpected response"
+msgstr ""
 
 msgid "User Activity"
 msgstr "Gebruikers activiteit"

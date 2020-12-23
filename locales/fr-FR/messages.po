@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint127\n"
-"PO-Revision-Date: 2020-05-29T12:49:35\n"
+"Project-Id-Version: TAO 3.4.0-sprint143\n"
+"PO-Revision-Date: 2020-12-23T17:41:36\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 msgid " sec"
-msgstr ""
+msgstr " sec"
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - Item %2$s/%3$s"
@@ -23,7 +23,7 @@ msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessions pour la passation %s n'ont pas été mises en pause."
 
 msgid "%s - item %p/%c"
-msgstr ""
+msgstr "%s - point %p/%c"
 
 msgid "%s completed"
 msgstr "%s effectué"
@@ -37,41 +37,47 @@ msgstr "%s ne peut être %s parce qu'il est terminé. Veuillez rafraichir vos do
 msgid "%s could not be %s."
 msgstr "%s ne peut être %s."
 
+msgid "%s executions migrated"
+msgstr "%s des exécutions ont migré"
+
+msgid "%s KV entries removed"
+msgstr "%s des entrées KV supprimées"
+
 msgid "%s minutes more"
 msgstr "%s minutes en plus"
 
 msgid "%s\'s test had already been authorized."
-msgstr ""
+msgstr "Le test de %s avait déjà été autorisé."
 
 msgid "%s\'s test had already been paused."
-msgstr ""
+msgstr "Le test de %s avait déjà été mis en pause."
 
 msgid "%s\'s test had already been terminated."
-msgstr ""
+msgstr "Le test de %s avait déjà été terminé."
 
 msgid "%s\'s test had been canceled."
-msgstr ""
+msgstr "Le test de %s avait déjà été annulé."
 
 msgid "%s\'s test had been completed."
-msgstr ""
+msgstr "Le test de %s était terminé."
 
 msgid "%s\'s test had been paused."
-msgstr ""
+msgstr "Le test de %s a été mis en pause."
 
 msgid "%s\'s test had been terminated."
-msgstr ""
+msgstr "Le test de %s avait été terminé."
 
 msgid "%s\'s test had not been finished."
-msgstr ""
+msgstr "Le test de %s n'était pas terminé."
 
 msgid "%s\'s test had not been in progress."
-msgstr ""
+msgstr "Le test de %s n'était pas en cours."
 
 msgid "%s\'s test had not been started."
-msgstr ""
+msgstr "Le test de %s n'avait pas commencé."
 
 msgid "%s\'s test must be terminated."
-msgstr ""
+msgstr "Le test de %s doit être terminé."
 
 msgid "..."
 msgstr "..."
@@ -100,6 +106,9 @@ msgstr "Acteur"
 msgid "Add test takers"
 msgstr "Ajouter des participants"
 
+msgid "Adjusted"
+msgstr "Ajusté"
+
 msgid "Administer deliveries"
 msgstr "Administrer des passations"
 
@@ -107,13 +116,13 @@ msgid "Administration"
 msgstr "Administration"
 
 msgid "All fields are required"
-msgstr ""
+msgstr "Tous les champs sont obligatoires"
 
 msgid "already authorized"
 msgstr "déjà autorisé"
 
 msgid "Already changed time will be added or subtracted by the new value."
-msgstr ""
+msgstr "Le temps déjà modifié sera ajouté ou soustrait par la nouvelle valeur."
 
 msgid "already paused"
 msgstr "déjà mis en pause"
@@ -165,16 +174,16 @@ msgid "author"
 msgstr "auteur"
 
 msgid "Authorization status"
-msgstr ""
+msgstr "Statut de l'autorisation"
 
 msgid "Authorize"
 msgstr "Autoriser"
 
-msgid "Authorize Session"
-msgstr "Autoriser cette session "
-
 msgid "Authorize session"
 msgstr "Autoriser la session"
+
+msgid "Authorize Session"
+msgstr "Autoriser cette session "
 
 msgid "Authorize sessions"
 msgstr "Autoriser les sessions"
@@ -195,7 +204,7 @@ msgid "Authorized but not started"
 msgstr "Autorisé mais non démarré"
 
 msgid "authorized but not started"
-msgstr ""
+msgstr "autorisé mais non commencé"
 
 msgid "Authorized proctors"
 msgstr "Surveillants autorisés"
@@ -203,8 +212,14 @@ msgstr "Surveillants autorisés"
 msgid "Authorized, you may proceed"
 msgstr "Autorisé, vous pouvez poursuivre"
 
+msgid "Automatically paused by the system due to authorized test not being launched by test taker."
+msgstr "Automatiquement mis en pause par le système parce que le test autorisé n'a pas été lancé par le candidat."
+
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
 msgstr "Remis par défaut automatiquement par le système dû à la requête d'autorisation annulée par le participant."
+
+msgid "Automatically reset by the system due to authorized test not being launched by test taker."
+msgstr "Réinitialisation automatique par le système lorsque le test autorisé n'est pas lancé par le candidat."
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
 msgstr "Remis par défaut automatiquement par le système dû au choix du participant de ne pas continuer avec le test autorisé."
@@ -219,7 +234,7 @@ msgid "Available test takers"
 msgstr "Participants disponibles"
 
 msgid "awaiting"
-msgstr ""
+msgstr "en attente de"
 
 msgid "Awaiting"
 msgstr "En attente"
@@ -297,7 +312,13 @@ msgid "category"
 msgstr "catégorie"
 
 msgid "Change time"
-msgstr ""
+msgstr "Changement d'heure"
+
+msgid "Changed Time"
+msgstr "Changement d'heure"
+
+msgid "Column %s successfully created"
+msgstr "Colonne %s créés avec succès"
 
 msgid "Comfort"
 msgstr "confort"
@@ -306,7 +327,7 @@ msgid "comment"
 msgstr "commentaire"
 
 msgid "comment..."
-msgstr ""
+msgstr "commentaire..."
 
 msgid "Complaint"
 msgstr "Réclamation"
@@ -344,11 +365,11 @@ msgstr "Activité de l'évaluation en cours"
 msgid "Current sessions"
 msgstr "Sessions courantes"
 
-msgid "date"
-msgstr "date"
-
 msgid "Date"
 msgstr "Date"
+
+msgid "date"
+msgstr "date"
 
 msgid "Days"
 msgstr "Jours"
@@ -392,6 +413,9 @@ msgstr "Fin"
 msgid "End date of the export"
 msgstr "Date de fin de l'export"
 
+msgid "Entered value is not correct"
+msgstr "La valeur saisie n'est pas correcte"
+
 msgid "Environment"
 msgstr "Environnement"
 
@@ -411,8 +435,11 @@ msgstr "Exporter"
 msgid "Export Irregularities"
 msgstr "Exporter les irrégularités"
 
-msgid "Extended Time"
-msgstr "Temps supplémentaire"
+msgid "Extended time"
+msgstr "Durée prolongée"
+
+msgid "Extra"
+msgstr "Extra"
 
 msgid "Extra Time"
 msgstr "Temps supplémentaire"
@@ -427,13 +454,13 @@ msgid "Filter"
 msgstr "Filtrer"
 
 msgid "Filter by the selected dates"
-msgstr ""
-
-msgid "finished"
-msgstr "terminé"
+msgstr "Filtrer par les dates sélectionnées"
 
 msgid "Finished"
 msgstr "Terminé"
+
+msgid "finished"
+msgstr "terminé"
 
 msgid "First name"
 msgstr "Prénom"
@@ -466,7 +493,10 @@ msgid "In Progress"
 msgstr "En cours"
 
 msgid "in progress"
-msgstr ""
+msgstr "en cours"
+
+msgid "INPROGRESS"
+msgstr "ENCOURS"
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "Irrégularités pour \"%s\" exportées avec succès"
@@ -511,7 +541,7 @@ msgid "Logout"
 msgstr "Déconnexion"
 
 msgid "Main Menu"
-msgstr ""
+msgstr "Menu principal"
 
 msgid "Manage Proctors"
 msgstr "Gestion des surveillants d'examen"
@@ -613,14 +643,14 @@ msgstr "Mettre en pause la session"
 msgid "Pause sessions"
 msgstr "Suspendre les sessions"
 
-msgid "Paused"
-msgstr "Suspendu"
-
 msgid "paused"
 msgstr "suspendu"
 
+msgid "Paused"
+msgstr "Suspendu"
+
 msgid "Please provide a reason"
-msgstr ""
+msgstr "Veuillez fournir une raison"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "Veuillez choisir un ou plusieurs tests pour gérer les surveillants d'examen."
@@ -656,7 +686,7 @@ msgid "Proctor"
 msgstr "Surveillant d'examen"
 
 msgid "Proctor authorization"
-msgstr ""
+msgstr "Autorisation du responsable"
 
 msgid "Proctor created"
 msgstr "Surveillant d'examen créé"
@@ -685,17 +715,20 @@ msgstr "Surveillants d'examen révoqués"
 msgid "Progress"
 msgstr "Progression"
 
-msgid "Reactivate session"
-msgstr "Réactiver la session"
-
 msgid "Reactivate Session"
 msgstr "Réactiver session"
+
+msgid "Reactivate session"
+msgstr "Réactiver la session"
 
 msgid "Refresh"
 msgstr "Actualiser"
 
 msgid "Refresh the page"
 msgstr "Actualiser la page"
+
+msgid "Registered proctoring log"
+msgstr "Journal de contrôle enregistré"
 
 msgid "Remaining"
 msgstr "Restant"
@@ -718,10 +751,10 @@ msgstr "Rapport"
 msgid "Report irregularities"
 msgstr "Rapporter des irrégularités"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "Rapporter une irrégularité"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "Rapporter une irrégularité"
 
 msgid "reported for irregularity"
@@ -761,11 +794,11 @@ msgstr "Rapport de notation"
 msgid "section"
 msgstr "section"
 
-msgid "session"
-msgstr ""
-
 msgid "Session"
 msgstr "Session"
+
+msgid "session"
+msgstr "session"
 
 msgid "Session %s - %s has not been processed"
 msgstr "La session %s - %s n'a pas été traitée."
@@ -780,16 +813,16 @@ msgid "Sessions"
 msgstr "Sessions"
 
 msgid "sessions"
-msgstr ""
+msgstr "sessions"
 
 msgid "Sessions authorized"
 msgstr "Sessions autorisées"
 
-msgid "sessions paused"
-msgstr "sessions en pause"
-
 msgid "Sessions paused"
 msgstr "Sessions en pause"
+
+msgid "sessions paused"
+msgstr "sessions en pause"
 
 msgid "Sessions reactivated"
 msgstr "Sessions réactivées"
@@ -845,20 +878,23 @@ msgstr "Démarré à"
 msgid "Status"
 msgstr "État"
 
-msgid "Subcategory"
-msgstr "Sous-catégorie"
-
 msgid "subcategory"
 msgstr "sous-catégorie"
 
+msgid "Subcategory"
+msgstr "Sous-catégorie"
+
 msgid "System generated pause."
 msgstr "Le système a généré une mise en pause."
+
+msgid "Tables successfully altered"
+msgstr "Tableaux modifiés avec succès"
 
 msgid "Take or continue a test controlled by a proctor"
 msgstr "Prendre ou continuer un test contrôlé par un surveillant d'examen"
 
 msgid "TAO: User Authorization"
-msgstr ""
+msgstr "TAO: Autorisation de l'utilisateur"
 
 msgid "Technical"
 msgstr "Technique"
@@ -867,28 +903,28 @@ msgid "Terminate"
 msgstr "Terminer"
 
 msgid "Terminate and irregularity"
-msgstr ""
-
-msgid "Terminate session"
-msgstr "Terminer la session"
+msgstr "Fin et irrégularité"
 
 msgid "Terminate Session"
+msgstr "Terminer la session"
+
+msgid "Terminate session"
 msgstr "Terminer la session"
 
 msgid "Terminate sessions"
 msgstr "Terminer les sessions"
 
 msgid "Terminate/Reactivate"
-msgstr ""
+msgstr "Terminer/Réactiver"
 
 msgid "Terminate/Reactivate and irregularity"
-msgstr ""
-
-msgid "Terminated"
-msgstr "Terminé"
+msgstr "Résiliation/réactivation et irrégularité"
 
 msgid "terminated"
 msgstr "terminé"
+
+msgid "Terminated"
+msgstr "Terminé"
 
 msgid "Test  must be terminated."
 msgstr "Le test doit être résilié."
@@ -959,14 +995,17 @@ msgstr "Le test n'était pas en cours."
 msgid "Test had not been started."
 msgstr "Le test n'était pas démarré."
 
+msgid "test has no time limits"
+msgstr "Le test n'a pas de limite de temps"
+
 msgid "Test site %s"
 msgstr "Site de test %s"
 
-msgid "test taker"
-msgstr "participant"
-
 msgid "Test taker"
 msgstr "Participant"
+
+msgid "test taker"
+msgstr "participant"
 
 msgid "Test takers have been added"
 msgstr "Des participants ont été ajoutés."
@@ -987,7 +1026,7 @@ msgid "The action cannot be applied, no eligible sessions found"
 msgstr "L'action ne peut être appliquée, pas de session éligible trouvée."
 
 msgid "The action will be applied to the following session(s)"
-msgstr ""
+msgstr "L'action sera appliquée à la (aux) session(s) suivante(s)"
 
 msgid "the already granted time will be replaced by the new value"
 msgstr "le temps déjà accordé sera remplacé par la nouvelle valeur"
@@ -999,13 +1038,22 @@ msgid "The assessment has been terminated. You cannot interact with it anymore."
 msgstr "L'évaluation vient de se terminer. Vous ne pouvez plus interagir avec elle."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
-msgstr ""
+msgstr "L'évaluation est terminée. Vous ne pouvez plus interagir avec elle. Veuillez contacter votre surveillant si nécessaire."
+
+msgid "The assessment was automatically terminated by the system due to inactivity."
+msgstr "L'évaluation a été automatiquement interrompue par le système pour cause d'inactivité."
+
+msgid "The decreased time cannot be higher than remaining time %s"
+msgstr "Le temps réduit ne peut être supérieur au temps restant %s"
 
 msgid "The extra time must be a number"
 msgstr "Le temps additionnel doit être un nombre."
 
 msgid "The extra time must be a number bigger than 0"
-msgstr ""
+msgstr "Le temps supplémentaire doit être un nombre supérieur à 0"
+
+msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
+msgstr "Le temps augmenté, ajouté au temps restant, %s ne peut pas être supérieur au temps total accordé pour ce minuteur %s"
 
 msgid "The proctor will be authorized. Continue ?"
 msgstr "Le surveillant d'examen va obtenir une autorisation. Continuer ?"
@@ -1032,7 +1080,13 @@ msgid "Time"
 msgstr "Durée"
 
 msgid "Time adjusted"
-msgstr ""
+msgstr "Temps ajusté"
+
+msgid "Time decrease is too high"
+msgstr "La diminution du temps est trop importante"
+
+msgid "Time increase is too high"
+msgstr "L'augmentation du temps est trop importante"
 
 #, tao-public
 msgid "Tools"
@@ -1049,6 +1103,9 @@ msgstr "Impossible de créer l'export des irrégularités pour %s"
 
 msgid "Unable to perform action on test %s."
 msgstr "Impossible de réaliser l'action sur le test %s."
+
+msgid "Unexpected response"
+msgstr "Une réponse inattendue"
 
 msgid "User Activity"
 msgstr "Activité de l'utilisateur"
