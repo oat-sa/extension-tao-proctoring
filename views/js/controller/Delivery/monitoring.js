@@ -94,6 +94,7 @@ define([
     var executionsUrl = urlHelper.route('deliveryExecutions', 'Monitor', 'taoProctoring');
     var historyUrl = urlHelper.route('index', 'Reporting', 'taoProctoring');
     const adjustTimeUrl = urlHelper.route('adjustTime', 'Monitor', 'taoProctoring');
+    let datePickerDate = null;
 
 
     /**
@@ -962,15 +963,17 @@ define([
                                 })
                                     .on('ready', function () {
                                         // set default date range
-                                        if (setStartDataOneDay) {
+                                        if (setStartDataOneDay && !datePickerDate) {
                                             const dateFormat = locale.getDateTimeFormat().split(' ')[0];
                                             const from = moment().format(dateFormat);
                                             const to = moment().add('1', 'd').format(dateFormat);
-                                            startDatePicker.setValue([from, to]);
+                                            datePickerDate = [from, to];
                                         }
+                                        startDatePicker.setValue(datePickerDate);
                                     })
                                     .on('change', function (value) {
-                                        var selection = this.getSelectedDates();
+                                        const selection = this.getSelectedDates();
+                                        datePickerDate = selection;
                                         if ((value === '' && lastValue !== value) ||
                                             (selection && selection.length === 2)) {
                                             $list.datatable('filter');
