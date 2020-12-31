@@ -245,6 +245,7 @@ define([
                                 if (message) {
                                     feedback().success(message);
                                 }
+                                $list.trigger('reset-checkboxes');
                                 $list.datatable('refresh');
                             })
                             .catch(function(err) {
@@ -972,7 +973,6 @@ define([
                                 var $filterContainer = $elt.closest('.filter');
                                 var dateFormat = locale.getDateTimeFormat().split(' ');
                                 var dateFormatStr = dateFormat[0];
-                                var lastValue;
 
                                 // the date time picker won't display otherwise
                                 $filterContainer.css('position', 'static');
@@ -1287,6 +1287,14 @@ define([
                                 .on('change.polling', function () {
                                     polling.stop();
                                 });
+
+                            $list.off('reset-checkboxes').on('reset-checkboxes', function(a) {
+                                const $checkboxes = $list.find('td.checkboxes input');
+                                const $checkAll = $list.find('th.checkboxes input');
+
+                                $checkAll.prop('checked', false);
+                                $checkboxes.prop('checked', false);
+                            });
 
                             polling.start();
                             timer.resume();
