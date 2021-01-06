@@ -780,6 +780,7 @@ define([
                             title: __('Refresh the page'),
                             label: __('Refresh'),
                             action() {
+                                $list.trigger('reset-checkboxes');
                                 $list.datatable('refresh');
                             }
                         });
