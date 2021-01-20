@@ -1247,6 +1247,12 @@ define([
                             highlightRows = [];
                         })
                         .on('load.datatable', function(e, newDataset) {
+                            if (newDataset.data) {
+                                newDataset.data.forEach(session => {
+                                    session.test_taker_first_name = session.test_taker_first_name ? $('<div>').html(session.test_taker_first_name).text() : undefined;
+                                    session.test_taker_last_name = session.test_taker_last_name ? $('<div>').html(session.test_taker_last_name).text() : undefined;
+                                })
+                            }                            
                             var applyTags;
 
                             //update dateset in memory
