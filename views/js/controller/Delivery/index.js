@@ -125,12 +125,7 @@ define([
                 renderTo: container.find('.content'),
                 replace: true,
                 list: [],
-                width: 12,
-
-                // discard the "all sessions" box from available count
-                countRenderer: function (count) {
-                    return count - 1;
-                }
+                width: 12
             });
 
             appController.on('change.deliveryIndex', function() {
