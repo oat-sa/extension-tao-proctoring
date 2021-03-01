@@ -25,7 +25,7 @@ use oat\generis\test\TestCase;
 use oat\taoProctoring\model\implementation\TestSessionService;
 use oat\taoQtiTest\models\runner\session\TestSession;
 use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
-use qtism\common\datatypes\Duration;
+use qtism\common\datatypes\QtiDuration;
 use qtism\runtime\tests\TimeConstraintCollection;
 
 class TestSessionServiceTest extends TestCase
@@ -120,11 +120,11 @@ class TestSessionServiceTest extends TestCase
 
     /**
      * @param int $maxRemainingTime
-     * @return Duration
+     * @return QtiDuration
      */
-    private function mockQtiDuration(int $maxRemainingTime): Duration
+    private function mockQtiDuration(int $maxRemainingTime): QtiDuration
     {
-        $durationMock = $this->createMock(Duration::class);
+        $durationMock = $this->createMock(QtiDuration::class);
         $durationMock->method('getSeconds')
             ->willReturn($maxRemainingTime);
 
@@ -132,7 +132,7 @@ class TestSessionServiceTest extends TestCase
     }
 
     /**
-     * @param Duration|bool $maxRemainingTime
+     * @param QtiDuration|bool $maxRemainingTime
      * @return QtiTimeConstraint|MockObject
      */
     private function mockQtiTimeConstraint($duration): QtiTimeConstraint
