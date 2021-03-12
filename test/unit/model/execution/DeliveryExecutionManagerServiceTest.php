@@ -48,7 +48,7 @@ use oat\taoQtiTest\models\runner\time\QtiTimeConstraint;
 use oat\taoQtiTest\models\runner\time\QtiTimer;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentService;
 use oat\taoQtiTest\models\runner\time\TimerAdjustmentServiceInterface;
-use qtism\common\datatypes\Duration;
+use qtism\common\datatypes\QtiDuration;
 use qtism\data\QtiIdentifiable;
 
 class DeliveryExecutionManagerServiceTest extends TestCase
@@ -219,7 +219,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
 
 
         // Setup TestSessionService mock
-        $durationMock = $this->createMock(Duration::class);
+        $durationMock = $this->createMock(QtiDuration::class);
         $durationMock->method('getSeconds')
             ->willReturn($expectedLimit);
         $qtiTimeConstraintMock = $this->createMock(QtiTimeConstraint::class);
