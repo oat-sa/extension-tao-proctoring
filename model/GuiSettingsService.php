@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,8 +40,9 @@ class GuiSettingsService extends ConfigurableService
     const PROCTORING_REFRESH_BUTTON = 'refreshBtn';
 
     /**
-     * Time between auto refresh
+     * Time between auto refresh in milliseconds
      * 0 - don't refresh
+     * Note: it is recommended to avoid having the auto-refresh rate less then 30 seconds.
      */
     const PROCTORING_AUTO_REFRESH = 'autoRefresh';
 
