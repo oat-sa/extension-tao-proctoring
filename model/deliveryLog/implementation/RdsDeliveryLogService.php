@@ -22,7 +22,9 @@ namespace oat\taoProctoring\model\deliveryLog\implementation;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use oat\generis\persistence\PersistenceManager;
 use oat\oatbox\event\EventManager;
+use oat\oatbox\session\SessionService;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\oatbox\service\ConfigurableService;
@@ -37,6 +39,7 @@ use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
 class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 {
     const OPTION_PERSISTENCE = 'persistence';
+    const OPTION_ENABLE_LOGGING = 'enable_logging';
     const TABLE_NAME = 'delivery_log';
 
     /**
@@ -49,12 +52,19 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      * @param string $user user identifier
      * @return boolean
      */
-    public function log($deliveryExecutionId, $eventId, $data, $user = null)
+    public function log($deliveryExecutionId, $eventId, $data, $user = null): bool
     {
+        if (!$this->isLoggingEnabled()) {
+            return false;
+        }
+
         $data = $this->encodeData($data);
 
         if ($user === null) {
-            $user = \common_session_SessionManager::getSession()->getUser()->getIdentifier();
+            $user = $this->getServiceLocator()
+                ->get(SessionService::SERVICE_ID)
+                ->getCurrentUser()
+                ->getIdentifier();
         }
 
         if (empty($user) && PHP_SAPI == 'cli') {
@@ -141,10 +151,14 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 
     /**
      * @param array $data
-     * @return mixed
+     * @return int
      */
-    public function insertMultiple(array $data)
+    public function insertMultiple(array $data): int
     {
+        if (!$this->isLoggingEnabled()) {
+            return 0;
+        }
+
         return $this->getPersistence()->insertMultiple(self::TABLE_NAME, $data);
     }
 
@@ -220,6 +234,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         return $result;
     }
 
+    private function isLoggingEnabled(): bool
+    {
+        return $this->getOption(self::OPTION_ENABLE_LOGGING, true) === true;
+    }
+
     /**
      * @return array
      */
@@ -269,7 +288,11 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
      */
     private function getPersistence()
     {
-        return \common_persistence_Manager::getPersistence($this->getOption(self::OPTION_PERSISTENCE));
+        return $this->getServiceLocator()
+            ->get(PersistenceManager::SERVICE_ID)
+            ->getPersistenceById(
+                $this->getOption(self::OPTION_PERSISTENCE)
+            );
     }
 
     /**
