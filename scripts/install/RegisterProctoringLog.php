@@ -20,6 +20,7 @@
 namespace oat\taoProctoring\scripts\install;
 
 use Doctrine\DBAL\Schema\SchemaException;
+use oat\generis\persistence\PersistenceManager;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
@@ -28,8 +29,33 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
     public function __invoke($params)
     {
         $persistenceId = count($params) > 0 ? reset($params) : 'default';
-        $persistence = \common_persistence_Manager::getPersistence($persistenceId);
+        $persistence = $this->getServiceLocator()
+            ->get(PersistenceManager::SERVICE_ID)
+            ->getPersistenceById($persistenceId);
 
+        $this->createTable($persistence);
+
+        $this->registerService(
+            DeliveryLog::SERVICE_ID,
+            new RdsDeliveryLogService(array(
+                RdsDeliveryLogService::OPTION_PERSISTENCE => $persistenceId,
+                RdsDeliveryLogService::OPTION_ENABLE_LOGGING => true,
+                DeliveryLog::OPTION_FIELDS => [
+                    DeliveryLog::EVENT_ID,
+                    DeliveryLog::CREATED_BY,
+                    DeliveryLog::DELIVERY_EXECUTION_ID,
+                    DeliveryLog::ID,
+                ]
+            ))
+        );
+        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Registered proctoring log'));
+    }
+
+    /**
+     * @param $persistence
+     */
+    public function createTable($persistence): void
+    {
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
@@ -38,11 +64,23 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             $tableLog = $schema->createTable(RdsDeliveryLogService::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
             $tableLog->addColumn(RdsDeliveryLogService::ID, "integer", array("autoincrement" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+                "string",
+                array("notnull" => true, "length" => 255)
+            );
             $tableLog->addColumn(RdsDeliveryLogService::EVENT_ID, "string", array("notnull" => true, "length" => 255));
             $tableLog->addColumn(RdsDeliveryLogService::DATA, "text", array("notnull" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_AT, "string", array("notnull" => true, "length" => 255));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_BY, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_AT,
+                "string",
+                array("notnull" => true, "length" => 255)
+            );
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_BY,
+                "string",
+                array("notnull" => true, "length" => 255)
+            );
 
             $tableLog->setPrimaryKey(array(RdsDeliveryLogService::ID));
 
@@ -70,23 +108,9 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             foreach ($queries as $query) {
                 $persistence->exec($query);
             }
-
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
+            var_dump("CREATING TABLE FAILED");
             \common_Logger::i('Database Schema already up to date.');
         }
-
-        $this->registerService(
-            DeliveryLog::SERVICE_ID,
-            new RdsDeliveryLogService(array(
-                RdsDeliveryLogService::OPTION_PERSISTENCE => $persistenceId,
-                DeliveryLog::OPTION_FIELDS => [
-                    DeliveryLog::EVENT_ID,
-                    DeliveryLog::CREATED_BY,
-                    DeliveryLog::DELIVERY_EXECUTION_ID,
-                    DeliveryLog::ID,
-                ]
-            ))
-        );
-        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Registered proctoring log'));
     }
 }
