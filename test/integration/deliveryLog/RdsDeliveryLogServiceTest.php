@@ -177,6 +177,35 @@ class RdsDeliveryLogServiceTest extends TestCase
         }
     }
 
+    public function testLogWithDisabledLoggingDoesNotStore(): void
+    {
+        $this->service->setOption(RdsDeliveryLogService::OPTION_ENABLE_LOGGING, false);
+        $this->assertEquals(0, $this->getLogRecordsCount(), 'Log table must be empty before tests.');
+
+        $result = $this->service->log($this->deliveryExecutionId, 'event ID', 'DATA');
+        $this->assertFalse($result);
+
+        $this->assertEquals(0, $this->getLogRecordsCount(), 'Log record should not be stored when logging is disabled.');
+    }
+
+    public function testInsertMultipleStoresData(): void
+    {
+        $this->assertEquals(0, $this->getLogRecordsCount(), 'Log table must be empty before tests.');
+        $result = $this->service->insertMultiple($this->getDeliveryLogsData());
+        $this->assertEquals(2, $result, 'Method must return number of inserted rows');
+        $this->assertEquals(2, $this->getLogRecordsCount(), 'All log records must be stored in DB.');
+    }
+
+    public function testInsertMultipleDoesNotStoreDataWhenLoggingDisabled(): void
+    {
+        $this->service->setOption(RdsDeliveryLogService::OPTION_ENABLE_LOGGING, false);
+
+        $this->assertEquals(0, $this->getLogRecordsCount(), 'Log table must be empty before tests.');
+        $result = $this->service->insertMultiple($this->getDeliveryLogsData());
+        $this->assertEquals(0, $result, 'Method must return number of inserted rows');
+        $this->assertEquals(0, $this->getLogRecordsCount(), 'Log record should not be stored when logging is disabled.');
+    }
+
     /**
      * @param $deliveryExecutionId
      * @param $eventId
@@ -243,5 +272,29 @@ class RdsDeliveryLogServiceTest extends TestCase
     private function getLogRecordsCount(): int
     {
         return (int) $this->persistence->exec('SELECT count(*) FROM delivery_log');
+    }
+
+    /**
+     * @return array[]
+     */
+    private function getDeliveryLogsData(): array
+    {
+        $data = [
+            [
+                'delivery_execution_id' => 'DX 1',
+                'event_id' => 'EVENT',
+                'data' => 'DATA 1',
+                'created_at' => time(),
+                'created_by' => 'USER 1',
+            ],
+            [
+                'delivery_execution_id' => 'DX 2',
+                'event_id' => 'EVENT',
+                'data' => 'DATA 2',
+                'created_at' => time(),
+                'created_by' => 'USER 2',
+            ]
+        ];
+        return $data;
     }
 }
