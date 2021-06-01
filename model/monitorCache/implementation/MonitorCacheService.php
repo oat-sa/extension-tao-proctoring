@@ -26,7 +26,6 @@ use oat\generis\model\OntologyRdfs;
 use oat\tao\model\taskQueue\QueueDispatcherInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\DeliveryExecutionService;
-use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionReactivated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
@@ -49,7 +48,7 @@ use oat\taoProctoring\model\authorization\AuthorizationGranted;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class MonitorCacheService extends MonitoringStorage
+class MonitorCacheService extends SimpleMonitoringStorage
 {
     /**
      * @param DeliveryExecutionCreated $event
@@ -129,7 +128,7 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function testStateChanged(TestChangedEvent $event)
     {
-        $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($event->getServiceCallId());
+        $deliveryExecution = $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID)->getDeliveryExecution($event->getServiceCallId());
 
         $data = $this->createMonitoringData($deliveryExecution);
 
