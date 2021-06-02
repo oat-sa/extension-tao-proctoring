@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use common_exception_NotFound;
-use common_Logger;
 use common_persistence_SqlPersistence;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -67,11 +66,12 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
     const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
     const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
 
+    const COLUMN_EXTRA_DATA = 'extra_data';
+
     const DEFAULT_SORT_COLUMN = self::COLUMN_ID;
     const DEFAULT_SORT_ORDER = 'ASC';
     const DEFAULT_SORT_TYPE = 'string';
 
-    private $joins = [];
     private $queryParams = [];
 
     /**
@@ -102,7 +102,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
      * @return array|DeliveryMonitoringData
      * @throws common_exception_NotFound
      */
-    public function getData(DeliveryExecutionInterface $deliveryExecution): array
+    public function getData(DeliveryExecutionInterface $deliveryExecution): DeliveryMonitoringData
     {
         return $this->createMonitoringData(
             $deliveryExecution,
@@ -118,11 +118,13 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
      */
     public function find(array $criteria = [], array $options = []): array
     {
-        $result = [];
-        $this->joins = [];
         $this->queryParams = [];
-        $selectColumns = $this->getPrimaryColumns();
-        $groupColumns = [];
+
+        $whereClause = $this->prepareCondition($criteria, $this->queryParams);
+        if ($whereClause !== '') {
+            $whereClause = 'WHERE ' . $whereClause;
+        }
+
         $defaultOptions = [
             'order' => join(' ', [static::DEFAULT_SORT_COLUMN, static::DEFAULT_SORT_ORDER, static::DEFAULT_SORT_TYPE]),
             'offset' => 0,
@@ -130,28 +132,18 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         ];
         $options = array_merge($defaultOptions, $options);
 
-        $options['order'] = $this->prepareOrderStmt($options['order']);
-        $fromClause = "FROM " . self::TABLE_NAME . " t ";
-
-        $whereClause = $this->prepareCondition($criteria, $this->queryParams, $selectClause);
-        if ($whereClause !== '') {
-            $whereClause = 'WHERE ' . $whereClause;
+        $orderClause = $this->prepareOrderStmt($options['order']);
+        if ($orderClause !== '') {
+            $orderClause = 'ORDER BY ' . $orderClause;
         }
 
-        $selectClause = "SELECT " . implode(','.PHP_EOL, $selectColumns) . PHP_EOL;
-
-        $sql = $selectClause . ' ' . $fromClause . PHP_EOL .
-            implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL;
-
-        if (!empty($groupColumns)) {
-            if (!in_array('t.delivery_execution_id', $groupColumns)) {
-                $groupColumns[] = 't.delivery_execution_id';
-            }
-            $sql .= 'GROUP BY ' . implode(',', $groupColumns) . PHP_EOL;
-        }
-
-        $sql .= "ORDER BY " . $options['order'];
+        $sql = sprintf(
+            'SELECT %s FROM %s t %s %s',
+            implode(', ', $this->getPrimaryColumns()),
+            self::TABLE_NAME,
+            $whereClause,
+            $orderClause
+        );
 
         if (isset($options['limit']))  {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
@@ -161,45 +153,39 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($options['asArray']) {
-            $result = $data;
-        } else {
-            foreach($data as $row) {
-                $extraData = [];
-                if (isset($row['extra_data'])) {
-                    $decodedExtraData = json_decode($row['extra_data']);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $extraData = $decodedExtraData;
-                    }
+        foreach($data as &$row) {
+            $extraData = [];
+            if (isset($row[self::COLUMN_EXTRA_DATA])) {
+                $decodedExtraData = json_decode($row[self::COLUMN_EXTRA_DATA]);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $extraData = $decodedExtraData;
                 }
-                $row['extra_data'] = $extraData;
+            }
+            $row[self::COLUMN_EXTRA_DATA] = $extraData;
 
+            if (!$options['asArray']) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
-                $result[] = $this->createMonitoringData($deliveryExecution, $row);
+                $row = $this->createMonitoringData($deliveryExecution, $row);
             }
         }
 
-        return $result;
+        return $data;
     }
 
     public function count(array $criteria = []): int
     {
-        $this->joins = [];
         $this->queryParams = [];
 
-        $selectClause = "select COUNT(*) FROM (SELECT t.delivery_execution_id ";
-        $fromClause = "FROM " . self::TABLE_NAME . " t ";
-        $whereClause = $this->prepareCondition($criteria, $this->queryParams, $selectClause);
+        $whereClause = $this->prepareCondition($criteria, $this->queryParams);
         if ($whereClause !== '') {
             $whereClause = 'WHERE ' . $whereClause;
         }
-        $sql = $selectClause . $fromClause . PHP_EOL .
-            implode(PHP_EOL, $this->joins) . PHP_EOL .
-            $whereClause . PHP_EOL .
-            'GROUP BY t.' . self::DELIVERY_EXECUTION_ID . ') as count_q';
+
+        $sql = sprintf('select count(*) from %s t %s', self::TABLE_NAME, $whereClause);
 
         $stmt = $this->getPersistence()->query($sql, $this->queryParams);
         $result = $stmt->fetch(PDO::FETCH_BOTH);
+
         return intval($result[0]);
     }
 
@@ -272,120 +258,6 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         $sql = sprintf('DELETE FROM %s WHERE %s = ?', self::TABLE_NAME, self::COLUMN_DELIVERY_EXECUTION_ID);
 
         return $this->getPersistence()->exec($sql, [$data[self::COLUMN_DELIVERY_EXECUTION_ID]]) === 1;
-    }
-
-    /**
-     * Load data instead of searching
-     *
-     * @param string $deliveryExecutionId
-     * @return array
-     */
-    private function loadData(string $deliveryExecutionId): array
-    {
-        $qb = $this->getQueryBuilder();
-        $qb->select('*')
-            ->from(self::TABLE_NAME)
-            ->where(self::DELIVERY_EXECUTION_ID.'= :id')
-            ->setParameter('id', $deliveryExecutionId);
-
-        $data = $qb->execute()->fetch(PDO::FETCH_ASSOC);
-
-        if ($data === false) {
-            $data = [];
-        } else {
-            $extraData = json_decode($data['extra_data']);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $data = array_merge($data, $extraData);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Create new record
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean whether data is saved
-     * @throws Exception
-     */
-    private function create(DeliveryMonitoringDataInterface $deliveryMonitoring): bool
-    {
-        $data = $deliveryMonitoring->get();
-
-        $primaryTableData = $this->extractPrimaryData($data);
-
-        $extraData = $this->extractKvData($data);
-
-        $types['extra_data'] = 'jsonb';
-        $primaryTableData['extra_data'] = json_encode($extraData);
-
-        return $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData, $types) === 1;
-    }
-
-    /**
-     * Update existing record
-     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
-     * @return boolean whether data is saved
-     */
-    private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
-    {
-        $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
-
-        $data = $deliveryMonitoring->get();
-        $extraData = $this->extractKvData($data);
-
-        $primaryTableData = $this->extractPrimaryData($data);
-
-        unset($primaryTableData['delivery_execution_id']);
-        $setClauses = [];
-        foreach ($primaryTableData as $dataKey => $dataValue) {
-            $setClauses[] = sprintf('%s = :%s', $dataKey, $dataKey);
-            $params[sprintf(':%s', $dataKey)] = $dataValue;
-        }
-
-        $setExtraDataClauses = [];
-
-        foreach ($extraData as $extraDataKey => $extraDataValue) {
-            $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', \'%s\')', $extraDataKey, $extraDataValue);
-        }
-
-        if (!empty($setExtraDataClauses)) {
-            $setClauses[] = 'extra_data = extra_data || ' . implode(' || ', $setExtraDataClauses);
-        }
-
-        $setClause = implode(', ', $setClauses);
-
-        $sql = "UPDATE " . self::TABLE_NAME . " SET $setClause
-        WHERE " . self::COLUMN_DELIVERY_EXECUTION_ID . ' = :delivery_execution_id';
-
-        return $this->getPersistence()->exec($sql, $params);
-    }
-
-    /**
-     * @param $order
-     * @return string
-     */
-    private function prepareOrderStmt($order): string
-    {
-        $order = explode(',', $order);
-        $result = [];
-        $primaryTableColumns = $this->getPrimaryColumns();
-        foreach ($order as $ruleNum => $orderRule) {
-            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
-
-            if (!in_array($ruleParts[1], $primaryTableColumns)) {
-                $colName = $ruleParts[1];
-                $this->queryParams[] = $colName;
-            } else {
-                $sortingColumn = $ruleParts[1];
-            }
-
-            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
-                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
-                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
-        }
-
-        return implode(', ', $result);
     }
 
     /**
@@ -601,6 +473,140 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         );
     }
 
+
+    /**
+     * Load data instead of searching
+     *
+     * @param string $deliveryExecutionId
+     * @return array
+     */
+    private function loadData(string $deliveryExecutionId): array
+    {
+        $qb = $this->getQueryBuilder();
+        $qb->select('*')
+            ->from(self::TABLE_NAME)
+            ->where(self::DELIVERY_EXECUTION_ID.'= :id')
+            ->setParameter('id', $deliveryExecutionId);
+
+        $data = $qb->execute()->fetch(PDO::FETCH_ASSOC);
+
+        if ($data === false) {
+            $data = [];
+        } else {
+            if (isset($data[self::COLUMN_EXTRA_DATA][0])) {
+                $extraData = json_decode($data[self::COLUMN_EXTRA_DATA][0], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $data = array_merge($data, $extraData);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Create new record
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean whether data is saved
+     * @throws Exception
+     */
+    private function create(DeliveryMonitoringDataInterface $deliveryMonitoring): bool
+    {
+        $data = $deliveryMonitoring->get();
+
+        $primaryTableData = $this->extractPrimaryData($data);
+
+        $extraData = $this->extractKvData($data);
+
+        $types[self::COLUMN_EXTRA_DATA] = ($this->getPlatformName() == 'mysql') ? 'json' : 'jsonb';
+        $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($extraData);
+
+        return $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData, $types) === 1;
+    }
+
+    /**
+     * Update existing record
+     * @param DeliveryMonitoringDataInterface $deliveryMonitoring
+     * @return boolean whether data is saved
+     */
+    private function update(DeliveryMonitoringDataInterface $deliveryMonitoring)
+    {
+        $params = [':delivery_execution_id' => $deliveryMonitoring->get()[self::COLUMN_DELIVERY_EXECUTION_ID]];
+
+        $data = $deliveryMonitoring->get();
+        $extraData = $this->extractKvData($data);
+
+        $primaryTableData = $this->extractPrimaryData($data);
+
+        unset($primaryTableData['delivery_execution_id']);
+        $setClauses = [];
+        foreach ($primaryTableData as $dataKey => $dataValue) {
+            $setClauses[] = sprintf('%s = :%s', $dataKey, $dataKey);
+            $params[sprintf(':%s', $dataKey)] = $dataValue;
+        }
+
+        $setExtraDataClauses = [];
+        $platformName = $this->getPlatformName();
+        foreach ($extraData as $extraDataKey => $extraDataValue) {
+            if ($platformName == 'mysql') {
+                $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
+            } else {
+                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', \':%s\')', $extraDataKey, $extraDataKey);
+            }
+            $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
+        }
+
+        if (!empty($setExtraDataClauses)) {
+            if ($platformName == 'mysql') {
+                $setClauses[] = sprintf(
+                    '%s = json_set(%s, %s)',
+                    self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(', ', $setExtraDataClauses)
+                );
+            } else {
+                $setClauses[] = sprintf(
+                    '%s = %s || %s',
+                    self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(' || ', $setExtraDataClauses)
+                );
+            }
+        }
+
+        $setClause = implode(', ', $setClauses);
+
+        $sql = sprintf(
+            'UPDATE %s SET %s WHERE %s  = :delivery_execution_id',
+            self::TABLE_NAME, $setClause, self::COLUMN_DELIVERY_EXECUTION_ID
+        );
+
+        return $this->getPersistence()->exec($sql, $params);
+    }
+
+    /**
+     * @param $order
+     * @return string
+     */
+    private function prepareOrderStmt($order): string
+    {
+        $order = explode(',', $order);
+        $result = [];
+        $primaryTableColumns = $this->getPrimaryColumns();
+        foreach ($order as $ruleNum => $orderRule) {
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
+
+            if (!in_array($ruleParts[1], $primaryTableColumns)) {
+                $colName = $ruleParts[1];
+                $this->queryParams[] = $colName;
+            } else {
+                $sortingColumn = $ruleParts[1];
+            }
+
+            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
+                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
+                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
+        }
+
+        return implode(', ', $result);
+    }
+
     /**
      * Get list of table column names
      * @return array
@@ -650,7 +656,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
      * @param $selectClause
      * @return string
      */
-    private function prepareCondition($condition, &$parameters, &$selectClause)
+    private function prepareCondition($condition, &$parameters)
     {
         $whereClause = '';
 
@@ -668,7 +674,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                 if (is_array($subCondition) && is_array($previousCondition)) {
                     $whereClause .= 'AND';
                 }
-                $whereClause .=  $this->prepareCondition($subCondition, $parameters, $selectClause);
+                $whereClause .=  $this->prepareCondition($subCondition, $parameters);
                 $previousCondition = $subCondition;
             }
             $whereClause .=  ')';
@@ -696,23 +702,16 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                 $value = $toLower ? strtolower($matches[2]) : $matches[2];
             }
 
-            /** @todo search on extra column */
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
             } else {
-                common_Logger::e('TEST');
-
-
-                // TODO FIXME
-                $whereClause .= ' "extra_data"::json->>\'' . trim($key) . '\'=\'?\'';
-//                $joinNum = count($this->joins);
-//                $whereClause .= " (kv_t_$joinNum.monitoring_key = ? AND ";
-//                $whereClause .= $toLower ? "LOWER(kv_t_$joinNum.monitoring_value)" : "kv_t_$joinNum.monitoring_value";
-//                $whereClause .= " $op) ";
-
-//                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
-                $parameters[] = trim($key);
+                // this part seems not used
+                if ($this->getPlatformName() == 'mysql') {
+                    $whereClause .= sprintf(' JSON_EXTRACT(t.%s, "$.%s") %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                } else {
+                    $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                }
             }
 
             if(is_array($value)){
@@ -724,11 +723,13 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         return $whereClause;
     }
 
-    /**
-     * @return QueryBuilder
-     */
     private function getQueryBuilder(): QueryBuilder
     {
         return $this->getPersistence()->getPlatForm()->getQueryBuilder();
+    }
+
+    private function getPlatformName(): string
+    {
+        return $this->getPersistence()->getPlatForm()->getName();
     }
 }
