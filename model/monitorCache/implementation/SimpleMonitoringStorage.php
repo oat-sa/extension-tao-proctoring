@@ -161,7 +161,8 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                     $extraData = $decodedExtraData;
                 }
             }
-            $row[self::COLUMN_EXTRA_DATA] = $extraData;
+            unset($row[self::COLUMN_EXTRA_DATA]);
+            $row = array_merge($row, $extraData);
 
             if (!$options['asArray']) {
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
@@ -499,6 +500,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                     $data = array_merge($data, $extraData);
                 }
             }
+            unset($data[self::COLUMN_EXTRA_DATA]);
         }
 
         return $data;
