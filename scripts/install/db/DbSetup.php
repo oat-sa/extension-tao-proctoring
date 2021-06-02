@@ -21,8 +21,10 @@
 namespace oat\taoProctoring\scripts\install\db;
 
 use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Types\Type;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use common_Logger;
+use oat\taoProctoring\model\monitorCache\implementation\SimpleMonitoringStorage;
 
 class DbSetup {
 
@@ -55,6 +57,10 @@ class DbSetup {
             $tableLog->addColumn(MonitoringStorage::ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
             $tableLog->addColumn(MonitoringStorage::STORED_ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
 
+            if ($persistence->getPlatForm()->getName() == 'mysql') {
+                $tableLog->addColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA, 'json', array("notnull" => false));
+            }
+
             $tableLog->setPrimaryKey(array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID));
 
             $tableLog->addIndex(
@@ -74,29 +80,20 @@ class DbSetup {
                 'IDX_' . MonitoringStorage::TABLE_NAME . '_' . MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
             );
 
-            $tableData = $schema->createTable(MonitoringStorage::KV_TABLE_NAME);
-            $tableData->addOption('engine', 'InnoDB');
-            $tableData->addColumn(MonitoringStorage::KV_COLUMN_PARENT_ID, "string", array("notnull" => true, "length" => 255));
-            $tableData->addColumn(MonitoringStorage::KV_COLUMN_KEY, "string", array("notnull" => true, "length" => 255));
-            $tableData->addColumn(MonitoringStorage::KV_COLUMN_VALUE, "text", array("notnull" => false));
-
-            $tableData->setPrimaryKey(array(MonitoringStorage::KV_COLUMN_PARENT_ID, MonitoringStorage::KV_COLUMN_KEY));
-
-            $tableData->addForeignKeyConstraint(
-                $tableLog,
-                array(MonitoringStorage::KV_COLUMN_PARENT_ID),
-                array(MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID),
-                array(
-                    'onDelete' => 'CASCADE',
-                    'onUpdate' => 'CASCADE',
-                ),
-                MonitoringStorage::KV_FK_PARENT
-            );
         } catch(SchemaException $e) {
             common_Logger::i('Database Schema already up to date.');
         }
 
         $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
+
+        if ($persistence->getPlatForm()->getName() == 'postgresql') {
+            $queries[] = sprintf(
+                'ALTER TABLE %s ADD COLUMN %s jsonb',
+                SimpleMonitoringStorage::TABLE_NAME,
+                SimpleMonitoringStorage::COLUMN_EXTRA_DATA
+            );
+        }
+
         foreach ($queries as $query) {
             $persistence->exec($query);
         }
