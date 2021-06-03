@@ -474,7 +474,6 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         );
     }
 
-
     /**
      * Load data instead of searching
      *
@@ -553,9 +552,9 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
             if ($platformName == 'mysql') {
                 $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
             } else {
-                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', \':%s\')', $extraDataKey, $extraDataKey);
+                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
             }
-            $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
+            $params[sprintf(':%s', $extraDataKey)] = json_encode($extraDataValue);
         }
 
         if (!empty($setExtraDataClauses)) {
@@ -708,11 +707,12 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
             } else {
-                // this part seems not used
                 if ($this->getPlatformName() == 'mysql') {
-                    $whereClause .= sprintf(' JSON_EXTRACT(t.%s, "$.%s") %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                    $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
                 } else {
                     $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                    $value = is_array($value) ? $value : [$value];
+                    $value = array_map('json_encode', $value);
                 }
             }
 
