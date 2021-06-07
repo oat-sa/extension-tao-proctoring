@@ -688,9 +688,9 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                     $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
                 } else {
                     $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
-                    $value = is_array($value) ? $value : [$value];
-                    $value = array_map('json_encode', $value);
                 }
+                $value = is_array($value) ? $value : [$value];
+                $value = array_map('json_encode', $value);
             }
 
             if(is_array($value)){
