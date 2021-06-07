@@ -71,6 +71,8 @@ use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExec
  *
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
+ *
+ * @deprecated 
  */
 class MonitoringStorage extends ConfigurableService implements DeliveryMonitoringService
 {

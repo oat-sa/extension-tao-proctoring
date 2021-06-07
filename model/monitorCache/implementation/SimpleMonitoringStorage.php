@@ -32,7 +32,6 @@ use oat\generis\persistence\PersistenceManager;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
-use oat\taoProctoring\helpers\DeliveryHelper;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
 use oat\oatbox\service\ConfigurableService;
@@ -187,7 +186,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         $stmt = $this->getPersistence()->query($sql, $this->queryParams);
         $result = $stmt->fetch(PDO::FETCH_BOTH);
 
-        return intval($result[0]);
+        return (int) $result[0];
     }
 
     /**
@@ -269,28 +268,6 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         return $this->getServiceLocator()
             ->get(PersistenceManager::SERVICE_ID)
             ->getPersistenceById($this->getOption(self::OPTION_PERSISTENCE));
-    }
-
-    /**
-     * @param string $sortBy
-     * @return string
-     */
-    public static function getSortByColumn($sortBy)
-    {
-        $map = array_merge([
-            'firstname' => self::COLUMN_TEST_TAKER_FIRST_NAME,
-            'lastname' => self::TEST_TAKER_LAST_NAME,
-            'delivery' => self::DELIVERY_NAME,
-            'status' => self::STATUS,
-            'connectivity' => self::CONNECTIVITY,
-        ],
-            array_combine(array_map(function ($property) {
-                return strtolower($property['id']);
-            }, DeliveryHelper::getExtraFields()), array_map(function ($property) {
-                return $property['id'];
-            }, DeliveryHelper::getExtraFields())));
-
-        return array_key_exists(strtolower($sortBy), $map) ? $map[strtolower($sortBy)] : self::DEFAULT_SORT_COLUMN;
     }
 
     /**
@@ -475,6 +452,33 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
     }
 
     /**
+     * @param $order
+     * @return string
+     */
+    protected function prepareOrderStmt($order): string
+    {
+        $order = explode(',', $order);
+        $result = [];
+        $primaryTableColumns = $this->getPrimaryColumns();
+        foreach ($order as $ruleNum => $orderRule) {
+            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
+
+            if (!in_array($ruleParts[1], $primaryTableColumns)) {
+                $colName = $ruleParts[1];
+                $this->queryParams[] = $colName;
+            } else {
+                $sortingColumn = $ruleParts[1];
+            }
+
+            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
+                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
+                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
+        }
+
+        return implode(', ', $result);
+    }
+
+    /**
      * Load data instead of searching
      *
      * @param string $deliveryExecutionId
@@ -579,33 +583,6 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         );
 
         return $this->getPersistence()->exec($sql, $params);
-    }
-
-    /**
-     * @param $order
-     * @return string
-     */
-    private function prepareOrderStmt($order): string
-    {
-        $order = explode(',', $order);
-        $result = [];
-        $primaryTableColumns = $this->getPrimaryColumns();
-        foreach ($order as $ruleNum => $orderRule) {
-            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
-
-            if (!in_array($ruleParts[1], $primaryTableColumns)) {
-                $colName = $ruleParts[1];
-                $this->queryParams[] = $colName;
-            } else {
-                $sortingColumn = $ruleParts[1];
-            }
-
-            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
-                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
-                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
-        }
-
-        return implode(', ', $result);
     }
 
     /**
