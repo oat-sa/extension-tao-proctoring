@@ -1,0 +1,112 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint117\n"
+"PO-Revision-Date: 2020-09-22T16:02:17\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ja-JP\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ja-JP\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor"
+msgstr "試検監督者"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring role"
+msgstr "The Proctoring role"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Manager"
+msgstr "試検監督者管理"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Manager Role"
+msgstr "The Proctoring Manager Role"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr "Proctor Administrator"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator Role"
+msgstr "The Proctoring Administrator Role"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Awaiting"
+msgstr "待機中"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Awaiting of authorization status of a delivery execution"
+msgstr "デリバリ実施の承認待ちステータス"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Authorized"
+msgstr "承認済"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Authorized status of a delivery execution"
+msgstr "デリバリ実行の承認済ステータス"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Terminated"
+msgstr "終了済み"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Terminated status of a delivery execution"
+msgstr "デリバリ実行の終了ステータス"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Canceled"
+msgstr "キャンセル済み"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Canceled status of a delivery execution"
+msgstr "デリバリ実行のキャンセルステータス"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require Proctoring"
+msgstr "試検監督者の要求"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Require Proctoring on selected deliveries"
+msgstr "選択デリバリの試検監督者の要求"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Check Enable"
+msgstr "有効化チェック"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Check Enable"
+msgstr "有効化チェック"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Enable"
+msgstr "有効"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Enable"
+msgstr "有効"
+
