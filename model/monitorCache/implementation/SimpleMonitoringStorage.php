@@ -569,8 +569,12 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                 );
             } else {
                 $setClauses[] = sprintf(
-                    '%s = %s || %s',
-                    self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(' || ', $setExtraDataClauses)
+                    '%s = CASE WHEN %s IS NULL THEN %s ELSE %s || %s END',
+                    self::COLUMN_EXTRA_DATA,
+                    self::COLUMN_EXTRA_DATA,
+                    implode(' || ', $setExtraDataClauses),
+                    self::COLUMN_EXTRA_DATA,
+                    implode(' || ', $setExtraDataClauses)
                 );
             }
         }
