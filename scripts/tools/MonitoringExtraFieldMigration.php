@@ -23,258 +23,92 @@ declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\tools;
 
+use Exception;
 use oat\oatbox\extension\script\ScriptAction;
 use common_report_Report as Report;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\monitorCache\implementation\SimpleMonitoringStorage;
-use oat\taoProctoring\scripts\install\db\DbSetup;
 use PDO;
 
 class MonitoringExtraFieldMigration extends ScriptAction
 {
+    /** @var SimpleMonitoringStorage */
+    private $monitoringService;
+
+    /** @var int */
+    private $updated = 0;
+
+    /** @var int */
+    private $deleted = 0;
+
     protected function provideOptions()
     {
-        return [];
-    }
+        return [
+            'wet-run' => [
+                'flag' => true,
+                'prefix' => 'w',
+                'longPrefix' => 'wet-run',
+                'description' => 'Use this option to persist data. Default is dry-run mode'
+            ],
 
-//    protected function provideOptions()
-//    {
-//        return [
-//            'fields' => [
-//                'prefix' => 'f',
-//                'longPrefix' => 'fields',
-//                'required' => true,
-//                'description' => 'A string contains coma separated list of target fields'
-//            ],
-//
-//            'dataLength' => [
-//                'prefix' => 'l',
-//                'longPrefix' => 'dataLength',
-//                'required' => false,
-//                'description' => 'Data length. If present new column(s) will have type VARCHAR($length), otherwise - TEXT column will be created'
-//            ],
-//
-//            'deleteKV' => [
-//                'prefix' => 'd',
-//                'longPrefix' => 'deleteKV',
-//                'defaultValue' => 0,
-//                'cast' => 'integer',
-//                'required' => false,
-//                'description' => 'Indicate whether or not records from KV strorage should be removed'
-//            ],
-//
-//            'strictMode' => [
-//                'prefix' => 's',
-//                'longPrefix' => 'strictMode',
-//                'defaultValue' => 1,
-//                'cast' => 'integer',
-//                'required' => false,
-//                'description' => 'Allow to skip creation of already existing in RDBS columns, should help resuming interrupted migrations '
-//            ],
-//
-//            'persistConfig' => [
-//                'flag' => true,
-//                'prefix' => 'pc',
-//                'longPrefix' => 'persistConfig',
-//                'defaultValue' => 1,
-//                'description' => 'Indicate whether or not changes in config should be recorded. Please note that applies to the current instance only and changes MUST be distributed across all of them'
-//            ],
-//
-//            'resume' => [
-//                'flag' => true,
-//                'prefix' => 'r',
-//                'longPrefix' => 'resume',
-//                'defaultValue' => 1,
-//                'description' => 'Indicate whether or not changes processing should be resumed from the last processed frame'
-//            ],
-//
-//            'chunkSize' => [
-//                'prefix' => 'c',
-//                'defaultValue' => 100,
-//                'longPrefix' => 'chunk-size',
-//                'cast' => 'integer',
-//                'required' => false,
-//                'description' => 'Specifies delivery executions amount for processing (chunk size) per iteration for migration'
-//            ],
-//        ];
-//    }
+            'chunkSize' => [
+                'prefix' => 'c',
+                'defaultValue' => 100,
+                'longPrefix' => 'chunk-size',
+                'cast' => 'integer',
+                'required' => false,
+                'description' => 'Number of delivery_execution migrated processed by iteration.'
+            ],
+
+            'deleteKv' => [
+                'flag' => true,
+                'longPrefix' => 'deleteKv',
+                'defaultValue' => 0,
+                'description' => 'Indicate if the script should remove migrated data.'
+            ],
+        ];
+    }
 
     protected function provideDescription()
     {
-        return 'This tools take care about KV monitoring data migration to the relational table';
+        return 'This tools take care about KV monitoring data migration to the relational table as extra_data column';
     }
 
-    /**
-     * Run Script.
-     *
-     *
-     * @return \common_report_Report
-     * @throws \common_Exception
-     * @throws \common_exception_Error
-     * @throws \oat\oatbox\service\exception\InvalidServiceManagerException
-     */
     protected function run()
     {
-        // check if service is already configured to use JSON column and if column `extra_field` exists
-        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        if (!$monitoringService instanceof SimpleMonitoringStorage) {
-            throw new \Exception('DeliveryMonitoringService is not implementing SimpleMonitoringStorage. Migration aborted');
+        $this->monitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+
+        try {
+            $this->validateMigrationCanBeDone();
+        } catch (Exception $e) {
+            return Report::createFailure(sprintf('Enable to perform migration with error: %s', $e->getMessage()));
         }
 
-        $table = $monitoringService
-            ->getPersistence()
-            ->getDriver()
-            ->getSchemaManager()
-            ->createSchema()
-            ->getTable(SimpleMonitoringStorage::TABLE_NAME);
-        if (!$table->hasColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA)) {
-            throw new \Exception(sprintf('Column %s does not exist. Migration aborted', SimpleMonitoringStorage::COLUMN_EXTRA_DATA));
-        }
+        $count = $this->monitoringService->count();
+        $chunk = ceil($count / $this->getOption('chunkSize'));
 
-        //option
-        $chunkSize = 100;
-        $count = $monitoringService->count();
-        $chunk = ceil($count / $chunkSize);
+        $this->printMigrationScriptOptions($count, (int) $chunk);
 
-        $removed = $updated = 0;
-
-        echo sprintf('%s delivery executions found', $count) . PHP_EOL;
-
-        for ($i = 0 ; $i < $chunk ; $i++) {
-            $options = [
-                'limit' => $chunkSize,
-                'offset' => 0,
-            ];
-
-            $deliveryExecutions = $monitoringService->find([], $options);
-            echo sprintf('%s delivery executions fetched', count($deliveryExecutions)) . PHP_EOL;
-
-            foreach ($deliveryExecutions as $deliveryExecution) {
-
-                $deliveryExecutionId = $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
-
-                $sql = 'SELECT monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id = ?';
-
-                $stmt = $monitoringService->getPersistence()->query($sql, [$deliveryExecutionId]);
-
-                $kvData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                echo sprintf('%s kvData found associated to delivery %s', count($kvData), $deliveryExecutionId) . PHP_EOL;
-
-                foreach ($kvData as $data) {
-                    echo $data['monitoring_key'] . ' => ' . $data['monitoring_value'] . PHP_EOL;
-                    $deliveryExecution->addValue($data['monitoring_key'], $data['monitoring_value']);
-                }
-
-                echo sprintf('Saving delivery %s', $deliveryExecutionId) . PHP_EOL;
-
-                if ($monitoringService->partialSave($deliveryExecution)) {
-                    $updated++;
-                } else {
-                    throw new \Exception(sprintf('Unable to save delivery execution %s', $deliveryExecutionId));
-                }
-
-//                $sql = 'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?';
-//
-//                $removed += $monitoringService->getPersistence()->exec($sql, [$deliveryExecutionId]);
-            }
-        }
-
-        echo sprintf('Saved delivery execution: %s', $updated) . PHP_EOL;
-        echo sprintf('ExtraData removed from KV table: %s', $removed) . PHP_EOL;
-
-        die;
-        // foreach count of DX on KV table
-            // fetch chunk of X data by delivery execution
-            // foreach X dx,
-                // json encode ? or set as part DeliveryMonitoringData
-                // put in buffer to later update
-            // update delivery_monitoring
-            // delete kv_delivery_monitoring
-
-        $subReport = new Report(Report::TYPE_INFO);
-        $removeKV = $this->getOption('deleteKV');
-        $persistConfig = $this->getOption('persistConfig');
-        $chunkSize = $this->getOption('chunkSize');
-        $resume = $this->getOption('resume');
-
-        /** @var MonitoringStorage $monitoringService */
-        $monitoringService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $originalPrimaryColumns = $monitoringService->getOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS);
-        $fields = array_unique(explode(',', $this->getOption('fields')));
-        $kvFields = array_diff($fields, $originalPrimaryColumns);
-        if (empty($kvFields)) {
-            return new Report(
-                Report::TYPE_INFO,
-                'Nothing to migrate'
-            );
-        }
-
-        $dataLength = 0;
-        if ($this->hasOption('dataLength')) {
-            $dataLength = (int) $this->getOption('dataLength');
-        }
-        foreach ($kvFields as $field) {
-            $createColumnReport = $this->addColumn($field, $dataLength);
-            $subReport->add($createColumnReport);
-        }
-
-        $total = $monitoringService->count([]);
         $offset = 0;
 
-        if ($resume) {
-            $offset = (int)$this->getCache()->get(__CLASS__ . 'offset');
-        }
+        try {
+            for ($i = 0; $i < $chunk; $i++) {
+                $deliveryExecutions = $this->findDeliveryExecutionsByChunk($offset);
 
-        $executionProcessed = 0;
-        $removed = 0;
+                foreach ($deliveryExecutions as $deliveryExecution) {
+                    $kvData = $this->fetchDeliveryExecutionExtraData($deliveryExecution);
 
-        while ($offset < $total ) {
-            $this->getCache()->set(__CLASS__ . 'offset', $offset);
+                    $this->migrateDeliveryExecutionKvDataToExtraColumn($deliveryExecution);
 
-            $options = [
-                'limit' => $chunkSize,
-                'offset' => $offset
-            ];
-            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, $originalPrimaryColumns);
-            $deliveryExecutionsData = $monitoringService->find([], $options, true);
-            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
-            foreach ($deliveryExecutionsData as $dd) {
-                $monitoringService->save($dd);
-                $executionProcessed++;
-
-                if ($removeKV) {
-                    $sql = 'DELETE FROM ' . MonitoringStorage::KV_TABLE_NAME . '
-                    WHERE ' . MonitoringStorage::KV_COLUMN_KEY . ' IN (' . implode(',', array_fill(0, count($kvFields), '?')) . ')' .
-                        'AND ' . MonitoringStorage::KV_COLUMN_PARENT_ID . ' =?';
-                    $removed += $monitoringService->getPersistence()->exec($sql, array_merge($kvFields, [$dd->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]));
+                    $this->deleteDeliveryExecutionKvData($deliveryExecution, $kvData);
                 }
             }
-            $offset += $chunkSize;
-        }
-        $subReport->add(Report::createSuccess(__('%s executions migrated', $executionProcessed)));
-
-        if ($removeKV) {
-            $subReport->add(Report::createSuccess(__('%s KV entries removed', $removed)));
+        } catch (Exception $e) {
+            return new Report(Report::TYPE_ERROR, $e->getMessage());
         }
 
-        if ($persistConfig) {
-            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
-            $this->getServiceManager()->register(DeliveryMonitoringService::SERVICE_ID, $monitoringService);
-            $subReport->add(Report::createSuccess('Config persisted (ONLY ON THE CURRENT SERVER. UPDATE CONFIGS ON ALL OTHER SERVERS)'));
-        }
-
-        // And return a Report!
-        $result = new Report(
-            Report::TYPE_SUCCESS,
-            'Thanks for using migration tool!'
-        );
-        $result->add($subReport);
-
-        $this->getCache()->set(__CLASS__ . 'offset', 0);
-
-        return $result;
+        return $this->createScriptReport();
     }
 
     protected function provideUsage()
@@ -288,45 +122,121 @@ class MonitoringExtraFieldMigration extends ScriptAction
         ];
     }
 
-    protected function addColumn(string $columnName, int $dataLength)
+    /**
+     * Check if service is already configured to use JSON column and if column `extra_field` exists
+     *
+     * @throws Exception
+     */
+    private function validateMigrationCanBeDone(): void
     {
-        $strictMode = $this->getOption('strictMode');
-
-        $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
-        $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
-        $schemaManager = $persistence->getDriver()->getSchemaManager();
-        $schema = $schemaManager->createSchema();
-        $fromSchema = clone $schema;
-
-        try {
-            $tableData = $schema->getTable(MonitoringStorage::TABLE_NAME);
-            $options = ['notnull' => false];
-            $columnType = 'text';
-            if ($dataLength > 0) {
-                $columnType = 'string';
-                $options['length'] = $dataLength;
-            }
-
-            $tableData->addColumn($columnName, $columnType, $options);
-            $queries = $persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
-            foreach ($queries as $query) {
-                $persistence->exec($query);
-            }
-        } catch (\Exception $exception) {
-            if ($strictMode) {
-                throw $exception;
-            }
+        if (!$this->monitoringService instanceof SimpleMonitoringStorage) {
+            throw new Exception('DeliveryMonitoringService is not implementing SimpleMonitoringStorage. Migration aborted');
         }
-        return Report::createSuccess(__('Column %s successfully created', $columnName));
 
+        $table = $this->monitoringService
+            ->getPersistence()
+            ->getDriver()
+            ->getSchemaManager()
+            ->createSchema()
+            ->getTable(SimpleMonitoringStorage::TABLE_NAME);
+
+        if (!$table->hasColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA)) {
+            throw new Exception(sprintf('Column %s does not exist. Migration aborted', SimpleMonitoringStorage::COLUMN_EXTRA_DATA));
+        }
+    }
+
+    private function printMigrationScriptOptions(int $countOfDeliveryExecution, int $chunk) :void
+    {
+        echo 'Script options: ' . PHP_EOL;
+        echo sprintf(' - DRY RUN mode: %s', $this->getOption('wet-run') ? 'no' : 'yes') . PHP_EOL;
+        echo sprintf(' - Delete KV data: %s', $this->getOption('deleteKv') ? 'yes' : 'no') . PHP_EOL;
+        echo sprintf(' - Number of delivery executions found: %s', $countOfDeliveryExecution) . PHP_EOL;
+        echo sprintf(' - Chunk size: %s', $this->getOption('chunkSize')) . PHP_EOL;
+        echo sprintf(' - Number of iteration: %s', $chunk) . PHP_EOL;
+    }
+
+    private function findDeliveryExecutionsByChunk(int &$offset): array
+    {
+        $chunkSize = $this->getOption('chunkSize');
+
+        $options = [
+            'limit' => $chunkSize,
+            'offset' => $offset,
+        ];
+
+        $deliveryExecutions = $this->monitoringService->find([], $options);
+
+        if (!$this->getOption('deleteKv')) {
+            $offset += $chunkSize;
+        }
+
+        // Moving percentage
+        echo sprintf('%s delivery executions fetched.', count($deliveryExecutions)) . PHP_EOL;
+
+        return $deliveryExecutions;
+    }
+
+    private function fetchDeliveryExecutionExtraData(DeliveryMonitoringData $deliveryExecution): array
+    {
+        $stmt = $this->monitoringService->getPersistence()->query(
+            'SELECT monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id = ?',
+            [
+                $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+            ]
+        );
+
+        $kvData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($kvData as $data) {
+            $deliveryExecution->addValue($data['monitoring_key'], $data['monitoring_value']);
+        }
+        return $kvData;
     }
 
     /**
-     * @return common_persistence_KeyValuePersistence|\common_persistence_Persistence
+     * @throws Exception
      */
-    private function getCache()
+    private function migrateDeliveryExecutionKvDataToExtraColumn(DeliveryMonitoringData $deliveryExecution)
     {
-        return \common_persistence_KeyValuePersistence::getPersistence('cache');
+        if ($this->getOption('wet-run')) {
+            if ($this->monitoringService->partialSave($deliveryExecution)) {
+                $this->updated++;
+            } else {
+                throw new Exception(sprintf(
+                    'Unable to save delivery execution %s',
+                    $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                ));
+            }
+        } else {
+            $this->updated++;
+        }
+    }
+
+    private function deleteDeliveryExecutionKvData(DeliveryMonitoringData $deliveryExecution, array $kvData): void
+    {
+        if ($this->getOption('wet-run')) {
+            if ($this->getOption('deleteKv')) {
+                $this->deleted += $this->monitoringService->getPersistence()->exec(
+                    'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?',
+                    [$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
+                );
+            }
+        }  else {
+            if ($this->getOption('deleteKv')) {
+                $this->deleted += count($kvData);
+            }
+        }
+    }
+
+    private function createScriptReport(): Report
+    {
+        $wetrun = $this->getOption('wet-run');
+        $report = Report::createInfo();
+        $report->add(Report::createSuccess(sprintf('Saved delivery execution: %s', $this->updated)));
+        $report->add(Report::createSuccess(sprintf('ExtraData removed from KV table: %s', $this->deleted)));
+        $report->add(new Report(
+            $wetrun ? Report::TYPE_SUCCESS : Report::TYPE_ERROR,
+            sprintf('Script runtime executed in `%s` mode', $wetrun ? 'WET_RUN' : 'DRY_RUN')
+        ));
+        return $report;
     }
 }
