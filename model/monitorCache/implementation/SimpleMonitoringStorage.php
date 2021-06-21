@@ -557,14 +557,15 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                 $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
             } else {
                 $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
+                $extraDataValue = json_encode($extraDataValue);
             }
-            $params[sprintf(':%s', $extraDataKey)] = json_encode($extraDataValue);
+            $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
         }
 
         if (!empty($setExtraDataClauses)) {
             if ($platformName == 'mysql') {
                 $setClauses[] = sprintf(
-                    '%s = json_set(%s, %s)',
+                    '%s = json_set(COALESCE(%s, \'{}\'), %s)',
                     self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(', ', $setExtraDataClauses)
                 );
             } else {
@@ -692,9 +693,9 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
                     $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
                 } else {
                     $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                    $value = is_array($value) ? $value : [$value];
+                    $value = array_map('json_encode', $value);
                 }
-                $value = is_array($value) ? $value : [$value];
-                $value = array_map('json_encode', $value);
             }
 
             if(is_array($value)){
