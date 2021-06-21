@@ -62,6 +62,7 @@ class MonitoringExtraFieldMigration extends ScriptAction
             ],
 
             'deleteKv' => [
+                'prefix' => 'd',
                 'flag' => true,
                 'longPrefix' => 'deleteKv',
                 'defaultValue' => 0,
@@ -166,7 +167,7 @@ class MonitoringExtraFieldMigration extends ScriptAction
 
         $deliveryExecutions = $this->monitoringService->find([], $options);
 
-        if (!$this->getOption('deleteKv')) {
+        if (!$this->getOption('deleteKv') || !$this->getOption('wet-run')) {
             $offset += $chunkSize;
         }
 
@@ -231,10 +232,15 @@ class MonitoringExtraFieldMigration extends ScriptAction
         $report = Report::createInfo();
         $report->add(Report::createSuccess(sprintf('Saved delivery execution: %s', $this->updated)));
         $report->add(Report::createSuccess(sprintf('ExtraData removed from KV table: %s', $this->deleted)));
-        $report->add(new Report(
-            $wetrun ? Report::TYPE_SUCCESS : Report::TYPE_ERROR,
-            sprintf('Script runtime executed in `%s` mode', $wetrun ? 'WET_RUN' : 'DRY_RUN')
-        ));
+        if ($wetrun) {
+            $report->add(new Report(Report::TYPE_SUCCESS, 'Script runtime executed in `WET_RUN` mode'));
+            $report->add(new Report(Report::TYPE_INFO,
+                'You can now check that `kv_delivery_monitoring` table is empty and delete it'
+            ));
+
+        } else {
+            $report->add(new Report(Report::TYPE_ERROR, 'Script runtime executed in `DRY_RUN` mode'));
+        }
         return $report;
     }
 }
