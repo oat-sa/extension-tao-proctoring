@@ -86,9 +86,9 @@ class MonitoringExtraFieldMigration extends ScriptAction
         }
 
         $count = $this->monitoringService->count();
-        $chunk = ceil($count / $this->getOption('chunkSize'));
+        $chunk = (int) ceil($count / $this->getOption('chunkSize'));
 
-        $this->printMigrationScriptOptions($count, (int) $chunk);
+        $this->printMigrationScriptOptions($count, $chunk);
 
         $offset = 0;
 
@@ -213,15 +213,13 @@ class MonitoringExtraFieldMigration extends ScriptAction
 
     private function deleteDeliveryExecutionKvData(DeliveryMonitoringData $deliveryExecution, array $kvData): void
     {
-        if ($this->getOption('wet-run')) {
-            if ($this->getOption('deleteKv')) {
+        if ($this->getOption('deleteKv')) {
+            if ($this->getOption('wet-run')) {
                 $this->deleted += $this->monitoringService->getPersistence()->exec(
                     'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?',
                     [$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
                 );
-            }
-        }  else {
-            if ($this->getOption('deleteKv')) {
+            }  else {
                 $this->deleted += count($kvData);
             }
         }
