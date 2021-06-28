@@ -28,12 +28,12 @@ use oat\oatbox\extension\script\ScriptAction;
 use common_report_Report as Report;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\implementation\SimpleMonitoringStorage;
+use oat\taoProctoring\model\repository\MonitoringRepository;
 use PDO;
 
 class MonitoringExtraFieldMigration extends ScriptAction
 {
-    /** @var SimpleMonitoringStorage */
+    /** @var MonitoringRepository */
     private $monitoringService;
 
     /** @var int */
@@ -130,8 +130,8 @@ class MonitoringExtraFieldMigration extends ScriptAction
      */
     private function validateMigrationCanBeDone(): void
     {
-        if (!$this->monitoringService instanceof SimpleMonitoringStorage) {
-            throw new Exception('DeliveryMonitoringService is not implementing SimpleMonitoringStorage. Migration aborted');
+        if (!$this->monitoringService instanceof MonitoringRepository) {
+            throw new Exception('DeliveryMonitoringService is not implementing MonitoringRepository. Migration aborted');
         }
 
         $table = $this->monitoringService
@@ -139,10 +139,10 @@ class MonitoringExtraFieldMigration extends ScriptAction
             ->getDriver()
             ->getSchemaManager()
             ->createSchema()
-            ->getTable(SimpleMonitoringStorage::TABLE_NAME);
+            ->getTable(MonitoringRepository::TABLE_NAME);
 
-        if (!$table->hasColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA)) {
-            throw new Exception(sprintf('Column %s does not exist. Migration aborted', SimpleMonitoringStorage::COLUMN_EXTRA_DATA));
+        if (!$table->hasColumn(MonitoringRepository::COLUMN_EXTRA_DATA)) {
+            throw new Exception(sprintf('Column %s does not exist. Migration aborted', MonitoringRepository::COLUMN_EXTRA_DATA));
         }
     }
 
