@@ -72,7 +72,7 @@ class MonitoringExtraFieldMigration extends ScriptAction
 
     protected function provideDescription()
     {
-        return 'This tools take care about KV monitoring data migration to the relational table as extra_data column';
+        return 'This tool takes care about KV monitoring data migration to the relational table as extra_data column';
     }
 
     protected function run()
@@ -162,21 +162,17 @@ class MonitoringExtraFieldMigration extends ScriptAction
             'offset' => $offset,
         ];
 
-        $deliveryExecutions = $this->monitoringService->find([], $options);
+        $unorderedDeliveryExecutions = $this->monitoringService->find([], $options);
 
-        if (!$this->getOption('deleteKv') || !$this->getOption('wet-run')) {
-            $offset += $chunkSize;
+        $offset += $chunkSize;
+
+        $deliveryExecutions = [];
+        foreach ($unorderedDeliveryExecutions as $deliveryExecution) {
+            $deliveryExecutions[$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]] = $deliveryExecution;
         }
 
         // Moving percentage
         echo sprintf('%s delivery executions fetched.', count($deliveryExecutions)) . PHP_EOL;
-
-        array_walk(
-            $deliveryExecutions,
-            function(&$key, DeliveryMonitoringData $deliveryExecution) {
-                $key = $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
-            }
-        );
 
         return $this->hydrateDeliveryExecutionsExtraData($deliveryExecutions);
     }
@@ -187,17 +183,18 @@ class MonitoringExtraFieldMigration extends ScriptAction
      */
     private function hydrateDeliveryExecutionsExtraData(array $deliveryExecutions): array
     {
-        $stmt = $this->monitoringService->getPersistence()->query(
-            'SELECT parent_id, monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id IN ?',
-            [array_keys($deliveryExecutions)]
+        $sql = sprintf(
+            'SELECT parent_id, monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id IN (%s) ',
+            implode(',', array_fill(0, count($deliveryExecutions), '?'))
         );
+        $stmt = $this->monitoringService->getPersistence()->query($sql, array_keys($deliveryExecutions));
 
         $kvData = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($kvData as $data) {
             $deliveryExecutions[$data['parent_id']]->addValue($data['monitoring_key'], $data['monitoring_value']);
         }
 
-        if (!$this->getOption('wet-run')) {
+        if (!$this->getOption('wet-run') && $this->getOption('deleteKv')) {
             $this->deleted += count($kvData);
         }
 
@@ -225,13 +222,11 @@ class MonitoringExtraFieldMigration extends ScriptAction
 
     private function deleteDeliveryExecutionKvData(DeliveryMonitoringData $deliveryExecution): void
     {
-        if ($this->getOption('deleteKv')) {
-            if ($this->getOption('wet-run')) {
-                $this->deleted += $this->monitoringService->getPersistence()->exec(
-                    'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?',
-                    [$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
-                );
-            }
+        if ($this->getOption('deleteKv') && $this->getOption('wet-run')) {
+            $this->deleted += $this->monitoringService->getPersistence()->exec(
+                'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?',
+                [$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
+            );
         }
     }
 
@@ -244,7 +239,8 @@ class MonitoringExtraFieldMigration extends ScriptAction
         if ($wetrun) {
             $report->add(new Report(Report::TYPE_SUCCESS, 'Script runtime executed in `WET_RUN` mode'));
             $report->add(new Report(Report::TYPE_INFO,
-                'You can now check that `kv_delivery_monitoring` table is empty and delete it'
+                'You can now check that `kv_delivery_monitoring` table is empty and delete it. ' .
+                 'Only valid if you have specified --deleteKv flag.'
             ));
 
         } else {
