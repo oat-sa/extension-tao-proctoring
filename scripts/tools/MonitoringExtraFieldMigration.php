@@ -65,7 +65,6 @@ class MonitoringExtraFieldMigration extends ScriptAction
                 'prefix' => 'd',
                 'flag' => true,
                 'longPrefix' => 'deleteKv',
-                'defaultValue' => 0,
                 'description' => 'Indicate if the script should remove migrated data.'
             ],
         ];
@@ -98,11 +97,9 @@ class MonitoringExtraFieldMigration extends ScriptAction
                 $deliveryExecutions = $this->findDeliveryExecutionsByChunk($offset);
 
                 foreach ($deliveryExecutions as $deliveryExecution) {
-                    $kvData = $this->fetchDeliveryExecutionExtraData($deliveryExecution);
-
                     $this->migrateDeliveryExecutionKvDataToExtraColumn($deliveryExecution);
 
-                    $this->deleteDeliveryExecutionKvData($deliveryExecution, $kvData);
+                    $this->deleteDeliveryExecutionKvData($deliveryExecution);
                 }
             }
         } catch (Exception $e) {
@@ -174,23 +171,37 @@ class MonitoringExtraFieldMigration extends ScriptAction
         // Moving percentage
         echo sprintf('%s delivery executions fetched.', count($deliveryExecutions)) . PHP_EOL;
 
-        return $deliveryExecutions;
+        array_walk(
+            $deliveryExecutions,
+            function(&$key, DeliveryMonitoringData $deliveryExecution) {
+                $key = $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
+            }
+        );
+
+        return $this->hydrateDeliveryExecutionsExtraData($deliveryExecutions);
     }
 
-    private function fetchDeliveryExecutionExtraData(DeliveryMonitoringData $deliveryExecution): array
+    /**
+     * @param DeliveryMonitoringData[] $deliveryExecutions
+     * @return DeliveryMonitoringData[]
+     */
+    private function hydrateDeliveryExecutionsExtraData(array $deliveryExecutions): array
     {
         $stmt = $this->monitoringService->getPersistence()->query(
-            'SELECT monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id = ?',
-            [
-                $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
-            ]
+            'SELECT parent_id, monitoring_key, monitoring_value FROM kv_delivery_monitoring WHERE parent_id IN ?',
+            [array_keys($deliveryExecutions)]
         );
 
         $kvData = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($kvData as $data) {
-            $deliveryExecution->addValue($data['monitoring_key'], $data['monitoring_value']);
+            $deliveryExecutions[$data['parent_id']]->addValue($data['monitoring_key'], $data['monitoring_value']);
         }
-        return $kvData;
+
+        if (!$this->getOption('wet-run')) {
+            $this->deleted += count($kvData);
+        }
+
+        return $deliveryExecutions;
     }
 
     /**
@@ -212,7 +223,7 @@ class MonitoringExtraFieldMigration extends ScriptAction
         }
     }
 
-    private function deleteDeliveryExecutionKvData(DeliveryMonitoringData $deliveryExecution, array $kvData): void
+    private function deleteDeliveryExecutionKvData(DeliveryMonitoringData $deliveryExecution): void
     {
         if ($this->getOption('deleteKv')) {
             if ($this->getOption('wet-run')) {
@@ -220,8 +231,6 @@ class MonitoringExtraFieldMigration extends ScriptAction
                     'DELETE FROM kv_delivery_monitoring WHERE parent_id = ?',
                     [$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
                 );
-            }  else {
-                $this->deleted += count($kvData);
             }
         }
     }
