@@ -29,7 +29,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use oat\generis\persistence\PersistenceManager;
 use oat\tao\scripts\tools\migrations\AbstractMigration;
-use oat\taoProctoring\model\monitorCache\implementation\SimpleMonitoringStorage;
+use oat\taoProctoring\model\repository\MonitoringRepository;
 
 final class Version202106081338544101_taoProctoring extends AbstractMigration
 {
@@ -48,14 +48,14 @@ final class Version202106081338544101_taoProctoring extends AbstractMigration
                 $schema = $persistence->getSchemaManager()->createSchema();
                 $fromSchema = clone $schema;
 
-                $table = $schema->getTable(SimpleMonitoringStorage::TABLE_NAME);
-                $table->addColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA, Types::JSON, array("notnull" => false));
+                $table = $schema->getTable(MonitoringRepository::TABLE_NAME);
+                $table->addColumn(MonitoringRepository::COLUMN_EXTRA_DATA, Types::JSON, array("notnull" => false));
                 $persistence->getPlatForm()->migrateSchema($fromSchema, $schema);
             } elseif ($platformName == 'postgresql') {
                 $query = sprintf(
                     'ALTER TABLE %s ADD COLUMN %s jsonb',
-                    SimpleMonitoringStorage::TABLE_NAME,
-                    SimpleMonitoringStorage::COLUMN_EXTRA_DATA
+                    MonitoringRepository::TABLE_NAME,
+                    MonitoringRepository::COLUMN_EXTRA_DATA
                 );
                 $persistence->exec($query);
             } else {
@@ -82,9 +82,9 @@ final class Version202106081338544101_taoProctoring extends AbstractMigration
         $schema = $persistence->getSchemaManager()->createSchema();
         $fromSchema = clone $schema;
 
-        $table = $schema->getTable(SimpleMonitoringStorage::TABLE_NAME);
-        if ($table->hasColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA)) {
-            $table->dropColumn(SimpleMonitoringStorage::COLUMN_EXTRA_DATA);
+        $table = $schema->getTable(MonitoringRepository::TABLE_NAME);
+        if ($table->hasColumn(MonitoringRepository::COLUMN_EXTRA_DATA)) {
+            $table->dropColumn(MonitoringRepository::COLUMN_EXTRA_DATA);
         }
         $persistence->getPlatForm()->migrateSchema($fromSchema, $schema);
         $this->addReport(Report::createSuccess('`extra_data` column was deleted in `delivery_monitoring` table'));

@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace oat\taoProctoring\model\monitorCache\implementation;
+namespace oat\taoProctoring\model\repository;
 
 use common_exception_NotFound;
 use common_persistence_SqlPersistence;
@@ -37,10 +37,11 @@ use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonit
 use oat\oatbox\service\ConfigurableService;
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
+use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use PDO;
 use PDOException;
 
-class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMonitoringService
+class MonitoringRepository extends ConfigurableService implements DeliveryMonitoringService
 {
     use OntologyAwareTrait;
 
