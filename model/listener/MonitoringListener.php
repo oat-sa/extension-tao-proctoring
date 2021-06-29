@@ -51,14 +51,12 @@ use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use tao_helpers_Date;
 
-class MonitoringListener extends ConfigurableService
+class MonitoringListener extends ConfigurableService implements MonitoringListenerInterface
 {
     /**
-     * @param DeliveryExecutionCreated $event
      * @throws common_exception_NotFound
-     * @throws Exception
      */
-    public function executionCreated(DeliveryExecutionCreated $event)
+    public function executionCreated(DeliveryExecutionCreated $event): void
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
@@ -75,12 +73,9 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * @param DeliveryExecutionState $event
-     * @throws common_exception_Error
-     * @throws common_exception_NotFound
-     * @throws Exception
+     * @throws common_exception_Error|common_exception_NotFound|Exception
      */
-    public function executionStateChanged(DeliveryExecutionState $event)
+    public function executionStateChanged(DeliveryExecutionState $event): void
     {
         $data = $this->getMonitoringRepository()->createMonitoringData($event->getDeliveryExecution());
 
@@ -93,12 +88,9 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * @param DeliveryExecutionState $event
-     * @param DeliveryMonitoringData $data
-     * @throws common_exception_Error
-     * @throws common_exception_NotFound
+     * @throws common_exception_Error|common_exception_NotFound
      */
-    protected function fillMonitoringOnExecutionStateChanged(DeliveryExecutionState $event, DeliveryMonitoringData $data)
+    protected function fillMonitoringOnExecutionStateChanged(DeliveryExecutionState $event, DeliveryMonitoringData $data): void
     {
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
@@ -124,15 +116,11 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * Something changed in the state of the test execution
-     * (for example: the current item in the test)
+     * Something changed in the state of the test execution (for example: the current item in the test)
      *
-     * @param TestChangedEvent $event
-     * @throws common_exception_NotFound
-     * @throws common_exception_Error
-     * @throws Exception
+     * @throws common_exception_NotFound|common_exception_Error
      */
-    public function testStateChanged(TestChangedEvent $event)
+    public function testStateChanged(TestChangedEvent $event): void
     {
         $deliveryExecution = $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID)
             ->getDeliveryExecution($event->getServiceCallId());
@@ -168,14 +156,11 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * The status of the test execution has changed
-     * (for example: from running to paused)
+     * The status of the test execution has change (for example: from running to paused)
      *
-     * @param QtiTestStateChangeEvent $event
      * @throws common_exception_NotFound
-     * @throws Exception
      */
-    public function qtiTestStatusChanged(QtiTestStateChangeEvent $event)
+    public function qtiTestStatusChanged(QtiTestStateChangeEvent $event): void
     {
         /** @var DeliveryExecutionService $deliveryExecutionService */
         $deliveryExecutionService = $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID);
@@ -196,11 +181,11 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * Update the label of the delivery across the entrie cache
+     * Update the label of the delivery across the entry cache
      *
      * @param MetadataModified $event
      */
-    public function deliveryLabelChanged(MetadataModified $event)
+    public function deliveryLabelChanged(MetadataModified $event): void
     {
         $resource = $event->getResource();
         if ($event->getMetadataUri() === OntologyRdfs::RDFS_LABEL) {
@@ -218,13 +203,11 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * Sets the protor who authorized this delivery execution
+     * Set the proctor who authorized this delivery execution
      *
-     * @param AuthorizationGranted $event
      * @throws common_exception_NotFound
-     * @throws Exception
      */
-    public function deliveryAuthorized(AuthorizationGranted $event)
+    public function deliveryAuthorized(AuthorizationGranted $event): void
     {
         $deliveryExecution = $event->getDeliveryExecution();
         $data = $this->getMonitoringRepository()->createMonitoringData($deliveryExecution);
@@ -236,11 +219,9 @@ class MonitoringListener extends ConfigurableService
     }
 
     /**
-     * @param DeliveryExecutionReactivated $event
      * @throws common_exception_NotFound
-     * @throws Exception
      */
-    public function catchTestReactivatedEvent(DeliveryExecutionReactivated $event)
+    public function catchTestReactivatedEvent(DeliveryExecutionReactivated $event): void
     {
         $deliveryExecution = $event->getDeliveryExecution();
 
@@ -254,14 +235,8 @@ class MonitoringListener extends ConfigurableService
         }
     }
 
-    /**
-     * @param DeliveryMonitoringData $data
-     * @param User $user
-     * @return DeliveryMonitoringData
-     */
-    private function updateTestTakerInformation($data, $user)
+    private function updateTestTakerInformation(DeliveryMonitoringData $data, User $user): DeliveryMonitoringData
     {
-        // need to add user to event
         $firstNames = $user->getPropertyValues(GenerisRdf::PROPERTY_USER_FIRSTNAME);
         if (!empty($firstNames)) {
             $data->update(DeliveryMonitoringService::TEST_TAKER_FIRST_NAME, reset($firstNames));
@@ -274,13 +249,7 @@ class MonitoringListener extends ConfigurableService
         return $data;
     }
 
-    /**
-     * @param DeliveryMonitoringData $data
-     * @param DeliveryExecutionInterface $deliveryExecution
-     * @return DeliveryMonitoringData
-     * @throws common_exception_NotFound
-     */
-    private function updateDeliveryInformation($data, $deliveryExecution)
+    private function updateDeliveryInformation(DeliveryMonitoringData $data, DeliveryExecutionInterface $deliveryExecution): DeliveryMonitoringData
     {
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
