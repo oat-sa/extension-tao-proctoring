@@ -292,7 +292,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
     }
 
     /**
-     * @todo extract this method to another service with statistic responsabilities
+     * @todo extract this method to another service with statistic responsibilities
      * @todo query of 150 lines, erf
      *
      * @param int $limit

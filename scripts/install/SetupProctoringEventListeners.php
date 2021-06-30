@@ -22,11 +22,14 @@ declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install;
 
+use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
+use oat\taoProctoring\model\listener\MonitoringListenerInterface;
+use oat\taoProctoring\scripts\tools\MonitoringExtraFieldConfigurationMigration;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoTests\models\event\TestChangedEvent;
@@ -53,19 +56,16 @@ class SetupProctoringEventListeners extends InstallAction
      */
     public function __invoke($params)
     {
-        // monitoring cache
-        $this->registerEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']);
-        $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']);
-        $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
-        $this->registerEvent(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
-        $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
-        $this->registerEvent(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
+        $this->registerEvent(DeliveryExecutionState::class, [MonitoringListenerInterface::SERVICE_ID, 'executionStateChanged']);
+        $this->registerEvent(DeliveryExecutionCreated::class, [MonitoringListenerInterface::SERVICE_ID, 'executionCreated']);
+        $this->registerEvent(MetadataModified::class, [MonitoringListenerInterface::SERVICE_ID, 'deliveryLabelChanged']);
+        $this->registerEvent(TestChangedEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']);
+        $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']);
+        $this->registerEvent(AuthorizationGranted::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']);
+        $this->registerEvent(TestExecutionPausedEvent::class, [MonitoringListenerInterface::SERVICE_ID, 'catchSessionPause']);
+
         $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
-
-        $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']);
-
         $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
-
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
 
         /**
