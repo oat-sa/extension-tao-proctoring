@@ -46,9 +46,10 @@ class SetupDeliveryMonitoring extends InstallAction
             $this->propagate($service);
         }
 
-        call_user_func(new DbSetup(), ['persistence' => $service->getPersistence()]);
+        $dbSetup = new DbSetup();
+        $dbSetup->generateTable($service->getPersistence());
 
-        $service->setOption(MonitoringRepository::OPTION_PRIMARY_COLUMNS, DbSetup::getPrimaryColumns());
+        $service->setOption(MonitoringRepository::OPTION_PRIMARY_COLUMNS, $dbSetup->getPrimaryColumns());
         $this->registerService(MonitoringRepository::SERVICE_ID, $service);
     }
 }
