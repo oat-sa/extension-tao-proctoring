@@ -31,6 +31,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoProctoring\model\authorization\AuthorizationGranted;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\listener\MonitoringListener;
 use oat\taoProctoring\model\listener\MonitoringListenerInterface;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\repository\MonitoringRepository;
@@ -40,10 +41,8 @@ use oat\taoTests\models\event\TestExecutionPausedEvent;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
-class MonitoringExtraFieldConfigurationMigration extends ScriptAction implements ServiceLocatorAwareInterface
+class MonitoringExtraFieldConfigurationMigration extends ScriptAction
 {
-    use ServiceLocatorAwareTrait;
-
     protected function provideOptions()
     {
         return [];
@@ -60,6 +59,8 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction implements
 
         $this->registerMonitoringRepository();
 
+        $this->registerMonitoringListener();
+
         $report = new Report(Report::TYPE_SUCCESS, 'Events and services are now configured to use new data schema');
         $report->add(
             new Report(
@@ -75,7 +76,7 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction implements
 
     private function migrateEvents(): void
     {
-        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
+        $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
 
         $this->detachLegacyEvents($eventManager);
         $this->attachNewEvents($eventManager);
@@ -107,10 +108,15 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction implements
 
     private function registerMonitoringRepository(): void
     {
-        $monitoringStorage = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+        $monitoringStorage = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         if (is_a($monitoringStorage, 'oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService', true)) {
             $options = $monitoringStorage->getOptions();
             $this->registerService(DeliveryMonitoringService::SERVICE_ID, new MonitoringRepository($options));
         }
+    }
+
+    private function registerMonitoringListener(): void
+    {
+        $this->registerService(MonitoringListenerInterface::SERVICE_ID, new MonitoringListener());
     }
 }
