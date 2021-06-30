@@ -14,10 +14,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA;
  *
  */
+
 declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install;
@@ -40,16 +40,8 @@ use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 
-/**
- * Class RegisterSessionStateListener
- * @package oat\taoProctoring\scripts\install
- * @author Aleh Hutnikau, <hutnikau@1pt.com>
- */
 class SetupProctoringEventListeners extends InstallAction
 {
-    /**
-     * @param $params
-     */
     public function __invoke($params)
     {
         $this->registerEvent(DeliveryExecutionState::class, [MonitoringListenerInterface::SERVICE_ID, 'executionStateChanged']);
@@ -73,4 +65,3 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(DeliveryExecutionTimerAdjusted::class, [DeliveryLogTimerAdjustedEventListener::class, 'logTimeAdjustment']);
     }
 }
-
