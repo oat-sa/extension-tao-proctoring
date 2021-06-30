@@ -65,7 +65,8 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction implements
             new Report(
                 Report::TYPE_INFO,
                 'If you have delivery executions, you should migrate them via: ' . PHP_EOL .
-                '`php index.php \'\oat\taoProctoring\scripts\tools\MonitoringExtraFieldMigration\' -h`'
+                '`php index.php \'\oat\taoProctoring\scripts\tools\MonitoringExtraFieldMigration\' -h`' . PHP_EOL .
+                'This script can take time depending of number of delivery execution to migrate'
             )
         );
 
