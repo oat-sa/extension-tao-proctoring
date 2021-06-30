@@ -36,7 +36,7 @@ use oat\taoTests\models\event\TestChangedEvent;
 
 interface MonitoringListenerInterface
 {
-    public const SERVICE_ID = 'tapProctoring/MonitoringListener';
+    public const SERVICE_ID = 'taoProctoring/MonitoringListener';
 
     /**
      * @throws common_exception_NotFound

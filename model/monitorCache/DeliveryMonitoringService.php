@@ -117,13 +117,13 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
     public function count();
 
     /**
-     * Get statistic by statuses groped by deliveries.
+     * Get statistic by statuses grouped by deliveries.
      * Result is an array of deliveries with amount of delivery executions in each status
-     * @param integer $limit
-     * @param integer $offset
-     * @param string $orderby - status uri to order
-     * @param string $orderdir - status uri to order
-     * @return mixed
      */
     public function getStatusesStatistic($limit = 0, $offset = 0, $orderby = 'delivery_name', $orderdir = 'asc');
+
+    /**
+     * Count statistic by statuses grouped by deliveries.
+     */
+    public function getCountOfStatistics();
 }
