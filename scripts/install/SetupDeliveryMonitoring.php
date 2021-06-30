@@ -47,6 +47,7 @@ class SetupDeliveryMonitoring extends InstallAction implements ServiceLocatorAwa
                 MonitoringRepository::OPTION_PERSISTENCE => 'default',
                 MonitoringRepository::OPTION_USE_UPDATE_MULTIPLE => false
             ));
+            $this->propagate($service);
         }
 
         call_user_func(new DbSetup(), ['persistence' => $service->getPersistence()]);
