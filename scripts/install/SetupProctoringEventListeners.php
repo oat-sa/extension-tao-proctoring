@@ -22,19 +22,15 @@ declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install;
 
-use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\InstallAction;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
 use oat\taoProctoring\model\listener\MonitoringListenerInterface;
-use oat\taoProctoring\scripts\tools\MonitoringExtraFieldConfigurationMigration;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
-use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoProctoring\helpers\DeliveryHelper;
