@@ -28,20 +28,16 @@ use oat\oatbox\service\ServiceNotFoundException;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\repository\MonitoringRepository;
 use oat\taoProctoring\scripts\install\db\DbSetup;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
 /**
  * Setup the tables and the service to enable delivery data to allow monitoring
  */
-class SetupDeliveryMonitoring extends InstallAction implements ServiceLocatorAwareInterface
+class SetupDeliveryMonitoring extends InstallAction
 {
-    use ServiceLocatorAwareTrait;
-
     public function __invoke($params)
     {
         try {
-            $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
+            $service = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         } catch (ServiceNotFoundException $exception) {
             $service = new MonitoringRepository(array(
                 MonitoringRepository::OPTION_PERSISTENCE => 'default',
