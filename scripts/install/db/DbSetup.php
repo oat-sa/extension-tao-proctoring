@@ -23,21 +23,15 @@ declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install\db;
 
+use common_persistence_SqlPersistence;
 use Doctrine\DBAL\Schema\SchemaException;
 use common_Logger;
-use oat\oatbox\action\Action;
-use oat\oatbox\reporting\Report;
 use oat\taoProctoring\model\repository\MonitoringRepository;
 
-class DbSetup implements Action
+class DbSetup
 {
-    public function __invoke($params)
+    public function generateTable(common_persistence_SqlPersistence $persistence)
     {
-        if (!isset($params['persistence'])) {
-            return new Report(Report::TYPE_ERROR, 'Missing required parameter `persistence`.');
-        }
-        $persistence = $params['persistence'];
-
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
@@ -64,7 +58,7 @@ class DbSetup implements Action
             $tableLog->addColumn(MonitoringRepository::ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
             $tableLog->addColumn(MonitoringRepository::STORED_ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
 
-            if ($persistence->getPlatForm()->getName() == 'mysql') {
+            if (in_array($persistence->getPlatForm()->getName(), ['mysql','sqlite'])) {
                 $tableLog->addColumn(MonitoringRepository::COLUMN_EXTRA_DATA, 'json', array("notnull" => false));
             }
 

@@ -524,7 +524,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $extraData = $this->extractKvData($data);
 
-        $types[self::COLUMN_EXTRA_DATA] = ($this->getPlatformName() == 'mysql') ? 'json' : 'jsonb';
+        $types[self::COLUMN_EXTRA_DATA] = (in_array($this->getPlatformName(), ['mysql','sqlite'])) ? 'json' : 'jsonb';
         $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($extraData);
 
         return $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData, $types) === 1;
@@ -554,7 +554,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $setExtraDataClauses = [];
         $platformName = $this->getPlatformName();
         foreach ($extraData as $extraDataKey => $extraDataValue) {
-            if ($platformName == 'mysql') {
+            if (in_array($platformName, ['mysql','sqlite'])) {
                 $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
             } else {
                 $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
@@ -564,7 +564,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         }
 
         if (!empty($setExtraDataClauses)) {
-            if ($platformName == 'mysql') {
+            if (in_array($platformName, ['mysql','sqlite'])) {
                 $setClauses[] = sprintf(
                     '%s = json_set(COALESCE(%s, \'{}\'), %s)',
                     self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(', ', $setExtraDataClauses)
@@ -690,7 +690,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
             } else {
-                if ($this->getPlatformName() == 'mysql') {
+                if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
                     $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
                 } else {
                     $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
