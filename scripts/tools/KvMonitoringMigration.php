@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,15 +22,17 @@
 
 namespace oat\taoProctoring\scripts\tools;
 
-
 use oat\oatbox\extension\script\ScriptAction;
 use common_report_Report as Report;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
+
+/**
+ * @deprecated
+ */
 class KvMonitoringMigration extends ScriptAction
 {
-
     protected function provideOptions()
     {
         return [

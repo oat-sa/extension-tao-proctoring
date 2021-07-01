@@ -26,6 +26,8 @@ use oat\tao\model\datatable\DatatablePayload;
 use oat\oatbox\service\ServiceManager;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\ActivityMonitoringService;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
+use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
@@ -60,8 +62,8 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
 
     public function getPayload()
     {
-        /** @var \oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage $service */
-        $service = $this->getServiceLocator()->get(\oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage::SERVICE_ID);
+        /** @var DeliveryMonitoringService $service */
+        $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
 
         $offset = ($this->request->getPage() - 1) * $this->request->getRows() ? : 0;
         $limit = $this->request->getRows() ? : 0;
@@ -81,8 +83,8 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
      */
     protected function doPostProcessing(array $result)
     {
-        /** @var \oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage $service */
-        $service = $this->getServiceLocator()->get(\oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage::SERVICE_ID);
+        /** @var DeliveryMonitoringService $service */
+        $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
         $rows = $this->request->getRows();
         $rows = $rows?:1;
         $total = $service->getCountOfStatistics();
