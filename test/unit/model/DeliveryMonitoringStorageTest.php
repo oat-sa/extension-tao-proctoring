@@ -35,11 +35,8 @@ use oat\generis\persistence\PersistenceManager;
 
 class DeliveryMonitoringStorageTest extends TestCase
 {
-    /** @var PersistenceManager */
-    private $persistenceManager;
-
     /** @var MonitoringRepository */
-    private $monitoringRepository;
+    private $subject;
 
     /** @var common_persistence_SqlPersistence $persistence */
     private $persistence;
@@ -48,8 +45,8 @@ class DeliveryMonitoringStorageTest extends TestCase
     {
         $this->persistence = $this->getSqlMock('monitoring')->getPersistenceById('monitoring');
 
-        $this->persistenceManager = $this->createMock(PersistenceManager::class);
-        $this->persistenceManager
+        $persistenceManager = $this->createMock(PersistenceManager::class);
+        $persistenceManager
             ->method('getPersistenceById')
             ->with('monitoring')
             ->willReturn($this->persistence);
@@ -57,13 +54,13 @@ class DeliveryMonitoringStorageTest extends TestCase
         $dbSetup = new DbSetup();
         $dbSetup->generateTable($this->persistence);
 
-        $this->monitoringRepository = new MonitoringRepository([
+        $this->subject = new MonitoringRepository([
             MonitoringRepository::OPTION_PERSISTENCE => 'monitoring',
             MonitoringRepository::OPTION_USE_UPDATE_MULTIPLE => false,
             MonitoringRepository::OPTION_PRIMARY_COLUMNS => $dbSetup->getPrimaryColumns()
         ]);
-        $this->monitoringRepository->setServiceLocator($this->getServiceLocatorMock([
-            PersistenceManager::SERVICE_ID => $this->persistenceManager
+        $this->subject->setServiceLocator($this->getServiceLocatorMock([
+            PersistenceManager::SERVICE_ID => $persistenceManager
         ]));
     }
 
@@ -74,7 +71,7 @@ class DeliveryMonitoringStorageTest extends TestCase
 
     public function testCreateMonitoringData(): DeliveryMonitoringData
     {
-        $data = $this->monitoringRepository->getData($this->getDeliveryExecutionFixture());
+        $data = $this->subject->getData($this->getDeliveryExecutionFixture());
         $this->assertInstanceOf(DeliveryMonitoringData::class, $data);
 
         return $data;
@@ -88,7 +85,7 @@ class DeliveryMonitoringStorageTest extends TestCase
         $data->update('a', '1');
         $data->update('b', '2');
         $data->update(DeliveryMonitoringService::STATUS, DeliveryExecutionInterface::STATE_PAUSED);
-        $this->assertTrue($this->monitoringRepository->save($data));
+        $this->assertTrue($this->subject->save($data));
 
         $dataArray = $data->get();
         $this->assertArrayHasKey('a', $dataArray);
@@ -103,14 +100,14 @@ class DeliveryMonitoringStorageTest extends TestCase
     public function testPartialSave(DeliveryMonitoringData $data): void
     {
         $data->update('a', '3');
-        $this->assertTrue($this->monitoringRepository->partialSave($data));
+        $this->assertTrue($this->subject->partialSave($data));
 
         $dataArray = $data->get();
         $this->assertArrayHasKey('a', $dataArray);
         $this->assertEquals('3', $dataArray['a']);
 
         $data->update('a', '4');
-        $this->assertTrue($this->monitoringRepository->partialSave($data));
+        $this->assertTrue($this->subject->partialSave($data));
 
         $dataArray = $data->get();
         $this->assertArrayHasKey('a', $dataArray);
