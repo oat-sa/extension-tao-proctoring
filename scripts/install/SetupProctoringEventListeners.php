@@ -27,6 +27,7 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
+use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\listener\MonitoringListenerInterface;
 use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoTests\models\event\TestChangedEvent;
@@ -50,8 +51,8 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(TestChangedEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']);
         $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']);
         $this->registerEvent(AuthorizationGranted::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']);
-        $this->registerEvent(TestExecutionPausedEvent::class, [MonitoringListenerInterface::SERVICE_ID, 'catchSessionPause']);
 
+        $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']);
         $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
         $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);

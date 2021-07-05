@@ -92,7 +92,6 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction
         $eventManager->detach(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
         $eventManager->detach(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
         $eventManager->detach(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
-        $eventManager->detach(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']);
     }
 
     private function attachNewEvents(EventManager $eventManager): void
@@ -103,7 +102,6 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction
         $eventManager->attach(TestChangedEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']);
         $eventManager->attach(QtiTestStateChangeEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']);
         $eventManager->attach(AuthorizationGranted::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']);
-        $eventManager->attach(TestExecutionPausedEvent::class, [MonitoringListenerInterface::SERVICE_ID, 'catchSessionPause']);
     }
 
     private function registerMonitoringRepository(): void
