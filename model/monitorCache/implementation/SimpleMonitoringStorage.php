@@ -155,7 +155,7 @@ class SimpleMonitoringStorage extends ConfigurableService implements DeliveryMon
         foreach($data as &$row) {
             $extraData = [];
             if (isset($row[self::COLUMN_EXTRA_DATA])) {
-                $decodedExtraData = json_decode($row[self::COLUMN_EXTRA_DATA]);
+                $decodedExtraData = json_decode($row[self::COLUMN_EXTRA_DATA], true);
                 if (json_last_error() === JSON_ERROR_NONE) {
                     $extraData = $decodedExtraData;
                 }
