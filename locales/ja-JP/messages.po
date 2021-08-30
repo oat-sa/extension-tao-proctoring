@@ -360,7 +360,7 @@ msgid "Detailed Session History of %s"
 msgstr "%s の詳細なセッション履歴"
 
 msgid "Detailed Session History of a selection"
-msgstr "選択肢の詳細なセッション履歴
+msgstr "選択肢の詳細なセッション履歴"
 
 msgid "Details"
 msgstr "詳細"
