@@ -1,5 +1,4 @@
-@import 'inc/bootstrap';
-
+@import "inc/bootstrap";
 .proctoring-scope {
     h1 {
         font-family: $headingFont;
@@ -12,27 +11,27 @@
         margin: 30px 0 10px;
     }
 
-    .breadcrumbs {
+    .breadcrumbs{
         overflow: visible;
-        font-size: 14px;
+        font-size : 14px;
         padding-bottom: 2px;
         a {
-            color: white;
+            color : white;
         }
-        li.breadcrumb {
-            bottom: 2px;
-            background: inherit;
+        li.breadcrumb{
+            bottom : 2px;
+            background : inherit;
             ul {
-                background: inherit;
-                padding-top: 2px;
-                border: none;
+                background : inherit;
+                padding-top : 2px;
+                border : none;
             }
         }
     }
 
     table.datatable {
         white-space: nowrap;
-        [class^='icon-'] {
+        [class^="icon-"] {
             padding: 0;
         }
 
@@ -61,45 +60,32 @@
         margin: auto;
     }
 
-    .testcenters-index,
-    .testcenters-testcenter,
-    .delivery-index {
+    .testcenters-index, .testcenters-testcenter, .delivery-index {
         .content {
             width: 500px;
         }
     }
 
-    .delivery-testtakers,
-    .delivery-manager {
+    .delivery-testtakers, .delivery-manager {
         .content {
             width: 800px;
         }
     }
 
     .session-history {
-        .tool-show-brief-report,
-        .tool-show-detailed-report {
+        .tool-show-brief-report, .tool-show-detailed-report {
             float: right;
         }
     }
 
-    .diagnostic-index,
-    .diagnostic-runner,
-    .reporting-index,
-    .session-history,
-    .delivery-monitoring {
+    .diagnostic-index, .diagnostic-runner, .reporting-index, .session-history, .delivery-monitoring {
         .content {
             width: 100%;
             padding: 0 20px;
         }
     }
 
-    .diagnostic-index,
-    .diagnostic-runner,
-    .reporting-index,
-    .session-history,
-    .delivery-testtakers,
-    .delivery-manager {
+    .diagnostic-index, .diagnostic-runner, .reporting-index, .session-history, .delivery-testtakers, .delivery-manager {
         .message {
             padding: 8px;
             text-align: center;
@@ -108,30 +94,29 @@
 
     .panel {
         @include flex-container();
-        .back-button,
-        .daterange {
+        .back-button, .daterange {
             margin: 10px 4px;
         }
         .daterange {
             @include simple-flex-box();
             label {
-                padding: 0;
+                padding : 0;
             }
             input {
                 margin: 0 10px;
             }
         }
         .action-bar {
-            background: whiten($info, 0.1);
+            background: whiten($info, .1);
             padding: 3px;
             overflow: hidden;
-            color: whiten($info, 0.9);
+            color: whiten($info, .9);
             margin: 40px 0 10px 0;
 
             .btn-info {
                 overflow: hidden;
                 background: transparent;
-                border: 1px white(0.3) solid;
+                border: 1px white(.3) solid;
             }
         }
     }
@@ -141,72 +126,67 @@
         max-width: 800px;
     }
 
-    .delivery-testtakers,
-    .delivery-manager {
-        .list {
-            margin-top: 20px;
+    .delivery-testtakers, .delivery-manager {
+        .list{
+            margin-top : 20px;
             @include simple-border();
-            background-color: whiten($canvas, 0.6);
-            padding: 15px;
+            background-color: whiten($canvas, .6);
+            padding : 15px;
         }
     }
 
-    .delivery-testtakers .list {
-        background-color: whiten($canvas, 0.1);
+    .delivery-testtakers .list{
+        background-color: whiten($canvas, .1);
     }
 
     .testcenters-index {
-        .header {
-            position: relative;
+        .header{
+            position:relative
         }
-        .admin-link {
+        .admin-link{
             position: absolute;
             right: 26px;
             top: 5px;
             color: white;
-            opacity: 0.9;
-            span {
-                margin-right: 8px;
+            opacity : .9;
+            span{
+                margin-right:8px;
             }
-            &:hover {
-                opacity: 1;
+            &:hover{
+                opacity : 1;
             }
         }
     }
 
-    .delivery-index {
+    .delivery-index{
         .list-box {
             .dark {
                 .box {
-                    background: blacken($uiClickableDefaultBg, 0.15);
-                    h3,
-                    [class^='icon-'],
-                    [class*=' icon-'] {
+                    background: blacken($uiClickableDefaultBg, .15);
+                    h3, [class^="icon-"], [class*=" icon-"] {
                         text-shadow: none;
                         font-weight: bold;
                     }
-                    .listbox-actions {
+                    .listbox-actions{
                         color: $info;
-                        .action {
-                            &:hover,
-                            &:hover [class^='icon-'],
-                            [class*=' icon-'] {
-                                color: $uiClickableHoverBg;
+                        .action{
+                            &:hover, &:hover [class^="icon-"], [class*=" icon-"]{
+                                color : $uiClickableHoverBg
                             }
                         }
                     }
                 }
             }
-            .has-properties-displayed {
+            .has-properties-displayed{
                 .box {
-                    h3 {
+                    h3{
                         margin-top: 5px;
                     }
-                    .listbox-properties {
-                        margin-bottom: 3px;
-                        li label {
-                            margin-bottom: -1px;
-                            min-width: 30px;
+                    .listbox-properties{
+                        margin-bottom : 3px;
+                        li label{
+                            margin-bottom : -1px;
+                            min-width : 30px;
                             padding-right: 0;
                         }
                     }
@@ -214,35 +194,34 @@
             }
         }
         .listbox-stats {
-            padding: 0 1px;
-            [class^='icon-'],
-            [class*=' icon-'] {
-                color: whiten($textColor, 0.2);
+            padding : 0 1px;
+            [class^="icon-"], [class*=" icon-"]{
+                color: whiten($textColor, .2);
                 font-size: 11px;
             }
-            .icon-lock {
+            .icon-lock{
                 font-size: 12px;
             }
             .number {
-                margin: 0 12px 0 6px;
+                margin : 0 12px 0 6px;
                 top: -1px;
                 position: relative;
             }
         }
-        .listbox-actions {
+        .listbox-actions{
             position: absolute;
             right: -1px;
             bottom: -1px;
             color: $uiClickableHoverBg;
             outline: 0;
-            .action {
+            .action{
                 display: inline-block;
                 padding: 20px;
                 border-bottom: 3px solid !important;
                 height: 62px;
                 margin-left: -3px;
                 span {
-                    margin-right: 10px;
+                    margin-right:10px;
                 }
                 &:hover {
                     color: $info;
@@ -256,9 +235,9 @@
             padding: 10px 20px 10px 0;
         }
 
-        .proctor-form {
-            h2 {
-                margin: 0 0 35px;
+        .proctor-form{
+            h2{
+                margin : 0 0 35px;
             }
         }
 
@@ -270,7 +249,7 @@
             //background: $canvas;
 
             .message {
-                color: whiten($textColor, 0.5);
+                color: whiten($textColor, .5);
                 @include font-size(20);
                 display: table-cell;
                 vertical-align: middle;
@@ -293,9 +272,9 @@
     .icon-history:before {
         @include icon-screen();
     }
-    #start_time_filter {
-        width: 180px;
-        font-size: 12px;
+    #start_time_filter{
+      width: 180px;
+      font-size: 12px;
     }
 
     .change-time-controls-container {
