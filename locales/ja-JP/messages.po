@@ -129,7 +129,7 @@ msgid "Assessment Activity"
 msgstr "アセスメントアクティビティ"
 
 msgid "Assessment has been paused due to attempt to switch to another window/tab."
-msgstr "別のウィンドウ/タブに切り替えるために、テストが一時停止されました。"
+msgstr "別のウィンドウ/タブに切り替えたために、テストが一時停止されました。"
 
 msgid "Assign administrator"
 msgstr "アドミン権限の割当て"
@@ -150,7 +150,7 @@ msgid "Assign the test taker to the session"
 msgstr "受検者をそのセッションに割当てる"
 
 msgid "Assigned proctors"
-msgstr "割当て済みの試検監督者"
+msgstr "割当て候補の試検監督者"
 
 msgid "Assigned test takers"
 msgstr "割当て済みの受検者"
@@ -189,10 +189,10 @@ msgid "Authorized but not started"
 msgstr "承認済み｜未開始"
 
 msgid "Authorized proctors"
-msgstr "担当の試検監督者"
+msgstr "承認済み試検監督者"
 
 msgid "Authorized, you may proceed"
-msgstr "承認されました。進めてください。"
+msgstr "承認されました。開始してください。"
 
 msgid "Automatically paused by the system due to authorized test not being launched by test taker."
 msgstr "承認されたテストが受検者によって開始されていないため、システムによって自動的に一時停止されました。"
@@ -360,7 +360,7 @@ msgid "Detailed Session History of %s"
 msgstr "%s の詳細なセッション履歴"
 
 msgid "Detailed Session History of a selection"
-msgstr "選択肢の詳細なセッション履歴"
+msgstr "選択肢の詳細なセッション履"
 
 msgid "Details"
 msgstr "詳細"
@@ -372,7 +372,7 @@ msgid "Duration"
 msgstr "実施時間"
 
 msgid "Edit test center"
-msgstr "テストセンタ編集"
+msgstr "テストセンター編集"
 
 msgid "Elapsed time"
 msgstr "経過時間"
@@ -400,7 +400,7 @@ msgstr "エクスポート"
 
 #, tao-public
 msgid "Export Irregularities"
-msgstr "イレギュラーのエクスポート"
+msgstr "イレギュラー出力"
 
 msgid "Extended Time"
 msgstr "延長時間"
@@ -900,7 +900,7 @@ msgid "Test %s must be terminated."
 msgstr "テスト %s は終了する必要があります"
 
 msgid "Test center saved"
-msgstr "テストセンタを保存しました"
+msgstr "テストセンターを保存しました"
 
 msgid "Test had already been authorized."
 msgstr "テストは既に承認されています"
