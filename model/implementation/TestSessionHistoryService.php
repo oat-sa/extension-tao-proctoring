@@ -245,7 +245,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         $periodStart = null;
 
         if (!empty($options['periodStart'])) {
-            $periodStart = new DateTime($options['periodStart']);
+            $periodStart = DateTime::createFromFormat('Y-m-d', $options['periodStart']);
             $periodStart->setTime(0, 0, 0);
             $periodStart = DateHelper::getTimeStamp($periodStart->getTimestamp());
         }
@@ -261,7 +261,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         $periodEnd = null;
 
         if (!empty($options['periodEnd'])) {
-            $periodEnd = new DateTime($options['periodEnd']);
+            $periodEnd = DateTime::createFromFormat('Y-m-d', $options['periodEnd']);
             $periodEnd->setTime(23, 59, 59);
             $periodEnd = DateHelper::getTimeStamp($periodEnd->getTimestamp());
         }
