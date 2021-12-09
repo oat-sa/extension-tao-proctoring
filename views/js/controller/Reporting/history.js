@@ -32,6 +32,7 @@ define([
     'taoProctoring/component/proxy',
     'taoProctoring/component/history/historyTable',
     'tpl!taoProctoring/templates/reporting/index',
+    'moment',
     'ui/datatable'
 ], function (
     _,
@@ -46,7 +47,8 @@ define([
     locale,
     proxyFactory,
     historyTableFactory,
-    indexTpl
+    indexTpl,
+    moment
 ) {
     'use strict';
 
@@ -79,6 +81,21 @@ define([
             var sessions = decodeURIComponent(currentRoute.query.session).split(',');
             var monitoringUrl = currentRoute.query.monitoring && decodeURIComponent(currentRoute.query.monitoring);
             var dateFormat = locale.getDateTimeFormat().split(" ")[0];
+
+            /**
+             * Transform date picker value to format recognized by datatable filter query
+             * @param {string} pickerDate
+             * @returns {string}
+             */
+            function transformDateQueryParam(pickerDate) {
+                if (pickerDate) {
+                    const dateObject = moment(pickerDate, dateFormat);
+                    if (dateObject.isValid()) {
+                        return dateObject.format('YYYY-MM-DD');
+                    }
+                }
+                return null;
+            }
 
             appController
                 .on('set-referrer.history', function(route) {
@@ -159,11 +176,11 @@ define([
                         })
                         .on('ready', resolve)
                         .on('error', reject)
-                        .on('submit reset', function() {
+                        .on('submit reset', function () {
 
                             historyTable.refresh({
-                                periodStart : this.getStart(),
-                                periodEnd : this.getEnd()
+                                periodStart: transformDateQueryParam(this.getStart()),
+                                periodEnd: transformDateQueryParam(this.getEnd())
                             });
                         });
                     })
