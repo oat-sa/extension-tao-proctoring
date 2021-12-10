@@ -79,11 +79,9 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
                 'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
             );
         }
-        $deliveryUri = $deliveryExecution->getDelivery()->getUri();
 
         if (
-            $this->isProctored($deliveryUri, $user)
-            && $state !== ProctoredDeliveryExecution::STATE_AUTHORIZED
+            $this->isMissingProctorAuthorization($deliveryExecution, $user)
             && !$this->isActiveUnSecureDelivery($deliveryExecution, $state)
         ) {
             $this->throwUnAuthorizedException($deliveryExecution);
@@ -144,6 +142,12 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
         }
 
         return $secure;
+    }
+
+    protected function isMissingProctorAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user)
+    {
+        return $this->isProctored($deliveryExecution->getDelivery()->getUri(), $user)
+            && $deliveryExecution->getState()->getUri() !== ProctoredDeliveryExecution::STATE_AUTHORIZED;
     }
 
     /**
