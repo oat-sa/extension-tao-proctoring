@@ -25,7 +25,7 @@ namespace oat\taoProctoring\scripts\tools;
 
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\script\ScriptAction;
-use oat\oatbox\reporting\Report;
+use common_report_Report as Report;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;

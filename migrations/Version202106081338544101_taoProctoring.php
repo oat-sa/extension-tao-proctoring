@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace oat\taoProctoring\migrations;
 
 use Exception;
-use oat\oatbox\reporting\Report as Report;
+use common_report_Report as Report;
 use common_persistence_SqlPersistence;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
