@@ -672,7 +672,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 $op = 'IS NULL';
             } elseif(is_array($value)){
                 $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
-            } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
+            } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', (string)$value, $matches)) {
                 if (!empty($matches[1]) && preg_grep('/' . $matches[1] .'/i', ['like','ilike'])) {
                     $toLower = true;
                     $op = 'LIKE';
