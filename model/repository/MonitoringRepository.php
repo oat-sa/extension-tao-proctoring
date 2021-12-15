@@ -498,8 +498,8 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         if ($data === false) {
             $data = [];
         } else {
-            if (isset($data[self::COLUMN_EXTRA_DATA][0])) {
-                $extraData = json_decode($data[self::COLUMN_EXTRA_DATA][0], true);
+            if (isset($data[self::COLUMN_EXTRA_DATA])) {
+                $extraData = json_decode($data[self::COLUMN_EXTRA_DATA], true);
                 if (json_last_error() === JSON_ERROR_NONE) {
                     $data = array_merge($data, $extraData);
                 }
