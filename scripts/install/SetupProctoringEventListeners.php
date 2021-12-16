@@ -14,10 +14,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA;
  *
  */
+
 declare(strict_types=1);
 
 namespace oat\taoProctoring\scripts\install;
@@ -27,11 +27,11 @@ use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionCreated;
 use oat\taoProctoring\model\delivery\DeliverySyncService;
 use oat\taoProctoring\model\deliveryLog\listener\DeliveryLogTimerAdjustedEventListener;
 use oat\taoProctoring\model\event\DeliveryExecutionTimerAdjusted;
-use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
+use oat\taoProctoring\model\listener\MonitoringListenerInterface;
+use oat\taoTests\models\event\TestExecutionPausedEvent;
 use oat\taoTests\models\event\TestChangedEvent;
 use oat\taoQtiTest\models\event\QtiTestStateChangeEvent;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\tao\model\event\MetadataModified;
 use oat\taoDelivery\models\classes\execution\event\DeliveryExecutionState;
 use oat\taoProctoring\helpers\DeliveryHelper;
@@ -41,31 +41,20 @@ use oat\taoEventLog\model\eventLog\LoggerService;
 use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
 
-/**
- * Class RegisterSessionStateListener
- * @package oat\taoProctoring\scripts\install
- * @author Aleh Hutnikau, <hutnikau@1pt.com>
- */
 class SetupProctoringEventListeners extends InstallAction
 {
-    /**
-     * @param $params
-     */
     public function __invoke($params)
     {
-        // monitoring cache
-        $this->registerEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']);
-        $this->registerEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']);
-        $this->registerEvent(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
-        $this->registerEvent(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
-        $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
-        $this->registerEvent(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
-        $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
+        $this->registerEvent(DeliveryExecutionState::class, [MonitoringListenerInterface::SERVICE_ID, 'executionStateChanged']);
+        $this->registerEvent(DeliveryExecutionCreated::class, [MonitoringListenerInterface::SERVICE_ID, 'executionCreated']);
+        $this->registerEvent(MetadataModified::class, [MonitoringListenerInterface::SERVICE_ID, 'deliveryLabelChanged']);
+        $this->registerEvent(TestChangedEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']);
+        $this->registerEvent(QtiTestStateChangeEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']);
+        $this->registerEvent(AuthorizationGranted::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']);
 
         $this->registerEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']);
-
+        $this->registerEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
         $this->registerEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
-
         $this->registerEvent('oat\\taoProctoring\\model\\event\\DeliveryExecutionFinished', [LoggerService::class, 'logEvent']);
 
         /**
@@ -77,4 +66,3 @@ class SetupProctoringEventListeners extends InstallAction
         $this->registerEvent(DeliveryExecutionTimerAdjusted::class, [DeliveryLogTimerAdjustedEventListener::class, 'logTimeAdjustment']);
     }
 }
-
