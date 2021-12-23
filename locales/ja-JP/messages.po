@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint117\n"
-"PO-Revision-Date: 2020-09-22T16:02:17\n"
+"Project-Id-Version: TAO 2022.01\n"
+"PO-Revision-Date: 2021-12-23T18:14:43\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -12,6 +12,9 @@ msgstr ""
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+
+msgid " sec"
+msgstr ""
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - アイテム %2$s/%3$s"
@@ -103,14 +106,23 @@ msgstr "アクター"
 msgid "Add test takers"
 msgstr "受検者を追加"
 
+msgid "Adjusted"
+msgstr ""
+
 msgid "Administer deliveries"
 msgstr "デリバリ管理"
 
 msgid "Administration"
 msgstr "アドミン権限"
 
+msgid "All fields are required"
+msgstr ""
+
 msgid "already authorized"
 msgstr "すでに承認されています"
+
+msgid "Already changed time will be added or subtracted by the new value."
+msgstr ""
 
 msgid "already paused"
 msgstr "すでに一時停止されています"
@@ -161,13 +173,16 @@ msgstr "実施"
 msgid "author"
 msgstr "編集者"
 
+msgid "Authorization status"
+msgstr ""
+
 msgid "Authorize"
 msgstr "承認"
 
-msgid "Authorize Session"
+msgid "Authorize session"
 msgstr "セッション承認"
 
-msgid "Authorize session"
+msgid "Authorize Session"
 msgstr "セッション承認"
 
 msgid "Authorize sessions"
@@ -179,14 +194,17 @@ msgstr "試検監督者の承認"
 msgid "Authorize the selected proctors"
 msgstr "選択した試検監督者を承認"
 
-msgid "authorized"
+msgid "Authorized"
 msgstr "承認済"
 
-msgid "Authorized"
+msgid "authorized"
 msgstr "承認済"
 
 msgid "Authorized but not started"
 msgstr "承認済み｜未開始"
+
+msgid "authorized but not started"
+msgstr ""
 
 msgid "Authorized proctors"
 msgstr "承認済み試検監督者"
@@ -215,6 +233,9 @@ msgstr "利用可能な履歴"
 msgid "Available test takers"
 msgstr "利用可能な受検者"
 
+msgid "awaiting"
+msgstr "待機中"
+
 msgid "Awaiting"
 msgstr "待機中"
 
@@ -227,10 +248,10 @@ msgstr "セッションに戻る"
 msgid "Behaviour"
 msgstr "態度・振る舞い"
 
-msgid "cancel"
+msgid "Cancel"
 msgstr "キャンセル"
 
-msgid "Cancel"
+msgid "cancel"
 msgstr "キャンセル"
 
 msgid "cancel the action"
@@ -290,6 +311,12 @@ msgstr "テストセッションを終了できません"
 msgid "category"
 msgstr "カテゴリ"
 
+msgid "Change time"
+msgstr ""
+
+msgid "Changed Time"
+msgstr ""
+
 msgid "Column %s successfully created"
 msgstr "列 %s が正しく作成されました"
 
@@ -298,6 +325,9 @@ msgstr "快適"
 
 msgid "comment"
 msgstr "コメント"
+
+msgid "comment..."
+msgstr ""
 
 msgid "Complaint"
 msgstr "苦情"
@@ -335,10 +365,10 @@ msgstr "現在のアセスメントアクティビティ"
 msgid "Current sessions"
 msgstr "現在のセッション"
 
-msgid "date"
+msgid "Date"
 msgstr "日付"
 
-msgid "Date"
+msgid "date"
 msgstr "日付"
 
 msgid "Days"
@@ -383,6 +413,9 @@ msgstr "終了"
 msgid "End date of the export"
 msgstr "エクスポートの終了日時"
 
+msgid "Entered value is not correct"
+msgstr ""
+
 msgid "Environment"
 msgstr "状況・環境"
 
@@ -402,8 +435,11 @@ msgstr "エクスポート"
 msgid "Export Irregularities"
 msgstr "イレギュラー出力"
 
-msgid "Extended Time"
+msgid "Extended time"
 msgstr "延長時間"
+
+msgid "Extra"
+msgstr ""
 
 msgid "Extra Time"
 msgstr "延長時間"
@@ -420,10 +456,10 @@ msgstr "フィルタ"
 msgid "Filter by the selected dates"
 msgstr "選択データでのフィルタ"
 
-msgid "finished"
+msgid "Finished"
 msgstr "完了済"
 
-msgid "Finished"
+msgid "finished"
 msgstr "完了済"
 
 msgid "First name"
@@ -455,6 +491,12 @@ msgstr "病気"
 
 msgid "In Progress"
 msgstr "実施中"
+
+msgid "in progress"
+msgstr ""
+
+msgid "INPROGRESS"
+msgstr ""
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "エクスポートされた \"%s\" のイレギュラー情報"
@@ -497,6 +539,9 @@ msgstr "読み込み"
 
 msgid "Logout"
 msgstr "ログアウト"
+
+msgid "Main Menu"
+msgstr ""
 
 msgid "Manage Proctors"
 msgstr "試検監督者の管理"
@@ -589,10 +634,10 @@ msgstr "アクティブなテストセッションを一時停止"
 msgid "Pause due to server maintenance"
 msgstr "サーバーメンテナンスのため一時停止"
 
-msgid "Pause Session"
+msgid "Pause session"
 msgstr "セッション一時停止"
 
-msgid "Pause session"
+msgid "Pause Session"
 msgstr "セッション一時停止"
 
 msgid "Pause sessions"
@@ -603,6 +648,9 @@ msgstr "一時停止"
 
 msgid "Paused"
 msgstr "一時停止"
+
+msgid "Please provide a reason"
+msgstr ""
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "試検監督者を管理するテストサイトを一つ以上選んでください"
@@ -637,6 +685,9 @@ msgstr "続行"
 msgid "Proctor"
 msgstr "試検監督者"
 
+msgid "Proctor authorization"
+msgstr ""
+
 msgid "Proctor created"
 msgstr "試検監督者が作成されました"
 
@@ -664,10 +715,10 @@ msgstr "試検監督者は取り消されました"
 msgid "Progress"
 msgstr "実施"
 
-msgid "Reactivate session"
+msgid "Reactivate Session"
 msgstr "セッション再開"
 
-msgid "Reactivate Session"
+msgid "Reactivate session"
 msgstr "セッション再開"
 
 msgid "Refresh"
@@ -700,10 +751,10 @@ msgstr "レポート"
 msgid "Report irregularities"
 msgstr "イレギュラー・レポート"
 
-msgid "Report irregularity"
+msgid "Report Irregularity"
 msgstr "イレギュラー・レポート"
 
-msgid "Report Irregularity"
+msgid "Report irregularity"
 msgstr "イレギュラー・レポート"
 
 msgid "reported for irregularity"
@@ -746,6 +797,9 @@ msgstr "セクション"
 msgid "Session"
 msgstr "セッション"
 
+msgid "session"
+msgstr ""
+
 msgid "Session %s - %s has not been processed"
 msgstr "セッション %s - %s は処理されませんでした"
 
@@ -757,6 +811,9 @@ msgstr "セッション時間処理"
 
 msgid "Sessions"
 msgstr "セッション"
+
+msgid "sessions"
+msgstr ""
 
 msgid "Sessions authorized"
 msgstr "セッションが承認されました"
@@ -836,6 +893,9 @@ msgstr "テーブルは正常に変更されました"
 msgid "Take or continue a test controlled by a proctor"
 msgstr "試験監督によって管理されたテストの受検または継続"
 
+msgid "TAO: User Authorization"
+msgstr ""
+
 msgid "Technical"
 msgstr "技術的障害"
 
@@ -845,14 +905,17 @@ msgstr "終了"
 msgid "Terminate and irregularity"
 msgstr "終了とイレギュラー対応"
 
-msgid "Terminate session"
+msgid "Terminate Session"
 msgstr "セッション終了"
 
-msgid "Terminate Session"
+msgid "Terminate session"
 msgstr "セッション終了"
 
 msgid "Terminate sessions"
 msgstr "セッション終了"
+
+msgid "Terminate/Reactivate"
+msgstr ""
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr "終了/再実施・イレギュラー対応"
@@ -932,13 +995,16 @@ msgstr "テストは実施されていません"
 msgid "Test had not been started."
 msgstr "テストは開始されていません"
 
+msgid "test has no time limits"
+msgstr ""
+
 msgid "Test site %s"
 msgstr "テストサイト： %s"
 
-msgid "test taker"
+msgid "Test taker"
 msgstr "受検者"
 
-msgid "Test taker"
+msgid "test taker"
 msgstr "受検者"
 
 msgid "Test takers have been added"
@@ -959,7 +1025,7 @@ msgstr "試検ワークステーション"
 msgid "The action cannot be applied, no eligible sessions found"
 msgstr "処理を適用できません。適切な処理が見つかりません。"
 
-msgid "The action will be applied to the following session"
+msgid "The action will be applied to the following session(s)"
 msgstr "処理は次のセッションに適用されます。"
 
 msgid "the already granted time will be replaced by the new value"
@@ -977,8 +1043,17 @@ msgstr "テストは終了していますので、これ以上操作すること
 msgid "The assessment was automatically terminated by the system due to inactivity."
 msgstr "テストはシステムによって自動的に中止されました。"
 
+msgid "The decreased time cannot be higher than remaining time %s"
+msgstr ""
+
 msgid "The extra time must be a number"
 msgstr "延長時間は数値でなければなりません"
+
+msgid "The extra time must be a number bigger than 0"
+msgstr ""
+
+msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
+msgstr ""
 
 msgid "The proctor will be authorized. Continue ?"
 msgstr "試検監督者を承認しますか？"
@@ -1004,6 +1079,15 @@ msgstr "実施中のデリバリはありません"
 msgid "Time"
 msgstr "時間"
 
+msgid "Time adjusted"
+msgstr ""
+
+msgid "Time decrease is too high"
+msgstr ""
+
+msgid "Time increase is too high"
+msgstr ""
+
 #, tao-public
 msgid "Tools"
 msgstr "ツール"
@@ -1019,6 +1103,9 @@ msgstr "イレギュラーのエクスポートを作成できませんでした
 
 msgid "Unable to perform action on test %s."
 msgstr "テスト %s でアクションを実行できません"
+
+msgid "Unexpected response"
+msgstr ""
 
 msgid "User Activity"
 msgstr "ユーザアクテビティ"
