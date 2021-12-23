@@ -92,12 +92,7 @@ final class TestRunnerMessageServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @param array $options
-     * @param ServiceManager $serviceManager
-     * @return TestRunnerMessageService
-     */
-    private function getClassTestRunnerMessageService($serviceManager, $options = []): TestRunnerMessageService
+    private function getClassTestRunnerMessageService(ServiceManager $serviceManager, array $options = []): TestRunnerMessageService
     {
         return new class ($options, $serviceManager) extends TestRunnerMessageService {
             /**
@@ -105,24 +100,17 @@ final class TestRunnerMessageServiceTest extends TestCase
              */
             private $serviceManager;
 
-            public function __construct($options = [], $serviceManager)
+            public function __construct(array $options = [], ServiceManager $serviceManager)
             {
                 parent::__construct($options);
                 $this->serviceManager = $serviceManager;
             }
 
-            /**
-             * @param AssessmentTestSession $testSession
-             * @return string
-             */
             public function getPausedStateMessageFrom(AssessmentTestSession $testSession): string
             {
                 return parent::getPausedStateMessage($testSession);
             }
 
-            /**
-             * @return ServiceManager
-             */
             public function getServiceLocator(): ServiceManager
             {
                 return $this->serviceManager;
