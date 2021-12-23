@@ -23,7 +23,8 @@
 
 namespace oat\taoProctoring\model\implementation;
 
-use oat\taoProctoring\model\ProctorService;
+use oat\tao\model\featureFlag\FeatureFlagChecker;
+use oat\tao\model\featureFlag\FeatureFlagCheckerInterface;
 use oat\taoQtiTest\models\runner\QtiRunnerMessageService;
 use qtism\runtime\tests\AssessmentTestSession;
 
@@ -36,6 +37,11 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
+    /**
+     * @var string Controls whether a pause message is not sent on status, default false
+     */
+    private const FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE = 'FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE';
+
     /** Proctor roles option in options. */
     const PROCTOR_ROLES_OPTION = 'proctorRoles';
 
@@ -89,6 +95,10 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getPausedStateMessage(AssessmentTestSession $testSession)
     {
+        if ($this->cantReturnPauseStateMessage()) {
+            return '';
+        }
+
         if ($this->isProctorAction($testSession)) {
             return $this->getProctorPausedStateMessage($testSession);
         }
@@ -110,4 +120,13 @@ class TestRunnerMessageService extends QtiRunnerMessageService
         return parent::getTerminatedStateMessage($testSession);
     }
 
+    private function cantReturnPauseStateMessage(): bool
+    {
+        return $this->getFeatureFlagChecker()->isEnabled(self::FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE);
+    }
+
+    private function getFeatureFlagChecker(): FeatureFlagCheckerInterface
+    {
+        return $this->getServiceLocator()->get(FeatureFlagChecker::class);
+    }
 }
