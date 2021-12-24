@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<rdf:RDF 
-	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
-	xml:base="http://www.tao.lu/Ontologies/TAODelivery.rdf#" 
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xml:base="http://www.tao.lu/Ontologies/TAODelivery.rdf#"
 	xmlns:generis="http://www.tao.lu/Ontologies/generis.rdf#"
     xmlns:widget="http://www.tao.lu/datatypes/WidgetDefinitions.rdf#"
     xmlns:tao="http://www.tao.lu/Ontologies/TAO.rdf#"
@@ -57,7 +57,7 @@
 
    <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible">
      <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
-     <rdfs:label xml:lang="en-US"><![CDATA[Require Proctoring]]></rdfs:label>
+     <rdfs:label xml:lang="en-US"><![CDATA[Proctoring Settings]]></rdfs:label>
      <rdfs:comment xml:lang="en-US"><![CDATA[Require Proctoring on selected deliveries]]></rdfs:comment>
      <widget:widget rdf:resource="http://www.tao.lu/datatypes/WidgetDefinitions.rdf#CheckBox"/>
      <generis:is_language_dependent rdf:resource="http://www.tao.lu/Ontologies/generis.rdf#False"/>
@@ -73,7 +73,7 @@
    </rdf:Description>
 
    <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled">
-     <rdfs:label xml:lang="en-US"><![CDATA[Enable]]></rdfs:label>
+     <rdfs:label xml:lang="en-US"><![CDATA[Require authorization]]></rdfs:label>
      <rdfs:comment xml:lang="en-US"><![CDATA[Enable]]></rdfs:comment>
      <rdf:type rdf:resource="http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode"/>
    </rdf:Description>

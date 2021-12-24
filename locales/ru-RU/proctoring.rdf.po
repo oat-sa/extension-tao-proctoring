@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint143\n"
-"PO-Revision-Date: 2020-12-23T17:41:38\n"
+"Project-Id-Version: TAO 2022.01\n"
+"PO-Revision-Date: 2021-12-23T18:15:10\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ru-RU\n"
@@ -82,8 +82,8 @@ msgstr "Статус «Отменено» для выполнения выдач
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
-msgid "Require Proctoring"
-msgstr "Требуется наблюдение"
+msgid "Proctoring Settings"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
@@ -102,11 +102,21 @@ msgstr "Включить проверку"
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
-msgid "Enable"
-msgstr "Включить"
+msgid "Require authorization"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Enable"
+msgstr "Включить"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require Proctoring"
+msgstr "Требуется наблюдение"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Enable"
 msgstr "Включить"
 
