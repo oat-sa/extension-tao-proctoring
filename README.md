@@ -9,7 +9,7 @@ It is work in progress and will contain functionalities such as:
 ## Configuration options
 
 ### Feature flags
-#### FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE
+#### FEATURE_FLAG_SKIP_PAUSED_ASSESSMENT_DIALOG
 
 Controls whether message is not sent when test is paused.
 

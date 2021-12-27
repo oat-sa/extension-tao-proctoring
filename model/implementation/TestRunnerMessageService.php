@@ -40,7 +40,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
     /**
      * @var string Controls whether a pause message is not sent on status, default false
      */
-    private const FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE = 'FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE';
+    private const FEATURE_FLAG_SKIP_PAUSED_ASSESSMENT_DIALOG = 'FEATURE_FLAG_SKIP_PAUSED_ASSESSMENT_DIALOG';
 
     /** Proctor roles option in options. */
     const PROCTOR_ROLES_OPTION = 'proctorRoles';
