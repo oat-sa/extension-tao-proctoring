@@ -95,7 +95,7 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getPausedStateMessage(AssessmentTestSession $testSession)
     {
-        if ($this->cantReturnPauseStateMessage()) {
+        if (false === $this->isPausedDialogRequired()) {
             return '';
         }
 
@@ -120,9 +120,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
         return parent::getTerminatedStateMessage($testSession);
     }
 
-    private function cantReturnPauseStateMessage(): bool
+    private function isPausedDialogRequired(): bool
     {
-        return $this->getFeatureFlagChecker()->isEnabled(self::FEATURE_FLAG_PROCTOR_NOT_LAUNCH_PAUSE_MESSAGE);
+        return false === $this->getFeatureFlagChecker()->isEnabled(self::FEATURE_FLAG_SKIP_PAUSED_ASSESSMENT_DIALOG);
     }
 
     private function getFeatureFlagChecker(): FeatureFlagCheckerInterface
