@@ -466,7 +466,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
             if (!in_array($ruleParts[1], $primaryTableColumns)) {
                 $colName = $ruleParts[1];
+                if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
+                    $colName = sprintf('JSON_EXTRACT(t.%s, \'$.%s\')', self::COLUMN_EXTRA_DATA, $colName);
+                } else {
+                    $colName = sprintf('t.%s -> \'%s\'', self::COLUMN_EXTRA_DATA, $colName);
+                }
                 $this->queryParams[] = $colName;
+                $sortingColumn ='?';
             } else {
                 $sortingColumn = $ruleParts[1];
             }
