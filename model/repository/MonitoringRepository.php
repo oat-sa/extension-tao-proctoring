@@ -482,8 +482,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             } else {
                 $colName = sprintf('t.%s -> \'%s\'', self::COLUMN_EXTRA_DATA, $colName);
             }
-            $this->queryParams[] = $colName;
-            $sortingColumn = '?';
+            $sortingColumn = $colName;
         } else {
             $sortingColumn = $ruleParts[1];
         }
