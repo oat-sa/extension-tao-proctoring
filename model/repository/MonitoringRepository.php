@@ -703,14 +703,24 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
+            } else if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
+                $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
             } else {
-                if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
-                    $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                $isLikeSearch = isset($op) && stripos(strtolower($op), 'like') !== false;
+                $value = is_array($value) ? $value : [$value];
+                if ($isLikeSearch) {
+                    $jsonDataAccessOperator = '->>';
                 } else {
-                    $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
-                    $value = is_array($value) ? $value : [$value];
+                    $jsonDataAccessOperator = '->';
                     $value = array_map('json_encode', $value);
                 }
+                $whereClause .= sprintf(
+                    ' t.%s %s \'%s\' %s ',
+                    self::COLUMN_EXTRA_DATA,
+                    $jsonDataAccessOperator,
+                    trim($key),
+                    $op
+                );
             }
 
             if(is_array($value)){
