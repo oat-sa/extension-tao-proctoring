@@ -705,7 +705,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             } else if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
                 $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
             } else {
-                $isLikeSearch = isset($op) && stripos(strtolower($op), 'like') !== false;
+                $isLikeSearch = isset($op) && stripos($op, 'like') !== false;
                 $value = is_array($value) ? $value : [$value];
                 if ($isLikeSearch) {
                     $jsonDataAccessOperator = '->>';
