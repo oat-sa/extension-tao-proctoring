@@ -480,7 +480,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             if (in_array($this->getPlatformName(), ['mysql', 'sqlite'])) {
                 $colName = sprintf('JSON_EXTRACT(t.%s, \'$.%s\')', self::COLUMN_EXTRA_DATA, $colName);
             } else {
-                $colName = sprintf('t.%s -> \'%s\'', self::COLUMN_EXTRA_DATA, $colName);
+                $colName = sprintf('t.%s ->> \'%s\'', self::COLUMN_EXTRA_DATA, $colName);
             }
             $sortingColumn = $colName;
         } else {
