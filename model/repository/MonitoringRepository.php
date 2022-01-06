@@ -487,8 +487,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $sortingColumn = $ruleParts[1];
         }
 
+        // Hotfix for sorting by authorised_by column which can contain a curd number or user URI
+        $numericPart = in_array($this->getPlatformName(), ['mysql', 'sqlite'])
+            ? sprintf("cast(NULLIF(%s, '') as SIGNED) %s", $sortingColumn, $ruleParts[2])
+            : sprintf("cast(NULLIF(regexp_replace(%s, '\D', '', 'g'), '') as decimal) %s", $sortingColumn, $ruleParts[2]);
+
         return isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
-            ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
+            ? $numericPart
             : sprintf('%s %s', $sortingColumn, $ruleParts[2] ?? 'ASC');
     }
 
