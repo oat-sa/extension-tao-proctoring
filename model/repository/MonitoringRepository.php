@@ -696,7 +696,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                     $op = $matches[1] ? $matches[1] : '=';
                 }
                 $op .= ' ? ';
-                $value = $toLower ? strtolower($matches[2]) : $matches[2];
+                $value = trim($toLower ? strtolower($matches[2]) : $matches[2]);
             }
 
             if (in_array($key, $primaryColumns)) {
