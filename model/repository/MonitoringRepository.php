@@ -469,14 +469,20 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
     private function buildSingleOrderRule(string $orderRule): string
     {
-        preg_match(
-            '/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i',
+        if (!preg_match(
+            '/([a-z_][a-z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i',
             $orderRule,
             $ruleParts
-        );
+        )) {
+            return '';
+        }
 
-        if (!in_array($ruleParts[1], $this->getPrimaryColumns(), true)) {
-            $colName = $ruleParts[1];
+        $orderBy = $ruleParts[1];
+        $order = $ruleParts[2] ?? 'ASC';
+        $type = $ruleParts[3] ?? null;
+
+        if (!in_array($orderBy, $this->getPrimaryColumns(), true)) {
+            $colName = $orderBy;
             if (in_array($this->getPlatformName(), ['mysql', 'sqlite'])) {
                 $colName = sprintf('JSON_EXTRACT(t.%s, \'$.%s\')', self::COLUMN_EXTRA_DATA, $colName);
             } else {
@@ -484,17 +490,22 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             }
             $sortingColumn = $colName;
         } else {
-            $sortingColumn = $ruleParts[1];
+            $sortingColumn = $orderBy;
         }
 
-        // Hotfix for sorting by authorised_by column which can contain a curd number or user URI
-        $numericPart = in_array($this->getPlatformName(), ['mysql', 'sqlite'])
-            ? sprintf("cast(NULLIF(%s, '') as SIGNED) %s", $sortingColumn, $ruleParts[2])
-            : sprintf("cast(NULLIF(regexp_replace(%s, '\D', '', 'g'), '') as decimal) %s", $sortingColumn, $ruleParts[2]);
+        return isset($type) && $type === 'numeric'
+            ? $this->buildNumericOrderWithCastingToDecimal($sortingColumn, $orderRule)
+            : sprintf('%s %s', $sortingColumn, $order);
+    }
 
-        return isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
-            ? $numericPart
-            : sprintf('%s %s', $sortingColumn, $ruleParts[2] ?? 'ASC');
+    /**
+     * to cover cases when numeric order requested for not numeric fields
+     */
+    private function buildNumericOrderWithCastingToDecimal(string $sortingColumn, string $direction): string
+    {
+        return in_array($this->getPlatformName(), ['mysql', 'sqlite'])
+            ? sprintf("cast(%s as DECIMAL) %s", $sortingColumn, $direction)
+            : sprintf("cast(NULLIF(regexp_replace(%s, '\D', '', 'g'), '') as decimal) %s", $sortingColumn, $direction);
     }
 
     /**
