@@ -461,7 +461,10 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $order = explode(',', $order);
         $result = [];
         foreach ($order as $orderRule) {
-            $result[] = $this->buildSingleOrderRule($orderRule);
+            $orderStmt = $this->buildSingleOrderRule($orderRule);
+            if ($orderStmt) {
+                $result[] = $orderStmt;
+            }
         }
 
         return implode(', ', $result);
@@ -493,8 +496,8 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $sortingColumn = $orderBy;
         }
 
-        return isset($type) && $type === 'numeric'
-            ? $this->buildNumericOrderWithCastingToDecimal($sortingColumn, $orderRule)
+        return $type === 'numeric'
+            ? $this->buildNumericOrderWithCastingToDecimal($sortingColumn, $order)
             : sprintf('%s %s', $sortingColumn, $order);
     }
 
