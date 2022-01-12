@@ -28,15 +28,15 @@ use common_persistence_SqlPersistence;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
+use oat\generis\model\OntologyAwareTrait;
 use oat\generis\persistence\PersistenceManager;
+use oat\oatbox\service\ConfigurableService;
+use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
-use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
-use oat\oatbox\service\ConfigurableService;
-use oat\generis\model\OntologyAwareTrait;
 use oat\taoProctoring\model\execution\DeliveryExecution as ProctoredDeliveryExecution;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData as DeliveryMonitoringDataInterface;
+use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\DeliveryMonitoringData;
 use PDO;
 use PDOException;
@@ -460,23 +460,55 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
     {
         $order = explode(',', $order);
         $result = [];
-        $primaryTableColumns = $this->getPrimaryColumns();
-        foreach ($order as $ruleNum => $orderRule) {
-            preg_match('/([a-zA-Z_][a-zA-Z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i', $orderRule, $ruleParts);
-
-            if (!in_array($ruleParts[1], $primaryTableColumns)) {
-                $colName = $ruleParts[1];
-                $this->queryParams[] = $colName;
-            } else {
-                $sortingColumn = $ruleParts[1];
+        foreach ($order as $orderRule) {
+            $orderStmt = $this->buildSingleOrderRule($orderRule);
+            if ($orderStmt) {
+                $result[] = $orderStmt;
             }
-
-            $result[] = isset($ruleParts[3]) && $ruleParts[3] === 'numeric'
-                ? sprintf("cast(nullif(%s, '') as decimal) %s", $sortingColumn, $ruleParts[2])
-                : sprintf('%s %s', $sortingColumn, isset($ruleParts[2]) ? $ruleParts[2] : 'ASC');
         }
 
         return implode(', ', $result);
+    }
+
+    private function buildSingleOrderRule(string $orderRule): string
+    {
+        if (!preg_match(
+            '/([a-z_][a-z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i',
+            $orderRule,
+            $ruleParts
+        )) {
+            return '';
+        }
+
+        $orderBy = $ruleParts[1];
+        $order = $ruleParts[2] ?? 'ASC';
+        $type = $ruleParts[3] ?? null;
+
+        if (!in_array($orderBy, $this->getPrimaryColumns(), true)) {
+            $colName = $orderBy;
+            if (in_array($this->getPlatformName(), ['mysql', 'sqlite'])) {
+                $colName = sprintf('JSON_EXTRACT(t.%s, \'$.%s\')', self::COLUMN_EXTRA_DATA, $colName);
+            } else {
+                $colName = sprintf('t.%s ->> \'%s\'', self::COLUMN_EXTRA_DATA, $colName);
+            }
+            $sortingColumn = $colName;
+        } else {
+            $sortingColumn = $orderBy;
+        }
+
+        return $type === 'numeric'
+            ? $this->buildNumericOrderWithCastingToDecimal($sortingColumn, $order)
+            : sprintf('%s %s', $sortingColumn, $order);
+    }
+
+    /**
+     * to cover cases when numeric order requested for not numeric fields
+     */
+    private function buildNumericOrderWithCastingToDecimal(string $sortingColumn, string $direction): string
+    {
+        return in_array($this->getPlatformName(), ['mysql', 'sqlite'])
+            ? sprintf("cast(%s as DECIMAL) %s", $sortingColumn, $direction)
+            : sprintf("cast(NULLIF(regexp_replace(%s, '\D', '', 'g'), '') as decimal) %s", $sortingColumn, $direction);
     }
 
     /**
@@ -683,20 +715,30 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                     $op = $matches[1] ? $matches[1] : '=';
                 }
                 $op .= ' ? ';
-                $value = $toLower ? strtolower($matches[2]) : $matches[2];
+                $value = trim($toLower ? strtolower($matches[2]) : $matches[2]);
             }
 
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
+            } else if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
+                $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
             } else {
-                if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
-                    $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
+                $isLikeSearch = isset($op) && stripos($op, 'like') !== false;
+                $value = is_array($value) ? $value : [$value];
+                if ($isLikeSearch) {
+                    $jsonDataAccessOperator = '->>';
                 } else {
-                    $whereClause .= sprintf(' t.%s -> \'%s\' %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
-                    $value = is_array($value) ? $value : [$value];
+                    $jsonDataAccessOperator = '->';
                     $value = array_map('json_encode', $value);
                 }
+                $whereClause .= sprintf(
+                    ' t.%s %s \'%s\' %s ',
+                    self::COLUMN_EXTRA_DATA,
+                    $jsonDataAccessOperator,
+                    trim($key),
+                    $op
+                );
             }
 
             if(is_array($value)){
