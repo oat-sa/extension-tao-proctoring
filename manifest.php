@@ -46,6 +46,7 @@ use oat\taoProctoring\scripts\install\SetupProctorCsvImporter;
 use oat\taoProctoring\scripts\install\SetupProctoringEventListeners;
 use oat\taoProctoring\scripts\install\SetUpProctoringUrlService;
 use oat\taoProctoring\scripts\install\SetUpQueueTasks;
+use oat\taoProctoring\scripts\tools\MonitoringExtraFieldConfigurationMigration;
 use oat\taoProctoring\scripts\uninstall\RestoreServices;
 use oat\taoProctoring\scripts\uninstall\UnregisterProctoringEvents;
 
@@ -90,7 +91,8 @@ return array(
             RegisterProctoringDeliveryDeleteService::class,
             SetUpQueueTasks::class,
             RegisterDeleteDeliveryExecution::class,
-            RegisterWebhookEvents::class
+            RegisterWebhookEvents::class,
+            MonitoringExtraFieldConfigurationMigration::class,
         ),
         'rdf' => array(
             __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
