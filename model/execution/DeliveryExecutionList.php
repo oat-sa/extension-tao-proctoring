@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
  */
 
 namespace oat\taoProctoring\model\execution;
@@ -39,10 +39,10 @@ use oat\taoQtiTest\models\SessionStateService;
 use tao_helpers_Uri;
 
 /**
- * Class DeliveryHelperService
+ * Class DeliveryExecutionList
  * @author Bartlomiej Marszal
  */
-class DeliveryExecutionList extends ConfigurableService
+class DeliveryExecutionList extends ConfigurableService implements DeliveryExecutionListInterface
 {
     use OntologyAwareTrait;
 
@@ -98,7 +98,7 @@ class DeliveryExecutionList extends ConfigurableService
      * @throws common_ext_ExtensionException
      * @throws QtiTestExtractionFailedException
      */
-    private function createExecution($cachedData, $extraFields): array
+    protected function createExecution($cachedData, $extraFields): array
     {
         $online = $this->isOnline($cachedData);
 
