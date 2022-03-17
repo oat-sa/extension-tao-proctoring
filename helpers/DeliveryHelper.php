@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2022 (original work) Open Assessment Technologies SA ;
  *
  */
 
@@ -26,6 +26,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution as DeliveryExecutionInterf
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoProctoring\model\DeliveryExecutionStateService;
 use oat\taoProctoring\model\execution\DeliveryExecution;
+use oat\taoProctoring\model\execution\DeliveryExecutionListInterface;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
@@ -356,7 +357,8 @@ class DeliveryHelper
      * @internal param array $options
      */
     private static function adjustDeliveryExecutions($deliveryExecutions) {
-        return ServiceManager::getServiceManager()->get(DeliveryExecutionList::class)->adjustDeliveryExecutions($deliveryExecutions);
+        return ServiceManager::getServiceManager()->get(DeliveryExecutionListInterface::class)
+            ->adjustDeliveryExecutions($deliveryExecutions);
     }
 
     /**
