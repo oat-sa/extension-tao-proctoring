@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2022 (original work) Open Assessment Technologies SA ;
  *
  */
 
@@ -23,6 +23,7 @@ namespace oat\taoProctoring\model\datatable;
 use oat\tao\model\datatable\implementation\DatatableRequest;
 use oat\tao\model\datatable\DatatablePayload;
 use oat\taoProctoring\model\execution\DeliveryExecutionList;
+use oat\taoProctoring\model\execution\DeliveryExecutionListInterface;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use oat\taoProctoring\model\ProctorService;
@@ -135,6 +136,6 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
      */
     private function getDeliveryHelperService()
     {
-        return $this->getServiceLocator()->get(DeliveryExecutionList::class);
+        return $this->getServiceLocator()->get(DeliveryExecutionListInterface::class);
     }
 }
