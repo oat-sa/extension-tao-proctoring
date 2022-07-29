@@ -42,6 +42,7 @@
     "require-dev": {
         "oat-sa/generis": "dev-php8-migration as v16.0.0",
         "oat-sa/tao-core": "dev-php8-migration as v51.0.0",
-        "oat-sa/extension-tao-testqti": "dev-php8-migration as v45.0.0"
+        "oat-sa/extension-tao-testqti": "dev-php8-migration as v45.0.0",
+        "oat-sa/extension-tao-outcome": "dev-php8-migration as v14.0.0"
     }
 }
