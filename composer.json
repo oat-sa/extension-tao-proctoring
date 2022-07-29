@@ -32,7 +32,7 @@
         "oat-sa/extension-tao-testqti" : ">=41.0.0",
         "oat-sa/extension-tao-testtaker" : ">=8.0.0",
         "oat-sa/extension-tao-test" : ">=15.0.0",
-        "oat-sa/lib-tao-dtms" : "dev-php8-migration as 1.0.1"
+        "oat-sa/lib-tao-dtms" : "^1.0.1"
     },
     "autoload" : {
         "psr-4" : {
