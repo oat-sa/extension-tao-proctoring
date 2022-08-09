@@ -57,9 +57,7 @@
                     <label for="input-extra-time">{{__ "minutes"}}</label>
                 {{/if}}
                 <div class="errors">
-                    <ul>
-                        <div class="feedback-error small hidden">{{errorMessage}}</div>
-                    </ul>
+                    <div class="feedback-error small hidden">{{errorMessage}}</div>
                 </div>
             </p>
         </div>
