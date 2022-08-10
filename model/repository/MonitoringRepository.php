@@ -557,9 +557,29 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $extraData = $this->extractKvData($data);
 
         $types[self::COLUMN_EXTRA_DATA] = (in_array($this->getPlatformName(), ['mysql','sqlite'])) ? 'json' : 'jsonb';
-        $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($extraData);
+        $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($this->reformatExtraData($extraData));
 
         return $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData, $types) === 1;
+    }
+
+    /**
+     * Reformat extra data array in case it was wrongly formatted and it has extra unneeded array level
+     */
+    private function reformatExtraData(array $data): array
+    {
+        $reformatted = [];
+
+        foreach ($data as $dataKey => $dataVal) {
+            if (is_array($dataKey)) {
+                $realKey = current(array_keys($dataVal));
+                $realVal = current(array_values($dataVal));
+                $reformatted[$realKey] = $realVal;
+            } else {
+                $reformatted[$dataKey] = $dataVal;
+            }
+        }
+
+        return $reformatted;
     }
 
     /**
@@ -586,11 +606,19 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $setExtraDataClauses = [];
         $platformName = $this->getPlatformName();
         foreach ($extraData as $extraDataKey => $extraDataValue) {
-            if (in_array($platformName, ['mysql','sqlite'])) {
-                $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
+            if (is_array($extraDataValue)) {
+                $realKey = current(array_keys($extraDataValue));
+                $realVal = current(array_values($extraDataValue));
             } else {
-                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
-                $extraDataValue = json_encode($extraDataValue);
+                $realKey = $extraDataKey;
+                $realVal = $extraDataValue;
+            }
+            if (in_array($platformName, ['mysql','sqlite'])) {
+                $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $realKey, $realKey);
+                $extraDataValue = $realVal;
+            } else {
+                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $realKey, $realKey);
+                $extraDataValue = json_encode($realVal);
             }
             $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
         }
