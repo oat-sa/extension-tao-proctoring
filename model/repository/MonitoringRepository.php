@@ -569,13 +569,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
     {
         $reformatted = [];
 
-        foreach ($data as $dataKey => $dataVal) {
-            if (is_array($dataKey)) {
-                $realKey = current(array_keys($dataVal));
-                $realVal = current(array_values($dataVal));
+        foreach ($data as $extraDataKey => $extraDataValue) {
+            if (is_array($extraDataValue)) {
+                $realKey = current(array_keys($extraDataValue));
+                $realVal = current(array_values($extraDataValue));
                 $reformatted[$realKey] = $realVal;
             } else {
-                $reformatted[$dataKey] = $dataVal;
+                $reformatted[$extraDataKey] = $extraDataValue;
             }
         }
 
@@ -605,20 +605,15 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $setExtraDataClauses = [];
         $platformName = $this->getPlatformName();
+
+        $extraData = $this->reformatExtraData($extraData);
+
         foreach ($extraData as $extraDataKey => $extraDataValue) {
-            if (is_array($extraDataValue)) {
-                $realKey = current(array_keys($extraDataValue));
-                $realVal = current(array_values($extraDataValue));
-            } else {
-                $realKey = $extraDataKey;
-                $realVal = $extraDataValue;
-            }
             if (in_array($platformName, ['mysql','sqlite'])) {
-                $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $realKey, $realKey);
-                $extraDataValue = $realVal;
+                $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
             } else {
-                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $realKey, $realKey);
-                $extraDataValue = json_encode($realVal);
+                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
+                $extraDataValue = json_encode($extraDataValue);
             }
             $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
         }
