@@ -557,9 +557,29 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $extraData = $this->extractKvData($data);
 
         $types[self::COLUMN_EXTRA_DATA] = (in_array($this->getPlatformName(), ['mysql','sqlite'])) ? 'json' : 'jsonb';
-        $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($extraData);
+        $primaryTableData[self::COLUMN_EXTRA_DATA] = json_encode($this->reformatExtraData($extraData));
 
         return $this->getPersistence()->insert(self::TABLE_NAME, $primaryTableData, $types) === 1;
+    }
+
+    /**
+     * Reformat extra data array in case it was wrongly formatted and it has extra unneeded array level
+     */
+    private function reformatExtraData(array $data): array
+    {
+        $reformatted = [];
+
+        foreach ($data as $extraDataKey => $extraDataValue) {
+            if (is_array($extraDataValue)) {
+                $realKey = current(array_keys($extraDataValue));
+                $realVal = current(array_values($extraDataValue));
+                $reformatted[$realKey] = $realVal;
+            } else {
+                $reformatted[$extraDataKey] = $extraDataValue;
+            }
+        }
+
+        return $reformatted;
     }
 
     /**
@@ -585,6 +605,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $setExtraDataClauses = [];
         $platformName = $this->getPlatformName();
+
+        $extraData = $this->reformatExtraData($extraData);
+
         foreach ($extraData as $extraDataKey => $extraDataValue) {
             if (in_array($platformName, ['mysql','sqlite'])) {
                 $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
