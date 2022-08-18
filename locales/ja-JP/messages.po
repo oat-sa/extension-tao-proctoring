@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.01\n"
-"PO-Revision-Date: 2021-12-23T18:14:43\n"
+"Project-Id-Version: TAO 2022.09\n"
+"PO-Revision-Date: 2022-08-12T16:46:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 msgid " sec"
-msgstr ""
+msgstr " sec"
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - アイテム %2$s/%3$s"
@@ -98,16 +98,16 @@ msgid "Active proctors"
 msgstr "試検監督者（アクティブ）"
 
 msgid "Active test-takers"
-msgstr "受検者（アクティブ）"
+msgstr "受験者（アクティブ）"
 
 msgid "Actor"
 msgstr "アクター"
 
 msgid "Add test takers"
-msgstr "受検者を追加"
+msgstr "受験者を追加"
 
 msgid "Adjusted"
-msgstr ""
+msgstr "調整済み"
 
 msgid "Administer deliveries"
 msgstr "デリバリ管理"
@@ -116,13 +116,13 @@ msgid "Administration"
 msgstr "アドミン権限"
 
 msgid "All fields are required"
-msgstr ""
+msgstr "すべての項目が必須です"
 
 msgid "already authorized"
 msgstr "すでに承認されています"
 
 msgid "Already changed time will be added or subtracted by the new value."
-msgstr ""
+msgstr "すでに変更されている時間は、新しい値で加算または減算されます。"
 
 msgid "already paused"
 msgstr "すでに一時停止されています"
@@ -144,28 +144,28 @@ msgid "Assessment has been paused due to attempt to switch to another window/tab
 msgstr "別のウィンドウ/タブに切り替えたために、テストが一時停止されました。"
 
 msgid "Assign administrator"
-msgstr "アドミン権限の割当て"
+msgstr ""
 
 msgid "Assign more test takers to this session"
-msgstr "さらにこのセッションに受検者を割当てます"
+msgstr "さらにこのセッションに受験者を割当てます"
 
 msgid "Assign proctors"
 msgstr "試検監督者の割当て"
 
 msgid "Assign the selected test takers"
-msgstr "選択した受検者の割当て"
+msgstr "選択した受験者の割当て"
 
 msgid "Assign the selected test takers to the session"
-msgstr "選択した受検者をそのセッションに割当てる"
+msgstr "選択した受験者をそのセッションに割当てる"
 
 msgid "Assign the test taker to the session"
-msgstr "受検者をそのセッションに割当てる"
+msgstr "受験者をそのセッションに割当てる"
 
 msgid "Assigned proctors"
 msgstr "割当て候補の試検監督者"
 
 msgid "Assigned test takers"
-msgstr "割当て済みの受検者"
+msgstr "割当て済みの受験者"
 
 msgid "Attempts"
 msgstr "実施"
@@ -174,7 +174,7 @@ msgid "author"
 msgstr "編集者"
 
 msgid "Authorization status"
-msgstr ""
+msgstr "認証ステータス"
 
 msgid "Authorize"
 msgstr "承認"
@@ -204,7 +204,7 @@ msgid "Authorized but not started"
 msgstr "承認済み｜未開始"
 
 msgid "authorized but not started"
-msgstr ""
+msgstr "未認証"
 
 msgid "Authorized proctors"
 msgstr "承認済み試検監督者"
@@ -213,16 +213,16 @@ msgid "Authorized, you may proceed"
 msgstr "承認されました。開始してください。"
 
 msgid "Automatically paused by the system due to authorized test not being launched by test taker."
-msgstr "承認されたテストが受検者によって開始されていないため、システムによって自動的に一時停止されました。"
+msgstr "承認されたテストが受験者によって開始されていないため、システムによって自動的に一時停止されました。"
 
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
-msgstr "受検者が承認リクエストをキャンセルしたため、システムによって自動的にリセットされま自動的にした。"
+msgstr "受験者が承認リクエストをキャンセルしたため、システムによって自動的にリセットされま自動的にした。"
 
 msgid "Automatically reset by the system due to authorized test not being launched by test taker."
-msgstr "承認されたテストが受検者によって開始されなかったため、システムによって自動的にリセットされました。"
+msgstr "承認されたテストが受験者によって開始されなかったため、システムによって自動的にリセットされました。"
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
-msgstr "受検者が承認済みテストを続行しないため、システムによって自動的にリセットされます。"
+msgstr "受験者が承認済みテストを続行しないため、システムによって自動的にリセットされます。"
 
 msgid "Available"
 msgstr "利用可能"
@@ -231,7 +231,7 @@ msgid "Available history"
 msgstr "利用可能な履歴"
 
 msgid "Available test takers"
-msgstr "利用可能な受検者"
+msgstr "利用可能な受験者"
 
 msgid "awaiting"
 msgstr "待機中"
@@ -312,10 +312,10 @@ msgid "category"
 msgstr "カテゴリ"
 
 msgid "Change time"
-msgstr ""
+msgstr "変更時間"
 
 msgid "Changed Time"
-msgstr ""
+msgstr "変更時間"
 
 msgid "Column %s successfully created"
 msgstr "列 %s が正しく作成されました"
@@ -327,7 +327,7 @@ msgid "comment"
 msgstr "コメント"
 
 msgid "comment..."
-msgstr ""
+msgstr "コメント"
 
 msgid "Complaint"
 msgstr "苦情"
@@ -411,10 +411,10 @@ msgid "End"
 msgstr "終了"
 
 msgid "End date of the export"
-msgstr "エクスポートの終了日時"
+msgstr "エクスポート終了日時"
 
 msgid "Entered value is not correct"
-msgstr ""
+msgstr "入力された値が正しくありません"
 
 msgid "Environment"
 msgstr "状況・環境"
@@ -426,7 +426,7 @@ msgid "Event"
 msgstr "イベント"
 
 msgid "Examinee"
-msgstr "受検者"
+msgstr "受験者"
 
 msgid "Export"
 msgstr "エクスポート"
@@ -439,7 +439,7 @@ msgid "Extended time"
 msgstr "延長時間"
 
 msgid "Extra"
-msgstr ""
+msgstr "エクストラ"
 
 msgid "Extra Time"
 msgstr "延長時間"
@@ -493,10 +493,10 @@ msgid "In Progress"
 msgstr "実施中"
 
 msgid "in progress"
-msgstr ""
+msgstr "実施中"
 
 msgid "INPROGRESS"
-msgstr ""
+msgstr "実施中"
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "エクスポートされた \"%s\" のイレギュラー情報"
@@ -541,7 +541,7 @@ msgid "Logout"
 msgstr "ログアウト"
 
 msgid "Main Menu"
-msgstr ""
+msgstr "メインメニュ"
 
 msgid "Manage Proctors"
 msgstr "試検監督者の管理"
@@ -569,10 +569,10 @@ msgid "No assigned proctors"
 msgstr "割当てられた試検監督者がいません"
 
 msgid "No assigned test takers"
-msgstr "割当てられた受検者がいません"
+msgstr "割当てられた受験者がいません"
 
 msgid "No available test takers to assign"
-msgstr "割当て可能な受検者はいません"
+msgstr "割当て可能な受験者はいません"
 
 msgid "No history to display!"
 msgstr "表示する履歴がありません！"
@@ -650,7 +650,7 @@ msgid "Paused"
 msgstr "一時停止"
 
 msgid "Please provide a reason"
-msgstr ""
+msgstr "理由をご記入ください"
 
 msgid "Please select one or more test site to manage proctors"
 msgstr "試検監督者を管理するテストサイトを一つ以上選んでください"
@@ -686,7 +686,7 @@ msgid "Proctor"
 msgstr "試検監督者"
 
 msgid "Proctor authorization"
-msgstr ""
+msgstr "試験監督承認"
 
 msgid "Proctor created"
 msgstr "試検監督者が作成されました"
@@ -695,10 +695,10 @@ msgid "Proctor/Staff"
 msgstr "試験監督/スタッフ"
 
 msgid "Proctored Delivery Server"
-msgstr "監視されているデリバリサーバ"
+msgstr "デリバリサーバ"
 
 msgid "Proctored Test-Takers"
-msgstr "受検者を監督"
+msgstr "受験者"
 
 msgid "Proctoring interface"
 msgstr "試験監督インターフェース"
@@ -740,10 +740,10 @@ msgid "Remove default tag filtering"
 msgstr "デフォルトのタグフィルタを削除"
 
 msgid "Remove the selected test takers from the session"
-msgstr "選択した受検者をセッションから削除"
+msgstr "選択した受験者をセッションから削除"
 
 msgid "Remove the test taker from the session"
-msgstr "受検者をセッションから削除"
+msgstr "受験者をセッションから削除"
 
 msgid "Report"
 msgstr "レポート"
@@ -798,7 +798,7 @@ msgid "Session"
 msgstr "セッション"
 
 msgid "session"
-msgstr ""
+msgstr "セッション"
 
 msgid "Session %s - %s has not been processed"
 msgstr "セッション %s - %s は処理されませんでした"
@@ -813,7 +813,7 @@ msgid "Sessions"
 msgstr "セッション"
 
 msgid "sessions"
-msgstr ""
+msgstr "セッション"
 
 msgid "Sessions authorized"
 msgstr "セッションが承認されました"
@@ -870,7 +870,7 @@ msgid "Start"
 msgstr "開 始"
 
 msgid "Start date of the export"
-msgstr "エクスポートの開始日"
+msgstr "エクスポート開始日"
 
 msgid "Started at"
 msgstr "開始"
@@ -891,10 +891,10 @@ msgid "Tables successfully altered"
 msgstr "テーブルは正常に変更されました"
 
 msgid "Take or continue a test controlled by a proctor"
-msgstr "試験監督によって管理されたテストの受検または継続"
+msgstr "試験監督者が管理するテストを受験"
 
 msgid "TAO: User Authorization"
-msgstr ""
+msgstr "TAO：ユーザー認証"
 
 msgid "Technical"
 msgstr "技術的障害"
@@ -915,7 +915,7 @@ msgid "Terminate sessions"
 msgstr "セッション終了"
 
 msgid "Terminate/Reactivate"
-msgstr ""
+msgstr "終了／再実施"
 
 msgid "Terminate/Reactivate and irregularity"
 msgstr "終了/再実施・イレギュラー対応"
@@ -996,28 +996,28 @@ msgid "Test had not been started."
 msgstr "テストは開始されていません"
 
 msgid "test has no time limits"
-msgstr ""
+msgstr "テストに時間制限はありません"
 
 msgid "Test site %s"
 msgstr "テストサイト： %s"
 
 msgid "Test taker"
-msgstr "受検者"
+msgstr "受験者"
 
 msgid "test taker"
-msgstr "受検者"
+msgstr "受験者"
 
 msgid "Test takers have been added"
-msgstr "受検者が追加されました"
+msgstr "受験者が追加されました"
 
 msgid "Test takers have been removed"
-msgstr "受検者が削除されました"
+msgstr "受験者が削除されました"
 
 msgid "Test Variables"
 msgstr "テスト結果（変数）"
 
 msgid "Test-Taker"
-msgstr "受検者"
+msgstr "受験者"
 
 msgid "Testing Workstation"
 msgstr "試検ワークステーション"
@@ -1044,16 +1044,16 @@ msgid "The assessment was automatically terminated by the system due to inactivi
 msgstr "テストはシステムによって自動的に中止されました。"
 
 msgid "The decreased time cannot be higher than remaining time %s"
-msgstr ""
+msgstr "短縮された時間は残り時間 %s よりも大きくできません。"
 
 msgid "The extra time must be a number"
 msgstr "延長時間は数値でなければなりません"
 
 msgid "The extra time must be a number bigger than 0"
-msgstr ""
+msgstr "延長時間は0より大きい数字でなければならない"
 
 msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
-msgstr ""
+msgstr "増加した時間を残り時間に加えたとき、%sはこのタイマー%sに与えられた全体の時間より長くなることはできません。"
 
 msgid "The proctor will be authorized. Continue ?"
 msgstr "試検監督者を承認しますか？"
@@ -1068,10 +1068,10 @@ msgid "The proctors will be revoked. Continue ?"
 msgstr "試検監督者を取り消しますか？"
 
 msgid "The test taker will be removed from this session. Continue ?"
-msgstr "受検者をこのセッションから削除しますか？"
+msgstr "受験者をこのセッションから削除しますか？"
 
 msgid "The test takers will be removed from this session. Continue ?"
-msgstr "このセッションから受検者を削除しますか？"
+msgstr "このセッションから受験者を削除しますか？"
 
 msgid "There is no delivery in progress"
 msgstr "実施中のデリバリはありません"
@@ -1080,13 +1080,13 @@ msgid "Time"
 msgstr "時間"
 
 msgid "Time adjusted"
-msgstr ""
+msgstr "調整時間"
 
 msgid "Time decrease is too high"
-msgstr ""
+msgstr "時間の減少が大きすぎる"
 
 msgid "Time increase is too high"
-msgstr ""
+msgstr "時間増加率が高すぎる"
 
 #, tao-public
 msgid "Tools"
@@ -1105,7 +1105,7 @@ msgid "Unable to perform action on test %s."
 msgstr "テスト %s でアクションを実行できません"
 
 msgid "Unexpected response"
-msgstr ""
+msgstr "予期せぬレスポンス"
 
 msgid "User Activity"
 msgstr "ユーザアクテビティ"
