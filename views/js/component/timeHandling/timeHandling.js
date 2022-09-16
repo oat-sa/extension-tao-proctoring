@@ -79,6 +79,7 @@ define([
                 const $ok = $cmp.find('[data-control="done"]');
                 const $changeTimeControls = $cmp.find('input[name="changeTimeControl"]');
                 let changeTimeOperator = '';
+                const defaultTime = 1;
                 const state = {
                     reasons: null,
                     comment: '',
@@ -101,11 +102,14 @@ define([
                  * @returns undefined
                  */
                 function renderErrors(errors) {
+                    const errorMessages = [];
+
                     if ($cmp) {
                         errors.forEach( error => {
-                            const $error = $('<div class="feedback-error small"></div>').text(error);
-                            $cmp.find('.actions').prepend($error);
-                        })
+                            errorMessages.push(`<div class="feedback-error small">${error}</div>`);
+                        });
+
+                        $cmp.find('.errors').prepend(errorMessages.join(''));
                         hider.show($error);
                     }
                 }
@@ -169,7 +173,7 @@ define([
                                         resource.errorLabel = __('Time increase is too high');
                                         break;
                                     default:
-                                        resource.errorLabel = undefined;
+                                        resource.errorLabel = '';
                                 }
                             }
 
@@ -184,12 +188,11 @@ define([
                     });
 
                     if (errs) {
-                        $ok.attr('disabled', true);
                         renderErrors(errList);
                         focus();
-                    } else {
-                        $ok.removeAttr('disabled');
                     }
+
+                    $ok.attr('disabled', (errs || value.length === 0));
 
                     return errs;
                 }
@@ -338,15 +341,19 @@ define([
                         .render($reasonCategories);
                 }
 
-                $time.on('change', function() {
+                $time.on('input', function() {
                     clearErrors();
                     checkInputError();
                 });
 
                 $changeTimeControls.on('change', ({ target: { value } }) => {
-                  changeTimeOperator = value;
-                    clearErrors();
-                    checkInputError();
+                    changeTimeOperator = value;
+                    if($time.val().length !== 0) {
+                        clearErrors();
+                        checkInputError();
+                    } else {
+                        $time.val(defaultTime);
+                    }
                 });
 
                 focus();
