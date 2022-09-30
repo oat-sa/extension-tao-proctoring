@@ -119,7 +119,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             $sqlMock = $this->getSqlMock('test_monitoring');
             $cacheMock = $this->getKvMock('cache');
             $this->persistence = $sqlMock->getPersistenceById('test_monitoring');
-            DbSetup::generateTable($this->persistence);
+
+            (new DbSetup())->generateTable($this->persistence);
 
             $pmMock = $this->getMockBuilder(PersistenceManager::class)
                 ->setMethods(['getPersistenceById'])

@@ -128,8 +128,8 @@ class UpdaterDeliveryTest extends TestCase
     {
         $this->pmMock = $this->getSqlMock('test_monitoring');
         $this->persistence = $this->pmMock->getPersistenceById('test_monitoring');
-        DbSetup::generateTable($this->persistence);
 
+        (new DbSetup)->generateTable($this->persistence);
     }
 
     /**

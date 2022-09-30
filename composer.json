@@ -5,7 +5,7 @@
     "type" : "tao-extension",
     "authors" : [
         {
-        "name": "Open Assessment Technologies SA"
+            "name": "Open Assessment Technologies SA"
         }
     ],
     "keywords" : [
@@ -23,8 +23,8 @@
     "require": {
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
         "sinergi/browser-detector": "^6.0.2",
-        "oat-sa/generis" : ">=14.0.0",
-        "oat-sa/tao-core" : ">=47.0.0",
+        "oat-sa/generis" : ">=15.22",
+        "oat-sa/tao-core" : ">=50.24.6",
         "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
         "oat-sa/extension-tao-delivery" : ">=15.0.0",
         "oat-sa/extension-tao-eventlog" : ">=3.0.0",
@@ -32,7 +32,7 @@
         "oat-sa/extension-tao-testqti" : ">=41.0.0",
         "oat-sa/extension-tao-testtaker" : ">=8.0.0",
         "oat-sa/extension-tao-test" : ">=15.0.0",
-        "oat-sa/lib-tao-dtms" : "1.0.0"
+        "oat-sa/lib-tao-dtms" : "^1.0.1"
     },
     "autoload" : {
         "psr-4" : {
