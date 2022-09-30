@@ -23,8 +23,8 @@
     "require": {
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
         "sinergi/browser-detector": "^6.0.2",
-        "oat-sa/generis" : ">=14.0.0",
-        "oat-sa/tao-core" : ">=47.0.0",
+        "oat-sa/generis" : ">=15.22",
+        "oat-sa/tao-core" : ">=50.24.6",
         "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
         "oat-sa/extension-tao-delivery" : ">=15.0.0",
         "oat-sa/extension-tao-eventlog" : ">=3.0.0",
@@ -38,12 +38,5 @@
         "psr-4" : {
             "oat\\taoProctoring\\" : ""
         }
-    },
-    "require-dev": {
-        "oat-sa/generis": "dev-php8-migration as v16.0.0",
-        "oat-sa/tao-core": "dev-php8-migration as v51.0.0",
-        "oat-sa/extension-tao-testqti": "dev-php8-migration as v45.0.0",
-        "oat-sa/extension-tao-eventlog": "dev-php8-migration as v4.0.0",
-        "oat-sa/extension-tao-outcome": "dev-php8-migration as v14.0.0"
     }
 }
