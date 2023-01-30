@@ -466,7 +466,7 @@ msgid "First name"
 msgstr "Prénom"
 
 msgid "Freezing"
-msgstr "Gelé"
+msgstr "Ecran figé"
 
 msgid "Grant Extra Time"
 msgstr "Accorder du temps supplémentaire"
@@ -563,7 +563,7 @@ msgid "Navigation"
 msgstr "Navigation"
 
 msgid "Network"
-msgstr "Réseau"
+msgstr "Problème de réseau"
 
 msgid "No assigned proctors"
 msgstr "Aucun surveillant assigné"
@@ -677,7 +677,7 @@ msgid "Print the assessment results"
 msgstr "Imprimer les résultats de l'évaluation"
 
 msgid "Printing"
-msgstr "En cours d'impression"
+msgstr "Problème d’impression"
 
 msgid "Proceed"
 msgstr "Continuer"
@@ -897,7 +897,7 @@ msgid "TAO: User Authorization"
 msgstr "TAO: Autorisation de l'utilisateur"
 
 msgid "Technical"
-msgstr "Technique"
+msgstr "Raison technique"
 
 msgid "Terminate"
 msgstr "Terminer"
@@ -1020,7 +1020,7 @@ msgid "Test-Taker"
 msgstr "Participant"
 
 msgid "Testing Workstation"
-msgstr "Test en cours de la station de travail"
+msgstr "Intervention technique"
 
 msgid "The action cannot be applied, no eligible sessions found"
 msgstr "L'action ne peut être appliquée, pas de session éligible trouvée."
