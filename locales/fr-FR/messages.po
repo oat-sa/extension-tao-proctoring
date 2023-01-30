@@ -321,7 +321,7 @@ msgid "Column %s successfully created"
 msgstr "Colonne %s créés avec succès"
 
 msgid "Comfort"
-msgstr "confort"
+msgstr "Confort matériel"
 
 msgid "comment"
 msgstr "commentaire"
@@ -342,7 +342,7 @@ msgid "Completed tests"
 msgstr "Tests terminés"
 
 msgid "Compliance"
-msgstr "Conformité"
+msgstr "Infraction du participant"
 
 msgid "Connectivity"
 msgstr "Connectivité"
@@ -420,13 +420,13 @@ msgid "Environment"
 msgstr "Environnement"
 
 msgid "Error"
-msgstr "Erreur"
+msgstr "Erreur du surveillant"
 
 msgid "Event"
 msgstr "Événement"
 
 msgid "Examinee"
-msgstr "Examiné"
+msgstr "Participant"
 
 msgid "Export"
 msgstr "Exporter"
@@ -481,13 +481,13 @@ msgid "However, the action will not be applied to the following sessions"
 msgstr "Cependant, l'action ne sera pas appliquée aux sessions suivantes."
 
 msgid "ID/Authorization"
-msgstr "ID/Autorisation"
+msgstr "Identification"
 
 msgid "Identifier"
 msgstr "Identifiant"
 
 msgid "Illness"
-msgstr "Maladie"
+msgstr "Raison médicale"
 
 msgid "In Progress"
 msgstr "En cours"
@@ -529,7 +529,7 @@ msgid "Last Week"
 msgstr "Semaine dernière"
 
 msgid "Late"
-msgstr "Tard"
+msgstr "Retard"
 
 msgid "Launching"
 msgstr "Lancement"
@@ -587,7 +587,7 @@ msgid "No sessions available"
 msgstr "Aucune session disponible"
 
 msgid "No Show"
-msgstr "Pas d'affichage"
+msgstr "Problème d’affichage"
 
 msgid "Noise"
 msgstr "Bruit"
@@ -1114,5 +1114,5 @@ msgid "Warning, you are about to pause all in progress tests. All test takers wi
 msgstr "Avertissement : vous allez mettre en pause tous les tests en cours. Tous les participants seront mis en pause sur ou avant le prochain battement. Veuillez justifier la raison de cette action."
 
 msgid "Weather"
-msgstr "Temps"
+msgstr "Conditions météo"
 
