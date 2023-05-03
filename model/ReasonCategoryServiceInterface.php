@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,10 +21,9 @@
 
 namespace oat\taoProctoring\model;
 
-
 interface ReasonCategoryServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/reasonCategory';
+    public const SERVICE_ID = 'taoProctoring/reasonCategory';
 
     /**
      * @return array

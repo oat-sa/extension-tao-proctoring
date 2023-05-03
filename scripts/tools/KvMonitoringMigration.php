@@ -27,7 +27,6 @@ use common_report_Report as Report;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
-
 /**
  * @deprecated
  */
@@ -148,7 +147,7 @@ class KvMonitoringMigration extends ScriptAction
         $executionProcessed = 0;
         $removed = 0;
 
-        while ($offset < $total ) {
+        while ($offset < $total) {
             $this->getCache()->set(__CLASS__ . 'offset', $offset);
 
             $options = [
@@ -237,7 +236,6 @@ class KvMonitoringMigration extends ScriptAction
             }
         }
         return Report::createSuccess(__('Column %s successfully created', $columnName));
-
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,6 +22,7 @@
 namespace oat\taoProctoring\model\deliveryLog;
 
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDelete;
+
 /**
  * Interface DeliveryLog
  *
@@ -29,19 +31,19 @@ use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDelete;
  */
 interface DeliveryLog extends DeliveryExecutionDelete
 {
-    const SERVICE_ID = 'taoProctoring/DeliveryLog';
+    public const SERVICE_ID = 'taoProctoring/DeliveryLog';
 
     /**
      * list of searchable fields
      */
-    const OPTION_FIELDS = 'fields';
+    public const OPTION_FIELDS = 'fields';
 
-    const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
-    const EVENT_ID = 'event_id';
-    const DATA = 'data';
-    const CREATED_AT = 'created_at';
-    const CREATED_BY = 'created_by';
-    const ID = 'id';
+    public const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
+    public const EVENT_ID = 'event_id';
+    public const DATA = 'data';
+    public const CREATED_AT = 'created_at';
+    public const CREATED_BY = 'created_by';
+    public const ID = 'id';
 
     /**
      * @param array $data

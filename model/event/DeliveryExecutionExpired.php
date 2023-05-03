@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,6 +24,7 @@ namespace oat\taoProctoring\model\event;
 use oat\oatbox\event\Event;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\oatbox\user\User;
+
 /**
  * This event is fired whenever a proctor terminates
  * a delivery execution expired after pausing
@@ -33,12 +35,12 @@ class DeliveryExecutionExpired implements Event
      * @var DeliveryExecution
      */
     private $deliveryExecution;
-    
+
     /**
      * @var User
      */
     private $proctor;
-    
+
     /**
      * @var mixed
      */
@@ -67,7 +69,7 @@ class DeliveryExecutionExpired implements Event
 
     /**
      * Returns the terminated delivery execution
-     * 
+     *
      * @return DeliveryExecution
      */
     public function getDeliveryExecution()
@@ -77,7 +79,7 @@ class DeliveryExecutionExpired implements Event
 
     /**
      * Returns the reason for termination
-     * 
+     *
      * @return mixed
      */
     public function getReason()
@@ -87,12 +89,11 @@ class DeliveryExecutionExpired implements Event
 
     /**
      * Returns the proctor that terminated the execution
-     * 
+     *
      * @return \oat\oatbox\user\User
      */
     public function getProctor()
     {
         return $this->proctor;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\StateServiceInterface;
 
@@ -31,7 +31,6 @@ use oat\taoDelivery\model\execution\StateServiceInterface;
  */
 interface DeliveryExecutionStateService extends StateServiceInterface
 {
-
     /**
      * Sets a delivery execution in the awaiting state
      *
@@ -94,5 +93,4 @@ interface DeliveryExecutionStateService extends StateServiceInterface
      * @return bool
      */
     public function reportExecution(DeliveryExecution $deliveryExecution, $reason);
-
 }

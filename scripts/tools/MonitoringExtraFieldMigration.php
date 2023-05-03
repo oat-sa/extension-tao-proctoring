@@ -143,7 +143,7 @@ class MonitoringExtraFieldMigration extends ScriptAction
         }
     }
 
-    private function printMigrationScriptOptions(int $countOfDeliveryExecution, int $chunk) :void
+    private function printMigrationScriptOptions(int $countOfDeliveryExecution, int $chunk): void
     {
         echo 'Script options: ' . PHP_EOL;
         echo sprintf(' - DRY RUN mode: %s', $this->getOption('wet-run') ? 'no' : 'yes') . PHP_EOL;
@@ -238,11 +238,11 @@ class MonitoringExtraFieldMigration extends ScriptAction
         $report->add(Report::createSuccess(sprintf('ExtraData removed from KV table: %s', $this->deleted)));
         if ($wetrun) {
             $report->add(new Report(Report::TYPE_SUCCESS, 'Script runtime executed in `WET_RUN` mode'));
-            $report->add(new Report(Report::TYPE_INFO,
+            $report->add(new Report(
+                Report::TYPE_INFO,
                 'You can now check that `kv_delivery_monitoring` table is empty and delete it. ' .
                  'Only valid if you have specified --deleteKv flag.'
             ));
-
         } else {
             $report->add(new Report(Report::TYPE_ERROR, 'Script runtime executed in `DRY_RUN` mode'));
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,7 +43,7 @@ sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t 
  */
 class ProctorCsvImporter extends RdsUserImportService
 {
-    CONST USER_IMPORTER_TYPE = 'proctor';
+    public const USER_IMPORTER_TYPE = 'proctor';
 
     /**
      * Add test taker role to user to import

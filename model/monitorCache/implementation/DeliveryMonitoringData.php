@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -95,7 +96,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     public function update($key, $value)
     {
-       $this->addValue($key, $value, true);
+        $this->addValue($key, $value, true);
     }
 
     /**
@@ -145,7 +146,8 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
             if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
                 return DeliveryExecutionContext::createFromArray(json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true));
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return null;
     }
@@ -247,7 +249,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
 
         if ($testSessionConnectivityStatusService->hasOnlineMode() && ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
             $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
-        }else{
+        } else {
             // to ensure that during sorting by connectivity all similar statuses grouped together
             $lastConnectivity = (~PHP_INT_MAX) + substr(abs(crc32($status)), 0, 3);
         }

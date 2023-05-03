@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,7 +42,7 @@ use qtism\runtime\tests\AssessmentTestSession;
  */
 class TestSessionService extends QtiTestSessionService
 {
-    const SERVICE_ID = 'taoProctoring/TestSessionService';
+    public const SERVICE_ID = 'taoProctoring/TestSessionService';
 
     public static function singleton()
     {
@@ -58,13 +59,15 @@ class TestSessionService extends QtiTestSessionService
     {
         if (!isset(self::$cache[$deliveryExecution->getIdentifier()]['expired'])) {
             $executionState = $deliveryExecution->getState()->getUri();
-            if (!in_array($executionState, [
+            if (
+                !in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
                 DeliveryExecutionState::STATE_AWAITING,
                 DeliveryExecutionState::STATE_AUTHORIZED,
-            ]) ||
-                !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)) {
+                ]) ||
+                !$lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution)
+            ) {
                 return self::$cache[$deliveryExecution->getIdentifier()]['expired'] = false;
             }
 
@@ -141,10 +144,10 @@ class TestSessionService extends QtiTestSessionService
                                 if ($currentItem->getAssessmentItemRef()->getIdentifier() == $key) {
                                     $result = $this->getProgressText($section['label'], $item['positionInSection'], count($section['items']));
                                     break 3;
-                                 }
-                             }
-                         }
-                     }
+                                }
+                            }
+                        }
+                    }
                 }
             } else {
                 $result = __('finished');
@@ -216,9 +219,9 @@ class TestSessionService extends QtiTestSessionService
                 'partLabel' => $partId
             ];
 
-            $offset ++;
-            $offsetSection ++;
-            $offsetPart ++;
+            $offset++;
+            $offsetSection++;
+            $offsetPart++;
         }
 
         return $parts;

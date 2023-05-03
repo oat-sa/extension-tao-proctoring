@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -53,18 +54,18 @@ use Symfony\Component\Lock\Lock;
  */
 class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
 {
-    const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
+    use LoggerAwareTrait;
+    use LockTrait;
+
+    public const OPTION_TERMINATION_DELAY_AFTER_PAUSE = 'termination_delay_after_pause';
     /**
      * @var string lifetime delivery executions in awaiting state
      */
-    const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
-    const OPTION_TIME_HANDLING = 'time_handling';
+    public const OPTION_CANCELLATION_DELAY = 'cancellation_delay';
+    public const OPTION_TIME_HANDLING = 'time_handling';
 
-    const TIME_HANDLING_EXTRA_TIME = 'extra_time';
-    const TIME_HANDLING_TIMER_ADJUSTMENT = 'timer_adjustment';
-
-    use LoggerAwareTrait;
-    use LockTrait;
+    public const TIME_HANDLING_EXTRA_TIME = 'extra_time';
+    public const TIME_HANDLING_TIMER_ADJUSTMENT = 'timer_adjustment';
 
     /**
      * @var TestSessionService
@@ -395,7 +396,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_CANCEL, $data);
             $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
-            $this->logNotice('Attempt to cancel delivery execution '.$deliveryExecution->getIdentifier().' with initialized test session.');
+            $this->logNotice('Attempt to cancel delivery execution ' . $deliveryExecution->getIdentifier() . ' with initialized test session.');
             $result = false;
         }
 
@@ -477,7 +478,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 $result = $this->terminateExecution($deliveryExecution, $reason);
                 break;
             default:
-                $this->logWarning('Unrecognised state '.$state);
+                $this->logWarning('Unrecognised state ' . $state);
                 $result = $this->setState($deliveryExecution, $state);
         }
 
@@ -505,7 +506,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 ProctoredDeliveryExecution::STATE_TERMINATED,
                 ProctoredDeliveryExecution::STATE_CANCELED,
             ])
-        ){
+        ) {
             $result = true;
         }
 
@@ -600,7 +601,6 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $result = parent::reactivateExecution($deliveryExecution, $reason);
 
         if (ProctoredDeliveryExecution::STATE_TERMINATED === $executionState) {
-
             $logData = [
                 'reason' => $reason,
                 'timestamp' => microtime(true),
@@ -639,7 +639,7 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
     protected function lockExecution(DeliveryExecution $deliveryExecution)
     {
         $deId = $deliveryExecution->getIdentifier();
-        $this->executionLocks[$deId] = $this->createLock(static::class.$deId, 30);
+        $this->executionLocks[$deId] = $this->createLock(static::class . $deId, 30);
         $this->executionLocks[$deId]->acquire(true);
     }
 
@@ -654,5 +654,4 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
             unset($this->executionLocks[$deId]);
         }
     }
-
 }

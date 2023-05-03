@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,6 @@
 
 namespace oat\taoProctoring\model\execution;
 
-
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
@@ -37,7 +37,7 @@ class ProctoredSectionPauseService extends SectionPauseService
     /**
      * This category triggers the section pause
      */
-    const PAUSE_CATEGORY = 'x-tao-proctored-auto-pause';
+    public const PAUSE_CATEGORY = 'x-tao-proctored-auto-pause';
 
     private $isProctored = null;
 
@@ -101,7 +101,6 @@ class ProctoredSectionPauseService extends SectionPauseService
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
                 $this->isProctored = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user);
             }
-
         }
         return $this->isProctored;
     }

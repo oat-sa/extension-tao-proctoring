@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -101,8 +102,10 @@ class MonitorCacheService extends MonitoringStorage
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = \common_session_SessionManager::getSession()->getUser();
 
-        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
-            && $user instanceof GuestTestUser) {
+        if (
+            in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser
+        ) {
             $data->getDeliveryExecution()->setState(DeliveryExecution::STATE_AUTHORIZED);
         }
 

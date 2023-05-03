@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -64,7 +65,8 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
      * @param array $defaults
      * @return array
      */
-    protected function getRequestOptions(array $defaults = []) {
+    protected function getRequestOptions(array $defaults = [])
+    {
 
         $defaults = array_merge($this->getDefaultOptions(), $defaults);
 
@@ -89,7 +91,6 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
             'detailed' => $detailed,
             'periodEnd' => $periodEnd
         );
-
     }
 
     /**
@@ -108,5 +109,4 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
             'periodEnd' => $today->format('Y-m-d')
         ];
     }
-
 }

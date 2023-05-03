@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,7 +41,6 @@ class IrregularitiesExportForm extends \tao_helpers_form_FormContainer
     {
         $this->instanceUri = $instanceUri;
         parent::__construct($data, $options);
-
     }
 
     protected function initForm()
@@ -51,7 +51,6 @@ class IrregularitiesExportForm extends \tao_helpers_form_FormContainer
 
         $this->form->setActions(array($submitElt), 'bottom');
         $this->form->setActions(array(), 'top');
-
     }
 
     /**
@@ -79,6 +78,5 @@ class IrregularitiesExportForm extends \tao_helpers_form_FormContainer
             $instanceElt->setValue($this->instanceUri);
             $this->form->addElement($instanceElt);
         }
-
     }
 }

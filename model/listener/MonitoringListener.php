@@ -96,8 +96,10 @@ class MonitoringListener extends ConfigurableService implements MonitoringListen
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = common_session_SessionManager::getSession()->getUser();
 
-        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
-            && $user instanceof GuestTestUser) {
+        if (
+            in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser
+        ) {
             $data->getDeliveryExecution()->setState(DeliveryExecution::STATE_AUTHORIZED);
         }
 

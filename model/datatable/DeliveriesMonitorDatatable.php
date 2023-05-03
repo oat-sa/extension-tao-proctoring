@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -79,7 +80,7 @@ class DeliveriesMonitorDatatable implements DatatablePayload, ServiceLocatorAwar
             } elseif ($filterKey === 'tag') {
                 $filters[] = [$filterKey => $filterValue];
             } else {
-                $filters[] = [$filterKey => 'LIKE %'.$filterValue.'%'];
+                $filters[] = [$filterKey => 'LIKE %' . $filterValue . '%'];
             }
         }
         $options = [];

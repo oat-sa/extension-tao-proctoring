@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,13 +22,11 @@
 
 namespace oat\taoProctoring\scripts\update\v8_12_0;
 
-
 use oat\oatbox\extension\AbstractAction;
 use oat\taoProctoring\model\deliveryLog\implementation\RdsDeliveryLogService;
 
 class AddIndexesToDeliveryLogTable extends AbstractAction
 {
-
     public function __invoke($params)
     {
         $deliveryLogService = $this->getServiceLocator()->get(RdsDeliveryLogService::SERVICE_ID);

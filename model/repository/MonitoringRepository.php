@@ -45,32 +45,32 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 {
     use OntologyAwareTrait;
 
-    const OPTION_PERSISTENCE = 'persistence';
-    const OPTION_USE_UPDATE_MULTIPLE = 'use_update_multiple';
+    public const OPTION_PERSISTENCE = 'persistence';
+    public const OPTION_USE_UPDATE_MULTIPLE = 'use_update_multiple';
 
-    const OPTION_PRIMARY_COLUMNS = 'primary_columns';
+    public const OPTION_PRIMARY_COLUMNS = 'primary_columns';
 
-    const TABLE_NAME = 'delivery_monitoring';
+    public const TABLE_NAME = 'delivery_monitoring';
 
-    const COLUMN_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
-    const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
-    const COLUMN_STATUS = DeliveryMonitoringService::STATUS;
-    const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM;
-    const COLUMN_TEST_TAKER = DeliveryMonitoringService::TEST_TAKER;
-    const COLUMN_TEST_TAKER_FIRST_NAME = DeliveryMonitoringService::TEST_TAKER_FIRST_NAME;
-    const COLUMN_TEST_TAKER_LAST_NAME = DeliveryMonitoringService::TEST_TAKER_LAST_NAME;
-    const COLUMN_AUTHORIZED_BY = DeliveryMonitoringService::AUTHORIZED_BY;
-    const COLUMN_START_TIME = DeliveryMonitoringService::START_TIME;
-    const COLUMN_END_TIME = DeliveryMonitoringService::END_TIME;
-    const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
-    const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
-    const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
+    public const COLUMN_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
+    public const COLUMN_DELIVERY_EXECUTION_ID = DeliveryMonitoringService::DELIVERY_EXECUTION_ID;
+    public const COLUMN_STATUS = DeliveryMonitoringService::STATUS;
+    public const COLUMN_CURRENT_ASSESSMENT_ITEM = DeliveryMonitoringService::CURRENT_ASSESSMENT_ITEM;
+    public const COLUMN_TEST_TAKER = DeliveryMonitoringService::TEST_TAKER;
+    public const COLUMN_TEST_TAKER_FIRST_NAME = DeliveryMonitoringService::TEST_TAKER_FIRST_NAME;
+    public const COLUMN_TEST_TAKER_LAST_NAME = DeliveryMonitoringService::TEST_TAKER_LAST_NAME;
+    public const COLUMN_AUTHORIZED_BY = DeliveryMonitoringService::AUTHORIZED_BY;
+    public const COLUMN_START_TIME = DeliveryMonitoringService::START_TIME;
+    public const COLUMN_END_TIME = DeliveryMonitoringService::END_TIME;
+    public const COLUMN_REMAINING_TIME = DeliveryMonitoringService::REMAINING_TIME;
+    public const COLUMN_EXTRA_TIME = DeliveryMonitoringService::EXTRA_TIME;
+    public const COLUMN_CONSUMED_EXTRA_TIME = DeliveryMonitoringService::CONSUMED_EXTRA_TIME;
 
-    const COLUMN_EXTRA_DATA = 'extra_data';
+    public const COLUMN_EXTRA_DATA = 'extra_data';
 
-    const DEFAULT_SORT_COLUMN = self::COLUMN_ID;
-    const DEFAULT_SORT_ORDER = 'ASC';
-    const DEFAULT_SORT_TYPE = 'string';
+    public const DEFAULT_SORT_COLUMN = self::COLUMN_ID;
+    public const DEFAULT_SORT_ORDER = 'ASC';
+    public const DEFAULT_SORT_TYPE = 'string';
 
     private $queryParams = [];
 
@@ -145,7 +145,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $orderClause
         );
 
-        if (isset($options['limit']))  {
+        if (isset($options['limit'])) {
             $sql = $this->getPersistence()->getPlatForm()->limitStatement($sql, $options['limit'], $options['offset']);
         }
 
@@ -153,7 +153,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach($data as &$row) {
+        foreach ($data as &$row) {
             $extraData = [];
             if (isset($row[self::COLUMN_EXTRA_DATA])) {
                 $decodedExtraData = json_decode($row[self::COLUMN_EXTRA_DATA], true);
@@ -286,7 +286,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $countQueryBuilder = $this->getQueryBuilder();
         $countQueryBuilder->select('count(grouped.delivery_id)');
-        $countQueryBuilder->from('('.$groupedSql.')', 'grouped');
+        $countQueryBuilder->from('(' . $groupedSql . ')', 'grouped');
         $stmt = $this->getPersistence()->query($countQueryBuilder->getSQL());
         return $stmt->fetch(PDO::FETCH_COLUMN);
     }
@@ -338,7 +338,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
             $innerQueryBuilder->leftJoin(
                 'delivery_monitoring',
-                '('.$statusSql.')',
+                '(' . $statusSql . ')',
                 'order_join',
                 'order_join.delivery_id=delivery_monitoring.delivery_id'
             );
@@ -351,10 +351,10 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $innerQueryBuilder->setFirstResult($offset);
 
             $innerSql = $innerQueryBuilder->getSQL();
-            $limitQueryBuilder->from('('.$innerSql.')', 'limit_q');
+            $limitQueryBuilder->from('(' . $innerSql . ')', 'limit_q');
             $limitQueryBuilder->addGroupBy('limit_q.order_val');
             $limitQueryBuilder->orderBy('order_val', $orderdir);
-        } else if($orderby == 'label') {
+        } elseif ($orderby == 'label') {
             $limitQueryBuilder->from('delivery_monitoring', 'limit_q');
             $limitQueryBuilder->addSelect('limit_q.delivery_name');
             $limitQueryBuilder->addGroupBy('limit_q.delivery_name');
@@ -383,10 +383,10 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $queryBuilder->select('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $queryBuilder->addSelect('count('.$conn->quoteIdentifier('s_'.$label).'.status) as ' . $conn->quoteIdentifier($label));
+            $queryBuilder->addSelect('count(' . $conn->quoteIdentifier('s_' . $label) . '.status) as ' . $conn->quoteIdentifier($label));
         }
 
-        $queryBuilder->addSelect('max('.$conn->quoteIdentifier('last_launch').'.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
+        $queryBuilder->addSelect('max(' . $conn->quoteIdentifier('last_launch') . '.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
 
         $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
@@ -396,18 +396,18 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $queryBuilder->leftJoin(
                 'delivery_m',
                 self::TABLE_NAME,
-                $conn->quoteIdentifier('s_'.$label),
-                'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('s_'.$label).'.delivery_execution_id and '
-                .$conn->quoteIdentifier('s_'.$label).'.status = :status_uri_'.$statusNum
+                $conn->quoteIdentifier('s_' . $label),
+                'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('s_' . $label) . '.delivery_execution_id and '
+                . $conn->quoteIdentifier('s_' . $label) . '.status = :status_uri_' . $statusNum
             );
-            $paramsValues[':status_uri_'.$statusNum] = $statusUri;
+            $paramsValues[':status_uri_' . $statusNum] = $statusUri;
             $statusNum++;
         }
         $queryBuilder->leftJoin(
             'delivery_m',
             self::TABLE_NAME,
             $conn->quoteIdentifier('last_launch'),
-            'delivery_m.delivery_execution_id='.$conn->quoteIdentifier('last_launch').'.delivery_execution_id'
+            'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('last_launch') . '.delivery_execution_id'
         );
 
         if ($dataLimit) {
@@ -424,7 +424,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $queryBuilder->groupBy('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $queryBuilder->addGroupBy($conn->quoteIdentifier('s_'.$label).'.status');
+            $queryBuilder->addGroupBy($conn->quoteIdentifier('s_' . $label) . '.status');
         }
 
         $outerQueryBuilder = $this->getQueryBuilder();
@@ -432,10 +432,10 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $outerQueryBuilder->select('delivery_name as label, delivery_id');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $outerQueryBuilder->addSelect('sum('.$conn->quoteIdentifier($label).') as ' . $conn->quoteIdentifier($label));
+            $outerQueryBuilder->addSelect('sum(' . $conn->quoteIdentifier($label) . ') as ' . $conn->quoteIdentifier($label));
         }
-        $outerQueryBuilder->addSelect('max('.$conn->quoteIdentifier(__('Last launch')).') as ' .  $conn->quoteIdentifier(__('Last launch')));
-        $outerQueryBuilder->from('('.$queryBuilder->getSQL().')', 'delivery_statuses');
+        $outerQueryBuilder->addSelect('max(' . $conn->quoteIdentifier(__('Last launch')) . ') as ' .  $conn->quoteIdentifier(__('Last launch')));
+        $outerQueryBuilder->from('(' . $queryBuilder->getSQL() . ')', 'delivery_statuses');
         $outerQueryBuilder->groupBy('delivery_id, label');
         $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);
 
@@ -472,11 +472,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
     private function buildSingleOrderRule(string $orderRule): string
     {
-        if (!preg_match(
-            '/([a-z_][a-z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i',
-            $orderRule,
-            $ruleParts
-        )) {
+        if (
+            !preg_match(
+                '/([a-z_][a-z0-9_]*)\s?(asc|desc)?\s?(string|numeric)?/i',
+                $orderRule,
+                $ruleParts
+            )
+        ) {
             return '';
         }
 
@@ -522,7 +524,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $qb = $this->getQueryBuilder();
         $qb->select('*')
             ->from(self::TABLE_NAME)
-            ->where(self::DELIVERY_EXECUTION_ID.'= :id')
+            ->where(self::DELIVERY_EXECUTION_ID . '= :id')
             ->setParameter('id', $deliveryExecutionId);
 
         $data = $qb->execute()->fetch(PDO::FETCH_ASSOC);
@@ -622,7 +624,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             if (in_array($platformName, ['mysql','sqlite'])) {
                 $setClauses[] = sprintf(
                     '%s = json_set(COALESCE(%s, \'{}\'), %s)',
-                    self::COLUMN_EXTRA_DATA, self::COLUMN_EXTRA_DATA, implode(', ', $setExtraDataClauses)
+                    self::COLUMN_EXTRA_DATA,
+                    self::COLUMN_EXTRA_DATA,
+                    implode(', ', $setExtraDataClauses)
                 );
             } else {
                 $setClauses[] = sprintf(
@@ -640,7 +644,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
         $sql = sprintf(
             'UPDATE %s SET %s WHERE %s  = :delivery_execution_id',
-            self::TABLE_NAME, $setClause, self::COLUMN_DELIVERY_EXECUTION_ID
+            self::TABLE_NAME,
+            $setClause,
+            self::COLUMN_DELIVERY_EXECUTION_ID
         );
 
         return $this->getPersistence()->exec($sql, $params);
@@ -700,13 +706,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $whereClause = '';
 
         //if condition is [ [ key => val ] ] then flatten to [ key => val ]
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer' ) {
-             $condition = current($condition);
+        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer') {
+            $condition = current($condition);
         }
 
         if (is_string($condition) && in_array(mb_strtoupper($condition), ['OR', 'AND'])) {
             $whereClause .= " $condition ";
-        } else if (is_array($condition) && count($condition) > 1) {
+        } elseif (is_array($condition) && count($condition) > 1) {
             $whereClause .=  '(';
             $previousCondition = null;
             foreach ($condition as $subCondition) {
@@ -717,7 +723,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 $previousCondition = $subCondition;
             }
             $whereClause .=  ')';
-        } else if (is_array($condition) && count($condition) === 1) {
+        } elseif (is_array($condition) && count($condition) === 1) {
             $primaryColumns = $this->getPrimaryColumns();
             $key = array_keys($condition)[0];
             $value = $condition[$key];
@@ -725,13 +731,15 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
 
             if ($value === null) {
                 $op = 'IS NULL';
-            } elseif(is_array($value)){
-                $op = 'IN (' . join(',', array_map(function(){ return '?'; }, $value)) . ')';
+            } elseif (is_array($value)) {
+                $op = 'IN (' . join(',', array_map(function () {
+                    return '?';
+                }, $value)) . ')';
             } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', (string)$value, $matches)) {
-                if (!empty($matches[1]) && preg_grep('/' . $matches[1] .'/i', ['like','ilike'])) {
+                if (!empty($matches[1]) && preg_grep('/' . $matches[1] . '/i', ['like','ilike'])) {
                     $toLower = true;
                     $op = 'LIKE';
-                } elseif (!empty($matches[1]) && preg_grep('/' . $matches[1] .'/i', ['not like','not ilike'])) {
+                } elseif (!empty($matches[1]) && preg_grep('/' . $matches[1] . '/i', ['not like','not ilike'])) {
                     $toLower = true;
                     $op = 'NOT LIKE';
                 } else {
@@ -744,7 +752,7 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             if (in_array($key, $primaryColumns)) {
                 $whereClause .= $toLower ? " LOWER(t.$key) " : " t.$key ";
                 $whereClause .= $op;
-            } else if (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
+            } elseif (in_array($this->getPlatformName(), ['mysql','sqlite'])) {
                 $whereClause .= sprintf(' JSON_EXTRACT(t.%s, \'$.%s\') %s ', self::COLUMN_EXTRA_DATA, trim($key), $op);
             } else {
                 $isLikeSearch = isset($op) && stripos($op, 'like') !== false;
@@ -764,9 +772,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 );
             }
 
-            if(is_array($value)){
-               $parameters = array_merge($parameters, $value);
-            } else if ($value !== null) {
+            if (is_array($value)) {
+                $parameters = array_merge($parameters, $value);
+            } elseif ($value !== null) {
                 $parameters[] = trim($value);
             }
         }

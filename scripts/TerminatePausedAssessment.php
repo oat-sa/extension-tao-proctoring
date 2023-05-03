@@ -87,7 +87,6 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
         // Should we make a wet run?
         if (isset($this->params[0])) {
-
             $this->wetRun = (boolval($this->params[0]) === true);
 
             // Should we limit the number of tests being terminated?
@@ -96,7 +95,7 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
             }
         }
         $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
-        if(!$deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
+        if (!$deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
             return new Report(
                 Report::TYPE_WARNING,
                 'Option `termination_delay_after_pause` not configured. `TerminatePausedAssessment` execution terminated'
@@ -177,7 +176,8 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
      * $terminate delivery execution
      * @param DeliveryExecution $deliveryExecution
      */
-    protected function terminateExecution(DeliveryExecution $deliveryExecution) {
+    protected function terminateExecution(DeliveryExecution $deliveryExecution)
+    {
         if ($this->wetRun === true) {
             $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
             $deliveryExecutionStateService->terminateExecution(
@@ -219,7 +219,8 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         $result = false;
         $executionState = $deliveryExecution->getState()->getUri();
 
-        if (in_array($executionState, [
+        if (
+            in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
             ], true)
@@ -262,5 +263,4 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
         return (new DateTimeImmutable())->setTimestamp($lastPause);
     }
-
 }

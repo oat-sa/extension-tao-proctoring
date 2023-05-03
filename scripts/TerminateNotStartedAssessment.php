@@ -89,7 +89,7 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
                 );
 
                 if ($this->isExpired($deliveryExecution)) {
-                    if ($deliveryExecutionStateService->isCancelable($deliveryExecution)){
+                    if ($deliveryExecutionStateService->isCancelable($deliveryExecution)) {
                         $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
                             'comment' => __('Automatically reset by the system due to authorized test not being launched by test taker.'),
@@ -104,7 +104,6 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
                         ]);
                         $pause++;
                     }
-
                 }
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
@@ -134,12 +133,13 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
         $executionState = $deliveryExecution->getState()->getUri();
         $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
 
-        if (in_array($executionState, [
+        if (
+            in_array($executionState, [
                 DeliveryExecutionState::STATE_AWAITING,
                 DeliveryExecutionState::STATE_AUTHORIZED,
             ]) &&
-            $lastTestTakersEvent)
-        {
+            $lastTestTakersEvent
+        ) {
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
             $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);

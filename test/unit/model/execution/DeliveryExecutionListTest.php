@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,6 +17,7 @@
  *
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
+
 declare(strict_types=1);
 
 namespace oat\taoProctoring\test\unit\model\execution;
@@ -250,7 +252,6 @@ class DeliveryExecutionListTest extends TestCase
         /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
         $this->assertSame('in progress - item 1/2', $result[0]['state']['progress']);
-
     }
 
     public function testAdjustDeliveryExecutionsProgressStringWithCustomOption(): void

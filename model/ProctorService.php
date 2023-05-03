@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +19,7 @@
  *
  *
  */
+
 namespace oat\taoProctoring\model;
 
 use oat\generis\model\OntologyAwareTrait;
@@ -38,17 +40,17 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
     /**
      * @deprecated constant moved to the \oat\taoProctoring\model\authorization\TestTakerAuthorizationService
      */
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+    public const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
-    const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
+    public const ROLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole';
 
-    const ROLE_PROCTOR_ADMINISTRATOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole';
+    public const ROLE_PROCTOR_ADMINISTRATOR = 'http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole';
 
-    const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
+    public const ACCESSIBLE_PROCTOR = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible';
 
-    const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
+    public const ACCESSIBLE_PROCTOR_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
 
-    const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
+    public const ACCESSIBLE_PROCTOR_DISABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyDisabled';
 
     /**
      * Gets all deliveries available for a proctor
@@ -58,7 +60,8 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
     public function getProctorableDeliveries(User $proctor, $context = null)
     {
         return DeliveryAssemblyService::singleton()->getRootClass()->searchInstances(
-            array(self::ACCESSIBLE_PROCTOR => self::ACCESSIBLE_PROCTOR_ENABLED), array('recursive' => true)
+            array(self::ACCESSIBLE_PROCTOR => self::ACCESSIBLE_PROCTOR_ENABLED),
+            array('recursive' => true)
         );
     }
 
@@ -108,5 +111,4 @@ class ProctorService extends ConfigurableService implements ProctorServiceHandle
     {
         return true;
     }
-
 }

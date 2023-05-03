@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,7 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
-require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
+require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -69,7 +70,7 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     {
         $deliveryExecutionId = 'http://sample/first.rdf#i1450190828500474_test_record';
         $columns = [
-            DeliveryMonitoringService::TEST_TAKER=> 'http://sample/first.rdf#superUser',
+            DeliveryMonitoringService::TEST_TAKER => 'http://sample/first.rdf#superUser',
             DeliveryMonitoringService::STATUS => 'initial',
             'arbitrary_key' => 'arbitrary_value',
         ];

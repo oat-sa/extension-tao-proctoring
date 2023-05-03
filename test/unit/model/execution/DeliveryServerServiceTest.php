@@ -48,7 +48,6 @@ class DeliveryServerServiceTest extends TestCase
         $service = new DeliveryServerService();
         $service->setServiceLocator($serviceLocatorMock);
         $service->revoke($this->deliveryExecutionMock);
-
     }
 
     public function testRevokePauseSession()
@@ -63,6 +62,5 @@ class DeliveryServerServiceTest extends TestCase
         $service = new DeliveryServerService();
         $service->setServiceLocator($serviceLocatorMock);
         $service->revoke($this->deliveryExecutionMock);
-
     }
 }

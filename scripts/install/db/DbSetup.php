@@ -80,8 +80,7 @@ class DbSetup
                 array(MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID),
                 'IDX_' . MonitoringRepository::TABLE_NAME . '_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
             );
-
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
             common_Logger::i('Database Schema already up to date.');
         }
 

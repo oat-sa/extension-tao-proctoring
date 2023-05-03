@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -103,10 +104,10 @@ class Reporting extends SimplePageModule
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
             $viewData['title'] = __('Detailed Session History of %s', $deliveryExecution->getLabel());
         }
-        
+
         return $viewData;
     }
-    
+
     /**
      * Display the session history of the current test center
      */
@@ -114,7 +115,7 @@ class Reporting extends SimplePageModule
     {
         $this->composeView('session-history', null, 'pages/index.tpl', 'tao');
     }
-    
+
     /**
      * Display the session history of the current test center
      */
@@ -145,7 +146,6 @@ class Reporting extends SimplePageModule
             }
             $historyService = $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
             $this->returnJson(DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $requestOptions), $requestOptions));
-
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No history service defined for proctoring');
             $this->returnError('Proctoring interface not available');

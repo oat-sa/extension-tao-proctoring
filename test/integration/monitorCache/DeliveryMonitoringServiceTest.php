@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,7 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
-require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
+require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
 
 use common_persistence_Persistence;
 use common_persistence_SqlPersistence;
@@ -91,7 +92,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     ];
 
 
-    private function getService(): MonitoringStorage {
+    private function getService(): MonitoringStorage
+    {
         if (!$this->service) {
             $this->service = new MonitoringStorage([
                 MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
@@ -428,7 +430,6 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
         $this->assertEquals($result[1]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554176_test_record');
         $this->assertEquals($result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
-
     }
 
     public function testCount()

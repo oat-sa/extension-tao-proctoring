@@ -55,7 +55,8 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction
 
     protected function run()
     {
-        $this->migrateEvents();;
+        $this->migrateEvents();
+        ;
 
         $this->registerMonitoringRepository();
 

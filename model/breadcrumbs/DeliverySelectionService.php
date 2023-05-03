@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,8 +30,8 @@ use oat\tao\model\mvc\Breadcrumbs;
  */
 class DeliverySelectionService extends ConfigurableService implements Breadcrumbs
 {
-    const SERVICE_ID = 'taoProctoring/DeliverySelection/breadcrumbs';
-    
+    public const SERVICE_ID = 'taoProctoring/DeliverySelection/breadcrumbs';
+
     /**
      * Builds breadcrumbs for a particular route.
      * @param string $route - The route URL
@@ -44,7 +45,7 @@ class DeliverySelectionService extends ConfigurableService implements Breadcrumb
     public function breadcrumbs($route, $parsedRoute)
     {
         if (isset($parsedRoute['action'])) {
-            switch($parsedRoute['action']) {
+            switch ($parsedRoute['action']) {
                 case 'index':
                     return $this->breadcrumbsIndex($route, $parsedRoute);
             }

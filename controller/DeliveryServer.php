@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +19,7 @@
  *
  *
  */
+
 namespace oat\taoProctoring\controller;
 
 use common_Logger;
@@ -46,8 +48,8 @@ class DeliveryServer extends DefaultDeliveryServer
         // whatever the delivery execution status is.
         $user = common_session_SessionManager::getSession()->getUser();
         $startedExecutions = $this->service->getResumableDeliveries($user);
-        foreach($startedExecutions as $startedExecution) {
-            if($startedExecution->getDelivery()->exists()) {
+        foreach ($startedExecutions as $startedExecution) {
+            if ($startedExecution->getDelivery()->exists()) {
                 $this->getDeliveryServerService()->revoke($startedExecution);
             }
         }
@@ -86,7 +88,7 @@ class DeliveryServer extends DefaultDeliveryServer
         }
 
         // we need to change the state of the delivery execution
-        if (!in_array($executionState , array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
+        if (!in_array($executionState, array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
             if (DeliveryExecutionState::STATE_AUTHORIZED !== $executionState) {
                 $deliveryExecutionStateService->waitExecution($deliveryExecution);
             }
@@ -130,7 +132,7 @@ class DeliveryServer extends DefaultDeliveryServer
         // reacts to a few particular states
         switch ($executionState) {
             case DeliveryExecutionState::STATE_AUTHORIZED:
-                    $authorized = true;
+                $authorized = true;
                 break;
 
             case DeliveryExecutionState::STATE_TERMINATED:

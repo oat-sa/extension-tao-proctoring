@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoProctoring\test\integration\model\authorization;
 
 use oat\oatbox\service\ServiceManager;
@@ -28,7 +30,6 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 use oat\taoProctoring\model\Tasks\DeliveryUpdaterTask;
 use oat\taoProctoring\scripts\install\db\DbSetup;
 use oat\generis\test\TestCase;
-
 
 /**
  * Test the UpdaterDeliveryTest
@@ -129,7 +130,7 @@ class UpdaterDeliveryTest extends TestCase
         $this->pmMock = $this->getSqlMock('test_monitoring');
         $this->persistence = $this->pmMock->getPersistenceById('test_monitoring');
 
-        (new DbSetup)->generateTable($this->persistence);
+        (new DbSetup())->generateTable($this->persistence);
     }
 
     /**
@@ -193,5 +194,4 @@ class UpdaterDeliveryTest extends TestCase
         }
         return $this->deliveryUpdaterTask;
     }
-
 }

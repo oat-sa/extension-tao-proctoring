@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,7 +37,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 interface DeliveryMonitoringData
 {
-    const PARAM_EXECUTION_CONTEXT = 'execution_context';
+    public const PARAM_EXECUTION_CONTEXT = 'execution_context';
 
     /**
      * Set delivery execution
@@ -90,5 +91,4 @@ interface DeliveryMonitoringData
      * @param array|null $keys list of fields to update
      */
     public function updateData(array $keys = null);
-
 }

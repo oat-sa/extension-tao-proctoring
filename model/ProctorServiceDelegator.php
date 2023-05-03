@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,6 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 
@@ -33,7 +33,7 @@ use oat\oatbox\user\User;
 class ProctorServiceDelegator extends ServiceDelegator
 {
     /** @deprecated need to be used SERVICE_HANDLERS */
-    const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;
+    public const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;
 
     /**
      * (non-PHPdoc)

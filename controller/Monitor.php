@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,12 +52,12 @@ class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
 
-    const ERROR_AUTHORIZE_EXECUTIONS = 1;
-    const ERROR_PAUSE_EXECUTIONS = 2;
-    const ERROR_TERMINATE_EXECUTIONS = 3;
-    const ERROR_REPORT_IRREGULARITIES = 4;
-    const ERROR_SET_EXTRA_TIME = 5;
-    const ERROR_ADJUST_TIME = 6;
+    public const ERROR_AUTHORIZE_EXECUTIONS = 1;
+    public const ERROR_PAUSE_EXECUTIONS = 2;
+    public const ERROR_TERMINATE_EXECUTIONS = 3;
+    public const ERROR_REPORT_IRREGULARITIES = 4;
+    public const ERROR_SET_EXTRA_TIME = 5;
+    public const ERROR_ADJUST_TIME = 6;
 
     /**
      * Returns the currently proctored delivery
@@ -158,7 +159,6 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
             $data = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
 
             $response = [

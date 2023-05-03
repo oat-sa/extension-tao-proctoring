@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -104,22 +105,22 @@ class TestTakerAuthorizationServiceTest extends TestCase
             ],
             'Execution active, not secure mode (pause plugin disabled)' => [
                 'enabledPlugins' => ['PLUGIN2', 'PLUGIN2'],
-                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 'expected' => true
             ],
             'Execution not active, not secure mode (pause plugin disabled)' => [
                 'enabledPlugins' => ['PLUGIN2', 'PLUGIN2'],
-                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+                'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 'expected' => false
             ],
             'Execution active, secure mode (pause plugin enabled)' => [
                 'enabledPlugins' => ['PLUGIN2', 'PLUGIN2', 'blurPause'],
-                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
+                'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive',
                 'expected' => false
             ],
             'Execution not active, secure mode (pause plugin enabled)' => [
                 'enabledPlugins' => ['PLUGIN2', 'PLUGIN2', 'blurPause'],
-                'state' =>'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
+                'state' => 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized',
                 'expected' => false
             ],
             'Execution not active, secure mode (only pause plugin enabled)' => [

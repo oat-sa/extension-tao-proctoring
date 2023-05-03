@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2018 Open Assessment Technologies, S.A.
  *
@@ -8,7 +9,7 @@ namespace oat\taoProctoring\scripts\tools;
 
 use oat\dtms\DateTime;
 use oat\oatbox\extension\script\ScriptAction;
-use \common_report_Report as Report;
+use common_report_Report as Report;
 use oat\taoDelivery\model\execution\implementation\KeyValueService;
 use oat\taoDelivery\model\execution\KVDeliveryExecution;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
@@ -17,7 +18,6 @@ use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\generis\model\OntologyRdfs;
-
 
 /**
  * Class FixMonitoringStates
@@ -118,14 +118,13 @@ class FixMonitoringStates extends ScriptAction
                 DeliveryMonitoringService::STATUS => $this->deliveryMonitoringStates
             ],
             'AND',
-            [['start_time' => '<'.$this->to], 'AND', ['start_time' => '>'.$this->from]],
+            [['start_time' => '<' . $this->to], 'AND', ['start_time' => '>' . $this->from]],
         ]);
         $deliveryExecutionService = ServiceProxy::singleton();
-        $this->report->add(new Report(Report::TYPE_INFO, "Found ".sizeof($deliveryExecutionsData). " items."));
+        $this->report->add(new Report(Report::TYPE_INFO, "Found " . sizeof($deliveryExecutionsData) . " items."));
         $count = 0;
 
         foreach ($deliveryExecutionsData as $deliveryExecutionData) {
-
             $data = $deliveryExecutionData->get();
             $deliveryExecution = $deliveryExecutionService->getDeliveryExecution(
                 $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
@@ -171,8 +170,6 @@ class FixMonitoringStates extends ScriptAction
                 $this->report->add(new Report(Report::TYPE_INFO, "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} will be created in storage."));
                 $this->initExecutionData($data);
             }
-
-
         }
 
         $this->report->add(new Report(Report::TYPE_INFO, "Was updated {$count} items."));
@@ -189,13 +186,14 @@ class FixMonitoringStates extends ScriptAction
         $this->from = $this->getOption('from');
         $this->to = $this->getOption('to');
         $this->deliveryExecutionStatesForce = $this->getOption('deliveryExecutionStatesForce');
-        $this->deliveryMonitoringStates = explode(',', $this->getOption('deliveryMonitoringStates')?:'');
-        $this->deliveryExecutionStates = explode(',', $this->getOption('deliveryExecutionStates')?:'');
-        $this->wetRun = (boolean) $this->getOption('wetRun');
-        $this->withProgress = (boolean) $this->getOption('withProgress');
+        $this->deliveryMonitoringStates = explode(',', $this->getOption('deliveryMonitoringStates') ?: '');
+        $this->deliveryExecutionStates = explode(',', $this->getOption('deliveryExecutionStates') ?: '');
+        $this->wetRun = (bool) $this->getOption('wetRun');
+        $this->withProgress = (bool) $this->getOption('withProgress');
         $this->report = new Report(
             Report::TYPE_INFO,
-            'Starting checking delivery monitoring entries');
+            'Starting checking delivery monitoring entries'
+        );
     }
 
     protected function initExecutionData($data)

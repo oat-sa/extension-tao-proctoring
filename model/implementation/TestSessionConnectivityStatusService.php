@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,16 +33,16 @@ use oat\taoProctoring\model\TestSessionConnectivityStatusService as TestSessionC
  */
 class TestSessionConnectivityStatusService extends ConfigurableService implements TestSessionConnectivityStatusServiceInterface
 {
-
-    const HAS_ONLINE_MODE = 'onlineMode';
+    public const HAS_ONLINE_MODE = 'onlineMode';
 
     /**
      * Whether test session is online
      * @param string $sessionId test session identifier
      * @return bool
      */
-    public function isOnline($sessionId) {
-        if(!$this->hasOnlineMode()){
+    public function isOnline($sessionId)
+    {
+        if (!$this->hasOnlineMode()) {
             \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
         }
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessionId);
@@ -64,6 +65,4 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
     {
         return ($this->hasOption(self::HAS_ONLINE_MODE)) ? $this->getOption(self::HAS_ONLINE_MODE) : false;
     }
-
-
 }

@@ -20,6 +20,7 @@
  */
 
 namespace oat\taoProctoring\controller;
+
 use oat\taoProctoring\helpers\DeliveryHelper;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 
@@ -33,7 +34,7 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
  */
 class MonitorProctorAdministrator extends Monitor
 {
-    const ERROR_REACTIVATE_EXECUTIONS = 6;
+    public const ERROR_REACTIVATE_EXECUTIONS = 6;
 
     /**
      * @throws \common_Exception

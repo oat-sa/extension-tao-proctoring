@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,7 +37,6 @@ use oat\taoTestTaker\models\TestTakerService;
  */
 class TestTakerUpdate
 {
-
     public static function propertyChange(MetadataModified $event)
     {
         $resource = $event->getResource();
@@ -48,7 +48,6 @@ class TestTakerUpdate
 
 
         if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::CLASS_URI_SUBJECT))) {
-
             $deliveryExecutionsData = $service->find([
                 DeliveryMonitoringService::TEST_TAKER => $resource->getUri(),
             ], []);
@@ -64,5 +63,4 @@ class TestTakerUpdate
             }
         }
     }
-
 }

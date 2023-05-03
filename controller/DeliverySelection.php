@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -48,7 +49,11 @@ class DeliverySelection extends SimplePageModule
         foreach ($deliveries as $delivery) {
             $executions = $service->getProctorableDeliveryExecutions($proctor, $delivery, $context);
             $deliveryData = DeliveryHelper::buildDeliveryData($delivery, $executions);
-            $deliveryData['url'] = _url('index', 'Monitor', null, is_null($context)
+            $deliveryData['url'] = _url(
+                'index',
+                'Monitor',
+                null,
+                is_null($context)
                 ? ['delivery' => $delivery->getUri()]
                 : ['delivery' => $delivery->getUri(), 'context' => $context]
             );

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +23,7 @@ namespace oat\taoProctoring\model\implementation;
 use Exception;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\TestSessionHistoryService as TestSessionHistoryServiceInterface;
-use \oat\oatbox\service\ConfigurableService;
+use oat\oatbox\service\ConfigurableService;
 use DateTime;
 use tao_helpers_Date as DateHelper;
 use oat\taoProctoring\model\deliveryLog\DeliveryLog;
@@ -84,11 +85,10 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     {
         parent::__construct($options);
         $roles = $this->getOption(self::PROCTOR_ROLES);
-        if(is_null($roles)){
+        if (is_null($roles)) {
             $roles = [];
         }
         $this->proctorRoles = array_merge([new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole')], $roles);
-
     }
 
     /**
@@ -134,7 +134,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 $context = $this->getEventContext($data);
                 $role = $this->getUserRole($author);
 
-                $exportable['timestamp'] = (isset($data['data']['timestamp']))?$data['data']['timestamp']:$data['created_at'];
+                $exportable['timestamp'] = (isset($data['data']['timestamp'])) ? $data['data']['timestamp'] : $data['created_at'];
                 if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
                     continue;
                 }
@@ -195,7 +195,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
     private function getEventDetails($data)
     {
         $details = '';
-        if(isset($data['data']['type'])) {
+        if (isset($data['data']['type'])) {
             $details = $data['data']['context']['shortcut'] ?? '';
         } elseif (isset($data['data']['reason'], $data['data']['reason']['reasons'])) {
             $details = is_array($data['data']['reason']['reasons']) ?
@@ -284,7 +284,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
             $sortOrder = -1;
         }
         if ($sortBy == 'timestamp' || $sortBy == 'id') {
-            usort($history, function($a, $b) use($sortOrder) {
+            usort($history, function ($a, $b) use ($sortOrder) {
                 $result = $sortOrder * (floatval($a['timestamp']) - floatval($b['timestamp']));
                 if ($result === 0) {
                     return $result;
@@ -292,7 +292,7 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 return $result > 0 ? 1 : -1;
             });
         } else {
-            usort($history, function($a, $b) use($sortBy, $sortOrder) {
+            usort($history, function ($a, $b) use ($sortBy, $sortOrder) {
                 return $sortOrder * strnatcasecmp($a[$sortBy], $b[$sortBy]);
             });
         }

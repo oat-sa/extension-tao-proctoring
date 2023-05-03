@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -104,7 +105,6 @@ use oat\taoTests\models\event\TestExecutionPausedEvent;
  */
 class Updater extends common_ext_ExtensionUpdater
 {
-
     /**
      * @param string $initialVersion
      * @return string string
@@ -155,7 +155,7 @@ class Updater extends common_ext_ExtensionUpdater
                     $persistence->exec($query);
                 }
             } catch (SchemaException $e) {
-                        \common_Logger::i('Database Schema already up to date.');
+                \common_Logger::i('Database Schema already up to date.');
             }
 
             // update model
@@ -163,16 +163,20 @@ class Updater extends common_ext_ExtensionUpdater
 
             // correct event listeners
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            $eventManager->detach(TestChangedEvent::EVENT_NAME,
+            $eventManager->detach(
+                TestChangedEvent::EVENT_NAME,
                 array('oat\\taoProctoring\\model\\monitorCache\\update\\TestUpdate', 'testStateChange')
             );
-            $eventManager->detach('oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
+            $eventManager->detach(
+                'oat\\taoDelivery\\models\\classes\\execution\\event\\DeliveryExecutionState',
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryExecutionStateUpdate', 'stateChange']
             );
-            $eventManager->detach('oat\\taoProctoring\\model\\event\\EligiblityChanged',
+            $eventManager->detach(
+                'oat\\taoProctoring\\model\\event\\EligiblityChanged',
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\EligiblityUpdate', 'eligiblityChange']
             );
-            $eventManager->detach(\oat\tao\model\event\MetadataModified::class,
+            $eventManager->detach(
+                \oat\tao\model\event\MetadataModified::class,
                 ['oat\\taoProctoring\\model\\monitorCache\\update\\DeliveryUpdate', 'labelChange']
             );
             $eventManager->attach(DeliveryExecutionState::class, [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']);
@@ -211,7 +215,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         // fix potentially missing roles, moved from 4.1.1
         if ($this->isVersion('4.3.0')) {
-            AclProxy::applyRule(new AccessRule('grant',TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'));
+            AclProxy::applyRule(new AccessRule('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class . '@pauseActiveExecutions'));
             $this->setVersion('4.3.1');
         }
 
@@ -233,7 +237,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('4.5.3', '4.6.2');
 
-         if ($this->isVersion('4.6.2')) {
+        if ($this->isVersion('4.6.2')) {
             $options = $this->getServiceManager()->get('taoProctoring/DeliveryExecutionState')->getOptions();
             $this->getServiceManager()->unregister('taoProctoring/DeliveryExecutionState');
             $service = new DeliveryExecutionStateService($options);
@@ -271,15 +275,13 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('4.9.1', '4.10.9');
 
-       if ($this->isVersion('4.10.9')) {
-
+        if ($this->isVersion('4.10.9')) {
             $this->runExtensionScript(RegisterRunnerMessageService::class);
 
             $this->setVersion('4.11.0');
-       }
+        }
 
         if ($this->isVersion('4.11.0')) {
-
             $action = new SetUpProctoringUrlService();
             $action->setServiceLocator($this->getServiceManager());
             $action([]);
@@ -301,7 +303,6 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('4.13.0', '4.13.1');
 
         if ($this->isVersion('4.13.1')) {
-
             $action = new RegisterGuiSettingsService();
             $action->setServiceLocator($this->getServiceManager());
             $action->__invoke([]);
@@ -310,12 +311,13 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         if ($this->isVersion('4.14.0')) {
-
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
-            $eventManager->detach(TestExecutionPausedEvent::class,
+            $eventManager->detach(
+                TestExecutionPausedEvent::class,
                 [DeliveryExecutionStateService::class, 'catchSessionPause']
             );
-            $eventManager->attach(TestExecutionPausedEvent::class,
+            $eventManager->attach(
+                TestExecutionPausedEvent::class,
                 [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']
             );
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
@@ -361,7 +363,9 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('5.9.0') || $this->isVersion('5.9.1')) {
             $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
-            $urlService->setRoute('ProctoringDeliveryServer', [
+            $urlService->setRoute(
+                'ProctoringDeliveryServer',
+                [
                     'ext' => 'taoProctoring',
                     'controller' => 'DeliveryServer',
                     'action' => 'index',
@@ -443,15 +447,14 @@ class Updater extends common_ext_ExtensionUpdater
         }
         $this->skip('5.16.6', '5.16.9');
 
-         if ($this->isVersion('5.16.9')) {
+        if ($this->isVersion('5.16.9')) {
             $this->getServiceManager()->register(AbstractIrregularityReport::SERVICE_ID, new IrregularityReport());
             $this->setVersion('5.17.0');
-         }
+        }
 
         $this->skip('5.17.0', '5.18.1');
 
         if ($this->isVersion('5.18.1')) {
-
             $proctorService = $this->getServiceManager()->get(ProctorServiceInterface::SERVICE_ID);
             $authService = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID);
             if ($proctorService->hasOption(TestTakerAuthorizationService::PROCTORED_BY_DEFAULT)) {
@@ -480,7 +483,6 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('6.0.0', '6.1.2');
 
         if ($this->isVersion('6.1.2')) {
-
             $authService = $this->getServiceManager()->get(TestTakerAuthorizationInterface::SERVICE_ID);
             // register DeliverySyncService
             $oldDefault = $authService->hasOption(DeliverySyncService::PROCTORED_BY_DEFAULT)
@@ -491,7 +493,7 @@ class Updater extends common_ext_ExtensionUpdater
 
             // wrap auth service
             if (!is_a($authService, TestTakerAuthorizationDelegator::class)) {
-                $delegator = new TestTakerAuthorizationDelegator ([
+                $delegator = new TestTakerAuthorizationDelegator([
                     ServiceDelegatorInterface::SERVICE_HANDLERS => [
                         new TestTakerAuthorizationService(),
                     ],
@@ -610,7 +612,6 @@ class Updater extends common_ext_ExtensionUpdater
 
 
             $this->setVersion('8.5.1');
-
         }
 
         if ($this->isVersion('8.5.1')) {
@@ -722,7 +723,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('8.13.1', '8.13.3');
 
-        if ($this->isVersion('8.13.3')){
+        if ($this->isVersion('8.13.3')) {
             /** @var DeliveryDeleteService $deleteDelivery */
             $deleteDelivery        = $this->getServiceManager()->get(DeliveryDeleteService::SERVICE_ID);
             $proctorDeleteDelivery = new ProctoringDeliveryDeleteService($deleteDelivery->getOptions());
@@ -763,7 +764,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('10.2.0', '10.2.4');
 
-        if ($this->isVersion('10.2.4')){
+        if ($this->isVersion('10.2.4')) {
             AclProxy::applyRule(new AccessRule('grant', ProctorService::ROLE_PROCTOR, 'oat\\taoProctoring\\controller\\ExecutionRestService'));
             $this->setVersion('10.3.0');
         }
@@ -786,7 +787,6 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('12.0.0', '12.3.0');
 
         if ($this->isVersion('12.3.0')) {
-
             $eventManager = $this->getServiceManager()->get(EventManager::SERVICE_ID);
             $eventManager->detach(DeliveryExecutionFinished::class, ['oat\\taoEventLog\\model\\LoggerService', 'logEvent']);
             $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
@@ -810,7 +810,9 @@ class Updater extends common_ext_ExtensionUpdater
                 ];
 
                 if ($proctoringHomeRoute == $dumbRoute) {
-                    $urlService->setRoute('ProctoringHome', [
+                    $urlService->setRoute(
+                        'ProctoringHome',
+                        [
                             'ext' => 'tao',
                             'controller' => 'Main',
                             'action' => 'entry',
@@ -853,7 +855,8 @@ class Updater extends common_ext_ExtensionUpdater
             $executionDeleteService = $this->getServiceManager()->get(DeliveryExecutionDeleteService::SERVICE_ID);
             $previousServices       = $executionDeleteService->getOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES);
 
-            $executionDeleteService->setOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
+            $executionDeleteService->setOption(
+                DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
                 array_merge($previousServices, [
                     'taoProctoring/DeliveryLog',
                     'taoProctoring/DeliveryMonitoring',
@@ -962,7 +965,7 @@ class Updater extends common_ext_ExtensionUpdater
 
         $this->skip('19.15.0', '19.17.1');
 
-        
+
         //Updater files are deprecated. Please use migrations.
         //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
 

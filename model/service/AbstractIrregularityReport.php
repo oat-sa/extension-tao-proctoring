@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,7 +36,7 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
     use OntologyAwareTrait;
     use FilesystemAwareTrait;
 
-    const SERVICE_ID = 'taoProctoring/irregularity';
+    public const SERVICE_ID = 'taoProctoring/irregularity';
 
     /**
      * return formated string for export file name
@@ -111,11 +112,11 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
     {
         return strtolower(
             'irregularities_'
-            .\tao_helpers_File::getSafeFileName($delivery->getLabel()).'_'
-            .$this->getFormatedDateForFileName($params['from']).'_'
-            .$this->getFormatedDateForFileName($params['to']).'_'
-            .date('YmdHis') . rand(10, 99) //more unique name
-            .'.csv'
+            . \tao_helpers_File::getSafeFileName($delivery->getLabel()) . '_'
+            . $this->getFormatedDateForFileName($params['from']) . '_'
+            . $this->getFormatedDateForFileName($params['to']) . '_'
+            . date('YmdHis') . rand(10, 99) //more unique name
+            . '.csv'
         );
     }
 
