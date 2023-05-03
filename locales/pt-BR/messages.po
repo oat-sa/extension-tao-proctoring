@@ -388,10 +388,10 @@ msgid "Define sub-centers"
 msgstr "Definir sub-centros"
 
 msgid "Deliveries"
-msgstr "Entregas"
+msgstr "Exames"
 
 msgid "Delivery"
-msgstr "Entrega"
+msgstr "Exame"
 
 msgid "Detailed Session History of %s"
 msgstr "Histórico da sessão detalhada de %s"
@@ -436,7 +436,7 @@ msgid "Examinee"
 msgstr "Examinear"
 
 msgid "Export"
-msgstr "Exportação"
+msgstr "Exportar"
 
 #, tao-public
 msgid "Export Irregularities"
