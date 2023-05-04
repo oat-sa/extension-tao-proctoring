@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,12 +52,12 @@ class Monitor extends SimplePageModule
 {
     use OntologyAwareTrait;
 
-    const ERROR_AUTHORIZE_EXECUTIONS = 1;
-    const ERROR_PAUSE_EXECUTIONS = 2;
-    const ERROR_TERMINATE_EXECUTIONS = 3;
-    const ERROR_REPORT_IRREGULARITIES = 4;
-    const ERROR_SET_EXTRA_TIME = 5;
-    const ERROR_ADJUST_TIME = 6;
+    public const ERROR_AUTHORIZE_EXECUTIONS = 1;
+    public const ERROR_PAUSE_EXECUTIONS = 2;
+    public const ERROR_TERMINATE_EXECUTIONS = 3;
+    public const ERROR_REPORT_IRREGULARITIES = 4;
+    public const ERROR_SET_EXTRA_TIME = 5;
+    public const ERROR_ADJUST_TIME = 6;
 
     /**
      * Returns the currently proctored delivery
@@ -78,7 +79,12 @@ class Monitor extends SimplePageModule
     protected function getViewData()
     {
         $user = \common_session_SessionManager::getSession()->getUser();
-        $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
+        $hasAccessToReactivate = AclProxy::hasAccess(
+            $user,
+            MonitorProctorAdministrator::class,
+            'reactivateExecutions',
+            []
+        );
         $delivery = $this->getCurrentDelivery();
         /** @var GuiSettingsService $guiSettingsService */
         $guiSettingsService = $this->getServiceLocator()->get(GuiSettingsService::SERVICE_ID);
@@ -88,11 +94,21 @@ class Monitor extends SimplePageModule
             'set' => [],
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories($hasAccessToReactivate),
-            'printReportButton' => $assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
+            'printReportButton' => $assessmentResultsService->getOption(
+                AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON
+            ),
             'printReportUrl' => $assessmentResultsService->getScoreReportUrlParts(),
-            'timeHandling' => $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
-            'historyUrl' => $this->getServiceLocator()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
-            'onlineStatus' => $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
+            'timeHandling' => $this->getServiceLocator()
+                ->get(DeliveryExecutionStateService::SERVICE_ID)
+                ->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
+            'historyUrl' => $this
+                ->getServiceLocator()
+                ->get(TestSessionHistoryService::SERVICE_ID)
+                ->getHistoryUrl($delivery),
+            'onlineStatus' => $this
+                ->getServiceLocator()
+                ->get(TestSessionConnectivityStatusService::SERVICE_ID)
+                ->hasOnlineMode(),
             'hasAccessToReactivate' => $hasAccessToReactivate
         ];
 
@@ -113,8 +129,14 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
-        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
-        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
+        $this->setData(
+            'homeUrl',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome')
+        );
+        $this->setData(
+            'logout',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout')
+        );
         $this->composeView('delivery-monitoring', null, 'pages/index.tpl', 'tao');
     }
 
@@ -158,7 +180,6 @@ class Monitor extends SimplePageModule
         }
 
         try {
-
             $data = DeliveryHelper::authoriseExecutions($deliveryExecution, $reason, $testCenter);
 
             $response = [
@@ -309,7 +330,9 @@ class Monitor extends SimplePageModule
 
         try {
             /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
-            $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+            $deliveryExecutionManagerService = $this->getServiceLocator()->get(
+                DeliveryExecutionManagerService::SERVICE_ID
+            );
             $data = $deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
             $response = [

@@ -38,8 +38,10 @@ use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 /**
  * Script that terminates assessments, paused longer than XXX.
  *
- * Parameter 1 - Wet Run (optional) - A boolean value (0|1) to indicate wheter or not making a dry run. Default is 1 for backward compatibility reasons.
- * Parameter 2 - Max Terminations (optional) - An integer value to indicate the maximum number of assessments to be terminated. Default is 0, meaning no limit.
+ * Parameter 1 - Wet Run (optional) - A boolean value (0|1) to indicate wheter or not making a dry run. Default is 1
+ *                                    for backward compatibility reasons.
+ * Parameter 2 - Max Terminations (optional) - An integer value to indicate the maximum number of assessments to be
+ *                                             terminated. Default is 0, meaning no limit.
  *
  * Run examples:
  *
@@ -87,7 +89,6 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
         // Should we make a wet run?
         if (isset($this->params[0])) {
-
             $this->wetRun = (boolval($this->params[0]) === true);
 
             // Should we limit the number of tests being terminated?
@@ -96,10 +97,15 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
             }
         }
         $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
-        if(!$deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
+        $hasOptionTerminationDelayAfterPause = $deliveryExecutionStateService->hasOption(
+            DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE
+        );
+
+        if (!$hasOptionTerminationDelayAfterPause) {
             return new Report(
                 Report::TYPE_WARNING,
-                'Option `termination_delay_after_pause` not configured. `TerminatePausedAssessment` execution terminated'
+                'Option `termination_delay_after_pause` not configured. `TerminatePausedAssessment` execution '
+                    . 'terminated'
             );
         }
         $wetInfo = ($this->wetRun === false) ? 'dry' : 'wet';
@@ -117,7 +123,9 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         $count = 0;
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
-        $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+        $delay = $deliveryExecutionStateService->getOption(
+            DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE
+        );
         $startTimeFilter = (new DateTimeImmutable('now'))->sub(new DateInterval($delay))->getTimestamp();
         $deliveryExecutionsData = $deliveryMonitoringService->find([
             [DeliveryMonitoringService::STATUS     => [
@@ -150,8 +158,8 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                 );
                 $this->addReport(
                     Report::TYPE_WARNING,
-                    'Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was set to `terminated` ' .
-                    'due to missed delivery execution entry.'
+                    'Delivery execution {$deliveryExecution->getIdentifier()} state in delivery monitoring was '
+                        . 'set to `terminated` due to missed delivery execution entry.'
                 );
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
@@ -177,9 +185,12 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
      * $terminate delivery execution
      * @param DeliveryExecution $deliveryExecution
      */
-    protected function terminateExecution(DeliveryExecution $deliveryExecution) {
+    protected function terminateExecution(DeliveryExecution $deliveryExecution)
+    {
         if ($this->wetRun === true) {
-            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+            $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+                DeliveryExecutionStateService::SERVICE_ID
+            );
             $deliveryExecutionStateService->terminateExecution(
                 $deliveryExecution,
                 [
@@ -187,9 +198,15 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
                     'comment' => __('The assessment was automatically terminated by the system due to inactivity.'),
                 ]
             );
-            $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated.");
+            $this->addReport(
+                Report::TYPE_INFO,
+                "Delivery execution {$deliveryExecution->getIdentifier()} has been terminated."
+            );
         } else {
-            $this->addReport(Report::TYPE_INFO, "Delivery execution {$deliveryExecution->getIdentifier()} should be terminated.");
+            $this->addReport(
+                Report::TYPE_INFO,
+                "Delivery execution {$deliveryExecution->getIdentifier()} should be terminated."
+            );
         }
     }
 
@@ -219,7 +236,8 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
         $result = false;
         $executionState = $deliveryExecution->getState()->getUri();
 
-        if (in_array($executionState, [
+        if (
+            in_array($executionState, [
                 DeliveryExecutionState::STATE_PAUSED,
                 DeliveryExecutionState::STATE_ACTIVE,
             ], true)
@@ -235,7 +253,9 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
             }
 
             if ($lastEventTime) {
-                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+                $delay = $deliveryExecutionStateService->getOption(
+                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE
+                );
                 $result = ($lastEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable('now')));
             }
         }
@@ -252,7 +272,12 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
     private function getLastPause(DeliveryExecution $deliveryExecution)
     {
         $deliveryLogService = $this->getServiceLocator()->get(DeliveryLog::SERVICE_ID);
-        $pauses = array_reverse($deliveryLogService->get($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSE));
+        $pauses = array_reverse(
+            $deliveryLogService->get(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_PAUSE
+            )
+        );
 
         if (!empty($pauses)) {
             $lastPause = $pauses[0]['created_at'];
@@ -262,5 +287,4 @@ class TerminatePausedAssessment extends AbstractExpiredSessionSeeker
 
         return (new DateTimeImmutable())->setTimestamp($lastPause);
     }
-
 }

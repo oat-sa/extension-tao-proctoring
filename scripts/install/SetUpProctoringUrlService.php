@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,27 +22,33 @@
 
 namespace oat\taoProctoring\scripts\install;
 
-
 use oat\oatbox\extension\InstallAction;
 use oat\tao\model\mvc\DefaultUrlService;
 
 class SetUpProctoringUrlService extends InstallAction
 {
-    public function __invoke($params) {
+    public function __invoke($params)
+    {
         $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
-        $urlService->setRoute('ProctoringHome', [
+        $urlService->setRoute(
+            'ProctoringHome',
+            [
                 'ext' => 'tao',
                 'controller' => 'Main',
                 'action' => 'entry',
             ]
         );
-        $urlService->setRoute('ProctoringLogout', [
+        $urlService->setRoute(
+            'ProctoringLogout',
+            [
                 'ext' => 'tao',
                 'controller' => 'Main',
                 'action' => 'logout',
             ]
         );
-        $urlService->setRoute('ProctoringDeliveryServer', [
+        $urlService->setRoute(
+            'ProctoringDeliveryServer',
+            [
                 'ext' => 'taoProctoring',
                 'controller' => 'DeliveryServer',
                 'action' => 'index',

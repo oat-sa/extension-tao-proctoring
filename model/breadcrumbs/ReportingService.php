@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
 
 namespace oat\taoProctoring\model\breadcrumbs;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\tao\model\mvc\Breadcrumbs;
 
@@ -30,8 +30,8 @@ use oat\tao\model\mvc\Breadcrumbs;
  */
 class ReportingService extends ConfigurableService implements Breadcrumbs
 {
-    const SERVICE_ID = 'taoProctoring/Reporting/breadcrumbs';
-    
+    public const SERVICE_ID = 'taoProctoring/Reporting/breadcrumbs';
+
     /**
      * Builds breadcrumbs for a particular route.
      * @param string $route - The route URL
@@ -59,7 +59,8 @@ class ReportingService extends ConfigurableService implements Breadcrumbs
      * @param array $parsedRoute
      * @return array
      */
-    protected function breadcrumbsIndex($route, $parsedRoute) {
+    protected function breadcrumbsIndex($route, $parsedRoute)
+    {
         $urlContext = [];
         if (isset($parsedRoute['params'])) {
             if (isset($parsedRoute['params']['session'])) {

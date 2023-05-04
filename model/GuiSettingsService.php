@@ -32,24 +32,24 @@ use oat\oatbox\service\ConfigurableService;
  */
 class GuiSettingsService extends ConfigurableService
 {
-    const SERVICE_ID = 'taoProctoring/GuiSettings';
+    public const SERVICE_ID = 'taoProctoring/GuiSettings';
 
     /**
      * Refresh button can be configured as available or unavailable
      */
-    const PROCTORING_REFRESH_BUTTON = 'refreshBtn';
+    public const PROCTORING_REFRESH_BUTTON = 'refreshBtn';
 
     /**
      * Time between auto refresh in milliseconds
      * 0 - don't refresh
      * Note: it is recommended to avoid having the auto-refresh rate less then 30 seconds.
      */
-    const PROCTORING_AUTO_REFRESH = 'autoRefresh';
+    public const PROCTORING_AUTO_REFRESH = 'autoRefresh';
 
     /**
      * Allow or not proctor to  pause a delivery
      */
-    const PROCTORING_ALLOW_PAUSE = 'canPause';
+    public const PROCTORING_ALLOW_PAUSE = 'canPause';
 
     /**
      * Settings: message and icon for different actions will be displayed in dialog (bulkActionPopup)
@@ -67,18 +67,18 @@ class GuiSettingsService extends ConfigurableService
      *   ],
      * ]
      */
-    const OPTION_DIALOG_SETTINGS = 'dialogSettings';
+    public const OPTION_DIALOG_SETTINGS = 'dialogSettings';
 
-    const OPTION_SHOW_COLUMN_FIRST_NAME = 'showColumnFirstName';
-    const OPTION_SHOW_COLUMN_LAST_NAME = 'showColumnLastName';
-    const OPTION_SHOW_COLUMN_AUTHORIZE = 'showColumnAuthorize';
-    const OPTION_SHOW_COLUMN_REMAINING_TIME = 'showColumnRemainingTime';
-    const OPTION_SHOW_COLUMN_EXTENDED_TIME = 'showColumnExtendedTime';
-    const OPTION_SHOW_COLUMN_CONNECTIVITY = 'onlineStatus';
+    public const OPTION_SHOW_COLUMN_FIRST_NAME = 'showColumnFirstName';
+    public const OPTION_SHOW_COLUMN_LAST_NAME = 'showColumnLastName';
+    public const OPTION_SHOW_COLUMN_AUTHORIZE = 'showColumnAuthorize';
+    public const OPTION_SHOW_COLUMN_REMAINING_TIME = 'showColumnRemainingTime';
+    public const OPTION_SHOW_COLUMN_EXTENDED_TIME = 'showColumnExtendedTime';
+    public const OPTION_SHOW_COLUMN_CONNECTIVITY = 'onlineStatus';
 
-    const OPTION_SHOW_ACTION_SHOW_HISTORY = 'showActionShowHistory';
+    public const OPTION_SHOW_ACTION_SHOW_HISTORY = 'showActionShowHistory';
 
-    const OPTION_SET_START_DATA_ONE_DAY = 'setStartDataOneDay';
+    public const OPTION_SET_START_DATA_ONE_DAY = 'setStartDataOneDay';
 
     /**
      * @return array
@@ -86,18 +86,42 @@ class GuiSettingsService extends ConfigurableService
     public function asArray()
     {
         return [
-            self::PROCTORING_REFRESH_BUTTON         => $this->hasOption(self::PROCTORING_REFRESH_BUTTON) ? $this->getOption(self::PROCTORING_REFRESH_BUTTON) : true,
-            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : 0,
-            self::PROCTORING_ALLOW_PAUSE            => $this->hasOption(self::PROCTORING_ALLOW_PAUSE) ? $this->getOption(self::PROCTORING_ALLOW_PAUSE) : true,
-            self::OPTION_DIALOG_SETTINGS            => $this->hasOption(self::OPTION_DIALOG_SETTINGS) ? $this->getOption(self::OPTION_DIALOG_SETTINGS) : [],
-            self::OPTION_SHOW_COLUMN_FIRST_NAME     => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) : true,
-            self::OPTION_SHOW_COLUMN_LAST_NAME      => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME) : true,
-            self::OPTION_SHOW_COLUMN_AUTHORIZE      => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) : true,
-            self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) : true,
-            self::OPTION_SHOW_COLUMN_EXTENDED_TIME  => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) : true,
-            self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : false,
-            self::OPTION_SHOW_ACTION_SHOW_HISTORY   => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) : true,
-            self::OPTION_SET_START_DATA_ONE_DAY     => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY) ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY) : true,
+            self::PROCTORING_REFRESH_BUTTON => $this->hasOption(self::PROCTORING_REFRESH_BUTTON)
+                ? $this->getOption(self::PROCTORING_REFRESH_BUTTON)
+                : true,
+            self::PROCTORING_AUTO_REFRESH => $this->hasOption(self::PROCTORING_AUTO_REFRESH)
+                ? $this->getOption(self::PROCTORING_AUTO_REFRESH)
+                : 0,
+            self::PROCTORING_ALLOW_PAUSE => $this->hasOption(self::PROCTORING_ALLOW_PAUSE)
+                ? $this->getOption(self::PROCTORING_ALLOW_PAUSE)
+                : true,
+            self::OPTION_DIALOG_SETTINGS => $this->hasOption(self::OPTION_DIALOG_SETTINGS)
+                ? $this->getOption(self::OPTION_DIALOG_SETTINGS)
+                : [],
+            self::OPTION_SHOW_COLUMN_FIRST_NAME => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME)
+                : true,
+            self::OPTION_SHOW_COLUMN_LAST_NAME => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME)
+                : true,
+            self::OPTION_SHOW_COLUMN_AUTHORIZE => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE)
+                : true,
+            self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME)
+                : true,
+            self::OPTION_SHOW_COLUMN_EXTENDED_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME)
+                : true,
+            self::OPTION_SHOW_COLUMN_CONNECTIVITY => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY)
+                : false,
+            self::OPTION_SHOW_ACTION_SHOW_HISTORY => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY)
+                ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY)
+                : true,
+            self::OPTION_SET_START_DATA_ONE_DAY => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY)
+                ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY)
+                : true,
         ];
     }
 }

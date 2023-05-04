@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,7 @@ use oat\taoProctoring\model\authorization\TestTakerAuthorizationDelegator;
 use oat\taoProctoring\model\authorization\TestTakerAuthorizationService;
 use oat\taoProctoring\model\ServiceDelegator;
 
-return new TestTakerAuthorizationDelegator ([
+return new TestTakerAuthorizationDelegator([
         ServiceDelegator::SERVICE_HANDLERS => [
             new TestTakerAuthorizationService(
             ),

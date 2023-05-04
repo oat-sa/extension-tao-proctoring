@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -128,9 +129,10 @@ class DeliveryExecutionList extends ConfigurableService implements DeliveryExecu
                 'approximatedRemaining' => $this->getApproximatedRemainingTime($cachedData, $online),
                 'remaining_time' => $this->getRemainingTime($cachedData),
                 'extraTime' => (float) ($cachedData[DeliveryMonitoringService::EXTRA_TIME] ?? 0),
-                'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME]) && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
-                    ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
-                    : '',
+                'extendedTime' => (isset($cachedData[DeliveryMonitoringService::EXTENDED_TIME])
+                    && $cachedData[DeliveryMonitoringService::EXTENDED_TIME] > 1)
+                        ? (float)$cachedData[DeliveryMonitoringService::EXTENDED_TIME]
+                        : '',
                 'consumedExtraTime' => (float) ($cachedData[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] ?? 0),
                 'adjustedTime' => $adjustedTime
             ],
@@ -330,7 +332,13 @@ class DeliveryExecutionList extends ConfigurableService implements DeliveryExecu
             return $progressStr;
         }
 
-        if (in_array($cachedData[DeliveryMonitoringService::STATUS], [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED], true)) {
+        if (
+            in_array(
+                $cachedData[DeliveryMonitoringService::STATUS],
+                [DeliveryExecutionInterface::STATE_TERMINATED, DeliveryExecutionInterface::STATE_FINISHED],
+                true
+            )
+        ) {
             return $progress['title'];
         }
         $format = $this->getSessionStateService()->hasOption(SessionStateService::OPTION_STATE_FORMAT)
@@ -352,7 +360,9 @@ class DeliveryExecutionList extends ConfigurableService implements DeliveryExecu
     private function isOnline(array $cachedData)
     {
         if ($this->getTestSessionConnectivityStatusService()->hasOnlineMode()) {
-            return $this->getTestSessionConnectivityStatusService()->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+            return $this
+                ->getTestSessionConnectivityStatusService()
+                ->isOnline($cachedData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
         }
         return null;
     }

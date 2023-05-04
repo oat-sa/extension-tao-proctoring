@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +23,7 @@ namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
-use \oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoDelivery\model\execution\StateServiceInterface;
 use oat\taoProctoring\model\ActivityMonitoringService;
 use oat\taoProctoring\model\execution\Counter\DeliveryExecutionCounterService;
 use oat\taoDelivery\model\execution\Counter\DeliveryExecutionCounterInterface;

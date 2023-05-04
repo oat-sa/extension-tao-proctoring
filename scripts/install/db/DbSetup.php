@@ -39,24 +39,96 @@ class DbSetup
         try {
             $tableLog = $schema->createTable(MonitoringRepository::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
-            $tableLog->addColumn(MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_STATUS, "string", array("notnull" => true, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_CURRENT_ASSESSMENT_ITEM, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_TEST_TAKER, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_AUTHORIZED_BY, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_START_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_END_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_TEST_TAKER_FIRST_NAME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::COLUMN_TEST_TAKER_LAST_NAME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::DELIVERY_ID, "text", array("notnull" => false));
-            $tableLog->addColumn(MonitoringRepository::DELIVERY_NAME, "text", array("notnull" => false));
-            $tableLog->addColumn(MonitoringRepository::LAST_TEST_TAKER_ACTIVITY, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::REMAINING_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::EXTENDED_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::CONSUMED_EXTRA_TIME, "string", array("notnull" => false, "length" => 255));
-            $tableLog->addColumn(MonitoringRepository::ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
-            $tableLog->addColumn(MonitoringRepository::STORED_ITEM_DURATION, "string", array("notnull" => false, "length" => 32));
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_STATUS,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_CURRENT_ASSESSMENT_ITEM,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_TEST_TAKER,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_AUTHORIZED_BY,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_START_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_END_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_TEST_TAKER_FIRST_NAME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::COLUMN_TEST_TAKER_LAST_NAME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::DELIVERY_ID,
+                "text",
+                ["notnull" => false]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::DELIVERY_NAME,
+                "text",
+                ["notnull" => false]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::LAST_TEST_TAKER_ACTIVITY,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::REMAINING_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::EXTENDED_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::EXTRA_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::CONSUMED_EXTRA_TIME,
+                "string",
+                ["notnull" => false, "length" => 255]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::ITEM_DURATION,
+                "string",
+                ["notnull" => false, "length" => 32]
+            );
+            $tableLog->addColumn(
+                MonitoringRepository::STORED_ITEM_DURATION,
+                "string",
+                ["notnull" => false, "length" => 32]
+            );
 
             if (in_array($persistence->getPlatForm()->getName(), ['mysql','sqlite'])) {
                 $tableLog->addColumn(MonitoringRepository::COLUMN_EXTRA_DATA, 'json', array("notnull" => false));
@@ -66,7 +138,8 @@ class DbSetup
 
             $tableLog->addIndex(
                 array(MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID),
-                'IDX_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID . '_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID
+                'IDX_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID . '_'
+                    . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID
             );
             $tableLog->addIndex(
                 array(MonitoringRepository::COLUMN_START_TIME),
@@ -78,10 +151,10 @@ class DbSetup
             );
             $tableLog->addUniqueIndex(
                 array(MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID),
-                'IDX_' . MonitoringRepository::TABLE_NAME . '_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID . '_UNIQUE'
+                'IDX_' . MonitoringRepository::TABLE_NAME . '_' . MonitoringRepository::COLUMN_DELIVERY_EXECUTION_ID
+                    . '_UNIQUE'
             );
-
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
             common_Logger::i('Database Schema already up to date.');
         }
 

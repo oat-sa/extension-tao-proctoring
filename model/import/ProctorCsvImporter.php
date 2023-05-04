@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,21 +29,22 @@ use oat\taoProctoring\model\ProctorService;
  *
  * Implementation of RdsUserImportService to import proctor resource from a CSV
  *
-`
-$userImporter = $this->getServiceLocator()->get(UserCsvImporterFactory::SERVICE_ID);
-$importer = $userImporter->getImporter(CsvProctorImporter::USER_IMPORTER_TYPE);
-$report = $importer->import($filePath);
-`
+ * `
+ * $userImporter = $this->getServiceLocator()->get(UserCsvImporterFactory::SERVICE_ID);
+ * $importer = $userImporter->getImporter(CsvProctorImporter::USER_IMPORTER_TYPE);
+ * $report = $importer->import($filePath);
+ * `
  *
  * or by command line:
-`
-sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t proctor -f tao/test/user/import/example.csv
-`
+ * `
+ * sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t proctor -f
+ * tao/test/user/import/example.csv
+ * `
  *
  */
 class ProctorCsvImporter extends RdsUserImportService
 {
-    CONST USER_IMPORTER_TYPE = 'proctor';
+    public const USER_IMPORTER_TYPE = 'proctor';
 
     /**
      * Add test taker role to user to import

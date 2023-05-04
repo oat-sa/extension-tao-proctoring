@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -57,25 +58,28 @@ class setKVExecutionPersistenceService extends \common_ext_action_InstallAction
             ]
         );
 
-        $method = new \ReflectionMethod(get_class($newService),
-            'addDeliveryToUserExecutionList');
+        $method = new \ReflectionMethod(
+            get_class($newService),
+            'addDeliveryToUserExecutionList'
+        );
         $method->setAccessible(true);
 
         foreach ($deliveryExecutionsData as $deliveryExecutionData) {
             $data = $deliveryExecutionData->get();
 
-            $method->invoke($newService,
+            $method->invoke(
+                $newService,
                 $data[DeliveryMonitoringService::TEST_TAKER],
                 $data[DeliveryMonitoringService::DELIVERY_ID],
-                $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
-
+                $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+            );
         }
 
         $ext->setConfig(ServiceProxy::CONFIG_KEY, $newService);
 
-        return new common_report_Report(common_report_Report::TYPE_SUCCESS,
-            'Execution KV storage updated to oat\taoDelivery\model\execution\KeyValueService');
-
+        return new common_report_Report(
+            common_report_Report::TYPE_SUCCESS,
+            'Execution KV storage updated to oat\taoDelivery\model\execution\KeyValueService'
+        );
     }
 }
-

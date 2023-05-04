@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,6 +17,7 @@
  *
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  */
+
 namespace oat\taoProctoring\model\monitorCache\implementation;
 
 use Iterator;
@@ -31,7 +33,7 @@ class DeliveryMonitoringIterator implements \Iterator
 {
     use ServiceLocatorAwareTrait;
 
-    const CACHE_SIZE = 10000;
+    public const CACHE_SIZE = 10000;
 
     /**
      * Id of the current instance
@@ -66,7 +68,8 @@ class DeliveryMonitoringIterator implements \Iterator
      * @param ServiceLocatorInterface $serviceLocator
      * @throws \common_exception_Error
      */
-    public function __construct(ServiceLocatorInterface $serviceLocator) {
+    public function __construct(ServiceLocatorInterface $serviceLocator)
+    {
         $this->setServiceLocator($serviceLocator);
         $this->load(0);
     }
@@ -75,7 +78,8 @@ class DeliveryMonitoringIterator implements \Iterator
      * (non-PHPdoc)
      * @see Iterator::rewind()
      */
-    function rewind() {
+    public function rewind()
+    {
         if (!$this->unmoved) {
             $this->unmoved = true;
         }
@@ -85,7 +89,8 @@ class DeliveryMonitoringIterator implements \Iterator
      * (non-PHPdoc)
      * @see Iterator::current()
      */
-    function current() {
+    public function current()
+    {
         return $this->instanceCache[$this->currentInstance];
     }
 
@@ -93,12 +98,13 @@ class DeliveryMonitoringIterator implements \Iterator
      * (non-PHPdoc)
      * @see Iterator::key()
      */
-    function key() {
+    public function key()
+    {
         return $this->currentInstance;
     }
 
 
-    function valid()
+    public function valid()
     {
         return isset($this->instanceCache[$this->currentInstance]);
     }
@@ -107,7 +113,8 @@ class DeliveryMonitoringIterator implements \Iterator
      * (non-PHPdoc)
      * @see Iterator::next()
      */
-    function next() {
+    public function next()
+    {
         $this->unmoved = false;
         if ($this->valid()) {
             $this->currentInstance++;

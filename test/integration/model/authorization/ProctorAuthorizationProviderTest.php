@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoProctoring\test\integration\model\authorization;
 
 use core_kernel_classes_Resource;
@@ -49,7 +51,9 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     {
         $prophecy = $this->prophesize(core_kernel_classes_Resource::class);
         $prophecy->getUri()->willReturn('fakeDelivery');
-        $prophecy->getOnePropertyValue(Argument::any())->willReturn(new core_kernel_classes_Resource(ProctorService::ACCESSIBLE_PROCTOR_ENABLED));
+        $prophecy
+            ->getOnePropertyValue(Argument::any())
+            ->willReturn(new core_kernel_classes_Resource(ProctorService::ACCESSIBLE_PROCTOR_ENABLED));
 
         return $prophecy->reveal();
     }
@@ -69,7 +73,7 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
         $prophecy->getDelivery()->willReturn($this->getDelivery());
         $prophecy->getState()->willReturn($pState->reveal());
         $prophecy->getIdentifier()->willReturn('fakeDeliveryExecution');
-        $prophecy->setState(Argument::any())->will(function($args) use ($prophecy){
+        $prophecy->setState(Argument::any())->will(function ($args) use ($prophecy) {
             $prophecy->getState()->willReturn(new \core_kernel_classes_Resource($args[0]));
         });
 
@@ -82,7 +86,11 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     public function testGetAuthorizationProviderAPI()
     {
         $authorizationProvider = new ProctorAuthorizationProvider();
-        $this->assertInstanceOf(AuthorizationProvider::class, $authorizationProvider, "Check if the provider implements the authorizationProvider interface");
+        $this->assertInstanceOf(
+            AuthorizationProvider::class,
+            $authorizationProvider,
+            "Check if the provider implements the authorizationProvider interface"
+        );
     }
 
     /**

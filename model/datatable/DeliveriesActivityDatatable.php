@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -65,8 +66,8 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
         /** @var DeliveryMonitoringService $service */
         $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $offset = ($this->request->getPage() - 1) * $this->request->getRows() ? : 0;
-        $limit = $this->request->getRows() ? : 0;
+        $offset = ($this->request->getPage() - 1) * $this->request->getRows() ?: 0;
+        $limit = $this->request->getRows() ?: 0;
 
         $sortBy = $this->request->getSortBy();
         $sortOrder = strcasecmp($this->request->getSortOrder(), 'asc') === 0 ? 'asc' : 'desc';
@@ -86,12 +87,12 @@ class DeliveriesActivityDatatable implements DatatablePayload, ServiceLocatorAwa
         /** @var DeliveryMonitoringService $service */
         $service = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
         $rows = $this->request->getRows();
-        $rows = $rows?:1;
+        $rows = $rows ?: 1;
         $total = $service->getCountOfStatistics();
         $payload = [
             'data' => $result,
-            'page' => (integer) $this->request->getPage(),
-            'records' => (integer) count($result),
+            'page' => (int) $this->request->getPage(),
+            'records' => (int) count($result),
             'total' => ceil($total / $rows),
         ];
         return $payload;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
 
 namespace oat\taoProctoring\model\breadcrumbs;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\tao\model\mvc\Breadcrumbs;
 use oat\taoProctoring\model\ProctorService;
@@ -31,7 +31,7 @@ use oat\taoProctoring\model\ProctorService;
  */
 class MonitorService extends ConfigurableService implements Breadcrumbs
 {
-    const SERVICE_ID = 'taoProctoring/Monitor/breadcrumbs';
+    public const SERVICE_ID = 'taoProctoring/Monitor/breadcrumbs';
 
     /**
      * Builds breadcrumbs for a particular route.
@@ -64,7 +64,7 @@ class MonitorService extends ConfigurableService implements Breadcrumbs
     {
         $routeContext = null;
         $routeDelivery = null;
-        
+
         if (isset($parsedRoute['params'])) {
             if (isset($parsedRoute['params']['delivery'])) {
                 $routeDelivery = $parsedRoute['params']['delivery'];
@@ -83,17 +83,25 @@ class MonitorService extends ConfigurableService implements Breadcrumbs
             $deliveryId = $delivery->getUri();
             $crumb = [
                 'id' => $deliveryId,
-                'url' => _url('index', 'Monitor', 'taoProctoring', ['delivery' => $deliveryId, 'context' => $routeContext]),
+                'url' => _url(
+                    'index',
+                    'Monitor',
+                    'taoProctoring',
+                    [
+                        'delivery' => $deliveryId,
+                        'context' => $routeContext,
+                    ]
+                ),
                 'label' => $delivery->getLabel(),
             ];
-            
+
             if ($deliveryId == $routeDelivery) {
                 $main = $crumb;
             } else {
                 $entries[] = $crumb;
             }
         }
-        
+
         if ($main) {
             $main['entries'] = $entries;
         }

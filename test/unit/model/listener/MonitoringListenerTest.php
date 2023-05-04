@@ -60,7 +60,8 @@ class MonitoringListenerTest extends TestCase
         );
 
         $testSessionConnectivityStatusService = $this->createConfiguredMock(
-            TestSessionConnectivityStatusService::class, ['hasOnlineMode' => false]
+            TestSessionConnectivityStatusService::class,
+            ['hasOnlineMode' => false]
         );
         $monitoringData->setServiceLocator($this->getServiceLocatorMock([
             TestSessionConnectivityStatusService::SERVICE_ID => $testSessionConnectivityStatusService,
@@ -75,7 +76,7 @@ class MonitoringListenerTest extends TestCase
                     $data = $monitoringData->get();
 
                     $this->assertArrayHasKey('status', $data);
-                    $this->assertEquals(DeliveryExecutionInterface::STATE_PAUSED , $data['status']);
+                    $this->assertEquals(DeliveryExecutionInterface::STATE_PAUSED, $data['status']);
 
                     $this->assertArrayHasKey('test_taker', $data);
                     $this->assertEquals('user-identifier', $data['test_taker']);
@@ -90,10 +91,10 @@ class MonitoringListenerTest extends TestCase
                     $this->assertEquals('019183843', $data['start_time']);
 
                     $this->assertArrayHasKey('test_taker_first_name', $data);
-                    $this->assertEquals('name' , $data['test_taker_first_name']);
+                    $this->assertEquals('name', $data['test_taker_first_name']);
 
                     $this->assertArrayHasKey('test_taker_last_name', $data);
-                    $this->assertEquals('name' , $data['test_taker_last_name']);
+                    $this->assertEquals('name', $data['test_taker_last_name']);
 
                     $this->assertArrayHasKey('last_connect', $data);
 
@@ -115,11 +116,13 @@ class MonitoringListenerTest extends TestCase
 
     private function getDeliveryExecutionFixture(): DeliveryExecutionInterface
     {
-        $state = $this->createConfiguredMock(core_kernel_classes_Resource::class,
+        $state = $this->createConfiguredMock(
+            core_kernel_classes_Resource::class,
             ['getUri' => DeliveryExecutionInterface::STATE_PAUSED,]
         );
 
-        $delivery = $this->createConfiguredMock(core_kernel_classes_Resource::class,
+        $delivery = $this->createConfiguredMock(
+            core_kernel_classes_Resource::class,
             ['getUri' => 'http://test/deliveryExecutionUri', 'getLabel' => 'deliveryExecutionUri',]
         );
 

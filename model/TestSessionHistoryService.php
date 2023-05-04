@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,9 +28,9 @@ namespace oat\taoProctoring\model;
  */
 interface TestSessionHistoryService
 {
-    const SERVICE_ID = 'taoProctoring/TestSessionHistoryService';
+    public const SERVICE_ID = 'taoProctoring/TestSessionHistoryService';
 
-    const PROCTOR_ROLES = 'proctorRoles';
+    public const PROCTOR_ROLES = 'proctorRoles';
 
     /**
      * @param array $sessions List of session ids
@@ -49,7 +50,7 @@ interface TestSessionHistoryService
      * @return string
      */
     public function getHistoryUrl($delivery = null);
-    
+
     /**
      * Gets the back url that returns to the page listing the sessions
      * @param $delivery

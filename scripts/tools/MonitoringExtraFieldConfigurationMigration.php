@@ -55,7 +55,8 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction
 
     protected function run()
     {
-        $this->migrateEvents();;
+        $this->migrateEvents();
+        ;
 
         $this->registerMonitoringRepository();
 
@@ -86,22 +87,58 @@ class MonitoringExtraFieldConfigurationMigration extends ScriptAction
 
     private function detachLegacyEvents(EventManager $eventManager): void
     {
-        $eventManager->detach(DeliveryExecutionState::class, [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']);
-        $eventManager->detach(DeliveryExecutionCreated::class, [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']);
-        $eventManager->detach(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
-        $eventManager->detach(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
-        $eventManager->detach(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
-        $eventManager->detach(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
+        $eventManager->detach(
+            DeliveryExecutionState::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']
+        );
+        $eventManager->detach(
+            DeliveryExecutionCreated::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']
+        );
+        $eventManager->detach(
+            MetadataModified::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']
+        );
+        $eventManager->detach(
+            TestChangedEvent::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']
+        );
+        $eventManager->detach(
+            QtiTestStateChangeEvent::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']
+        );
+        $eventManager->detach(
+            AuthorizationGranted::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']
+        );
     }
 
     private function attachNewEvents(EventManager $eventManager): void
     {
-        $eventManager->attach(DeliveryExecutionState::class, [MonitoringListenerInterface::SERVICE_ID, 'executionStateChanged']);
-        $eventManager->attach(DeliveryExecutionCreated::class, [MonitoringListenerInterface::SERVICE_ID, 'executionCreated']);
-        $eventManager->attach(MetadataModified::class, [MonitoringListenerInterface::SERVICE_ID, 'deliveryLabelChanged']);
-        $eventManager->attach(TestChangedEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']);
-        $eventManager->attach(QtiTestStateChangeEvent::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']);
-        $eventManager->attach(AuthorizationGranted::EVENT_NAME, [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']);
+        $eventManager->attach(
+            DeliveryExecutionState::class,
+            [MonitoringListenerInterface::SERVICE_ID, 'executionStateChanged']
+        );
+        $eventManager->attach(
+            DeliveryExecutionCreated::class,
+            [MonitoringListenerInterface::SERVICE_ID, 'executionCreated']
+        );
+        $eventManager->attach(
+            MetadataModified::class,
+            [MonitoringListenerInterface::SERVICE_ID, 'deliveryLabelChanged']
+        );
+        $eventManager->attach(
+            TestChangedEvent::EVENT_NAME,
+            [MonitoringListenerInterface::SERVICE_ID, 'testStateChanged']
+        );
+        $eventManager->attach(
+            QtiTestStateChangeEvent::EVENT_NAME,
+            [MonitoringListenerInterface::SERVICE_ID, 'qtiTestStatusChanged']
+        );
+        $eventManager->attach(
+            AuthorizationGranted::EVENT_NAME,
+            [MonitoringListenerInterface::SERVICE_ID, 'deliveryAuthorized']
+        );
     }
 
     private function registerMonitoringRepository(): void

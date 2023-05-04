@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,53 +37,54 @@ use oat\taoEventLog\model\userLastActivityLog\UserLastActivityLog;
 class ActivityMonitoringService extends ConfigurableService
 {
     use OntologyAwareTrait;
-    const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
+
+    public const SERVICE_ID = 'taoProctoring/ActivityMonitoringService';
 
     /** Threshold in seconds */
-    const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
+    public const OPTION_ACTIVE_USER_THRESHOLD = 'active_user_threshold';
 
     /** Interval of refreshing assessment activity graph in seconds. 0 - no auto refresh */
-    const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
+    public const OPTION_COMPLETED_ASSESSMENTS_AUTO_REFRESH = 'completed_assessments_auto_refresh';
 
     /** Interval of refreshing assessment activity data in seconds. 0 - no auto refresh */
-    const OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH = 'assessment_activity_auto_refresh';
+    public const OPTION_ASSESSMENT_ACTIVITY_AUTO_REFRESH = 'assessment_activity_auto_refresh';
 
     /** Allow to specify custom  activity widgets to be rendered */
-    const OPTION_USER_ACTIVITY_WIDGETS = 'userActivityWidgets';
+    public const OPTION_USER_ACTIVITY_WIDGETS = 'userActivityWidgets';
 
     /** State of awaiting assessment */
-    const STATE_AWAITING_ASSESSMENT = 'awaiting_assessments';
+    public const STATE_AWAITING_ASSESSMENT = 'awaiting_assessments';
 
     /** State of authorized assessment */
-    const STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS = 'authorized_but_not_started_assessments';
+    public const STATE_AUTHORIZED_BUT_NOT_STARTED_ASSESSMENTS = 'authorized_but_not_started_assessments';
 
     /** State of paused assessment */
-    const STATE_PAUSED_ASSESSMENTS = 'paused_assessments';
+    public const STATE_PAUSED_ASSESSMENTS = 'paused_assessments';
 
     /** State of in progress assessment */
-    const STATE_IN_PROGRESS_ASSESSMENTS = 'in_progress_assessments';
+    public const STATE_IN_PROGRESS_ASSESSMENTS = 'in_progress_assessments';
 
     /** Active proctors field */
-    const FIELD_ACTIVE_PROCTORS = 'active_proctors';
+    public const FIELD_ACTIVE_PROCTORS = 'active_proctors';
 
     /** Active Test Takers field */
-    const FIELD_ACTIVE_TEST_TAKERS = 'active_test_takers';
+    public const FIELD_ACTIVE_TEST_TAKERS = 'active_test_takers';
 
     /** Total assessments field */
-    const FIELD_TOTAL_ASSESSMENTS = 'total_assessments';
+    public const FIELD_TOTAL_ASSESSMENTS = 'total_assessments';
 
     /** Deliveries statistics field*/
-    const FIELD_DELIVERIES_STATISTICS = 'deliveries_statistics';
+    public const FIELD_DELIVERIES_STATISTICS = 'deliveries_statistics';
 
     /** Retired deliveries field*/
-    const FIELD_RETIRED_DELIVERIES = 'retired_deliveries';
+    public const FIELD_RETIRED_DELIVERIES = 'retired_deliveries';
 
     /** Total current assessment field */
-    const FIELD_TOTAL_CURRENT_ASSESSMENTS = 'total_current_assessments';
+    public const FIELD_TOTAL_CURRENT_ASSESSMENTS = 'total_current_assessments';
 
-    const LABEL_RETIRED_DELIVERIES = 'Retired Deliveries';
+    public const LABEL_RETIRED_DELIVERIES = 'Retired Deliveries';
 
-    const GROUPFIELD_USER_ACTIVITY = 'group_user_activity';
+    public const GROUPFIELD_USER_ACTIVITY = 'group_user_activity';
 
     /**
      * @var array list of all the statuses uris
@@ -173,12 +175,16 @@ class ActivityMonitoringService extends ConfigurableService
         $userActivityService = $this->getServiceManager()->get(UserLastActivityLog::SERVICE_ID);
         $now = microtime(true);
         $filter = [
-            [UserLastActivityLog::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
+            [
+                UserLastActivityLog::EVENT_TIME,
+                'between',
+                $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD),
+                $now,
+            ],
         ];
         if ($role !== null) {
             $filter[] = [UserLastActivityLog::USER_ROLES, 'like', '%,' . $role . ',%'];
         }
-        return $userActivityService->count($filter, ['group'=>UserLastActivityLog::USER_ID]);
+        return $userActivityService->count($filter, ['group' => UserLastActivityLog::USER_ID]);
     }
-
 }

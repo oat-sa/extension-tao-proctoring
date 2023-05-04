@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,14 +44,14 @@ use taoQtiTest_models_classes_QtiTestService;
 class AssessmentResultsService extends ConfigurableService
 {
     /** @deprecated */
-    const CONFIG_ID = 'taoProctoring/AssessmentResults';
+    public const CONFIG_ID = 'taoProctoring/AssessmentResults';
 
-    const SERVICE_ID = 'taoProctoring/AssessmentResults';
+    public const SERVICE_ID = 'taoProctoring/AssessmentResults';
 
-    const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
-    const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
+    public const OPTION_PRINTABLE_RUBRIC_TAG = 'printable_rubric_tag';
+    public const OPTION_PRINT_REPORT_BUTTON = 'print_report_button';
 
-    const OPTION_SCORE_URL = 'score_report_url';
+    public const OPTION_SCORE_URL = 'score_report_url';
 
     /**
      * Get test taker data as associative array
@@ -59,7 +60,9 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getTestTakerData(DeliveryExecutionInterface $deliveryExecution)
     {
-        $data = $this->getResultService($deliveryExecution->getDelivery())->getTestTakerData($deliveryExecution->getIdentifier());
+        $data = $this
+            ->getResultService($deliveryExecution->getDelivery())
+            ->getTestTakerData($deliveryExecution->getIdentifier());
         $result = $this->propertiesToArray($data);
         return $result;
     }
@@ -98,7 +101,10 @@ class AssessmentResultsService extends ConfigurableService
         $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
 
-        $itemsData = $resultService->getItemVariableDataFromDeliveryResult($deliveryExecution->getIdentifier(), 'lastSubmitted');
+        $itemsData = $resultService->getItemVariableDataFromDeliveryResult(
+            $deliveryExecution->getIdentifier(),
+            'lastSubmitted'
+        );
 
         foreach ($itemsData as $itemData) {
             $rawResult = [];
@@ -174,7 +180,7 @@ class AssessmentResultsService extends ConfigurableService
         foreach ($sections as $section) {
             $assessmentItemsRef = $section->getComponentsByClassName('assessmentItemRef');
             foreach ($assessmentItemsRef as $item) {
-                foreach($item->getCategories() as $category) {
+                foreach ($item->getCategories() as $category) {
                     if ($category === $tag) {
                         foreach ($section->getRubricBlockRefs() as $rubric) {
                             ob_start();

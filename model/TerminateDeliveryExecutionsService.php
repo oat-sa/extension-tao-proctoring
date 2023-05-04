@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,15 +18,15 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
-namespace oat\taoProctoring\model;
 
+namespace oat\taoProctoring\model;
 
 use oat\taoProctoring\model\execution\DeliveryExecutionsUpdater;
 use common_report_Report as Report;
 
 class TerminateDeliveryExecutionsService extends DeliveryExecutionsUpdater
 {
-    const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
+    public const SERVICE_ID = 'taoProctoring/TerminateDeliveryExecutions';
 
     /**
      * Terminate delivery execution
@@ -39,13 +40,13 @@ class TerminateDeliveryExecutionsService extends DeliveryExecutionsUpdater
     protected function action($deliveryExecution, $executionId, $isEndDate = false)
     {
         $this->getDeliveryStateService()->terminateExecution($deliveryExecution, [
-            'reasons' =>[
+            'reasons' => [
                 'category' => 'Technical'
             ],
             'comment' => $isEndDate
                 ? 'The assessment was automatically terminated because end time expired.'
                 : 'The assessment was automatically terminated.'
         ]);
-        $this->report->add(Report::createSuccess('Execution terminated with success:'. $executionId ));
+        $this->report->add(Report::createSuccess('Execution terminated with success:' . $executionId));
     }
 }

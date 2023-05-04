@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +25,7 @@ namespace oat\taoProctoring\scripts\update;
 use oat\oatbox\service\ServiceManager;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\oatbox\action\Action;
-use \common_report_Report as Report;
+use common_report_Report as Report;
 
 /**
  * Class UpdateMonitoringTimeValues
@@ -38,7 +39,6 @@ use \common_report_Report as Report;
  */
 class UpdateMonitoringTimeValues implements Action
 {
-
     public function __invoke($params)
     {
         $serviceManager = ServiceManager::getServiceManager();

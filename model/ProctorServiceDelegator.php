@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,6 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 
@@ -33,7 +33,7 @@ use oat\oatbox\user\User;
 class ProctorServiceDelegator extends ServiceDelegator
 {
     /** @deprecated need to be used SERVICE_HANDLERS */
-    const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;
+    public const PROCTOR_SERVICE_HANDLERS = self::SERVICE_HANDLERS;
 
     /**
      * (non-PHPdoc)
@@ -51,7 +51,10 @@ class ProctorServiceDelegator extends ServiceDelegator
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $deliveryId = $delivery ? $delivery->getUri() : null;
-        return $this->getResponsibleService($proctor, $deliveryId)->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+
+        return $this
+            ->getResponsibleService($proctor, $deliveryId)
+            ->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 
     /**
@@ -61,6 +64,9 @@ class ProctorServiceDelegator extends ServiceDelegator
     public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $deliveryId = $delivery ? $delivery->getUri() : null;
-        return $this->getResponsibleService($proctor, $deliveryId)->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+
+        return $this
+            ->getResponsibleService($proctor, $deliveryId)
+            ->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 }

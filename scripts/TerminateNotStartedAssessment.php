@@ -76,11 +76,17 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
         $deliveryExecutionsData = $deliveryMonitoringService->find([
-            DeliveryMonitoringService::STATUS => [DeliveryExecutionState::STATE_AUTHORIZED, DeliveryExecutionState::STATE_AWAITING],
+            DeliveryMonitoringService::STATUS => [
+                DeliveryExecutionState::STATE_AUTHORIZED,
+                DeliveryExecutionState::STATE_AWAITING,
+            ],
         ]);
 
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
+
         foreach ($deliveryExecutionsData as $deliveryExecutionData) {
             try {
                 $data = $deliveryExecutionData->get();
@@ -89,29 +95,34 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
                 );
 
                 if ($this->isExpired($deliveryExecution)) {
-                    if ($deliveryExecutionStateService->isCancelable($deliveryExecution)){
+                    if ($deliveryExecutionStateService->isCancelable($deliveryExecution)) {
                         $deliveryExecutionStateService->cancelExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
+                            // phpcs:disable Generic.Files.LineLength
                             'comment' => __('Automatically reset by the system due to authorized test not being launched by test taker.'),
+                            // phpcs:enable Generic.Files.LineLength
                         ]);
                         $cancel++;
                     } else {
-                        //do not remove these comments, this is used to generate the translation in .po file
+                        // phpcs:disable Generic.Files.LineLength
+                        // Do not remove these comments, this is used to generate the translation in .po file
                         // __('Automatically paused by the system due to authorized test not being launched by test taker.');
+                        // phpcs:enable Generic.Files.LineLength
                         $deliveryExecutionStateService->pauseExecution($deliveryExecution, [
                             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Authorization'],
-                            'comment' => 'Automatically paused by the system due to authorized test not being launched by test taker.',
+                            'comment' => 'Automatically paused by the system due to authorized test not being launched '
+                                . 'by test taker.',
                         ]);
                         $pause++;
                     }
-
                 }
             } catch (\Exception $e) {
                 $this->addReport(Report::TYPE_ERROR, $e->getMessage());
             }
         }
 
-        $msg = ($cancel > 0 ? "{$cancel} executions has been canceled. " : "") . ($pause > 0 ? "{$pause} executions has been paused." : "");
+        $msg = ($cancel > 0 ? "{$cancel} executions has been canceled. " : "")
+            . ($pause > 0 ? "{$pause} executions has been paused." : "");
         $msg = !$msg ? "Expired executions not found." : $msg;
 
         $this->addReport(Report::TYPE_INFO, $msg);
@@ -134,15 +145,18 @@ class TerminateNotStartedAssessment extends AbstractExpiredSessionSeeker
         $executionState = $deliveryExecution->getState()->getUri();
         $lastTestTakersEvent = $this->getLastTestTakersEvent($deliveryExecution);
 
-        if (in_array($executionState, [
+        if (
+            in_array($executionState, [
                 DeliveryExecutionState::STATE_AWAITING,
                 DeliveryExecutionState::STATE_AUTHORIZED,
             ]) &&
-            $lastTestTakersEvent)
-        {
+            $lastTestTakersEvent
+        ) {
             /** @var \oat\taoProctoring\model\implementation\DeliveryExecutionStateService $deliveryExecutionStateService */
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
-            $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
+            $delay = $deliveryExecutionStateService->getOption(
+                DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY
+            );
             $lastTestEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
             $result = ($lastTestEventTime->add(new DateInterval($delay)) < (new DateTimeImmutable()));
         }

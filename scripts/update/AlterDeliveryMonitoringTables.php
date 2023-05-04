@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,7 +35,9 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
     {
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
 
-        $this->persistence = \common_persistence_Manager::getPersistence($service->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE));
+        $this->persistence = \common_persistence_Manager::getPersistence(
+            $service->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE)
+        );
 
         // Drop foreign key
         /** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
@@ -44,7 +47,7 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         try {
             $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
             $tableData->removeForeignKey(DeliveryMonitoringService::KV_FK_PARENT);
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
         $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
@@ -58,8 +61,15 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         $fromSchema = clone $schema;
         try {
             $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-            $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
-        } catch(SchemaException $e) {
+            $tableData->changeColumn(
+                DeliveryMonitoringService::KV_COLUMN_PARENT_ID,
+                [
+                    'type' => Type::getType('string'),
+                    'notnull' => true,
+                    'length' => 255,
+                ]
+            );
+        } catch (SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
         $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);
@@ -91,8 +101,7 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
 
             $tableLog->dropColumn('id');
             $tableData->dropColumn('id');
-
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
         $queries = $this->persistence->getPlatform()->getMigrateSchemaSql($fromSchema, $schema);

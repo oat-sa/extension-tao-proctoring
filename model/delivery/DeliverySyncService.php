@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,9 +38,9 @@ class DeliverySyncService extends ConfigurableService
 {
     use OntologyAwareTrait;
 
-    const SERVICE_ID = 'taoProctoring/DeliverySync';
+    public const SERVICE_ID = 'taoProctoring/DeliverySync';
 
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+    public const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
     /**
      * Listen create event for delivery
@@ -52,7 +53,9 @@ class DeliverySyncService extends ConfigurableService
         $proctoredByDefault = $this->isProctoredByDefault();
 
         $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), (
-        $proctoredByDefault ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+            $proctoredByDefault
+                ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
         ));
     }
 
@@ -65,8 +68,15 @@ class DeliverySyncService extends ConfigurableService
         $data = $event->jsonSerialize();
         $deliveryData = !empty($data['data']) ? $data['data'] : [];
         $delivery = $this->getResource($event->getDeliveryUri());
-        if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-            $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
+
+        if (
+            isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR])
+            && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]
+        ) {
+            $delivery->editPropertyValues(
+                $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR),
+                ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+            );
         }
     }
 

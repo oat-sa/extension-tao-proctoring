@@ -68,7 +68,9 @@ class MonitoringListener extends ConfigurableService implements MonitoringListen
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $success = $this->getMonitoringRepository()->save($data);
         if (!$success) {
-            $this->logWarning('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+            $this->logWarning(
+                'monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created'
+            );
         }
     }
 
@@ -83,21 +85,28 @@ class MonitoringListener extends ConfigurableService implements MonitoringListen
 
         $success = $this->getMonitoringRepository()->partialSave($data);
         if (!$success) {
-            $this->logWarning('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
+            $this->logWarning(
+                'monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier()
+                    . ' could not be created'
+            );
         }
     }
 
     /**
      * @throws common_exception_Error|common_exception_NotFound
      */
-    protected function fillMonitoringOnExecutionStateChanged(DeliveryExecutionState $event, DeliveryMonitoringData $data): void
-    {
+    protected function fillMonitoringOnExecutionStateChanged(
+        DeliveryExecutionState $event,
+        DeliveryMonitoringData $data
+    ): void {
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = common_session_SessionManager::getSession()->getUser();
 
-        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
-            && $user instanceof GuestTestUser) {
+        if (
+            in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser
+        ) {
             $data->getDeliveryExecution()->setState(DeliveryExecution::STATE_AUTHORIZED);
         }
 
@@ -231,7 +240,9 @@ class MonitoringListener extends ConfigurableService implements MonitoringListen
 
         $success = $this->getMonitoringRepository()->partialSave($data);
         if (!$success) {
-            $this->logWarning('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+            $this->logWarning(
+                'monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created'
+            );
         }
     }
 
@@ -249,8 +260,10 @@ class MonitoringListener extends ConfigurableService implements MonitoringListen
         return $data;
     }
 
-    private function updateDeliveryInformation(DeliveryMonitoringData $data, DeliveryExecutionInterface $deliveryExecution): DeliveryMonitoringData
-    {
+    private function updateDeliveryInformation(
+        DeliveryMonitoringData $data,
+        DeliveryExecutionInterface $deliveryExecution
+    ): DeliveryMonitoringData {
         $data->update(DeliveryMonitoringService::STATUS, $deliveryExecution->getState()->getUri());
         $data->update(DeliveryMonitoringService::TEST_TAKER, $deliveryExecution->getUserIdentifier());
         $data->update(DeliveryMonitoringService::DELIVERY_ID, $deliveryExecution->getDelivery()->getUri());

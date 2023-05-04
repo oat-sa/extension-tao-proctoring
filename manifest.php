@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,15 +59,22 @@ return array(
     'author' => 'Open Assessment Technologies SA',
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod'=>'Irregularity')),
+        [
+            'grant',
+            'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole',
+            [
+                'ext' => 'taoProctoring',
+                'mod' => 'Irregularity',
+            ],
+        ],
         array('grant', ProctorService::ROLE_PROCTOR, DeliverySelection::class),
         array('grant', ProctorService::ROLE_PROCTOR, Monitor::class),
         array('grant', ProctorService::ROLE_PROCTOR, tao_actions_Breadcrumbs::class),
-        array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'Reporting')),
-        array('grant', ProctorService::ROLE_PROCTOR, array('ext'=>'taoProctoring', 'mod'=>'TextConverter')),
-        array('grant', TaoRoles::DELIVERY, array('ext'=>'taoProctoring', 'mod'=>'DeliveryServer')),
-        array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class.'@pauseActiveExecutions'),
-        array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext'=>'taoProctoring', 'mod'=>'Tools')),
+        array('grant', ProctorService::ROLE_PROCTOR, array('ext' => 'taoProctoring', 'mod' => 'Reporting')),
+        array('grant', ProctorService::ROLE_PROCTOR, array('ext' => 'taoProctoring', 'mod' => 'TextConverter')),
+        array('grant', TaoRoles::DELIVERY, array('ext' => 'taoProctoring', 'mod' => 'DeliveryServer')),
+        array('grant', TaoRoles::SYSTEM_ADMINISTRATOR, Tools::class . '@pauseActiveExecutions'),
+        array('grant', TaoRoles::OPERATIONAL_ADMINISTRATOR, array('ext' => 'taoProctoring', 'mod' => 'Tools')),
         array('grant', ProctorService::ROLE_PROCTOR_ADMINISTRATOR, MonitorProctorAdministrator::class),
     ),
     'install' => array(
@@ -95,7 +103,8 @@ return array(
             MonitoringExtraFieldConfigurationMigration::class,
         ),
         'rdf' => array(
-            __DIR__.DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'proctoring.rdf'
+            __DIR__ . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR
+                . 'proctoring.rdf'
         )
     ),
     'uninstall' => array(
@@ -108,13 +117,13 @@ return array(
         'taoProctoring' => 'oat\\taoProctoring\\controller'
     ),
     'update' => 'oat\\taoProctoring\\scripts\\update\\Updater',
-	'constants' => array(
-	    # views directory
-	    'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
+    'constants' => array(
+        # views directory
+        'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
 
-		#BASE URL (usually the domain root)
-		'BASE_URL' => ROOT_URL.'taoProctoring/',
-	),
+        #BASE URL (usually the domain root)
+        'BASE_URL' => ROOT_URL . 'taoProctoring/',
+    ),
     'extra' => array(
         'structures' => __DIR__ . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',
     )

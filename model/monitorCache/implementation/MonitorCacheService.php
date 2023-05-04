@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -68,7 +69,9 @@ class MonitorCacheService extends MonitoringStorage
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $success = $this->save($data);
         if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+            \common_Logger::w(
+                'monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created'
+            );
         }
     }
 
@@ -85,7 +88,10 @@ class MonitorCacheService extends MonitoringStorage
 
         $success = $this->partialSave($data);
         if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier() . ' could not be created');
+            \common_Logger::w(
+                'monitor cache for delivery ' . $event->getDeliveryExecution()->getIdentifier()
+                    . ' could not be created'
+            );
         }
     }
 
@@ -95,14 +101,18 @@ class MonitorCacheService extends MonitoringStorage
      * @throws \common_exception_Error
      * @throws \common_exception_NotFound
      */
-    protected function fillMonitoringOnExecutionStateChanged(DeliveryExecutionState $event, DeliveryMonitoringData $data)
-    {
+    protected function fillMonitoringOnExecutionStateChanged(
+        DeliveryExecutionState $event,
+        DeliveryMonitoringData $data
+    ) {
         $data->update(DeliveryMonitoringService::STATUS, $event->getState());
         $data->updateData([DeliveryMonitoringService::CONNECTIVITY]);
         $user = \common_session_SessionManager::getSession()->getUser();
 
-        if (in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
-            && $user instanceof GuestTestUser) {
+        if (
+            in_array($event->getState(), [DeliveryExecution::STATE_AWAITING, DeliveryExecution::STATE_PAUSED])
+            && $user instanceof GuestTestUser
+        ) {
             $data->getDeliveryExecution()->setState(DeliveryExecution::STATE_AUTHORIZED);
         }
 
@@ -130,7 +140,10 @@ class MonitorCacheService extends MonitoringStorage
      */
     public function testStateChanged(TestChangedEvent $event)
     {
-        $deliveryExecution = $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID)->getDeliveryExecution($event->getServiceCallId());
+        $deliveryExecution = $this
+            ->getServiceLocator()
+            ->get(DeliveryExecutionService::SERVICE_ID)
+            ->getDeliveryExecution($event->getServiceCallId());
 
         $data = $this->createMonitoringData($deliveryExecution);
 
@@ -202,7 +215,14 @@ class MonitorCacheService extends MonitoringStorage
             if ($resource->isInstanceOf($assemblyClass)) {
                 /** @var $queueService QueueDispatcherInterface */
                 $queueService = $this->getServiceLocator()->get(QueueDispatcherInterface::SERVICE_ID);
-                $queueService->createTask(new DeliveryUpdaterTask(), [$resource->getUri(), $event->getMetadataValue()], 'Update delivery label');
+                $queueService->createTask(
+                    new DeliveryUpdaterTask(),
+                    [
+                        $resource->getUri(),
+                        $event->getMetadataValue(),
+                    ],
+                    'Update delivery label'
+                );
             }
         }
     }
@@ -239,7 +259,9 @@ class MonitorCacheService extends MonitoringStorage
 
         $success = $this->partialSave($data);
         if (!$success) {
-            \common_Logger::w('monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created');
+            \common_Logger::w(
+                'monitor cache for delivery ' . $deliveryExecution->getIdentifier() . ' could not be created'
+            );
         }
     }
 

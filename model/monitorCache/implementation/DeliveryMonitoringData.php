@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -95,7 +96,7 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
      */
     public function update($key, $value)
     {
-       $this->addValue($key, $value, true);
+        $this->addValue($key, $value, true);
     }
 
     /**
@@ -143,9 +144,12 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     {
         try {
             if (isset($this->data[self::PARAM_EXECUTION_CONTEXT])) {
-                return DeliveryExecutionContext::createFromArray(json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true));
+                return DeliveryExecutionContext::createFromArray(
+                    json_decode($this->data[self::PARAM_EXECUTION_CONTEXT], true)
+                );
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return null;
     }
@@ -243,11 +247,18 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
     {
         $status = $this->deliveryExecution->getState()->getUri();
         /** @var TestSessionConnectivityStatusService $testSessionConnectivityStatusService */
-        $testSessionConnectivityStatusService = $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID);
+        $testSessionConnectivityStatusService = $this->getServiceLocator()->get(
+            TestSessionConnectivityStatusService::SERVICE_ID
+        );
 
-        if ($testSessionConnectivityStatusService->hasOnlineMode() && ProctoredDeliveryExecution::STATE_ACTIVE == $status) {
-            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline($this->deliveryExecution->getIdentifier());
-        }else{
+        if (
+            $testSessionConnectivityStatusService->hasOnlineMode()
+            && ProctoredDeliveryExecution::STATE_ACTIVE == $status
+        ) {
+            $lastConnectivity = $testSessionConnectivityStatusService->getLastOnline(
+                $this->deliveryExecution->getIdentifier()
+            );
+        } else {
             // to ensure that during sorting by connectivity all similar statuses grouped together
             $lastConnectivity = (~PHP_INT_MAX) + substr(abs(crc32($status)), 0, 3);
         }
@@ -315,7 +326,9 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         }
 
         if ($lastTimeStamp - $lastActivity > 0) {
-            $diffTimestamp = isset($this->data[DeliveryMonitoringService::DIFF_TIMESTAMP]) ? $this->data[DeliveryMonitoringService::DIFF_TIMESTAMP] : 0;
+            $diffTimestamp = isset($this->data[DeliveryMonitoringService::DIFF_TIMESTAMP])
+                ? $this->data[DeliveryMonitoringService::DIFF_TIMESTAMP]
+                : 0;
             $diffTimestamp += $lastTimeStamp - $lastActivity;
         }
 
@@ -334,7 +347,10 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         } else {
             $timerTarget = TimePoint::TARGET_SERVER;
             $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
-            $timer = $qtiTimerFactory->getTimer($this->deliveryExecution->getIdentifier(), $this->deliveryExecution->getUserIdentifier());
+            $timer = $qtiTimerFactory->getTimer(
+                $this->deliveryExecution->getIdentifier(),
+                $this->deliveryExecution->getUserIdentifier()
+            );
         }
 
         /** @var DeliveryExecutionManagerService $deliveryExecutionManager */
@@ -342,8 +358,13 @@ class DeliveryMonitoringData implements DeliveryMonitoringDataInterface, Service
         $maxTimeSeconds = $deliveryExecutionManager->getTimeLimits($testSession);
 
         $data = $this->get();
-        $oldConsumedExtraTime = isset($data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]) ? $data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME] : 0;
-        $consumedExtraTime = max($oldConsumedExtraTime, $timer->getConsumedExtraTime(null, $maxTimeSeconds, $timerTarget));
+        $oldConsumedExtraTime = isset($data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME])
+            ? $data[DeliveryMonitoringService::CONSUMED_EXTRA_TIME]
+            : 0;
+        $consumedExtraTime = max(
+            $oldConsumedExtraTime,
+            $timer->getConsumedExtraTime(null, $maxTimeSeconds, $timerTarget)
+        );
 
         $this->addValue(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime(), true);
         $this->addValue(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $consumedExtraTime, true);

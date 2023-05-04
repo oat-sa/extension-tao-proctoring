@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
-require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
+// phpcs:disable PSR1.Files.SideEffects
+require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
+// phpcs:enable PSR1.Files.SideEffects
 
 use common_persistence_Persistence;
 use common_persistence_SqlPersistence;
@@ -91,7 +94,8 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
     ];
 
 
-    private function getService(): MonitoringStorage {
+    private function getService(): MonitoringStorage
+    {
         if (!$this->service) {
             $this->service = new MonitoringStorage([
                 MonitoringStorage::OPTION_PERSISTENCE => 'test_monitoring',
@@ -254,8 +258,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
      * @param array $secondaryDataToCheck
      * @throws \common_exception_NotFound
      */
-    protected function save($partialModel, $saveAsPartial, array $dataToUpdate, array $secondaryDataToUpdate, array $dataToCheck, array $secondaryDataToCheck)
-    {
+    protected function save(
+        $partialModel,
+        $saveAsPartial,
+        array $dataToUpdate,
+        array $secondaryDataToUpdate,
+        array $dataToCheck,
+        array $secondaryDataToCheck
+    ) {
         $deliveryExecution = $this->getDeliveryExecution($this->deliveryExecutionId, 'active');
         if ($partialModel) {
             $dataModel = $this->service->createMonitoringData($deliveryExecution);
@@ -349,7 +359,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             [MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record']
         ]);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
+        $this->assertEquals(
+            $result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554175_test_record'
+        );
 
         $result = $this->service->find([
             ['error_code' => '1'],
@@ -385,7 +398,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ['error_code' => '0'],
         ]);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
+        $this->assertEquals(
+            $result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554178_test_record'
+        );
 
 
         $result = $this->service->find([
@@ -393,8 +409,14 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ['error_code' => '0'],
         ], [], true);
         $this->assertEquals(count($result), 1);
-        $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554178_test_record');
-        $this->assertEquals($result[0]->get()['error_code'], '0');
+        $this->assertEquals(
+            $result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554178_test_record'
+        );
+        $this->assertEquals(
+            $result[0]->get()['error_code'],
+            '0'
+        );
 
 
         $result = $this->service->find([
@@ -425,10 +447,18 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
             ]],
         ], ['order' => 'session_id'], true);
         $this->assertEquals(count($result), 3);
-        $this->assertEquals($result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554175_test_record');
-        $this->assertEquals($result[1]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554176_test_record');
-        $this->assertEquals($result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID], 'http://sample/first.rdf#i1450191587554177_test_record');
-
+        $this->assertEquals(
+            $result[0]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554175_test_record'
+        );
+        $this->assertEquals(
+            $result[1]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554176_test_record'
+        );
+        $this->assertEquals(
+            $result[2]->get()[MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID],
+            'http://sample/first.rdf#i1450191587554177_test_record'
+        );
     }
 
     public function testCount()
@@ -510,7 +540,10 @@ class DeliveryMonitoringServiceTest extends TaoPhpUnitTestRunner
         $this->setUp();
 
         foreach ($this->fixtureData as $item) {
-            $dataModel = $this->service->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
+            $dataModel = $this->service->getData(
+                $this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID])
+            );
+
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }

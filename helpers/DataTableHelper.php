@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,42 +32,42 @@ class DataTableHelper
     /**
      * The default number of rows displayed in a page
      */
-    const DEFAULT_ROWS = 25;
+    public const DEFAULT_ROWS = 25;
 
     /**
      * The index of the default page
      */
-    const DEFAULT_PAGE = 1;
+    public const DEFAULT_PAGE = 1;
 
     /**
      * The index of the option providing the number of rows per page
      */
-    const OPTION_ROWS = 'rows';
+    public const OPTION_ROWS = 'rows';
 
     /**
      * The index of the option providing the page number
      */
-    const OPTION_PAGE = 'page';
+    public const OPTION_PAGE = 'page';
 
     /**
      * The index of the option providing the page filter
      */
-    const OPTION_FILTER = 'filter';
+    public const OPTION_FILTER = 'filter';
 
     /**
      * The keyword for an ascending sort
      */
-    const SORT_ASC = 'asc';
+    public const SORT_ASC = 'asc';
 
     /**
      * The keyword for a descending sort
      */
-    const SORT_DESC = 'desc';
+    public const SORT_DESC = 'desc';
 
     /**
      * The default sort order to use when none is provided
      */
-    const DEFAULT_SORT_ORDER = self::SORT_ASC;
+    public const DEFAULT_SORT_ORDER = self::SORT_ASC;
 
     /**
      * Paginates a collection to render a subset in a table

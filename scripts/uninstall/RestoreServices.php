@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
  */
 
 namespace oat\taoProctoring\scripts\uninstall;
-
 
 use oat\oatbox\extension\UninstallAction;
 use oat\tao\model\entryPoint\EntryPointService;
@@ -46,12 +46,15 @@ use oat\taoQtiTest\models\runner\QtiRunnerMessageService;
 
 class RestoreServices extends UninstallAction
 {
-    public function __invoke($params) {
+    public function __invoke($params)
+    {
 
         // checks
         $authService = $this->getServiceManager()->get(AuthorizationService::SERVICE_ID);
         if (!$authService instanceof AuthorizationAggregator) {
-            throw new \common_exception_Error('Incompatible AuthorizationService "'.get_class($authService).'" found.');
+            throw new \common_exception_Error(
+                'Incompatible AuthorizationService "' . get_class($authService) . '" found.'
+            );
         }
 
         // restore entry points
@@ -74,7 +77,10 @@ class RestoreServices extends UninstallAction
 
         // restore delivery server
         $deliveryConfig = $this->getServiceManager()->get(DeliveryServerService::SERVICE_ID)->getOptions();
-        $this->getServiceManager()->register(DeliveryServerService::SERVICE_ID, new DeliveryServerService($deliveryConfig));
+        $this->getServiceManager()->register(
+            DeliveryServerService::SERVICE_ID,
+            new DeliveryServerService($deliveryConfig)
+        );
 
         // restore authorisation provider
         $authService->unregister(ProctorAuthorizationProvider::class);
@@ -83,10 +89,10 @@ class RestoreServices extends UninstallAction
 
         // restore state service
         $this->getServiceManager()->register(StateServiceInterface::SERVICE_ID, new StateService());
-        
+
         // Restore QTI runner
         $this->getServiceManager()->register(TestRunnerMessageService::SERVICE_ID, new QtiRunnerMessageService());
-        
+
         // get rid of custom URLs
         $urlService = $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID);
         $options = $urlService->getOptions();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,7 +32,9 @@ use oat\generis\model\OntologyAwareTrait;
  *
  * @package oat\taoProctoring\scripts\tools
  * @author Aleksej Tikhanovich, <aleksej@taotesting.com>
- * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri --prod --mode=off`
+ * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri
+ * --prod --mode=off`
+ *
  * $uri - Uri of delivery
  * --prod - Start script in production mode
  * --mode - (off|on) change proctorable status to on or off state
@@ -86,20 +89,25 @@ class UpdateProctorableStatus implements Action
         foreach ($deliveries as $delivery) {
             if ($delivery->exists()) {
                 try {
-                    if(!$this->dryrun) {
+                    if (!$this->dryrun) {
                         if ($this->mode) {
-                            $delivery->editPropertyValues($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                            $delivery->editPropertyValues(
+                                $accessibleProperty,
+                                ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                            );
                         } else {
-                            $delivery->removePropertyValue($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                            $delivery->removePropertyValue(
+                                $accessibleProperty,
+                                ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                            );
                         }
                     }
-                    $this->addReport(Report::TYPE_INFO, "Updated ".$delivery->getUri());
+                    $this->addReport(Report::TYPE_INFO, "Updated " . $delivery->getUri());
 
                     $count++;
                 } catch (\Exception $e) {
                     $this->addReport(Report::TYPE_ERROR, $e->getMessage());
                 }
-
             }
         }
 
@@ -145,7 +153,6 @@ class UpdateProctorableStatus implements Action
                 $message
             ));
         }
-
     }
 
     /**
@@ -155,7 +162,7 @@ class UpdateProctorableStatus implements Action
     {
         if ($params && is_array($params)) {
             foreach ($params as $uri) {
-                if (\common_Utils::isUri($uri)){
+                if (\common_Utils::isUri($uri)) {
                     $uriArray[] = $uri;
                 }
             }

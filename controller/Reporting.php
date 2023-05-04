@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -75,7 +76,10 @@ class Reporting extends SimplePageModule
 
         // retrieve history
         $historyService = $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
-        $history = DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $requestOptions), $requestOptions);
+        $history = DataTableHelper::paginate(
+            $historyService->getSessionsHistory($sessions, $requestOptions),
+            $requestOptions
+        );
 
         $viewData = [
             'set'         => $history,
@@ -103,10 +107,10 @@ class Reporting extends SimplePageModule
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessions[0]);
             $viewData['title'] = __('Detailed Session History of %s', $deliveryExecution->getLabel());
         }
-        
+
         return $viewData;
     }
-    
+
     /**
      * Display the session history of the current test center
      */
@@ -114,7 +118,7 @@ class Reporting extends SimplePageModule
     {
         $this->composeView('session-history', null, 'pages/index.tpl', 'tao');
     }
-    
+
     /**
      * Display the session history of the current test center
      */
@@ -144,8 +148,12 @@ class Reporting extends SimplePageModule
                 $sessions = $sessions ? explode(',', $sessions) : [];
             }
             $historyService = $this->getServiceManager()->get(TestSessionHistoryService::SERVICE_ID);
-            $this->returnJson(DataTableHelper::paginate($historyService->getSessionsHistory($sessions, $requestOptions), $requestOptions));
-
+            $this->returnJson(
+                DataTableHelper::paginate(
+                    $historyService->getSessionsHistory($sessions, $requestOptions),
+                    $requestOptions
+                )
+            );
         } catch (ServiceNotFoundException $e) {
             \common_Logger::w('No history service defined for proctoring');
             $this->returnError('Proctoring interface not available');
@@ -182,7 +190,11 @@ class Reporting extends SimplePageModule
             $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($deliveryExecutionId);
             $delivery = $deliveryExecution->getDelivery();
             if (!isset($deliveries[$delivery->getUri()])) {
-                \common_Logger::i('Attempt to print assessment results for which the proctor ' . $currentUser->getIdentifier() . ' has no access.');
+                \common_Logger::i(
+                    'Attempt to print assessment results for which the proctor '
+                        . $currentUser->getIdentifier() . ' has no access.'
+                );
+
                 continue;
             }
             $deliveryData = $assessmentResultsService->getDeliveryData($deliveryExecution);

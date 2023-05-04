@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -44,7 +45,8 @@ class RegisterWebhookEvents extends InstallAction
      * @throws \common_Exception
      * @throws InvalidServiceManagerException
      */
-    protected function registerEvents(array $eventNames) {
+    protected function registerEvents(array $eventNames)
+    {
         /** @var EventManager $eventManager */
         $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
         /** @var WebhookEventsServiceInterface $webhooksService */

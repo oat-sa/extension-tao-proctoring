@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,13 +22,11 @@
 
 namespace oat\taoProctoring\scripts\install;
 
-
 use oat\oatbox\extension\InstallAction;
 use oat\taoProctoring\model\GuiSettingsService;
 
 class RegisterGuiSettingsService extends InstallAction
 {
-
     /**
      * Configure and register the GuiSettingsService
      */

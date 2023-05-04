@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +25,7 @@ use oat\tao\model\textConverter\TextConverterService;
 
 class ProctoringTextConverter extends TextConverterService
 {
-    const SERVICE_ID = 'taoProctoring/textConverter';
+    public const SERVICE_ID = 'taoProctoring/textConverter';
 
     /**
      * Return the translation of key
@@ -36,9 +37,13 @@ class ProctoringTextConverter extends TextConverterService
         return array(
             'Assign administrator' => __('Assign administrator'),
             'Assign proctors' => __('Assign proctors'),
+            // phpcs:disable Generic.Files.LineLength
             'Please select one or more test site to manage proctors' => __('Please select one or more test site to manage proctors'),
+            // phpcs:enable Generic.Files.LineLength
             'Create Proctor' => __('Create Proctor'),
+            // phpcs:disable Generic.Files.LineLength
             'Create and authorize a proctor to the selected test sites' => __('Create and authorize a proctor to the selected test sites'),
+            // phpcs:enable Generic.Files.LineLength
             'Manage Proctors' => __('Manage Proctors'),
             'Define sub-centers' => __('Define sub-centers'),
             'The proctors will be authorized. Continue ?' => __('The proctors will be authorized. Continue ?'),
@@ -58,11 +63,9 @@ class ProctoringTextConverter extends TextConverterService
             'Proctors revoked' => __('Proctors revoked'),
             'Proctor created' => __('Proctor created'),
             'No proctors in request param' => __('No proctors in request param'),
-            'Test site %s' =>__('Test site %s'),
+            'Test site %s' => __('Test site %s'),
             'Test center saved' => __('Test center saved'),
             'Edit test center' => __('Edit test center')
         );
     }
-
-
 }

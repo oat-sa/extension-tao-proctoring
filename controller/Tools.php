@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,7 +37,6 @@ use oat\taoProctoring\model\event\DeliveryExecutionFinished;
  */
 class Tools extends SimplePageModule
 {
-
     use OntologyAwareTrait;
 
     /**
@@ -204,7 +204,8 @@ class Tools extends SimplePageModule
                     break;
                 case 'prevmonth':
                     $startDate = new \DateTime('now', new \DateTimeZone('UTC'));
-                    $startDate->sub(new \DateInterval('P'.cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y')).'D'));
+                    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y'));
+                    $startDate->sub(new \DateInterval('P' . $daysInMonth . 'D'));
                     $amount = cal_days_in_month(CAL_GREGORIAN, $startDate->format('m'), $startDate->format('Y'));
                     break;
                 default:

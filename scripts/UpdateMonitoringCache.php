@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -54,7 +55,9 @@ class UpdateMonitoringCache implements Action, ServiceLocatorAwareInterface
     public function __invoke($params)
     {
         $deliveryMonitoringService = $this->getServiceLocator()->get(DeliveryMonitoringService::SERVICE_ID);
-        $deliveryClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
+        $deliveryClass = new \core_kernel_classes_Class(
+            'http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery'
+        );
         $deliveries = $deliveryClass->getInstances(true);
 
         $deliveryExecutionService = ServiceProxy::singleton();
