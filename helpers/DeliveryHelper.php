@@ -78,17 +78,13 @@ class DeliveryHelper
     private static function createErrorMessage($deliveryExecution, $action)
     {
         if ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_FINISHED) {
-            $errorMsg = __(
-                '%s could not be %s because it is finished. Please refresh your data.',
-                $deliveryExecution->getLabel(),
-                $action
-            );
+            // phpcs:disable Generic.Files.LineLength
+            $errorMsg = __('%s could not be %s because it is finished. Please refresh your data.', $deliveryExecution->getLabel(), $action);
+            // phpcs:enable Generic.Files.LineLength
         } elseif ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_TERMINATED) {
-            $errorMsg = __(
-                '%s could not be %s because it is terminated. Please refresh your data.',
-                $deliveryExecution->getLabel(),
-                $action
-            );
+            // phpcs:disable Generic.Files.LineLength
+            $errorMsg = __('%s could not be %s because it is terminated. Please refresh your data.', $deliveryExecution->getLabel(), $action);
+            // phpcs:enable Generic.Files.LineLength
         } else {
             $errorMsg = __('%s could not be %s.', $deliveryExecution->getLabel(), $action);
         }

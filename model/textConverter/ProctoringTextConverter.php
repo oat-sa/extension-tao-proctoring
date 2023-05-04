@@ -37,13 +37,13 @@ class ProctoringTextConverter extends TextConverterService
         return array(
             'Assign administrator' => __('Assign administrator'),
             'Assign proctors' => __('Assign proctors'),
-            'Please select one or more test site to manage proctors' => __(
-                'Please select one or more test site to manage proctors'
-            ),
+            // phpcs:disable Generic.Files.LineLength
+            'Please select one or more test site to manage proctors' => __('Please select one or more test site to manage proctors'),
+            // phpcs:enable Generic.Files.LineLength
             'Create Proctor' => __('Create Proctor'),
-            'Create and authorize a proctor to the selected test sites' => __(
-                'Create and authorize a proctor to the selected test sites'
-            ),
+            // phpcs:disable Generic.Files.LineLength
+            'Create and authorize a proctor to the selected test sites' => __('Create and authorize a proctor to the selected test sites'),
+            // phpcs:enable Generic.Files.LineLength
             'Manage Proctors' => __('Manage Proctors'),
             'Define sub-centers' => __('Define sub-centers'),
             'The proctors will be authorized. Continue ?' => __('The proctors will be authorized. Continue ?'),
