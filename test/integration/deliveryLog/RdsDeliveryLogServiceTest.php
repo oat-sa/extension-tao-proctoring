@@ -22,7 +22,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
+// phpcs:disable PSR1.Files.SideEffects
 require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
+// phpcs:enable PSR1.Files.SideEffects
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\Delete\DeliveryExecutionDeleteRequest;
@@ -122,7 +124,10 @@ class RdsDeliveryLogServiceTest extends TaoPhpUnitTestRunner
             ->method('getIdentifier')
             ->willReturn($deliveryExecutionId);
 
-        $request = $this->getMockBuilder(DeliveryExecutionDeleteRequest::class)->disableOriginalConstructor()->getMock();
+        $request = $this
+            ->getMockBuilder(DeliveryExecutionDeleteRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $request
             ->method('getDeliveryExecution')
             ->willReturn($executionMock);

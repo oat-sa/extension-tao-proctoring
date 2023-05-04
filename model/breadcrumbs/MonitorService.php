@@ -83,7 +83,15 @@ class MonitorService extends ConfigurableService implements Breadcrumbs
             $deliveryId = $delivery->getUri();
             $crumb = [
                 'id' => $deliveryId,
-                'url' => _url('index', 'Monitor', 'taoProctoring', ['delivery' => $deliveryId, 'context' => $routeContext]),
+                'url' => _url(
+                    'index',
+                    'Monitor',
+                    'taoProctoring',
+                    [
+                        'delivery' => $deliveryId,
+                        'context' => $routeContext,
+                    ]
+                ),
                 'label' => $delivery->getLabel(),
             ];
 

@@ -42,12 +42,21 @@ class TestTakerUpdate
         $resource = $event->getResource();
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
 
-        $tracked = array_merge([GenerisRdf::PROPERTY_USER_FIRSTNAME, GenerisRdf::PROPERTY_USER_LASTNAME], array_map(function ($field) {
-            return $field['property']->getUri();
-        }, DeliveryHelper::getExtraFieldsProperties()));
+        $tracked = array_merge(
+            [GenerisRdf::PROPERTY_USER_FIRSTNAME, GenerisRdf::PROPERTY_USER_LASTNAME],
+            array_map(
+                function ($field) {
+                    return $field['property']->getUri();
+                },
+                DeliveryHelper::getExtraFieldsProperties()
+            )
+        );
 
 
-        if (in_array($event->getMetadataUri(), $tracked) && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::CLASS_URI_SUBJECT))) {
+        if (
+            in_array($event->getMetadataUri(), $tracked)
+            && $resource->hasType(new \core_kernel_classes_Class(TestTakerService::CLASS_URI_SUBJECT))
+        ) {
             $deliveryExecutionsData = $service->find([
                 DeliveryMonitoringService::TEST_TAKER => $resource->getUri(),
             ], []);
@@ -58,7 +67,10 @@ class TestTakerUpdate
                 $data->update(DeliveryMonitoringService::TEST_TAKER_LAST_NAME, UserHelper::getUserLastName($user));
                 $success = $service->partialSave($data);
                 if (!$success) {
-                    \common_Logger::w('monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. TestTaker data has not been changed');
+                    \common_Logger::w(
+                        'monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                            . ' could not be updated. TestTaker data has not been changed'
+                    );
                 }
             }
         }

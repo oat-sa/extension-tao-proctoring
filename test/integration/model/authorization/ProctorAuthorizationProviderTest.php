@@ -51,7 +51,9 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     {
         $prophecy = $this->prophesize(core_kernel_classes_Resource::class);
         $prophecy->getUri()->willReturn('fakeDelivery');
-        $prophecy->getOnePropertyValue(Argument::any())->willReturn(new core_kernel_classes_Resource(ProctorService::ACCESSIBLE_PROCTOR_ENABLED));
+        $prophecy
+            ->getOnePropertyValue(Argument::any())
+            ->willReturn(new core_kernel_classes_Resource(ProctorService::ACCESSIBLE_PROCTOR_ENABLED));
 
         return $prophecy->reveal();
     }
@@ -84,7 +86,11 @@ class ProctorAuthorizationProviderTest extends TaoPhpUnitTestRunner
     public function testGetAuthorizationProviderAPI()
     {
         $authorizationProvider = new ProctorAuthorizationProvider();
-        $this->assertInstanceOf(AuthorizationProvider::class, $authorizationProvider, "Check if the provider implements the authorizationProvider interface");
+        $this->assertInstanceOf(
+            AuthorizationProvider::class,
+            $authorizationProvider,
+            "Check if the provider implements the authorizationProvider interface"
+        );
     }
 
     /**

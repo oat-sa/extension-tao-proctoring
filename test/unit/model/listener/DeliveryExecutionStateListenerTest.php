@@ -72,6 +72,7 @@ class DeliveryExecutionStateListenerTest extends TestCase
         );
     }
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testUpdateRemainingTime_WhenNewDeliveryExecutionStateIsPaused_ThenRemainingTimeIsRecalculated()
     {
         $this->deliveryMonitoringServiceMock
@@ -86,7 +87,9 @@ class DeliveryExecutionStateListenerTest extends TestCase
             )
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testUpdateRemainingTime_WhenNewDeliveryExecutionStateIsNotPaused_ThenNoActionsTaken()
     {
         $this->deliveryMonitoringServiceMock
@@ -100,4 +103,5 @@ class DeliveryExecutionStateListenerTest extends TestCase
             )
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 }

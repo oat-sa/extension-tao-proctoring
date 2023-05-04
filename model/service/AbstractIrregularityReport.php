@@ -105,7 +105,10 @@ abstract class AbstractIrregularityReport extends ConfigurableService implements
 
         return $filePrefix === false
             ? Report::createFailure(__('Unable to create irregularities export for %s', $delivery->getLabel()))
-            : Report::createSuccess(__('Irregularities for "%s" successfully exported', $delivery->getLabel()), $filePrefix);
+            : Report::createSuccess(
+                __('Irregularities for "%s" successfully exported', $delivery->getLabel()),
+                $filePrefix
+            );
     }
 
     protected function getFileName(\core_kernel_classes_Resource $delivery, array $params)

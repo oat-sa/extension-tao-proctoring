@@ -32,7 +32,9 @@ use oat\generis\model\OntologyAwareTrait;
  *
  * @package oat\taoProctoring\scripts\tools
  * @author Aleksej Tikhanovich, <aleksej@taotesting.com>
- * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri --prod --mode=off`
+ * Run example: `sudo php index.php 'oat\taoProctoring\scripts\tools\UpdateProctorableStatus' $uri $uri
+ * --prod --mode=off`
+ *
  * $uri - Uri of delivery
  * --prod - Start script in production mode
  * --mode - (off|on) change proctorable status to on or off state
@@ -89,9 +91,15 @@ class UpdateProctorableStatus implements Action
                 try {
                     if (!$this->dryrun) {
                         if ($this->mode) {
-                            $delivery->editPropertyValues($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                            $delivery->editPropertyValues(
+                                $accessibleProperty,
+                                ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                            );
                         } else {
-                            $delivery->removePropertyValue($accessibleProperty, ProctorService::ACCESSIBLE_PROCTOR_ENABLED);
+                            $delivery->removePropertyValue(
+                                $accessibleProperty,
+                                ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                            );
                         }
                     }
                     $this->addReport(Report::TYPE_INFO, "Updated " . $delivery->getUri());

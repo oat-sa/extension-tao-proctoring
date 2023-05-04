@@ -47,7 +47,10 @@ class IrregularitiesExportForm extends \tao_helpers_form_FormContainer
     {
         $this->form = new \tao_helpers_form_xhtml_Form('export-form');
         $submitElt = \tao_helpers_form_FormFactory::getElement('export', 'Free');
-        $submitElt->setValue('<a href="#" class="form-submitter btn-success small"><span class="icon-export"></span> ' . __('Export') . '</a>');
+        $submitElt->setValue(
+            '<a href="#" class="form-submitter btn-success small"><span class="icon-export"></span> '
+                . __('Export') . '</a>'
+        );
 
         $this->form->setActions(array($submitElt), 'bottom');
         $this->form->setActions(array(), 'top');

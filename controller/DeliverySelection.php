@@ -80,8 +80,14 @@ class DeliverySelection extends SimplePageModule
      */
     public function index()
     {
-        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
-        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
+        $this->setData(
+            'homeUrl',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome')
+        );
+        $this->setData(
+            'logout',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout')
+        );
         $this->composeView('delivery-index', null, 'pages/index.tpl', 'tao');
     }
 

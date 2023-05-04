@@ -106,10 +106,14 @@ class DeliveryExecutionListTest extends TestCase
     {
         $this->sessionStateServiceMock = $this->createMock(SessionStateService::class);
         $this->extensionManagerMock = $this->createMock(common_ext_ExtensionsManager::class);
-        $this->testSessionConnectivityStatusServiceMock = $this->createMock(TestSessionConnectivityStatusService::class);
+        $this->testSessionConnectivityStatusServiceMock = $this->createMock(
+            TestSessionConnectivityStatusService::class
+        );
         $this->deliveryExecutionManagerServiceMock = $this->createMock(DeliveryExecutionManagerService::class);
         $deliveryExecutionMock = $this->createMock(DeliveryExecution::class);
-        $this->deliveryExecutionManagerServiceMock->method('getDeliveryExecutionById')->willReturn($deliveryExecutionMock);
+        $this->deliveryExecutionManagerServiceMock
+            ->method('getDeliveryExecutionById')
+            ->willReturn($deliveryExecutionMock);
         $this->applicationServiceMock = $this->createMock(ApplicationService::class);
         $this->proctoringExtensionMock = $this->createMock(common_ext_Extension::class);
         $this->modelMock = $this->createMock(Ontology::class);
@@ -141,8 +145,10 @@ class DeliveryExecutionListTest extends TestCase
 
     public function testAdjustDeliveryExecutionsFinished(): void
     {
-        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
-        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#'
+            . 'DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1",'
+            . '"itemCount":"2"}';
         $deliveryExecutions[] = $this->deliveryExecution;
 
         $deliveryHelperService = new DeliveryExecutionList();
@@ -162,21 +168,29 @@ class DeliveryExecutionListTest extends TestCase
         /* @noinspection PhpUnhandledExceptionInspection */
         $result = $deliveryHelperService->adjustDeliveryExecutions($deliveryExecutions);
         $this->assertSame('https://nccersso.taocloud.org/tao.rdf#i15675082249329111', $result[0]['id']);
-        $this->assertSame('https://nccersso.taocloud.org/tao.rdf#i1567505985808893', $result[0]['delivery']['uri']);
+        $this->assertSame(
+            'https://nccersso.taocloud.org/tao.rdf#i1567505985808893',
+            $result[0]['delivery']['uri']
+        );
         $this->assertSame('Delivery of Basic Test (Linear-Individual)', $result[0]['delivery']['label']);
         $this->assertSame('1567508223.829546', $result[0]['start_time']);
         $this->assertFalse($result[0]['allowExtraTime']);
         $this->assertSame('11211775', $result[0]['testTaker']['id']);
         $this->assertSame('Chobanian', $result[0]['testTaker']['test_taker_last_name']);
         $this->assertSame('Debora', $result[0]['testTaker']['test_taker_first_name']);
-        $this->assertSame('http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished', $result[0]['state']['status']);
+        $this->assertSame(
+            'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished',
+            $result[0]['state']['status']
+        );
         $this->assertSame('finished', $result[0]['state']['progress']);
     }
 
     public function testAdjustDeliveryExecutionsOnline(): void
     {
-        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
-        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1",'
+            . '"itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#'
+            . 'DeliveryExecutionStatusFinished';
         $this->deliveryExecution['last_test_taker_activity'] = '1567508648.2458';
 
         $deliveryExecutions[] = $this->deliveryExecution;
@@ -198,8 +212,10 @@ class DeliveryExecutionListTest extends TestCase
     {
         $this->deliveryExecution['test_category'] = 'http://www.nccer.org/testmodel#category_01';
         $this->deliveryExecution['test_taker'] = '12345';
-        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
-        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#'
+            . 'DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1",'
+            . '"itemCount":"2"}';
 
 
         $deliveryExecutions[] = $this->deliveryExecution;
@@ -224,7 +240,10 @@ class DeliveryExecutionListTest extends TestCase
         $this->modelMock->method('getProperty')->willReturn($this->propertyMock);
         $categoryResourceMock = $this->createMock(\core_kernel_classes_Resource::class);
         $categoryResourceMock->method('getLabel')->willReturn('CategoryLabelString');
-        $this->modelMock->method('getResource')->with('http://www.nccer.org/testmodel#category_01')->willReturn($categoryResourceMock);
+        $this->modelMock
+            ->method('getResource')
+            ->with('http://www.nccer.org/testmodel#category_01')
+            ->willReturn($categoryResourceMock);
         $this->propertyMock->method('getLabel')->willReturn('labelString');
 
         //Execute
@@ -236,8 +255,10 @@ class DeliveryExecutionListTest extends TestCase
 
     public function testAdjustDeliveryExecutionsProgressStringWithNoOption(): void
     {
-        $this->deliveryExecution['current_assessment_item'] = '{"title":"in progress","itemPosition":"1","itemCount":"2"}';
-        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusActive';
+        $this->deliveryExecution['current_assessment_item'] = '{"title":"in progress","itemPosition":"1",'
+            . '"itemCount":"2"}';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#'
+            . 'DeliveryExecutionStatusActive';
         $deliveryExecutions[] = $this->deliveryExecution;
 
         $this->sessionStateServiceMock->method('hasOption')->willReturn(false);
@@ -258,7 +279,8 @@ class DeliveryExecutionListTest extends TestCase
     {
         //Prepare
         $this->deliveryExecution['current_assessment_item'] = '{"title":"finished","itemPosition":"1","itemCount":"2"}';
-        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusFinished';
+        $this->deliveryExecution['status'] = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#'
+            . 'DeliveryExecutionStatusFinished';
         $deliveryExecutions[] = $this->deliveryExecution;
         $this->sessionStateServiceMock->method('hasOption')->willReturn(true);
         $this->sessionStateServiceMock->method('getOption')->willReturn('%s');

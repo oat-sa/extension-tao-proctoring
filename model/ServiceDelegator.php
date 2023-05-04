@@ -46,7 +46,9 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
             /** @var DelegatedServiceHandler $handler */
             foreach ($this->getOption(self::SERVICE_HANDLERS) as $handler) {
                 if (!is_a($handler, DelegatedServiceHandler::class)) {
-                    throw new \common_exception_NoImplementation('Handler should be instance of DelegatorServiceHandler.');
+                    throw new \common_exception_NoImplementation(
+                        'Handler should be instance of DelegatorServiceHandler.'
+                    );
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
                 if ($handler->isSuitable($user, $deliveryId)) {

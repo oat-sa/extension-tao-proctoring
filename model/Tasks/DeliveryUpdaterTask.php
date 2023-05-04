@@ -69,7 +69,10 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
             $data->update(DeliveryMonitoringService::DELIVERY_NAME, $metadataValue);
             $success = $service->partialSave($data);
             if (!$success) {
-                \common_Logger::w('Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
+                \common_Logger::w(
+                    'Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                        . ' could not be updated. Label has not been changed'
+                );
             }
         }
         return true;

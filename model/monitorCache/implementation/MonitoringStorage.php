@@ -256,7 +256,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
      *   <li>string `$options['order']='id ASC numeric'`</li>
      *   <li>integer `$options['limit']=null`</li>
      *   <li>integer `$options['offset']=0`</li>
-     *   <li>integer `$options['asArray']=false` whether data should be returned as multidimensional or as array of `DeliveryMonitoringData` instances</li>
+     *   <li>integer `$options['asArray']=false` whether data should be returned as multidimensional or as array of
+     *                                           `DeliveryMonitoringData` instances</li>
      * </ul>
      * @param boolean $together - whether the secondary data should be fetched together with primary.
      * @return DeliveryMonitoringData[]
@@ -315,7 +316,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
             $result = $data;
         } else {
             foreach ($data as $row) {
-                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution(
+                    $row[self::COLUMN_DELIVERY_EXECUTION_ID]
+                );
                 $result[] = $this->buildData($deliveryExecution, $row);
             }
         }
@@ -476,7 +479,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
 
         $stmt = $this->getPersistence()->query($query, $params);
         $existent = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $existent = array_combine(array_column($existent, self::KV_COLUMN_KEY), array_column($existent, self::KV_COLUMN_VALUE));
+        $existent = array_combine(
+            array_column($existent, self::KV_COLUMN_KEY),
+            array_column($existent, self::KV_COLUMN_VALUE)
+        );
         $dataToBeInserted = [];
         $dataToBeUpdated = [];
         $kvColumns = $this->getKvColumns();
@@ -569,9 +575,11 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                    on kv_case.parent_id = t.delivery_execution_id';
         foreach ($kvColumns as $kvColNum => $kvColName) {
             if ($this->getPersistence()->getPlatForm()->getName() == 'postgresql') {
-                $this->selectColumns[] = 'string_agg(case when kv_case.monitoring_key = \'' . $kvColName . '\' then kv_case.monitoring_value else \'\' end,\'\') as "' . $kvColName . '"';
+                $this->selectColumns[] = 'string_agg(case when kv_case.monitoring_key = \'' . $kvColName
+                    . '\' then kv_case.monitoring_value else \'\' end,\'\') as "' . $kvColName . '"';
             } else {
-                $this->selectColumns[] = 'GROUP_CONCAT(case when kv_case.monitoring_key = \'' . $kvColName . '\' then kv_case.monitoring_value else \'\' end SEPARATOR \'\' ) as `' . $kvColName . '`';
+                $this->selectColumns[] = 'GROUP_CONCAT(case when kv_case.monitoring_key = \'' . $kvColName
+                    . '\' then kv_case.monitoring_value else \'\' end SEPARATOR \'\' ) as `' . $kvColName . '`';
             }
         }
     }
@@ -586,7 +594,10 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $cache = $this->getServiceLocator()->get(PersistenceManager::SERVICE_ID)->getPersistenceById('cache');
         $key = self::class . '_KvColumns';
         if (!$cache->exists($key)) {
-            $kvColumns = $this->getPersistence()->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')->fetchAll(\PDO::FETCH_COLUMN);
+            $kvColumns = $this
+                ->getPersistence()
+                ->query('SELECT DISTINCT monitoring_key FROM kv_delivery_monitoring')
+                ->fetchAll(\PDO::FETCH_COLUMN);
             //remove columns which presented in primary columns list
             $cache->set($key, json_encode($kvColumns));
         } else {
@@ -622,8 +633,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $colName = $ruleParts[1];
                 $joinNum = count($this->joins);
                 $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum 
-                                  ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . "
-                                  AND kv_t_$joinNum.monitoring_key = ?";
+                    ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID . "
+                    AND kv_t_$joinNum.monitoring_key = ?";
                 $this->queryParams[] = $colName;
                 $this->selectColumns[] = "kv_t_$joinNum.monitoring_value as $colName";
                 $this->groupColumns[] = "kv_t_$joinNum.monitoring_value";
@@ -734,7 +745,12 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $whereClause = '';
 
         //if condition is [ [ key => val ] ] then flatten to [ key => val ]
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer') {
+        if (
+            is_array($condition)
+            && count($condition) === 1
+            && is_array(current($condition))
+            && gettype(array_keys($condition)[0]) == 'integer'
+        ) {
             $condition = current($condition);
         }
 
@@ -763,7 +779,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $op = 'IN (' . join(',', array_map(function () {
                     return '?';
                 }, $value)) . ')';
-            } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)) {
+            } elseif (
+                preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', $value, $matches)
+            ) {
                 if (!empty($matches[1]) && preg_grep('/' . $matches[1] . '/i', ['like','ilike'])) {
                     $toLower = true;
                     $op = 'LIKE';
@@ -786,7 +804,8 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 $whereClause .= $toLower ? "LOWER(kv_t_$joinNum.monitoring_value)" : "kv_t_$joinNum.monitoring_value";
                 $whereClause .= " $op) ";
 
-                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum." . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
+                $this->joins[] = "LEFT JOIN " . self::KV_TABLE_NAME . " kv_t_$joinNum ON kv_t_$joinNum."
+                    . self::KV_COLUMN_PARENT_ID . " = t." . self::COLUMN_DELIVERY_EXECUTION_ID;
                 $parameters[] = trim($key);
             }
 
@@ -955,10 +974,15 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $queryBuilder->select('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $queryBuilder->addSelect('count(' . $conn->quoteIdentifier('s_' . $label) . '.status) as ' . $conn->quoteIdentifier($label));
+            $queryBuilder->addSelect(
+                'count(' . $conn->quoteIdentifier('s_' . $label) . '.status) as ' . $conn->quoteIdentifier($label)
+            );
         }
 
-        $queryBuilder->addSelect('max(' . $conn->quoteIdentifier('last_launch') . '.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
+        $queryBuilder->addSelect(
+            'max(' . $conn->quoteIdentifier('last_launch') . '.start_time) as '
+                . $conn->quoteIdentifier(__('Last launch'))
+        );
 
         $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
@@ -969,8 +993,9 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
                 'delivery_m',
                 self::TABLE_NAME,
                 $conn->quoteIdentifier('s_' . $label),
-                'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('s_' . $label) . '.delivery_execution_id and '
-                . $conn->quoteIdentifier('s_' . $label) . '.status = :status_uri_' . $statusNum
+                'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('s_' . $label)
+                    . '.delivery_execution_id and ' . $conn->quoteIdentifier('s_' . $label)
+                    . '.status = :status_uri_' . $statusNum
             );
             $paramsValues[':status_uri_' . $statusNum] = $statusUri;
             $statusNum++;
@@ -1004,9 +1029,14 @@ class MonitoringStorage extends ConfigurableService implements DeliveryMonitorin
         $outerQueryBuilder->select('delivery_name as label, delivery_id');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $outerQueryBuilder->addSelect('sum(' . $conn->quoteIdentifier($label) . ') as ' . $conn->quoteIdentifier($label));
+            $outerQueryBuilder->addSelect(
+                'sum(' . $conn->quoteIdentifier($label) . ') as ' . $conn->quoteIdentifier($label)
+            );
         }
-        $outerQueryBuilder->addSelect('max(' . $conn->quoteIdentifier(__('Last launch')) . ') as ' .  $conn->quoteIdentifier(__('Last launch')));
+        $outerQueryBuilder->addSelect(
+            'max(' . $conn->quoteIdentifier(__('Last launch')) . ') as '
+            .  $conn->quoteIdentifier(__('Last launch'))
+        );
         $outerQueryBuilder->from('(' . $queryBuilder->getSQL() . ')', 'delivery_statuses');
         $outerQueryBuilder->groupBy('delivery_id, label');
         $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);

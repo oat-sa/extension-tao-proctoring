@@ -50,6 +50,7 @@ class TestSessionServiceTest extends TestCase
         $this->subject = new TestSessionService();
     }
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetSmallestMaxTimeConstraint_NoConstraints_ReturnsNull(): void
     {
         $this->testSessionMock->method('getTimeConstraints')
@@ -60,7 +61,9 @@ class TestSessionServiceTest extends TestCase
             'Method must return correct response in case session does not have time constraints.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetSmallestMaxTimeConstraint_NoConstraintsWithMaximumRemainingTime_ReturnsNull(): void
     {
         $timeConstraintSession = $this->mockQtiTimeConstraint(false);
@@ -75,7 +78,9 @@ class TestSessionServiceTest extends TestCase
             'Method must return correct response in case constraints do not have max time limits.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetSmallestMaxTimeConstraint_OneConstraintWithMaximumRemainingTime(): void
     {
         $timeConstraintSession = $this->mockQtiTimeConstraint(false);
@@ -97,7 +102,9 @@ class TestSessionServiceTest extends TestCase
             'Method must return correct response in case there is one constraint with max time limit.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetSmallestMaxTimeConstraint_MultipleConstraintsWithMaximumRemainingTime(): void
     {
         $timeConstraintTest = $this->mockQtiTimeConstraint($this->mockQtiDuration(600));
@@ -119,6 +126,7 @@ class TestSessionServiceTest extends TestCase
             'Method must return correct response in case there multiple constraints with max time limit.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
     /**
      * @param int $maxRemainingTime

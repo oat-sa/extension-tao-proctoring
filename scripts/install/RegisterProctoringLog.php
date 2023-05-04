@@ -40,11 +40,23 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             $tableLog = $schema->createTable(RdsDeliveryLogService::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
             $tableLog->addColumn(RdsDeliveryLogService::ID, "integer", array("autoincrement" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
             $tableLog->addColumn(RdsDeliveryLogService::EVENT_ID, "string", array("notnull" => true, "length" => 255));
             $tableLog->addColumn(RdsDeliveryLogService::DATA, "text", array("notnull" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_AT, "string", array("notnull" => true, "length" => 255));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_BY, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_AT,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_BY,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
 
             $tableLog->setPrimaryKey(array(RdsDeliveryLogService::ID));
 

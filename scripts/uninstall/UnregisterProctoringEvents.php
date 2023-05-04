@@ -41,15 +41,36 @@ class UnregisterProctoringEvents extends UninstallAction
     public function __invoke($params)
     {
 
-        $this->unregisterEvent(DeliveryExecutionState::class, [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']);
-        $this->unregisterEvent(DeliveryExecutionCreated::class, [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']);
-        $this->unregisterEvent(MetadataModified::class, [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']);
-        $this->unregisterEvent(TestChangedEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']);
-        $this->unregisterEvent(QtiTestStateChangeEvent::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']);
-        $this->unregisterEvent(AuthorizationGranted::EVENT_NAME, [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']);
+        $this->unregisterEvent(
+            DeliveryExecutionState::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'executionStateChanged']
+        );
+        $this->unregisterEvent(
+            DeliveryExecutionCreated::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'executionCreated']
+        );
+        $this->unregisterEvent(
+            MetadataModified::class,
+            [DeliveryMonitoringService::SERVICE_ID, 'deliveryLabelChanged']
+        );
+        $this->unregisterEvent(
+            TestChangedEvent::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'testStateChanged']
+        );
+        $this->unregisterEvent(
+            QtiTestStateChangeEvent::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'qtiTestStatusChanged']
+        );
+        $this->unregisterEvent(
+            AuthorizationGranted::EVENT_NAME,
+            [DeliveryMonitoringService::SERVICE_ID, 'deliveryAuthorized']
+        );
         $this->unregisterEvent(MetadataModified::class, [TestTakerUpdate::class, 'propertyChange']);
 
-        $this->unregisterEvent(TestExecutionPausedEvent::class, [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']);
+        $this->unregisterEvent(
+            TestExecutionPausedEvent::class,
+            [DeliveryExecutionStateService::SERVICE_ID, 'catchSessionPause']
+        );
 
         $this->unregisterEvent(QtiTestStateChangeEvent::class, [DeliveryHelper::class, 'testStateChanged']);
     }

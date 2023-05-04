@@ -99,7 +99,10 @@ class ProctoredSectionPauseService extends SectionPauseService
             if (!is_null($session)) {
                 $user = \common_session_SessionManager::getSession()->getUser();
                 $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($session->getSessionId());
-                $this->isProctored = $this->getServiceManager()->get(TestTakerAuthorizationService::SERVICE_ID)->isProctored($deliveryExecution->getDelivery(), $user);
+                $this->isProctored = $this
+                    ->getServiceManager()
+                    ->get(TestTakerAuthorizationService::SERVICE_ID)
+                    ->isProctored($deliveryExecution->getDelivery(), $user);
             }
         }
         return $this->isProctored;

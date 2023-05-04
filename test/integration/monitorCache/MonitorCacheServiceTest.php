@@ -22,7 +22,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
+// phpcs:disable PSR1.Files.SideEffects
 require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
+// phpcs:enable PSR1.Files.SideEffects
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\test\integration\monitorCache\helpers\MonitorCacheServiceThread;

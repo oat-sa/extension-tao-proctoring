@@ -36,7 +36,9 @@ class RegisterDeleteDeliveryExecution extends InstallAction
     {
         /** @var DeliveryExecutionDeleteService $executionDeleteService */
         $executionDeleteService = $this->getServiceLocator()->get(DeliveryExecutionDeleteService::SERVICE_ID);
-        $previousServices       = $executionDeleteService->getOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES);
+        $previousServices = $executionDeleteService->getOption(
+            DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES
+        );
 
         $executionDeleteService->setOption(
             DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,

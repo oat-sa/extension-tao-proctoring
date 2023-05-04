@@ -54,8 +54,10 @@ class DeliveryExecutionStateListener extends ConfigurableService
         $testSession = $this->getTestSession($deliveryExecution);
         if (empty($testSession)) {
             $this->logWarning(
-                'monitor cache for delivery ' . $executionId . ' could not be updated. Test session could not be retrieved'
+                'monitor cache for delivery ' . $executionId
+                    . ' could not be updated. Test session could not be retrieved'
             );
+
             return;
         }
         $testSession->setTimerTarget(TimePoint::TARGET_SERVER);

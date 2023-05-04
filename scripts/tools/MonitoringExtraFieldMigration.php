@@ -128,7 +128,9 @@ class MonitoringExtraFieldMigration extends ScriptAction
     private function validateMigrationCanBeDone(): void
     {
         if (!$this->monitoringService instanceof MonitoringRepository) {
-            throw new Exception('DeliveryMonitoringService is not implementing MonitoringRepository. Migration aborted');
+            throw new Exception(
+                'DeliveryMonitoringService is not implementing MonitoringRepository. Migration aborted'
+            );
         }
 
         $table = $this->monitoringService
@@ -139,7 +141,12 @@ class MonitoringExtraFieldMigration extends ScriptAction
             ->getTable(MonitoringRepository::TABLE_NAME);
 
         if (!$table->hasColumn(MonitoringRepository::COLUMN_EXTRA_DATA)) {
-            throw new Exception(sprintf('Column %s does not exist. Migration aborted', MonitoringRepository::COLUMN_EXTRA_DATA));
+            throw new Exception(
+                sprintf(
+                    'Column %s does not exist. Migration aborted',
+                    MonitoringRepository::COLUMN_EXTRA_DATA
+                )
+            );
         }
     }
 
@@ -168,7 +175,8 @@ class MonitoringExtraFieldMigration extends ScriptAction
 
         $deliveryExecutions = [];
         foreach ($unorderedDeliveryExecutions as $deliveryExecution) {
-            $deliveryExecutions[$deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]] = $deliveryExecution;
+            $key = $deliveryExecution->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
+            $deliveryExecutions[$key] = $deliveryExecution;
         }
 
         // Moving percentage

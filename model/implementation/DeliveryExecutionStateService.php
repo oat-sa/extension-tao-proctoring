@@ -52,7 +52,8 @@ use Symfony\Component\Lock\Lock;
  * @package oat\taoProctoring\model
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  */
-class DeliveryExecutionStateService extends AbstractStateService implements \oat\taoProctoring\model\DeliveryExecutionStateService
+class DeliveryExecutionStateService extends AbstractStateService implements
+    \oat\taoProctoring\model\DeliveryExecutionStateService
 {
     use LoggerAwareTrait;
     use LockTrait;
@@ -247,7 +248,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
-        if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
+        if (
+            ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState
+            && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState
+        ) {
             $proctor = SessionManager::getSession()->getUser();
             $eventManager = $this->getServiceManager()->get(EventManager::CONFIG_ID);
 
@@ -318,7 +322,10 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
         $executionState = $deliveryExecution->getState()->getUri();
         $result = false;
 
-        if (ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState) {
+        if (
+            ProctoredDeliveryExecution::STATE_TERMINATED !== $executionState
+            && ProctoredDeliveryExecution::STATE_FINISHED !== $executionState
+        ) {
             $session = $this->getTestSessionService()->getTestSession($deliveryExecution);
             $data = [
                 'reason' => $reason,
@@ -334,7 +341,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 }
                 $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID)->persist($session->getSessionId());
             }
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_PAUSE, $data);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_PAUSE,
+                $data
+            );
             $result = true;
         }
         $this->releaseExecution($deliveryExecution);
@@ -393,10 +404,17 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'timestamp' => microtime(true),
                 'context' => $this->getContext($deliveryExecution),
             ];
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryLogEvent::EVENT_ID_TEST_CANCEL, $data);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryLogEvent::EVENT_ID_TEST_CANCEL,
+                $data
+            );
             $result = $this->setState($deliveryExecution, ProctoredDeliveryExecution::STATE_CANCELED);
         } else {
-            $this->logNotice('Attempt to cancel delivery execution ' . $deliveryExecution->getIdentifier() . ' with initialized test session.');
+            $this->logNotice(
+                'Attempt to cancel delivery execution ' . $deliveryExecution->getIdentifier()
+                    . ' with initialized test session.'
+            );
             $result = false;
         }
 
@@ -607,7 +625,11 @@ class DeliveryExecutionStateService extends AbstractStateService implements \oat
                 'context' => $this->getContext($deliveryExecution),
             ];
 
-            $this->getDeliveryLogService()->log($deliveryExecution->getIdentifier(), DeliveryExecutionReactivated::LOG_KEY, $logData);
+            $this->getDeliveryLogService()->log(
+                $deliveryExecution->getIdentifier(),
+                DeliveryExecutionReactivated::LOG_KEY,
+                $logData
+            );
         }
         $this->releaseExecution($deliveryExecution);
         return $result;

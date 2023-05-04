@@ -60,7 +60,9 @@ class AssessmentResultsService extends ConfigurableService
      */
     public function getTestTakerData(DeliveryExecutionInterface $deliveryExecution)
     {
-        $data = $this->getResultService($deliveryExecution->getDelivery())->getTestTakerData($deliveryExecution->getIdentifier());
+        $data = $this
+            ->getResultService($deliveryExecution->getDelivery())
+            ->getTestTakerData($deliveryExecution->getIdentifier());
         $result = $this->propertiesToArray($data);
         return $result;
     }
@@ -99,7 +101,10 @@ class AssessmentResultsService extends ConfigurableService
         $result = [];
         $resultService = $this->getResultService($deliveryExecution->getDelivery());
 
-        $itemsData = $resultService->getItemVariableDataFromDeliveryResult($deliveryExecution->getIdentifier(), 'lastSubmitted');
+        $itemsData = $resultService->getItemVariableDataFromDeliveryResult(
+            $deliveryExecution->getIdentifier(),
+            'lastSubmitted'
+        );
 
         foreach ($itemsData as $itemData) {
             $rawResult = [];

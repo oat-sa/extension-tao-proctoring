@@ -29,16 +29,17 @@ use oat\taoProctoring\model\ProctorService;
  *
  * Implementation of RdsUserImportService to import proctor resource from a CSV
  *
-`
-$userImporter = $this->getServiceLocator()->get(UserCsvImporterFactory::SERVICE_ID);
-$importer = $userImporter->getImporter(CsvProctorImporter::USER_IMPORTER_TYPE);
-$report = $importer->import($filePath);
-`
+ * `
+ * $userImporter = $this->getServiceLocator()->get(UserCsvImporterFactory::SERVICE_ID);
+ * $importer = $userImporter->getImporter(CsvProctorImporter::USER_IMPORTER_TYPE);
+ * $report = $importer->import($filePath);
+ * `
  *
  * or by command line:
-`
-sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t proctor -f tao/test/user/import/example.csv
-`
+ * `
+ * sudo -u www-data php index.php 'oat\tao\scripts\tools\import\ImportUsersCsv' -t proctor -f
+ * tao/test/user/import/example.csv
+ * `
  *
  */
 class ProctorCsvImporter extends RdsUserImportService

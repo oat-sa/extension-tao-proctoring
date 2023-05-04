@@ -22,7 +22,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
+// phpcs:disable PSR1.Files.SideEffects
 require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
+// phpcs:enable PSR1.Files.SideEffects
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -77,7 +79,12 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
 
         $deliveryExecution = $this->getDeliveryExecution();
 
-        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
+        $data = new DeliveryMonitoringData(
+            $deliveryExecution,
+            [
+                DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            ]
+        );
         $data->setServiceLocator($this->getServiceManagerProphecy());
         foreach ($columns as $columnKey => $columnVal) {
             $data->addValue($columnKey, $columnVal);
@@ -92,10 +99,18 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testAddValue()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
+        $data = new DeliveryMonitoringData(
+            $deliveryExecution,
+            [
+                DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            ]
+        );
         $data->setServiceLocator($this->getServiceManagerProphecy());
 
-        $this->assertEquals($data->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID], $deliveryExecution->getIdentifier());
+        $this->assertEquals(
+            $data->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID],
+            $deliveryExecution->getIdentifier()
+        );
 
         $data->addValue('new_value', 'value');
         $this->assertEquals($data->get()['new_value'], 'value');
@@ -112,7 +127,12 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     public function testValidate()
     {
         $deliveryExecution = $this->getDeliveryExecution();
-        $data = new DeliveryMonitoringData($deliveryExecution, [DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier()]);
+        $data = new DeliveryMonitoringData(
+            $deliveryExecution,
+            [
+                DeliveryMonitoringService::DELIVERY_EXECUTION_ID => $deliveryExecution->getIdentifier(),
+            ]
+        );
         $data->setServiceLocator($this->getServiceManagerProphecy());
         $this->assertFalse($data->validate());
         $errors = $data->getErrors();
@@ -141,7 +161,11 @@ class DeliveryMonitoringDataTest extends TaoPhpUnitTestRunner
     {
         $deliveryExecution = $this->object->getDeliveryExecution();
 
-        $this->assertInstanceOf(DeliveryExecutionInterface::class, $deliveryExecution, 'Method must return an instance of expected interface.');
+        $this->assertInstanceOf(
+            DeliveryExecutionInterface::class,
+            $deliveryExecution,
+            'Method must return an instance of expected interface.'
+        );
     }
 
     public function testSetDeliveryExecutionContext()

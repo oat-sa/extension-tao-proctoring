@@ -79,7 +79,12 @@ class Monitor extends SimplePageModule
     protected function getViewData()
     {
         $user = \common_session_SessionManager::getSession()->getUser();
-        $hasAccessToReactivate = AclProxy::hasAccess($user, MonitorProctorAdministrator::class, 'reactivateExecutions', array());
+        $hasAccessToReactivate = AclProxy::hasAccess(
+            $user,
+            MonitorProctorAdministrator::class,
+            'reactivateExecutions',
+            []
+        );
         $delivery = $this->getCurrentDelivery();
         /** @var GuiSettingsService $guiSettingsService */
         $guiSettingsService = $this->getServiceLocator()->get(GuiSettingsService::SERVICE_ID);
@@ -89,11 +94,21 @@ class Monitor extends SimplePageModule
             'set' => [],
             'extrafields' => DeliveryHelper::getExtraFields(),
             'categories' => DeliveryHelper::getAllReasonsCategories($hasAccessToReactivate),
-            'printReportButton' => $assessmentResultsService->getOption(AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON),
+            'printReportButton' => $assessmentResultsService->getOption(
+                AssessmentResultsService::OPTION_PRINT_REPORT_BUTTON
+            ),
             'printReportUrl' => $assessmentResultsService->getScoreReportUrlParts(),
-            'timeHandling' => $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID)->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
-            'historyUrl' => $this->getServiceLocator()->get(TestSessionHistoryService::SERVICE_ID)->getHistoryUrl($delivery),
-            'onlineStatus' => $this->getServiceLocator()->get(TestSessionConnectivityStatusService::SERVICE_ID)->hasOnlineMode(),
+            'timeHandling' => $this->getServiceLocator()
+                ->get(DeliveryExecutionStateService::SERVICE_ID)
+                ->getOption(DeliveryExecutionStateService::OPTION_TIME_HANDLING),
+            'historyUrl' => $this
+                ->getServiceLocator()
+                ->get(TestSessionHistoryService::SERVICE_ID)
+                ->getHistoryUrl($delivery),
+            'onlineStatus' => $this
+                ->getServiceLocator()
+                ->get(TestSessionConnectivityStatusService::SERVICE_ID)
+                ->hasOnlineMode(),
             'hasAccessToReactivate' => $hasAccessToReactivate
         ];
 
@@ -114,8 +129,14 @@ class Monitor extends SimplePageModule
      */
     public function index()
     {
-        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
-        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
+        $this->setData(
+            'homeUrl',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome')
+        );
+        $this->setData(
+            'logout',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout')
+        );
         $this->composeView('delivery-monitoring', null, 'pages/index.tpl', 'tao');
     }
 
@@ -309,7 +330,9 @@ class Monitor extends SimplePageModule
 
         try {
             /** @var DeliveryExecutionManagerService $deliveryExecutionManagerService */
-            $deliveryExecutionManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+            $deliveryExecutionManagerService = $this->getServiceLocator()->get(
+                DeliveryExecutionManagerService::SERVICE_ID
+            );
             $data = $deliveryExecutionManagerService->setExtraTime($deliveryExecution, $extraTime);
 
             $response = [

@@ -51,7 +51,10 @@ class ProctorServiceDelegator extends ServiceDelegator
     public function getProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $deliveryId = $delivery ? $delivery->getUri() : null;
-        return $this->getResponsibleService($proctor, $deliveryId)->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+
+        return $this
+            ->getResponsibleService($proctor, $deliveryId)
+            ->getProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 
     /**
@@ -61,6 +64,9 @@ class ProctorServiceDelegator extends ServiceDelegator
     public function countProctorableDeliveryExecutions(User $proctor, $delivery = null, $context = null, $options = [])
     {
         $deliveryId = $delivery ? $delivery->getUri() : null;
-        return $this->getResponsibleService($proctor, $deliveryId)->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
+
+        return $this
+            ->getResponsibleService($proctor, $deliveryId)
+            ->countProctorableDeliveryExecutions($proctor, $delivery, $context, $options);
     }
 }

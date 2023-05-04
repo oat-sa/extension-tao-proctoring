@@ -65,7 +65,9 @@ class IrregularityReport extends AbstractIrregularityReport
                     $exportable[] = $this->getUserName($data['created_by']);
                     $exportable[] = $this->getUserName($res['testTakerIdentifier']);
                     $exportable[] = $data['data']['reason']['reasons']['category'];
-                    $exportable[] = (isset($data['data']['reason']['reasons']['subCategory'])) ? $data['data']['reason']['reasons']['subCategory'] : '';
+                    $exportable[] = (isset($data['data']['reason']['reasons']['subCategory']))
+                        ? $data['data']['reason']['reasons']['subCategory']
+                        : '';
                     $exportable[] = $data['data']['reason']['comment'];
                     $export[] = $exportable;
                 }

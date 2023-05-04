@@ -47,7 +47,9 @@ class ProctoringDeliveryDeleteService extends DeliveryDeleteService
         foreach ($monitoringExecutions as $data) {
             try {
                 $rawData = $data->get();
-                $executions[] = $serviceProxy->getDeliveryExecution($rawData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
+                $executions[] = $serviceProxy->getDeliveryExecution(
+                    $rawData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                );
             } catch (\Exception $exception) {
                 $this->report->add(Report::createFailure($exception->getMessage()));
             }

@@ -59,7 +59,14 @@ return array(
     'author' => 'Open Assessment Technologies SA',
     'managementRole' => 'http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager',
     'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole', array('ext' => 'taoProctoring', 'mod' => 'Irregularity')),
+        [
+            'grant',
+            'http://www.tao.lu/Ontologies/TAO.rdf#GlobalManagerRole',
+            [
+                'ext' => 'taoProctoring',
+                'mod' => 'Irregularity',
+            ],
+        ],
         array('grant', ProctorService::ROLE_PROCTOR, DeliverySelection::class),
         array('grant', ProctorService::ROLE_PROCTOR, Monitor::class),
         array('grant', ProctorService::ROLE_PROCTOR, tao_actions_Breadcrumbs::class),
@@ -96,7 +103,8 @@ return array(
             MonitoringExtraFieldConfigurationMigration::class,
         ),
         'rdf' => array(
-            __DIR__ . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR . 'proctoring.rdf'
+            __DIR__ . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR
+                . 'proctoring.rdf'
         )
     ),
     'uninstall' => array(

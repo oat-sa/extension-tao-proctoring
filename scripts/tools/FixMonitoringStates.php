@@ -133,30 +133,64 @@ class FixMonitoringStates extends ScriptAction
                 $deliveryExecution->getDelivery();
                 try {
                     /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-                    $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+                    $deliveryExecutionStateService = $this->getServiceLocator()->get(
+                        DeliveryExecutionStateService::SERVICE_ID
+                    );
+
                     if ($this->withProgress && $deliveryExecutionStateService->isCancelable($deliveryExecution)) {
                         break;
                     }
                     $executionState = $deliveryExecution->getState()->getUri();
-                    if (in_array($executionState, $this->deliveryExecutionStates) && $data['status'] != $executionState) {
+
+                    if (
+                        in_array($executionState, $this->deliveryExecutionStates)
+                        && $data['status'] != $executionState
+                    ) {
                         $deliveryExecutionStatesForce = $this->deliveryExecutionStatesForce ?: $executionState;
                         if ($this->wetRun === true) {
                             if ($this->deliveryExecutionStatesForce) {
                                 $deliveryExecution->setState($this->deliveryExecutionStatesForce);
-                                $deliveryExecutionData->update(DeliveryMonitoringService::STATUS, $this->deliveryExecutionStatesForce);
+                                $deliveryExecutionData->update(
+                                    DeliveryMonitoringService::STATUS,
+                                    $this->deliveryExecutionStatesForce
+                                );
                                 $deliveryMonitoringService->save($deliveryExecutionData);
-                                $this->report->add(new Report(Report::TYPE_INFO, "{$deliveryExecution->getIdentifier()} was updated from {$data['status']} to {$deliveryExecutionStatesForce} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "{$deliveryExecution->getIdentifier()} was updated from "
+                                            . "{$data['status']} to {$deliveryExecutionStatesForce} ."
+                                    )
+                                );
                             } else {
                                 $deliveryExecutionData->update(DeliveryMonitoringService::STATUS, $executionState);
                                 $deliveryMonitoringService->save($deliveryExecutionData);
-                                $this->report->add(new Report(Report::TYPE_INFO, "{$deliveryExecution->getIdentifier()} was updated from {$data['status']} to {$executionState} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "{$deliveryExecution->getIdentifier()} was updated from "
+                                            . "{$data['status']} to {$executionState} ."
+                                    )
+                                );
                             }
                             $count++;
                         } else {
                             if ($this->deliveryExecutionStatesForce) {
-                                $this->report->add(new Report(Report::TYPE_INFO, "Will update state for {$deliveryExecution->getIdentifier()} from {$data['status']} to {$this->deliveryExecutionStatesForce} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "Will update state for {$deliveryExecution->getIdentifier()} from "
+                                            . "{$data['status']} to {$this->deliveryExecutionStatesForce} ."
+                                    )
+                                );
                             } else {
-                                $this->report->add(new Report(Report::TYPE_INFO, "Will update state for {$deliveryExecution->getIdentifier()} from {$data['status']} to {$executionState} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "Will update state for {$deliveryExecution->getIdentifier()} from "
+                                            . "{$data['status']} to {$executionState} ."
+                                    )
+                                );
                             }
 
                             $count++;
@@ -166,8 +200,20 @@ class FixMonitoringStates extends ScriptAction
                     $this->report->add(new Report(Report::TYPE_ERROR, $e->getMessage()));
                 }
             } catch (\Exception $e) {
-                $this->report->add(new Report(Report::TYPE_INFO, "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} doesn't exist."));
-                $this->report->add(new Report(Report::TYPE_INFO, "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} will be created in storage."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} doesn't "
+                            . "exist."
+                    )
+                );
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} will be "
+                            . "created in storage."
+                    )
+                );
                 $this->initExecutionData($data);
             }
         }
@@ -216,9 +262,21 @@ class FixMonitoringStates extends ScriptAction
             if ($this->wetRun === true) {
                 $kvDe = new KVDeliveryExecution($deliveryService, $data['delivery_execution_id'], $executionData);
                 $deliveryService->update($kvDe);
-                $this->report->add(new Report(Report::TYPE_INFO, "Was created execution with id state for {$data['delivery_execution_id']} and body {$executionDataJson}."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Was created execution with id state for {$data['delivery_execution_id']} and body "
+                            . "{$executionDataJson}."
+                    )
+                );
             } else {
-                $this->report->add(new Report(Report::TYPE_INFO, "Will create execution with id state for {$data['delivery_execution_id']} and body {$executionDataJson}."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Will create execution with id state for {$data['delivery_execution_id']} and body "
+                            . "{$executionDataJson}."
+                    )
+                );
             }
         }
     }

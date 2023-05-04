@@ -134,7 +134,10 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
             $lastInteraction   = $this->getLastInteractionDateTime($deliveryExecution);
 
             if ($lastInteraction === null) {
-                $this->report->add(Report::createFailure('Execution last interaction cannot be found: ' . $executionId));
+                $this->report->add(
+                    Report::createFailure('Execution last interaction cannot be found: ' . $executionId)
+                );
+
                 return false;
             }
 
@@ -171,7 +174,10 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
             $lastInteraction   = $this->getLastInteractionDateTime($deliveryExecution);
 
             if ($lastInteraction === null) {
-                $this->report->add(Report::createFailure('Execution last interaction cannot be found: ' . $executionId));
+                $this->report->add(
+                    Report::createFailure('Execution last interaction cannot be found: ' . $executionId)
+                );
+
                 return false;
             }
 
@@ -329,7 +335,9 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
      */
     private function getDeliveryEndDateProperty()
     {
-        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate ?: $this->getProperty(DeliveryAssemblyService::PROPERTY_END);
+        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate
+            ?: $this->getProperty(DeliveryAssemblyService::PROPERTY_END);
+
         return $this->propertyDeliveryEndDate;
     }
 }

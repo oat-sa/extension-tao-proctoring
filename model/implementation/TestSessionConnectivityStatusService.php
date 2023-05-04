@@ -31,7 +31,8 @@ use oat\taoProctoring\model\TestSessionConnectivityStatusService as TestSessionC
  * @author Aleh Hutnikau <hutnikau@1pt.com>
  * @package oat\taoProctoring
  */
-class TestSessionConnectivityStatusService extends ConfigurableService implements TestSessionConnectivityStatusServiceInterface
+class TestSessionConnectivityStatusService extends ConfigurableService implements
+    TestSessionConnectivityStatusServiceInterface
 {
     public const HAS_ONLINE_MODE = 'onlineMode';
 
@@ -43,7 +44,11 @@ class TestSessionConnectivityStatusService extends ConfigurableService implement
     public function isOnline($sessionId)
     {
         if (!$this->hasOnlineMode()) {
-            \common_Logger::w('Using of `oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` method which may give inaccurate result.');
+            \common_Logger::w(
+                'Using of '
+                    . '`oat\taoProctoring\model\implementation\TestSessionConnectivityStatusService::isOnline()` '
+                    . 'method which may give inaccurate result.'
+            );
         }
         $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($sessionId);
         return $deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_ACTIVE;

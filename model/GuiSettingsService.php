@@ -86,18 +86,42 @@ class GuiSettingsService extends ConfigurableService
     public function asArray()
     {
         return [
-            self::PROCTORING_REFRESH_BUTTON         => $this->hasOption(self::PROCTORING_REFRESH_BUTTON) ? $this->getOption(self::PROCTORING_REFRESH_BUTTON) : true,
-            self::PROCTORING_AUTO_REFRESH           => $this->hasOption(self::PROCTORING_AUTO_REFRESH) ? $this->getOption(self::PROCTORING_AUTO_REFRESH) : 0,
-            self::PROCTORING_ALLOW_PAUSE            => $this->hasOption(self::PROCTORING_ALLOW_PAUSE) ? $this->getOption(self::PROCTORING_ALLOW_PAUSE) : true,
-            self::OPTION_DIALOG_SETTINGS            => $this->hasOption(self::OPTION_DIALOG_SETTINGS) ? $this->getOption(self::OPTION_DIALOG_SETTINGS) : [],
-            self::OPTION_SHOW_COLUMN_FIRST_NAME     => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME) : true,
-            self::OPTION_SHOW_COLUMN_LAST_NAME      => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME) ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME) : true,
-            self::OPTION_SHOW_COLUMN_AUTHORIZE      => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE) : true,
-            self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME) : true,
-            self::OPTION_SHOW_COLUMN_EXTENDED_TIME  => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME) : true,
-            self::OPTION_SHOW_COLUMN_CONNECTIVITY   => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY) : false,
-            self::OPTION_SHOW_ACTION_SHOW_HISTORY   => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY) : true,
-            self::OPTION_SET_START_DATA_ONE_DAY     => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY) ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY) : true,
+            self::PROCTORING_REFRESH_BUTTON => $this->hasOption(self::PROCTORING_REFRESH_BUTTON)
+                ? $this->getOption(self::PROCTORING_REFRESH_BUTTON)
+                : true,
+            self::PROCTORING_AUTO_REFRESH => $this->hasOption(self::PROCTORING_AUTO_REFRESH)
+                ? $this->getOption(self::PROCTORING_AUTO_REFRESH)
+                : 0,
+            self::PROCTORING_ALLOW_PAUSE => $this->hasOption(self::PROCTORING_ALLOW_PAUSE)
+                ? $this->getOption(self::PROCTORING_ALLOW_PAUSE)
+                : true,
+            self::OPTION_DIALOG_SETTINGS => $this->hasOption(self::OPTION_DIALOG_SETTINGS)
+                ? $this->getOption(self::OPTION_DIALOG_SETTINGS)
+                : [],
+            self::OPTION_SHOW_COLUMN_FIRST_NAME => $this->hasOption(self::OPTION_SHOW_COLUMN_FIRST_NAME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_FIRST_NAME)
+                : true,
+            self::OPTION_SHOW_COLUMN_LAST_NAME => $this->hasOption(self::OPTION_SHOW_COLUMN_LAST_NAME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_LAST_NAME)
+                : true,
+            self::OPTION_SHOW_COLUMN_AUTHORIZE => $this->hasOption(self::OPTION_SHOW_COLUMN_AUTHORIZE)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_AUTHORIZE)
+                : true,
+            self::OPTION_SHOW_COLUMN_REMAINING_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_REMAINING_TIME)
+                : true,
+            self::OPTION_SHOW_COLUMN_EXTENDED_TIME => $this->hasOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_EXTENDED_TIME)
+                : true,
+            self::OPTION_SHOW_COLUMN_CONNECTIVITY => $this->hasOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY)
+                ? $this->getOption(self::OPTION_SHOW_COLUMN_CONNECTIVITY)
+                : false,
+            self::OPTION_SHOW_ACTION_SHOW_HISTORY => $this->hasOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY)
+                ? $this->getOption(self::OPTION_SHOW_ACTION_SHOW_HISTORY)
+                : true,
+            self::OPTION_SET_START_DATA_ONE_DAY => $this->hasOption(self::OPTION_SET_START_DATA_ONE_DAY)
+                ? $this->getOption(self::OPTION_SET_START_DATA_ONE_DAY)
+                : true,
         ];
     }
 }

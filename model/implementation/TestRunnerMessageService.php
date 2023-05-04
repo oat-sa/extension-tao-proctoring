@@ -71,7 +71,10 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorPausedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+        return __(
+            'The assessment has been suspended. To resume your assessment, please relaunch it and contact your '
+                . 'proctor if required.'
+        );
     }
 
     /**
@@ -81,7 +84,10 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorTerminatedStateMessage(AssessmentTestSession $testSession)
     {
-        return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+        return __(
+            'The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor '
+                . 'if required.'
+        );
     }
 
     /**

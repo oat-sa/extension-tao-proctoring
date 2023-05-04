@@ -75,7 +75,14 @@ class DeliveryServer extends DefaultDeliveryServer
         $deliveryExecutionStateService = $this->getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
         $executionState = $deliveryExecution->getState()->getUri();
 
-        $runDeliveryUrl = _url('runDeliveryExecution', null, null, array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+        $runDeliveryUrl = _url(
+            'runDeliveryExecution',
+            null,
+            null,
+            [
+                'deliveryExecution' => $deliveryExecution->getIdentifier(),
+            ]
+        );
 
         // if the test is in progress, first pause it to avoid inconsistent storage state
         if (DeliveryExecutionState::STATE_ACTIVE == $executionState) {
@@ -87,8 +94,10 @@ class DeliveryServer extends DefaultDeliveryServer
             ]);
         }
 
+        $states = [DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED];
+
         // we need to change the state of the delivery execution
-        if (!in_array($executionState, array(DeliveryExecutionState::STATE_FINISHED, DeliveryExecutionState::STATE_TERMINATED))) {
+        if (!in_array($executionState, $states)) {
             if (DeliveryExecutionState::STATE_AUTHORIZED !== $executionState) {
                 $deliveryExecutionStateService->waitExecution($deliveryExecution);
             }
@@ -96,7 +105,17 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('deliveryExecution', $deliveryExecution->getIdentifier());
             $this->setData('deliveryLabel', addslashes($deliveryExecution->getLabel()));
             $this->setData('returnUrl', $this->getReturnUrl());
-            $this->setData('cancelUrl', _url('cancelExecution', 'DeliveryServer', 'taoProctoring', ['deliveryExecution' => $deliveryExecution->getIdentifier()]));
+            $this->setData(
+                'cancelUrl',
+                _url(
+                    'cancelExecution',
+                    'DeliveryServer',
+                    'taoProctoring',
+                    [
+                        'deliveryExecution' => $deliveryExecution->getIdentifier(),
+                    ]
+                )
+            );
             $this->setData('cancelable', $deliveryExecutionStateService->isCancelable($deliveryExecution));
             $this->setData('userLabel', common_session_SessionManager::getSession()->getUserLabel());
             $this->setData('client_config_url', $this->getClientConfigUrl());
@@ -104,15 +123,26 @@ class DeliveryServer extends DefaultDeliveryServer
             $this->setData('runDeliveryUrl', $runDeliveryUrl);
 
             //set template
-            $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
-            $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
+            $this->setData(
+                'homeUrl',
+                $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome')
+            );
+            $this->setData(
+                'logout',
+                $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout')
+            );
             $this->setData('content-template', 'DeliveryServer/awaiting.tpl');
             $this->setData('content-extension', 'taoProctoring');
             $this->setData('title', __('TAO: User Authorization'));
             $this->setView('DeliveryServer/layout.tpl', 'taoDelivery');
         } else {
             // inconsistent state
-            common_Logger::i(get_called_class() . '::awaitingAuthorization(): cannot wait authorization for delivery execution ' . $deliveryExecution->getIdentifier() . ' with state ' . $executionState);
+            common_Logger::i(
+                get_called_class()
+                . '::awaitingAuthorization(): cannot wait authorization for delivery execution '
+                . $deliveryExecution->getIdentifier() . ' with state ' . $executionState
+            );
+
             return $this->redirect($this->getReturnUrl());
         }
     }
@@ -143,7 +173,10 @@ class DeliveryServer extends DefaultDeliveryServer
 
             case DeliveryExecutionState::STATE_PAUSED:
                 $success = false;
+                // phpcs:disable Generic.Files.LineLength
                 $message = __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+                // phpcs:enable Generic.Files.LineLength
+
                 break;
         }
 
@@ -167,9 +200,13 @@ class DeliveryServer extends DefaultDeliveryServer
             'reasons' => ['category' => 'Examinee', 'subCategory' => 'Navigation'],
         ];
         if ($deliveryExecution->getState()->getUri() === DeliveryExecutionState::STATE_AUTHORIZED) {
+            // phpcs:disable Generic.Files.LineLength
             $reason['comment'] = __('Automatically reset by the system due to the test taker choosing not to proceed with the authorized test.');
+        // phpcs:enable Generic.Files.LineLength
         } else {
+            // phpcs:disable Generic.Files.LineLength
             $reason['comment'] = __('Automatically reset by the system due to authorization request being cancelled by test taker.');
+            // phpcs:enable Generic.Files.LineLength
         }
         $deliveryExecutionStateService->cancelExecution(
             $deliveryExecution,

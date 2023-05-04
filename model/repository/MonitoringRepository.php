@@ -165,7 +165,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             $row = array_merge($row, $extraData);
 
             if (!$options['asArray']) {
-                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution($row[self::COLUMN_DELIVERY_EXECUTION_ID]);
+                $deliveryExecution = ServiceProxy::singleton()->getDeliveryExecution(
+                    $row[self::COLUMN_DELIVERY_EXECUTION_ID]
+                );
                 $row = $this->createMonitoringData($deliveryExecution, $row);
             }
         }
@@ -383,10 +385,15 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $queryBuilder->select('delivery_m.delivery_id, delivery_m.delivery_name');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $queryBuilder->addSelect('count(' . $conn->quoteIdentifier('s_' . $label) . '.status) as ' . $conn->quoteIdentifier($label));
+            $queryBuilder->addSelect(
+                'count(' . $conn->quoteIdentifier('s_' . $label) . '.status) as ' . $conn->quoteIdentifier($label)
+            );
         }
 
-        $queryBuilder->addSelect('max(' . $conn->quoteIdentifier('last_launch') . '.start_time) as ' . $conn->quoteIdentifier(__('Last launch')));
+        $queryBuilder->addSelect(
+            'max(' . $conn->quoteIdentifier('last_launch') . '.start_time) as '
+                . $conn->quoteIdentifier(__('Last launch'))
+        );
 
         $queryBuilder->from(self::TABLE_NAME, 'delivery_m');
 
@@ -397,8 +404,9 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 'delivery_m',
                 self::TABLE_NAME,
                 $conn->quoteIdentifier('s_' . $label),
-                'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('s_' . $label) . '.delivery_execution_id and '
-                . $conn->quoteIdentifier('s_' . $label) . '.status = :status_uri_' . $statusNum
+                'delivery_m.delivery_execution_id=' . $conn->quoteIdentifier('s_' . $label)
+                    . '.delivery_execution_id and '
+                    . $conn->quoteIdentifier('s_' . $label) . '.status = :status_uri_' . $statusNum
             );
             $paramsValues[':status_uri_' . $statusNum] = $statusUri;
             $statusNum++;
@@ -432,9 +440,14 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $outerQueryBuilder->select('delivery_name as label, delivery_id');
 
         foreach ($statusesMap as $label => $statusUri) {
-            $outerQueryBuilder->addSelect('sum(' . $conn->quoteIdentifier($label) . ') as ' . $conn->quoteIdentifier($label));
+            $outerQueryBuilder->addSelect(
+                'sum(' . $conn->quoteIdentifier($label) . ') as ' . $conn->quoteIdentifier($label)
+            );
         }
-        $outerQueryBuilder->addSelect('max(' . $conn->quoteIdentifier(__('Last launch')) . ') as ' .  $conn->quoteIdentifier(__('Last launch')));
+        $outerQueryBuilder->addSelect(
+            'max(' . $conn->quoteIdentifier(__('Last launch')) . ') as '
+                .  $conn->quoteIdentifier(__('Last launch'))
+        );
         $outerQueryBuilder->from('(' . $queryBuilder->getSQL() . ')', 'delivery_statuses');
         $outerQueryBuilder->groupBy('delivery_id, label');
         $outerQueryBuilder->orderBy($conn->quoteIdentifier($orderby), $orderdir);
@@ -614,7 +627,11 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
             if (in_array($platformName, ['mysql','sqlite'])) {
                 $setExtraDataClauses[] = sprintf('\'$.%s\', :%s', $extraDataKey, $extraDataKey);
             } else {
-                $setExtraDataClauses[] = sprintf('jsonb_build_object(\'%s\', :%s::jsonb)', $extraDataKey, $extraDataKey);
+                $setExtraDataClauses[] = sprintf(
+                    'jsonb_build_object(\'%s\', :%s::jsonb)',
+                    $extraDataKey,
+                    $extraDataKey
+                );
                 $extraDataValue = json_encode($extraDataValue);
             }
             $params[sprintf(':%s', $extraDataKey)] = $extraDataValue;
@@ -706,7 +723,12 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
         $whereClause = '';
 
         //if condition is [ [ key => val ] ] then flatten to [ key => val ]
-        if (is_array($condition) && count($condition) === 1 && is_array(current($condition)) && gettype(array_keys($condition)[0]) == 'integer') {
+        if (
+            is_array($condition)
+            && count($condition) === 1
+            && is_array(current($condition))
+            && gettype(array_keys($condition)[0]) == 'integer'
+        ) {
             $condition = current($condition);
         }
 
@@ -735,7 +757,13 @@ class MonitoringRepository extends ConfigurableService implements DeliveryMonito
                 $op = 'IN (' . join(',', array_map(function () {
                     return '?';
                 }, $value)) . ')';
-            } elseif (preg_match('/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/', (string)$value, $matches)) {
+            } elseif (
+                preg_match(
+                    '/^(?:\s*(<>|<=|>=|<|>|=|LIKE|ILIKE|NOT\sLIKE|NOT\sILIKE))?(.*)$/',
+                    (string)$value,
+                    $matches
+                )
+            ) {
                 if (!empty($matches[1]) && preg_grep('/' . $matches[1] . '/i', ['like','ilike'])) {
                     $toLower = true;
                     $op = 'LIKE';

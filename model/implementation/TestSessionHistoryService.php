@@ -88,7 +88,10 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         if (is_null($roles)) {
             $roles = [];
         }
-        $this->proctorRoles = array_merge([new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole')], $roles);
+        $this->proctorRoles = array_merge(
+            [new \core_kernel_classes_Resource('http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole')],
+            $roles
+        );
     }
 
     /**
@@ -123,8 +126,8 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 $eventName = strtolower(explode('.', $eventId)[0]);
 
                 if (
-                    (!empty($eventsToInclude) && !in_array($eventName, $eventsToInclude)) || //event should not be included
-                    in_array($eventName, self::$eventsToExclude) //event must be excluded
+                    (!empty($eventsToInclude) && !in_array($eventName, $eventsToInclude)) //event should not be included
+                    || in_array($eventName, self::$eventsToExclude) //event must be excluded
                 ) {
                     continue;
                 }
@@ -134,11 +137,20 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
                 $context = $this->getEventContext($data);
                 $role = $this->getUserRole($author);
 
-                $exportable['timestamp'] = (isset($data['data']['timestamp'])) ? $data['data']['timestamp'] : $data['created_at'];
-                if (($periodStart && $exportable['timestamp'] < $periodStart) || ($periodEnd && $exportable['timestamp'] > $periodEnd)) {
+                $exportable['timestamp'] = (isset($data['data']['timestamp']))
+                    ? $data['data']['timestamp']
+                    : $data['created_at'];
+
+                if (
+                    ($periodStart && $exportable['timestamp'] < $periodStart)
+                    || ($periodEnd && $exportable['timestamp'] > $periodEnd)
+                ) {
                     continue;
                 }
-                $exportable['date'] = DateHelper::displayeDate($exportable['timestamp'], DateHelper::FORMAT_LONG_MICROSECONDS);
+                $exportable['date'] = DateHelper::displayeDate(
+                    $exportable['timestamp'],
+                    DateHelper::FORMAT_LONG_MICROSECONDS
+                );
                 $exportable['role'] = $role;
                 $exportable['actor'] = _dh($this->getActorName($author->getUri()));
                 $exportable['event'] = $eventId;
@@ -230,7 +242,9 @@ class TestSessionHistoryService extends ConfigurableService implements TestSessi
         if (isset($data['data']['type'])) {
             $context = $data['data']['context']['readable'] ?? '';
         } else {
-            $context = (isset($data['data']['context']) && !is_null($data['data']['context'])) ? $data['data']['context'] : '';
+            $context = (isset($data['data']['context']) && !is_null($data['data']['context']))
+                ? $data['data']['context']
+                : '';
         }
         return $context;
     }

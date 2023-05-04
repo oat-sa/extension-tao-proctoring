@@ -54,8 +54,14 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
      */
     protected function getLayout()
     {
-        $this->setData('homeUrl', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome'));
-        $this->setData('logout', $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout'));
+        $this->setData(
+            'homeUrl',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringHome')
+        );
+        $this->setData(
+            'logout',
+            $this->getServiceManager()->get(DefaultUrlService::SERVICE_ID)->getUrl('ProctoringLogout')
+        );
         return ['layout.tpl', 'taoProctoring'];
     }
 
@@ -70,15 +76,33 @@ abstract class SimplePageModule extends \tao_actions_SinglePageModule
 
         $defaults = array_merge($this->getDefaultOptions(), $defaults);
 
-        $page = $this->hasRequestParameter('page') ? $this->getRequestParameter('page') : $defaults['page'];
-        $rows = $this->hasRequestParameter('rows') ? $this->getRequestParameter('rows') : $defaults['rows'];
-        $sortBy = $this->hasRequestParameter('sortby') ? $this->getRequestParameter('sortby') : $defaults['sortby'];
-        $sortOrder = $this->hasRequestParameter('sortorder') ? $this->getRequestParameter('sortorder') : $defaults['sortorder'];
-        $filter = $this->hasRequestParameter('filter') ? $this->getRequestParameter('filter') : $defaults['filter'];
-        $filterquery = $this->hasRequestParameter('filterquery') ? $this->getRequestParameter('filterquery') : $defaults['filter'];
-        $periodStart = $this->hasRequestParameter('periodStart') ? $this->getRequestParameter('periodStart') : $defaults['periodStart'];
-        $periodEnd = $this->hasRequestParameter('periodEnd') ? $this->getRequestParameter('periodEnd') : $defaults['periodEnd'];
-        $detailed = $this->hasRequestParameter('detailed') ? $this->getRequestParameter('detailed') : 'false';
+        $page = $this->hasRequestParameter('page')
+            ? $this->getRequestParameter('page')
+            : $defaults['page'];
+        $rows = $this->hasRequestParameter('rows')
+            ? $this->getRequestParameter('rows')
+            : $defaults['rows'];
+        $sortBy = $this->hasRequestParameter('sortby')
+            ? $this->getRequestParameter('sortby')
+            : $defaults['sortby'];
+        $sortOrder = $this->hasRequestParameter('sortorder')
+            ? $this->getRequestParameter('sortorder')
+            : $defaults['sortorder'];
+        $filter = $this->hasRequestParameter('filter')
+            ? $this->getRequestParameter('filter')
+            : $defaults['filter'];
+        $filterquery = $this->hasRequestParameter('filterquery')
+            ? $this->getRequestParameter('filterquery')
+            : $defaults['filter'];
+        $periodStart = $this->hasRequestParameter('periodStart')
+            ? $this->getRequestParameter('periodStart')
+            : $defaults['periodStart'];
+        $periodEnd = $this->hasRequestParameter('periodEnd')
+            ? $this->getRequestParameter('periodEnd')
+            : $defaults['periodEnd'];
+        $detailed = $this->hasRequestParameter('detailed')
+            ? $this->getRequestParameter('detailed')
+            : 'false';
         $detailed = filter_var($detailed, FILTER_VALIDATE_BOOLEAN);
 
         return array(

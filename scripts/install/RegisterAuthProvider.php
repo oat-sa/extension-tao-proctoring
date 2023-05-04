@@ -46,7 +46,9 @@ class RegisterAuthProvider extends \common_ext_action_InstallAction
             $authService->addProvider(new ProctorAuthorizationProvider());
             $this->registerService(AuthorizationService::SERVICE_ID, $authService);
         } else {
-            throw new \common_exception_Error('Incompatible AuthorizationService "' . get_class($authService) . '" found.');
+            throw new \common_exception_Error(
+                'Incompatible AuthorizationService "' . get_class($authService) . '" found.'
+            );
         }
     }
 }

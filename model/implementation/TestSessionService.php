@@ -75,10 +75,15 @@ class TestSessionService extends QtiTestSessionService
             $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
 
             if (
-                ($executionState === DeliveryExecutionState::STATE_AUTHORIZED || $executionState === DeliveryExecutionState::STATE_AWAITING)
+                (
+                    $executionState === DeliveryExecutionState::STATE_AUTHORIZED
+                    || $executionState === DeliveryExecutionState::STATE_AWAITING
+                )
                 && $deliveryExecutionStateService->isCancelable($deliveryExecution)
             ) {
-                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY);
+                $delay = $deliveryExecutionStateService->getOption(
+                    DeliveryExecutionStateService::OPTION_CANCELLATION_DELAY
+                );
                 $startedTimestamp = \tao_helpers_Date::getTimeStamp($deliveryExecution->getStartTime(), true);
                 $started = (new DateTimeImmutable())->setTimestamp($startedTimestamp);
                 if ($started->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
@@ -88,8 +93,16 @@ class TestSessionService extends QtiTestSessionService
             }
 
             $wasPausedAt = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent['created_at']);
-            if ($wasPausedAt && $deliveryExecutionStateService->hasOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE)) {
-                $delay = $deliveryExecutionStateService->getOption(DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE);
+            if (
+                $wasPausedAt
+                && $deliveryExecutionStateService->hasOption(
+                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE
+                )
+            ) {
+                $delay = $deliveryExecutionStateService->getOption(
+                    DeliveryExecutionStateService::OPTION_TERMINATION_DELAY_AFTER_PAUSE
+                );
+
                 if ($wasPausedAt->add(new DateInterval($delay)) < (new DateTimeImmutable())) {
                     self::$cache[$deliveryExecution->getIdentifier()]['expired'] = true;
 
@@ -113,7 +126,9 @@ class TestSessionService extends QtiTestSessionService
 
         $testConfig = $this->getServiceManager()->get(QtiRunnerConfig::SERVICE_ID);
         $reviewConfig = $testConfig->getConfigValue('review');
-        $displaySubsectionTitle = isset($reviewConfig['displaySubsectionTitle']) ? (bool) $reviewConfig['displaySubsectionTitle'] : true;
+        $displaySubsectionTitle = isset($reviewConfig['displaySubsectionTitle'])
+            ? (bool) $reviewConfig['displaySubsectionTitle']
+            : true;
 
         if ($session !== null) {
             if ($session->isRunning()) {
@@ -127,14 +142,26 @@ class TestSessionService extends QtiTestSessionService
                     $currentSection = $session->getCurrentAssessmentSection();
                     if ($isAdaptive) {
                         $testSessionData = $this->getTestSessionDataById($session->getSessionId());
-                        $sectionItems = $catService->getShadowTest($session, $testSessionData['compilation']['private'], $currentItem);
-                        $currentItem = $catService->getCurrentCatItemId($session, $testSessionData['compilation']['private'], $currentItem);
+                        $sectionItems = $catService->getShadowTest(
+                            $session,
+                            $testSessionData['compilation']['private'],
+                            $currentItem
+                        );
+                        $currentItem = $catService->getCurrentCatItemId(
+                            $session,
+                            $testSessionData['compilation']['private'],
+                            $currentItem
+                        );
                     } else {
                         $sectionItems = $route->getRouteItemsByAssessmentSection($currentSection)->getArrayCopy(true);
                     }
                     $positionInSection = array_search($currentItem, $sectionItems);
 
-                    $result = $this->getProgressText($currentSection->getTitle(), $positionInSection, count($sectionItems));
+                    $result = $this->getProgressText(
+                        $currentSection->getTitle(),
+                        $positionInSection,
+                        count($sectionItems)
+                    );
                 } else {
                     // we need only top section and items from there
                     $parts = $this->getMappedItems($session);
@@ -142,7 +169,12 @@ class TestSessionService extends QtiTestSessionService
                         foreach ($part['sections'] as $section) {
                             foreach ($section['items'] as $key => $item) {
                                 if ($currentItem->getAssessmentItemRef()->getIdentifier() == $key) {
-                                    $result = $this->getProgressText($section['label'], $item['positionInSection'], count($section['items']));
+                                    $result = $this->getProgressText(
+                                        $section['label'],
+                                        $item['positionInSection'],
+                                        count($section['items'])
+                                    );
+
                                     break 3;
                                 }
                             }

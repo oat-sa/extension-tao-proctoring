@@ -53,7 +53,9 @@ class DeliverySyncService extends ConfigurableService
         $proctoredByDefault = $this->isProctoredByDefault();
 
         $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), (
-            $proctoredByDefault ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+            $proctoredByDefault
+                ? ProctorService::ACCESSIBLE_PROCTOR_ENABLED
+                : ProctorService::ACCESSIBLE_PROCTOR_DISABLED
         ));
     }
 
@@ -66,8 +68,15 @@ class DeliverySyncService extends ConfigurableService
         $data = $event->jsonSerialize();
         $deliveryData = !empty($data['data']) ? $data['data'] : [];
         $delivery = $this->getResource($event->getDeliveryUri());
-        if (isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]) {
-            $delivery->editPropertyValues($this->getProperty(ProctorService::ACCESSIBLE_PROCTOR), ProctorService::ACCESSIBLE_PROCTOR_DISABLED);
+
+        if (
+            isset($deliveryData[ProctorService::ACCESSIBLE_PROCTOR])
+            && !$deliveryData[ProctorService::ACCESSIBLE_PROCTOR]
+        ) {
+            $delivery->editPropertyValues(
+                $this->getProperty(ProctorService::ACCESSIBLE_PROCTOR),
+                ProctorService::ACCESSIBLE_PROCTOR_DISABLED
+            );
         }
     }
 

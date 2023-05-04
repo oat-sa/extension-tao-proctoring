@@ -35,7 +35,9 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
     {
         $service = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::CONFIG_ID);
 
-        $this->persistence = \common_persistence_Manager::getPersistence($service->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE));
+        $this->persistence = \common_persistence_Manager::getPersistence(
+            $service->getOption(DeliveryMonitoringService::OPTION_PERSISTENCE)
+        );
 
         // Drop foreign key
         /** @var common_persistence_sql_pdo_SchemaManager $schemaManager */
@@ -59,7 +61,14 @@ class AlterDeliveryMonitoringTables extends \common_ext_action_InstallAction
         $fromSchema = clone $schema;
         try {
             $tableData = $schema->getTable(DeliveryMonitoringService::KV_TABLE_NAME);
-            $tableData->changeColumn(DeliveryMonitoringService::KV_COLUMN_PARENT_ID, array('type' => Type::getType('string'), 'notnull' => true, 'length' => 255));
+            $tableData->changeColumn(
+                DeliveryMonitoringService::KV_COLUMN_PARENT_ID,
+                [
+                    'type' => Type::getType('string'),
+                    'notnull' => true,
+                    'length' => 255,
+                ]
+            );
         } catch (SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }

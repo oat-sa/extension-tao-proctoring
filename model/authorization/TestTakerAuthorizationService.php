@@ -40,7 +40,9 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class TestTakerAuthorizationService extends ConfigurableService implements TestTakerAuthorizationInterface, DelegatedServiceHandler
+class TestTakerAuthorizationService extends ConfigurableService implements
+    TestTakerAuthorizationInterface,
+    DelegatedServiceHandler
 {
     use OntologyAwareTrait;
 
@@ -161,7 +163,15 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      */
     protected function throwUnAuthorizedException(DeliveryExecution $deliveryExecution)
     {
-        $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+        $errorPage = _url(
+            'awaitingAuthorization',
+            'DeliveryServer',
+            'taoProctoring',
+            [
+                'deliveryExecution' => $deliveryExecution->getIdentifier(),
+            ]
+        );
+
         throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
     }
 

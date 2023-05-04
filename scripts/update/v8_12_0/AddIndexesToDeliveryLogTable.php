@@ -31,7 +31,9 @@ class AddIndexesToDeliveryLogTable extends AbstractAction
     {
         $deliveryLogService = $this->getServiceLocator()->get(RdsDeliveryLogService::SERVICE_ID);
         $persistenceManager = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID);
-        $persistence = $persistenceManager->getPersistenceById($deliveryLogService->getOption(RdsDeliveryLogService::OPTION_PERSISTENCE));
+        $persistence = $persistenceManager->getPersistenceById(
+            $deliveryLogService->getOption(RdsDeliveryLogService::OPTION_PERSISTENCE)
+        );
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;

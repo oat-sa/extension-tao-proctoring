@@ -175,7 +175,12 @@ class ActivityMonitoringService extends ConfigurableService
         $userActivityService = $this->getServiceManager()->get(UserLastActivityLog::SERVICE_ID);
         $now = microtime(true);
         $filter = [
-            [UserLastActivityLog::EVENT_TIME, 'between', $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD), $now]
+            [
+                UserLastActivityLog::EVENT_TIME,
+                'between',
+                $now - $this->getOption(self::OPTION_ACTIVE_USER_THRESHOLD),
+                $now,
+            ],
         ];
         if ($role !== null) {
             $filter[] = [UserLastActivityLog::USER_ROLES, 'like', '%,' . $role . ',%'];

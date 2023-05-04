@@ -52,7 +52,9 @@ class RestoreServices extends UninstallAction
         // checks
         $authService = $this->getServiceManager()->get(AuthorizationService::SERVICE_ID);
         if (!$authService instanceof AuthorizationAggregator) {
-            throw new \common_exception_Error('Incompatible AuthorizationService "' . get_class($authService) . '" found.');
+            throw new \common_exception_Error(
+                'Incompatible AuthorizationService "' . get_class($authService) . '" found.'
+            );
         }
 
         // restore entry points
@@ -75,7 +77,10 @@ class RestoreServices extends UninstallAction
 
         // restore delivery server
         $deliveryConfig = $this->getServiceManager()->get(DeliveryServerService::SERVICE_ID)->getOptions();
-        $this->getServiceManager()->register(DeliveryServerService::SERVICE_ID, new DeliveryServerService($deliveryConfig));
+        $this->getServiceManager()->register(
+            DeliveryServerService::SERVICE_ID,
+            new DeliveryServerService($deliveryConfig)
+        );
 
         // restore authorisation provider
         $authService->unregister(ProctorAuthorizationProvider::class);

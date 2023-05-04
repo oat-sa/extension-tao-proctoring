@@ -62,7 +62,10 @@ class UpdaterDeliveryTest extends TestCase
     {
         $this->loadFixture();
 
-        $update = $this->getDeliveryUpdaterTask()->updateDeliveryLabels('http://sample/first.rdf#i1450191587554180_test_record', 'Delivery test 2');
+        $update = $this->getDeliveryUpdaterTask()->updateDeliveryLabels(
+            'http://sample/first.rdf#i1450191587554180_test_record',
+            'Delivery test 2'
+        );
         $this->assertTrue($update);
 
         $result = $this->getDeliveryMonitoringService()->find([
@@ -80,7 +83,8 @@ class UpdaterDeliveryTest extends TestCase
     {
         $data = [
             [
-                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#i1450191587554175_test_record',
+                MonitoringStorage::COLUMN_DELIVERY_EXECUTION_ID => 'http://sample/first.rdf#'
+                    . 'i1450191587554175_test_record',
                 MonitoringStorage::COLUMN_TEST_TAKER => 'test_taker_1',
                 MonitoringStorage::COLUMN_STATUS => 'active_test',
                 OntologyDeliveryExecution::PROPERTY_SUBJECT => 'http://sample/first.rdf#i1450191587554175_test_user',
@@ -90,7 +94,10 @@ class UpdaterDeliveryTest extends TestCase
         ];
 
         foreach ($data as $item) {
-            $dataModel = $this->getDeliveryMonitoringService()->getData($this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID]));
+            $dataModel = $this->getDeliveryMonitoringService()->getData(
+                $this->getDeliveryExecution($item[MonitoringStorage::DELIVERY_EXECUTION_ID])
+            );
+
             foreach ($item as $key => $val) {
                 $dataModel->addValue($key, $val);
             }
