@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-3x\n"
+"PO-Revision-Date: 2023-04-21 15:46\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: pt\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-3x\n"
+"X-Crowdin-Project-ID: 582145\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /taoProctoring/locales/en-US/proctor.rdf.po\n"
+"X-Crowdin-File-ID: 1621\n"
+"Language-Team: Portuguese, Brazilian\n"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor"
+msgstr "Profissional"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr "Administrador do Perfil"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring role"
+msgstr "O papel de Proctoring"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator role"
+msgstr "A função de Administrador Proctoring"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Test Center Administrator Role"
+msgstr "Função do administrador do centro de teste"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Test Center Administrator Role"
+msgstr "Função do administrador do centro de teste"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Test Centers Manager"
+msgstr "Gerenciador de Centros de Teste"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Test Centers Manager Role"
+msgstr "Função do Gerenciador de Centros de Teste"
+
