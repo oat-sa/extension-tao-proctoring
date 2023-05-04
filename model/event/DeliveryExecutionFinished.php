@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,14 +29,14 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
  */
 class DeliveryExecutionFinished implements WebhookSerializableEventInterface
 {
-    const EVENT_NAME = self::class;
-    const WEBHOOK_EVENT_NAME = 'DeliveryExecutionFinished';
+    public const EVENT_NAME = self::class;
+    public const WEBHOOK_EVENT_NAME = 'DeliveryExecutionFinished';
 
     /**
      * @var DeliveryExecution
      */
     private $deliveryExecution;
-    
+
     /**
      * @return string
      */
@@ -54,7 +55,7 @@ class DeliveryExecutionFinished implements WebhookSerializableEventInterface
 
     /**
      * Returns the finished delivery execution instance
-     * 
+     *
      * @return DeliveryExecution
      */
     public function getDeliveryExecution()

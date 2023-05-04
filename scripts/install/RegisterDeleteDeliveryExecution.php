@@ -19,6 +19,7 @@
  *
  *
  */
+
 namespace oat\taoProctoring\scripts\install;
 
 use oat\oatbox\extension\InstallAction;
@@ -35,9 +36,12 @@ class RegisterDeleteDeliveryExecution extends InstallAction
     {
         /** @var DeliveryExecutionDeleteService $executionDeleteService */
         $executionDeleteService = $this->getServiceLocator()->get(DeliveryExecutionDeleteService::SERVICE_ID);
-        $previousServices       = $executionDeleteService->getOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES);
+        $previousServices = $executionDeleteService->getOption(
+            DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES
+        );
 
-        $executionDeleteService->setOption(DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
+        $executionDeleteService->setOption(
+            DeliveryExecutionDeleteService::OPTION_DELETE_DELIVERY_EXECUTION_DATA_SERVICES,
             array_merge($previousServices, [
                 'taoProctoring/DeliveryLog',
                 'taoProctoring/DeliveryMonitoring',
@@ -46,5 +50,4 @@ class RegisterDeleteDeliveryExecution extends InstallAction
 
         $this->getServiceManager()->register(DeliveryExecutionDeleteService::SERVICE_ID, $executionDeleteService);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,13 +22,11 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\user\User;
 
 abstract class ServiceDelegator extends ConfigurableService implements ServiceDelegatorInterface
 {
-
     /**
      * @var ConfigurableService
      */
@@ -43,12 +42,13 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
      */
     public function getResponsibleService(User $user, $deliveryId = null)
     {
-        if (!isset($this->service))
-        {
+        if (!isset($this->service)) {
             /** @var DelegatedServiceHandler $handler */
             foreach ($this->getOption(self::SERVICE_HANDLERS) as $handler) {
                 if (!is_a($handler, DelegatedServiceHandler::class)) {
-                    throw new \common_exception_NoImplementation('Handler should be instance of DelegatorServiceHandler.');
+                    throw new \common_exception_NoImplementation(
+                        'Handler should be instance of DelegatorServiceHandler.'
+                    );
                 }
                 $handler->setServiceLocator($this->getServiceLocator());
                 if ($handler->isSuitable($user, $deliveryId)) {
@@ -84,5 +84,4 @@ abstract class ServiceDelegator extends ConfigurableService implements ServiceDe
 
         $this->setOption(self::SERVICE_HANDLERS, $handlers);
     }
-
 }

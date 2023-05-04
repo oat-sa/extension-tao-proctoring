@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,6 +17,7 @@
  *
  * Copyright (c) 2020 (original work) Open Assessment Technologies SA ;
  */
+
 declare(strict_types=1);
 
 namespace oat\taoProctoring\test\unit\model\listener;
@@ -70,6 +72,7 @@ class DeliveryExecutionStateListenerTest extends TestCase
         );
     }
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testUpdateRemainingTime_WhenNewDeliveryExecutionStateIsPaused_ThenRemainingTimeIsRecalculated()
     {
         $this->deliveryMonitoringServiceMock
@@ -84,7 +87,9 @@ class DeliveryExecutionStateListenerTest extends TestCase
             )
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testUpdateRemainingTime_WhenNewDeliveryExecutionStateIsNotPaused_ThenNoActionsTaken()
     {
         $this->deliveryMonitoringServiceMock
@@ -98,5 +103,5 @@ class DeliveryExecutionStateListenerTest extends TestCase
             )
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 }
-

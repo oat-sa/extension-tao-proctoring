@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,15 +22,15 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\oatbox\user\User;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringData;
+
 /**
  * Interface for services that manage proctor access rights
  */
 interface ProctorServiceInterface
 {
-    const SERVICE_ID = 'taoProctoring/ProctorAccess';
+    public const SERVICE_ID = 'taoProctoring/ProctorAccess';
 
     /**
      * Gets all deliveries available for a proctor

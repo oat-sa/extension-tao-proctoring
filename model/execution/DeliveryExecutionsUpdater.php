@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +19,6 @@
  */
 
 namespace oat\taoProctoring\model\execution;
-
 
 use common_report_Report as Report;
 use DateInterval;
@@ -45,17 +45,17 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
     /**
      * Action based on the time of the last delivery execution activity
      */
-    const OPTION_TTL_AS_ACTIVE = 'ttlAsActive';
+    public const OPTION_TTL_AS_ACTIVE = 'ttlAsActive';
 
     /**
      * Action based on the delivery end time
      */
-    const OPTION_USE_DELIVERY_END_TIME = 'useDeliveryEndTime';
+    public const OPTION_USE_DELIVERY_END_TIME = 'useDeliveryEndTime';
 
     /**
      * Statuses of the DE which will be updated
      */
-    const OPTION_UPDATEABLE_STATUSES = 'updateableExecutionStatuses';
+    public const OPTION_UPDATEABLE_STATUSES = 'updateableExecutionStatuses';
 
     /** @var Report */
     protected $report;
@@ -89,16 +89,16 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
         $count  = 0;
 
         foreach ($executionsMonitoringData as $datum) {
-            try{
+            try {
                 $data        = $datum->get();
                 $executionId = $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID];
-                if ($this->isBasedOnEndDateTime()){
+                if ($this->isBasedOnEndDateTime()) {
                     $deliveryID  = $data[DeliveryMonitoringService::DELIVERY_ID];
                     $endDateTime = $this->getDeliveryEndDateTime($deliveryID);
                     //if no end date time found, fallback to normal updating execution based on TTL.
-                    if (!is_null($endDateTime)){
+                    if (!is_null($endDateTime)) {
                         $updated = $this->actionBasedOnEndDate($endDateTime, $executionId);
-                        if($updated){
+                        if ($updated) {
                             $count++;
                         }
                         continue;
@@ -106,10 +106,10 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
                 }
 
                 $updated = $this->actionBasedOnTTL($executionId);
-                if($updated){
+                if ($updated) {
                     $count++;
                 }
-            }catch (\Exception $exception){
+            } catch (\Exception $exception) {
                 $this->report->add(Report::createFailure($exception->getMessage()));
             }
         }
@@ -133,8 +133,11 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
             $deliveryExecution = $this->getServiceProxy()->getDeliveryExecution($executionId);
             $lastInteraction   = $this->getLastInteractionDateTime($deliveryExecution);
 
-            if ($lastInteraction === null){
-                $this->report->add(Report::createFailure('Execution last interaction cannot be found: '. $executionId));
+            if ($lastInteraction === null) {
+                $this->report->add(
+                    Report::createFailure('Execution last interaction cannot be found: ' . $executionId)
+                );
+
                 return false;
             }
 
@@ -143,13 +146,13 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
                 return true;
             }
 
-            $this->report->add(Report::createInfo('Execution not expired yet:'. $executionId .
-                ' Last Interaction:'.$lastInteraction->format('Y-m-d H:i:s') .
-                ' Time when will expire:'.$endDateTime->format('Y-m-d H:i:s')
+            $this->report->add(Report::createInfo(
+                'Execution not expired yet:' . $executionId .
+                ' Last Interaction:' . $lastInteraction->format('Y-m-d H:i:s') .
+                ' Time when will expire:' . $endDateTime->format('Y-m-d H:i:s')
             ));
-
         } catch (\common_exception_NotFound $e) {
-            $this->report->add(Report::createFailure('Execution cannot be found: '. $executionId));
+            $this->report->add(Report::createFailure('Execution cannot be found: ' . $executionId));
             $this->report->add(Report::createFailure($e->getMessage()));
         }
 
@@ -170,14 +173,17 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
             $deliveryExecution = $this->getServiceProxy()->getDeliveryExecution($executionId);
             $lastInteraction   = $this->getLastInteractionDateTime($deliveryExecution);
 
-            if ($lastInteraction === null){
-                $this->report->add(Report::createFailure('Execution last interaction cannot be found: '. $executionId));
+            if ($lastInteraction === null) {
+                $this->report->add(
+                    Report::createFailure('Execution last interaction cannot be found: ' . $executionId)
+                );
+
                 return false;
             }
 
             $ttl = $this->getTtlAsActive();
             if ($ttl === null) {
-                $this->report->add(Report::createFailure('Execution ttl not set: '. $executionId));
+                $this->report->add(Report::createFailure('Execution ttl not set: ' . $executionId));
                 return false;
             }
 
@@ -188,16 +194,15 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
                 $this->action($deliveryExecution, $executionId);
                 return true;
             } else {
-                $this->report->add(Report::createInfo('Execution not expired yet:'. $executionId .
-                    ' Last Interaction: '.$lastInteraction->format('Y-m-d H:i:s') .
-                    ' Time when will expire: '.$timeUntilToLive->format('Y-m-d H:i:s')
+                $this->report->add(Report::createInfo(
+                    'Execution not expired yet:' . $executionId .
+                    ' Last Interaction: ' . $lastInteraction->format('Y-m-d H:i:s') .
+                    ' Time when will expire: ' . $timeUntilToLive->format('Y-m-d H:i:s')
                 ));
             }
-
         } catch (\common_exception_NotFound $e) {
-            $this->report->add(Report::createFailure('Execution cannot be found: '. $executionId));
+            $this->report->add(Report::createFailure('Execution cannot be found: ' . $executionId));
             $this->report->add(Report::createFailure($e->getMessage()));
-
         }
 
         return false;
@@ -283,7 +288,7 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
             }
         }
 
-        if (!is_null($lastTestTakersEvent)){
+        if (!is_null($lastTestTakersEvent)) {
             $lastEventTime = (new DateTimeImmutable())->setTimestamp($lastTestTakersEvent[DeliveryLog::CREATED_AT]);
         } else {
             return null;
@@ -318,7 +323,7 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
         try {
             $endDate = (string)$delivery->getUniquePropertyValue($this->getDeliveryEndDateProperty());
 
-            return (new DateTimeImmutable)->setTimestamp($endDate);
+            return (new DateTimeImmutable())->setTimestamp($endDate);
         } catch (\Exception $e) {
             return null;
         }
@@ -328,8 +333,11 @@ abstract class DeliveryExecutionsUpdater extends ConfigurableService
      * Caching property to avoid multiple generations
      * @return \core_kernel_classes_Property
      */
-    private function getDeliveryEndDateProperty() {
-        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate ?: $this->getProperty(DeliveryAssemblyService::PROPERTY_END);
+    private function getDeliveryEndDateProperty()
+    {
+        $this->propertyDeliveryEndDate = $this->propertyDeliveryEndDate
+            ?: $this->getProperty(DeliveryAssemblyService::PROPERTY_END);
+
         return $this->propertyDeliveryEndDate;
     }
 }

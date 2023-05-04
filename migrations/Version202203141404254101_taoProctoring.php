@@ -11,7 +11,6 @@ use oat\taoProctoring\model\execution\DeliveryExecutionListInterface;
 
 final class Version202203141404254101_taoProctoring extends AbstractMigration
 {
-
     public function getDescription(): string
     {
         return 'Register `DeliveryExecutionList` by interface for overriding possibility';

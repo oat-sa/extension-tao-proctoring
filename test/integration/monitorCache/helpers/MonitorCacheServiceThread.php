@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -61,7 +62,7 @@ class MonitorCacheServiceThread extends \Thread
      */
     public function run()
     {
-        require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
+        require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
 
         $deliveryExecution = $this->getDeliveryExecution();
 

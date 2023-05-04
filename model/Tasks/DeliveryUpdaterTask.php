@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2018 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoProctoring\model\Tasks;
 
 use oat\oatbox\extension\AbstractAction;
@@ -67,7 +69,10 @@ class DeliveryUpdaterTask extends AbstractAction implements \JsonSerializable
             $data->update(DeliveryMonitoringService::DELIVERY_NAME, $metadataValue);
             $success = $service->partialSave($data);
             if (!$success) {
-                \common_Logger::w('Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID] . ' could not be updated. Label has not been changed');
+                \common_Logger::w(
+                    'Monitor cache for delivery ' . $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                        . ' could not be updated. Label has not been changed'
+                );
             }
         }
         return true;

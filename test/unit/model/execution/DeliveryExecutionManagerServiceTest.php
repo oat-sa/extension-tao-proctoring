@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,6 +17,7 @@
  *
  * Copyright (c) 2020  (original work) Open Assessment Technologies SA;
  */
+
 declare(strict_types=1);
 
 namespace oat\taoProctoring\test\unit\model\execution;
@@ -208,6 +210,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         self::assertSame($expectedResult, $adjustmentResult, 'Method must return response in correct format.');
     }
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetTimerAdjustmentDecreaseLimit_CalculationFailedNoDecreaseLimit(): void
     {
         $expectedLimit = 300;
@@ -238,7 +241,9 @@ class DeliveryExecutionManagerServiceTest extends TestCase
             'Method must return correct value of maximum possible time decrease.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function testGetTimerAdjustmentDecreaseLimit_NullSmallestMaxTime(): void
     {
         $expectedLimit = -1;
@@ -261,6 +266,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
             'Method must return correct value of maximum possible time decrease.'
         );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
     public function testGetTimerAdjustmentDecreaseLimit(): void
     {
@@ -289,7 +295,8 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         );
     }
 
-    public function testAdjustedTimeWithoutTestSession(): void {
+    public function testAdjustedTimeWithoutTestSession(): void
+    {
         $pausedExecution = $this->getDeliveryExecutionMockWithState(
             DeliveryExecutionProctoring::STATE_PAUSED,
             'paused'
@@ -366,6 +373,7 @@ class DeliveryExecutionManagerServiceTest extends TestCase
         $this->assertSame(9, $this->subject->getAdjustedTime('PHPUnitDeliveryExecutionId'));
     }
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function isTimerAdjustmentAllowed_WhenSessionHasTimer_ThenReturnTrue(): void
     {
         $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
@@ -384,7 +392,9 @@ class DeliveryExecutionManagerServiceTest extends TestCase
 
         self::assertTrue($adjustmentAllowed, 'Timer adjustment must be allowed if test session has time constraint.');
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function isTimerAdjustmentAllowed_WhenIncorrectSessionStatus_ThenReturnFalse(): void
     {
         $executionState = 'INVALID_URI';
@@ -392,9 +402,14 @@ class DeliveryExecutionManagerServiceTest extends TestCase
 
         $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
 
-        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session is in incorrect state.');
+        self::assertFalse(
+            $adjustmentAllowed,
+            'Timer adjustment should not be allowed if test session is in incorrect state.'
+        );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function isTimerAdjustmentAllowed_WhenSessionNotLoaded_ThenReturnFalse(): void
     {
         $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
@@ -406,9 +421,14 @@ class DeliveryExecutionManagerServiceTest extends TestCase
 
         $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
 
-        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session cannot be loaded.');
+        self::assertFalse(
+            $adjustmentAllowed,
+            'Timer adjustment should not be allowed if test session cannot be loaded.'
+        );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
+    // phpcs:disable PSR1.Methods.CamelCapsMethodName
     public function isTimerAdjustmentAllowed_WhenSessionWithoutTimer_ThenReturnFalse(): void
     {
         $executionState = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting';
@@ -424,8 +444,12 @@ class DeliveryExecutionManagerServiceTest extends TestCase
 
         $adjustmentAllowed = $this->subject->isTimerAdjustmentAllowed($deliveryExecution);
 
-        self::assertFalse($adjustmentAllowed, 'Timer adjustment should not be allowed if test session has no time constraints.');
+        self::assertFalse(
+            $adjustmentAllowed,
+            'Timer adjustment should not be allowed if test session has no time constraints.'
+        );
     }
+    // phpcs:enable PSR1.Methods.CamelCapsMethodName
 
     /**
      * @param string $stateUri

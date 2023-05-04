@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -113,7 +114,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
             $timer = $testSession->getTimer();
         } else {
             $qtiTimerFactory = $this->getServiceLocator()->get(QtiTimerFactory::SERVICE_ID);
-            $timer = $qtiTimerFactory->getTimer($deliveryExecution->getIdentifier(), $deliveryExecution->getUserIdentifier());
+            $timer = $qtiTimerFactory->getTimer(
+                $deliveryExecution->getIdentifier(),
+                $deliveryExecution->getUserIdentifier()
+            );
         }
 
         return $timer;
@@ -235,7 +239,10 @@ class DeliveryExecutionManagerService extends ConfigurableService
                 ->save();
 
             $data->update(DeliveryMonitoringService::EXTRA_TIME, $timer->getExtraTime());
-            $data->update(DeliveryMonitoringService::CONSUMED_EXTRA_TIME, $timer->getConsumedExtraTime(null, $maxTime, $timerTarget));
+            $data->update(
+                DeliveryMonitoringService::CONSUMED_EXTRA_TIME,
+                $timer->getConsumedExtraTime(null, $maxTime, $timerTarget)
+            );
             if ($deliveryMonitoringService->save($data)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
@@ -337,7 +344,9 @@ class DeliveryExecutionManagerService extends ConfigurableService
 
                 $deliveryMonitoringService->save($data);
 
-                $eventManager->trigger(new DeliveryExecutionTimerAdjusted($deliveryExecution, $proctor, $seconds, $reason));
+                $eventManager->trigger(
+                    new DeliveryExecutionTimerAdjusted($deliveryExecution, $proctor, $seconds, $reason)
+                );
             }
 
             if ($success) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Delivery logger service configuration.
  *

@@ -37,10 +37,15 @@ class DeliveryServerServiceTest extends TestCase
     {
         $this->stateResource->expects($this->once())->method('getUri')->willReturn(DeliveryExecution::STATE_ACTIVE);
 
-        $this->deliveryExecutionStateServiceMock->expects($this->once())->method('pauseExecution')->with($this->deliveryExecutionMock, [
-            'reasons' => ['category' => 'focus-loss'],
-            'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
-        ]);
+        $this->deliveryExecutionStateServiceMock
+            ->expects($this->once())
+            ->method('pauseExecution')
+            ->with($this->deliveryExecutionMock, [
+                'reasons' => [
+                    'category' => 'focus-loss',
+                ],
+                'comment' => 'Assessment has been paused due to attempt to switch to another window/tab.',
+            ]);
         $serviceLocatorMock = $this->getServiceLocatorMock([
             DeliveryExecutionStateService::SERVICE_ID => $this->deliveryExecutionStateServiceMock
         ]);
@@ -48,7 +53,6 @@ class DeliveryServerServiceTest extends TestCase
         $service = new DeliveryServerService();
         $service->setServiceLocator($serviceLocatorMock);
         $service->revoke($this->deliveryExecutionMock);
-
     }
 
     public function testRevokePauseSession()
@@ -63,6 +67,5 @@ class DeliveryServerServiceTest extends TestCase
         $service = new DeliveryServerService();
         $service->setServiceLocator($serviceLocatorMock);
         $service->revoke($this->deliveryExecutionMock);
-
     }
 }

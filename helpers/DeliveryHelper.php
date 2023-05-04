@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -45,7 +46,6 @@ use tao_helpers_Date as DateHelper;
  */
 class DeliveryHelper
 {
-
     /**
      * Cached value for prepopulated fields
      * @var array
@@ -78,9 +78,13 @@ class DeliveryHelper
     private static function createErrorMessage($deliveryExecution, $action)
     {
         if ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_FINISHED) {
+            // phpcs:disable Generic.Files.LineLength
             $errorMsg = __('%s could not be %s because it is finished. Please refresh your data.', $deliveryExecution->getLabel(), $action);
-        } else if ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_TERMINATED) {
+            // phpcs:enable Generic.Files.LineLength
+        } elseif ($deliveryExecution->getState()->getUri() === DeliveryExecution::STATE_TERMINATED) {
+            // phpcs:disable Generic.Files.LineLength
             $errorMsg = __('%s could not be %s because it is terminated. Please refresh your data.', $deliveryExecution->getLabel(), $action);
+            // phpcs:enable Generic.Files.LineLength
         } else {
             $errorMsg = __('%s could not be %s.', $deliveryExecution->getLabel(), $action);
         }
@@ -93,9 +97,9 @@ class DeliveryHelper
         $inprogress = 0;
         $paused = 0;
         $awaiting = 0;
-        foreach($executions as $executionData) {
+        foreach ($executions as $executionData) {
             $executionState = $executionData[DeliveryMonitoringService::STATUS];
-            switch($executionState){
+            switch ($executionState) {
                 case DeliveryExecution::STATE_AWAITING:
                     $awaiting++;
                     break;
@@ -148,10 +152,17 @@ class DeliveryHelper
      * @param array $options
      * @return array
      */
-    public static function getCurrentDeliveryExecutions(core_kernel_classes_Resource $delivery, core_kernel_classes_Resource $testCenter, array $options = array())
-    {
+    public static function getCurrentDeliveryExecutions(
+        core_kernel_classes_Resource $delivery,
+        core_kernel_classes_Resource $testCenter,
+        array $options = []
+    ) {
         $deliveryService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
-        return self::adjustDeliveryExecutions($deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options), $options);
+
+        return self::adjustDeliveryExecutions(
+            $deliveryService->getCurrentDeliveryExecutions($delivery, $testCenter, $options),
+            $options
+        );
     }
 
     /**
@@ -166,10 +177,12 @@ class DeliveryHelper
     public static function authoriseExecutions($deliveryExecutions, $reason = null, $testCenter = null)
     {
         /** @var  DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
-        foreach($deliveryExecutions as $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
@@ -177,7 +190,10 @@ class DeliveryHelper
             if ($deliveryExecutionStateService->authoriseExecution($deliveryExecution, $reason, $testCenter)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
-                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('authorized'));
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage(
+                    $deliveryExecution,
+                    __('authorized')
+                );
             }
         }
 
@@ -195,7 +211,9 @@ class DeliveryHelper
     public static function terminateExecutions($deliveryExecutions, $reason = null)
     {
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach ($deliveryExecutions as $deliveryExecution) {
@@ -206,7 +224,10 @@ class DeliveryHelper
             if ($deliveryExecutionStateService->terminateExecution($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
-                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage(
+                    $deliveryExecution,
+                    __('terminated')
+                );
             }
         }
 
@@ -221,11 +242,12 @@ class DeliveryHelper
     public static function reactivateExecution($deliveryExecutions, $reason = null)
     {
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
         foreach ($deliveryExecutions as $deliveryExecution) {
-
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
@@ -233,7 +255,10 @@ class DeliveryHelper
             if ($deliveryExecutionStateService->reactivateExecution($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
-                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('terminated'));
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage(
+                    $deliveryExecution,
+                    __('terminated')
+                );
             }
         }
 
@@ -251,10 +276,12 @@ class DeliveryHelper
     public static function pauseExecutions($deliveryExecutions, $reason = null)
     {
         /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
-        foreach($deliveryExecutions as $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
@@ -264,7 +291,10 @@ class DeliveryHelper
                 if ($isPaused) {
                     $result['processed'][$deliveryExecution->getIdentifier()] = true;
                 } else {
-                    $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('paused'));
+                    $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage(
+                        $deliveryExecution,
+                        __('paused')
+                    );
                 }
             } catch (\Exception $exception) {
                 $result['unprocessed'][$deliveryExecution->getIdentifier()] = $exception->getMessage();
@@ -284,10 +314,12 @@ class DeliveryHelper
      */
     public static function reportExecutions($deliveryExecutions, $reason = null)
     {
-        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(DeliveryExecutionStateService::SERVICE_ID);
+        $deliveryExecutionStateService = ServiceManager::getServiceManager()->get(
+            DeliveryExecutionStateService::SERVICE_ID
+        );
 
         $result = [ 'processed' => [], 'unprocessed' => [] ];
-        foreach($deliveryExecutions as $deliveryExecution) {
+        foreach ($deliveryExecutions as $deliveryExecution) {
             if (is_string($deliveryExecution)) {
                 $deliveryExecution = self::getDeliveryExecutionById($deliveryExecution);
             }
@@ -295,7 +327,10 @@ class DeliveryHelper
             if ($deliveryExecutionStateService->reportExecution($deliveryExecution, $reason)) {
                 $result['processed'][$deliveryExecution->getIdentifier()] = true;
             } else {
-                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage($deliveryExecution, __('reported for irregularity'));
+                $result['unprocessed'][$deliveryExecution->getIdentifier()] = self::createErrorMessage(
+                    $deliveryExecution,
+                    __('reported for irregularity')
+                );
             }
         }
 
@@ -332,7 +367,8 @@ class DeliveryHelper
         return self::getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
     }
 
-    public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array()) {
+    public static function buildDeliveryExecutionData($deliveryExecutions, $sortOptions = array())
+    {
         return self::adjustDeliveryExecutions($deliveryExecutions, $sortOptions);
     }
 
@@ -356,7 +392,8 @@ class DeliveryHelper
      * @return array
      * @internal param array $options
      */
-    private static function adjustDeliveryExecutions($deliveryExecutions) {
+    private static function adjustDeliveryExecutions($deliveryExecutions)
+    {
         return ServiceManager::getServiceManager()->get(DeliveryExecutionListInterface::class)
             ->adjustDeliveryExecutions($deliveryExecutions);
     }
@@ -365,14 +402,17 @@ class DeliveryHelper
      * Get array of user specific extra fields to be displayed in the monitoring data table
      *
      * @return array
+     *
+     * phpcs:disable PSR2.Methods.MethodDeclaration
      */
-    private static function _getUserExtraFields(){
-        if (!self::$extraFields){
+    private static function _getUserExtraFields()
+    {
+        if (!self::$extraFields) {
             $proctoringExtension = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoProctoring');
             $userExtraFields = $proctoringExtension->getConfig('monitoringUserExtraFields');
             $userExtraFieldsSettings = $proctoringExtension->getConfig('monitoringUserExtraFieldsSettings');
-            if(!empty($userExtraFields) && is_array($userExtraFields)){
-                foreach($userExtraFields as $name => $uri){
+            if (!empty($userExtraFields) && is_array($userExtraFields)) {
+                foreach ($userExtraFields as $name => $uri) {
                     $property = new \core_kernel_classes_Property($uri);
                     $settings = array_key_exists($name, $userExtraFieldsSettings) ?
                         $userExtraFieldsSettings[$name] : [];
@@ -387,14 +427,16 @@ class DeliveryHelper
 
         return self::$extraFields;
     }
+    // phpcs:enable PSR2.Methods.MethodDeclaration
 
     /**
      * Return array of extra fields to be displayed in the monitoring data table
      *
      * @return array
      */
-    public static function getExtraFields(){
-        return array_map(function($field){
+    public static function getExtraFields()
+    {
+        return array_map(function ($field) {
             $extra = [
                 'id' => $field['id'],
                 'label' => $field['label'],
@@ -412,8 +454,9 @@ class DeliveryHelper
      *
      * @return array
      */
-    public static function getExtraFieldsProperties(){
-        return array_map(function($field){
+    public static function getExtraFieldsProperties()
+    {
+        return array_map(function ($field) {
             return array(
                 'id' => $field['id'],
                 'property' => $field['property']
@@ -427,8 +470,10 @@ class DeliveryHelper
      */
     public static function testStateChanged(QtiTestStateChangeEvent $event)
     {
-        if ($event->getPreviousState() !== AssessmentTestSessionState::INITIAL
-            && $event->getSession()->getState() === AssessmentTestSessionState::SUSPENDED) {
+        if (
+            $event->getPreviousState() !== AssessmentTestSessionState::INITIAL
+            && $event->getSession()->getState() === AssessmentTestSessionState::SUSPENDED
+        ) {
             self::setHasBeenPaused($event->getSession()->getSessionId(), true);
         }
     }
@@ -445,7 +490,7 @@ class DeliveryHelper
         /** @var DeliveryMonitoringService $deliveryMonitoringService */
         $deliveryMonitoringService = ServiceManager::getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $data = $deliveryMonitoringService->getData($deliveryExecution);
-        $status = isset($data->get()['hasBeenPaused']) ? (boolean) $data->get()['hasBeenPaused'] : false;
+        $status = isset($data->get()['hasBeenPaused']) ? (bool) $data->get()['hasBeenPaused'] : false;
         self::setHasBeenPaused($deliveryExecution, false);
         return $status;
     }
@@ -475,7 +520,8 @@ class DeliveryHelper
      * @param bool $hasAccessToReactivate
      * @return array
      */
-    public static function getAllReasonsCategories($hasAccessToReactivate = false){
+    public static function getAllReasonsCategories($hasAccessToReactivate = false)
+    {
         /** @var ReasonCategoryService $categoryService */
         $categoryService = ServiceManager::getServiceManager()->get(ReasonCategoryService::SERVICE_ID);
 

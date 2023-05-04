@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,9 @@
 
 namespace oat\taoProctoring\test\integration\monitorCache;
 
-require_once dirname(__FILE__).'/../../../../tao/includes/raw_start.php';
+// phpcs:disable PSR1.Files.SideEffects
+require_once dirname(__FILE__) . '/../../../../tao/includes/raw_start.php';
+// phpcs:enable PSR1.Files.SideEffects
 
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoProctoring\test\integration\monitorCache\helpers\MonitorCacheServiceThread;
@@ -40,7 +43,6 @@ use oat\taoProctoring\model\monitorCache\implementation\MonitorCacheService;
  */
 class MonitorCacheServiceTest extends DeliveryMonitoringServiceTest
 {
-
     public function setUp(): void
     {
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDelivery');
@@ -65,7 +67,7 @@ class MonitorCacheServiceTest extends DeliveryMonitoringServiceTest
         $fails = 0;
         $service = $this->service;
         for ($i = 0; $i < 100; $i++) {
-            $workers[$i]= new MonitorCacheServiceThread($service);
+            $workers[$i] = new MonitorCacheServiceThread($service);
             $workers[$i]->start(0);
         }
         foreach ($workers as $worker) {

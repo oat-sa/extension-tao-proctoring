@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,11 +44,13 @@ class ProctoringDeliveryDeleteService extends DeliveryDeleteService
             DeliveryMonitoringService::DELIVERY_ID => $deliveryResource->getUri()
         ]);
 
-        foreach ($monitoringExecutions as $data){
-            try{
-               $rawData = $data->get();
-               $executions[] = $serviceProxy->getDeliveryExecution($rawData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]);
-            }catch (\Exception $exception) {
+        foreach ($monitoringExecutions as $data) {
+            try {
+                $rawData = $data->get();
+                $executions[] = $serviceProxy->getDeliveryExecution(
+                    $rawData[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
+                );
+            } catch (\Exception $exception) {
                 $this->report->add(Report::createFailure($exception->getMessage()));
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,6 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\oatbox\user\User;
 
 interface ServiceDelegatorInterface
@@ -29,7 +29,7 @@ interface ServiceDelegatorInterface
     /**
      * Services which could handle the request
      */
-    const SERVICE_HANDLERS = 'handlers';
+    public const SERVICE_HANDLERS = 'handlers';
 
     /**
      * Returns applicable service

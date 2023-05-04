@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +19,7 @@
  *
  *
  */
+
 namespace oat\taoProctoring\model\entrypoint;
 
 use oat\oatbox\Configurable;
@@ -25,25 +27,28 @@ use oat\tao\model\entryPoint\Entrypoint;
 
 class ProctoringDeliveryServer extends Configurable implements Entrypoint
 {
-
-    public function getId() {
+    public function getId()
+    {
         return 'proctoringDelivery';
     }
-    
-    public function getTitle() {
+
+    public function getTitle()
+    {
         return __('Proctored Test-Takers');
     }
-    
-    public function getLabel() {
+
+    public function getLabel()
+    {
         return __('Proctored Delivery Server');
     }
-    
-    public function getDescription() {
+
+    public function getDescription()
+    {
         return __('Take or continue a test controlled by a proctor');
     }
-    
-    public function getUrl() {
+
+    public function getUrl()
+    {
         return _url("index", "DeliveryServer", "taoProctoring");
     }
-
 }

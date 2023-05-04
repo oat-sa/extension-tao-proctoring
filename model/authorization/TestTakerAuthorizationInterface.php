@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +22,6 @@
 
 namespace oat\taoProctoring\model\authorization;
 
-
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDeliveryRdf\model\event\DeliveryCreatedEvent;
@@ -29,7 +29,7 @@ use oat\taoDeliveryRdf\model\event\DeliveryUpdatedEvent;
 
 interface TestTakerAuthorizationInterface
 {
-    const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
+    public const SERVICE_ID = 'taoProctoring/TestTakerAuthorization';
 
     /**
      * (non-PHPdoc)
@@ -47,5 +47,4 @@ interface TestTakerAuthorizationInterface
      * @throws UnAuthorizedException
      */
     public function verifyResumeAuthorization(DeliveryExecutionInterface $deliveryExecution, User $user);
-
 }

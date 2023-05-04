@@ -33,7 +33,6 @@ use oat\taoProctoring\model\listener\DeliveryExecutionStateListener;
  */
 final class Version202011121023284101_taoProctoring extends AbstractMigration
 {
-
     public function getDescription(): string
     {
         return 'Register event handlers to update state in delivery monitoring when test session status changes.';
@@ -51,7 +50,7 @@ final class Version202011121023284101_taoProctoring extends AbstractMigration
             ]
         );
 
-        $this->getServiceLocator()->register(EventManager::SERVICE_ID , $eventManager);
+        $this->getServiceLocator()->register(EventManager::SERVICE_ID, $eventManager);
     }
 
     public function down(Schema $schema): void
@@ -66,6 +65,6 @@ final class Version202011121023284101_taoProctoring extends AbstractMigration
             ]
         );
 
-        $this->getServiceLocator()->register(EventManager::SERVICE_ID , $eventManager);
+        $this->getServiceLocator()->register(EventManager::SERVICE_ID, $eventManager);
     }
 }

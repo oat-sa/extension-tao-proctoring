@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,11 +18,13 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoProctoring\model\authorization;
 
 use oat\oatbox\event\Event;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\oatbox\user\User;
+
 /**
  * Manage the Delivery authorization.
  *
@@ -29,7 +32,7 @@ use oat\oatbox\user\User;
  */
 class AuthorizationGranted implements Event
 {
-    const EVENT_NAME = __CLASS__;
+    public const EVENT_NAME = __CLASS__;
 
     /**
      * @var DeliveryExecution

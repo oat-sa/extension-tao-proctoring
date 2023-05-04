@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2018 Open Assessment Technologies, S.A.
  *
@@ -8,7 +9,7 @@ namespace oat\taoProctoring\scripts\tools;
 
 use oat\dtms\DateTime;
 use oat\oatbox\extension\script\ScriptAction;
-use \common_report_Report as Report;
+use common_report_Report as Report;
 use oat\taoDelivery\model\execution\implementation\KeyValueService;
 use oat\taoDelivery\model\execution\KVDeliveryExecution;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
@@ -17,7 +18,6 @@ use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoProctoring\model\implementation\DeliveryExecutionStateService;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\generis\model\OntologyRdfs;
-
 
 /**
  * Class FixMonitoringStates
@@ -118,14 +118,13 @@ class FixMonitoringStates extends ScriptAction
                 DeliveryMonitoringService::STATUS => $this->deliveryMonitoringStates
             ],
             'AND',
-            [['start_time' => '<'.$this->to], 'AND', ['start_time' => '>'.$this->from]],
+            [['start_time' => '<' . $this->to], 'AND', ['start_time' => '>' . $this->from]],
         ]);
         $deliveryExecutionService = ServiceProxy::singleton();
-        $this->report->add(new Report(Report::TYPE_INFO, "Found ".sizeof($deliveryExecutionsData). " items."));
+        $this->report->add(new Report(Report::TYPE_INFO, "Found " . sizeof($deliveryExecutionsData) . " items."));
         $count = 0;
 
         foreach ($deliveryExecutionsData as $deliveryExecutionData) {
-
             $data = $deliveryExecutionData->get();
             $deliveryExecution = $deliveryExecutionService->getDeliveryExecution(
                 $data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]
@@ -134,30 +133,64 @@ class FixMonitoringStates extends ScriptAction
                 $deliveryExecution->getDelivery();
                 try {
                     /** @var DeliveryExecutionStateService $deliveryExecutionStateService */
-                    $deliveryExecutionStateService = $this->getServiceLocator()->get(DeliveryExecutionStateService::SERVICE_ID);
+                    $deliveryExecutionStateService = $this->getServiceLocator()->get(
+                        DeliveryExecutionStateService::SERVICE_ID
+                    );
+
                     if ($this->withProgress && $deliveryExecutionStateService->isCancelable($deliveryExecution)) {
                         break;
                     }
                     $executionState = $deliveryExecution->getState()->getUri();
-                    if (in_array($executionState, $this->deliveryExecutionStates) && $data['status'] != $executionState) {
+
+                    if (
+                        in_array($executionState, $this->deliveryExecutionStates)
+                        && $data['status'] != $executionState
+                    ) {
                         $deliveryExecutionStatesForce = $this->deliveryExecutionStatesForce ?: $executionState;
                         if ($this->wetRun === true) {
                             if ($this->deliveryExecutionStatesForce) {
                                 $deliveryExecution->setState($this->deliveryExecutionStatesForce);
-                                $deliveryExecutionData->update(DeliveryMonitoringService::STATUS, $this->deliveryExecutionStatesForce);
+                                $deliveryExecutionData->update(
+                                    DeliveryMonitoringService::STATUS,
+                                    $this->deliveryExecutionStatesForce
+                                );
                                 $deliveryMonitoringService->save($deliveryExecutionData);
-                                $this->report->add(new Report(Report::TYPE_INFO, "{$deliveryExecution->getIdentifier()} was updated from {$data['status']} to {$deliveryExecutionStatesForce} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "{$deliveryExecution->getIdentifier()} was updated from "
+                                            . "{$data['status']} to {$deliveryExecutionStatesForce} ."
+                                    )
+                                );
                             } else {
                                 $deliveryExecutionData->update(DeliveryMonitoringService::STATUS, $executionState);
                                 $deliveryMonitoringService->save($deliveryExecutionData);
-                                $this->report->add(new Report(Report::TYPE_INFO, "{$deliveryExecution->getIdentifier()} was updated from {$data['status']} to {$executionState} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "{$deliveryExecution->getIdentifier()} was updated from "
+                                            . "{$data['status']} to {$executionState} ."
+                                    )
+                                );
                             }
                             $count++;
                         } else {
                             if ($this->deliveryExecutionStatesForce) {
-                                $this->report->add(new Report(Report::TYPE_INFO, "Will update state for {$deliveryExecution->getIdentifier()} from {$data['status']} to {$this->deliveryExecutionStatesForce} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "Will update state for {$deliveryExecution->getIdentifier()} from "
+                                            . "{$data['status']} to {$this->deliveryExecutionStatesForce} ."
+                                    )
+                                );
                             } else {
-                                $this->report->add(new Report(Report::TYPE_INFO, "Will update state for {$deliveryExecution->getIdentifier()} from {$data['status']} to {$executionState} ."));
+                                $this->report->add(
+                                    new Report(
+                                        Report::TYPE_INFO,
+                                        "Will update state for {$deliveryExecution->getIdentifier()} from "
+                                            . "{$data['status']} to {$executionState} ."
+                                    )
+                                );
                             }
 
                             $count++;
@@ -167,12 +200,22 @@ class FixMonitoringStates extends ScriptAction
                     $this->report->add(new Report(Report::TYPE_ERROR, $e->getMessage()));
                 }
             } catch (\Exception $e) {
-                $this->report->add(new Report(Report::TYPE_INFO, "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} doesn't exist."));
-                $this->report->add(new Report(Report::TYPE_INFO, "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} will be created in storage."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} doesn't "
+                            . "exist."
+                    )
+                );
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Execution with ID {$data[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]} will be "
+                            . "created in storage."
+                    )
+                );
                 $this->initExecutionData($data);
             }
-
-
         }
 
         $this->report->add(new Report(Report::TYPE_INFO, "Was updated {$count} items."));
@@ -189,13 +232,14 @@ class FixMonitoringStates extends ScriptAction
         $this->from = $this->getOption('from');
         $this->to = $this->getOption('to');
         $this->deliveryExecutionStatesForce = $this->getOption('deliveryExecutionStatesForce');
-        $this->deliveryMonitoringStates = explode(',', $this->getOption('deliveryMonitoringStates')?:'');
-        $this->deliveryExecutionStates = explode(',', $this->getOption('deliveryExecutionStates')?:'');
-        $this->wetRun = (boolean) $this->getOption('wetRun');
-        $this->withProgress = (boolean) $this->getOption('withProgress');
+        $this->deliveryMonitoringStates = explode(',', $this->getOption('deliveryMonitoringStates') ?: '');
+        $this->deliveryExecutionStates = explode(',', $this->getOption('deliveryExecutionStates') ?: '');
+        $this->wetRun = (bool) $this->getOption('wetRun');
+        $this->withProgress = (bool) $this->getOption('withProgress');
         $this->report = new Report(
             Report::TYPE_INFO,
-            'Starting checking delivery monitoring entries');
+            'Starting checking delivery monitoring entries'
+        );
     }
 
     protected function initExecutionData($data)
@@ -218,9 +262,21 @@ class FixMonitoringStates extends ScriptAction
             if ($this->wetRun === true) {
                 $kvDe = new KVDeliveryExecution($deliveryService, $data['delivery_execution_id'], $executionData);
                 $deliveryService->update($kvDe);
-                $this->report->add(new Report(Report::TYPE_INFO, "Was created execution with id state for {$data['delivery_execution_id']} and body {$executionDataJson}."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Was created execution with id state for {$data['delivery_execution_id']} and body "
+                            . "{$executionDataJson}."
+                    )
+                );
             } else {
-                $this->report->add(new Report(Report::TYPE_INFO, "Will create execution with id state for {$data['delivery_execution_id']} and body {$executionDataJson}."));
+                $this->report->add(
+                    new Report(
+                        Report::TYPE_INFO,
+                        "Will create execution with id state for {$data['delivery_execution_id']} and body "
+                            . "{$executionDataJson}."
+                    )
+                );
             }
         }
     }

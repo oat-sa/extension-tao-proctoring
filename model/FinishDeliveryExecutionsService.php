@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,14 +20,13 @@
 
 namespace oat\taoProctoring\model;
 
-
 use oat\taoProctoring\model\execution\DeliveryExecutionsUpdater;
 use common_report_Report as Report;
 use oat\taoProctoring\model\implementation\TestSessionService;
 
 class FinishDeliveryExecutionsService extends DeliveryExecutionsUpdater
 {
-    const SERVICE_ID = 'taoProctoring/FinishDeliveryExecutions';
+    public const SERVICE_ID = 'taoProctoring/FinishDeliveryExecutions';
 
     /**
      * @param $deliveryExecution
@@ -48,13 +48,13 @@ class FinishDeliveryExecutionsService extends DeliveryExecutionsUpdater
         }
 
         $this->getDeliveryStateService()->finish($deliveryExecution, [
-            'reasons' =>[
+            'reasons' => [
                 'category' => 'Technical'
             ],
             'comment' => $isEndDate
                 ? 'The assessment was automatically finished because end time expired.'
                 : 'The assessment was automatically finished.'
         ]);
-        $this->report->add(Report::createSuccess('Execution finished with success: ' . $executionId ));
+        $this->report->add(Report::createSuccess('Execution finished with success: ' . $executionId));
     }
 }

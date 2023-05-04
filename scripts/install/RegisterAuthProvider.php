@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +28,6 @@ use oat\taoDelivery\model\authorization\strategy\AuthorizationAggregator;
 use oat\taoProctoring\model\authorization\ProctorAuthorizationProvider;
 use oat\taoDelivery\model\authorization\strategy\StateValidation;
 
-
 /**
  * Installation action that register the requirements service.
  *
@@ -46,7 +46,9 @@ class RegisterAuthProvider extends \common_ext_action_InstallAction
             $authService->addProvider(new ProctorAuthorizationProvider());
             $this->registerService(AuthorizationService::SERVICE_ID, $authService);
         } else {
-            throw new \common_exception_Error('Incompatible AuthorizationService "'.get_class($authService).'" found.');
+            throw new \common_exception_Error(
+                'Incompatible AuthorizationService "' . get_class($authService) . '" found.'
+            );
         }
     }
 }

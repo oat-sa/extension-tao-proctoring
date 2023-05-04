@@ -27,7 +27,6 @@ use common_report_Report as Report;
 use oat\taoProctoring\model\monitorCache\DeliveryMonitoringService;
 use oat\taoProctoring\model\monitorCache\implementation\MonitoringStorage;
 
-
 /**
  * @deprecated
  */
@@ -47,7 +46,8 @@ class KvMonitoringMigration extends ScriptAction
                 'prefix' => 'l',
                 'longPrefix' => 'dataLength',
                 'required' => false,
-                'description' => 'Data length. If present new column(s) will have type VARCHAR($length), otherwise - TEXT column will be created'
+                'description' => 'Data length. If present new column(s) will have type VARCHAR($length), otherwise - '
+                    . 'TEXT column will be created',
             ],
 
             'deleteKV' => [
@@ -65,7 +65,8 @@ class KvMonitoringMigration extends ScriptAction
                 'defaultValue' => 1,
                 'cast' => 'integer',
                 'required' => false,
-                'description' => 'Allow to skip creation of already existing in RDBS columns, should help resuming interrupted migrations '
+                'description' => 'Allow to skip creation of already existing in RDBS columns, should help resuming '
+                    . 'interrupted migrations',
             ],
 
             'persistConfig' => [
@@ -73,7 +74,8 @@ class KvMonitoringMigration extends ScriptAction
                 'prefix' => 'pc',
                 'longPrefix' => 'persistConfig',
                 'defaultValue' => 1,
-                'description' => 'Indicate whether or not changes in config should be recorded. Please note that applies to the current instance only and changes MUST be distributed across all of them'
+                'description' => 'Indicate whether or not changes in config should be recorded. Please note that '
+                    . 'applies to the current instance only and changes MUST be distributed across all of them',
             ],
 
             'resume' => [
@@ -81,7 +83,8 @@ class KvMonitoringMigration extends ScriptAction
                 'prefix' => 'r',
                 'longPrefix' => 'resume',
                 'defaultValue' => 1,
-                'description' => 'Indicate whether or not changes processing should be resumed from the last processed frame'
+                'description' => 'Indicate whether or not changes processing should be resumed from the last processed '
+                    . 'frame',
             ],
 
             'chunkSize' => [
@@ -90,7 +93,8 @@ class KvMonitoringMigration extends ScriptAction
                 'longPrefix' => 'chunk-size',
                 'cast' => 'integer',
                 'required' => false,
-                'description' => 'Specifies delivery executions amount for processing (chunk size) per iteration for migration'
+                'description' => 'Specifies delivery executions amount for processing (chunk size) per iteration for '
+                    . 'migration',
             ],
         ];
     }
@@ -148,7 +152,7 @@ class KvMonitoringMigration extends ScriptAction
         $executionProcessed = 0;
         $removed = 0;
 
-        while ($offset < $total ) {
+        while ($offset < $total) {
             $this->getCache()->set(__CLASS__ . 'offset', $offset);
 
             $options = [
@@ -157,16 +161,26 @@ class KvMonitoringMigration extends ScriptAction
             ];
             $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, $originalPrimaryColumns);
             $deliveryExecutionsData = $monitoringService->find([], $options, true);
-            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
+            $monitoringService->setOption(
+                MonitoringStorage::OPTION_PRIMARY_COLUMNS,
+                array_merge($originalPrimaryColumns, $kvFields)
+            );
             foreach ($deliveryExecutionsData as $dd) {
                 $monitoringService->save($dd);
                 $executionProcessed++;
 
                 if ($removeKV) {
-                    $sql = 'DELETE FROM ' . MonitoringStorage::KV_TABLE_NAME . '
-                    WHERE ' . MonitoringStorage::KV_COLUMN_KEY . ' IN (' . implode(',', array_fill(0, count($kvFields), '?')) . ')' .
-                        'AND ' . MonitoringStorage::KV_COLUMN_PARENT_ID . ' =?';
-                    $removed += $monitoringService->getPersistence()->exec($sql, array_merge($kvFields, [$dd->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]));
+                    $sql = 'DELETE FROM ' . MonitoringStorage::KV_TABLE_NAME . 'WHERE '
+                        . MonitoringStorage::KV_COLUMN_KEY
+                        . ' IN (' . implode(',', array_fill(0, count($kvFields), '?')) . ')'
+                        . 'AND ' . MonitoringStorage::KV_COLUMN_PARENT_ID . ' =?';
+                    $removed += $monitoringService->getPersistence()->exec(
+                        $sql,
+                        array_merge(
+                            $kvFields,
+                            [$dd->get()[DeliveryMonitoringService::DELIVERY_EXECUTION_ID]]
+                        )
+                    );
                 }
             }
             $offset += $chunkSize;
@@ -178,9 +192,16 @@ class KvMonitoringMigration extends ScriptAction
         }
 
         if ($persistConfig) {
-            $monitoringService->setOption(MonitoringStorage::OPTION_PRIMARY_COLUMNS, array_merge($originalPrimaryColumns, $kvFields));
+            $monitoringService->setOption(
+                MonitoringStorage::OPTION_PRIMARY_COLUMNS,
+                array_merge($originalPrimaryColumns, $kvFields)
+            );
             $this->getServiceManager()->register(DeliveryMonitoringService::SERVICE_ID, $monitoringService);
-            $subReport->add(Report::createSuccess('Config persisted (ONLY ON THE CURRENT SERVER. UPDATE CONFIGS ON ALL OTHER SERVERS)'));
+            $subReport->add(
+                Report::createSuccess(
+                    'Config persisted (ONLY ON THE CURRENT SERVER. UPDATE CONFIGS ON ALL OTHER SERVERS)'
+                )
+            );
         }
 
         // And return a Report!
@@ -212,7 +233,9 @@ class KvMonitoringMigration extends ScriptAction
 
         $monitorService = $this->getServiceManager()->get(DeliveryMonitoringService::SERVICE_ID);
         $persistenceManager = $this->getServiceManager()->get(\common_persistence_Manager::SERVICE_ID);
-        $persistence = $persistenceManager->getPersistenceById($monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE));
+        $persistence = $persistenceManager->getPersistenceById(
+            $monitorService->getOption(MonitoringStorage::OPTION_PERSISTENCE)
+        );
         $schemaManager = $persistence->getDriver()->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $fromSchema = clone $schema;
@@ -237,7 +260,6 @@ class KvMonitoringMigration extends ScriptAction
             }
         }
         return Report::createSuccess(__('Column %s successfully created', $columnName));
-
     }
 
     /**

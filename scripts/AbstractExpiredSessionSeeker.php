@@ -92,5 +92,4 @@ abstract class AbstractExpiredSessionSeeker implements Action, ServiceLocatorAwa
 
         return $lastTestTakersEvent;
     }
-
 }

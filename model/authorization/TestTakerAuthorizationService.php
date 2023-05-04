@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoProctoring\model\authorization;
 
 use common_Exception;
@@ -38,14 +40,16 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
-class TestTakerAuthorizationService extends ConfigurableService implements TestTakerAuthorizationInterface, DelegatedServiceHandler
+class TestTakerAuthorizationService extends ConfigurableService implements
+    TestTakerAuthorizationInterface,
+    DelegatedServiceHandler
 {
     use OntologyAwareTrait;
 
     /**
      * @deprecated moved to \oat\taoProctoring\model\delivery\DeliverySyncService::PROCTORED_BY_DEFAULT
      */
-    const PROCTORED_BY_DEFAULT = 'proctored_by_default';
+    public const PROCTORED_BY_DEFAULT = 'proctored_by_default';
 
     /**
      * (non-PHPdoc)
@@ -69,14 +73,15 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
     {
         $state = $deliveryExecution->getState()->getUri();
 
-        if (in_array($state, [
+        if (
+            in_array($state, [
             ProctoredDeliveryExecution::STATE_FINISHED,
             ProctoredDeliveryExecution::STATE_CANCELED,
             ProctoredDeliveryExecution::STATE_TERMINATED])
         ) {
             throw new UnAuthorizedException(
                 _url('index', 'DeliveryServer', 'taoProctoring'),
-                'Terminated/Finished delivery execution "'.$deliveryExecution->getIdentifier().'" cannot be resumed'
+                'Terminated/Finished delivery execution "' . $deliveryExecution->getIdentifier() . '" cannot be resumed'
             );
         }
 
@@ -158,7 +163,15 @@ class TestTakerAuthorizationService extends ConfigurableService implements TestT
      */
     protected function throwUnAuthorizedException(DeliveryExecution $deliveryExecution)
     {
-        $errorPage = _url('awaitingAuthorization', 'DeliveryServer', 'taoProctoring', array('deliveryExecution' => $deliveryExecution->getIdentifier()));
+        $errorPage = _url(
+            'awaitingAuthorization',
+            'DeliveryServer',
+            'taoProctoring',
+            [
+                'deliveryExecution' => $deliveryExecution->getIdentifier(),
+            ]
+        );
+
         throw new UnAuthorizedException($errorPage, 'Proctor authorization missing');
     }
 

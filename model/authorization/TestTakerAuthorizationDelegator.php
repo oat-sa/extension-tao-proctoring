@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,6 @@
  */
 
 namespace oat\taoProctoring\model\authorization;
-
 
 use oat\oatbox\user\User;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;

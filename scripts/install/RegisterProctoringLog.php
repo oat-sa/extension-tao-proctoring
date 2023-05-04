@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA;
  *
  */
+
 namespace oat\taoProctoring\scripts\install;
 
 use Doctrine\DBAL\Schema\SchemaException;
@@ -38,11 +40,23 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             $tableLog = $schema->createTable(RdsDeliveryLogService::TABLE_NAME);
             $tableLog->addOption('engine', 'InnoDB');
             $tableLog->addColumn(RdsDeliveryLogService::ID, "integer", array("autoincrement" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::DELIVERY_EXECUTION_ID, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::DELIVERY_EXECUTION_ID,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
             $tableLog->addColumn(RdsDeliveryLogService::EVENT_ID, "string", array("notnull" => true, "length" => 255));
             $tableLog->addColumn(RdsDeliveryLogService::DATA, "text", array("notnull" => true));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_AT, "string", array("notnull" => true, "length" => 255));
-            $tableLog->addColumn(RdsDeliveryLogService::CREATED_BY, "string", array("notnull" => true, "length" => 255));
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_AT,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
+            $tableLog->addColumn(
+                RdsDeliveryLogService::CREATED_BY,
+                "string",
+                ["notnull" => true, "length" => 255]
+            );
 
             $tableLog->setPrimaryKey(array(RdsDeliveryLogService::ID));
 
@@ -70,8 +84,7 @@ class RegisterProctoringLog extends \common_ext_action_InstallAction
             foreach ($queries as $query) {
                 $persistence->exec($query);
             }
-
-        } catch(SchemaException $e) {
+        } catch (SchemaException $e) {
             \common_Logger::i('Database Schema already up to date.');
         }
 

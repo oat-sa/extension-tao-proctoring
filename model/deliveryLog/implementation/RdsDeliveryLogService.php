@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,8 +37,8 @@ use oat\taoProctoring\model\deliveryLog\event\DeliveryLogEvent;
  */
 class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
 {
-    const OPTION_PERSISTENCE = 'persistence';
-    const TABLE_NAME = 'delivery_log';
+    public const OPTION_PERSISTENCE = 'persistence';
+    public const TABLE_NAME = 'delivery_log';
 
     /**
      * Log delivery execution data.
@@ -117,9 +118,9 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
     {
         $query = 'TRUNCATE ' . self::TABLE_NAME;
 
-        try{
+        try {
             $this->getPersistence()->exec($query);
-        } catch (\PDOException $e){
+        } catch (\PDOException $e) {
             return false;
         }
         return true;
@@ -179,10 +180,10 @@ class RdsDeliveryLogService extends ConfigurableService implements DeliveryLog
         foreach ($params as $key => $val) {
             if (in_array($key, $fields, false)) {
                 if (is_array($val)) {
-                    $queryBuilder->andWhere($key . ' IN (:'.$key.')');
+                    $queryBuilder->andWhere($key . ' IN (:' . $key . ')');
                     $queryBuilder->setParameter($key, $val, Connection::PARAM_STR_ARRAY);
                 } else {
-                    $queryBuilder->andWhere($key . '= :'.$key);
+                    $queryBuilder->andWhere($key . '= :' . $key);
                     $queryBuilder->setParameter($key, $val);
                 }
             }

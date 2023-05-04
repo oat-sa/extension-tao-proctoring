@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,43 +36,43 @@ interface DeliveryMonitoringService extends DeliveryExecutionDelete
     /**
      * @deprecated
      */
-    const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
+    public const CONFIG_ID = 'taoProctoring/DeliveryMonitoring';
 
     /**
      * Service Id of the main Monitoring Cache Service
      * @var string
      */
-    const SERVICE_ID = 'taoProctoring/DeliveryMonitoring';
+    public const SERVICE_ID = 'taoProctoring/DeliveryMonitoring';
 
-    const ID = 'id';
-    const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
-    const STATUS = 'status';
-    const CURRENT_ASSESSMENT_ITEM = 'current_assessment_item';
-    const TEST_TAKER = 'test_taker';
-    const AUTHORIZED_BY = 'authorized_by';
-    const START_TIME = 'start_time';
-    const END_TIME = 'end_time';
-    const REMAINING_TIME = 'remaining_time';
-    const EXTRA_TIME = 'extra_time';
-    const EXTENDED_TIME = 'extended_time';
-    const CONSUMED_EXTRA_TIME = 'consumed_extra_time';
-    const ALLOW_EXTRA_TIME = 'allow_extra_time';
+    public const ID = 'id';
+    public const DELIVERY_EXECUTION_ID = 'delivery_execution_id';
+    public const STATUS = 'status';
+    public const CURRENT_ASSESSMENT_ITEM = 'current_assessment_item';
+    public const TEST_TAKER = 'test_taker';
+    public const AUTHORIZED_BY = 'authorized_by';
+    public const START_TIME = 'start_time';
+    public const END_TIME = 'end_time';
+    public const REMAINING_TIME = 'remaining_time';
+    public const EXTRA_TIME = 'extra_time';
+    public const EXTENDED_TIME = 'extended_time';
+    public const CONSUMED_EXTRA_TIME = 'consumed_extra_time';
+    public const ALLOW_EXTRA_TIME = 'allow_extra_time';
 
-    const LAST_TEST_TAKER_ACTIVITY = 'last_test_taker_activity';
-    const LAST_TEST_STATE_CHANGE = 'last_test_state_change';
-    const LAST_PAUSE_TIMESTAMP = 'last_pause_timestamp';
+    public const LAST_TEST_TAKER_ACTIVITY = 'last_test_taker_activity';
+    public const LAST_TEST_STATE_CHANGE = 'last_test_state_change';
+    public const LAST_PAUSE_TIMESTAMP = 'last_pause_timestamp';
 
-    const DIFF_TIMESTAMP = 'diff_timestamp';
-    const ITEM_DURATION = 'item_duration';
-    const STORED_ITEM_DURATION = 'stored_item_duration';
+    public const DIFF_TIMESTAMP = 'diff_timestamp';
+    public const ITEM_DURATION = 'item_duration';
+    public const STORED_ITEM_DURATION = 'stored_item_duration';
 
-    const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
-    const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
-    const DELIVERY_ID = 'delivery_id';
-    const DELIVERY_NAME = 'delivery_name';
-    const CONNECTIVITY = 'last_connect';
+    public const TEST_TAKER_FIRST_NAME = 'test_taker_first_name';
+    public const TEST_TAKER_LAST_NAME = 'test_taker_last_name';
+    public const DELIVERY_ID = 'delivery_id';
+    public const DELIVERY_NAME = 'delivery_name';
+    public const CONNECTIVITY = 'last_connect';
 
-    const REACTIVATE_AUTHORIZED_BY = 'reactivate_authorized_by';
+    public const REACTIVATE_AUTHORIZED_BY = 'reactivate_authorized_by';
 
     /**
      * @param DeliveryExecutionInterface $deliveryExecution

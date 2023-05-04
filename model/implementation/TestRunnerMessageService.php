@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
  *
  */
+
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
@@ -37,7 +39,7 @@ use qtism\runtime\tests\AssessmentTestSession;
 class TestRunnerMessageService extends QtiRunnerMessageService
 {
     /** Proctor roles option in options. */
-    const PROCTOR_ROLES_OPTION = 'proctorRoles';
+    public const PROCTOR_ROLES_OPTION = 'proctorRoles';
 
     /**
      * Returns TRUE when the current role is proctor like.
@@ -69,7 +71,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorPausedStateMessage(AssessmentTestSession $testSession)
     {
+        // phpcs:disable Generic.Files.LineLength
         return __('The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required.');
+        // phpcs:enable Generic.Files.LineLength
     }
 
     /**
@@ -79,7 +83,9 @@ class TestRunnerMessageService extends QtiRunnerMessageService
      */
     protected function getProctorTerminatedStateMessage(AssessmentTestSession $testSession)
     {
+        // phpcs:disable Generic.Files.LineLength
         return __('The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required.');
+        // phpcs:enable Generic.Files.LineLength
     }
 
     /**
@@ -109,5 +115,4 @@ class TestRunnerMessageService extends QtiRunnerMessageService
 
         return parent::getTerminatedStateMessage($testSession);
     }
-
 }
