@@ -1,0 +1,134 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-3x\n"
+"PO-Revision-Date: 2023-04-21 15:46\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: pt\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-3x\n"
+"X-Crowdin-Project-ID: 582145\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /taoProctoring/locales/en-US/proctoring.rdf.po\n"
+"X-Crowdin-File-ID: 1627\n"
+"Language-Team: Portuguese, Brazilian\n"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor"
+msgstr "Profissional"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring role"
+msgstr "O papel de Proctoring"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Manager"
+msgstr "Gerente de Profissional"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Manager Role"
+msgstr "O papel do gerente de proctoring"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctor Administrator"
+msgstr "Administrador do Perfil"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator Role"
+msgstr "A função de administrador de proctoring"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Awaiting"
+msgstr "Aguardando"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Awaiting of authorization status of a delivery execution"
+msgstr "Aguardando autorização do status de execução de uma entrega"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Authorized"
+msgstr "Autorizado"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Authorized status of a delivery execution"
+msgstr "Status autorizado de execução de uma entrega"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Terminated"
+msgstr "Finalizado"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Terminated status of a delivery execution"
+msgstr "Status finalizado de execução de uma entrega"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Canceled"
+msgstr "Cancelado"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Canceled status of a delivery execution"
+msgstr "Status cancelado da execução da entrega"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Proctoring Settings"
+msgstr "Configurações de Proctoring"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Require Proctoring on selected deliveries"
+msgstr "Exigir Proliferação nas entregas selecionadas"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Check Enable"
+msgstr "Habilitar Verificação"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Check Enable"
+msgstr "Habilitar Verificação"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require authorization"
+msgstr "Exigir autorização"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "Enable"
+msgstr "Habilitado"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Require Proctoring"
+msgstr "Exigir Proturação"
+
+# http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
+msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
+msgid "Enable"
+msgstr "Habilitado"
+
+# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
+msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
+msgid "The Proctoring Administrator role"
+msgstr "A função de Administrador Proctoring"
+
