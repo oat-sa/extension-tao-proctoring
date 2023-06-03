@@ -1,15 +1,1 @@
-{
-	"version": 3,
-	"file": "tools.css",
-	"sources": [
-		"../scss/tools.scss",
-		"../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_bootstrap.scss",
-		"../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_variables.scss",
-		"../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss",
-		"../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss",
-		"../../../tao/views/scss/inc/fonts/_tao-icon-vars.scss",
-		"../scss/activity-chart.scss"
-	],
-	"names": [],
-	"mappings": "AMCA,AACE,eADa,CACb,YAAY,AAAC,CACX,KAAK,CAAE,IAAI,CACX,QAAQ,CAAE,QAAQ,CAClB,MAAM,CAAC,GAAG,CAOX,AAXH,AAKI,eALW,CACb,YAAY,CAIV,qBAAqB,AAAC,CACpB,QAAQ,CAAE,QAAQ,CAClB,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,IAAI,CACZ,gBAAgB,CFRf,OAAgB,CESlB,ANTL,AAAA,mBAAmB,AAAC,CAClB,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CA0Bb,AA5BD,AAII,mBAJe,CAGjB,gBAAgB,CACd,EAAE,CAJN,mBAAmB,CAGjB,gBAAgB,CACX,EAAE,CAJT,mBAAmB,CAGjB,gBAAgB,CACR,EAAE,AAAC,CACP,UAAU,CAAE,CAAC,CACd,AANL,AASI,mBATe,CAQjB,cAAc,CACZ,gBAAgB,AAAC,CACf,OAAO,CAAE,SAAS,CGiGpB,MAAM,CAAE,GAAG,CAAC,KAAK,CClGN,OAAkB,CDmG7B,aAAa,CAAE,GAAG,CAClB,qBAAqB,CAAE,GAAG,CHjGxB,UAAU,CIFC,OAAkB,CJG9B,AAbL,AAcI,mBAde,CAQjB,cAAc,CAMZ,uBAAuB,AAAC,CACtB,SAAS,CAAE,GAAG,CACf,AAhBL,AAmBI,mBAnBe,CAkBjB,oBAAoB,CAClB,gBAAgB,AAAC,CACf,OAAO,CAAE,QAAQ,CGuFnB,MAAM,CAAE,GAAG,CAAC,KAAK,CHtFQ,OAA4B,CGuFrD,aAAa,CAAE,GAAG,CAClB,qBAAqB,CAAE,GAAG,CHvFxB,UAAU,CAAE,OAA4B,CACzC,AAvBL,AAwBI,mBAxBe,CAkBjB,oBAAoB,CAMlB,uBAAuB,AAAC,CACtB,SAAS,CAAE,KAAK,CACjB"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/activity-chart.scss","../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss","../scss/tools.scss","../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss"],"names":[],"mappings":"AAEE,6BACE,WACA,kBACA,WACA,mDACE,kBACA,QACA,YACA,iBCRC,4BCCL,WACA,YAEE,wHACE,aAIF,oDACE,kBCiGF,yBACA,kBACA,0BDjGE,WDFW,QCIb,2DACE,cAIF,0DACE,iBCuFF,yBACA,kBACA,0BDvFE,mBAEF,iEACE","file":"tools.css"}
