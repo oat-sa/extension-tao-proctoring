@@ -1,17 +1,24 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.01\n"
-"PO-Revision-Date: 2021-12-23T18:13:58\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2023-06-07 15:17\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: de-DE\n"
+"Language: de\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: de-DE\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 701\n"
+"Language-Team: German\n"
 
 msgid " sec"
 msgstr ""
@@ -46,37 +53,37 @@ msgstr ""
 msgid "%s minutes more"
 msgstr ""
 
-msgid "%s\'s test had already been authorized."
+msgid "%s\\'s test had already been authorized."
 msgstr ""
 
-msgid "%s\'s test had already been paused."
+msgid "%s\\'s test had already been paused."
 msgstr ""
 
-msgid "%s\'s test had already been terminated."
+msgid "%s\\'s test had already been terminated."
 msgstr ""
 
-msgid "%s\'s test had been canceled."
+msgid "%s\\'s test had been canceled."
 msgstr ""
 
-msgid "%s\'s test had been completed."
+msgid "%s\\'s test had been completed."
 msgstr ""
 
-msgid "%s\'s test had been paused."
+msgid "%s\\'s test had been paused."
 msgstr ""
 
-msgid "%s\'s test had been terminated."
+msgid "%s\\'s test had been terminated."
 msgstr ""
 
-msgid "%s\'s test had not been finished."
+msgid "%s\\'s test had not been finished."
 msgstr ""
 
-msgid "%s\'s test had not been in progress."
+msgid "%s\\'s test had not been in progress."
 msgstr ""
 
-msgid "%s\'s test had not been started."
+msgid "%s\\'s test had not been started."
 msgstr ""
 
-msgid "%s\'s test must be terminated."
+msgid "%s\\'s test must be terminated."
 msgstr ""
 
 msgid "..."
@@ -252,7 +259,7 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 msgid "cancel"
-msgstr ""
+msgstr "abbrechen"
 
 msgid "cancel the action"
 msgstr ""
@@ -484,7 +491,7 @@ msgid "ID/Authorization"
 msgstr ""
 
 msgid "Identifier"
-msgstr ""
+msgstr "Bezeichner"
 
 msgid "Illness"
 msgstr ""
@@ -511,7 +518,7 @@ msgid "Item Variables"
 msgstr ""
 
 msgid "Label"
-msgstr ""
+msgstr "Beschriftung"
 
 msgid "Last Day"
 msgstr ""
@@ -768,7 +775,7 @@ msgstr ""
 
 #, tao-public
 msgid "Results"
-msgstr ""
+msgstr "Ergebnisse"
 
 msgid "Return to the session manager"
 msgstr ""
@@ -786,7 +793,7 @@ msgid "Role"
 msgstr ""
 
 msgid "Score"
-msgstr ""
+msgstr "Punktzahl"
 
 msgid "Score Report"
 msgstr ""
