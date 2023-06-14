@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-06-07 15:17\n"
+"PO-Revision-Date: 2023-06-14 13:04\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ar\n"
@@ -256,10 +256,10 @@ msgid "Behaviour"
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 msgid "cancel"
-msgstr ""
+msgstr "إلغاء"
 
 msgid "cancel the action"
 msgstr ""
@@ -497,7 +497,7 @@ msgid "Illness"
 msgstr ""
 
 msgid "In Progress"
-msgstr ""
+msgstr "في تقدم"
 
 msgid "in progress"
 msgstr ""
@@ -518,7 +518,7 @@ msgid "Item Variables"
 msgstr ""
 
 msgid "Label"
-msgstr ""
+msgstr "اسم"
 
 msgid "Last Day"
 msgstr ""
@@ -618,7 +618,7 @@ msgid "offline"
 msgstr ""
 
 msgid "OK"
-msgstr ""
+msgstr "نعم"
 
 msgid "online"
 msgstr ""
@@ -633,7 +633,7 @@ msgid "Partially authorized proctors"
 msgstr ""
 
 msgid "Pause"
-msgstr ""
+msgstr "وقفة"
 
 msgid "Pause Active Test Sessions"
 msgstr ""
@@ -793,7 +793,7 @@ msgid "Role"
 msgstr ""
 
 msgid "Score"
-msgstr ""
+msgstr "نتيجة"
 
 msgid "Score Report"
 msgstr ""
