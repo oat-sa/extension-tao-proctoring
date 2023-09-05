@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-09-01 08:21\n"
+"PO-Revision-Date: 2023-09-05 09:54\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja\n"
@@ -618,7 +618,7 @@ msgid "offline"
 msgstr "オフライン"
 
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 msgid "online"
 msgstr "オンライン"
@@ -1084,7 +1084,7 @@ msgid "There is no delivery in progress"
 msgstr "実施中のデリバリはありません"
 
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 msgid "Time adjusted"
 msgstr "調整時間"
