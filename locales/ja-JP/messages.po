@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-09-05 09:54\n"
+"PO-Revision-Date: 2023-09-13 09:12\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Language-Team: Japanese\n"
 
 msgid " sec"
-msgstr ""
+msgstr " 秒"
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - アイテム %2$s/%3$s"
@@ -87,7 +87,7 @@ msgid "%s\\'s test must be terminated."
 msgstr "%sのテストを終了する必要があります"
 
 msgid "..."
-msgstr ""
+msgstr "..."
 
 msgid "A session of the delivery %s have not been paused"
 msgstr "デリバリ %s のセッションは一時停止しませんでした"
@@ -151,7 +151,7 @@ msgid "Assessment has been paused due to attempt to switch to another window/tab
 msgstr "別のウィンドウ/タブに切り替えたために、テストが一時停止されました。"
 
 msgid "Assign administrator"
-msgstr ""
+msgstr "管理者の割り当て"
 
 msgid "Assign more test takers to this session"
 msgstr "さらにこのセッションに受験者を割当てます"
