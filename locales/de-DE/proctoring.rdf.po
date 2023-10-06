@@ -119,9 +119,3 @@ msgstr ""
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Enable"
 msgstr ""
-
-# http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
-msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
-msgid "The Proctoring Administrator role"
-msgstr ""
-
