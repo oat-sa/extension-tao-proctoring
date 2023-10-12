@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-06-14 13:04\n"
+"PO-Revision-Date: 2023-10-12 11:16\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ar\n"
@@ -96,7 +96,7 @@ msgid "Action"
 msgstr ""
 
 msgid "Actions"
-msgstr ""
+msgstr "إجراءات"
 
 msgid "Active"
 msgstr ""
@@ -373,7 +373,7 @@ msgid "Current sessions"
 msgstr ""
 
 msgid "Date"
-msgstr ""
+msgstr "التاريخ"
 
 msgid "date"
 msgstr ""
@@ -400,7 +400,7 @@ msgid "Detailed Session History of a selection"
 msgstr ""
 
 msgid "Details"
-msgstr ""
+msgstr "تفاصيل"
 
 msgid "Disturbance"
 msgstr ""
@@ -427,7 +427,7 @@ msgid "Environment"
 msgstr ""
 
 msgid "Error"
-msgstr ""
+msgstr "خطأ"
 
 msgid "Event"
 msgstr ""
@@ -542,7 +542,7 @@ msgid "Launching"
 msgstr ""
 
 msgid "Loading"
-msgstr ""
+msgstr "جار التحميل"
 
 msgid "Logout"
 msgstr ""
@@ -741,7 +741,7 @@ msgid "Remaining"
 msgstr ""
 
 msgid "Remove"
-msgstr ""
+msgstr "إزالة"
 
 msgid "Remove default tag filtering"
 msgstr ""
@@ -775,7 +775,7 @@ msgstr ""
 
 #, tao-public
 msgid "Results"
-msgstr ""
+msgstr "نتائج"
 
 msgid "Return to the session manager"
 msgstr ""
