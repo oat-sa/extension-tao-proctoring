@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-06-07 15:17\n"
+"PO-Revision-Date: 2023-11-07 12:37\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de\n"
@@ -373,7 +373,7 @@ msgid "Current sessions"
 msgstr ""
 
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 msgid "date"
 msgstr ""
@@ -400,7 +400,7 @@ msgid "Detailed Session History of a selection"
 msgstr ""
 
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 msgid "Disturbance"
 msgstr ""
@@ -542,10 +542,10 @@ msgid "Launching"
 msgstr ""
 
 msgid "Loading"
-msgstr ""
+msgstr "Ladevorgang"
 
 msgid "Logout"
-msgstr ""
+msgstr "Abmelden"
 
 msgid "Main Menu"
 msgstr ""
@@ -567,7 +567,7 @@ msgid "Monitoring"
 msgstr ""
 
 msgid "Navigation"
-msgstr ""
+msgstr "Navigation"
 
 msgid "Network"
 msgstr ""
