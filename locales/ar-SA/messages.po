@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-11-07 12:37\n"
+"PO-Revision-Date: 2023-11-09 13:55\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ar\n"
@@ -545,7 +545,7 @@ msgid "Loading"
 msgstr "جار التحميل"
 
 msgid "Logout"
-msgstr ""
+msgstr "تسجيل الخروج"
 
 msgid "Main Menu"
 msgstr "القائمة الرئيسية"
@@ -729,10 +729,10 @@ msgid "Reactivate session"
 msgstr ""
 
 msgid "Refresh"
-msgstr ""
+msgstr "تحديث"
 
 msgid "Refresh the page"
-msgstr ""
+msgstr "تحديث الصفحة"
 
 msgid "Registered proctoring log"
 msgstr ""
@@ -871,7 +871,7 @@ msgid "Some delivery executions have not been updated"
 msgstr ""
 
 msgid "Something went wrong ..."
-msgstr ""
+msgstr "حدث خطأ ما ..."
 
 msgid "Start"
 msgstr ""
