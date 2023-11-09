@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-11-08 12:57\n"
+"PO-Revision-Date: 2023-11-09 13:55\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de\n"
@@ -436,7 +436,7 @@ msgid "Examinee"
 msgstr ""
 
 msgid "Export"
-msgstr ""
+msgstr "Export"
 
 #, tao-public
 msgid "Export Irregularities"
@@ -618,7 +618,7 @@ msgid "offline"
 msgstr ""
 
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 msgid "online"
 msgstr ""
@@ -633,7 +633,7 @@ msgid "Partially authorized proctors"
 msgstr ""
 
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 msgid "Pause Active Test Sessions"
 msgstr ""
