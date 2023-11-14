@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-11-09 13:55\n"
+"PO-Revision-Date: 2023-11-14 16:05\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de\n"
@@ -21,13 +21,13 @@ msgstr ""
 "Language-Team: German\n"
 
 msgid " sec"
-msgstr ""
+msgstr " Sek"
 
 msgid "%1$s - Item %2$s/%3$s"
-msgstr ""
+msgstr "%1$s - Element %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
-msgstr ""
+msgstr "%d Sitzungen der Lieferung %s wurden nicht pausiert"
 
 msgid "%s - item %p/%c"
 msgstr ""
