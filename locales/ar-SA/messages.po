@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-11-17 17:05\n"
+"PO-Revision-Date: 2023-11-21 17:48\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ar\n"
@@ -184,7 +184,7 @@ msgid "Authorization status"
 msgstr "حالة الترخيص"
 
 msgid "Authorize"
-msgstr ""
+msgstr "رخٍص"
 
 msgid "Authorize session"
 msgstr "الترخيص للجلسة"
@@ -202,7 +202,7 @@ msgid "Authorize the selected proctors"
 msgstr "الترخيص للمراقبين المختارين"
 
 msgid "Authorized"
-msgstr ""
+msgstr "مرخص له"
 
 msgid "authorized"
 msgstr "مرخص له"
@@ -232,7 +232,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "إعادة الضبط تِلْقائيًا بواسطة النظام بسبب اختيار الخاضع للرائز عدم المضي قدما في الرائز المرخص به."
 
 msgid "Available"
-msgstr ""
+msgstr "متوفر"
 
 msgid "Available history"
 msgstr "السجل المتاح"
@@ -262,7 +262,7 @@ msgid "cancel"
 msgstr "إلغاء"
 
 msgid "cancel the action"
-msgstr ""
+msgstr "إلغاء الإجراء"
 
 msgid "canceled"
 msgstr "تم إلغاؤه/ها"
@@ -340,7 +340,7 @@ msgid "Complaint"
 msgstr "شكوى"
 
 msgid "Completed"
-msgstr ""
+msgstr "مكتمل"
 
 msgid "completed"
 msgstr "اكتمل"
@@ -391,7 +391,7 @@ msgid "Deliveries"
 msgstr "عمليات التسليم"
 
 msgid "Delivery"
-msgstr ""
+msgstr "تسليم"
 
 msgid "Detailed Session History of %s"
 msgstr "تاريخ الحصة المفصل ل %s"
@@ -470,7 +470,7 @@ msgid "finished"
 msgstr "انتهى"
 
 msgid "First name"
-msgstr ""
+msgstr "الاسم الشخصي"
 
 msgid "Freezing"
 msgstr "تجميد"
@@ -811,13 +811,13 @@ msgid "Session %s - %s has not been processed"
 msgstr "لم تتم معالجة الحصة %s - %s"
 
 msgid "Session history"
-msgstr ""
+msgstr "سجل الحصة"
 
 msgid "Session time handling"
 msgstr "التعامل مع وقت الحصة"
 
 msgid "Sessions"
-msgstr ""
+msgstr "حصص"
 
 msgid "sessions"
 msgstr "حصص"
@@ -883,7 +883,7 @@ msgid "Started at"
 msgstr "بدأ في"
 
 msgid "Status"
-msgstr ""
+msgstr "حالة"
 
 msgid "subcategory"
 msgstr "فئة فرعية"
@@ -1084,7 +1084,7 @@ msgid "There is no delivery in progress"
 msgstr "لا يوجد تسليم قيد التنفيذ"
 
 msgid "Time"
-msgstr ""
+msgstr "وقت"
 
 msgid "Time adjusted"
 msgstr "وقت معدل"
