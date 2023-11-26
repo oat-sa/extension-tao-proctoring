@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-11-25 18:49\n"
+"PO-Revision-Date: 2023-11-26 18:54\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: de\n"
@@ -184,7 +184,7 @@ msgid "Authorization status"
 msgstr "Autorisierungsstatus"
 
 msgid "Authorize"
-msgstr ""
+msgstr "Autorisierung"
 
 msgid "Authorize session"
 msgstr "Sitzung autorisieren"
@@ -202,7 +202,7 @@ msgid "Authorize the selected proctors"
 msgstr "Ausgewählte Aufsichtspersonen autorisieren"
 
 msgid "Authorized"
-msgstr ""
+msgstr "Autorisiert"
 
 msgid "authorized"
 msgstr "autorisiert"
@@ -232,7 +232,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "Vom System automatisch zurückgesetzt, da der Prüfungsteilnehmer sich dazu entschlossen hat, mit dem autorisierten Test nicht fortzufahren."
 
 msgid "Available"
-msgstr ""
+msgstr "Verfügbar"
 
 msgid "Available history"
 msgstr "Verfügbarer Verlauf"
@@ -262,7 +262,7 @@ msgid "cancel"
 msgstr "abbrechen"
 
 msgid "cancel the action"
-msgstr ""
+msgstr "die Aktion abbrechen"
 
 msgid "canceled"
 msgstr "storniert"
@@ -340,7 +340,7 @@ msgid "Complaint"
 msgstr "Beschwerde"
 
 msgid "Completed"
-msgstr ""
+msgstr "Abgeschlossen"
 
 msgid "completed"
 msgstr "abgeschlossen"
@@ -391,7 +391,7 @@ msgid "Deliveries"
 msgstr "Lieferungen"
 
 msgid "Delivery"
-msgstr ""
+msgstr "Lieferung"
 
 msgid "Detailed Session History of %s"
 msgstr "Detaillierter Sitzungsverlauf von %s"
@@ -470,7 +470,7 @@ msgid "finished"
 msgstr "beended"
 
 msgid "First name"
-msgstr ""
+msgstr "Vorname"
 
 msgid "Freezing"
 msgstr "Einfrieren"
@@ -530,7 +530,7 @@ msgid "Last Month"
 msgstr "Im vergangenen Monat"
 
 msgid "Last name"
-msgstr ""
+msgstr "Nachname"
 
 msgid "Last Week"
 msgstr "Vergangene Woche"
@@ -548,7 +548,7 @@ msgid "Logout"
 msgstr "Abmelden"
 
 msgid "Main Menu"
-msgstr ""
+msgstr "Hauptmenü"
 
 msgid "Manage Proctors"
 msgstr "Aufsichtspersonen verwalten"
@@ -811,13 +811,13 @@ msgid "Session %s - %s has not been processed"
 msgstr "Sitzung %s – %s wurde nicht verarbeitet"
 
 msgid "Session history"
-msgstr ""
+msgstr "Sitzungsverlauf"
 
 msgid "Session time handling"
 msgstr "Administration der Sitzungszeit"
 
 msgid "Sessions"
-msgstr ""
+msgstr "Sitzungen"
 
 msgid "sessions"
 msgstr "Sitzungen"
@@ -883,7 +883,7 @@ msgid "Started at"
 msgstr "Gestartet bei"
 
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 msgid "subcategory"
 msgstr "Unterkategorie"
@@ -1084,7 +1084,7 @@ msgid "There is no delivery in progress"
 msgstr "Es läuft aktuell keine Prüfung"
 
 msgid "Time"
-msgstr ""
+msgstr "Zeit"
 
 msgid "Time adjusted"
 msgstr "Zeit angepasst"
