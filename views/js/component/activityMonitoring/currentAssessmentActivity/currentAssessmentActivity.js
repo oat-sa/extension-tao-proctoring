@@ -100,7 +100,7 @@ define([
                 _.merge(this.config.assessments, data);
 
                 // Update the template variables
-                _.each(this.config.assessments, function(val) {
+                _.forEach(this.config.assessments, function(val) {
                     $('.' + val.container, this.getElement())
                     .text(val.value);
                 }, this);

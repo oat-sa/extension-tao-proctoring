@@ -258,7 +258,7 @@ define([
                             .on('ok', function (reason) {
                                 proxySessions.action('pause', {
                                     delivery: deliveryId,
-                                    execution: _.pluck(selection, 'id'),
+                                    execution: _.map(selection, 'id'),
                                     reason: reason
                                 }).then(function() {
                                     feedback().success('Selected deliveries successfully paused');
