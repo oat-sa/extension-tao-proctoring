@@ -1,0 +1,1125 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2023-11-21 17:48\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ar\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: ar\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 701\n"
+"Language-Team: Arabic\n"
+
+msgid " sec"
+msgstr " ثانية"
+
+msgid "%1$s - Item %2$s/%3$s"
+msgstr "%1$s - البند %2$s/%3$s"
+
+msgid "%d sessions of the delivery %s have not been paused"
+msgstr "%d من جلسات التسليم %s لم يتم إيقافها مؤقتا"
+
+msgid "%s - item %p/%c"
+msgstr "%s - البند %p/%c"
+
+msgid "%s completed"
+msgstr "%s مكتمل"
+
+msgid "%s could not be %s because it is finished. Please refresh your data."
+msgstr "%s لا يمكن أن يكون %s لأنه انتهى. يرجى تحديث بياناتك."
+
+msgid "%s could not be %s because it is terminated. Please refresh your data."
+msgstr "%sلا يمكن أن يكون %s لأنه تم إنهاؤه. يرجى تحديث بياناتك."
+
+msgid "%s could not be %s."
+msgstr "%s لا يمكن أن يكون %s."
+
+msgid "%s executions migrated"
+msgstr "%s تم ترحيل عمليات التنفيذ"
+
+msgid "%s KV entries removed"
+msgstr "تمت إزالة %s إدخالات KV"
+
+msgid "%s minutes more"
+msgstr "%s دقيقة أكثر"
+
+msgid "%s\\'s test had already been authorized."
+msgstr "تم سلفا السماح برائز s\\’%s."
+
+msgid "%s\\'s test had already been paused."
+msgstr "تم سابقا إيقاف رائز %s\\."
+
+msgid "%s\\'s test had already been terminated."
+msgstr "تم سابقا إنهاء رائز %s."
+
+msgid "%s\\'s test had been canceled."
+msgstr "تم إلغاء رائز %s\\."
+
+msgid "%s\\'s test had been completed."
+msgstr "تم الانتهاء من رائز %s\\."
+
+msgid "%s\\'s test had been paused."
+msgstr "تم إيقاف اختبار %s\\ مؤقتا."
+
+msgid "%s\\'s test had been terminated."
+msgstr "تم إنهاء رائز %s\\."
+
+msgid "%s\\'s test had not been finished."
+msgstr "لم يتم الانتهاء من رائز %s\\."
+
+msgid "%s\\'s test had not been in progress."
+msgstr "لم يكن رائز %s\\ قيد التقدم."
+
+msgid "%s\\'s test had not been started."
+msgstr "لم يبدأ رائز %s\\."
+
+msgid "%s\\'s test must be terminated."
+msgstr "يجب إنهاء رائز %s\\."
+
+msgid "..."
+msgstr "..."
+
+msgid "A session of the delivery %s have not been paused"
+msgstr "لم يتم إيقاف جلسة التسليم %s مؤقتا"
+
+msgid "Action"
+msgstr "فِعْل"
+
+msgid "Actions"
+msgstr "إجراءات"
+
+msgid "Active"
+msgstr "نشيطٌ"
+
+msgid "Active proctors"
+msgstr "مراقبون نشيطون"
+
+msgid "Active test-takers"
+msgstr "الخاضعون للرائز النشطون"
+
+msgid "Actor"
+msgstr "فاعل"
+
+msgid "Add test takers"
+msgstr "أضف الخاضعين للرائز"
+
+msgid "Adjusted"
+msgstr "معدل"
+
+msgid "Administer deliveries"
+msgstr "إدارة عمليات التسليم"
+
+msgid "Administration"
+msgstr "إدارة"
+
+msgid "All fields are required"
+msgstr "جميع الحقول مطلوبة"
+
+msgid "already authorized"
+msgstr "مرخص له سابقا"
+
+msgid "Already changed time will be added or subtracted by the new value."
+msgstr "سيتم إضافة الوقت الذي تم تغييره سابقا أو طرحه بواسطة القيمة الجديدة."
+
+msgid "already paused"
+msgstr "تم إيقافه مؤقتا فعلًا"
+
+msgid "already terminated"
+msgstr "تم إنهاؤه فعلًا"
+
+msgid "Apply default tag"
+msgstr "تطبيق العلامة الافتراضية"
+
+msgid "Are you sure you want to end the test?"
+msgstr "هل أنت متأكد من أنك تريد إنهاء الرائز؟"
+
+#, tao-public
+msgid "Assessment Activity"
+msgstr "نشاط التقييم"
+
+msgid "Assessment has been paused due to attempt to switch to another window/tab."
+msgstr "تم إيقاف التقييم مؤقتا بسبب محاولة التبديل إلى نافذة/علامة تبويب أخرى."
+
+msgid "Assign administrator"
+msgstr "تعيين الممرر"
+
+msgid "Assign more test takers to this session"
+msgstr "خصص المزيد من الخاضعين للرائز لهذه الجَلسة"
+
+msgid "Assign proctors"
+msgstr "تعيين مراقبين"
+
+msgid "Assign the selected test takers"
+msgstr "خصص المتقدمين للرائز المختارين"
+
+msgid "Assign the selected test takers to the session"
+msgstr "خصص الخاضعين للرائز المختارين للجلسة"
+
+msgid "Assign the test taker to the session"
+msgstr "خصص الخاضع للرائز للجلسة"
+
+msgid "Assigned proctors"
+msgstr "مراقبون معينون"
+
+msgid "Assigned test takers"
+msgstr "المعينون من الخاضعين للرائز"
+
+msgid "Attempts"
+msgstr "محاولات"
+
+msgid "author"
+msgstr "مؤلف"
+
+msgid "Authorization status"
+msgstr "حالة الترخيص"
+
+msgid "Authorize"
+msgstr "رخٍص"
+
+msgid "Authorize session"
+msgstr "الترخيص للجلسة"
+
+msgid "Authorize Session"
+msgstr "الترخيص للجلسة"
+
+msgid "Authorize sessions"
+msgstr "الترخيص للجلسات"
+
+msgid "Authorize the proctor"
+msgstr "الترخيص للمراقب"
+
+msgid "Authorize the selected proctors"
+msgstr "الترخيص للمراقبين المختارين"
+
+msgid "Authorized"
+msgstr "مرخص له"
+
+msgid "authorized"
+msgstr "مرخص له"
+
+msgid "Authorized but not started"
+msgstr "مرخص له ولكن لم يبدأ"
+
+msgid "authorized but not started"
+msgstr "مرخص له ولكن لم يبدأ"
+
+msgid "Authorized proctors"
+msgstr "المراقبون المعتمدون"
+
+msgid "Authorized, you may proceed"
+msgstr "مرخص به، يمكنك المتابعة"
+
+msgid "Automatically paused by the system due to authorized test not being launched by test taker."
+msgstr "توقف النظام مؤقتا تِلْقائيًا بسبب عدم انطلاق الاختبار المرخص له من قبل الخاضع للرائز."
+
+msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
+msgstr "إعادة التعيين تِلْقائيًا بواسطة النظام بسبب إلغاء طلب الترخيص من قبل الخاضع للرائز."
+
+msgid "Automatically reset by the system due to authorized test not being launched by test taker."
+msgstr "إعادة الضبط تلقائيا بواسطة النظام بسبب عدم إطلاق الاختبار المرخص به من قبل الخاضع للرائز."
+
+msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
+msgstr "إعادة الضبط تِلْقائيًا بواسطة النظام بسبب اختيار الخاضع للرائز عدم المضي قدما في الرائز المرخص به."
+
+msgid "Available"
+msgstr "متوفر"
+
+msgid "Available history"
+msgstr "السجل المتاح"
+
+msgid "Available test takers"
+msgstr "الخاضعون للرائز المتاحون"
+
+msgid "awaiting"
+msgstr "في انتظار"
+
+msgid "Awaiting"
+msgstr "في انتظار"
+
+msgid "Back"
+msgstr "عودة"
+
+msgid "Back to sessions"
+msgstr "العودة إلى الجلسات"
+
+msgid "Behaviour"
+msgstr "سلوك"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "cancel"
+msgstr "إلغاء"
+
+msgid "cancel the action"
+msgstr "إلغاء الإجراء"
+
+msgid "canceled"
+msgstr "تم إلغاؤه/ها"
+
+msgid "Canceled"
+msgstr "تم إلغاؤه/ها"
+
+msgid "Cannot authorize test session."
+msgstr "لا يمكن الترخيص بجلسة الرائز."
+
+msgid "Cannot authorize test sessions."
+msgstr "لا يمكن الترخيص بجلسات الرائز."
+
+msgid "Cannot execute action."
+msgstr "لا يمكن تنفيذ الإجراء."
+
+msgid "Cannot extend test session."
+msgstr "لا يمكن تمديد جلسة الرائز."
+
+msgid "Cannot extend test sessions."
+msgstr "لا يمكن تمديد جلسات الرائز."
+
+msgid "Cannot pause test session."
+msgstr "لا يمكن إيقاف جلسة الرائز مؤقتا."
+
+msgid "Cannot pause test sessions."
+msgstr "لا يمكن إيقاف جلسات الرائز مؤقتا."
+
+msgid "Cannot print test session."
+msgstr "لا يمكن طباعة جلسة الرائز."
+
+msgid "Cannot print test sessions."
+msgstr "لا يمكن طباعة جلسات الرائز."
+
+msgid "Cannot reactivate test session."
+msgstr "لا يمكن إعادة تنشيط جلسة الرائز."
+
+msgid "Cannot reactivate test sessions."
+msgstr "لا يمكن إعادة تنشيط جلسات الرائز."
+
+msgid "Cannot report test session."
+msgstr "لا يمكن الإبلاغ عن جلسة الرائز."
+
+msgid "Cannot report test sessions."
+msgstr "لا يمكن الإبلاغ عن جلسات الرائز."
+
+msgid "Cannot terminate test session."
+msgstr "لا يمكن إنهاء جلسة الرائز."
+
+msgid "Cannot terminate test sessions."
+msgstr "لا يمكن إنهاء جلسات الرائز."
+
+msgid "category"
+msgstr "فئة"
+
+msgid "Change time"
+msgstr "تغيير الوقت"
+
+msgid "Changed Time"
+msgstr "الوقت المتغير"
+
+msgid "Column %s successfully created"
+msgstr "تم إنشاء العمود %s بنجاح"
+
+msgid "Comfort"
+msgstr "راحة"
+
+msgid "comment"
+msgstr "تعليق"
+
+msgid "comment..."
+msgstr "تعلي..."
+
+msgid "Complaint"
+msgstr "شكوى"
+
+msgid "Completed"
+msgstr "مكتمل"
+
+msgid "completed"
+msgstr "اكتمل"
+
+msgid "Completed tests"
+msgstr "الروائز المكتملة"
+
+msgid "Compliance"
+msgstr "امتثال"
+
+msgid "Connectivity"
+msgstr "اتصال"
+
+msgid "Context"
+msgstr "سياق"
+
+msgid "Create and authorize a proctor to the selected test sites"
+msgstr "إنشاء وتفويض مراقب لمواقع الرائز المختارة"
+
+msgid "Create Proctor"
+msgstr "قم بإنشاء مراقب"
+
+msgid "Creates and authorizes proctor"
+msgstr "ينشئ ويفوض المراقب"
+
+msgid "Current Assessment Activity"
+msgstr "نشاط التقييم الحالي"
+
+msgid "Current sessions"
+msgstr "الجلسات الحالية"
+
+msgid "Date"
+msgstr "التاريخ"
+
+msgid "date"
+msgstr "تاريخ"
+
+msgid "Days"
+msgstr "أيام"
+
+msgid "Decryption failed because of using the wrong customer app key."
+msgstr "فشل فك التشفير بسبب استخدام مفتاح تطبيق الزَّبُون الخاطئ."
+
+msgid "Define sub-centers"
+msgstr "حدد المراكز الفرعية"
+
+msgid "Deliveries"
+msgstr "عمليات التسليم"
+
+msgid "Delivery"
+msgstr "تسليم"
+
+msgid "Detailed Session History of %s"
+msgstr "تاريخ الحصة المفصل ل %s"
+
+msgid "Detailed Session History of a selection"
+msgstr "تاريخ الحصة المفصل للاختيار"
+
+msgid "Details"
+msgstr "تفاصيل"
+
+msgid "Disturbance"
+msgstr "إزْعاج"
+
+msgid "Duration"
+msgstr "أمد"
+
+msgid "Edit test center"
+msgstr "تحرير مركز الرائز"
+
+msgid "Elapsed time"
+msgstr "الوقت المنقضي"
+
+msgid "End"
+msgstr "نهاية"
+
+msgid "End date of the export"
+msgstr "تاريخ انتهاء التصدير"
+
+msgid "Entered value is not correct"
+msgstr "القيمة المدخلة غير صحيحة"
+
+msgid "Environment"
+msgstr "بيئة"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Event"
+msgstr "حدث"
+
+msgid "Examinee"
+msgstr "ممتحن"
+
+msgid "Export"
+msgstr "تصدير"
+
+#, tao-public
+msgid "Export Irregularities"
+msgstr "مخالفات التصدير"
+
+msgid "Extended time"
+msgstr "وقت ممتد"
+
+msgid "Extra"
+msgstr "إضافيّ"
+
+msgid "Extra Time"
+msgstr "وقت إضافي"
+
+msgid "Extra time"
+msgstr "وقت إضافي"
+
+msgid "Extra time granted"
+msgstr "تم منح وقت إضافي"
+
+msgid "Filter"
+msgstr "مصفي"
+
+msgid "Filter by the selected dates"
+msgstr "تصفية حسب التواريخ المحددة"
+
+msgid "Finished"
+msgstr "انتهى"
+
+msgid "finished"
+msgstr "انتهى"
+
+msgid "First name"
+msgstr "الاسم الشخصي"
+
+msgid "Freezing"
+msgstr "تجميد"
+
+msgid "Grant Extra Time"
+msgstr "منح وقت إضافي"
+
+msgid "Groups: %s. %s"
+msgstr "المجموعات: %s. %s"
+
+msgid "Hours"
+msgstr "ساعات"
+
+msgid "However, the action will not be applied to the following sessions"
+msgstr "ومع ذلك، لن يتم تطبيق الإجراء على الحصص التالية"
+
+msgid "ID/Authorization"
+msgstr "ID/ترخيص"
+
+msgid "Identifier"
+msgstr "معرف"
+
+msgid "Illness"
+msgstr "مرض"
+
+msgid "In Progress"
+msgstr "في تقدم"
+
+msgid "in progress"
+msgstr "في تقدم"
+
+msgid "INPROGRESS"
+msgstr "في تقدم"
+
+msgid "Irregularities for \"%s\" successfully exported"
+msgstr "المخالفات ل \"%s\" تم تصديرها بنجاح"
+
+msgid "Issue Category"
+msgstr "فئة المشكلة"
+
+msgid "item"
+msgstr "بند"
+
+msgid "Item Variables"
+msgstr "متغيرات البند"
+
+msgid "Label"
+msgstr "اسم"
+
+msgid "Last Day"
+msgstr "اليوم الأخير"
+
+msgid "Last launch"
+msgstr "الإنطلاق الأخير"
+
+msgid "Last Month"
+msgstr "الشهر الماضي"
+
+msgid "Last name"
+msgstr "الاسم العائلي "
+
+msgid "Last Week"
+msgstr "الأسبوع الماضي"
+
+msgid "Late"
+msgstr "متأخر"
+
+msgid "Launching"
+msgstr "الإنطلاق"
+
+msgid "Loading"
+msgstr "جار التحميل"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Main Menu"
+msgstr "القائمة الرئيسية"
+
+msgid "Manage Proctors"
+msgstr "إدارة المراقبين"
+
+#, tao-public
+msgid "Manage Results"
+msgstr "إدارة النتائج"
+
+msgid "minutes"
+msgstr "دقائق"
+
+msgid "Monitor"
+msgstr "شاشة/راقب"
+
+msgid "Monitoring"
+msgstr "مراقبة"
+
+msgid "Navigation"
+msgstr "تصفح"
+
+msgid "Network"
+msgstr "شبكة"
+
+msgid "No assigned proctors"
+msgstr "لم يتم تعيين مراقبين"
+
+msgid "No assigned test takers"
+msgstr "لم يتم تعيين الخاضعين للرائز"
+
+msgid "No available test takers to assign"
+msgstr "لا يوجد خاضعون للرائز لتعيينهم"
+
+msgid "No history to display!"
+msgstr "لا يوجد سجل لعرضه!"
+
+msgid "No proctors in request param"
+msgstr "لا يوجد مراقبون في طلب param"
+
+msgid "No sessions"
+msgstr "لا توجد حصص"
+
+msgid "No sessions available"
+msgstr "لا توجد حصص متاحة"
+
+msgid "No Show"
+msgstr "لا يوجد عرض"
+
+msgid "Noise"
+msgstr "ضوضاء"
+
+msgid "not finished"
+msgstr "غير منته"
+
+msgid "not in progress"
+msgstr "ليس قيد التقدم"
+
+msgid "not started"
+msgstr "لم يبدأ"
+
+msgid "not terminated"
+msgstr "لم يتم إنهاؤه/ها"
+
+msgid "Note"
+msgstr "ملاحظة"
+
+msgid "offline"
+msgstr "غير متصل بالإنترنت"
+
+msgid "OK"
+msgstr "نعم"
+
+msgid "online"
+msgstr "متصل بالإنترنت"
+
+msgid "Other"
+msgstr "آخر"
+
+msgid "Outcome"
+msgstr "نتيجة"
+
+msgid "Partially authorized proctors"
+msgstr "المراقبون المعتمدون جزئيا"
+
+msgid "Pause"
+msgstr "وقفة"
+
+msgid "Pause Active Test Sessions"
+msgstr "توقف الحصص النشطة للرائز"
+
+msgid "Pause due to server maintenance"
+msgstr "توقف مؤقتا بسبب صيانة الخادم"
+
+msgid "Pause session"
+msgstr "إيقاف الحصة مؤقتا"
+
+msgid "Pause Session"
+msgstr "إيقاف الحصة مؤقتا"
+
+msgid "Pause sessions"
+msgstr "إيقاف الحصص مؤقتا"
+
+msgid "paused"
+msgstr "متوقف مؤقتا"
+
+msgid "Paused"
+msgstr "متوقف مؤقتا"
+
+msgid "Please provide a reason"
+msgstr "يرجى تقديم سبب"
+
+msgid "Please select one or more test site to manage proctors"
+msgstr "يرجى اختيار موقع رائز واحد أو أكثر لإدارة المراقبين"
+
+msgid "Please wait, authorization in process ..."
+msgstr "من فضلك انتظر، التفويض قيد التنفيذ ..."
+
+msgid "Please, make your selection"
+msgstr "من فضلك، حدد اختيارك"
+
+msgid "Power Outage"
+msgstr "انقطاع التيار الكهربائي"
+
+msgid "Previous Month"
+msgstr "الشهر السابق"
+
+msgid "Print Results"
+msgstr "طبع النتائج"
+
+msgid "Print Score"
+msgstr "طبع النقط"
+
+msgid "Print the assessment results"
+msgstr "طباعة نتائج التقييم"
+
+msgid "Printing"
+msgstr "طباعة"
+
+msgid "Proceed"
+msgstr "تقدم"
+
+msgid "Proctor"
+msgstr "مراقب"
+
+msgid "Proctor authorization"
+msgstr "تفويض مراقب"
+
+msgid "Proctor created"
+msgstr "أنشأ مراقب"
+
+msgid "Proctor/Staff"
+msgstr "مراقب/اموظفون"
+
+msgid "Proctored Delivery Server"
+msgstr "خادم تسليم مراقب"
+
+msgid "Proctored Test-Takers"
+msgstr "خاضعون للرائز مراقبون"
+
+msgid "Proctoring interface"
+msgstr "واجهة المراقبة"
+
+msgid "Proctors"
+msgstr "مراقبون"
+
+msgid "Proctors authorized"
+msgstr "المراقبون المفوضون"
+
+msgid "Proctors revoked"
+msgstr "مراقبون مُلغىًون"
+
+msgid "Progress"
+msgstr "تقدم"
+
+msgid "Reactivate Session"
+msgstr "إعادة تنشيط الحصة"
+
+msgid "Reactivate session"
+msgstr "إعادة تنشيط الحصة"
+
+msgid "Refresh"
+msgstr "تحديث"
+
+msgid "Refresh the page"
+msgstr "تحديث الصفحة"
+
+msgid "Registered proctoring log"
+msgstr "سجل المراقبة المسجل"
+
+msgid "Remaining"
+msgstr "المتبقي"
+
+msgid "Remove"
+msgstr "إزالة"
+
+msgid "Remove default tag filtering"
+msgstr "قم بإزالة تصفية العلامات الافتراضية"
+
+msgid "Remove the selected test takers from the session"
+msgstr "قم بإزالة الخاضعين للاختبار المختارين من الحصة"
+
+msgid "Remove the test taker from the session"
+msgstr "قم بإزالة الخاضعين للاختبار من الحصة"
+
+msgid "Report"
+msgstr "تقرير"
+
+msgid "Report irregularities"
+msgstr "الإبلاغ عن المخالفات"
+
+msgid "Report Irregularity"
+msgstr "الإبلاغ عن المخالفة"
+
+msgid "Report irregularity"
+msgstr "الإبلاغ عن المخالفة"
+
+msgid "reported for irregularity"
+msgstr "تم الإبلاغ عنه/ها بسبب مخالفة"
+
+msgid "Resource update task is completed"
+msgstr "اكتملت مهمة تحديث الموارد"
+
+msgid "results"
+msgstr "نتائج"
+
+#, tao-public
+msgid "Results"
+msgstr "نتائج"
+
+msgid "Return to the session manager"
+msgstr "العودة إلى إدارة الحصة"
+
+msgid "Return to the session monitoring"
+msgstr "العودة إلى مراقبة الحصة"
+
+msgid "Revoke authorization for the selected proctor"
+msgstr "إلغاء التفويض للمراقب المختار"
+
+msgid "Revoke the proctor"
+msgstr "إلغاء المراقب"
+
+msgid "Role"
+msgstr "دور"
+
+msgid "Score"
+msgstr "نتيجة"
+
+msgid "Score Report"
+msgstr "تقرير النتيجة"
+
+msgid "section"
+msgstr "قسم"
+
+msgid "Session"
+msgstr "حصة"
+
+msgid "session"
+msgstr "حصة"
+
+msgid "Session %s - %s has not been processed"
+msgstr "لم تتم معالجة الحصة %s - %s"
+
+msgid "Session history"
+msgstr "سجل الحصة"
+
+msgid "Session time handling"
+msgstr "التعامل مع وقت الحصة"
+
+msgid "Sessions"
+msgstr "حصص"
+
+msgid "sessions"
+msgstr "حصص"
+
+msgid "Sessions authorized"
+msgstr "الحصص المصرح بها"
+
+msgid "Sessions paused"
+msgstr "الحصص متوقفة مؤقتا"
+
+msgid "sessions paused"
+msgstr "الحصص متوقفة مؤقتا"
+
+msgid "Sessions reactivated"
+msgstr "إعادة تنشيط الحصص"
+
+msgid "Sessions reported"
+msgstr "تم الإبلاغ عن الحصص"
+
+msgid "Sessions terminated"
+msgstr "تم إنهاء الحصص"
+
+msgid "Show brief report"
+msgstr "عرض تقرير موجز"
+
+msgid "Show detailed report"
+msgstr "عرض تقرير مفصل"
+
+msgid "Show detailed session history messages"
+msgstr "عرض سجل رسائل الحصة التفصيلية"
+
+msgid "Show the detailed session history"
+msgstr "أظهر السجل التفصيلي للجلسة"
+
+msgid "Some delivery executions have not been authorized"
+msgstr "لم يتم التصريح لبعض عمليات التسليم"
+
+msgid "Some delivery executions have not been paused"
+msgstr "لم يتم إيقاف بعض عمليات التسليم مؤقتا"
+
+msgid "Some delivery executions have not been reactivated"
+msgstr "لم يتم إعادة تنشيط بعض عمليات التسليم"
+
+msgid "Some delivery executions have not been reported"
+msgstr "لم يتم الإبلاغ عن بعض عمليات التسليم"
+
+msgid "Some delivery executions have not been terminated"
+msgstr "لم يتم إنهاء بعض عمليات التنفيذ"
+
+msgid "Some delivery executions have not been updated"
+msgstr "لم يتم تحديث بعض عمليات التسليم"
+
+msgid "Something went wrong ..."
+msgstr "حدث خطأ ما ..."
+
+msgid "Start"
+msgstr "بداية"
+
+msgid "Start date of the export"
+msgstr "تاريخ بَدْء التصدير"
+
+msgid "Started at"
+msgstr "بدأ في"
+
+msgid "Status"
+msgstr "حالة"
+
+msgid "subcategory"
+msgstr "فئة فرعية"
+
+msgid "Subcategory"
+msgstr "فئة فرعية"
+
+msgid "System generated pause."
+msgstr "توقف مؤقت من طرف النظام."
+
+msgid "Tables successfully altered"
+msgstr "تم تغيير الجداول بنجاح"
+
+msgid "Take or continue a test controlled by a proctor"
+msgstr "قم بإجراء أو متابعة رائز يتحكم فيه مراقب"
+
+msgid "TAO: User Authorization"
+msgstr "TAO: ترخيص المستخدم"
+
+msgid "Technical"
+msgstr "تقني"
+
+msgid "Terminate"
+msgstr "إنهاء"
+
+msgid "Terminate and irregularity"
+msgstr "الإنهاء وعدم الانتظام"
+
+msgid "Terminate Session"
+msgstr "إنهاء الحصة"
+
+msgid "Terminate session"
+msgstr "إنهاء الحصة"
+
+msgid "Terminate sessions"
+msgstr "إنهاء الحصص"
+
+msgid "Terminate/Reactivate"
+msgstr "إنهاء/إعادة التنشيط"
+
+msgid "Terminate/Reactivate and irregularity"
+msgstr "إنهاء/إعادة تنشيط وعدم انتظام"
+
+msgid "terminated"
+msgstr "منتهي/ة"
+
+msgid "Terminated"
+msgstr "منتهي/ة"
+
+msgid "Test  must be terminated."
+msgstr "يجب إنهاء الرائز."
+
+msgid "Test %s had already been authorized."
+msgstr "تم سلفا السماح برائز %s."
+
+msgid "Test %s had already been paused."
+msgstr "تم سلفا إيقاف رائز %s."
+
+msgid "Test %s had already been terminated."
+msgstr "تم سلفا إنهاء رائز %s."
+
+msgid "Test %s had been canceled."
+msgstr "تم إلغاء رائز %s."
+
+msgid "Test %s had been completed."
+msgstr "تم الانتهاء من رائز %s."
+
+msgid "Test %s had been paused."
+msgstr "تم إيقاف رائز %s مؤقتا."
+
+msgid "Test %s had been terminated."
+msgstr "تم إنهاء رائز %s."
+
+msgid "Test %s had not been finished."
+msgstr "لم يتم الانتهاء من رائز %s."
+
+msgid "Test %s had not been in progress."
+msgstr "لم يكن رائز %s قيد التقدم."
+
+msgid "Test %s had not been started."
+msgstr "لم يبدأ رائز %s."
+
+msgid "Test %s must be terminated."
+msgstr "يجب إنهاء رائز %s."
+
+msgid "Test center saved"
+msgstr "تم حفظ مركز الرائز"
+
+msgid "Test had already been authorized."
+msgstr "تم سلفا السماح بالرائز."
+
+msgid "Test had already been paused."
+msgstr "تم سلفا إيقاف الرائز."
+
+msgid "Test had alredy been terminated."
+msgstr "تم سلفا إنهاء الرائز."
+
+msgid "Test had been canceled."
+msgstr "تم إلغاء الرائز."
+
+msgid "Test had been completed."
+msgstr "تم الانتهاء من الرائز."
+
+msgid "Test had been paused."
+msgstr "تم إيقاف الرائز مؤقتا."
+
+msgid "Test had been terminated."
+msgstr "تم إنهاء الرائز."
+
+msgid "Test had not been finished."
+msgstr "لم يتم الانتهاء من الرائز."
+
+msgid "Test had not been in progress."
+msgstr "لم يكن الرائز قيد التقدم."
+
+msgid "Test had not been started."
+msgstr "لم يبدأ رائز."
+
+msgid "test has no time limits"
+msgstr "الرائز ليس له حدود زمنية"
+
+msgid "Test site %s"
+msgstr "موقع الرائز %s"
+
+msgid "Test taker"
+msgstr "الخاضعون للرائز"
+
+msgid "test taker"
+msgstr "الخاضعون للرائز"
+
+msgid "Test takers have been added"
+msgstr "تمت إضافة الخاضعين للرائز"
+
+msgid "Test takers have been removed"
+msgstr "تمت إزالة خاضعين للرائز"
+
+msgid "Test Variables"
+msgstr "متغيرات الرائز"
+
+msgid "Test-Taker"
+msgstr "الخاضعين للرائز"
+
+msgid "Testing Workstation"
+msgstr "محطة عمل الروائز"
+
+msgid "The action cannot be applied, no eligible sessions found"
+msgstr "لا يمكن تطبيق الإجراء، لم يتم العثور على حصص مؤهلة"
+
+msgid "The action will be applied to the following session(s)"
+msgstr "سيتم تطبيق الإجراء على الحصة (الحصص) التالية"
+
+msgid "the already granted time will be replaced by the new value"
+msgstr "سيتم استبدال الوقت الممنوح سابقا بالقيمة الجديدة"
+
+msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
+msgstr "تم تعليق التقييم. لاستئناف تقييمك، يرجى إعادة إطلاقه والاتصال بمراقبك إذا لزم الأمر."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore."
+msgstr "تم إنهاء التقييم. لا يمكنك التفاعل معه بعد الآن."
+
+msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
+msgstr "تم إنهاء التقييم. لا يمكنك التفاعل معه بعد الآن. يرجى الاتصال بمراقبك إذا لزم الأمر."
+
+msgid "The assessment was automatically terminated by the system due to inactivity."
+msgstr "تم إنهاء التقييم تِلْقائيًا من طرف النظام بسبب توقف النشاط."
+
+msgid "The decreased time cannot be higher than remaining time %s"
+msgstr "لا يمكن أن يكون الوقت المخفض أعلى من الوقت المتبقي %s"
+
+msgid "The extra time must be a number"
+msgstr "يجب أن يكون الوقت الإضافي رقما"
+
+msgid "The extra time must be a number bigger than 0"
+msgstr "يجب أن يكون الوقت الإضافي أكبر من 0"
+
+msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
+msgstr "لا يمكن للوقت المتزايد، عند إضافته إلى الوقت المتبقي، أن يكون %s أعلى من الوقت الإجمالي الممنوح لهذا المؤقت %s"
+
+msgid "The proctor will be authorized. Continue ?"
+msgstr "سيتم الترخيص للمراقب. هل تريد الاستمرار؟"
+
+msgid "The proctor will be revoked. Continue ?"
+msgstr "سيتم إلغاء الترخيص للمراقب. هل تريد الاستمرار؟"
+
+msgid "The proctors will be authorized. Continue ?"
+msgstr "سيتم الترخيص للمراقبين. هل تريد الاستمرار؟"
+
+msgid "The proctors will be revoked. Continue ?"
+msgstr "سيتم إلغاء الترخيص للمراقبين. هل تريد الاستمرار؟"
+
+msgid "The test taker will be removed from this session. Continue ?"
+msgstr "ستتم إزالة الخاضع للرائز من هذه الحصة. هل تريد الاستمرار؟"
+
+msgid "The test takers will be removed from this session. Continue ?"
+msgstr "ستتم إزالة الخاضعين للرائز من هذه الحصة. هل تريد الاستمرار؟"
+
+msgid "There is no delivery in progress"
+msgstr "لا يوجد تسليم قيد التنفيذ"
+
+msgid "Time"
+msgstr "وقت"
+
+msgid "Time adjusted"
+msgstr "وقت معدل"
+
+msgid "Time decrease is too high"
+msgstr "انخفاض الوقت مرتفع جدا"
+
+msgid "Time increase is too high"
+msgstr "زيادة الوقت مرتفعة جدا"
+
+#, tao-public
+msgid "Tools"
+msgstr "أدوات"
+
+msgid "Total Current Assessments"
+msgstr "إجمالي التقييمات الحالية"
+
+msgid "Total time"
+msgstr "الوقت الإجمالي"
+
+msgid "Unable to create irregularities export for %s"
+msgstr "غير قادر على إنشاء تصدير المخالفات ل %s"
+
+msgid "Unable to perform action on test %s."
+msgstr "غير قادر على تنفيذ إجراء في الرائز %s."
+
+msgid "Unexpected response"
+msgstr "إجابة غير متوقعة"
+
+msgid "User Activity"
+msgstr "نشاط المستخدم"
+
+msgid "Warning, you are about to pause all in progress tests. All test takers will be paused on or before the next heartbeat. Please provide a reason for this action."
+msgstr "تحذير، أنت على وشك إيقاف جميع الروائز الجارية مؤقتا. سيتم إيقاف جميع الخاضعين للرائز مؤقتا عند أو قبل الإشارة الدورية الموالية. يرجى تقديم سبب لهذا الإجراء."
+
+msgid "Weather"
+msgstr "طقس"
+

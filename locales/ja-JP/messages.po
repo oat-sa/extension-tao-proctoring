@@ -1,20 +1,27 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.09\n"
-"PO-Revision-Date: 2022-08-12T16:46:00\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2023-09-13 09:12\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: ja-JP\n"
+"Language: ja\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: ja-JP\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: ja\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 701\n"
+"Language-Team: Japanese\n"
 
 msgid " sec"
-msgstr " sec"
+msgstr " 秒"
 
 msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - アイテム %2$s/%3$s"
@@ -46,37 +53,37 @@ msgstr "%s KVエントリが削除されました"
 msgid "%s minutes more"
 msgstr "%s 分以上"
 
-msgid "%s\'s test had already been authorized."
+msgid "%s\\'s test had already been authorized."
 msgstr "%sのテストは既に承認されています"
 
-msgid "%s\'s test had already been paused."
+msgid "%s\\'s test had already been paused."
 msgstr "%sのテストは既に一時停止されています"
 
-msgid "%s\'s test had already been terminated."
+msgid "%s\\'s test had already been terminated."
 msgstr "%sのテストは既に終了されています"
 
-msgid "%s\'s test had been canceled."
+msgid "%s\\'s test had been canceled."
 msgstr "%sのテストはキャンセルされています"
 
-msgid "%s\'s test had been completed."
+msgid "%s\\'s test had been completed."
 msgstr "%sのテストは完了済みです"
 
-msgid "%s\'s test had been paused."
+msgid "%s\\'s test had been paused."
 msgstr "%sのテストは一時停止しています"
 
-msgid "%s\'s test had been terminated."
+msgid "%s\\'s test had been terminated."
 msgstr "%sのテストは終了しています"
 
-msgid "%s\'s test had not been finished."
+msgid "%s\\'s test had not been finished."
 msgstr "%sのテストは終了していません"
 
-msgid "%s\'s test had not been in progress."
+msgid "%s\\'s test had not been in progress."
 msgstr "%sのテストは実施されていません"
 
-msgid "%s\'s test had not been started."
+msgid "%s\\'s test had not been started."
 msgstr "%sのテストは開始していません"
 
-msgid "%s\'s test must be terminated."
+msgid "%s\\'s test must be terminated."
 msgstr "%sのテストを終了する必要があります"
 
 msgid "..."
@@ -89,7 +96,7 @@ msgid "Action"
 msgstr "処理"
 
 msgid "Actions"
-msgstr "処理"
+msgstr "アクション"
 
 msgid "Active"
 msgstr "アクティブ"
@@ -144,7 +151,7 @@ msgid "Assessment has been paused due to attempt to switch to another window/tab
 msgstr "別のウィンドウ/タブに切り替えたために、テストが一時停止されました。"
 
 msgid "Assign administrator"
-msgstr ""
+msgstr "管理者の割り当て"
 
 msgid "Assign more test takers to this session"
 msgstr "さらにこのセッションに受験者を割当てます"
@@ -195,7 +202,7 @@ msgid "Authorize the selected proctors"
 msgstr "選択した試検監督者を承認"
 
 msgid "Authorized"
-msgstr "承認済"
+msgstr "承認済み"
 
 msgid "authorized"
 msgstr "承認済"
@@ -225,7 +232,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "受験者が承認済みテストを続行しないため、システムによって自動的にリセットされます。"
 
 msgid "Available"
-msgstr "利用可能"
+msgstr "実施可能"
 
 msgid "Available history"
 msgstr "利用可能な履歴"
@@ -255,7 +262,7 @@ msgid "cancel"
 msgstr "キャンセル"
 
 msgid "cancel the action"
-msgstr "処理のキャンセル"
+msgstr "操作をキャンセル"
 
 msgid "canceled"
 msgstr "キャンセルされました"
@@ -333,7 +340,7 @@ msgid "Complaint"
 msgstr "苦情"
 
 msgid "Completed"
-msgstr "完了済"
+msgstr "完了"
 
 msgid "completed"
 msgstr "完了済"
@@ -420,7 +427,7 @@ msgid "Environment"
 msgstr "状況・環境"
 
 msgid "Error"
-msgstr "間違い・手違い"
+msgstr "エラー"
 
 msgid "Event"
 msgstr "イベント"
@@ -541,7 +548,7 @@ msgid "Logout"
 msgstr "ログアウト"
 
 msgid "Main Menu"
-msgstr "メインメニュ"
+msgstr "メインメニュー"
 
 msgid "Manage Proctors"
 msgstr "試検監督者の管理"

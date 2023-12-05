@@ -1,17 +1,24 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.01\n"
-"PO-Revision-Date: 2021-12-23T18:14:52\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2023-12-05 09:23\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: lt-LT\n"
+"Language: lt\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: lt-LT\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && (n%100>19 || n%100<11) ? 0 : (n%10>=2 && n%10<=9) && (n%100>19 || n%100<11) ? 1 : n%1!=0 ? 2: 3);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: lt\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 701\n"
+"Language-Team: Lithuanian\n"
 
 msgid " sec"
 msgstr ""
@@ -46,41 +53,41 @@ msgstr ""
 msgid "%s minutes more"
 msgstr "%s minučių daugiau"
 
-msgid "%s\'s test had already been authorized."
+msgid "%s\\'s test had already been authorized."
 msgstr ""
 
-msgid "%s\'s test had already been paused."
+msgid "%s\\'s test had already been paused."
 msgstr ""
 
-msgid "%s\'s test had already been terminated."
+msgid "%s\\'s test had already been terminated."
 msgstr ""
 
-msgid "%s\'s test had been canceled."
+msgid "%s\\'s test had been canceled."
 msgstr ""
 
-msgid "%s\'s test had been completed."
+msgid "%s\\'s test had been completed."
 msgstr ""
 
-msgid "%s\'s test had been paused."
+msgid "%s\\'s test had been paused."
 msgstr ""
 
-msgid "%s\'s test had been terminated."
+msgid "%s\\'s test had been terminated."
 msgstr ""
 
-msgid "%s\'s test had not been finished."
+msgid "%s\\'s test had not been finished."
 msgstr ""
 
-msgid "%s\'s test had not been in progress."
+msgid "%s\\'s test had not been in progress."
 msgstr ""
 
-msgid "%s\'s test had not been started."
+msgid "%s\\'s test had not been started."
 msgstr ""
 
-msgid "%s\'s test must be terminated."
+msgid "%s\\'s test must be terminated."
 msgstr ""
 
 msgid "..."
-msgstr "..."
+msgstr ""
 
 msgid "A session of the delivery %s have not been paused"
 msgstr "Pateikties sesija %s nebuvo pristabdyta"
@@ -177,7 +184,7 @@ msgid "Authorization status"
 msgstr ""
 
 msgid "Authorize"
-msgstr "Autorizuoti"
+msgstr ""
 
 msgid "Authorize session"
 msgstr "Autorizuoti sesiją"
@@ -195,7 +202,7 @@ msgid "Authorize the selected proctors"
 msgstr "Autorizuoti pasirinktus proktorius"
 
 msgid "Authorized"
-msgstr "Autorizuota"
+msgstr ""
 
 msgid "authorized"
 msgstr "autorizuota"
@@ -225,7 +232,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "Automatiškai atstatyti pagal sistemą dėl testo laikytojo pasirinkimo netęsti autorizuoto testo."
 
 msgid "Available"
-msgstr "Galimas"
+msgstr ""
 
 msgid "Available history"
 msgstr "Esanti istorija"
@@ -255,7 +262,7 @@ msgid "cancel"
 msgstr "atšaukti"
 
 msgid "cancel the action"
-msgstr "atšaukti veiksmą"
+msgstr ""
 
 msgid "canceled"
 msgstr "atšaukta"
@@ -333,7 +340,7 @@ msgid "Complaint"
 msgstr "Skundas"
 
 msgid "Completed"
-msgstr "Atlikta"
+msgstr ""
 
 msgid "completed"
 msgstr "atlikta"
@@ -384,7 +391,7 @@ msgid "Deliveries"
 msgstr "Pateiktys"
 
 msgid "Delivery"
-msgstr "Pateiktis"
+msgstr ""
 
 msgid "Detailed Session History of %s"
 msgstr "%s Detali Sesijos Istorija"
@@ -393,7 +400,7 @@ msgid "Detailed Session History of a selection"
 msgstr "Pasirinkimo Detali Sesijos Istorija"
 
 msgid "Details"
-msgstr "Detalės"
+msgstr "Informacija"
 
 msgid "Disturbance"
 msgstr "Trikdymas"
@@ -420,7 +427,7 @@ msgid "Environment"
 msgstr "Aplinka"
 
 msgid "Error"
-msgstr "Klaida"
+msgstr ""
 
 msgid "Event"
 msgstr "Įvykis"
@@ -429,7 +436,7 @@ msgid "Examinee"
 msgstr "Egzaminuojamasis"
 
 msgid "Export"
-msgstr "Eksportuoti"
+msgstr ""
 
 #, tao-public
 msgid "Export Irregularities"
@@ -463,7 +470,7 @@ msgid "finished"
 msgstr "baigta"
 
 msgid "First name"
-msgstr "Vardas"
+msgstr ""
 
 msgid "Freezing"
 msgstr "Užšaldyta"
@@ -490,7 +497,7 @@ msgid "Illness"
 msgstr "Liga"
 
 msgid "In Progress"
-msgstr "Progrese"
+msgstr "Vykdoma"
 
 msgid "in progress"
 msgstr ""
@@ -523,7 +530,7 @@ msgid "Last Month"
 msgstr "Paskutinis Mėnuo"
 
 msgid "Last name"
-msgstr "Pavardė"
+msgstr ""
 
 msgid "Last Week"
 msgstr "Paskutinė Savaitė"
@@ -786,7 +793,7 @@ msgid "Role"
 msgstr "Rolė"
 
 msgid "Score"
-msgstr "Rezultatas"
+msgstr "Balai"
 
 msgid "Score Report"
 msgstr "Rezultato Ataskaita"
@@ -804,13 +811,13 @@ msgid "Session %s - %s has not been processed"
 msgstr "Sesija %s - %s nebuvo apdorota"
 
 msgid "Session history"
-msgstr "Sesijos istorija"
+msgstr ""
 
 msgid "Session time handling"
 msgstr "Sesijos laiko valdymas"
 
 msgid "Sessions"
-msgstr "Sesijos"
+msgstr ""
 
 msgid "sessions"
 msgstr ""
@@ -864,7 +871,7 @@ msgid "Some delivery executions have not been updated"
 msgstr "Kaikurie pateikčių vykdymai nebuvo atnaujinti"
 
 msgid "Something went wrong ..."
-msgstr "Kažkas nutiko blogai..."
+msgstr "Kažkas blogai įvyko..."
 
 msgid "Start"
 msgstr "Pradėti"
@@ -876,7 +883,7 @@ msgid "Started at"
 msgstr "Pradėta"
 
 msgid "Status"
-msgstr "Būsena"
+msgstr ""
 
 msgid "subcategory"
 msgstr "subkategorija"
