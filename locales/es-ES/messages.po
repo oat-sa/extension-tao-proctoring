@@ -1,23 +1,30 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.01\n"
-"PO-Revision-Date: 2021-12-23T18:14:14\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2023-06-07 15:17\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: es-ES\n"
+"Language: es\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: es-ES\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: es-ES\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 701\n"
+"Language-Team: Spanish\n"
 
 msgid " sec"
 msgstr " s"
 
 msgid "%1$s - Item %2$s/%3$s"
-msgstr "%1$s - Item %2$s/%3$s"
+msgstr ""
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sesiones de la entrega %s no han sido pausadas"
@@ -46,41 +53,41 @@ msgstr "%s Entradas de KV eliminadas"
 msgid "%s minutes more"
 msgstr "%s minutos más"
 
-msgid "%s\'s test had already been authorized."
+msgid "%s\\'s test had already been authorized."
 msgstr "La prueba de %s ya se autorizó."
 
-msgid "%s\'s test had already been paused."
+msgid "%s\\'s test had already been paused."
 msgstr "La prueba de %s ya se pausó."
 
-msgid "%s\'s test had already been terminated."
+msgid "%s\\'s test had already been terminated."
 msgstr "La prueba de %s ya se terminó."
 
-msgid "%s\'s test had been canceled."
+msgid "%s\\'s test had been canceled."
 msgstr "La prueba de %s se canceló."
 
-msgid "%s\'s test had been completed."
+msgid "%s\\'s test had been completed."
 msgstr "La prueba de %s se completó."
 
-msgid "%s\'s test had been paused."
+msgid "%s\\'s test had been paused."
 msgstr "La prueba de %s se pausó."
 
-msgid "%s\'s test had been terminated."
+msgid "%s\\'s test had been terminated."
 msgstr "La prueba de %s se terminó."
 
-msgid "%s\'s test had not been finished."
+msgid "%s\\'s test had not been finished."
 msgstr "La prueba de %s no finalizó."
 
-msgid "%s\'s test had not been in progress."
+msgid "%s\\'s test had not been in progress."
 msgstr "La prueba de %s no estuvo en curso."
 
-msgid "%s\'s test had not been started."
+msgid "%s\\'s test had not been started."
 msgstr "La prueba de %s no se inició."
 
-msgid "%s\'s test must be terminated."
+msgid "%s\\'s test must be terminated."
 msgstr "La prueba %s debe terminarse."
 
 msgid "..."
-msgstr "..."
+msgstr ""
 
 msgid "A session of the delivery %s have not been paused"
 msgstr "No se pausó una sesión de la entrega %s"
@@ -89,7 +96,7 @@ msgid "Action"
 msgstr "Acción"
 
 msgid "Actions"
-msgstr "Acciones"
+msgstr ""
 
 msgid "Active"
 msgstr "Activo"
@@ -101,7 +108,7 @@ msgid "Active test-takers"
 msgstr "Examinados activos"
 
 msgid "Actor"
-msgstr "Actor"
+msgstr ""
 
 msgid "Add test takers"
 msgstr "Añadir examinados"
@@ -177,7 +184,7 @@ msgid "Authorization status"
 msgstr "Estado de la autorización"
 
 msgid "Authorize"
-msgstr "Autorizar"
+msgstr ""
 
 msgid "Authorize session"
 msgstr "Autorizar sesión"
@@ -195,7 +202,7 @@ msgid "Authorize the selected proctors"
 msgstr "Autorizar a los supervisores seleccionados"
 
 msgid "Authorized"
-msgstr "Autorizado"
+msgstr ""
 
 msgid "authorized"
 msgstr "autorizado"
@@ -225,7 +232,7 @@ msgid "Automatically reset by the system due to the test taker choosing not to p
 msgstr "Restablecido automáticamente por el sistema porque el examinado decidió no continuar con la prueba autorizada."
 
 msgid "Available"
-msgstr "Disponible"
+msgstr ""
 
 msgid "Available history"
 msgstr "Historial disponible"
@@ -255,7 +262,7 @@ msgid "cancel"
 msgstr "cancelar"
 
 msgid "cancel the action"
-msgstr "cancelar la acción"
+msgstr ""
 
 msgid "canceled"
 msgstr "cancelado"
@@ -333,7 +340,7 @@ msgid "Complaint"
 msgstr "Queja"
 
 msgid "Completed"
-msgstr "Completado"
+msgstr ""
 
 msgid "completed"
 msgstr "completado"
@@ -366,7 +373,7 @@ msgid "Current sessions"
 msgstr "Sesiones actuales"
 
 msgid "Date"
-msgstr "Fecha"
+msgstr ""
 
 msgid "date"
 msgstr "fecha"
@@ -384,7 +391,7 @@ msgid "Deliveries"
 msgstr "Entregas"
 
 msgid "Delivery"
-msgstr "Distribución"
+msgstr ""
 
 msgid "Detailed Session History of %s"
 msgstr "Historial de sesiones detallado de %s"
@@ -393,7 +400,7 @@ msgid "Detailed Session History of a selection"
 msgstr "Historial de sesiones detallado de una selección"
 
 msgid "Details"
-msgstr "Detalles"
+msgstr ""
 
 msgid "Disturbance"
 msgstr "Alteración"
@@ -420,7 +427,7 @@ msgid "Environment"
 msgstr "Entorno"
 
 msgid "Error"
-msgstr "Error"
+msgstr ""
 
 msgid "Event"
 msgstr "Evento"
@@ -429,7 +436,7 @@ msgid "Examinee"
 msgstr "Examinado"
 
 msgid "Export"
-msgstr "Exportar"
+msgstr ""
 
 #, tao-public
 msgid "Export Irregularities"
@@ -439,7 +446,7 @@ msgid "Extended time"
 msgstr "Tiempo extendido"
 
 msgid "Extra"
-msgstr "Extra"
+msgstr ""
 
 msgid "Extra Time"
 msgstr "Tiempo adicional"
@@ -463,7 +470,7 @@ msgid "finished"
 msgstr "finalizado"
 
 msgid "First name"
-msgstr "Nombre"
+msgstr ""
 
 msgid "Freezing"
 msgstr "Congelación"
@@ -490,7 +497,7 @@ msgid "Illness"
 msgstr "Enfermedad"
 
 msgid "In Progress"
-msgstr "En curso"
+msgstr ""
 
 msgid "in progress"
 msgstr "en progreso"
@@ -523,7 +530,7 @@ msgid "Last Month"
 msgstr "Último mes"
 
 msgid "Last name"
-msgstr "Apellido"
+msgstr ""
 
 msgid "Last Week"
 msgstr "Última semana"
@@ -535,13 +542,13 @@ msgid "Launching"
 msgstr "Lanzando"
 
 msgid "Loading"
-msgstr "Cargando"
+msgstr ""
 
 msgid "Logout"
-msgstr "Cerrar sesión"
+msgstr ""
 
 msgid "Main Menu"
-msgstr "Menú principal"
+msgstr ""
 
 msgid "Manage Proctors"
 msgstr "Gestionar supervisores"
@@ -560,7 +567,7 @@ msgid "Monitoring"
 msgstr "Monitoreo"
 
 msgid "Navigation"
-msgstr "Navegación"
+msgstr ""
 
 msgid "Network"
 msgstr "Red"
@@ -611,7 +618,7 @@ msgid "offline"
 msgstr "fuera de línea"
 
 msgid "OK"
-msgstr "Aceptar"
+msgstr ""
 
 msgid "online"
 msgstr "en línea"
@@ -722,10 +729,10 @@ msgid "Reactivate session"
 msgstr "Reactivar sesión"
 
 msgid "Refresh"
-msgstr "Recargar"
+msgstr ""
 
 msgid "Refresh the page"
-msgstr "Recargar la página"
+msgstr ""
 
 msgid "Registered proctoring log"
 msgstr "Registro de vigilancia"
@@ -734,7 +741,7 @@ msgid "Remaining"
 msgstr "Restante"
 
 msgid "Remove"
-msgstr "Retirar"
+msgstr ""
 
 msgid "Remove default tag filtering"
 msgstr "Retirar filtrado de etiquetas predeterminado"
@@ -768,7 +775,7 @@ msgstr "resultados"
 
 #, tao-public
 msgid "Results"
-msgstr "Resultados"
+msgstr ""
 
 msgid "Return to the session manager"
 msgstr "Regresar al gestor de sesiones"
@@ -786,7 +793,7 @@ msgid "Role"
 msgstr "Rol"
 
 msgid "Score"
-msgstr "Puntaje"
+msgstr "Puntuación"
 
 msgid "Score Report"
 msgstr "Reporte de puntajes"
@@ -804,13 +811,13 @@ msgid "Session %s - %s has not been processed"
 msgstr "La sesión %s - %s no se procesó"
 
 msgid "Session history"
-msgstr "Historial de sesiones"
+msgstr ""
 
 msgid "Session time handling"
 msgstr "Gestión del tiempo de sesión"
 
 msgid "Sessions"
-msgstr "Sesiones"
+msgstr ""
 
 msgid "sessions"
 msgstr "sesiones"
@@ -864,7 +871,7 @@ msgid "Some delivery executions have not been updated"
 msgstr "Algunas ejecuciones de entrega no se actualizaron"
 
 msgid "Something went wrong ..."
-msgstr "Algo salió mal..."
+msgstr ""
 
 msgid "Start"
 msgstr "Iniciar"
@@ -876,7 +883,7 @@ msgid "Started at"
 msgstr "Iniciado el"
 
 msgid "Status"
-msgstr "Estado"
+msgstr ""
 
 msgid "subcategory"
 msgstr "subcategoría"
@@ -1077,7 +1084,7 @@ msgid "There is no delivery in progress"
 msgstr "No hay ninguna entrega en curso"
 
 msgid "Time"
-msgstr "Tiempo"
+msgstr ""
 
 msgid "Time adjusted"
 msgstr "El tiempo se ajusta"
