@@ -24,7 +24,7 @@
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
         "sinergi/browser-detector": "^6.0.2",
         "oat-sa/generis" : ">=15.22",
-        "oat-sa/tao-core" : ">=50.24.6",
+        "oat-sa/tao-core" : ">=54.0.0",
         "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
         "oat-sa/extension-tao-delivery" : ">=15.0.0",
         "oat-sa/extension-tao-eventlog" : ">=3.0.0",
