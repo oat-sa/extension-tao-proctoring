@@ -457,7 +457,7 @@ define([
                         config.categoriesSelector = cascadingComboBox(categories[actionName]);
                     }
 
-                    _.each(_selection, function (uri) {
+                    _.forEach(_selection, function (uri) {
                         const deliveryExecutionData = getExecutionData(uri);
                         if (deliveryExecutionData.hasOwnProperty('lastPauseReason')) {
                             config['predefinedReason'] = deliveryExecutionData['lastPauseReason'];
@@ -562,7 +562,7 @@ define([
                     var allowedDeliveries = [];
                     var forbiddenDeliveries = [];
 
-                    _.each(selection, function (uri) {
+                    _.forEach(selection, function (uri) {
                         var testTakerData = getExecutionData(uri);
                         var checkedDelivery;
                         if(testTakerData){
@@ -931,7 +931,7 @@ define([
                     }
 
                     //extra fields
-                    _.each(extraFields, function(extraField){
+                    _.forEach(extraFields, function(extraField){
                         model.push({
                             id : extraField.id,
                             label: extraField.label,
