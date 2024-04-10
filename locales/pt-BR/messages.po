@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-06-07 15:17\n"
+"PO-Revision-Date: 2024-04-09 07:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: pt\n"
@@ -491,7 +491,7 @@ msgid "ID/Authorization"
 msgstr "ID/Autorização"
 
 msgid "Identifier"
-msgstr ""
+msgstr "Identificador"
 
 msgid "Illness"
 msgstr "Doença"
