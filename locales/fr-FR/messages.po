@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-06-13 12:46\n"
+"PO-Revision-Date: 2024-04-09 07:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr\n"
@@ -21,10 +21,10 @@ msgstr ""
 "Language-Team: French\n"
 
 msgid " sec"
-msgstr ""
+msgstr " sec"
 
 msgid "%1$s - Item %2$s/%3$s"
-msgstr ""
+msgstr "%1$s - Question %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessions pour la passation %s n'ont pas été mises en pause."
@@ -87,16 +87,16 @@ msgid "%s\\'s test must be terminated."
 msgstr "Le test de %s doit être terminé."
 
 msgid "..."
-msgstr ""
+msgstr "..."
 
 msgid "A session of the delivery %s have not been paused"
 msgstr "Une session de la passation %s n'a pas été interrompue."
 
 msgid "Action"
-msgstr ""
+msgstr "Action"
 
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgid "Active"
 msgstr "Actif"
@@ -120,7 +120,7 @@ msgid "Administer deliveries"
 msgstr "Administrer des passations"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 msgid "All fields are required"
 msgstr "Tous les champs sont obligatoires"
@@ -373,10 +373,10 @@ msgid "Current sessions"
 msgstr "Sessions courantes"
 
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 msgid "date"
-msgstr ""
+msgstr "date"
 
 msgid "Days"
 msgstr "Jours"
@@ -427,7 +427,7 @@ msgid "Environment"
 msgstr "Environnement"
 
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 msgid "Event"
 msgstr "Événement"
@@ -446,7 +446,7 @@ msgid "Extended time"
 msgstr "Durée prolongée"
 
 msgid "Extra"
-msgstr ""
+msgstr "Supplémentaire"
 
 msgid "Extra Time"
 msgstr "Temps supplémentaire"
@@ -512,7 +512,7 @@ msgid "Issue Category"
 msgstr "Catégorie de problème (ou question ?)"
 
 msgid "item"
-msgstr ""
+msgstr "question"
 
 msgid "Item Variables"
 msgstr "Variables d'item"
@@ -558,7 +558,7 @@ msgid "Manage Results"
 msgstr "Gestion des résultats"
 
 msgid "minutes"
-msgstr ""
+msgstr "minutes"
 
 msgid "Monitor"
 msgstr "Outil de surveillance"
@@ -612,7 +612,7 @@ msgid "not terminated"
 msgstr "non résilié"
 
 msgid "Note"
-msgstr ""
+msgstr "Note"
 
 msgid "offline"
 msgstr "non connecté"
@@ -799,13 +799,13 @@ msgid "Score Report"
 msgstr "Rapport de notation"
 
 msgid "section"
-msgstr ""
+msgstr "section"
 
 msgid "Session"
-msgstr ""
+msgstr "Session"
 
 msgid "session"
-msgstr ""
+msgstr "session"
 
 msgid "Session %s - %s has not been processed"
 msgstr "La session %s - %s n'a pas été traitée."
@@ -820,7 +820,7 @@ msgid "Sessions"
 msgstr ""
 
 msgid "sessions"
-msgstr ""
+msgstr "sessions"
 
 msgid "Sessions authorized"
 msgstr "Sessions autorisées"
