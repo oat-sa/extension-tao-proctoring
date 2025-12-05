@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2024-04-09 07:35\n"
+"PO-Revision-Date: 2025-12-05 08:37\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: pt\n"
@@ -24,13 +24,13 @@ msgid " sec"
 msgstr " seg."
 
 msgid "%1$s - Item %2$s/%3$s"
-msgstr ""
+msgstr "%1$s - Questão %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
 msgstr "%d sessões da entrega %s não foram pausadas"
 
 msgid "%s - item %p/%c"
-msgstr ""
+msgstr "%s - questão %p/%c"
 
 msgid "%s completed"
 msgstr "%s concluído"
@@ -87,7 +87,7 @@ msgid "%s\\'s test must be terminated."
 msgstr "O teste de %sprecisa ser encerrado."
 
 msgid "..."
-msgstr ""
+msgstr "..."
 
 msgid "A session of the delivery %s have not been paused"
 msgstr "Uma sessão da entrega %s não foi pausada"
@@ -446,7 +446,7 @@ msgid "Extended time"
 msgstr "Tempo estendido"
 
 msgid "Extra"
-msgstr ""
+msgstr "Extra"
 
 msgid "Extra Time"
 msgstr "Tempo extra"
