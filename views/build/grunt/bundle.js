@@ -34,6 +34,7 @@ module.exports = function(grunt) {
                         'taoItems',
                         'taoQtiTest'
                     ],
+                    babelPreTransform: { enabled: true, exclude: ['mathjax'] },
                     bundles : [{
                         name : 'taoProctoring',
                         default : true,
