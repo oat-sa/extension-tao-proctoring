@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-03-24 16:08\n"
+"PO-Revision-Date: 2026-07-31 07:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: sk\n"
@@ -40,7 +40,7 @@ msgstr "Proktor"
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#proctor
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Proctor of the test center"
-msgstr "Dozorca testovacieho centra"
+msgstr "Proktor testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administrator
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
@@ -55,22 +55,22 @@ msgstr "správca testovacieho centra"
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Authorized Proctor"
-msgstr "Autorizovaný dozorca"
+msgstr "Autorizovaný Proktor"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#authorizedProctor
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Authorized Proctor of the test center"
-msgstr "Autorizovaný dozorca testovacieho centra"
+msgstr "Autorizovaný proktor testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#assignedProctor
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Assigned Proctor"
-msgstr "Pridelený dozorca"
+msgstr "Pridelený proktor"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#assignedProctor
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Assigned Proctor of the test center"
-msgstr "Pridelený dozorca testovacieho centra"
+msgstr "Pridelený IT administrátor testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
@@ -80,17 +80,17 @@ msgstr "Obsah"
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#administers
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "test center administers delivery"
-msgstr "testovacie centrum spravuje doručenie"
+msgstr "testovacie centrum spravuje dodávku"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#children
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Children Test Center"
-msgstr "Detské testovacie centrum"
+msgstr "Podradené testovacie centrum"
 
 # http://www.tao.lu/Ontologies/TAOTestCenter.rdf#children
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "children test center of the test center"
-msgstr "detské testovacie centrum testovacieho centra"
+msgstr "podradené testovacie centrum testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOGroup.rdf#TestCenters
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
