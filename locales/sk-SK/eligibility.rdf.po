@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-03-24 16:06\n"
+"PO-Revision-Date: 2026-07-31 07:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: sk\n"
@@ -20,5 +20,5 @@ msgstr ""
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#DeliveryEligibility
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Delivery Eligibility"
-msgstr "Oprávnenosť na doručenie"
+msgstr "Oprávnenosť Dodávky"
 
