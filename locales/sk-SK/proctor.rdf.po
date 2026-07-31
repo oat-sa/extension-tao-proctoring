@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-03-24 16:07\n"
+"PO-Revision-Date: 2026-07-31 07:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: sk\n"
@@ -20,32 +20,32 @@ msgstr ""
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor"
-msgstr "Proktor"
+msgstr "IT administrátor"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Administrator"
-msgstr "Správca dozorcu"
+msgstr "Správca proktorov"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
-msgstr "Úloha dozorcu"
+msgstr "Úloha Proktora"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Administrator role"
-msgstr "Rola správcu dozoru"
+msgstr "Rola Správcu proktorov"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Test Center Administrator Role"
-msgstr "Rola správcu testovacieho centra"
+msgstr "Rola Správcu testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Test Center Administrator Role"
-msgstr "Rola správcu testovacieho centra"
+msgstr "Rola Správcu testovacieho centra"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
@@ -55,5 +55,5 @@ msgstr "Manažér testovacích centier"
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Test Centers Manager Role"
-msgstr "Úloha manažéra testovacích centier"
+msgstr "Rola Manažéra testovacích centier"
 
