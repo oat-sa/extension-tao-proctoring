@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2023-09-13 09:12\n"
+"PO-Revision-Date: 2026-08-20 07:44\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja\n"
@@ -690,7 +690,7 @@ msgid "Proceed"
 msgstr "続行"
 
 msgid "Proctor"
-msgstr "試検監督者"
+msgstr "試験監督者"
 
 msgid "Proctor authorization"
 msgstr "試験監督承認"

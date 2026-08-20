@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2025-12-05 08:37\n"
+"PO-Revision-Date: 2026-07-31 07:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: sk\n"
@@ -27,7 +27,7 @@ msgid "%1$s - Item %2$s/%3$s"
 msgstr "%1$s - Položka %2$s/%3$s"
 
 msgid "%d sessions of the delivery %s have not been paused"
-msgstr "%d relácií doručenia %s nebolo pozastavených"
+msgstr "%d záznamov dodávky %s nebolo pozastavených"
 
 msgid "%s - item %p/%c"
 msgstr "%s - položka %p/%c"
@@ -36,16 +36,16 @@ msgid "%s completed"
 msgstr "%s dokončené"
 
 msgid "%s could not be %s because it is finished. Please refresh your data."
-msgstr "%s sa nepodarilo nájsť %s , pretože je dokončené. Obnovte si údaje."
+msgstr "%s sa nepodarilo %s , pretože je dokončené. Obnovte si údaje."
 
 msgid "%s could not be %s because it is terminated. Please refresh your data."
-msgstr "%s sa nepodarilo nájsť %s , pretože je ukončené. Obnovte si údaje."
+msgstr "%s sa nepodarilo %s , pretože je ukončené. Obnovte si údaje."
 
 msgid "%s could not be %s."
 msgstr "%s nemôže byť %s."
 
 msgid "%s executions migrated"
-msgstr "migrovaných %s spustení"
+msgstr "%s presunutých spustení"
 
 msgid "%s KV entries removed"
 msgstr "%s Odstránené záznamy KV"
@@ -54,43 +54,43 @@ msgid "%s minutes more"
 msgstr "%s minút viac"
 
 msgid "%s\\'s test had already been authorized."
-msgstr "Test %s\\ už bol autorizovaný."
+msgstr "Test %s už bol autorizovaný."
 
 msgid "%s\\'s test had already been paused."
-msgstr "Test používateľa %s\\ už bol pozastavený."
+msgstr "Test používateľa %s už bol pozastavený."
 
 msgid "%s\\'s test had already been terminated."
-msgstr "Test používateľa %s\\ už bol ukončený."
+msgstr "Test používateľa %s už bol ukončený."
 
 msgid "%s\\'s test had been canceled."
-msgstr "Test %s\\ bol zrušený."
+msgstr "Test %s bol zrušený."
 
 msgid "%s\\'s test had been completed."
-msgstr "Test používateľa %sbol dokončený."
+msgstr "Test používateľa %s bol dokončený."
 
 msgid "%s\\'s test had been paused."
-msgstr "Test používateľa %sbol pozastavený."
+msgstr "Test používateľa %s bol pozastavený."
 
 msgid "%s\\'s test had been terminated."
-msgstr "Test používateľa %sbol ukončený."
+msgstr "Test používateľa %s bol ukončený."
 
 msgid "%s\\'s test had not been finished."
-msgstr "Test používateľa %s\\ nebol dokončený."
+msgstr "Test používateľa %s nebol dokončený."
 
 msgid "%s\\'s test had not been in progress."
-msgstr "Test používateľa %s\\ ešte neprebiehal."
+msgstr "Test používateľa %s ešte neprebiehal."
 
 msgid "%s\\'s test had not been started."
-msgstr "Test používateľa %s\\ nebol spustený."
+msgstr "Test používateľa %s nebol spustený."
 
 msgid "%s\\'s test must be terminated."
-msgstr "Test %s\\ musí byť ukončený."
+msgstr "Test %s musí byť ukončený."
 
 msgid "..."
 msgstr "..."
 
 msgid "A session of the delivery %s have not been paused"
-msgstr "Relácia doručovania %s nebola pozastavená"
+msgstr "Záznam dodávky %s nebol pozastavený"
 
 msgid "Action"
 msgstr "Akcia"
@@ -102,7 +102,7 @@ msgid "Active"
 msgstr "Aktívne"
 
 msgid "Active proctors"
-msgstr "Aktívni dozorcovia"
+msgstr "Aktívni proktori"
 
 msgid "Active test-takers"
 msgstr "Aktívni účastníci testov"
@@ -120,7 +120,7 @@ msgid "Administer deliveries"
 msgstr "Spravovať dodávky"
 
 msgid "Administration"
-msgstr "Administratíva"
+msgstr "Administrácia"
 
 msgid "All fields are required"
 msgstr "Všetky polia sú povinné"
@@ -129,7 +129,7 @@ msgid "already authorized"
 msgstr "už autorizovaný"
 
 msgid "Already changed time will be added or subtracted by the new value."
-msgstr "Už zmenený čas sa pripočíta alebo odpočíta o novú hodnotu."
+msgstr "K už upravenému času sa pripočíta alebo od neho odpočíta nová hodnota."
 
 msgid "already paused"
 msgstr "už pozastavené"
@@ -148,28 +148,28 @@ msgid "Assessment Activity"
 msgstr "Hodnotiaca aktivita"
 
 msgid "Assessment has been paused due to attempt to switch to another window/tab."
-msgstr "Hodnotenie bolo pozastavené z dôvodu pokusu o prepnutie do iného okna/karty."
+msgstr "Testovanie bolo pozastavené z dôvodu pokusu o prepnutie do iného okna/karty."
 
 msgid "Assign administrator"
 msgstr "Priradiť správcu"
 
 msgid "Assign more test takers to this session"
-msgstr "Priraďte k tejto relácii ďalších účastníkov testu"
+msgstr "Priraďte k tomuto záznamu ďalších účastníkov testu"
 
 msgid "Assign proctors"
-msgstr "Priradiť dozorcov"
+msgstr "Priradiť proktorov"
 
 msgid "Assign the selected test takers"
 msgstr "Priradiť vybraných účastníkov testu"
 
 msgid "Assign the selected test takers to the session"
-msgstr "Priradiť vybraných účastníkov testu k relácii"
+msgstr "Priradiť vybraných účastníkov testu k záznamu"
 
 msgid "Assign the test taker to the session"
-msgstr "Priradiť účastníka testu k relácii"
+msgstr "Priradiť účastníka testu k záznamu"
 
 msgid "Assigned proctors"
-msgstr "Pridelení administrátori"
+msgstr "Pridelení proktori"
 
 msgid "Assigned test takers"
 msgstr "Pridelení účastníci testu"
@@ -187,19 +187,19 @@ msgid "Authorize"
 msgstr "Autorizovať"
 
 msgid "Authorize session"
-msgstr "Autorizácia relácie"
+msgstr "Autorizovať záznam"
 
 msgid "Authorize Session"
-msgstr "Autorizácia relácie"
+msgstr "Autorizovať Záznam"
 
 msgid "Authorize sessions"
-msgstr "Autorizácia relácií"
+msgstr "Autorizovať záznamy"
 
 msgid "Authorize the proctor"
-msgstr "Autorizujte dozorcu"
+msgstr "Autorizujte proktora"
 
 msgid "Authorize the selected proctors"
-msgstr "Autorizovať vybraných dozorcov"
+msgstr "Autorizovať vybraných proktorov"
 
 msgid "Authorized"
 msgstr "Autorizované"
@@ -214,19 +214,19 @@ msgid "authorized but not started"
 msgstr "autorizované, ale nezačaté"
 
 msgid "Authorized proctors"
-msgstr "Autorizovaní administrátori"
+msgstr "Autorizovaní proktori"
 
 msgid "Authorized, you may proceed"
 msgstr "Autorizované, môžete pokračovať"
 
 msgid "Automatically paused by the system due to authorized test not being launched by test taker."
-msgstr "Systémom automaticky pozastavené, pretože účastník testovania nespustil autorizovaný test."
+msgstr "Systém automaticky pozastavil akciu, pretože uchádzač o test nespustil autorizovaný test."
 
 msgid "Automatically reset by the system due to authorization request being cancelled by test taker."
 msgstr "Systém automaticky resetuje z dôvodu zrušenia žiadosti o autorizáciu účastníkom testu."
 
 msgid "Automatically reset by the system due to authorized test not being launched by test taker."
-msgstr "Systém automaticky resetuje, pretože uchádzač nespustil autorizovaný test."
+msgstr "Systém automaticky resetuje, pretože účastník testu nespustil autorizovaný test."
 
 msgid "Automatically reset by the system due to the test taker choosing not to proceed with the authorized test."
 msgstr "Systém automaticky resetuje, ak sa účastník testu rozhodol nepokračovať v autorizovanom teste."
@@ -241,7 +241,7 @@ msgid "Available test takers"
 msgstr "Dostupní účastníci testu"
 
 msgid "awaiting"
-msgstr "čaká"
+msgstr "čaká sa"
 
 msgid "Awaiting"
 msgstr "Čaká sa"
@@ -250,7 +250,7 @@ msgid "Back"
 msgstr "Späť"
 
 msgid "Back to sessions"
-msgstr "Späť na relácie"
+msgstr "Späť na záznamy"
 
 msgid "Behaviour"
 msgstr "Správanie"
@@ -271,49 +271,49 @@ msgid "Canceled"
 msgstr "Zrušené"
 
 msgid "Cannot authorize test session."
-msgstr "Nemožno autorizovať testovaciu reláciu."
+msgstr "Testovací záznam nie je možné autorizovať."
 
 msgid "Cannot authorize test sessions."
-msgstr "Nie je možné autorizovať testovacie relácie."
+msgstr "Testovacie záznamy nie je možné autorizovať."
 
 msgid "Cannot execute action."
 msgstr "Nemožno vykonať akciu."
 
 msgid "Cannot extend test session."
-msgstr "Testovaciu reláciu nie je možné predĺžiť."
+msgstr "Testovací záznam nie je možné predĺžiť."
 
 msgid "Cannot extend test sessions."
-msgstr "Nie je možné predĺžiť testovacie relácie."
+msgstr "Testovacie záznamy nie je možné predĺžiť."
 
 msgid "Cannot pause test session."
-msgstr "Testovaciu reláciu nie je možné pozastaviť."
+msgstr "Testovací záznam nie je možné pozastaviť."
 
 msgid "Cannot pause test sessions."
-msgstr "Testovacie relácie nie je možné pozastaviť."
+msgstr "Testovacie záznamy nie je možné pozastaviť."
 
 msgid "Cannot print test session."
-msgstr "Nedá sa vytlačiť testovacia relácia."
+msgstr "Testovací záznam nie je možné vytlačiť."
 
 msgid "Cannot print test sessions."
-msgstr "Nie je možné tlačiť testovacie relácie."
+msgstr "Testovacie záznamy nie je možné vytlačiť."
 
 msgid "Cannot reactivate test session."
-msgstr "Testovaciu reláciu nie je možné znovu aktivovať."
+msgstr "Testovací záznam nie je možné znovu aktivovať."
 
 msgid "Cannot reactivate test sessions."
-msgstr "Testovacie relácie nie je možné znova aktivovať."
+msgstr "Testovacie záznamy nie je možné znova aktivovať."
 
 msgid "Cannot report test session."
-msgstr "Nie je možné nahlásiť testovaciu reláciu."
+msgstr "Nie je možné nahlásiť testovací záznam."
 
 msgid "Cannot report test sessions."
-msgstr "Nie je možné nahlásiť testovacie relácie."
+msgstr "Nie je možné nahlásiť testovacie záznamy."
 
 msgid "Cannot terminate test session."
-msgstr "Testovaciu reláciu nie je možné ukončiť."
+msgstr "Testovací záznam nie je možné ukončiť."
 
 msgid "Cannot terminate test sessions."
-msgstr "Testovacie relácie nie je možné ukončiť."
+msgstr "Testovacie záznamy nie je možné ukončiť."
 
 msgid "category"
 msgstr "kategória"
@@ -328,7 +328,7 @@ msgid "Column %s successfully created"
 msgstr "Stĺpec %s bol úspešne vytvorený"
 
 msgid "Comfort"
-msgstr "Pohodlie"
+msgstr "Komfort"
 
 msgid "comment"
 msgstr "komentár"
@@ -358,19 +358,19 @@ msgid "Context"
 msgstr "Kontext"
 
 msgid "Create and authorize a proctor to the selected test sites"
-msgstr "Vytvorte a autorizujte dozorcu pre vybrané testovacie miesta"
+msgstr "Vytvorte a autorizujte proktora pre vybrané testovacie stránky"
 
 msgid "Create Proctor"
-msgstr "Vytvoriť Proctora"
+msgstr "Vytvoriť Proktora"
 
 msgid "Creates and authorizes proctor"
-msgstr "Vytvára a autorizuje administrátora"
+msgstr "Vytvára a autorizuje proktora"
 
 msgid "Current Assessment Activity"
 msgstr "Aktuálna hodnotiaca aktivita"
 
 msgid "Current sessions"
-msgstr "Aktuálne relácie"
+msgstr "Aktuálne záznamy"
 
 msgid "Date"
 msgstr "Dátum"
@@ -382,7 +382,7 @@ msgid "Days"
 msgstr "Dni"
 
 msgid "Decryption failed because of using the wrong customer app key."
-msgstr "Dešifrovanie zlyhalo z dôvodu použitia nesprávneho kľúča zákazníckej aplikácie."
+msgstr "Dešifrovanie sa nepodarilo kvôli použitiu nesprávneho kľúča aplikácie zákazníka."
 
 msgid "Define sub-centers"
 msgstr "Definujte podcentrá"
@@ -391,13 +391,13 @@ msgid "Deliveries"
 msgstr "Dodávky"
 
 msgid "Delivery"
-msgstr "Doručenie"
+msgstr "Dodávka"
 
 msgid "Detailed Session History of %s"
-msgstr "Podrobná história relácií %s"
+msgstr "Podrobná história Záznamov pre %s"
 
 msgid "Detailed Session History of a selection"
-msgstr "Podrobná história relácií výberu"
+msgstr "Podrobná história Záznamov pre výber"
 
 msgid "Details"
 msgstr "Detaily"
@@ -424,7 +424,7 @@ msgid "Entered value is not correct"
 msgstr "Zadaná hodnota nie je správna"
 
 msgid "Environment"
-msgstr "Životné prostredie"
+msgstr "Prostredie"
 
 msgid "Error"
 msgstr "Chyba"
@@ -440,7 +440,7 @@ msgstr "Export"
 
 #, tao-public
 msgid "Export Irregularities"
-msgstr "Nezrovnalosti vo vývoze"
+msgstr "Export Nezrovnalostí"
 
 msgid "Extended time"
 msgstr "Predĺžený čas"
@@ -449,10 +449,10 @@ msgid "Extra"
 msgstr "Extra"
 
 msgid "Extra Time"
-msgstr "Predĺženie"
+msgstr "Dodatočný čas"
 
 msgid "Extra time"
-msgstr "Predĺženie"
+msgstr "Dodatočný čas"
 
 msgid "Extra time granted"
 msgstr "Poskytnutý dodatočný čas"
@@ -467,13 +467,13 @@ msgid "Finished"
 msgstr "Dokončené"
 
 msgid "finished"
-msgstr "hotové"
+msgstr "dokončené"
 
 msgid "First name"
-msgstr "Krstné meno"
+msgstr "Meno"
 
 msgid "Freezing"
-msgstr "Mrazenie"
+msgstr "Mrznutie"
 
 msgid "Grant Extra Time"
 msgstr "Udeliť dodatočný čas"
@@ -485,7 +485,7 @@ msgid "Hours"
 msgstr "Hodiny"
 
 msgid "However, the action will not be applied to the following sessions"
-msgstr "Táto akcia sa však nebude vzťahovať na nasledujúce relácie."
+msgstr "Táto akcia sa však nebude vzťahovať na nasledujúce záznamy."
 
 msgid "ID/Authorization"
 msgstr "ID/Autorizácia"
@@ -503,7 +503,7 @@ msgid "in progress"
 msgstr "prebieha"
 
 msgid "INPROGRESS"
-msgstr "NEDOKONČENÉ"
+msgstr "PREBIEHA"
 
 msgid "Irregularities for \"%s\" successfully exported"
 msgstr "Nezrovnalosti pre „%s“ boli úspešne exportované"
@@ -536,7 +536,7 @@ msgid "Last Week"
 msgstr "Minulý týždeň"
 
 msgid "Late"
-msgstr "Neskoro"
+msgstr "Meškanie"
 
 msgid "Launching"
 msgstr "Spustenie"
@@ -551,7 +551,7 @@ msgid "Main Menu"
 msgstr "Hlavné menu"
 
 msgid "Manage Proctors"
-msgstr "Spravovať dozorcov"
+msgstr "Spravovať proktorov"
 
 #, tao-public
 msgid "Manage Results"
@@ -573,7 +573,7 @@ msgid "Network"
 msgstr "Sieť"
 
 msgid "No assigned proctors"
-msgstr "Žiadni pridelení dozorcovia"
+msgstr "Žiadni pridelení proktori"
 
 msgid "No assigned test takers"
 msgstr "Žiadni priradení účastníci testu"
@@ -585,16 +585,16 @@ msgid "No history to display!"
 msgstr "Žiadna história na zobrazenie!"
 
 msgid "No proctors in request param"
-msgstr "V parametri požiadavky nie sú žiadne kontrolóry"
+msgstr "V parametri požiadavky nie sú žiadni proktori"
 
 msgid "No sessions"
-msgstr "Žiadne relácie"
+msgstr "Žiadne záznamy"
 
 msgid "No sessions available"
-msgstr "Žiadne dostupné relácie"
+msgstr "Žiadne dostupné záznamy"
 
 msgid "No Show"
-msgstr "Žiadna prezentácia"
+msgstr "Neúčasť"
 
 msgid "Noise"
 msgstr "Hluk"
@@ -606,7 +606,7 @@ msgid "not in progress"
 msgstr "neprebieha"
 
 msgid "not started"
-msgstr "nezačaté"
+msgstr "nespustené"
 
 msgid "not terminated"
 msgstr "neukončené"
@@ -618,7 +618,7 @@ msgid "offline"
 msgstr "offline"
 
 msgid "OK"
-msgstr "V poriadku"
+msgstr "OK"
 
 msgid "online"
 msgstr "online"
@@ -630,25 +630,25 @@ msgid "Outcome"
 msgstr "Výsledok"
 
 msgid "Partially authorized proctors"
-msgstr "Čiastočne autorizovaní dozorcovia"
+msgstr "Čiastočne autorizovaní proktori"
 
 msgid "Pause"
 msgstr "Pozastaviť"
 
 msgid "Pause Active Test Sessions"
-msgstr "Pozastaviť aktívne testovacie relácie"
+msgstr "Pozastaviť aktívne testovacie záznamy"
 
 msgid "Pause due to server maintenance"
 msgstr "Pozastavenie z dôvodu údržby servera"
 
 msgid "Pause session"
-msgstr "Pozastaviť reláciu"
+msgstr "Pozastaviť záznam"
 
 msgid "Pause Session"
-msgstr "Pozastaviť reláciu"
+msgstr "Pozastaviť Záznam"
 
 msgid "Pause sessions"
-msgstr "Pozastaviť relácie"
+msgstr "Pozastaviť záznamy"
 
 msgid "paused"
 msgstr "pozastavené"
@@ -660,16 +660,16 @@ msgid "Please provide a reason"
 msgstr "Uveďte dôvod"
 
 msgid "Please select one or more test site to manage proctors"
-msgstr "Vyberte jedno alebo viacero testovacích miest na správu dozorcov"
+msgstr "Vyberte jedno alebo viacero testovacích stránok na správu proktorov"
 
 msgid "Please wait, authorization in process ..."
 msgstr "Čakajte, prosím, prebieha autorizácia..."
 
 msgid "Please, make your selection"
-msgstr "Prosím, urobte si svoj výber"
+msgstr "Prosím, vyberte si"
 
 msgid "Power Outage"
-msgstr "Výpadok prúdu"
+msgstr "Výpadok energie"
 
 msgid "Previous Month"
 msgstr "Predchádzajúci mesiac"
@@ -678,13 +678,13 @@ msgid "Print Results"
 msgstr "Výsledky tlače"
 
 msgid "Print Score"
-msgstr "Tlač skóre"
+msgstr "Vytlačiť bodové hodnotenie"
 
 msgid "Print the assessment results"
 msgstr "Vytlačiť výsledky hodnotenia"
 
 msgid "Printing"
-msgstr "Tlač"
+msgstr "Tlačí sa"
 
 msgid "Proceed"
 msgstr "Pokračovať"
@@ -693,40 +693,40 @@ msgid "Proctor"
 msgstr "Proktor"
 
 msgid "Proctor authorization"
-msgstr "Autorizácia Administrátora"
+msgstr "Autorizácia Proktora"
 
 msgid "Proctor created"
 msgstr "Proktor vytvoril"
 
 msgid "Proctor/Staff"
-msgstr "Dozorca/Zamestnanec"
+msgstr "Proktor/Správca"
 
 msgid "Proctored Delivery Server"
-msgstr "Dozorovaný doručovací server"
+msgstr "Server pre kontrolované dodávky"
 
 msgid "Proctored Test-Takers"
-msgstr "Účastníci testov pod dohľadom"
+msgstr "Účastníci testov pod dohľadom proktora"
 
 msgid "Proctoring interface"
-msgstr "Rozhranie pre dozor"
+msgstr "Rozhranie pre Proktora"
 
 msgid "Proctors"
-msgstr "Dozorcovia"
+msgstr "Proktori"
 
 msgid "Proctors authorized"
-msgstr "Autorizovaní dozorcovia"
+msgstr "Autorizovaní proktori"
 
 msgid "Proctors revoked"
-msgstr "Zrušené dozory"
+msgstr "Zrušení proktori"
 
 msgid "Progress"
-msgstr "Pokrok"
+msgstr "Priebeh"
 
 msgid "Reactivate Session"
-msgstr "Znovu aktivovať reláciu"
+msgstr "Znovu aktivovať Záznam"
 
 msgid "Reactivate session"
-msgstr "Znovu aktivovať reláciu"
+msgstr "Znovu aktivovať záznam"
 
 msgid "Refresh"
 msgstr "Obnoviť"
@@ -735,10 +735,10 @@ msgid "Refresh the page"
 msgstr "Obnoviť stránku"
 
 msgid "Registered proctoring log"
-msgstr "Registrovaný protokol dozoru"
+msgstr "Protokol registrovaného dohľadu"
 
 msgid "Remaining"
-msgstr "Zostávajúce"
+msgstr "Zostáva"
 
 msgid "Remove"
 msgstr "Odstrániť"
@@ -747,13 +747,13 @@ msgid "Remove default tag filtering"
 msgstr "Odstrániť predvolené filtrovanie značiek"
 
 msgid "Remove the selected test takers from the session"
-msgstr "Odstrániť vybraných účastníkov testu z relácie"
+msgstr "Odstrániť vybraných účastníkov testu zo záznamu"
 
 msgid "Remove the test taker from the session"
-msgstr "Odobrať účastníka testu z relácie"
+msgstr "Odobrať účastníka testu zo záznamu"
 
 msgid "Report"
-msgstr "Správa"
+msgstr "Prehľad"
 
 msgid "Report irregularities"
 msgstr "Nahlásiť nezrovnalosti"
@@ -765,7 +765,7 @@ msgid "Report irregularity"
 msgstr "Nahlásiť nezrovnalosť"
 
 msgid "reported for irregularity"
-msgstr "nahlásená nezrovnalosť"
+msgstr "nahlásené pre nezrovnalosti"
 
 msgid "Resource update task is completed"
 msgstr "Úloha aktualizácie zdrojov je dokončená"
@@ -778,103 +778,103 @@ msgid "Results"
 msgstr "Výsledky"
 
 msgid "Return to the session manager"
-msgstr "Späť k správcovi relácie"
+msgstr "Späť k Správe záznamov"
 
 msgid "Return to the session monitoring"
-msgstr "Návrat k monitorovaniu relácie"
+msgstr "Návrat k monitorovaniu záznamu"
 
 msgid "Revoke authorization for the selected proctor"
-msgstr "Zrušiť autorizáciu pre vybraného dozorcu"
+msgstr "Zrušiť autorizáciu pre vybraného proktora"
 
 msgid "Revoke the proctor"
-msgstr "Zrušiť dozorcu"
+msgstr "Zrušiť proktora"
 
 msgid "Role"
-msgstr "Úloha"
+msgstr "Rola"
 
 msgid "Score"
 msgstr "Skóre"
 
 msgid "Score Report"
-msgstr "Správa o skóre"
+msgstr "Prehľad výsledkov"
 
 msgid "section"
 msgstr "sekcia"
 
 msgid "Session"
-msgstr "Relácia"
+msgstr "Záznam"
 
 msgid "session"
-msgstr "zasadnutie"
+msgstr "záznam"
 
 msgid "Session %s - %s has not been processed"
-msgstr "Relácia %s - %s nebola spracovaná"
+msgstr "Záznam %s - %s nebol spracovaný"
 
 msgid "Session history"
-msgstr "História relácií"
+msgstr "História Záznamov"
 
 msgid "Session time handling"
-msgstr "Spracovanie času relácie"
+msgstr "Spracovanie času záznamu"
 
 msgid "Sessions"
-msgstr "Relácie"
+msgstr "Záznamy"
 
 msgid "sessions"
-msgstr "sedenia"
+msgstr "záznamy"
 
 msgid "Sessions authorized"
-msgstr "Autorizované relácie"
+msgstr "Autorizované záznamy"
 
 msgid "Sessions paused"
-msgstr "Relácie pozastavené"
+msgstr "Záznamy boli pozastavené"
 
 msgid "sessions paused"
-msgstr "relácie pozastavené"
+msgstr "záznamy boli pozastavené"
 
 msgid "Sessions reactivated"
-msgstr "Relácie boli znovu aktivované"
+msgstr "Záznamy boli znovu aktivované"
 
 msgid "Sessions reported"
-msgstr "Nahlásené relácie"
+msgstr "Nahlásené záznamy"
 
 msgid "Sessions terminated"
-msgstr "Relácie ukončené"
+msgstr "Záznamy boli ukončené"
 
 msgid "Show brief report"
-msgstr "Zobraziť stručnú správu"
+msgstr "Zobraziť stručný prehľad"
 
 msgid "Show detailed report"
-msgstr "Zobraziť podrobnú správu"
+msgstr "Zobraziť podrobný prehľad"
 
 msgid "Show detailed session history messages"
-msgstr "Zobraziť podrobné správy z histórie relácií"
+msgstr "Zobraziť podrobné správy z histórie záznamov"
 
 msgid "Show the detailed session history"
-msgstr "Zobraziť podrobnú históriu relácií"
+msgstr "Zobraziť podrobnú históriu záznamov"
 
 msgid "Some delivery executions have not been authorized"
-msgstr "Niektoré doručenia neboli autorizované"
+msgstr "Niektoré realizácie dodávok neboli schválené"
 
 msgid "Some delivery executions have not been paused"
-msgstr "Niektoré doručenia neboli pozastavené"
+msgstr "Niektoré realizácie dodávok neboli pozastavené"
 
 msgid "Some delivery executions have not been reactivated"
-msgstr "Niektoré doručenia neboli znovu aktivované"
+msgstr "Niektoré realizácie dodávok neboli znovu aktivované"
 
 msgid "Some delivery executions have not been reported"
-msgstr "Niektoré doručenia neboli nahlásené"
+msgstr "Niektoré realizácie dodávok neboli nahlásené"
 
 msgid "Some delivery executions have not been terminated"
 msgstr "Niektoré realizácie dodávok neboli ukončené"
 
 msgid "Some delivery executions have not been updated"
-msgstr "Niektoré vykonania doručenia neboli aktualizované"
+msgstr "Niektoré realizácie dodávok neboli aktualizované"
 
 msgid "Something went wrong ..."
 msgstr "Niečo sa pokazilo..."
 
 msgid "Start"
-msgstr "Štart"
+msgstr "Spustiť"
 
 msgid "Start date of the export"
 msgstr "Dátum začiatku exportu"
@@ -898,10 +898,10 @@ msgid "Tables successfully altered"
 msgstr "Tabuľky boli úspešne upravené"
 
 msgid "Take or continue a test controlled by a proctor"
-msgstr "Absolvujte alebo pokračujte v teste pod dohľadom dozorcu"
+msgstr "Absolvujte alebo pokračujte v teste pod dohľadom proktora"
 
 msgid "TAO: User Authorization"
-msgstr "TAO: Autorizácia používateľa"
+msgstr "PET: Autorizácia používateľa"
 
 msgid "Technical"
 msgstr "Technické"
@@ -910,25 +910,25 @@ msgid "Terminate"
 msgstr "Ukončiť"
 
 msgid "Terminate and irregularity"
-msgstr "Ukončenie a nezrovnalosť"
+msgstr "Ukončenie a nezrovnalosti"
 
 msgid "Terminate Session"
-msgstr "Ukončiť reláciu"
+msgstr "Ukončiť Záznam"
 
 msgid "Terminate session"
-msgstr "Ukončiť reláciu"
+msgstr "Ukončiť záznam"
 
 msgid "Terminate sessions"
-msgstr "Ukončiť relácie"
+msgstr "Ukončiť záznamy"
 
 msgid "Terminate/Reactivate"
-msgstr "Ukončiť/Znovu aktivovať"
+msgstr "Ukončiť/Obnoviť"
 
 msgid "Terminate/Reactivate and irregularity"
-msgstr "Ukončenie/Reaktivácia a nezrovnalosť"
+msgstr "Zrušenie/Obnovenie a nezrovnalosti"
 
 msgid "terminated"
-msgstr "ukončený"
+msgstr "ukončené"
 
 msgid "Terminated"
 msgstr "Ukončené"
@@ -958,7 +958,7 @@ msgid "Test %s had been terminated."
 msgstr "Test %s bol ukončený."
 
 msgid "Test %s had not been finished."
-msgstr "Test %s nebol dokončený."
+msgstr "Test %s nebol ukončený."
 
 msgid "Test %s had not been in progress."
 msgstr "Test %s ešte neprebiehal."
@@ -997,16 +997,16 @@ msgid "Test had not been finished."
 msgstr "Test nebol ukončený."
 
 msgid "Test had not been in progress."
-msgstr "Test neprebiehal."
+msgstr "Test ešte neprebiehal."
 
 msgid "Test had not been started."
-msgstr "Test nebol spustený."
+msgstr "Test ešte nebol spustený."
 
 msgid "test has no time limits"
 msgstr "test nemá časové obmedzenia"
 
 msgid "Test site %s"
-msgstr "Testovacie miesto %s"
+msgstr "Testovacia stránka %s"
 
 msgid "Test taker"
 msgstr "Účastník testu"
@@ -1030,55 +1030,55 @@ msgid "Testing Workstation"
 msgstr "Testovacia pracovná stanica"
 
 msgid "The action cannot be applied, no eligible sessions found"
-msgstr "Akciu nie je možné použiť, nenašli sa žiadne vhodné relácie"
+msgstr "Akciu nie je možné vykonať, nenašli sa žiadne vhodné záznamy"
 
 msgid "The action will be applied to the following session(s)"
-msgstr "Akcia sa použije na nasledujúce relácie"
+msgstr "Akcia sa použije na nasledujúce záznamy"
 
 msgid "the already granted time will be replaced by the new value"
 msgstr "už pridelený čas bude nahradený novou hodnotou"
 
 msgid "The assessment has been suspended. To resume your assessment, please relaunch it and contact your proctor if required."
-msgstr "Hodnotenie bolo pozastavené. Ak chcete pokračovať v hodnotení, spustite ho znova a v prípade potreby kontaktujte svojho dozorcu."
+msgstr "Testovanie bolo pozastavené. Ak chcete v testovaní pokračovať, spustite ho znovu a v prípade potreby kontaktujte svojho proktora."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore."
-msgstr "Hodnotenie bolo ukončené. Už s ním nemôžete interagovať."
+msgstr "Testovanie bolo ukončené. Už s ním nemôžete ďalej pracovať."
 
 msgid "The assessment has been terminated. You cannot interact with it anymore. Please contact your proctor if required."
-msgstr "Hodnotenie bolo ukončené. Už s ním nemôžete interagovať. V prípade potreby kontaktujte svojho dozorcu."
+msgstr "Testovanie bolo ukončené. Už s ním nemôžete pracovať. V prípade potreby kontaktujte svojho proktora."
 
 msgid "The assessment was automatically terminated by the system due to inactivity."
-msgstr "Hodnotenie bolo systémom automaticky ukončené z dôvodu nečinnosti."
+msgstr "Testovanie bolo systémom automaticky ukončené z dôvodu nečinnosti."
 
 msgid "The decreased time cannot be higher than remaining time %s"
 msgstr "Skrátený čas nemôže byť vyšší ako zostávajúci čas %s"
 
 msgid "The extra time must be a number"
-msgstr "Predĺžený čas musí byť číslo"
+msgstr "Predĺžený čas musí byť vyjadrený číslom"
 
 msgid "The extra time must be a number bigger than 0"
-msgstr "Predĺžený čas musí byť číslo väčšie ako 0"
+msgstr "Predĺžený čas musí byť vyjadrený číslom väčším ako 0"
 
 msgid "The increased time, when added to the remaining time, %s cannot be higher than the overall time granted for this timer %s"
-msgstr "Predĺžený čas, keď sa pripočíta k zostávajúcemu času, %s nemôže byť vyšší ako celkový čas povolený pre tento časovač %s"
+msgstr "Predĺžený čas, keď sa pripočíta k zostávajúcemu času, %s nemôže byť vyšší ako celkový čas pridelený pre tento časovač %s"
 
 msgid "The proctor will be authorized. Continue ?"
-msgstr "Dozorca bude oprávnený. Pokračovať?"
+msgstr "Proktor bude oprávnený. Pokračovať?"
 
 msgid "The proctor will be revoked. Continue ?"
-msgstr "Dozorca bude odvolaný. Pokračovať?"
+msgstr "Proktor bude odvolaný. Pokračovať?"
 
 msgid "The proctors will be authorized. Continue ?"
-msgstr "Dozorcovia budú oprávnení. Pokračovať?"
+msgstr "IT administrátori budú oprávnení. Pokračovať?"
 
 msgid "The proctors will be revoked. Continue ?"
-msgstr "Administrátori budú odvolaní. Pokračovať?"
+msgstr "Proktori budú odvolaní. Pokračovať?"
 
 msgid "The test taker will be removed from this session. Continue ?"
-msgstr "Účastník testu bude z tejto relácie vylúčený. Chcete pokračovať?"
+msgstr "Účastník testu bude z tohto záznamu vylúčený. Chcete pokračovať?"
 
 msgid "The test takers will be removed from this session. Continue ?"
-msgstr "Účastníci testu budú z tejto relácie vylúčení. Chcete pokračovať?"
+msgstr "Účastníci testu budú z tohto záznamu vylúčení. Chcete pokračovať?"
 
 msgid "There is no delivery in progress"
 msgstr "Neprebieha žiadna dodávka"
@@ -1087,13 +1087,13 @@ msgid "Time"
 msgstr "Čas"
 
 msgid "Time adjusted"
-msgstr "Časovo upravené"
+msgstr "Čas bol upravený"
 
 msgid "Time decrease is too high"
-msgstr "Skrátenie času je príliš vysoké"
+msgstr "Skrátenie času je príliš veľké"
 
 msgid "Time increase is too high"
-msgstr "Predĺženie času je príliš vysoké"
+msgstr "Predĺženie času je príliš veľké"
 
 #, tao-public
 msgid "Tools"
@@ -1106,7 +1106,7 @@ msgid "Total time"
 msgstr "Celkový čas"
 
 msgid "Unable to create irregularities export for %s"
-msgstr "Nepodarilo sa vytvoriť export nepravidelností pre %s"
+msgstr "Nie je možné vytvoriť export nezrovnalostí pre %s"
 
 msgid "Unable to perform action on test %s."
 msgstr "Nepodarilo sa vykonať akciu na teste %s."

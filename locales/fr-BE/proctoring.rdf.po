@@ -4,131 +4,131 @@ msgstr ""
 "PO-Revision-Date: 2026-07-31 07:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: sk\n"
+"Language: fr_BE\n"
 "sourceLanguage: en-US\n"
 "targetLanguage: en-US\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Crowdin-Project: tao-open-source\n"
 "X-Crowdin-Project-ID: 590867\n"
-"X-Crowdin-Language: sk\n"
+"X-Crowdin-Language: fr-BE\n"
 "X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/proctoring.rdf.po\n"
 "X-Crowdin-File-ID: 1223\n"
-"Language-Team: Slovak\n"
+"Language-Team: French, Belgium\n"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor"
-msgstr "Proktor"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
-msgstr "Rola Proktora"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Manager"
-msgstr "Správca proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Manager Role"
-msgstr "Rola Správcu proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Administrator"
-msgstr "Správca proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Administrator Role"
-msgstr "Rola Správcu proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Awaiting"
-msgstr "Čaká sa"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAwaiting
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Awaiting of authorization status of a delivery execution"
-msgstr "Čaká sa na stav autorizácie vykonania doručenia"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Authorized"
-msgstr "Autorizované"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusAuthorized
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Authorized status of a delivery execution"
-msgstr "Autorizovaný stav realizácie dodávky"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Terminated"
-msgstr "Ukončené"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusTerminated
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Terminated status of a delivery execution"
-msgstr "Ukončený stav realizácie dodávky"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Canceled"
-msgstr "Zrušené"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliveryExecutionStatusCanceled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Canceled status of a delivery execution"
-msgstr "Zrušený stav realizácie dodávky"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctoring Settings"
-msgstr "Nastavenia dozoru (proctoring)"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Require Proctoring on selected deliveries"
-msgstr "Vyžadovať proktora pri vybraných dodávkach"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Check Enable"
-msgstr "Zaškrtnite Povoliť"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#CheckMode
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Check Enable"
-msgstr "Zaškrtnite Povoliť"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Require authorization"
-msgstr "Vyžadovať autorizáciu"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Enable"
-msgstr "Povoliť"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ProctorAccessible
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Require Proctoring"
-msgstr "Vyžadovať proktora"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Enable"
-msgstr "Povoliť"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Administrator role"
-msgstr "Rola Správcu IT administrátora"
+msgstr ""
 
