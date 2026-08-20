@@ -4,56 +4,56 @@ msgstr ""
 "PO-Revision-Date: 2026-07-31 07:34\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: sk\n"
+"Language: fr_BE\n"
 "sourceLanguage: en-US\n"
 "targetLanguage: en-US\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Crowdin-Project: tao-open-source\n"
 "X-Crowdin-Project-ID: 590867\n"
-"X-Crowdin-Language: sk\n"
+"X-Crowdin-Language: fr-BE\n"
 "X-Crowdin-File: /[oat-sa.extension-tao-proctoring] develop/locales/en-US/proctor.rdf.po\n"
 "X-Crowdin-File-ID: 1221\n"
-"Language-Team: Slovak\n"
+"Language-Team: French, Belgium\n"
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor"
-msgstr "IT administrátor"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Proctor Administrator"
-msgstr "Správca proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring role"
-msgstr "Úloha Proktora"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Proctoring Administrator role"
-msgstr "Rola Správcu proktorov"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Test Center Administrator Role"
-msgstr "Rola Správcu testovacieho centra"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterAdministratorRole
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "Test Center Administrator Role"
-msgstr "Rola Správcu testovacieho centra"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#label"
 msgid "Test Centers Manager"
-msgstr "Manažér testovacích centier"
+msgstr ""
 
 # http://www.tao.lu/Ontologies/TAOProctor.rdf#TestCenterManager
 msgctxt "http://www.w3.org/2000/01/rdf-schema#comment"
 msgid "The Test Centers Manager Role"
-msgstr "Rola Manažéra testovacích centier"
+msgstr ""
 
