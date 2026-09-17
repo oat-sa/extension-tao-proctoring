@@ -1,50 +1,24 @@
 # AGENTS.md — extension-tao-proctoring (taoProctoring)
 
-## Purpose
+> Shared pillars (standards, quality / `pr-ready-gate`, Make, commit/PR):
+> [nextgen-stack `tao/AGENTS.md`](https://github.com/oat-sa/nextgen-stack/blob/main/tao/AGENTS.md)
+> · local: [`../AGENTS.md`](../AGENTS.md).
 
-`oat-sa/extension-tao-proctoring` (extension id `taoProctoring`) provides **proctored delivery monitoring**: proctor roles, session monitor UI, start authorization, irregularities, and history. It builds on delivery execution (`taoDeliveryRdf` + QTI runner session control).
+## 01 — Project Context
 
-It is **not** delivery publish/authoring and **not** the test-runner engine.
+**What / why:** `oat-sa/extension-tao-proctoring` (id `taoProctoring`) provides
+**proctored delivery monitoring**: roles, session monitor UI, start authorization,
+irregularities, history.
 
-## Shared platform agent rules
+**Not:** delivery publish/authoring or the test-runner engine.
 
-Common readiness / context-budget / Definition of Done / family anti-patterns /
-verify-by-change-type conventions for TAO PHP extensions live in the installed
-**`tao`** package (`oat-sa/tao-core`) `AGENTS.md`. Read that file when present
-in the platform install.
-
-This file covers **only** ownership and workflows specific to this package.
-Do **not** require any external monorepo checkout or workstation-only note paths.
-
-
-## Stack
-
-Do **not** hardcode dependency or runtime versions in this file.
-
-- Depends on delivery-rdf/delivery/eventlog/outcome packages (see `composer.json`)
-- FE fully in-repo (typically **no** `views/package.json`)
-- **Dedicated app layout**: `views/templates/layout.tpl` → `loader/app.min.js` + `controller/app` (do not assume only standard backoffice sections)
-- Separate awaiting-authorization entry for test-takers (`DeliveryServer/awaiting`)
-- Versions from composer / CI only
-
-## Core Rules
-
-- **Follow existing patterns first** in this package.
-- **Prefer TDD** for behavior changes unless docs/config-only.
-- **Prefer minimal, local changes.** No broad refactors unless requested.
-- **Preserve license headers** — sibling-style **`GPL-2.0-only`** (see `composer.json`); do not auto-migrate to SPDX dual-license.
-- **Update tests** when behavior changes.
-- **Do not weaken** CI / lint / test / CodeRabbit gates.
-- For shared agent discipline (context budget, DoD, family anti-patterns), follow the installed **`tao`** (`oat-sa/tao-core`) `AGENTS.md`.
-
-
-## Structure
+**Key directories / stack / constraints:**
 
 ```text
 manifest.php
 controller/Monitor.php, DeliverySelection.php, DeliveryServer.php, …
 model/ProctorService.php, model/authorization/, …
-views/templates/layout.tpl
+views/templates/layout.tpl          # dedicated app shell
 views/js/controller/app.js
 views/js/controller/Delivery/
 views/js/component/activityMonitoring/
@@ -53,120 +27,44 @@ views/js/loader/taoProctoring.min.js
 test/
 ```
 
-## UI layer
+- Stack: delivery-rdf/delivery/eventlog/outcome deps; FE in-repo; **dedicated app
+  layout** (not only standard BO).
+- Versions from composer/CI.
 
-| Surface | Own? | Where |
-|---------|------|--------|
-| Proctor app / monitor / selection | **Yes** | app layout + Delivery controllers |
-| Awaiting authorization | **Yes** | DeliveryServer awaiting |
-| Delivery publish | **No** | `taoDeliveryRdf` |
-| Test runner engine | **No** | `taoQtiTest` / npm |
+**Docs:** [`README.md`](README.md). Shared docs / decision-log rules → parent AGENTS.
 
-## Conventions
+## 02 — Standards & Conventions
 
-- Keep proctor app shell vs backoffice fragments distinct.
-- Preserve pause/terminate/finish session contracts with delivery/QTI runner.
-- Do not hand-edit `app.min.js` / `taoProctoring.min.js` — rebuild via Grunt.
+Package-only below. Family patterns, quality SoT, `pr-ready-gate`, polar-star →
+**parent AGENTS**.
 
-## Testing
+**Patterns / structure:**
 
-- PHPUnit from platform root on `taoProctoring/test/...`.
-- FE grunt `--extension=taoProctoring` when JS changes; rebuild **both** app and extension bundles when applicable.
+- Keep proctor app shell vs BO fragments distinct; preserve pause/terminate/finish
+  contracts; rebuild **both** app and extension bundles.
 
-Discover the **platform root** (Composer application with `vendor/bin/phpunit`) from the environment — do not assume a particular monorepo path.
+**Never do (this package):**
 
-## Commands
+- Assume standard BO layout for all screens; implement publish/assembly.
+- Hand-edit dual loaders; merge awaiting-authorization with monitor casually.
+
+**Ownership**
+
+| Surface | Own? |
+|---------|------|
+| Proctor app / monitor / selection | **Yes** |
+| Awaiting authorization | **Yes** |
+| Delivery publish / Test runner | **No** |
+
+## 03 — Build & Test Commands
+
+Shared Make / CI / readiness / commit policy → **parent AGENTS**
+([commit/PR policy](https://oat-sa.atlassian.net/wiki/x/_oXmqQ)).
+
+**This package** (from Composer platform root):
 
 ```bash
 ./vendor/bin/phpunit -c phpunit.xml.dist taoProctoring/test
-npx grunt taobundle --extension=taoProctoring
 npx grunt eslint:extensionreport --extension=taoProctoring --force
+npx grunt taobundle --extension=taoProctoring
 ```
-
-## Hard rules / Constraints
-
-- Do not assume standard BO layout for all screens — respect dedicated app shell.
-- Do not implement publish/assembly here.
-- Never commit `.ai/` or `.cursor/`.
-
-## Anti-patterns
-
-- Merge proctor app into unrelated BO controllers casually.
-- Hand-edit dual loader bundles.
-- Break authorization awaiting vs proctor monitor entrypoints.
-
-Also follow family anti-patterns in the installed **`tao`** (`oat-sa/tao-core`) `AGENTS.md`.
-
-## Agent notes (`.ai/`)
-
-Local, **gitignored** branch-scoped notes. Do **not** commit `.ai/`. Durable
-rules stay in this file and in tao-core `AGENTS.md` for shared conventions.
-
-Write a **polar-star** under `.ai/work/<slug>/` plus supporting docs; prefer
-re-reading those files over chat-only memory.
-
-```text
-.ai/work/<branch-slug>/   # injective: `%`→`%25`, `_`→`%5F`, `/`→`_`
-.ai/current                # symlink to active work dir
-.ai/archive/*.tar.gz
-```
-
-Enable once per clone:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-After `git branch -d` / prune: `scripts/ai-notes-gc.sh`  
-Optional: `scripts/ai-notes-gc.sh --self-test`.
-
-
-## Definition of Done
-
-Satisfy **tao-core** Definition of Done / Readiness conventions when available, plus this package’s Hard rules. Minimal local checklist:
-
-1. Package-specific AC / polar-star addressed.
-2. Diff stays in this package unless the task requires otherwise.
-3. TDD evidence for behavior changes (or docs/config-only exception).
-4. License headers updated (`GPL-2.0-only` sibling style).
-5. `.ai/` notes updated when decisions matter.
-6. `pr-ready-gate` (or tao-core readiness fallback) passed with real command output.
-
-## Skills ([oat-sa/skills](https://github.com/oat-sa/skills))
-
-1. Search / load skills from **[oat-sa/skills](https://github.com/oat-sa/skills)** first.
-2. Prefer reusing shared skills over inventing a parallel local skill.
-3. Create a new skill only when nothing suitable exists.
-
-**Must-have for implementation / PR prep:** [`pr-ready-gate`](https://github.com/oat-sa/skills/tree/feat/pr-ready-gate/pr-ready-gate)
-(branch pin while testing). If the skill cannot be loaded, use the same criteria
-as **`tao` / tao-core AGENTS Readiness gate**: tests + lint on touched scope +
-local CodeRabbit with **zero critical / zero major**.
-
-## Readiness gate (before “done” / before opening a PR)
-
-Prefer skill `pr-ready-gate`. Fallback: follow **tao-core** `AGENTS.md` Readiness
-gate / Definition of Done, plus this package’s Hard rules. Report real command
-results. Docs / hooks / `AGENTS.md`-only changes: `bash -n` on touched shell +
-CodeRabbit on the diff; skip irrelevant suites explicitly.
-
-
-## Pointers
-
-- `README.md` — package overview
-- `composer.json` / `LICENSE` — license and Composer deps
-- `views/package.json` — FE pins (if present)
-- Installed **`tao`** package `AGENTS.md` (`oat-sa/tao-core`) — shared agent conventions
-- [oat-sa/skills](https://github.com/oat-sa/skills) — shared skills; [`pr-ready-gate`](https://github.com/oat-sa/skills/tree/feat/pr-ready-gate/pr-ready-gate) (branch pin while testing)
-- `.coderabbit.yaml` → remote `oat-sa/tao-code-quality` `coderabbit/php/authoring/v1`
-- `.github/workflows/*` — PR CI
-- `.githooks/post-checkout` + `scripts/ai-notes-gc.sh` — local `.ai/` lifecycle
-
-## Default Agent Behavior
-
-1. Read this file, then `.ai/current` / polar-star for the branch.
-2. Read installed **`tao`** (`oat-sa/tao-core`) `AGENTS.md` for shared gates when available.
-3. Check [oat-sa/skills](https://github.com/oat-sa/skills) before inventing procedures; use `pr-ready-gate` for implementation/PR prep.
-4. Prefer TDD; keep diffs minimal and inside this package.
-5. Respect UI/ownership tables above; avoid Anti-patterns.
-6. Update `.ai/` as decisions land; verify with platform-root commands; do not weaken CI.

@@ -3,7 +3,3 @@ composer.lock
 vendor/
 .idea/
 
-
-# Local agent working notes / editor agent config; never commit
-.ai/
-.cursor/
